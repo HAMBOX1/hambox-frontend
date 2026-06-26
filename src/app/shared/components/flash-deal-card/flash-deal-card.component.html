@@ -1,0 +1,30 @@
+<article class="flash-card">
+  <a class="flash-card__link" [routerLink]="['/products', deal().id]">
+    <div class="flash-card__media">
+      <img [src]="deal().imageUrl" [alt]="deal().title" loading="lazy" />
+      @if (deal().discountLabel) {
+        <p-tag [value]="deal().discountLabel" styleClass="flash-card__badge" />
+      }
+    </div>
+
+    <div class="flash-card__body">
+      <header class="flash-card__text">
+        <h3 class="flash-card__title">{{ deal().title }}</h3>
+        <p class="flash-card__subtitle">{{ deal().subtitle }}</p>
+      </header>
+
+      <footer class="flash-card__footer">
+        <div class="flash-card__pricing">
+          @if (deal().discountLabel) {
+            <span class="flash-card__original">{{ deal().originalPriceUsd | hamboxCurrency }}</span>
+          }
+          <span class="flash-card__sale" [class]="'flash-card__sale--' + deal().priceTone">
+            {{ deal().currentPriceUsd | hamboxCurrency }}
+          </span>
+        </div>
+
+        <span class="flash-card__buy">Buy Now</span>
+      </footer>
+    </div>
+  </a>
+</article>

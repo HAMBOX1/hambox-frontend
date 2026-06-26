@@ -1,0 +1,16 @@
+:root {
+  --hambox-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --hambox-font-size-xs: 0.75rem;
+  --hambox-font-size-sm: 0.875rem;
+  --hambox-font-size-base: 1rem;
+  --hambox-font-size-lg: 1.125rem;
+  --hambox-font-size-xl: 1.25rem;
+  --hambox-font-size-2xl: 1.5rem;
+  --hambox-font-size-3xl: 1.875rem;
+  --hambox-font-size-4xl: 2.25rem;
+
+  --sf-font-heading: 'Sora', var(--hambox-font-family);
+  --sf-font-body: 'Manrope', var(--hambox-font-family);
+  --admin-font-body: 'Inter', var(--sf-font-body);
+  --admin-font-heading: 'Sora', var(--sf-font-heading);
+}

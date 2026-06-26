@@ -1,0 +1,163 @@
+<div class="login-page">
+  <aside class="login-page__hero" aria-hidden="true">
+    <img class="login-page__hero-image" [src]="heroBackground" alt="" />
+    <div class="login-page__hero-overlay"></div>
+
+    <div class="login-page__hero-content">
+      <a class="login-page__logo-link" routerLink="/home" aria-label="HAMBOX home">
+        <img class="login-page__logo" [src]="logoSrc" alt="HAMBOX" />
+      </a>
+
+      <div class="login-page__hero-copy">
+        <h1 class="login-page__headline">
+          Elite Digital Assets.
+          <span class="login-page__headline-accent">Instant Tactical Deployment.</span>
+        </h1>
+        <p class="login-page__description">
+          The most secure digital gateway for premium gaming assets and enterprise-grade software
+          delivery.
+        </p>
+      </div>
+
+      <div class="login-page__hero-footer">
+        <div class="login-page__feature-row">
+          @for (feature of features; track feature.title) {
+            <article class="login-page__feature-card">
+              <span class="login-page__feature-icon">
+                <i class="pi" [class]="feature.icon"></i>
+              </span>
+              <div class="login-page__feature-copy">
+                <h2 class="login-page__feature-title">{{ feature.title }}</h2>
+                <p class="login-page__feature-text">{{ feature.description }}</p>
+              </div>
+            </article>
+          }
+        </div>
+
+        <div class="login-page__satisfaction">
+          <div class="login-page__avatars" aria-hidden="true">
+            @for (avatar of satisfactionAvatars; track avatar; let index = $index) {
+              <span class="login-page__avatar" [style.zIndex]="satisfactionAvatars.length - index">
+                {{ avatar }}
+              </span>
+            }
+          </div>
+          <p class="login-page__satisfaction-text">
+            <span class="login-page__satisfaction-value">99.9%</span>
+            Customer Satisfaction
+          </p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="login-page__panel" aria-label="Sign in">
+    <div class="login-page__panel-inner">
+      <div class="login-page__brand-mark" aria-hidden="true">
+        <span class="login-page__brand-shape login-page__brand-shape--red"></span>
+        <span class="login-page__brand-shape login-page__brand-shape--green"></span>
+        <span class="login-page__brand-shape login-page__brand-shape--yellow"></span>
+        <span class="login-page__brand-shape login-page__brand-shape--blue"></span>
+      </div>
+
+      <div class="login-page__form-header">
+        <h2 class="login-page__form-title">Welcome Back, Operative</h2>
+        <p class="login-page__form-subtitle">Secure access required to enter the marketplace.</p>
+      </div>
+
+      <form class="login-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (errorMessage()) {
+          <p class="login-form__banner login-form__banner--error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <div class="login-form__field">
+          <label class="login-form__label" for="login-email">Email or Phone</label>
+          <div class="login-form__control">
+            <i class="pi pi-at login-form__prefix" aria-hidden="true"></i>
+            <input
+              id="login-email"
+              class="login-form__input"
+              type="email"
+              autocomplete="username"
+              placeholder="name@example.com"
+              formControlName="email"
+            />
+          </div>
+          @if (fieldError('email'); as message) {
+            <p class="login-form__error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="login-form__field">
+          <label class="login-form__label" for="login-password">Password</label>
+          <div class="login-form__control">
+            <i class="pi pi-lock login-form__prefix" aria-hidden="true"></i>
+            <input
+              id="login-password"
+              class="login-form__input login-form__input--password"
+              [type]="showPassword() ? 'text' : 'password'"
+              autocomplete="current-password"
+              placeholder="••••••••"
+              formControlName="password"
+            />
+            <button
+              type="button"
+              class="login-form__suffix"
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+              (click)="togglePasswordVisibility()"
+            >
+              <i class="pi" [class]="showPassword() ? 'pi-eye-slash' : 'pi-eye'"></i>
+            </button>
+          </div>
+          @if (fieldError('password'); as message) {
+            <p class="login-form__error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="login-form__options">
+          <div class="login-form__remember">
+            <p-checkbox inputId="login-remember-me" formControlName="rememberMe" [binary]="true" />
+            <label for="login-remember-me">Remember Me</label>
+          </div>
+          <a class="login-form__forgot" routerLink="/auth/forgot-password">Forgot Password?</a>
+        </div>
+
+        <button
+          pButton
+          type="submit"
+          class="login-form__submit"
+          label="Sign In"
+          icon="pi pi-sign-in"
+          iconPos="right"
+          [loading]="isSubmitting()"
+          [disabled]="isSubmitting()"
+        ></button>
+
+        <div class="login-form__social">
+          <div class="login-form__divider" role="presentation">
+            <span>Or continue with</span>
+          </div>
+
+          <div class="login-form__social-buttons">
+            <button type="button" class="login-form__social-btn" aria-label="Continue with Google">
+              <i class="pi pi-google"></i>
+            </button>
+            <button type="button" class="login-form__social-btn" aria-label="Continue with Facebook">
+              <i class="pi pi-facebook"></i>
+            </button>
+          </div>
+        </div>
+
+        <p class="login-form__footer">
+          New to HAMBOX?
+          <a routerLink="/auth/register">Create an account</a>
+        </p>
+
+        <p class="login-form__footer login-form__footer--secondary">
+          Didn't receive a verification email?
+          <a routerLink="/auth/resend-verification">Resend verification</a>
+        </p>
+      </form>
+    </div>
+  </section>
+</div>

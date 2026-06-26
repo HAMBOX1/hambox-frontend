@@ -1,0 +1,58 @@
+<div class="storefront-store">
+  <app-storefront-nav [links]="navLinks" />
+
+  <div class="storefront-store__container">
+    <app-store-filters-sidebar [platforms]="platformFilters" />
+
+    <main class="storefront-store__main">
+      <app-store-toolbar
+        [categories]="categories()"
+        [sortOptions]="sortOptions()"
+        [activeCategoryId]="selectedCategoryId()"
+        [selectedSort]="selectedSort()"
+        (categoryChange)="onCategoryChange($event)"
+        (sortChange)="onSortChange($event)"
+      />
+
+      <app-store-promo-banner [banner]="promoBanner" />
+
+      @if (error()) {
+        <app-empty-state
+          icon="pi pi-exclamation-triangle"
+          title="Unable to load products"
+          [description]="error() ?? 'Something went wrong while loading the catalog.'"
+          actionLabel="Try again"
+          actionIcon="pi pi-refresh"
+          (action)="retryLoad()"
+        />
+      } @else if (loading() && products().length === 0) {
+        <app-loading-skeleton type="card" [count]="8" />
+      } @else if (isEmpty()) {
+        <app-empty-state
+          icon="pi pi-search"
+          title="No products found"
+          [description]="
+            searchTerm()
+              ? 'Try a different search term or browse all items.'
+              : 'Active products will appear here once they are published in the catalog.'
+          "
+        />
+      } @else {
+        <div class="storefront-store__grid">
+          @for (product of products(); track product.id) {
+            <app-store-product-card [product]="product" />
+          }
+        </div>
+
+        @if (hasMore()) {
+          <app-store-load-more
+            [loading]="loadingMore()"
+            (loadMore)="onLoadMore()"
+          />
+        }
+      }
+    </main>
+  </div>
+
+  <app-storefront-footer />
+</div>

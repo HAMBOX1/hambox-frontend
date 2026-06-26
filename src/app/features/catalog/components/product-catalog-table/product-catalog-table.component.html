@@ -1,0 +1,93 @@
+<div class="product-catalog-table">
+  @if (loading() && products().length === 0) {
+    <div class="product-catalog-table__skeleton" aria-hidden="true">
+      @for (row of skeletonRows; track row) {
+        <div class="product-catalog-table__skeleton-row">
+          <p-skeleton width="42%" height="1rem" />
+          <p-skeleton width="18%" height="1rem" />
+          <p-skeleton width="14%" height="1rem" />
+          <p-skeleton width="12%" height="1rem" />
+        </div>
+      }
+    </div>
+  } @else {
+    <p-table
+      class="product-catalog-table__grid"
+      [value]="[...products()]"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="totalRecords() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalRecords()"
+      [first]="first()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      selectionMode="single"
+      [selection]="tableSelection()"
+      (selectionChange)="onSelectionChange($event)"
+      (onLazyLoad)="onLazyLoad($event)"
+      dataKey="id"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-product>
+        <tr [pSelectableRow]="product" [class.product-catalog-table__row--selected]="product.id === selectedProductId()">
+          <td>
+            <div class="product-catalog-table__product">
+              <span class="product-catalog-table__product-icon" aria-hidden="true">
+                <i class="pi pi-box"></i>
+              </span>
+              <span class="product-catalog-table__product-copy">
+                <span class="product-catalog-table__product-name">{{ product.nameEn }}</span>
+                <span class="product-catalog-table__product-meta">{{ product.descriptionEn || 'No description' }}</span>
+              </span>
+            </div>
+          </td>
+          <td>
+            <p-tag
+              class="product-catalog-table__category-tag"
+              [value]="product.categoryName || 'Uncategorized'"
+              severity="info"
+            />
+          </td>
+          <td>
+            <span class="product-catalog-table__price">{{ product.price | hamboxCurrency }}</span>
+          </td>
+          <td>
+            <p-tag
+              [value]="statusLabel(product.status)"
+              [severity]="statusSeverity(product.status)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">
+            <div class="product-catalog-table__empty" role="status">
+              <i class="pi pi-inbox product-catalog-table__empty-icon" aria-hidden="true"></i>
+              <p class="product-catalog-table__empty-title">
+                {{ searchActive() ? 'No matching products' : 'No products yet' }}
+              </p>
+              <p class="product-catalog-table__empty-copy">
+                @if (searchActive()) {
+                  Try a different search term or clear the filter to see all products.
+                } @else {
+                  Create a product to start building your enterprise catalog.
+                }
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

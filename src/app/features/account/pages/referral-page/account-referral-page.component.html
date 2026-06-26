@@ -1,0 +1,47 @@
+<section class="referral-page">
+  <header class="referral-page__header">
+    <h1>Referral Program</h1>
+    <p>Invite friends and earn lifetime rewards.</p>
+  </header>
+
+  @if (loading()) {
+    <p class="referral-page__state">Loading referral dashboard...</p>
+  } @else if (error()) {
+    <p class="referral-page__state">{{ error() }}</p>
+  } @else if (dashboard(); as data) {
+    <div class="referral-page__grid">
+      <section class="referral-page__card">
+        <p class="referral-page__label">Lifetime Rewards</p>
+        <h2>{{ data.lifetimePoints | number }} Points</h2>
+        <p>{{ data.successfulReferrals }} successful referrals · {{ data.tier }} tier</p>
+
+        <div class="referral-page__progress">
+          <div class="referral-page__progress-bar" [style.width.%]="tierProgress()"></div>
+        </div>
+        <p class="referral-page__progress-label">Tier progress {{ tierProgress() | number:'1.0-0' }}%</p>
+
+        <button type="button" class="referral-page__copy" (click)="copyLink()">
+          {{ copied() ? 'Copied!' : 'Copy Invite Link' }}
+        </button>
+        <p class="referral-page__code">Code: {{ data.referralCode }}</p>
+        <p class="referral-page__link">{{ inviteLink() }}</p>
+      </section>
+
+      <section class="referral-page__card">
+        <h3>Recent Referrals</h3>
+        @if (data.recentHistory.length) {
+          <ul>
+            @for (entry of data.recentHistory; track entry.id) {
+              <li>
+                <strong>+{{ entry.pointsEarned }} pts</strong>
+                <span>{{ entry.createdOnUtc | date:'mediumDate' }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="referral-page__empty">No referral history yet.</p>
+        }
+      </section>
+    </div>
+  }
+</section>

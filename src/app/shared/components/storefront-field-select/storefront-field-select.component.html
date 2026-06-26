@@ -1,0 +1,18 @@
+<div class="field-select">
+  <label class="field-select__label" [for]="selectId()">{{ label() }}</label>
+  <div class="field-select__control">
+    <select
+      class="field-select__select"
+      [id]="selectId()"
+      [value]="value()"
+      (change)="onSelect($event)"
+    >
+      @for (option of options(); track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+    <svg class="field-select__icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </div>
+</div>

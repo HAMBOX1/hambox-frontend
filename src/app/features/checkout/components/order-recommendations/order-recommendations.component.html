@@ -1,0 +1,43 @@
+<section class="recommendations" aria-label="Gamer's Also Bought">
+  <div class="recommendations__header">
+    <h2 class="recommendations__title">Gamer's Also Bought</h2>
+    <div class="recommendations__nav">
+      <button
+        type="button"
+        class="recommendations__nav-btn"
+        aria-label="Previous recommendations"
+        [disabled]="!canGoPrev()"
+        (click)="prev()"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="recommendations__nav-btn"
+        aria-label="Next recommendations"
+        [disabled]="!canGoNext()"
+        (click)="next()"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="recommendations__grid">
+    @for (item of visibleItems(); track item.id) {
+      <a routerLink="/products" class="recommendations__card">
+        <div class="recommendations__media">
+          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+        </div>
+        <div class="recommendations__body">
+          <h3 class="recommendations__name">{{ item.title }}</h3>
+          <span class="recommendations__price">{{ item.priceUsd | hamboxCurrency }}</span>
+        </div>
+      </a>
+    }
+  </div>
+</section>

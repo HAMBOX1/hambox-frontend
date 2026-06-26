@@ -1,0 +1,62 @@
+<p-toast position="top-right" />
+
+<section class="product-edit-page">
+  <header class="product-edit-page__header">
+    <a class="product-edit-page__back" routerLink="/admin/inventory">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>
+      <span>Back to Catalog</span>
+    </a>
+
+    <div class="product-edit-page__heading">
+      <h1 class="product-edit-page__title">Edit Product</h1>
+      <p class="product-edit-page__subtitle">Update catalog details and manage product imagery.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="product-edit-page__state">Loading product...</p>
+  } @else if (error()) {
+    <p class="product-edit-page__state product-edit-page__state--error">{{ error() }}</p>
+  } @else if (product(); as current) {
+    <div class="product-edit-page__content">
+      <section class="product-edit-page__panel">
+        <h2 class="product-edit-page__section-title">Basic Information</h2>
+        <app-product-basic-info-form
+          [categories]="categories()"
+          [categoriesLoading]="categoriesLoading()"
+          [categoriesError]="categoriesError()"
+          [disabled]="submitting()"
+        />
+      </section>
+
+      <section class="product-edit-page__panel">
+        <h2 class="product-edit-page__section-title">Product Images</h2>
+        <p class="product-edit-page__section-copy">
+          Upload, reorder, remove, and set the primary image for {{ current.nameEn }}.
+        </p>
+
+        <app-product-assets-upload [productId]="productId()" />
+      </section>
+    </div>
+
+    <footer class="product-edit-page__footer">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        severity="secondary"
+        [disabled]="submitting()"
+        (click)="onCancel()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Save Changes"
+        icon="pi pi-check"
+        [loading]="submitting()"
+        [disabled]="submitting()"
+        (click)="onSave()"
+      ></button>
+    </footer>
+  }
+</section>

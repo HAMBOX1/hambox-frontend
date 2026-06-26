@@ -1,0 +1,74 @@
+<article class="cart-item">
+  <div class="cart-item__media">
+    <img class="cart-item__image" [src]="item().imageUrl" [alt]="item().title" loading="lazy" />
+    @if (item().platformIconUrl) {
+      <div class="cart-item__platform">
+        <img [src]="item().platformIconUrl" alt="" aria-hidden="true" />
+      </div>
+    }
+  </div>
+
+  <div class="cart-item__body">
+    <div class="cart-item__header">
+      <div class="cart-item__info">
+        <h2 class="cart-item__title">{{ item().title }}</h2>
+        @if (item().instantDelivery) {
+          <span class="cart-item__badge">
+            <img src="assets/images/flash-bolt.svg" alt="" aria-hidden="true" />
+            Instant Digital Delivery
+          </span>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="cart-item__remove"
+        aria-label="Remove item"
+        (click)="onRemove()"
+      >
+        <svg width="16" height="18" viewBox="0 0 16 18" fill="none" aria-hidden="true">
+          <path
+            d="M2 4.5h12M6 4.5V3a1 1 0 011-1h2a1 1 0 011 1v1.5M13 4.5v11a2 2 0 01-2 2H5a2 2 0 01-2-2v-11M6.5 8v5M9.5 8v5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="cart-item__footer">
+      <div class="cart-item__stepper">
+        <button
+          type="button"
+          class="cart-item__stepper-btn"
+          aria-label="Decrease quantity"
+          (click)="onDecrement()"
+        >
+          <svg width="12" height="2" viewBox="0 0 12 2" fill="none" aria-hidden="true">
+            <path d="M0 1h12" stroke="currentColor" stroke-width="1.67" />
+          </svg>
+        </button>
+        <span class="cart-item__quantity">{{ item().quantity }}</span>
+        <button
+          type="button"
+          class="cart-item__stepper-btn"
+          aria-label="Increase quantity"
+          (click)="onIncrement()"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M6 0v12M0 6h12" stroke="currentColor" stroke-width="1.67" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="cart-item__pricing">
+        @if (item().originalPrice) {
+          <span class="cart-item__original">{{ item().originalPrice! | hamboxCurrency }}</span>
+        }
+        <span class="cart-item__price">{{ item().price | hamboxCurrency }}</span>
+      </div>
+    </div>
+  </div>
+</article>

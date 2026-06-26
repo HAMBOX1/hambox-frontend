@@ -1,0 +1,61 @@
+<footer class="footer">
+  <div class="footer__top">
+    <div class="footer__inner footer__grid">
+      <div class="footer__brand">
+        <a routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate">
+          <img class="footer__logo" [src]="logoSrc" alt="HAMBOX" />
+        </a>
+        <p class="footer__description">
+          {{ 'FOOTER.DESCRIPTION' | translate }}
+        </p>
+      </div>
+
+      <div class="footer__column">
+        <h2 class="footer__heading">{{ 'FOOTER.NAVIGATION' | translate }}</h2>
+        <nav class="footer__nav" [attr.aria-label]="'FOOTER.NAVIGATION' | translate">
+          @for (link of navigationLinks; track link.labelKey) {
+            <a class="footer__link" [routerLink]="link.route">{{ link.labelKey | translate }}</a>
+          }
+        </nav>
+      </div>
+
+      <div class="footer__column">
+        <h2 class="footer__heading">{{ 'FOOTER.PROTOCOL' | translate }}</h2>
+        <nav class="footer__nav" [attr.aria-label]="'FOOTER.PROTOCOL' | translate">
+          @for (link of protocolLinks; track link.labelKey) {
+            <a class="footer__link" [routerLink]="link.route">{{ link.labelKey | translate }}</a>
+          }
+        </nav>
+      </div>
+
+      <div class="footer__column footer__contact">
+        <h2 class="footer__heading">{{ 'FOOTER.CONTACT' | translate }}</h2>
+
+        <div class="footer__social">
+          <a class="footer__social-btn footer__social-btn--outline" href="#" [attr.aria-label]="'FOOTER.SOCIAL.FACEBOOK' | translate">
+            <img [src]="facebookIcon" alt="" aria-hidden="true" />
+          </a>
+          <a class="footer__social-btn footer__social-btn--outline" href="#" [attr.aria-label]="'FOOTER.SOCIAL.WHATSAPP' | translate">
+            <img [src]="whatsappIcon" alt="" aria-hidden="true" />
+          </a>
+          <a class="footer__social-btn footer__social-btn--outline" href="#" [attr.aria-label]="'FOOTER.SOCIAL.TELEGRAM' | translate">
+            <img [src]="telegramIcon" alt="" aria-hidden="true" />
+          </a>
+        </div>
+
+        <div class="footer__status">
+          <p class="footer__status-label">{{ 'FOOTER.SYSTEM_STATUS' | translate }}</p>
+          <p class="footer__status-text">{{ 'FOOTER.STATUS_OK' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="footer__inner">
+      <p class="footer__copyright">
+        {{ 'FOOTER.COPYRIGHT' | translate }}
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,62 @@
+<aside class="order-summary" aria-label="Order summary">
+  <h2 class="order-summary__title">Order Summary</h2>
+
+  <div class="order-summary__promo">
+    <input
+      class="order-summary__promo-input"
+      type="text"
+      placeholder="Promo code"
+      [value]="promoCode()"
+      (input)="onPromoInput($event)"
+    />
+    <button type="button" class="order-summary__promo-btn" (click)="applyPromo()">Apply</button>
+  </div>
+
+  <dl class="order-summary__breakdown">
+    <div class="order-summary__row">
+      <dt>Subtotal</dt>
+      <dd>{{ summary().subtotal | hamboxCurrency }}</dd>
+    </div>
+    @if (summary().discountAmount > 0) {
+      <div class="order-summary__row order-summary__row--discount">
+        <dt>{{ summary().discountLabel }}</dt>
+        <dd>-{{ summary().discountAmount | hamboxCurrency }}</dd>
+      </div>
+    }
+    <div class="order-summary__row">
+      <dt>Taxes &amp; Fees</dt>
+      <dd>{{ summary().tax | hamboxCurrency }}</dd>
+    </div>
+  </dl>
+
+  <div class="order-summary__divider" role="presentation"></div>
+
+  <div class="order-summary__total-row">
+    <span class="order-summary__total-label">Total</span>
+    <span class="order-summary__total-value">{{ summary().total | hamboxCurrency }}</span>
+  </div>
+
+  <a routerLink="/checkout" class="order-summary__checkout">
+    <svg width="16" height="21" viewBox="0 0 16 21" fill="none" aria-hidden="true">
+      <path
+        d="M14 7H2a1 1 0 00-1 1v10a2 2 0 002 2h10a2 2 0 002-2V8a1 1 0 00-1-1zM5 7V5a3 3 0 016 0v2"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    Secure Checkout
+  </a>
+
+  <div class="order-summary__trust">
+    <div class="order-summary__payment-icons" aria-hidden="true">
+      <img src="assets/images/trust/secure-payment.svg" alt="" />
+      <img src="assets/images/trust/instant-delivery.svg" alt="" />
+      <img src="assets/images/trust/support.svg" alt="" />
+    </div>
+    <p class="order-summary__trust-text">
+      Keys are delivered instantly via email and added to your Library upon payment completion.
+    </p>
+  </div>
+</aside>

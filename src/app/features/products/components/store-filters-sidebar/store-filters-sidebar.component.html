@@ -1,0 +1,52 @@
+<aside class="store-filters" aria-label="Product filters">
+  <div class="store-filters__header">
+    <h2 class="store-filters__title">Filters</h2>
+    <button type="button" class="store-filters__reset">Reset</button>
+  </div>
+
+  <section class="store-filters__group" aria-labelledby="filter-platform">
+    <h3 id="filter-platform" class="store-filters__label">PLATFORM</h3>
+    <ul class="store-filters__list">
+      @for (platform of platforms(); track platform.id) {
+        <li>
+          <label class="store-filters__option">
+            <input
+              type="checkbox"
+              class="store-filters__checkbox"
+              [checked]="platform.checked"
+              [attr.aria-label]="platform.label"
+            />
+            <span class="store-filters__dot" [style.background-color]="platform.dotColor"></span>
+            <span class="store-filters__option-text">{{ platform.label }}</span>
+          </label>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="store-filters__group" aria-labelledby="filter-price">
+    <h3 id="filter-price" class="store-filters__label">PRICE RANGE</h3>
+    <div class="store-filters__price-inputs">
+      <input type="text" class="store-filters__input" placeholder="Min" aria-label="Minimum price" />
+      <span class="store-filters__dash" aria-hidden="true">-</span>
+      <input type="text" class="store-filters__input" placeholder="Max" aria-label="Maximum price" />
+    </div>
+    <div class="store-filters__slider" aria-hidden="true">
+      <div class="store-filters__slider-track">
+        <div class="store-filters__slider-range"></div>
+        <span class="store-filters__slider-thumb store-filters__slider-thumb--min"></span>
+        <span class="store-filters__slider-thumb store-filters__slider-thumb--max"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="store-filters__group" aria-labelledby="filter-region">
+    <h3 id="filter-region" class="store-filters__label">REGION</h3>
+    <div class="store-filters__select">
+      <span class="store-filters__select-value">{{ region() }}</span>
+      <svg class="store-filters__select-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </div>
+  </section>
+</aside>

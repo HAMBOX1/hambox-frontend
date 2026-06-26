@@ -1,0 +1,54 @@
+<div class="storefront-cart">
+  <app-storefront-nav [links]="navLinks()" />
+
+  <main class="storefront-cart__main">
+    @if (loading()) {
+      <app-loading-skeleton type="list" [count]="3" />
+    } @else if (error()) {
+      <app-empty-state
+        icon="pi pi-exclamation-triangle"
+        title="Unable to load cart"
+        [description]="error()!"
+        actionLabel="Try again"
+        actionIcon="pi pi-refresh"
+        (action)="retry()"
+      />
+    } @else if (isEmpty()) {
+      <section class="storefront-cart__empty" aria-label="Empty cart">
+        <h1 class="storefront-cart__empty-title">Your Cart</h1>
+        <p class="storefront-cart__empty-text">Your cart is empty. Browse the marketplace to add digital goods.</p>
+        <a routerLink="/products" class="storefront-cart__empty-cta">Browse Products</a>
+      </section>
+    } @else {
+      <div class="storefront-cart__layout">
+        <section class="storefront-cart__items" aria-label="Cart items">
+          <header class="storefront-cart__header">
+            <h1 class="storefront-cart__title">Your Cart</h1>
+            <span class="storefront-cart__count">{{ summary().itemCount }} Items</span>
+          </header>
+
+          @if (error()) {
+            <p class="storefront-cart__error" role="alert">{{ error() }}</p>
+          }
+
+          <div class="storefront-cart__list" [class.storefront-cart__list--busy]="mutating()">
+            @for (item of items(); track item.id) {
+              <app-cart-line-item
+                [item]="item"
+                (remove)="removeItem($event)"
+                (increment)="incrementQuantity($event)"
+                (decrement)="decrementQuantity($event)"
+              />
+            }
+          </div>
+        </section>
+
+        <div class="storefront-cart__summary">
+          <app-cart-order-summary [summary]="summary()" />
+        </div>
+      </div>
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

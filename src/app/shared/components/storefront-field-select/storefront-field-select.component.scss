@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.field-select {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-select__label {
+  color: var(--sf-text-secondary);
+  font-family: var(--sf-font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+.field-select__control {
+  position: relative;
+}
+
+.field-select__select {
+  appearance: none;
+  width: 100%;
+  padding: 12px 40px 12px 13px;
+  border: 1px solid var(--sf-border-default);
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-bg-card);
+  color: var(--sf-text-primary);
+  font-family: var(--sf-font-body);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  cursor: pointer;
+
+  &:focus {
+    outline: 2px solid var(--sf-accent-border);
+    outline-offset: 2px;
+  }
+}
+
+.field-select__icon {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  color: var(--sf-text-secondary);
+  pointer-events: none;
+  transform: translateY(-50%);
+}

@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-body);
+}
+
+.account-layout {
+  display: grid;
+  grid-template-columns: 15.5rem minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.account-layout__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.account-layout__content {
+  flex: 1;
+  padding: 1.5rem 2rem 2rem;
+}
+
+@media (max-width: 991px) {
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .account-layout__content {
+    padding: 1rem;
+  }
+}

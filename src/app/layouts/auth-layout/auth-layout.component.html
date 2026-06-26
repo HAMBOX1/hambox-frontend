@@ -1,0 +1,25 @@
+<div class="auth-layout">
+  <aside class="auth-layout__brand" aria-hidden="true">
+    <div class="auth-layout__brand-overlay"></div>
+    <img class="auth-layout__brand-image" [src]="heroBackground" alt="" />
+    <div class="auth-layout__brand-content">
+      <img class="auth-layout__logo" [src]="logoSrc" alt="HAMBOX" />
+      <h1 class="auth-layout__headline">The Next Level of Digital Gaming</h1>
+      <p class="auth-layout__tagline">
+        Secure access to game keys, gift cards, and instant digital delivery.
+      </p>
+    </div>
+  </aside>
+
+  <main class="auth-layout__main">
+    <header class="auth-layout__mobile-header">
+      <a routerLink="/home" aria-label="HAMBOX home">
+        <img class="auth-layout__mobile-logo" [src]="logoSrc" alt="HAMBOX" />
+      </a>
+    </header>
+
+    <div class="auth-layout__panel">
+      <router-outlet />
+    </div>
+  </main>
+</div>

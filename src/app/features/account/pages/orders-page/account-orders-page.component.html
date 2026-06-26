@@ -1,0 +1,49 @@
+<section class="orders-page">
+  <header class="orders-page__header">
+    <div>
+      <h1>Order Management</h1>
+      <p>Track your digital acquisitions and secure key delivery.</p>
+    </div>
+    <div class="orders-page__filters">
+      <span class="orders-page__filter">All Statuses</span>
+      <span class="orders-page__filter">Last 30 Days</span>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="orders-page__state">Loading orders...</p>
+  } @else if (error()) {
+    <p class="orders-page__state orders-page__state--error">{{ error() }}</p>
+  } @else if (!orders().length) {
+    <p class="orders-page__state">You have not placed any orders yet.</p>
+  } @else {
+    <div class="orders-page__list">
+      @for (order of orders(); track order.id; let i = $index) {
+        <article class="order-card">
+          <div class="order-card__image">
+            <img [src]="placeholderImage(i)" alt="" />
+            <span class="order-card__platform">Digital</span>
+          </div>
+
+          <div class="order-card__copy">
+            <h2>{{ order.orderNumber }}</h2>
+            <p>Order #{{ order.orderNumber }}</p>
+            <p>{{ order.createdOnUtc | date:'MMM d, y' }}</p>
+          </div>
+
+          <div class="order-card__meta">
+            <span class="order-card__status" [class]="statusClass(order.status)">{{ order.status }}</span>
+            <strong>{{ order.totalAmount | hamboxCurrency }}</strong>
+          </div>
+
+          <div class="order-card__actions">
+            <a class="order-card__btn order-card__btn--primary" [routerLink]="['/account/orders', order.id]">
+              View Details
+            </a>
+            <a class="order-card__btn" [routerLink]="['/account/orders', order.id]">Support</a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,68 @@
+/* RTL layout support — uses logical properties; avoid physical left/right hacks. */
+html.hambox-rtl {
+  direction: rtl;
+}
+
+html.hambox-ltr {
+  direction: ltr;
+}
+
+html[lang='ar'] {
+  --hambox-font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --sf-font-body: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --sf-font-heading: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+}
+
+html[lang='en'] {
+  --hambox-font-family: 'Inter', system-ui, sans-serif;
+  --sf-font-body: 'Manrope', system-ui, sans-serif;
+  --sf-font-heading: 'Sora', system-ui, sans-serif;
+}
+
+/* PrimeNG / dialogs */
+html.hambox-rtl .p-dialog-header-icons,
+html.hambox-rtl .p-dialog-footer {
+  direction: rtl;
+}
+
+html.hambox-rtl .p-paginator {
+  direction: rtl;
+}
+
+/* Flip directional icons only */
+html.hambox-rtl .pi-arrow-left::before {
+  content: '\e91b';
+}
+
+html.hambox-rtl .pi-chevron-left::before {
+  content: '\e901';
+}
+
+/* Tables */
+html.hambox-rtl .p-datatable .p-datatable-thead > tr > th,
+html.hambox-rtl .p-datatable .p-datatable-tbody > tr > td {
+  text-align: start;
+}
+
+/* Storefront nav search icon */
+html.hambox-rtl .storefront-nav__search-icon {
+  inset-inline-start: 12px;
+  inset-inline-end: auto;
+}
+
+html.hambox-rtl .storefront-nav__search-input {
+  padding-inline-start: 2.75rem;
+  padding-inline-end: 1rem;
+}
+
+/* Account / admin sidebars */
+html.hambox-rtl .account-sidebar,
+html.hambox-rtl .admin-sidebar {
+  border-inline-end: 0;
+  border-inline-start: 1px solid var(--color-border);
+}
+
+/* Breadcrumb separators */
+html.hambox-rtl .p-breadcrumb .p-menuitem-separator {
+  transform: scaleX(-1);
+}

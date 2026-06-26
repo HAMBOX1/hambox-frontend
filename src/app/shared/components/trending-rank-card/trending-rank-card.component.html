@@ -1,0 +1,20 @@
+<article class="rank-card">
+  <a class="rank-card__link" [routerLink]="item().route">
+  <header class="rank-card__header">
+    <div class="rank-card__icon">
+      <img [src]="item().iconSrc" alt="" aria-hidden="true" />
+    </div>
+    <span class="rank-card__rank" [class]="'rank-card__rank--' + item().rankTone">
+      {{ item().rank }}
+    </span>
+  </header>
+
+  <div class="rank-card__body">
+    <h4 class="rank-card__title">{{ item().title }}</h4>
+    <p class="rank-card__subtitle">{{ item().subtitle }}</p>
+    <p class="rank-card__price" [class]="'rank-card__price--' + item().priceTone">
+      {{ item().priceUsd | hamboxCurrency }}
+    </p>
+  </div>
+  </a>
+</article>

@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+.card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 8px;
+}
+
+.card-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-form__label {
+  color: var(--color-text-secondary);
+  font-family: var(--sf-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+.card-form__input-wrap {
+  position: relative;
+}
+
+.card-form__input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-input-bg);
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-body);
+  font-size: 16px;
+  outline: 0;
+  transition: var(--hambox-transition-theme);
+
+  &::placeholder {
+    color: var(--color-input-placeholder);
+    opacity: 1;
+  }
+
+  &:hover {
+    border-color: var(--color-border);
+  }
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+}
+
+.card-form__input-wrap .card-form__input {
+  padding-right: 48px;
+}
+
+.card-form__card-icon {
+  position: absolute;
+  top: 50%;
+  right: 17px;
+  color: var(--color-text-muted);
+  transform: translateY(-50%);
+}
+
+@media (max-width: 767px) {
+  .card-form__row {
+    grid-template-columns: 1fr;
+  }
+}

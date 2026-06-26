@@ -1,0 +1,15 @@
+<div class="payment-processing">
+  <div class="payment-processing__backdrop" aria-hidden="true">
+    <div class="payment-processing__glow payment-processing__glow--green"></div>
+    <div class="payment-processing__glow payment-processing__glow--blue"></div>
+    <div class="payment-processing__grid"></div>
+  </div>
+
+  <app-storefront-nav [links]="navLinks()" mode="checkout" />
+
+  <main class="payment-processing__main">
+    <app-payment-processing-card [progress]="progress()" />
+  </main>
+
+  <app-storefront-footer />
+</div>

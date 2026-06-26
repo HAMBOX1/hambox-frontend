@@ -1,0 +1,31 @@
+<section class="trending" aria-labelledby="trending-title">
+  <div class="trending__inner">
+    <h2 id="trending-title" class="trending__title">Trending Now</h2>
+
+    <div class="trending__bento">
+      @if (featuredProduct(); as featured) {
+        <div class="trending__feature">
+          <app-trending-feature-card [feature]="featured" />
+        </div>
+      }
+
+      <div class="trending__stack">
+        @if (valueItem(); as value) {
+          <div class="trending__value">
+            <app-trending-value-card [item]="value" />
+          </div>
+        }
+
+        @if (rankItems().length) {
+          <div class="trending__ranks">
+            @for (item of rankItems(); track item.id) {
+              <div class="trending__rank">
+                <app-trending-rank-card [item]="item" />
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

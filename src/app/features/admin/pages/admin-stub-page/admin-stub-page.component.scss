@@ -1,0 +1,39 @@
+.admin-stub__header {
+  margin-bottom: 1.25rem;
+}
+
+.admin-stub__title {
+  margin: 0 0 0.375rem;
+  color: var(--admin-text-primary);
+  font-family: var(--admin-font-heading);
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.admin-stub__description {
+  margin: 0;
+  color: var(--admin-text-secondary);
+  font-size: 0.9375rem;
+}
+
+.admin-stub__panel {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: var(--admin-panel-padding);
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-md);
+  background: var(--admin-bg-panel);
+}
+
+.admin-stub__icon {
+  color: var(--admin-accent-green);
+  font-size: 1.25rem;
+}
+
+.admin-stub__message {
+  margin: 0;
+  color: var(--admin-text-secondary);
+  font-size: 0.9375rem;
+}

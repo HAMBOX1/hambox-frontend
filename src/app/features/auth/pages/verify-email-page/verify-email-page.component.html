@@ -1,0 +1,27 @@
+<div class="auth-status">
+  @switch (state()) {
+    @case ('loading') {
+      <div class="auth-status__icon auth-status__icon--loading" aria-hidden="true">…</div>
+      <h2 class="auth-form__title">Verifying Email</h2>
+      <p class="auth-form__subtitle">{{ message() }}</p>
+    }
+    @case ('success') {
+      <div class="auth-status__icon auth-status__icon--success" aria-hidden="true">✓</div>
+      <h2 class="auth-form__title">Email Verified</h2>
+      <p class="auth-form__subtitle">{{ message() }}</p>
+      <p class="auth-form__footer"><a routerLink="/auth/login">Continue to sign in</a></p>
+    }
+    @case ('error') {
+      <div class="auth-status__icon auth-status__icon--error" aria-hidden="true">!</div>
+      <h2 class="auth-form__title">Verification Failed</h2>
+      <p class="auth-form__subtitle">{{ message() }}</p>
+      <p class="auth-form__footer"><a routerLink="/auth/resend-verification">Resend verification email</a></p>
+    }
+    @case ('missing-token') {
+      <div class="auth-status__icon auth-status__icon--error" aria-hidden="true">!</div>
+      <h2 class="auth-form__title">Invalid Link</h2>
+      <p class="auth-form__subtitle">{{ message() }}</p>
+      <p class="auth-form__footer"><a routerLink="/auth/resend-verification">Request a new verification email</a></p>
+    }
+  }
+</div>

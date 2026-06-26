@@ -1,0 +1,147 @@
+// HAMBOX Dark — marketplace reference (default)
+html[data-theme='hambox-dark'],
+html:not([data-theme]) {
+  // Raw palette (future themes override these blocks only)
+  --theme-background: #131314;
+  --theme-surface: #1a1a1c;
+  --theme-card: #2a2a2b;
+  --theme-elevated: #2a2a2b;
+  --theme-sidebar: #0e0e0f;
+  --theme-header: rgba(19, 19, 20, 0.92);
+  --theme-section: #0e0e0f;
+  --theme-flash: #1c1b1c;
+  --theme-icon: #353436;
+  --theme-footer-card: #201f20;
+  --theme-glass: rgba(255, 255, 255, 0.03);
+  --theme-nav: rgba(19, 19, 20, 0.82);
+  --theme-panel: rgba(32, 31, 32, 0.6);
+
+  --theme-border: rgba(255, 255, 255, 0.1);
+  --theme-border-subtle: rgba(255, 255, 255, 0.05);
+  --theme-border-strong: rgba(255, 255, 255, 0.2);
+  --theme-divider: rgba(255, 255, 255, 0.06);
+
+  --theme-primary: #50ed95;
+  --theme-primary-hover: #40e18b;
+  --theme-primary-active: #2dcc78;
+  --theme-primary-muted: rgba(80, 237, 149, 0.12);
+  --theme-primary-border: rgba(80, 237, 149, 0.2);
+  --theme-primary-text: #00391d;
+  --theme-primary-text-dark: #00210f;
+
+  --theme-success: #50ed95;
+  --theme-success-muted: rgba(80, 237, 149, 0.14);
+  --theme-warning: #fbbf24;
+  --theme-warning-muted: rgba(251, 191, 36, 0.16);
+  --theme-danger: #f87171;
+  --theme-danger-muted: rgba(248, 113, 113, 0.16);
+  --theme-info: #b0c6ff;
+  --theme-info-muted: rgba(176, 198, 255, 0.16);
+
+  --theme-text-primary: #e5e2e3;
+  --theme-text-secondary: #bbcbbc;
+  --theme-text-muted: rgba(187, 203, 188, 0.55);
+  --theme-text-caption: rgba(187, 203, 188, 0.7);
+  --theme-text-inverse: #111111;
+  --theme-text-on-primary: var(--theme-primary-text);
+
+  --theme-input-bg: rgba(255, 255, 255, 0.03);
+  --theme-input-border: rgba(255, 255, 255, 0.1);
+  --theme-input-placeholder: rgba(187, 203, 188, 0.5);
+
+  --theme-table-header: rgba(255, 255, 255, 0.04);
+  --theme-table-row-hover: rgba(255, 255, 255, 0.03);
+  --theme-table-border: var(--theme-border-subtle);
+
+  --theme-scrollbar-track: rgba(255, 255, 255, 0.04);
+  --theme-scrollbar-thumb: rgba(255, 255, 255, 0.16);
+
+  --theme-overlay: rgba(0, 0, 0, 0.6);
+  --theme-focus-ring: rgba(80, 237, 149, 0.45);
+
+  --theme-btn-primary-bg: var(--theme-primary);
+  --theme-btn-primary-text: var(--theme-primary-text);
+  --theme-btn-secondary-bg: rgba(255, 255, 255, 0.04);
+  --theme-btn-secondary-text: var(--theme-text-primary);
+  --theme-btn-secondary-border: var(--theme-border);
+  --theme-btn-ghost-hover: rgba(255, 255, 255, 0.04);
+
+  --theme-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --theme-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --theme-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --theme-shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.55);
+  --theme-shadow-accent-sm: 0 0 15px rgba(80, 237, 149, 0.2);
+  --theme-shadow-accent-md: 0 0 20px rgba(80, 237, 149, 0.15);
+  --theme-card-hover-shadow: 0 0 20px rgba(80, 237, 149, 0.08);
+
+  --theme-blur-nav: 12px;
+  --theme-blur-glass: 10px;
+
+  // Navbar
+  --theme-nav-bg: rgba(19, 19, 20, 0.82);
+  --theme-nav-panel: #131314;
+  --theme-nav-search-bg: #2a2a2b;
+  --theme-nav-text: #bbcbbc;
+  --theme-nav-heading: #e5e2e3;
+  --theme-nav-muted: rgba(187, 203, 188, 0.5);
+  --theme-nav-border: rgba(255, 255, 255, 0.1);
+  --theme-nav-soft-border: rgba(255, 255, 255, 0.05);
+  --theme-nav-hover: rgba(255, 255, 255, 0.04);
+  --theme-nav-shadow: none;
+  --theme-nav-elevated-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+  --theme-nav-height: 80px;
+
+  // Commerce surfaces
+  --theme-card-shell: rgba(18, 18, 20, 0.6);
+  --theme-card-shell-border: rgba(255, 255, 255, 0.08);
+  --theme-card-overlay: rgba(19, 19, 20, 0.5);
+  --theme-card-media-gradient: linear-gradient(0deg, #131314 0%, rgba(19, 19, 20, 0) 100%);
+  --theme-platform-badge-bg: rgba(53, 52, 54, 0.8);
+  --theme-favorite-bg: rgba(32, 31, 32, 0.4);
+  --theme-featured-bg: #03449d;
+  --theme-featured-text: #9ab7ff;
+  --theme-featured-border: rgba(176, 198, 255, 0.2);
+  --theme-rating: #ff9d7f;
+  --theme-price-glow: 0 0 12px rgba(80, 237, 149, 0.5);
+  --theme-cta-gradient-start: var(--theme-primary);
+  --theme-cta-gradient-end: var(--theme-primary-hover);
+  --theme-cta-icon-filter: brightness(0) saturate(100%);
+  --theme-panel-bg: rgba(32, 31, 32, 0.6);
+  --theme-panel-border: rgba(255, 255, 255, 0.08);
+  --theme-mobile-nav-bg: rgba(19, 19, 20, 0.96);
+  --theme-dropdown-bg: rgba(19, 19, 20, 0.98);
+  --theme-dropdown-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --theme-promo-overlay: linear-gradient(90deg, #131314 0%, rgba(19, 19, 20, 0.8) 50%, transparent 100%);
+  --theme-promo-glow: 0 0 30px rgba(80, 237, 149, 0.1);
+  --theme-promo-countdown-bg: rgba(32, 31, 32, 0.4);
+  --theme-referral-banner-bg: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  --theme-hero-accent-glow: rgba(80, 237, 149, 0.15);
+  --theme-hero-info-glow: rgba(176, 198, 255, 0.1);
+
+  // Accent price tones (marketplace)
+  --theme-price-green: #50ed95;
+  --theme-price-blue: #b0c6ff;
+  --theme-price-peach: #ffc5b3;
+  --theme-flash-label: #ffb4ab;
+  --theme-flash-badge-bg: #ffb4ab;
+  --theme-flash-badge-text: #690005;
+
+  // Membership / premium card (dark)
+  --theme-membership-border: rgba(176, 198, 255, 0.2);
+  --theme-membership-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(19, 19, 20, 0.9));
+  --theme-membership-text: #b0c6ff;
+  --theme-avatar-gradient: linear-gradient(135deg, #3b82f6, #50ed95);
+
+  // Brand orange scale (global marketing)
+  --hambox-primary-50: #fff3ec;
+  --hambox-primary-100: #ffe4d3;
+  --hambox-primary-200: #ffc6a5;
+  --hambox-primary-300: #ffa16d;
+  --hambox-primary-400: #ff7532;
+  --hambox-primary-500: #ff5400;
+  --hambox-primary-600: #f04100;
+  --hambox-primary-700: #c83000;
+  --hambox-primary-800: #9e2600;
+  --hambox-primary-900: #7e2104;
+}

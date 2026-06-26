@@ -1,0 +1,23 @@
+<article class="feature-card">
+  <div class="feature-card__media" aria-hidden="true">
+    <img [src]="feature().imageUrl" alt="" />
+  </div>
+  <div class="feature-card__scrim" aria-hidden="true"></div>
+
+  <div class="feature-card__content">
+    <p class="feature-card__badge">{{ feature().badge }}</p>
+    <h3 class="feature-card__title">
+      <span>{{ feature().title }}</span>
+    </h3>
+    <p class="feature-card__description">
+      {{ feature().description }}
+    </p>
+    <a
+      pButton
+      type="button"
+      [routerLink]="feature().route"
+      [label]="feature().ctaLabel"
+      class="feature-card__cta"
+    ></a>
+  </div>
+</article>

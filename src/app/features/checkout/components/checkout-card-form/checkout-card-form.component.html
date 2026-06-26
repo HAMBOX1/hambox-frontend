@@ -1,0 +1,64 @@
+<div class="card-form">
+  <div class="card-form__field">
+    <label class="card-form__label" for="cardholder-name">Cardholder Name</label>
+    <input
+      id="cardholder-name"
+      class="card-form__input"
+      type="text"
+      placeholder="John Commander"
+      autocomplete="cc-name"
+      [value]="cardDetails().cardholderName"
+      (input)="updateField('cardholderName', $event)"
+    />
+  </div>
+
+  <div class="card-form__field">
+    <label class="card-form__label" for="card-number">Card Number</label>
+    <div class="card-form__input-wrap">
+      <input
+        id="card-number"
+        class="card-form__input"
+        type="text"
+        inputmode="numeric"
+        placeholder="0000 0000 0000 0000"
+        autocomplete="cc-number"
+        [value]="cardDetails().cardNumber"
+        (input)="updateField('cardNumber', $event)"
+      />
+      <svg class="card-form__card-icon" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" />
+        <path d="M1 5h18" stroke="currentColor" stroke-width="1.5" />
+      </svg>
+    </div>
+  </div>
+
+  <div class="card-form__row">
+    <div class="card-form__field">
+      <label class="card-form__label" for="expiry-date">Expiry Date</label>
+      <input
+        id="expiry-date"
+        class="card-form__input"
+        type="text"
+        inputmode="numeric"
+        placeholder="MM/YY"
+        autocomplete="cc-exp"
+        [value]="cardDetails().expiryDate"
+        (input)="updateField('expiryDate', $event)"
+      />
+    </div>
+
+    <div class="card-form__field">
+      <label class="card-form__label" for="cvc">CVC/CVV</label>
+      <input
+        id="cvc"
+        class="card-form__input"
+        type="text"
+        inputmode="numeric"
+        placeholder="123"
+        autocomplete="cc-csc"
+        [value]="cardDetails().cvc"
+        (input)="updateField('cvc', $event)"
+      />
+    </div>
+  </div>
+</div>

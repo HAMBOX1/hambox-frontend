@@ -1,0 +1,11 @@
+<p-toolbar styleClass="topbar">
+  <div class="p-toolbar-group-start">
+    <p-button icon="pi pi-bars" [text]="true" (onClick)="onToggleMenu()" styleClass="mr-3"></p-button>
+    <app-search-box placeholder="Search products..."></app-search-box>
+  </div>
+  <div class="p-toolbar-group-end gap-3">
+    <p-button icon="pi pi-bell" [text]="true" [rounded]="true" severity="secondary"></p-button>
+    <p-button icon="pi pi-shopping-cart" [text]="true" [rounded]="true" severity="secondary"></p-button>
+    <p-avatar image="assets/images/avatar.png" shape="circle" size="normal" class="cursor-pointer"></p-avatar>
+  </div>
+</p-toolbar>

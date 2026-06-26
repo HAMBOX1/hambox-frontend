@@ -1,0 +1,40 @@
+<div class="locale-switch" [class.locale-switch--open]="open()">
+  <button
+    type="button"
+    class="locale-switch__trigger"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="listbox"
+    [attr.aria-label]="'COMMON.CURRENCY_SWITCHER' | translate"
+    (click)="toggle()"
+  >
+    <span class="locale-switch__flag" aria-hidden="true">{{ current().flagEmoji }}</span>
+    <span class="locale-switch__label">{{ current().code }}</span>
+    <svg class="locale-switch__chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  @if (open()) {
+    <ul class="locale-switch__menu" role="listbox" [attr.aria-label]="'COMMON.CURRENCY_SWITCHER' | translate">
+      @for (currency of currencies; track currency.code) {
+        <li role="option" [attr.aria-selected]="currency.code === current().code">
+          <button
+            type="button"
+            class="locale-switch__option"
+            [class.locale-switch__option--active]="currency.code === current().code"
+            (click)="selectCurrency(currency.code)"
+          >
+            <span class="locale-switch__flag" aria-hidden="true">{{ currency.flagEmoji }}</span>
+            <span class="locale-switch__option-copy">
+              <span class="locale-switch__option-name">{{ currency.labelKey | translate }}</span>
+              <span class="locale-switch__option-meta">{{ currency.symbol }} · {{ currency.code }}</span>
+            </span>
+            @if (currency.code === current().code) {
+              <i class="pi pi-check locale-switch__check" aria-hidden="true"></i>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

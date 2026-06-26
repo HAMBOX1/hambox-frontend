@@ -1,0 +1,10 @@
+<svg width="1440" height="720" viewBox="0 0 1440 720" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="heroOverlay" x1="0" y1="360" x2="1440" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#131314" stop-opacity="0.92"/>
+      <stop offset="0.45" stop-color="#131314" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#131314" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="720" fill="url(#heroOverlay)"/>
+</svg>

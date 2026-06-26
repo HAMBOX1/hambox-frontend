@@ -1,0 +1,23 @@
+<section class="purchased-items" aria-label="Purchased items">
+  <h2 class="purchased-items__title">Purchased Items</h2>
+
+  <ul class="purchased-items__list">
+    @for (item of items(); track item.id) {
+      <li class="purchased-items__row">
+        <div class="purchased-items__thumb">
+          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+        </div>
+        <div class="purchased-items__info">
+          <span class="purchased-items__name">{{ item.title }}</span>
+          <span class="purchased-items__subtitle">{{ item.subtitle }}</span>
+        </div>
+        <span class="purchased-items__price">{{ item.price | hamboxCurrency }}</span>
+      </li>
+    }
+  </ul>
+
+  <div class="purchased-items__total">
+    <span>TOTAL</span>
+    <span>{{ total() | hamboxCurrency }}</span>
+  </div>
+</section>

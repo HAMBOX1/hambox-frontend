@@ -1,0 +1,107 @@
+.notifications-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-primary);
+    font-family: var(--sf-font-heading);
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  button {
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--sf-radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--hambox-transition-theme);
+
+    &:hover {
+      background: var(--color-table-row-hover);
+    }
+  }
+}
+
+.notifications-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.notifications-page__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-panel-bg);
+  box-shadow: var(--color-shadow-xs);
+
+  &--unread {
+    border-color: var(--color-primary-border);
+    background: var(--color-primary-muted);
+  }
+
+  h2 {
+    margin: 0.25rem 0;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+
+  time {
+    color: var(--color-text-caption);
+    font-size: 0.75rem;
+  }
+
+  button {
+    padding: 0.45rem 0.875rem;
+    border: 0;
+    border-radius: var(--sf-radius-sm);
+    background: var(--color-primary);
+    color: var(--color-primary-text-on);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--hambox-transition-theme);
+
+    &:hover {
+      filter: brightness(1.05);
+    }
+  }
+}
+
+.notifications-page__category {
+  color: var(--color-primary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.notifications-page__state {
+  padding: 2.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-section);
+  color: var(--color-text-secondary);
+  text-align: center;
+}

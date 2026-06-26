@@ -1,0 +1,69 @@
+<section class="profile-page">
+  <header class="profile-page__header">
+    <h1>Account Settings</h1>
+    <p>Manage your profile and security preferences.</p>
+  </header>
+
+  @if (loading()) {
+    <p class="profile-page__state">Loading profile...</p>
+  } @else if (error()) {
+    <p class="profile-page__state profile-page__state--error">{{ error() }}</p>
+  } @else if (profile(); as current) {
+    @if (success()) {
+      <p class="profile-page__success">{{ success() }}</p>
+    }
+
+    <div class="profile-page__grid">
+      <section class="profile-page__card">
+        <h2>Profile</h2>
+        <p class="profile-page__meta">Member since {{ current.memberSince | date:'mediumDate' }}</p>
+
+        <label>
+          First name
+          <input type="text" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" />
+        </label>
+
+        <label>
+          Last name
+          <input type="text" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
+        </label>
+
+        <label>
+          Email
+          <input type="email" [value]="current.email" disabled />
+        </label>
+
+        <label>
+          Phone
+          <input type="tel" [ngModel]="phoneNumber()" (ngModelChange)="phoneNumber.set($event)" />
+        </label>
+
+        <button type="button" [disabled]="saving()" (click)="saveProfile()">
+          {{ saving() ? 'Saving...' : 'Save Profile' }}
+        </button>
+      </section>
+
+      <section class="profile-page__card">
+        <h2>Change Password</h2>
+
+        <label>
+          Current password
+          <input
+            type="password"
+            [ngModel]="currentPassword()"
+            (ngModelChange)="currentPassword.set($event)"
+          />
+        </label>
+
+        <label>
+          New password
+          <input type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" />
+        </label>
+
+        <button type="button" [disabled]="saving()" (click)="changePassword()">
+          {{ saving() ? 'Updating...' : 'Update Password' }}
+        </button>
+      </section>
+    </div>
+  }
+</section>

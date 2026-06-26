@@ -1,0 +1,123 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--sf-bg-base);
+}
+
+.auth-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  min-height: 100vh;
+}
+
+.auth-layout__brand {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem;
+  background: var(--sf-bg-section);
+}
+
+.auth-layout__brand-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.auth-layout__brand-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(19, 19, 20, 0.2) 0%, rgba(19, 19, 20, 0.92) 72%),
+    radial-gradient(circle at top right, rgba(80, 237, 149, 0.18), transparent 45%);
+}
+
+.auth-layout__brand-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 28rem;
+}
+
+.auth-layout__logo {
+  width: 189px;
+  height: 34px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.auth-layout__headline {
+  margin: 0;
+  font-family: var(--sf-font-heading);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: var(--sf-text-heading);
+  line-height: 1.1;
+}
+
+.auth-layout__tagline {
+  margin: 0;
+  font-family: var(--sf-font-body);
+  font-size: 1rem;
+  color: var(--sf-text-secondary);
+  line-height: 1.6;
+}
+
+.auth-layout__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-layout__mobile-header {
+  display: none;
+  width: 100%;
+  max-width: 28rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-layout__mobile-logo {
+  width: 150px;
+  height: auto;
+}
+
+.auth-layout__panel {
+  width: 100%;
+  max-width: 28rem;
+  padding: 2rem;
+  border: 1px solid var(--sf-border-subtle);
+  border-radius: var(--sf-radius-xl);
+  background: rgba(42, 42, 43, 0.72);
+  backdrop-filter: blur(var(--sf-blur-glass));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 960px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-layout__brand {
+    display: none;
+  }
+
+  .auth-layout__mobile-header {
+    display: block;
+  }
+
+  .auth-layout__main {
+    justify-content: flex-start;
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .auth-layout__panel {
+    padding: 1.5rem;
+  }
+}

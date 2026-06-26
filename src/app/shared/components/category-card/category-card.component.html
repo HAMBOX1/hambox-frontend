@@ -1,0 +1,6 @@
+<a [routerLink]="category.route" class="category-card" [style.--cat-color]="category.color || 'var(--primary-color)'">
+  <div class="category-icon">
+    <i [class]="category.icon || 'pi pi-folder'"></i>
+  </div>
+  <span class="category-name">{{ category.name }}</span>
+</a>

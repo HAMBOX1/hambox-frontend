@@ -1,0 +1,31 @@
+<p-card styleClass="product-card">
+  <ng-template pTemplate="header">
+    <div class="product-image-container">
+      <img alt="Product" [src]="product.image || 'assets/images/placeholder.png'" onerror="this.src='assets/images/placeholder.png'"/>
+      <div class="product-badge">
+        <p-tag [value]="product.category" severity="secondary"></p-tag>
+      </div>
+    </div>
+  </ng-template>
+  
+  <div class="product-content">
+    <div class="flex justify-content-between align-items-center mb-2" style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 class="m-0 text-lg font-semibold" style="margin:0;">{{ product.name || 'Unknown Product' }}</h3>
+      <span class="product-price font-bold text-primary">{{ (product.price || 0) | hamboxCurrency }}</span>
+    </div>
+    <p class="text-secondary product-desc">
+      {{ product.description }}
+    </p>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      [label]="product.inStock ? 'Add to Cart' : 'Out of Stock'" 
+      [icon]="product.inStock ? 'pi pi-shopping-cart' : 'pi pi-times'" 
+      styleClass="w-full"
+      [style]="{'width':'100%'}"
+      [disabled]="!product.inStock"
+      (onClick)="onAdd()">
+    </p-button>
+  </ng-template>
+</p-card>

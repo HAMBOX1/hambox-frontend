@@ -1,0 +1,12 @@
+<p-iconField iconPosition="left" class="search-box">
+  <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+  <input 
+    type="text" 
+    pInputText 
+    [placeholder]="placeholder" 
+    [ngModel]="value" 
+    (ngModelChange)="onModelChange($event)"
+    (keyup.enter)="onEnter()"
+    class="w-full search-input" 
+    style="width: 100%;" />
+</p-iconField>

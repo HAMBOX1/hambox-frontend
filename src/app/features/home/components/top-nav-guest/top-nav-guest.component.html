@@ -1,0 +1,128 @@
+<header
+  class="storefront-nav"
+  [class.storefront-nav--compact]="compact()"
+  [class.storefront-nav--elevated]="elevated()"
+  [class.storefront-nav--checkout]="mode() === 'checkout'"
+>
+  <div class="storefront-nav__container">
+    <div class="storefront-nav__grid">
+      <a class="storefront-nav__logo-link" routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate">
+        <img class="storefront-nav__logo" [src]="logoSrc" alt="HAMBOX" />
+      </a>
+
+      @if (mode() === 'checkout') {
+        <p class="storefront-nav__checkout-label">
+          <i class="pi pi-lock" aria-hidden="true"></i>
+          {{ 'NAVBAR.SECURE_CHECKOUT' | translate }}
+        </p>
+      } @else {
+        <form class="storefront-nav__search" (submit)="onSearchSubmit($event)">
+        <span class="storefront-nav__search-icon">
+          <img [src]="searchIconSrc" alt="" aria-hidden="true" />
+        </span>
+        <input
+          pInputText
+          class="storefront-nav__search-input"
+          type="search"
+          name="q"
+          [placeholder]="'NAVBAR.SEARCH_PLACEHOLDER' | translate"
+          [value]="searchValue()"
+          (input)="onSearchInput($event)"
+        />
+      </form>
+      }
+
+      <div class="storefront-nav__actions">
+        @if (mode() !== 'checkout') {
+        <app-language-switcher />
+        <app-currency-switcher />
+        }
+
+        <app-theme-toggle [compact]="true" />
+
+        <app-cart-nav-widget [compact]="mode() === 'checkout'" />
+
+        <a
+          routerLink="/auth/login"
+          class="storefront-nav__profile-btn"
+          [attr.aria-label]="'NAVBAR.SIGN_IN_ARIA' | translate"
+        >
+          <i class="pi pi-user" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <button
+        type="button"
+        class="storefront-nav__menu-button"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="top-nav-mobile-panel"
+        [attr.aria-label]="'NAVBAR.TOGGLE_NAV' | translate"
+        (click)="toggleMenu()"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      @if (mode() !== 'checkout') {
+      <nav class="storefront-nav__categories" [attr.aria-label]="'NAVBAR.CATEGORY_NAV' | translate">
+        @for (item of links(); track item.labelKey) {
+          <a
+            class="storefront-nav__category-link"
+            [routerLink]="item.route"
+            routerLinkActive="storefront-nav__category-link--active"
+            [routerLinkActiveOptions]="{ exact: false }"
+          >
+            {{ item.labelKey | translate }}
+          </a>
+        }
+      </nav>
+      }
+    </div>
+
+    @if (menuOpen()) {
+      <div id="top-nav-mobile-panel" class="storefront-nav__mobile-panel">
+        <nav class="storefront-nav__mobile-links" [attr.aria-label]="'NAVBAR.MOBILE_NAV' | translate">
+          @for (item of links(); track item.labelKey) {
+            <a
+              class="storefront-nav__mobile-link"
+              [routerLink]="item.route"
+              routerLinkActive="storefront-nav__mobile-link--active"
+              (click)="closeMenu()"
+            >
+              {{ item.labelKey | translate }}
+            </a>
+          }
+        </nav>
+
+        <form class="storefront-nav__search storefront-nav__search--mobile" (submit)="onSearchSubmit($event)">
+          <span class="storefront-nav__search-icon">
+            <img [src]="searchIconSrc" alt="" aria-hidden="true" />
+          </span>
+          <input
+            pInputText
+            class="storefront-nav__search-input"
+            type="search"
+            name="q"
+            [placeholder]="'NAVBAR.SEARCH_PLACEHOLDER' | translate"
+            [value]="searchValue()"
+            (input)="onSearchInput($event)"
+          />
+        </form>
+
+        <div class="storefront-nav__mobile-actions">
+          <app-cart-nav-widget (click)="closeMenu()" />
+
+          <a
+            routerLink="/auth/login"
+            class="storefront-nav__profile-btn storefront-nav__profile-btn--mobile"
+            (click)="closeMenu()"
+          >
+            <i class="pi pi-user" aria-hidden="true"></i>
+            <span>{{ 'NAVBAR.SIGN_IN' | translate }}</span>
+          </a>
+        </div>
+      </div>
+    }
+  </div>
+</header>

@@ -1,0 +1,26 @@
+<aside
+  class="admin-sidebar"
+  [class.admin-sidebar--mobile-open]="mobileOpen()"
+  aria-label="Admin navigation"
+>
+  <div class="admin-sidebar__brand">
+    <a class="admin-sidebar__logo-link" routerLink="/admin/inventory" (click)="onNavigate()">
+      <img class="admin-sidebar__logo" [src]="logoSrc" alt="HAMBOX" />
+    </a>
+  </div>
+
+  <nav class="admin-sidebar__nav">
+    @for (item of navItems; track item.id) {
+      <a
+        class="admin-sidebar__link"
+        [routerLink]="item.route"
+        routerLinkActive="admin-sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        (click)="onNavigate()"
+      >
+        <i class="admin-sidebar__icon" [class]="item.icon" aria-hidden="true"></i>
+        <span class="admin-sidebar__label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</aside>

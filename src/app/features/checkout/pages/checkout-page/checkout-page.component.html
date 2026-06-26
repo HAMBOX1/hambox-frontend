@@ -1,0 +1,48 @@
+<div class="storefront-checkout">
+  <app-storefront-nav [links]="navLinks()" mode="checkout" />
+
+  <main class="storefront-checkout__main">
+    <header class="storefront-checkout__header">
+      <svg class="storefront-checkout__lock" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="8" y="14" width="16" height="14" rx="2" stroke="currentColor" stroke-width="2" />
+        <path d="M12 14v-3a4 4 0 018 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <h1 class="storefront-checkout__title">Secure Checkout</h1>
+    </header>
+
+    @if (loading()) {
+      <app-loading-skeleton type="detail" [count]="1" />
+    } @else if (error()) {
+      <app-empty-state
+        icon="pi pi-exclamation-triangle"
+        title="Unable to load checkout"
+        [description]="error()!"
+        actionLabel="Try again"
+        actionIcon="pi pi-refresh"
+        (action)="retry()"
+      />
+    } @else if (isEmpty()) {
+      <app-empty-state
+        icon="pi pi-shopping-cart"
+        title="Your cart is empty"
+        description="Add items to your cart before checking out."
+        actionLabel="Browse products"
+        actionIcon="pi pi-arrow-left"
+        (action)="backToCart()"
+      />
+    } @else {
+      <div class="storefront-checkout__layout">
+        <section class="storefront-checkout__payment" aria-label="Payment and billing">
+          <app-payment-method-selector />
+          <app-checkout-billing-form />
+        </section>
+
+        <div class="storefront-checkout__summary">
+          <app-checkout-order-summary />
+        </div>
+      </div>
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

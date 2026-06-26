@@ -1,0 +1,46 @@
+@if (visible()) {
+  <div class="review-dialog" role="dialog" aria-modal="true" aria-labelledby="review-dialog-title">
+    <div class="review-dialog__panel">
+      <header class="review-dialog__header">
+        <h2 id="review-dialog-title">Write a Review</h2>
+        <button type="button" class="review-dialog__close" aria-label="Close" (click)="discard()">
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <p class="review-dialog__product">{{ productName() }}</p>
+
+      <div class="review-dialog__field">
+        <label>Overall Rating</label>
+        <div class="review-dialog__stars" role="group" aria-label="Rating">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <button
+              type="button"
+              class="review-dialog__star"
+              [class.review-dialog__star--active]="star <= rating()"
+              (click)="setRating(star)"
+            >
+              <i class="pi pi-star-fill" aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="review-dialog__field">
+        <label for="review-comment">Your Thoughts</label>
+        <textarea
+          id="review-comment"
+          rows="5"
+          placeholder="Share details of your experience with the product..."
+          [value]="comment()"
+          (input)="onCommentInput($event)"
+        ></textarea>
+      </div>
+
+      <footer class="review-dialog__footer">
+        <button type="button" class="review-dialog__submit" (click)="submit()">Submit Review</button>
+        <button type="button" class="review-dialog__discard" (click)="discard()">Discard</button>
+      </footer>
+    </div>
+  </div>
+}

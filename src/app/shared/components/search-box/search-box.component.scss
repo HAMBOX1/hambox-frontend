@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+}
+.search-box {
+  width: 100%;
+}
+.search-input {
+  border-radius: var(--hambox-radius-full);
+  background: var(--surface-section);
+  border: 1px solid transparent;
+  transition: all var(--hambox-transition-default);
+  padding-left: 2.5rem;
+  
+  &:focus {
+    background: var(--surface-card);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 20%, transparent);
+  }
+}

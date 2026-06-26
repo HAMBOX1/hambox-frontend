@@ -1,0 +1,39 @@
+<section class="wishlist-page">
+  <header class="wishlist-page__header">
+    <h1>Your Vault</h1>
+    <p>Saved products ready for your next purchase.</p>
+  </header>
+
+  @if (actionError()) {
+    <p class="wishlist-page__alert">{{ actionError() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="wishlist-page__state">Loading wishlist...</p>
+  } @else if (error()) {
+    <p class="wishlist-page__state">{{ error() }}</p>
+  } @else if (!items().length) {
+    <div class="wishlist-page__empty">
+      <p>Your vault is empty.</p>
+      <a routerLink="/products">Browse Marketplace</a>
+    </div>
+  } @else {
+    <div class="wishlist-page__grid">
+      @for (item of items(); track item.id; let i = $index) {
+        <article class="wishlist-page__card">
+          <img [src]="itemImageUrl(item.productImageUrl, i)" [alt]="item.productNameEn" loading="lazy" />
+          <div>
+            <h2>{{ item.productNameEn }}</h2>
+            <p>{{ item.unitPrice | hamboxCurrency }}</p>
+            <div class="wishlist-page__actions">
+              <button type="button" (click)="moveToCart(item.productId)">Move to Cart</button>
+              <button type="button" class="wishlist-page__remove" (click)="remove(item.productId)">
+                Remove
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

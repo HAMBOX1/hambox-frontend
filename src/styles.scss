@@ -1,1 +1,129 @@
-/* You can add global styles to this file, and also import other style files */
+@use './styles/variables';
+@use './styles/themes/spacing';
+@use './styles/themes/typography';
+@use './styles/themes/radius';
+@use './styles/themes/dark';
+@use './styles/themes/light';
+@use './styles/themes/tokens';
+@use './styles/themes/shadows';
+@use './styles/themes/primeng-overrides';
+@use './styles/storefront-tokens';
+@use './styles/admin-tokens';
+@use './styles/rtl';
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;600;700&family=Sora:wght@400;600;700&display=swap');
+@import 'primeicons/primeicons.css';
+
+/* ---------------------------------------------------------
+   CSS Reset & Base Styles
+--------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+html[data-theme='hambox-dark'],
+html:not([data-theme]) {
+  color-scheme: dark;
+}
+
+html[data-theme='hambox-light'] {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: var(--hambox-font-family);
+  font-size: 16px;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: var(--hambox-transition-theme);
+}
+
+/* ---------------------------------------------------------
+   Typography
+--------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: var(--hambox-spacing-4);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+h1 { font-size: var(--hambox-font-size-4xl); }
+h2 { font-size: var(--hambox-font-size-3xl); }
+h3 { font-size: var(--hambox-font-size-2xl); }
+h4 { font-size: var(--hambox-font-size-xl);  line-height: 1.4; }
+h5 { font-size: var(--hambox-font-size-lg);  line-height: 1.5; }
+h6 { font-size: var(--hambox-font-size-base); line-height: 1.5; }
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--hambox-spacing-4);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--hambox-transition-default);
+
+  &:hover {
+    color: var(--color-primary-hover);
+  }
+}
+
+/* ---------------------------------------------------------
+   PrimeNG CSS variable bridge
+--------------------------------------------------------- */
+:root,
+[data-theme] {
+  --primary-color: var(--color-primary);
+  --primary-color-text: var(--color-primary-text-on);
+  --font-family: var(--hambox-font-family);
+  --border-radius: var(--hambox-radius-md);
+  --surface-ground: var(--color-background);
+  --surface-section: var(--color-section);
+  --surface-card: var(--color-card);
+  --surface-overlay: var(--color-surface);
+  --surface-border: var(--color-border);
+  --surface-hover: var(--color-table-row-hover);
+  --text-color: var(--color-text-primary);
+  --text-color-secondary: var(--color-text-secondary);
+  --maskbg: var(--color-overlay);
+}
+
+/* ---------------------------------------------------------
+   Global Utility Classes
+--------------------------------------------------------- */
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted { color: var(--color-text-muted); }
+
+.bg-default { background-color: var(--color-background); }
+.bg-surface { background-color: var(--color-surface); }
+.bg-card { background-color: var(--color-card); }
+
+.shadow-sm { box-shadow: var(--color-shadow-sm); }
+.shadow-md { box-shadow: var(--color-shadow-md); }
+.shadow-lg { box-shadow: var(--color-shadow-lg); }
+.shadow-xl { box-shadow: var(--color-shadow-xl); }
+
+.rounded-sm { border-radius: var(--hambox-radius-sm); }
+.rounded-md { border-radius: var(--hambox-radius-md); }
+.rounded-lg { border-radius: var(--hambox-radius-lg); }
+.rounded-full { border-radius: var(--hambox-radius-full); }
+
+.m-0 { margin: 0; }
+.mb-4 { margin-bottom: var(--hambox-spacing-4); }
+.p-4 { padding: var(--hambox-spacing-4); }

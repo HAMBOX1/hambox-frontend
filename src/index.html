@@ -1,11 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
   <title>Hambox</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    (function () {
+      var themeKey = 'hambox.theme';
+      var langKey = 'hambox.language';
+      var storedTheme = localStorage.getItem(themeKey);
+      var theme = storedTheme === 'hambox-light' || storedTheme === 'hambox-dark'
+        ? storedTheme
+        : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'hambox-dark' : 'hambox-light');
+      document.documentElement.dataset.theme = theme;
+
+      var storedLang = localStorage.getItem(langKey);
+      var lang = storedLang === 'ar' || storedLang === 'en' ? storedLang : 'en';
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.classList.add(lang === 'ar' ? 'hambox-rtl' : 'hambox-ltr');
+      document.documentElement.dataset.lang = lang;
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

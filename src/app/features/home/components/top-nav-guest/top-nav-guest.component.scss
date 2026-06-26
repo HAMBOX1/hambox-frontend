@@ -1,0 +1,30 @@
+@use '../../../../shared/styles/storefront-navbar';
+
+.storefront-nav__profile-btn--mobile {
+  width: auto;
+  height: auto;
+  padding: 10px 12px;
+  border-radius: var(--sf-radius-sm);
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--storefront-nav-heading);
+}
+
+.storefront-nav__mobile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-3);
+
+  .storefront-nav__cart,
+  .storefront-nav__profile-btn--mobile {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .storefront-nav__menu-button {
+    grid-area: menu;
+  }
+}

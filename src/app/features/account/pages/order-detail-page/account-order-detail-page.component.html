@@ -1,0 +1,92 @@
+<section class="order-detail-page">
+  <a routerLink="/account/orders" class="order-detail-page__back">
+    <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    Back to orders
+  </a>
+
+  @if (loading()) {
+    <p class="order-detail-page__state">Loading order...</p>
+  } @else if (error()) {
+    <p class="order-detail-page__state">{{ error() }}</p>
+  } @else if (order(); as current) {
+    <header class="order-detail-page__header">
+      <div>
+        <h1>{{ current.orderNumber }}</h1>
+        <p>{{ current.createdOnUtc | date:'fullDate' }} · {{ current.status }}</p>
+      </div>
+      <strong>{{ current.totalAmount | hamboxCurrency }}</strong>
+    </header>
+
+    <div class="order-detail-page__grid">
+      <section class="order-detail-page__panel">
+        <h2>Timeline</h2>
+        <ul class="order-detail-page__timeline">
+          @for (event of current.timeline; track event.eventType + event.occurredOnUtc) {
+            <li>
+              <strong>{{ event.eventType }}</strong>
+              <p>{{ event.description }}</p>
+              <span>{{ event.occurredOnUtc | date:'short' }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="order-detail-page__panel">
+        <h2>License Keys</h2>
+        @if (current.licenseKeys.length) {
+          <ul class="order-detail-page__keys">
+            @for (key of current.licenseKeys; track key.licenseKey) {
+              <li>
+                <span>{{ key.productNameEn }}</span>
+                <code>{{ key.licenseKey }}</code>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="order-detail-page__empty">License keys will appear once delivery completes.</p>
+        }
+      </section>
+    </div>
+
+    <section class="order-detail-page__panel">
+      <h2>Items & Reviews</h2>
+      <div class="order-detail-page__items">
+        @for (item of current.itemReviewStatuses; track item.orderItemId) {
+          <article class="order-detail-page__item">
+            <div>
+              <strong>{{ item.productNameEn }}</strong>
+              @if (item.hasReview) {
+                <p>Review submitted</p>
+              } @else if (item.canReview) {
+                <p>Eligible for review</p>
+              }
+            </div>
+            @if (item.canReview) {
+              <button type="button" class="order-detail-page__review-btn" (click)="openReview(item)">
+                Write Review
+              </button>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <div class="order-detail-page__footer">
+      @if (current.invoiceUrl) {
+        <a class="order-detail-page__link" [href]="current.invoiceUrl" target="_blank" rel="noopener">
+          Download Invoice
+        </a>
+      }
+      @if (current.supportUrl) {
+        <a class="order-detail-page__link" [href]="current.supportUrl">Contact Support</a>
+      }
+    </div>
+  }
+
+  <app-write-review-dialog
+    [visible]="reviewOpen()"
+    [productName]="reviewTarget()?.productNameEn ?? ''"
+    (closed)="closeReview()"
+    (submitted)="submitReview($event)"
+  />
+</section>

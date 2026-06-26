@@ -1,0 +1,45 @@
+<section class="hero" aria-labelledby="hambox-hero-title">
+  <div class="hero__media" aria-hidden="true">
+    <img class="hero__image hero__image--background" [src]="hero().backgroundImageUrl" alt="" />
+    <img class="hero__image hero__image--overlay" [src]="hero().overlayImageUrl" alt="" />
+    <div class="hero__shade"></div>
+  </div>
+
+  <div class="hero__container">
+    <div class="hero__copy">
+      <p class="hero__eyebrow">{{ hero().eyebrow }}</p>
+
+      <h1 id="hambox-hero-title" class="hero__title">
+        <span class="hero__title-line">
+          {{ hero().titleLine1 }}
+        </span>
+        <span class="hero__title-line hero__accent">{{ hero().titleAccent }}</span>
+      </h1>
+
+      <p class="hero__description">
+        {{ hero().description }}
+      </p>
+
+      <div class="hero__actions" aria-label="Hero actions">
+        <a
+          pButton
+          [routerLink]="hero().primaryCtaRoute"
+          class="hero__button hero__button--primary"
+          styleClass="hero__button hero__button--primary"
+        >
+          <span class="hero__button-label">{{ hero().primaryCtaLabel }}</span>
+          <img class="hero__button-icon" [src]="boltIcon" alt="" aria-hidden="true" />
+        </a>
+
+        <a
+          pButton
+          [routerLink]="hero().secondaryCtaRoute"
+          class="hero__button hero__button--secondary"
+          styleClass="hero__button hero__button--secondary"
+        >
+          <span class="hero__button-label">{{ hero().secondaryCtaLabel }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,132 @@
+<div class="pdp">
+  <app-storefront-nav [links]="navLinks" />
+
+  <main class="pdp__main">
+    @if (loading()) {
+      <app-loading-skeleton type="detail" [count]="1" />
+    } @else if (error() || !product()) {
+      <app-empty-state
+        icon="pi pi-exclamation-triangle"
+        title="Product unavailable"
+        [description]="error() ?? 'This product could not be found.'"
+        actionLabel="Back to store"
+        actionIcon="pi pi-arrow-left"
+        (action)="backToStore()"
+      />
+    } @else {
+      <nav class="pdp__breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/home" class="pdp__crumb pdp__crumb--link">Home</a>
+        <span class="pdp__crumb-sep" aria-hidden="true">›</span>
+        <a routerLink="/products" class="pdp__crumb pdp__crumb--link">Products</a>
+        <span class="pdp__crumb-sep" aria-hidden="true">›</span>
+        <span class="pdp__crumb pdp__crumb--current" aria-current="page">{{ product()!.title }}</span>
+      </nav>
+
+      <div class="pdp__product">
+        <section class="pdp__gallery" aria-label="Product images">
+          <div class="pdp__hero-image">
+            <img [src]="activeGalleryImage()" [alt]="product()!.title" />
+            <span class="pdp__badge">INSTANT DELIVERY</span>
+          </div>
+          @if (product()!.galleryImages.length > 1) {
+            <div class="pdp__thumbs">
+              @for (image of product()!.galleryImages; track image; let i = $index) {
+                <button
+                  type="button"
+                  class="pdp__thumb"
+                  [class.pdp__thumb--active]="selectedImageIndex() === i"
+                  [attr.aria-label]="'Product image ' + (i + 1)"
+                  (click)="selectGalleryImage(i)"
+                >
+                  <img [src]="image" alt="" />
+                </button>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="pdp__details" aria-labelledby="pdp-title">
+          <div class="pdp__title-row">
+            <h1 id="pdp-title" class="pdp__title">{{ product()!.title }}</h1>
+            <div class="pdp__rating">
+              <span class="pdp__rating-value">{{ product()!.rating }}</span>
+              <span class="pdp__rating-count">({{ product()!.reviewCount }})</span>
+            </div>
+          </div>
+
+          <p class="pdp__description">{{ product()!.description }}</p>
+
+          <div class="pdp__pricing">
+            <span class="pdp__price">{{ product()!.priceUsd | hamboxCurrency }}</span>
+            @if (product()!.discountLabel) {
+              <span class="pdp__original">{{ product()!.originalPriceUsd | hamboxCurrency }}</span>
+              <span class="pdp__discount">{{ product()!.discountLabel }}</span>
+            }
+          </div>
+
+          <div class="pdp__options">
+            <app-storefront-field-select
+              selectId="pdp-region"
+              label="SELECT REGION"
+              [options]="product()!.regions"
+              [value]="selectedRegion()"
+              (valueChange)="selectedRegion.set($event)"
+            />
+            <app-storefront-field-select
+              selectId="pdp-value"
+              label="SELECT VALUE"
+              [options]="product()!.values"
+              [value]="selectedValue()"
+              (valueChange)="selectedValue.set($event)"
+            />
+          </div>
+
+          <div class="pdp__actions">
+            <button type="button" class="pdp__cta pdp__cta--cart" (click)="addToCart()">
+              <img [src]="cartIconSrc" alt="" aria-hidden="true" />
+              Add to Cart
+            </button>
+            <button type="button" class="pdp__cta pdp__cta--buy" (click)="buyNow()">Buy Now</button>
+            <button type="button" class="pdp__cta pdp__cta--wishlist" (click)="addToWishlist()">
+              <i class="pi pi-heart" aria-hidden="true"></i>
+              Save to Vault
+            </button>
+          </div>
+          @if (wishlistActionMessage()) {
+            <p class="pdp__action-message">{{ wishlistActionMessage() }}</p>
+          }
+
+          @if (cartActionError()) {
+            <p class="pdp__cart-error" role="alert">{{ cartActionError() }}</p>
+          }
+
+          <ul class="pdp__trust">
+            @for (feature of product()!.trustFeatures; track feature.label) {
+              <li class="pdp__trust-item">
+                <img [src]="feature.iconSrc" alt="" aria-hidden="true" />
+                <span>{{ feature.label }}</span>
+              </li>
+            }
+          </ul>
+        </section>
+      </div>
+
+      <section class="pdp__redeem" aria-labelledby="pdp-redeem-title">
+        <h2 id="pdp-redeem-title" class="pdp__redeem-title">How to Redeem</h2>
+        <p class="pdp__redeem-subtitle">
+          Follow these simple steps to access your digital purchase after checkout.
+        </p>
+        <ol class="pdp__steps">
+          @for (step of product()!.redeemSteps; track step.id) {
+            <li class="pdp__step">
+              <h3 class="pdp__step-title">{{ step.title }}</h3>
+              <p class="pdp__step-text">{{ step.description }}</p>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

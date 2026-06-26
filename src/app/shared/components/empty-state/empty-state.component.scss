@@ -1,0 +1,36 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--hambox-spacing-12) var(--hambox-spacing-4);
+  text-align: center;
+  background: var(--surface-card);
+  border-radius: var(--border-radius);
+  border: 1px dashed var(--surface-border);
+  margin: var(--hambox-spacing-6) 0;
+
+  &-icon {
+    font-size: 4rem;
+    color: var(--text-color-tertiary);
+    margin-bottom: var(--hambox-spacing-4);
+    background: var(--surface-section);
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &-title {
+    margin-bottom: var(--hambox-spacing-2);
+    color: var(--text-color);
+  }
+
+  &-desc {
+    color: var(--text-color-secondary);
+    margin-bottom: var(--hambox-spacing-6);
+    max-width: 400px;
+  }
+}

@@ -1,0 +1,13 @@
+<div class="empty-state">
+  <div class="empty-state-icon">
+    <i [class]="icon"></i>
+  </div>
+  <h3 class="empty-state-title">{{ title }}</h3>
+  <p class="empty-state-desc">{{ description }}</p>
+  
+  <p-button *ngIf="actionLabel" 
+            [label]="actionLabel" 
+            [icon]="actionIcon || ''" 
+            (onClick)="onAction()">
+  </p-button>
+</div>

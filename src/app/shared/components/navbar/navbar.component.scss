@@ -1,0 +1,19 @@
+.brand {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: var(--hambox-font-size-xl);
+  color: var(--primary-color);
+  margin-right: var(--hambox-spacing-4);
+  
+  img {
+    border-radius: var(--hambox-radius-md);
+  }
+}
+:host ::ng-deep .p-menubar {
+  border: none;
+  background: var(--surface-card);
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-6);
+  box-shadow: var(--hambox-shadow-sm);
+  border-radius: 0;
+}

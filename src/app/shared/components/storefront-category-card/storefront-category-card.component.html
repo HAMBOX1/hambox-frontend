@@ -1,0 +1,10 @@
+<a [routerLink]="category().route" class="category-card">
+  <div class="category-card__media">
+    <img [src]="category().imageUrl" [alt]="category().title" loading="lazy" />
+  </div>
+  <div class="category-card__scrim" aria-hidden="true"></div>
+  <div class="category-card__content">
+    <h3 class="category-card__title">{{ category().title }}</h3>
+    <p class="category-card__subtitle">{{ category().subtitle }}</p>
+  </div>
+</a>

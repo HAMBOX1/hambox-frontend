@@ -1,0 +1,23 @@
+<div class="admin-layout">
+  @if (mobileNavOpen()) {
+    <button
+      type="button"
+      class="admin-layout__backdrop"
+      aria-label="Close navigation menu"
+      (click)="closeMobileNav()"
+    ></button>
+  }
+
+  <app-admin-sidebar
+    [mobileOpen]="mobileNavOpen()"
+    (closeMobile)="closeMobileNav()"
+  />
+
+  <div class="admin-layout__main">
+    <app-admin-topbar (menuToggle)="toggleMobileNav()" />
+
+    <main class="admin-layout__content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

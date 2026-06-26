@@ -1,0 +1,15 @@
+<svg width="1440" height="720" viewBox="0 0 1440 720" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="heroBg" x1="0" y1="0" x2="1440" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#131314"/>
+      <stop offset="0.55" stop-color="#1a2420"/>
+      <stop offset="1" stop-color="#131314"/>
+    </linearGradient>
+    <radialGradient id="heroGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1180 120) rotate(90) scale(420)">
+      <stop stop-color="#50ED95" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#50ED95" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1440" height="720" fill="url(#heroBg)"/>
+  <rect width="1440" height="720" fill="url(#heroGlow)"/>
+</svg>

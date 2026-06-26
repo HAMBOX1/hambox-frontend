@@ -1,0 +1,105 @@
+<aside class="order-summary" aria-label="Order summary">
+  <h2 class="order-summary__title">Order Summary</h2>
+
+  <div class="order-summary__items">
+    @for (item of items(); track item.id) {
+      <article class="order-item">
+        <div class="order-item__thumb">
+          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+        </div>
+        <div class="order-item__body">
+          <h3 class="order-item__title">{{ item.title }}</h3>
+          <p class="order-item__subtitle">{{ item.subtitle }}</p>
+          <div class="order-item__footer">
+            <span class="order-item__badge">{{ item.deliveryBadge }}</span>
+            <span class="order-item__price">{{ item.price | hamboxCurrency }}</span>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+
+  <div class="order-summary__discount">
+    <input
+      class="order-summary__discount-input"
+      type="text"
+      placeholder="Discount Code"
+      [value]="discountCode()"
+      (input)="onDiscountInput($event)"
+    />
+    <button type="button" class="order-summary__discount-btn" (click)="applyDiscount()">
+      Apply
+    </button>
+  </div>
+
+  <dl class="order-summary__breakdown">
+    <div class="order-summary__row">
+      <dt>Subtotal</dt>
+      <dd>{{ summary().subtotal | hamboxCurrency }}</dd>
+    </div>
+    @if (summary().memberDiscount > 0) {
+      <div class="order-summary__row">
+        <dt>Member Discount</dt>
+        <dd>-{{ summary().memberDiscount | hamboxCurrency }}</dd>
+      </div>
+    }
+    <div class="order-summary__row">
+      <dt>Tax (VAT)</dt>
+      <dd>{{ summary().tax | hamboxCurrency }}</dd>
+    </div>
+    <div class="order-summary__row order-summary__row--total">
+      <dt>Total</dt>
+      <dd>{{ summary().total | hamboxCurrency }}</dd>
+    </div>
+  </dl>
+
+  @if (actionError() || error()) {
+    <p class="order-summary__error" role="alert">{{ actionError() ?? error() }}</p>
+  }
+
+  <button
+    type="button"
+    class="order-summary__purchase"
+    [disabled]="submitting()"
+    (click)="completePurchase()"
+  >
+    {{ submitting() ? 'Processing...' : 'Complete Purchase' }}
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <div class="order-summary__reassurance">
+    <svg class="order-summary__reassurance-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5" />
+      <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+    <p class="order-summary__reassurance-text">
+      Your code will be delivered instantly to your email after payment. Please check your spam
+      folder if you don't see it within 60 seconds.
+    </p>
+  </div>
+
+  <div class="order-summary__security" aria-label="Security badges">
+    <div class="order-summary__security-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M7 1l5 2v3c0 3.5-2.2 5.8-5 6.5C4.2 11.8 2 9.5 2 6V3l5-2z" stroke="currentColor" stroke-width="1.2" />
+        <path d="M5 7l1.5 1.5L9 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+      </svg>
+      <span>SSL SECURE</span>
+    </div>
+    <div class="order-summary__security-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M7 1l5 2v3c0 3.5-2.2 5.8-5 6.5C4.2 11.8 2 9.5 2 6V3l5-2z" stroke="currentColor" stroke-width="1.2" />
+      </svg>
+      <span>PCI COMPLIANT</span>
+    </div>
+    <div class="order-summary__security-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <rect x="3" y="6" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.2" />
+        <path d="M5 6V4.5a2 2 0 014 0V6" stroke="currentColor" stroke-width="1.2" />
+      </svg>
+      <span>256-BIT ENCRYPTION</span>
+    </div>
+  </div>
+</aside>

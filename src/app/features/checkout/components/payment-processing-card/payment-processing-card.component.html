@@ -1,0 +1,66 @@
+<article class="processing-card" aria-live="polite" aria-busy="true">
+  <div class="processing-card__spinner" aria-hidden="true">
+    <div class="processing-card__spinner-glow"></div>
+    <div class="processing-card__spinner-track"></div>
+    <div class="processing-card__spinner-arc"></div>
+    <svg class="processing-card__spinner-icon" width="33" height="24" viewBox="0 0 33 24" fill="none">
+      <rect x="1" y="4" width="31" height="18" rx="3" stroke="currentColor" stroke-width="1.5" />
+      <circle cx="24" cy="13" r="3" stroke="currentColor" stroke-width="1.5" />
+      <path d="M1 9h31" stroke="currentColor" stroke-width="1.5" />
+    </svg>
+  </div>
+
+  <header class="processing-card__header">
+    <h1 class="processing-card__title">Processing Transaction</h1>
+    <p class="processing-card__secure">
+      <img src="assets/images/flash-bolt.svg" alt="" aria-hidden="true" />
+      Secure Encrypted Connection Active
+    </p>
+  </header>
+
+  <div class="processing-card__details">
+    <div class="processing-card__wait-row">
+      <span class="processing-card__wait-label">Estimated Wait</span>
+      <span class="processing-card__wait-value">&lt; 10 seconds</span>
+    </div>
+    <div
+      class="processing-card__progress-track"
+      role="progressbar"
+      [attr.aria-valuenow]="progress()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <div class="processing-card__progress-fill" [style.width.%]="progress()"></div>
+    </div>
+  </div>
+
+  <p class="processing-card__guidance">
+    Please do not <strong>refresh</strong> or <strong>close</strong> this window while we finalize
+    your order.
+  </p>
+
+  <footer class="processing-card__trust">
+    <div class="processing-card__trust-item">
+      <svg width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true">
+        <path d="M8 1l6 2.5v4.5c0 4-2.5 6.5-6 7.5C4.5 14.5 2 12 2 8V3.5L8 1z" stroke="currentColor" stroke-width="1.2" />
+      </svg>
+      <span>PCI DSS Compliant</span>
+    </div>
+    <span class="processing-card__trust-divider" aria-hidden="true"></span>
+    <div class="processing-card__trust-item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <rect x="4" y="9" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.2" />
+        <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.2" />
+      </svg>
+      <span>SSL Secured</span>
+    </div>
+    <span class="processing-card__trust-divider" aria-hidden="true"></span>
+    <div class="processing-card__trust-item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M10 2l6 2v4c0 4.5-2.7 7.2-6 8.5C6.7 13.2 4 10.5 4 8V4l6-2z" stroke="currentColor" stroke-width="1.2" />
+        <path d="M7.5 10l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+      </svg>
+      <span>Bank Verified</span>
+    </div>
+  </footer>
+</article>

@@ -1,0 +1,50 @@
+<section class="product-catalog-page">
+  <p-toast />
+
+  <app-product-catalog-toolbar
+    [subtitle]="subtitle()"
+    [searchTerm]="searchTerm()"
+    (searchChange)="onSearchChange($event)"
+  />
+
+  @if (error()) {
+    <div class="product-catalog-page__alert" role="alert">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <span>{{ error() }}</span>
+      <button
+        pButton
+        type="button"
+        class="product-catalog-page__retry-btn"
+        label="Retry"
+        severity="secondary"
+        size="small"
+        (click)="retryLoad()"
+      ></button>
+    </div>
+  }
+
+  <div class="product-catalog-page__workspace">
+    <app-product-catalog-table
+      class="product-catalog-page__table"
+      [products]="items()"
+      [loading]="loading()"
+      [totalRecords]="totalCount()"
+      [pageSize]="pageSize()"
+      [first]="tableFirst()"
+      [selectedProductId]="selectedProductId()"
+      [searchActive]="hasActiveSearch()"
+      (pageChange)="onPageChange($event)"
+      (productSelect)="onProductSelect($event)"
+    />
+
+    <app-product-detail-panel
+      class="product-catalog-page__panel"
+      [product]="selectedProduct()"
+      [loading]="loading()"
+      [updatingStatus]="updatingStatus()"
+      [statusError]="statusError()"
+      (closePanel)="onClosePanel()"
+      (statusChange)="onStatusChange($event)"
+    />
+  </div>
+</section>

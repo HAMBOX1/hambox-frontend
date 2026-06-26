@@ -1,0 +1,25 @@
+<aside class="account-sidebar" aria-label="Account navigation">
+  <a class="account-sidebar__logo" routerLink="/home" aria-label="HAMBOX home">
+    <img [src]="logoSrc" alt="HAMBOX" />
+  </a>
+
+  <nav class="account-sidebar__nav">
+    @for (item of navItems; track item.route) {
+      <a
+        class="account-sidebar__link"
+        [routerLink]="item.route"
+        routerLinkActive="account-sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/account/dashboard' }"
+      >
+        <i class="pi" [class]="item.icon" aria-hidden="true"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="account-sidebar__support">
+    <p class="account-sidebar__support-label">Support</p>
+    <p class="account-sidebar__support-copy">Need help with a digital delivery?</p>
+    <a routerLink="/support-chat" class="account-sidebar__support-btn">Contact Expert</a>
+  </div>
+</aside>

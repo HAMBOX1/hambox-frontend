@@ -1,0 +1,164 @@
+{
+  "COMMON": {
+    "APP_NAME": "HAMBOX",
+    "LANGUAGE_SWITCHER": "تغيير اللغة",
+    "CURRENCY_SWITCHER": "تغيير العملة",
+    "LOADING": "جاري التحميل…",
+    "SAVE": "حفظ",
+    "CANCEL": "إلغاء",
+    "CLOSE": "إغلاق",
+    "CONTINUE": "متابعة",
+    "BACK": "رجوع",
+    "SEARCH": "بحث",
+    "VIEW_ALL": "عرض الكل",
+    "LEARN_MORE": "اعرف المزيد",
+    "LANGUAGES": {
+      "EN": "الإنجليزية",
+      "AR": "العربية"
+    },
+    "THEME": {
+      "SWITCH_TO_LIGHT": "التبديل إلى الوضع الفاتح",
+      "SWITCH_TO_DARK": "التبديل إلى الوضع الداكن",
+      "LIGHT": "فاتح",
+      "DARK": "داكن"
+    }
+  },
+  "NAVBAR": {
+    "HOME_ARIA": "الصفحة الرئيسية HAMBOX",
+    "SEARCH_PLACEHOLDER": "ابحث عن منتجات رقمية…",
+    "SEARCH_MARKETPLACE": "ابحث في السوق…",
+    "SECURE_CHECKOUT": "دفع آمن",
+    "SIGN_IN": "تسجيل الدخول",
+    "SIGN_IN_ARIA": "تسجيل الدخول",
+    "TOGGLE_NAV": "تبديل التنقل",
+    "CATEGORY_NAV": "تنقل التصنيفات",
+    "MOBILE_NAV": "التنقل على الجوال",
+    "ACCOUNT_MENU": "قائمة الحساب",
+    "CATEGORIES": {
+      "GAMES": "الألعاب",
+      "GIFT_CARDS": "بطاقات الهدايا",
+      "SUBSCRIPTIONS": "الاشتراكات",
+      "DEALS": "العروض"
+    }
+  },
+  "FOOTER": {
+    "DESCRIPTION": "أرقى منصة رقمية للاعبين في العالم. خدمة عالية الجودة منذ 2018.",
+    "NAVIGATION": "التنقل",
+    "PROTOCOL": "البروتوكول",
+    "CONTACT": "تواصل معنا",
+    "SYSTEM_STATUS": "حالة النظام",
+    "STATUS_OK": "جميع الأنظمة تعمل",
+    "COPYRIGHT": "© 2026 HAMBOX Global. جميع الحقوق محفوظة. المحطة الآمنة نشطة.",
+    "LINKS": {
+      "MARKETPLACE": "السوق",
+      "GIFT_CARDS": "بطاقات الهدايا",
+      "SUBSCRIPTIONS": "الاشتراكات",
+      "AFFILIATE": "برنامج الإحالة",
+      "TERMS": "شروط الخدمة",
+      "PRIVACY": "بروتوكول الخصوصية",
+      "SUPPORT": "مركز الدعم",
+      "VERIFICATION": "حالة التحقق"
+    },
+    "SOCIAL": {
+      "FACEBOOK": "فيسبوك",
+      "WHATSAPP": "واتساب",
+      "TELEGRAM": "تيليجرام"
+    }
+  },
+  "CURRENCY": {
+    "USD": "الدولار الأمريكي",
+    "EUR": "اليورو",
+    "EGP": "الجنيه المصري",
+    "SAR": "الريال السعودي"
+  },
+  "AUTH": {
+    "LOGIN_TITLE": "مرحباً بعودتك",
+    "LOGIN_SUBTITLE": "سجّل الدخول للوصول إلى خزنتك الرقمية",
+    "REGISTER_TITLE": "أنشئ حسابك",
+    "REGISTER_SUBTITLE": "انضم إلى سوق HAMBOX",
+    "EMAIL": "البريد الإلكتروني",
+    "PASSWORD": "كلمة المرور",
+    "FIRST_NAME": "الاسم الأول",
+    "LAST_NAME": "اسم العائلة",
+    "FORGOT_PASSWORD": "نسيت كلمة المرور؟",
+    "SIGN_IN": "تسجيل الدخول",
+    "CREATE_ACCOUNT": "إنشاء حساب",
+    "ALREADY_HAVE_ACCOUNT": "لديك حساب بالفعل؟",
+    "DONT_HAVE_ACCOUNT": "ليس لديك حساب؟"
+  },
+  "PRODUCT": {
+    "ADD_TO_CART": "أضف إلى السلة",
+    "BUY_NOW": "اشترِ الآن",
+    "NOTIFY_ME": "أبلغني",
+    "INSTANT_DIGITAL": "تسليم رقمي فوري",
+    "FEATURED": "مميز",
+    "OUT_OF_STOCK": "غير متوفر",
+    "LOAD_MORE": "تحميل المزيد من المنتجات"
+  },
+  "CART": {
+    "TITLE": "سلة التسوق",
+    "EMPTY_TITLE": "سلتك فارغة",
+    "EMPTY_TEXT": "تصفح السوق وأضف منتجات رقمية إلى سلتك.",
+    "CONTINUE_SHOPPING": "متابعة التسوق",
+    "CHECKOUT": "إتمام الشراء",
+    "SUBTOTAL": "المجموع الفرعي",
+    "DISCOUNT": "الخصم",
+    "TOTAL": "الإجمالي",
+    "PROMO_PLACEHOLDER": "رمز ترويجي",
+    "APPLY": "تطبيق",
+    "REMOVE": "إزالة",
+    "QUANTITY": "الكمية",
+    "ADD_ERROR": "تعذر الإضافة إلى السلة."
+  },
+  "CHECKOUT": {
+    "TITLE": "دفع آمن",
+    "BILLING": "تفاصيل الفوترة",
+    "PAYMENT": "طريقة الدفع",
+    "ORDER_SUMMARY": "ملخص الطلب",
+    "PLACE_ORDER": "تأكيد الطلب",
+    "PROCESSING": "جاري معالجة الدفع…"
+  },
+  "ACCOUNT": {
+    "DASHBOARD": "لوحة التحكم",
+    "ORDERS": "الطلبات",
+    "WISHLIST": "المفضلة",
+    "NOTIFICATIONS": "الإشعارات",
+    "REFERRAL": "الإحالة",
+    "PROFILE": "الملف الشخصي",
+    "SETTINGS": "الإعدادات",
+    "LOGOUT": "تسجيل الخروج",
+    "SIGNING_OUT": "جاري تسجيل الخروج…"
+  },
+  "VALIDATION": {
+    "REQUIRED": "{{field}} مطلوب.",
+    "EMAIL": "أدخل بريداً إلكترونياً صالحاً.",
+    "MIN_LENGTH": "يجب ألا يقل {{field}} عن {{min}} أحرف.",
+    "MAX_LENGTH": "يجب ألا يزيد {{field}} عن {{max}} حرفاً."
+  },
+  "ERRORS": {
+    "GENERIC": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "NOT_FOUND": "الصفحة غير موجودة",
+    "SERVER": "خطأ في الخادم"
+  },
+  "MESSAGES": {
+    "SUCCESS": "تم بنجاح",
+    "SAVED": "تم حفظ التغييرات"
+  },
+  "HOME": {
+    "TRUST": {
+      "INSTANT_TITLE": "تسليم فوري",
+      "INSTANT_DESC": "أكواد تصل في ثوانٍ",
+      "SECURE_TITLE": "دفع آمن",
+      "SECURE_DESC": "معاملات مشفرة بالكامل",
+      "SUPPORT_TITLE": "دعم 24/7",
+      "SUPPORT_DESC": "نحن هنا متى لعبت"
+    }
+  },
+  "ADMIN": {
+    "CLEARANCE": "تصريح المستوى 4",
+    "UTILITIES": "أدوات الإدارة",
+    "MESSAGES": "الرسائل",
+    "NETWORK_STATUS": "حالة الشبكة",
+    "PROFILE": "ملف المسؤول"
+  }
+}

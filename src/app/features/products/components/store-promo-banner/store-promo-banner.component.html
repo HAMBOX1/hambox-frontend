@@ -1,0 +1,37 @@
+<section class="store-promo" aria-labelledby="store-promo-title">
+  <img
+    class="store-promo__bg"
+    [src]="banner().backgroundImageUrl"
+    alt=""
+    aria-hidden="true"
+  />
+  <div class="store-promo__overlay"></div>
+
+  <div class="store-promo__content">
+    <div class="store-promo__copy">
+      <div class="store-promo__label">
+        <img [src]="flashIconSrc" alt="" aria-hidden="true" />
+        <span>FLASH DEALS</span>
+      </div>
+      <h2 id="store-promo-title" class="store-promo__headline">{{ banner().headline }}</h2>
+      <p class="store-promo__subheadline">{{ banner().subheadline }}</p>
+    </div>
+
+    <div class="store-promo__countdown" aria-label="Sale countdown">
+      <div class="store-promo__time-block">
+        <span class="store-promo__time-value">{{ hours() }}</span>
+        <span class="store-promo__time-unit">HOURS</span>
+      </div>
+      <span class="store-promo__time-sep" aria-hidden="true">:</span>
+      <div class="store-promo__time-block">
+        <span class="store-promo__time-value">{{ minutes() }}</span>
+        <span class="store-promo__time-unit">MINS</span>
+      </div>
+      <span class="store-promo__time-sep" aria-hidden="true">:</span>
+      <div class="store-promo__time-block">
+        <span class="store-promo__time-value">{{ seconds() }}</span>
+        <span class="store-promo__time-unit">SECS</span>
+      </div>
+    </div>
+  </div>
+</section>

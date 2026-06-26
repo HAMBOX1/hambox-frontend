@@ -1,0 +1,258 @@
+<div class="register-page">
+  <header class="register-page__topbar">
+    <a class="register-page__logo-link" routerLink="/home" aria-label="HAMBOX home">
+      <img class="register-page__logo" [src]="logoSrc" alt="HAMBOX" />
+    </a>
+
+    <div class="register-page__topbar-actions" aria-hidden="true">
+      <span class="register-page__topbar-icon register-page__topbar-icon--accent">
+        <i class="pi pi-shield"></i>
+      </span>
+      <span class="register-page__topbar-icon">
+        <i class="pi pi-lock"></i>
+      </span>
+    </div>
+  </header>
+
+  <div class="register-page__body">
+    <aside class="register-page__hero">
+      <div class="register-page__hero-copy">
+        <p class="register-page__eyebrow">Elite Access Tier</p>
+        <h1 class="register-page__headline">Join the Secure Gateway.</h1>
+        <p class="register-page__description">
+          Access high-fidelity logistics and secure operational data within the HAMBOX ecosystem.
+        </p>
+      </div>
+
+      <ul class="register-page__features">
+        @for (feature of features; track feature.title; let index = $index) {
+          <li
+            class="register-page__feature"
+            [class.register-page__feature--active]="activeFeatureIndex() === index"
+          >
+            <span class="register-page__feature-icon">
+              <i class="pi" [class]="feature.icon"></i>
+            </span>
+            <div class="register-page__feature-copy">
+              <h2 class="register-page__feature-title">{{ feature.title }}</h2>
+              <p class="register-page__feature-text">{{ feature.description }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+
+      <div class="register-page__gateway">
+        <div class="register-page__chip" aria-hidden="true">
+          <div class="register-page__chip-board"></div>
+          <div class="register-page__chip-hologram"></div>
+        </div>
+        <p class="register-page__gateway-status">
+          <span class="register-page__gateway-dot"></span>
+          Gateway Active
+        </p>
+      </div>
+    </aside>
+
+    <section class="register-page__panel" aria-label="Registration form">
+      <div class="register-card">
+        <nav class="register-stepper" aria-label="Registration progress">
+          @for (step of steps; track step.id; let last = $last) {
+            <div
+              class="register-stepper__item"
+              [class.register-stepper__item--active]="step.id === 1"
+              [class.register-stepper__item--complete]="false"
+            >
+              <span class="register-stepper__circle">{{ step.id }}</span>
+              <span class="register-stepper__label">{{ step.label }}</span>
+            </div>
+            @if (!last) {
+              <span class="register-stepper__line" aria-hidden="true"></span>
+            }
+          }
+        </nav>
+
+        <form class="register-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          @if (errorMessage()) {
+            <p class="register-form__banner register-form__banner--error" role="alert">
+              {{ errorMessage() }}
+            </p>
+          }
+
+          @if (successMessage()) {
+            <p class="register-form__banner register-form__banner--success" role="status">
+              {{ successMessage() }}
+            </p>
+          }
+
+          <div class="register-form__field">
+            <label class="register-form__label" for="register-full-name">Username</label>
+            <div class="register-form__control">
+              <i class="pi pi-user register-form__prefix" aria-hidden="true"></i>
+              <input
+                id="register-full-name"
+                class="register-form__input"
+                type="text"
+                autocomplete="name"
+                placeholder="John Doe"
+                formControlName="fullName"
+              />
+            </div>
+            @if (fieldError('fullName'); as message) {
+              <p class="register-form__error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="register-form__field">
+            <label class="register-form__label" for="register-email">Email</label>
+            <div class="register-form__control">
+              <i class="pi pi-at register-form__prefix" aria-hidden="true"></i>
+              <input
+                id="register-email"
+                class="register-form__input"
+                type="email"
+                autocomplete="email"
+                placeholder="commander@hambox.io"
+                formControlName="email"
+              />
+            </div>
+            @if (fieldError('email'); as message) {
+              <p class="register-form__error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="register-form__field">
+            <label class="register-form__label" for="register-phone">Phone Number</label>
+            <div class="register-form__control">
+              <i class="pi pi-mobile register-form__prefix" aria-hidden="true"></i>
+              <input
+                id="register-phone"
+                class="register-form__input"
+                type="tel"
+                autocomplete="tel"
+                placeholder="+1 (555) 000-0000"
+                formControlName="phone"
+              />
+            </div>
+          </div>
+
+          <div class="register-form__row">
+            <div class="register-form__field">
+              <label class="register-form__label" for="register-password">Password</label>
+              <div class="register-form__control">
+                <i class="pi pi-lock register-form__prefix" aria-hidden="true"></i>
+                <input
+                  id="register-password"
+                  class="register-form__input register-form__input--password"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  placeholder="••••••••"
+                  formControlName="password"
+                />
+                <button
+                  type="button"
+                  class="register-form__suffix"
+                  [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                  (click)="togglePasswordVisibility()"
+                >
+                  <i class="pi" [class]="showPassword() ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+              </div>
+              @if (fieldError('password'); as message) {
+                <p class="register-form__error">{{ message }}</p>
+              }
+            </div>
+
+            <div class="register-form__field">
+              <label class="register-form__label" for="register-confirm-password">Confirm Password</label>
+              <div class="register-form__control">
+                <i class="pi pi-shield register-form__prefix" aria-hidden="true"></i>
+                <input
+                  id="register-confirm-password"
+                  class="register-form__input register-form__input--password"
+                  [type]="showConfirmPassword() ? 'text' : 'password'"
+                  autocomplete="new-password"
+                  placeholder="••••••••"
+                  formControlName="confirmPassword"
+                />
+                <button
+                  type="button"
+                  class="register-form__suffix"
+                  [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+                  (click)="toggleConfirmPasswordVisibility()"
+                >
+                  <i class="pi" [class]="showConfirmPassword() ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+              </div>
+              @if (fieldError('confirmPassword'); as message) {
+                <p class="register-form__error">{{ message }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="register-form__field">
+            <label class="register-form__label" for="register-referral">
+              Referral Protocol <span class="register-form__optional">(Optional)</span>
+            </label>
+            <div class="register-form__control">
+              <i class="pi pi-qrcode register-form__prefix" aria-hidden="true"></i>
+              <input
+                id="register-referral"
+                class="register-form__input register-form__input--uppercase"
+                type="text"
+                placeholder="ENTER CODE"
+                formControlName="referralCode"
+              />
+            </div>
+          </div>
+
+          <div class="register-form__terms">
+            <p-checkbox
+              inputId="register-accept-terms"
+              formControlName="acceptTerms"
+              [binary]="true"
+            />
+            <label class="register-form__terms-label" for="register-accept-terms">
+              I acknowledge the
+              <a href="#" (click)="$event.preventDefault()">Terms of Service</a>
+              and
+              <a href="#" (click)="$event.preventDefault()">Privacy Protocol</a>.
+              I understand that account security is my responsibility.
+            </label>
+          </div>
+          @if (fieldError('acceptTerms'); as message) {
+            <p class="register-form__error register-form__error--terms">{{ message }}</p>
+          }
+
+          <button
+            pButton
+            type="submit"
+            class="register-form__submit"
+            label="Initialize Commander Profile"
+            [loading]="isSubmitting()"
+            [disabled]="isSubmitting()"
+          ></button>
+
+          <div class="register-form__social">
+            <div class="register-form__divider" role="presentation">
+              <span>Or continue with</span>
+            </div>
+
+            <div class="register-form__social-buttons">
+              <button type="button" class="register-form__social-btn" aria-label="Continue with Google">
+                <i class="pi pi-google"></i>
+              </button>
+              <button type="button" class="register-form__social-btn" aria-label="Continue with Facebook">
+                <i class="pi pi-facebook"></i>
+              </button>
+            </div>
+          </div>
+
+          <p class="register-form__sign-in">
+            Already initialized?
+            <a routerLink="/auth/login">Sign in</a>
+          </p>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>

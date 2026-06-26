@@ -1,0 +1,29 @@
+<section class="billing-panel" aria-label="Billing details">
+  <h2 class="billing-panel__title">Billing Details</h2>
+
+  <div class="billing-panel__fields">
+    <input
+      class="billing-panel__input"
+      type="email"
+      placeholder="Email Address"
+      autocomplete="email"
+      [value]="billing().email"
+      (input)="updateEmail($event)"
+    />
+
+    <div class="billing-panel__select-wrap">
+      <select
+        class="billing-panel__select"
+        [value]="billing().country"
+        (change)="updateCountry($event)"
+      >
+        @for (country of countries; track country.value) {
+          <option [value]="country.value">{{ country.label }}</option>
+        }
+      </select>
+      <svg class="billing-panel__chevron" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+</section>

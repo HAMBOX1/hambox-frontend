@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.store-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 40px;
+}
+
+.store-load-more__button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-surface);
+  box-shadow: var(--color-shadow-xs);
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    border-color: var(--color-primary-border);
+    background: var(--color-primary-muted);
+    box-shadow: var(--color-shadow-sm);
+  }
+}
+
+.store-load-more__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-primary);
+}
+
+.store-load-more__label {
+  padding-left: 4px;
+  color: var(--color-primary);
+  font-family: var(--sf-font-body);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

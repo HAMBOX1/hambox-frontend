@@ -1,0 +1,164 @@
+{
+  "COMMON": {
+    "APP_NAME": "HAMBOX",
+    "LANGUAGE_SWITCHER": "Change language",
+    "CURRENCY_SWITCHER": "Change currency",
+    "LOADING": "Loading…",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "CLOSE": "Close",
+    "CONTINUE": "Continue",
+    "BACK": "Back",
+    "SEARCH": "Search",
+    "VIEW_ALL": "View all",
+    "LEARN_MORE": "Learn more",
+    "LANGUAGES": {
+      "EN": "English",
+      "AR": "Arabic"
+    },
+    "THEME": {
+      "SWITCH_TO_LIGHT": "Switch to light theme",
+      "SWITCH_TO_DARK": "Switch to dark theme",
+      "LIGHT": "Light",
+      "DARK": "Dark"
+    }
+  },
+  "NAVBAR": {
+    "HOME_ARIA": "HAMBOX home",
+    "SEARCH_PLACEHOLDER": "Search digital goods…",
+    "SEARCH_MARKETPLACE": "Search marketplace…",
+    "SECURE_CHECKOUT": "Secure Checkout",
+    "SIGN_IN": "Sign In",
+    "SIGN_IN_ARIA": "Sign in",
+    "TOGGLE_NAV": "Toggle navigation",
+    "CATEGORY_NAV": "Category navigation",
+    "MOBILE_NAV": "Mobile navigation",
+    "ACCOUNT_MENU": "Account menu",
+    "CATEGORIES": {
+      "GAMES": "Games",
+      "GIFT_CARDS": "Gift Cards",
+      "SUBSCRIPTIONS": "Subscriptions",
+      "DEALS": "Deals"
+    }
+  },
+  "FOOTER": {
+    "DESCRIPTION": "The world's premier digital terminal for gamers. High-fidelity service since 2018.",
+    "NAVIGATION": "Navigation",
+    "PROTOCOL": "Protocol",
+    "CONTACT": "Contact us",
+    "SYSTEM_STATUS": "System status",
+    "STATUS_OK": "All systems operational",
+    "COPYRIGHT": "© 2026 HAMBOX Global. All rights reserved. Secure terminal active.",
+    "LINKS": {
+      "MARKETPLACE": "Marketplace",
+      "GIFT_CARDS": "Gift Cards",
+      "SUBSCRIPTIONS": "Subscriptions",
+      "AFFILIATE": "Affiliate program",
+      "TERMS": "Terms of service",
+      "PRIVACY": "Privacy protocol",
+      "SUPPORT": "Support center",
+      "VERIFICATION": "Verification status"
+    },
+    "SOCIAL": {
+      "FACEBOOK": "Facebook",
+      "WHATSAPP": "WhatsApp",
+      "TELEGRAM": "Telegram"
+    }
+  },
+  "CURRENCY": {
+    "USD": "US Dollar",
+    "EUR": "Euro",
+    "EGP": "Egyptian Pound",
+    "SAR": "Saudi Riyal"
+  },
+  "AUTH": {
+    "LOGIN_TITLE": "Welcome back",
+    "LOGIN_SUBTITLE": "Sign in to access your digital vault",
+    "REGISTER_TITLE": "Create your account",
+    "REGISTER_SUBTITLE": "Join the HAMBOX marketplace",
+    "EMAIL": "Email",
+    "PASSWORD": "Password",
+    "FIRST_NAME": "First name",
+    "LAST_NAME": "Last name",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "SIGN_IN": "Sign in",
+    "CREATE_ACCOUNT": "Create account",
+    "ALREADY_HAVE_ACCOUNT": "Already have an account?",
+    "DONT_HAVE_ACCOUNT": "Don't have an account?"
+  },
+  "PRODUCT": {
+    "ADD_TO_CART": "Add to cart",
+    "BUY_NOW": "Buy now",
+    "NOTIFY_ME": "Notify me",
+    "INSTANT_DIGITAL": "Instant digital",
+    "FEATURED": "Featured",
+    "OUT_OF_STOCK": "Out of stock",
+    "LOAD_MORE": "Load more products"
+  },
+  "CART": {
+    "TITLE": "Your cart",
+    "EMPTY_TITLE": "Your cart is empty",
+    "EMPTY_TEXT": "Browse the marketplace and add digital goods to your cart.",
+    "CONTINUE_SHOPPING": "Continue shopping",
+    "CHECKOUT": "Checkout",
+    "SUBTOTAL": "Subtotal",
+    "DISCOUNT": "Discount",
+    "TOTAL": "Total",
+    "PROMO_PLACEHOLDER": "Promo code",
+    "APPLY": "Apply",
+    "REMOVE": "Remove",
+    "QUANTITY": "Quantity",
+    "ADD_ERROR": "Unable to add to cart."
+  },
+  "CHECKOUT": {
+    "TITLE": "Secure checkout",
+    "BILLING": "Billing details",
+    "PAYMENT": "Payment method",
+    "ORDER_SUMMARY": "Order summary",
+    "PLACE_ORDER": "Place order",
+    "PROCESSING": "Processing payment…"
+  },
+  "ACCOUNT": {
+    "DASHBOARD": "Dashboard",
+    "ORDERS": "Orders",
+    "WISHLIST": "Wishlist",
+    "NOTIFICATIONS": "Notifications",
+    "REFERRAL": "Referral",
+    "PROFILE": "Profile",
+    "SETTINGS": "Settings",
+    "LOGOUT": "Log out",
+    "SIGNING_OUT": "Signing out…"
+  },
+  "VALIDATION": {
+    "REQUIRED": "{{field}} is required.",
+    "EMAIL": "Enter a valid email address.",
+    "MIN_LENGTH": "{{field}} must be at least {{min}} characters.",
+    "MAX_LENGTH": "{{field}} must not exceed {{max}} characters."
+  },
+  "ERRORS": {
+    "GENERIC": "Something went wrong. Please try again.",
+    "NOT_FOUND": "Page not found",
+    "SERVER": "Server error"
+  },
+  "MESSAGES": {
+    "SUCCESS": "Success",
+    "SAVED": "Changes saved"
+  },
+  "HOME": {
+    "TRUST": {
+      "INSTANT_TITLE": "Instant delivery",
+      "INSTANT_DESC": "Codes delivered in seconds",
+      "SECURE_TITLE": "Secure payment",
+      "SECURE_DESC": "100% encrypted transactions",
+      "SUPPORT_TITLE": "24/7 support",
+      "SUPPORT_DESC": "We're here whenever you play"
+    }
+  },
+  "ADMIN": {
+    "CLEARANCE": "Level 4 clearance",
+    "UTILITIES": "Admin utilities",
+    "MESSAGES": "Messages",
+    "NETWORK_STATUS": "Network status",
+    "PROFILE": "Admin profile"
+  }
+}

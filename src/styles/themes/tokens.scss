@@ -1,0 +1,196 @@
+// Semantic design tokens — the public API for all components.
+// Pages and components should prefer --color-* over legacy --sf-* / --admin-*.
+:root,
+[data-theme] {
+  --color-background: var(--theme-background);
+  --color-surface: var(--theme-surface);
+  --color-card: var(--theme-card);
+  --color-elevated: var(--theme-elevated);
+  --color-sidebar: var(--theme-sidebar);
+  --color-header: var(--theme-header);
+  --color-section: var(--theme-section);
+  --color-glass: var(--theme-glass);
+  --color-nav: var(--theme-nav);
+  --color-panel: var(--theme-panel);
+
+  --color-nav-bg: var(--theme-nav-bg);
+  --color-nav-panel: var(--theme-nav-panel);
+  --color-nav-search-bg: var(--theme-nav-search-bg);
+  --color-nav-text: var(--theme-nav-text);
+  --color-nav-heading: var(--theme-nav-heading);
+  --color-nav-muted: var(--theme-nav-muted);
+  --color-nav-border: var(--theme-nav-border);
+  --color-nav-soft-border: var(--theme-nav-soft-border);
+  --color-nav-hover: var(--theme-nav-hover);
+  --color-nav-shadow: var(--theme-nav-shadow);
+  --color-nav-elevated-shadow: var(--theme-nav-elevated-shadow);
+
+  --color-card-shell: var(--theme-card-shell);
+  --color-card-shell-border: var(--theme-card-shell-border);
+  --color-card-overlay: var(--theme-card-overlay);
+  --color-card-media-gradient: var(--theme-card-media-gradient);
+  --color-platform-badge-bg: var(--theme-platform-badge-bg);
+  --color-favorite-bg: var(--theme-favorite-bg);
+  --color-featured-bg: var(--theme-featured-bg);
+  --color-featured-text: var(--theme-featured-text);
+  --color-featured-border: var(--theme-featured-border);
+  --color-rating: var(--theme-rating);
+  --color-price-glow: var(--theme-price-glow);
+  --color-cta-gradient-start: var(--theme-cta-gradient-start);
+  --color-cta-gradient-end: var(--theme-cta-gradient-end);
+  --color-cta-icon-filter: var(--theme-cta-icon-filter);
+  --color-panel-bg: var(--theme-panel-bg);
+  --color-panel-border: var(--theme-panel-border);
+  --color-mobile-nav-bg: var(--theme-mobile-nav-bg);
+  --color-dropdown-bg: var(--theme-dropdown-bg);
+  --color-dropdown-shadow: var(--theme-dropdown-shadow);
+  --color-promo-overlay: var(--theme-promo-overlay);
+  --color-promo-glow: var(--theme-promo-glow);
+  --color-promo-countdown-bg: var(--theme-promo-countdown-bg);
+  --color-referral-banner-bg: var(--theme-referral-banner-bg);
+  --color-hero-accent-glow: var(--theme-hero-accent-glow);
+  --color-hero-info-glow: var(--theme-hero-info-glow);
+  --color-btn-ghost-hover: var(--theme-btn-ghost-hover);
+  --color-card-hover-shadow: var(--theme-card-hover-shadow);
+  --color-text-caption: var(--theme-text-caption);
+
+  --color-border: var(--theme-border);
+  --color-border-subtle: var(--theme-border-subtle);
+  --color-border-strong: var(--theme-border-strong);
+  --color-divider: var(--theme-divider);
+
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-primary-hover);
+  --color-primary-active: var(--theme-primary-active);
+  --color-primary-muted: var(--theme-primary-muted);
+  --color-primary-border: var(--theme-primary-border);
+  --color-primary-text: var(--theme-primary-text);
+  --color-primary-text-on: var(--theme-text-on-primary);
+
+  --color-success: var(--theme-success);
+  --color-success-muted: var(--theme-success-muted);
+  --color-warning: var(--theme-warning);
+  --color-warning-muted: var(--theme-warning-muted);
+  --color-danger: var(--theme-danger);
+  --color-danger-muted: var(--theme-danger-muted);
+  --color-info: var(--theme-info);
+  --color-info-muted: var(--theme-info-muted);
+
+  --color-text-primary: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-muted: var(--theme-text-muted);
+  --color-text-inverse: var(--theme-text-inverse);
+
+  --color-input-bg: var(--theme-input-bg);
+  --color-input-border: var(--theme-input-border);
+  --color-input-placeholder: var(--theme-input-placeholder);
+
+  --color-table-header: var(--theme-table-header);
+  --color-table-row-hover: var(--theme-table-row-hover);
+  --color-table-border: var(--theme-table-border);
+
+  --color-scrollbar-track: var(--theme-scrollbar-track);
+  --color-scrollbar-thumb: var(--theme-scrollbar-thumb);
+
+  --color-overlay: var(--theme-overlay);
+  --color-focus-ring: var(--theme-focus-ring);
+
+  --color-btn-primary-bg: var(--theme-btn-primary-bg);
+  --color-btn-primary-text: var(--theme-btn-primary-text);
+  --color-btn-secondary-bg: var(--theme-btn-secondary-bg);
+  --color-btn-secondary-text: var(--theme-btn-secondary-text);
+  --color-btn-secondary-border: var(--theme-btn-secondary-border);
+
+  --color-membership-border: var(--theme-membership-border);
+  --color-membership-bg: var(--theme-membership-bg);
+  --color-membership-text: var(--theme-membership-text);
+  --color-avatar-gradient: var(--theme-avatar-gradient);
+
+  --color-price-green: var(--theme-price-green);
+  --color-price-blue: var(--theme-price-blue);
+  --color-price-peach: var(--theme-price-peach);
+  --color-flash-label: var(--theme-flash-label);
+  --color-flash-badge-bg: var(--theme-flash-badge-bg);
+  --color-flash-badge-text: var(--theme-flash-badge-text);
+
+  --hambox-transition-default: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --hambox-transition-theme: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+
+  // Legacy HAMBOX global tokens
+  --hambox-bg-default: var(--color-background);
+  --hambox-bg-paper: var(--color-surface);
+  --hambox-bg-subtle: var(--color-section);
+  --hambox-text-primary: var(--color-text-primary);
+  --hambox-text-secondary: var(--color-text-secondary);
+  --hambox-text-tertiary: var(--color-text-muted);
+  --hambox-text-inverse: var(--color-text-inverse);
+  --hambox-border-light: var(--color-border-subtle);
+  --hambox-border-default: var(--color-border);
+  --hambox-border-strong: var(--color-border-strong);
+  --hambox-success: var(--color-success);
+  --hambox-warning: var(--color-warning);
+  --hambox-danger: var(--color-danger);
+  --hambox-info: var(--color-info);
+  --hambox-secondary-50: var(--color-section);
+  --hambox-secondary-100: var(--color-border-subtle);
+  --hambox-secondary-500: var(--color-text-secondary);
+  --hambox-secondary-800: var(--color-text-primary);
+  --hambox-secondary-900: var(--color-text-primary);
+
+  // Legacy storefront tokens (backward compatibility)
+  --sf-bg-base: var(--color-background);
+  --sf-bg-section: var(--color-section);
+  --sf-bg-flash: var(--theme-flash);
+  --sf-bg-card: var(--color-card);
+  --sf-bg-icon: var(--theme-icon);
+  --sf-bg-footer-card: var(--theme-footer-card);
+  --sf-bg-glass: var(--color-glass);
+  --sf-bg-nav: var(--color-nav);
+
+  --sf-accent: var(--color-primary);
+  --sf-accent-end: var(--color-primary-hover);
+  --sf-accent-muted: var(--color-primary-muted);
+  --sf-accent-border: var(--color-primary-border);
+  --sf-accent-text: var(--color-primary-text);
+  --sf-accent-text-dark: var(--theme-primary-text-dark);
+
+  --sf-text-primary: var(--color-text-primary);
+  --sf-text-secondary: var(--color-text-secondary);
+  --sf-text-placeholder: var(--color-input-placeholder);
+  --sf-text-heading: var(--color-text-primary);
+
+  --sf-flash-label: var(--color-flash-label);
+  --sf-flash-badge-bg: var(--color-flash-badge-bg);
+  --sf-flash-badge-text: var(--color-flash-badge-text);
+  --sf-price-green: var(--color-price-green);
+  --sf-price-blue: var(--color-price-blue);
+  --sf-price-peach: var(--color-price-peach);
+
+  --sf-border-subtle: var(--color-border-subtle);
+  --sf-border-default: var(--color-border);
+  --sf-border-white-20: var(--color-border-strong);
+  --sf-blur-nav: var(--theme-blur-nav);
+  --sf-blur-glass: var(--theme-blur-glass);
+
+  // Legacy admin tokens
+  --admin-bg-base: var(--color-background);
+  --admin-bg-elevated: var(--color-surface);
+  --admin-bg-panel: var(--color-card);
+  --admin-bg-sidebar: var(--color-sidebar);
+  --admin-bg-input: var(--color-input-bg);
+  --admin-bg-hover: var(--color-table-row-hover);
+  --admin-bg-active: var(--color-primary-muted);
+  --admin-border-subtle: var(--color-border-subtle);
+  --admin-border-default: var(--color-border);
+  --admin-border-strong: var(--color-border-strong);
+  --admin-text-primary: var(--color-text-primary);
+  --admin-text-secondary: var(--color-text-secondary);
+  --admin-text-muted: var(--color-text-muted);
+  --admin-text-inverse: var(--color-text-inverse);
+  --admin-accent-blue: var(--color-info);
+  --admin-accent-blue-soft: var(--color-info-muted);
+  --admin-accent-green: var(--color-primary);
+  --admin-accent-green-soft: var(--color-primary-muted);
+  --admin-accent-red: var(--color-danger);
+  --admin-accent-amber: var(--color-warning);
+}

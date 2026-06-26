@@ -1,0 +1,65 @@
+<div class="category-table">
+  <p-table
+    class="category-table__grid"
+    [value]="[...categories()]"
+    [loading]="loading()"
+    [lazy]="true"
+    [paginator]="totalRecords() > 0"
+    [rows]="pageSize()"
+    [totalRecords]="totalRecords()"
+    [first]="first()"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    (onLazyLoad)="onLazyLoad($event)"
+    dataKey="id"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name (EN)</th>
+        <th>Name (AR)</th>
+        <th>Slug</th>
+        <th>Status</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-category>
+      <tr>
+        <td>
+          <span class="category-table__name">{{ category.nameEn }}</span>
+        </td>
+        <td>
+          <span class="category-table__name category-table__name--rtl" dir="rtl">{{ category.nameAr }}</span>
+        </td>
+        <td>
+          <code class="category-table__slug">{{ category.slug }}</code>
+        </td>
+        <td>
+          <p-tag
+            [value]="category.isActive ? 'Active' : 'Inactive'"
+            [severity]="category.isActive ? 'success' : 'secondary'"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4">
+          <div class="category-table__empty" role="status">
+            <i class="pi pi-inbox category-table__empty-icon" aria-hidden="true"></i>
+            <p class="category-table__empty-title">
+              {{ searchActive() ? 'No matching categories' : 'No categories yet' }}
+            </p>
+            <p class="category-table__empty-copy">
+              @if (searchActive()) {
+                Try a different search term or clear the filter to see all categories.
+              } @else {
+                Create your first category to organize products in the catalog.
+              }
+            </p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

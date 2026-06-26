@@ -1,0 +1,21 @@
+<section class="flash-deals" aria-labelledby="flash-deals-title">
+  <div class="flash-deals__inner">
+    <header class="flash-deals__header">
+      <div class="flash-deals__heading">
+        <div class="flash-deals__label">
+          <img [src]="flashIconSrc" alt="" aria-hidden="true" />
+          <span>FLASH DEALS</span>
+        </div>
+        <h2 id="flash-deals-title" class="flash-deals__title">{{ countdownLabel() }}</h2>
+      </div>
+
+      <a routerLink="/products" class="flash-deals__link">View all deals</a>
+    </header>
+
+    <div class="flash-deals__grid">
+      @for (deal of deals(); track deal.id) {
+        <app-flash-deal-card [deal]="deal" />
+      }
+    </div>
+  </div>
+</section>

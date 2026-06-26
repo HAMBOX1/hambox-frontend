@@ -1,0 +1,14 @@
+<article class="value-card">
+  <a class="value-card__link" [routerLink]="item().route">
+    <div class="value-card__left">
+      <p class="value-card__badge">{{ item().badge }}</p>
+      <h4 class="value-card__title">{{ item().title }}</h4>
+      <p class="value-card__subtitle">{{ item().subtitle }}</p>
+    </div>
+
+    <div class="value-card__right">
+      <p class="value-card__price">{{ item().priceUsd | hamboxCurrency }}</p>
+      <span class="value-card__cta">Grab Now</span>
+    </div>
+  </a>
+</article>

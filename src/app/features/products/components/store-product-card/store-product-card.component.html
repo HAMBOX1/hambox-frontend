@@ -1,0 +1,96 @@
+<article
+  class="store-card"
+  [class.store-card--highlighted]="product().highlighted"
+  [class.store-card--out-of-stock]="product().outOfStock"
+>
+  <a class="store-card__link" [routerLink]="['/products', product().id]">
+    <div class="store-card__media">
+      <img
+        class="store-card__image"
+        [src]="product().imageUrl"
+        [alt]="product().title"
+        loading="lazy"
+      />
+      <div class="store-card__media-shade" aria-hidden="true"></div>
+
+      @if (product().discountLabel) {
+        <span class="store-card__badge store-card__badge--discount">{{ product().discountLabel }}</span>
+      }
+
+      @if (product().featuredBadge) {
+        <span class="store-card__badge store-card__badge--featured">{{ 'PRODUCT.FEATURED' | translate }}</span>
+      }
+
+      @if (!product().outOfStock) {
+        <span class="store-card__favorite" aria-hidden="true">
+          <svg width="16" height="15" viewBox="0 0 17 16" fill="none" aria-hidden="true">
+            <path
+              d="M8.5 14.5l-1.1-1C3.7 10.1 1.5 8.1 1.5 5.5 1.5 3.6 3 2 4.9 2c1.1 0 2.1.5 2.8 1.3L8.5 4.2l.8-0.9C10 2.5 11 2 12.1 2 14 2 15.5 3.6 15.5 5.5c0 2.6-2.2 4.6-5.9 8l-1.1 1z"
+              stroke="currentColor"
+              stroke-width="1.2"
+              fill="none"
+            />
+          </svg>
+        </span>
+      }
+
+      @if (product().outOfStock) {
+        <div class="store-card__stock-overlay">
+          <span class="store-card__stock-label">{{ 'PRODUCT.OUT_OF_STOCK' | translate }}</span>
+        </div>
+      }
+
+      <span class="store-card__platform">{{ product().platformLabel }}</span>
+
+      @if (product().rating !== undefined) {
+        <span class="store-card__rating">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+            <path d="M6 1l1.5 3.5L11 5l-2.8 2.6.7 4.1L6 9.8 3.1 11.7l.7-4.1L1 5l3.5-.5L6 1z" />
+          </svg>
+          {{ product().rating }}
+        </span>
+      }
+    </div>
+
+    <div class="store-card__content">
+      <h3 class="store-card__title">{{ product().title }}</h3>
+
+      @if (product().instantDigital) {
+        <span class="store-card__tag">
+          <svg width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true">
+            <path d="M4 0L0 2v6l4 2 4-2V2L4 0z" />
+          </svg>
+          {{ 'PRODUCT.INSTANT_DIGITAL' | translate }}
+        </span>
+      }
+    </div>
+  </a>
+
+  <footer class="store-card__footer">
+    <div class="store-card__pricing" [class.store-card__pricing--muted]="product().priceMuted">
+      @if (product().originalPriceUsd) {
+        <span class="store-card__original">{{ product().originalPriceUsd | hamboxCurrency }}</span>
+      }
+      <span class="store-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
+    </div>
+
+    @switch (product().cta) {
+      @case ('cart') {
+        <button
+          type="button"
+          class="store-card__cta store-card__cta--icon"
+          [attr.aria-label]="'PRODUCT.ADD_TO_CART' | translate"
+          (click)="addToCart($event)"
+        >
+          <img [src]="cartIconSrc" alt="" aria-hidden="true" />
+        </button>
+      }
+      @case ('buy-now') {
+        <button type="button" class="store-card__cta store-card__cta--buy">{{ 'PRODUCT.BUY_NOW' | translate }}</button>
+      }
+      @case ('notify-me') {
+        <button type="button" class="store-card__cta store-card__cta--notify">{{ 'PRODUCT.NOTIFY_ME' | translate }}</button>
+      }
+    }
+  </footer>
+</article>

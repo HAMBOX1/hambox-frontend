@@ -1,0 +1,96 @@
+<p-toast position="top-right" />
+
+<section class="product-create-page">
+  <header class="product-create-page__header">
+    <a class="product-create-page__back" routerLink="/admin/inventory">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>
+      <span>Back to Catalog</span>
+    </a>
+
+    <div class="product-create-page__heading">
+      <h1 class="product-create-page__title">Create Product</h1>
+      <p class="product-create-page__subtitle">Add a new enterprise listing to the HAMBOX catalog.</p>
+    </div>
+  </header>
+
+  @if (showDraftBanner()) {
+    <div
+      class="product-create-page__draft-banner"
+      [class.product-create-page__draft-banner--saving]="draftSaving()"
+      role="status"
+      aria-live="polite"
+    >
+      @if (draftSaving()) {
+        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      } @else {
+        <i class="pi pi-save" aria-hidden="true"></i>
+      }
+      <span>{{ draftBanner() }}</span>
+    </div>
+  }
+
+  <app-product-create-stepper
+    [steps]="steps"
+    [activeStep]="activeStep()"
+    (stepSelect)="onStepSelect($event)"
+  />
+
+  <div class="product-create-page__content">
+    @if (activeStep() === 'overview') {
+      <section class="product-create-page__panel">
+        <h2 class="product-create-page__section-title">Overview</h2>
+        <p class="product-create-page__section-copy">
+          Start with the required product details in Basic Information. Variants, fulfillment,
+          pricing, inventory, SEO, and visibility controls will be enabled in later phases.
+        </p>
+      </section>
+    }
+
+    @if (activeStep() === 'basic-information') {
+      <section class="product-create-page__panel">
+        <h2 class="product-create-page__section-title">Basic Information</h2>
+        <p class="product-create-page__section-copy">
+          Enter the core catalog fields required to publish a new product listing.
+        </p>
+
+        <app-product-basic-info-form
+          [categories]="categories()"
+          [categoriesLoading]="categoriesLoading()"
+          [categoriesError]="categoriesError()"
+          [disabled]="submitting()"
+        />
+      </section>
+
+      <section class="product-create-page__panel">
+        <h2 class="product-create-page__section-title">Product Assets</h2>
+        <p class="product-create-page__section-copy">
+          Upload product imagery. The first image becomes the primary storefront image unless you choose another.
+        </p>
+
+        <app-product-assets-upload (assetsChanged)="onAssetsChanged()" />
+      </section>
+    }
+  </div>
+
+  <label class="product-create-page__publish-option">
+    <p-checkbox
+      [binary]="true"
+      [ngModel]="publishToStorefront()"
+      (ngModelChange)="publishToStorefront.set($event)"
+      [disabled]="submitting()"
+      inputId="publishToStorefront"
+    />
+    <span>
+      <strong>Publish to storefront</strong>
+      <span class="product-create-page__publish-hint">
+        Sets status to Active so customers can see this product. Leave unchecked to save as Draft.
+      </span>
+    </span>
+  </label>
+
+  <app-product-form-footer
+    [submitting]="submitting()"
+    (cancel)="onCancel()"
+    (create)="onCreate()"
+  />
+</section>

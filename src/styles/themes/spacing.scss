@@ -1,0 +1,29 @@
+// Static spacing scale — theme-independent
+:root {
+  --hambox-spacing-1: 0.25rem;
+  --hambox-spacing-2: 0.5rem;
+  --hambox-spacing-3: 0.75rem;
+  --hambox-spacing-4: 1rem;
+  --hambox-spacing-5: 1.25rem;
+  --hambox-spacing-6: 1.5rem;
+  --hambox-spacing-8: 2rem;
+  --hambox-spacing-10: 2.5rem;
+  --hambox-spacing-12: 3rem;
+  --hambox-spacing-16: 4rem;
+
+  --sf-container-max: 1280px;
+  --sf-container-px: 64px;
+  --sf-container-px-tablet: 32px;
+  --sf-container-px-mobile: 16px;
+  --sf-nav-height: var(--theme-nav-height, 80px);
+  --sf-hero-height: 600px;
+  --sf-section-gap: 32px;
+  --sf-grid-gap: 24px;
+
+  --admin-sidebar-width: 15.5rem;
+  --admin-topbar-height: 4.5rem;
+  --admin-content-padding: 1.5rem;
+  --admin-content-padding-mobile: 1rem;
+  --admin-page-gap: 1.25rem;
+  --admin-panel-padding: 1.25rem;
+}

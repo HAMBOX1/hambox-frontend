@@ -1,0 +1,20 @@
+// Theme-specific shadow values are set in dark.scss / light.scss via --theme-shadow-*.
+// This file declares semantic shadow aliases consumed by components.
+:root,
+[data-theme] {
+  --color-shadow-sm: var(--theme-shadow-sm);
+  --color-shadow-md: var(--theme-shadow-md);
+  --color-shadow-lg: var(--theme-shadow-lg);
+  --color-shadow-xl: var(--theme-shadow-xl);
+  --color-shadow-xs: var(--theme-shadow-xs);
+  --color-shadow-accent-sm: var(--theme-shadow-accent-sm);
+  --color-shadow-accent-md: var(--theme-shadow-accent-md);
+
+  --hambox-shadow-sm: var(--color-shadow-sm);
+  --hambox-shadow-md: var(--color-shadow-md);
+  --hambox-shadow-lg: var(--color-shadow-lg);
+  --hambox-shadow-xl: var(--color-shadow-xl);
+  --sf-shadow-accent-sm: var(--color-shadow-accent-sm);
+  --sf-shadow-accent-md: var(--color-shadow-accent-md);
+  --admin-shadow-panel: var(--color-shadow-lg);
+}

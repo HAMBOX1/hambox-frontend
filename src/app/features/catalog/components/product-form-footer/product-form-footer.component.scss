@@ -1,0 +1,59 @@
+.product-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--admin-border-subtle);
+}
+
+.product-form-footer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+}
+
+:host ::ng-deep {
+  .product-form-footer__btn.p-button {
+    padding: 0.625rem 1rem;
+    border-radius: var(--admin-radius-sm);
+    font-family: var(--admin-font-body);
+    font-weight: 700;
+  }
+
+  .product-form-footer__btn--ghost.p-button {
+    border-color: var(--admin-border-default);
+    background: transparent;
+    color: var(--admin-text-secondary);
+  }
+
+  .product-form-footer__btn--primary.p-button {
+    border-color: transparent;
+    background: var(--admin-accent-green);
+    color: var(--admin-text-inverse);
+  }
+
+  .product-form-footer__btn--primary.p-button:enabled:hover {
+    filter: brightness(1.05);
+  }
+}
+
+@media (max-width: 767px) {
+  .product-form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .product-form-footer__actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  :host ::ng-deep .product-form-footer__actions .p-button {
+    flex: 1 1 auto;
+  }
+}

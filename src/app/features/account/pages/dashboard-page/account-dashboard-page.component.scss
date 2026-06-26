@@ -1,0 +1,294 @@
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-page__title {
+  margin: 0 0 0.375rem;
+  font-family: var(--sf-font-heading);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 700;
+}
+
+.dashboard-page__subtitle {
+  margin: 0;
+  color: var(--sf-text-secondary);
+  font-size: 1rem;
+}
+
+.dashboard-page__membership {
+  min-width: 14rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--color-membership-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-membership-bg);
+}
+
+.dashboard-page__membership-tier {
+  margin: 0 0 0.25rem;
+  color: var(--color-membership-text);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-page__membership-title {
+  margin: 0 0 0.375rem;
+  font-family: var(--sf-font-heading);
+  font-size: 1.25rem;
+}
+
+.dashboard-page__membership-meta {
+  margin: 0;
+  color: var(--sf-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.dashboard-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.9fr);
+  gap: 1.25rem;
+}
+
+.dashboard-page__wishlist,
+.dashboard-page__referral,
+.dashboard-page__activity {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-card);
+  box-shadow: var(--color-shadow-sm);
+  transition: var(--hambox-transition-theme);
+}
+
+.dashboard-page__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    font-family: var(--sf-font-heading);
+    font-size: 1.125rem;
+  }
+
+  a,
+  .dashboard-page__section-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--sf-accent);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
+
+.dashboard-page__wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.wishlist-card {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--sf-border-subtle);
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-bg-card);
+}
+
+.wishlist-card__image-wrap {
+  overflow: hidden;
+  border-radius: var(--sf-radius-sm);
+  box-shadow: var(--color-shadow-accent-md);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 4.5rem;
+    object-fit: cover;
+  }
+}
+
+.wishlist-card__body {
+  position: relative;
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+  }
+}
+
+.wishlist-card__price {
+  margin: 0;
+  color: var(--sf-accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.wishlist-card__cart-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--sf-border-default);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-btn-secondary-bg);
+  color: var(--sf-text-secondary);
+  cursor: pointer;
+}
+
+.dashboard-page__referral-label {
+  margin: 0 0 0.5rem;
+  color: var(--sf-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dashboard-page__referral-points {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+
+  strong {
+    color: var(--sf-accent);
+  }
+}
+
+.dashboard-page__progress {
+  height: 0.5rem;
+  margin-bottom: 0.75rem;
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-border-subtle);
+  overflow: hidden;
+}
+
+.dashboard-page__progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+}
+
+.dashboard-page__referral-tier {
+  margin: 0 0 1rem;
+  color: var(--sf-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.dashboard-page__invite-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-accent);
+  color: var(--sf-accent-text);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--sf-shadow-accent-sm);
+}
+
+.dashboard-page__empty,
+.dashboard-page__loading,
+.dashboard-page__error {
+  padding: 2rem;
+  border: 1px dashed var(--sf-border-default);
+  border-radius: var(--sf-radius-md);
+  color: var(--sf-text-secondary);
+  text-align: center;
+}
+
+.dashboard-page__retry {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-accent);
+  color: var(--sf-accent-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.activity-table__head,
+.activity-table__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.8fr 0.8fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.activity-table__head {
+  color: var(--sf-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--sf-border-subtle);
+}
+
+.activity-table__row {
+  border-bottom: 1px solid var(--sf-border-subtle);
+  font-size: 0.875rem;
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--sf-text-secondary);
+    font-size: 0.8125rem;
+  }
+}
+
+.activity-table__status {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-success-muted);
+  color: var(--color-success);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@media (max-width: 991px) {
+  .dashboard-page__header,
+  .dashboard-page__grid {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-page__wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-table__head,
+  .activity-table__row {
+    grid-template-columns: 1fr;
+  }
+}

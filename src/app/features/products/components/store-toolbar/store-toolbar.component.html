@@ -1,0 +1,38 @@
+<div class="store-toolbar">
+  <div class="store-toolbar__pills" role="tablist" aria-label="Product categories">
+    @for (category of categories(); track category.id) {
+      <button
+        type="button"
+        class="store-toolbar__pill"
+        [class.store-toolbar__pill--active]="activeCategoryId() === category.id"
+        role="tab"
+        [attr.aria-selected]="activeCategoryId() === category.id"
+        (click)="onCategorySelect(category.id)"
+      >
+        {{ category.label }}
+      </button>
+    }
+  </div>
+
+  <div class="store-toolbar__sort">
+    <label class="store-toolbar__sort-label" for="store-sort">Sort by:</label>
+    <div class="store-toolbar__select">
+      <select
+        id="store-sort"
+        class="store-toolbar__select-native"
+        [value]="selectedSort()"
+        (change)="onSortSelect($event)"
+      >
+        @for (option of sortOptions(); track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <span class="store-toolbar__select-value">
+        {{ sortOptions().find((o) => o.value === selectedSort())?.label ?? 'Popular' }}
+      </span>
+      <svg class="store-toolbar__select-icon" width="21" height="21" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+</div>

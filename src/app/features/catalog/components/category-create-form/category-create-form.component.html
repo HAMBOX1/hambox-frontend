@@ -1,0 +1,79 @@
+<form class="category-create-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (serverError()) {
+    <div class="category-create-form__alert" role="alert">
+      <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+      <span>{{ serverError() }}</span>
+    </div>
+  }
+
+  <div class="category-create-form__field">
+    <label class="category-create-form__label" for="category-name-en">English name</label>
+    <input
+      pInputText
+      id="category-name-en"
+      class="category-create-form__input"
+      type="text"
+      formControlName="nameEn"
+      autocomplete="off"
+      (blur)="onNameEnBlur()"
+    />
+    @if (fieldError('nameEn'); as error) {
+      <p class="category-create-form__error">{{ error }}</p>
+    }
+  </div>
+
+  <div class="category-create-form__field">
+    <label class="category-create-form__label" for="category-name-ar">Arabic name</label>
+    <input
+      pInputText
+      id="category-name-ar"
+      class="category-create-form__input"
+      type="text"
+      formControlName="nameAr"
+      dir="rtl"
+      autocomplete="off"
+    />
+    @if (fieldError('nameAr'); as error) {
+      <p class="category-create-form__error">{{ error }}</p>
+    }
+  </div>
+
+  <div class="category-create-form__field">
+    <label class="category-create-form__label" for="category-slug">Slug</label>
+    <input
+      pInputText
+      id="category-slug"
+      class="category-create-form__input"
+      type="text"
+      formControlName="slug"
+      autocomplete="off"
+      placeholder="gift-cards"
+    />
+    @if (fieldError('slug'); as error) {
+      <p class="category-create-form__error">{{ error }}</p>
+    }
+    <p class="category-create-form__hint">Lowercase URL segment used in storefront routes.</p>
+  </div>
+
+  <div class="category-create-form__actions">
+    <button
+      pButton
+      type="button"
+      class="category-create-form__btn category-create-form__btn--ghost"
+      label="Cancel"
+      severity="secondary"
+      [disabled]="submitting()"
+      (click)="cancel()"
+    ></button>
+
+    <button
+      pButton
+      type="submit"
+      class="category-create-form__btn category-create-form__btn--primary"
+      label="Create Category"
+      icon="pi pi-plus"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+    ></button>
+  </div>
+</form>

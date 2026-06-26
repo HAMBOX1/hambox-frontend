@@ -1,0 +1,110 @@
+<section class="dashboard-page">
+  @if (loading()) {
+    <div class="dashboard-page__loading">Loading your dashboard...</div>
+  } @else if (error()) {
+    <div class="dashboard-page__error">
+      <p>{{ error() }}</p>
+      <button type="button" class="dashboard-page__retry" (click)="retry()">Retry</button>
+    </div>
+  } @else {
+    <header class="dashboard-page__header">
+      <div>
+        <h1 class="dashboard-page__title">Welcome back, {{ displayName() }}</h1>
+        <p class="dashboard-page__subtitle">Your gaming kingdom is ready for the next quest.</p>
+      </div>
+
+      @if (membership(); as card) {
+        <div class="dashboard-page__membership">
+          <p class="dashboard-page__membership-tier">Premium Tier</p>
+          <h2 class="dashboard-page__membership-title">{{ card.tier }} Member</h2>
+          <p class="dashboard-page__membership-meta">
+            Valid until {{ card.nextTierThreshold | hamboxCurrency:'1.0-0' }} tier
+            · {{ card.progressPercent | number:'1.0-0' }}% progress
+          </p>
+        </div>
+      }
+    </header>
+
+    <div class="dashboard-page__grid">
+      <section class="dashboard-page__wishlist">
+        <div class="dashboard-page__section-head">
+          <h2>Your Wishlist</h2>
+          <a routerLink="/account/wishlist">View All</a>
+        </div>
+
+        @if (wishlistPreview().length) {
+          <div class="dashboard-page__wishlist-grid">
+            @for (item of wishlistPreview(); track item.productId; let i = $index) {
+              <article class="wishlist-card">
+                <div class="wishlist-card__image-wrap">
+                  <img [src]="itemImageUrl(item.productImageUrl, i)" [alt]="item.productNameEn" loading="lazy" />
+                </div>
+                <div class="wishlist-card__body">
+                  <h3>{{ item.productNameEn }}</h3>
+                  <p class="wishlist-card__price">{{ item.unitPrice | hamboxCurrency }}</p>
+                  <button
+                    type="button"
+                    class="wishlist-card__cart-btn"
+                    (click)="moveToCart(item.productId)"
+                    aria-label="Move to cart"
+                  >
+                    <i class="pi pi-shopping-bag" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="dashboard-page__empty">Your vault is empty. Browse the marketplace to save favorites.</p>
+        }
+      </section>
+
+      @if (referral(); as ref) {
+        <aside class="dashboard-page__referral">
+          <p class="dashboard-page__referral-label">Referral Status</p>
+          <p class="dashboard-page__referral-points">
+            Lifetime Rewards: <strong>{{ ref.lifetimePoints | number }} Points</strong>
+          </p>
+          <div class="dashboard-page__progress">
+            <div class="dashboard-page__progress-bar" [style.width.%]="referralProgress()"></div>
+          </div>
+          <p class="dashboard-page__referral-tier">{{ ref.tier }} Goal · {{ ref.successfulReferrals }} referrals</p>
+          <button type="button" class="dashboard-page__invite-btn" (click)="copyInviteLink()">
+            {{ copiedInvite() ? 'Link Copied' : 'Copy Invite Link' }}
+          </button>
+        </aside>
+      }
+    </div>
+
+    <section class="dashboard-page__activity">
+      <div class="dashboard-page__section-head">
+        <h2>Recent Activity</h2>
+        <button type="button" class="dashboard-page__section-link" (click)="markAllRead()">Mark all read</button>
+      </div>
+
+      @if (recentActivity().length) {
+        <div class="activity-table">
+          <div class="activity-table__head">
+            <span>Transaction</span>
+            <span>Date</span>
+            <span>Status</span>
+            <span>Value</span>
+          </div>
+          @for (item of recentActivity(); track item.title + item.occurredOnUtc) {
+            <div class="activity-table__row">
+              <div>
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.description }}</p>
+              </div>
+              <span>{{ item.occurredOnUtc | date:'MMM d, y' }}</span>
+              <span class="activity-table__status">Completed</span>
+              <span>{{ item.type }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="dashboard-page__empty">No recent activity yet.</p>
+      }
+    </section>
+  }
+</section>

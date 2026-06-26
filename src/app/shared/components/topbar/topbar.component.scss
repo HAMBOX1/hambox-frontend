@@ -1,0 +1,11 @@
+:host ::ng-deep .topbar {
+  background: var(--surface-card);
+  border: none;
+  border-bottom: 1px solid var(--surface-border);
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-6);
+  border-radius: 0;
+  box-shadow: var(--hambox-shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}

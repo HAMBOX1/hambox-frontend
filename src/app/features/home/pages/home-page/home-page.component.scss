@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  background: var(--sf-bg-base);
+}
+
+.storefront-home {
+  min-height: 100vh;
+  background: var(--sf-bg-base);
+  color: var(--sf-text-primary);
+}
+
+.storefront-home__main {
+  display: flex;
+  flex-direction: column;
+}
+
+.storefront-home__main--state {
+  padding: 48px 16px;
+}
+
+.storefront-home__empty-section {
+  padding: 0 16px 32px;
+}

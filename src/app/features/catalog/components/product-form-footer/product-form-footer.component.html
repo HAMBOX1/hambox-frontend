@@ -1,0 +1,49 @@
+<footer class="product-form-footer">
+  <button
+    pButton
+    type="button"
+    class="product-form-footer__btn product-form-footer__btn--ghost"
+    label="Cancel"
+    severity="secondary"
+    [disabled]="submitting()"
+    (click)="onCancel()"
+  ></button>
+
+  <div class="product-form-footer__actions">
+    <button
+      pButton
+      type="button"
+      class="product-form-footer__btn"
+      label="Save Draft"
+      icon="pi pi-save"
+      severity="secondary"
+      [outlined]="true"
+      disabled
+      aria-disabled="true"
+    ></button>
+
+    <button
+      pButton
+      type="button"
+      class="product-form-footer__btn"
+      label="Next Step"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      severity="secondary"
+      [outlined]="true"
+      disabled
+      aria-disabled="true"
+    ></button>
+
+    <button
+      pButton
+      type="button"
+      class="product-form-footer__btn product-form-footer__btn--primary"
+      label="Create Product"
+      icon="pi pi-check"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+      (click)="onCreate()"
+    ></button>
+  </div>
+</footer>

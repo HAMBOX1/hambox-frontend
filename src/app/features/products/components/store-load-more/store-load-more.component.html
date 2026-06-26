@@ -1,0 +1,17 @@
+<div class="store-load-more">
+  <button
+    type="button"
+    class="store-load-more__button"
+    [disabled]="loading()"
+    (click)="onLoadMore()"
+  >
+    @if (loading()) {
+      <span class="store-load-more__dot" aria-hidden="true"></span>
+      <span class="store-load-more__dot" aria-hidden="true"></span>
+      <span class="store-load-more__dot" aria-hidden="true"></span>
+      <span class="store-load-more__label">LOADING MORE</span>
+    } @else {
+      <span class="store-load-more__label">LOAD MORE</span>
+    }
+  </button>
+</div>

@@ -1,0 +1,104 @@
+@use '../../../../shared/styles/storefront-navbar';
+
+.storefront-nav__account {
+  position: relative;
+}
+
+.storefront-nav__account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  min-width: 12rem;
+  padding: 8px;
+  border: 1px solid var(--storefront-nav-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-dropdown-bg);
+  box-shadow: var(--color-dropdown-shadow);
+}
+
+.storefront-nav__account-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--sf-radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    background: var(--color-table-row-hover);
+  }
+
+  &--danger {
+    color: var(--color-danger);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.storefront-nav__logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-danger-muted);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-danger-muted);
+  color: var(--color-danger);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    filter: brightness(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.storefront-nav__profile-btn--mobile {
+  width: auto;
+  height: auto;
+  padding: 10px 12px;
+  border-radius: var(--sf-radius-sm);
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--storefront-nav-heading);
+}
+
+.storefront-nav__mobile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-3);
+
+  .storefront-nav__cart,
+  .storefront-nav__profile-btn--mobile {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .storefront-nav__menu-button {
+    grid-area: menu;
+  }
+}

@@ -1,0 +1,33 @@
+<section class="notifications-page">
+  <header class="notifications-page__header">
+    <div>
+      <h1>Notifications</h1>
+      <p>Stay updated on orders, referrals, and account activity.</p>
+    </div>
+    <button type="button" (click)="markAllRead()">Mark all read</button>
+  </header>
+
+  @if (loading()) {
+    <p class="notifications-page__state">Loading notifications...</p>
+  } @else if (error()) {
+    <p class="notifications-page__state">{{ error() }}</p>
+  } @else if (!items().length) {
+    <p class="notifications-page__state">You are all caught up.</p>
+  } @else {
+    <div class="notifications-page__list">
+      @for (item of items(); track item.id) {
+        <article class="notifications-page__item" [class.notifications-page__item--unread]="!item.isRead">
+          <div>
+            <span class="notifications-page__category">{{ item.category }}</span>
+            <h2>{{ item.title }}</h2>
+            <p>{{ item.body }}</p>
+            <time>{{ item.createdOnUtc | date:'medium' }}</time>
+          </div>
+          @if (!item.isRead) {
+            <button type="button" (click)="markRead(item.id)">Mark read</button>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>

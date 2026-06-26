@@ -1,0 +1,200 @@
+<aside class="detail-panel" aria-label="Selected product details">
+  @if (loading() && !product()) {
+    <div class="detail-panel__skeleton" aria-hidden="true">
+      <p-skeleton width="40%" height="0.75rem" />
+      <p-skeleton width="75%" height="1.5rem" styleClass="detail-panel__skeleton-gap" />
+      <div class="detail-panel__metric-grid">
+        <p-skeleton height="4.5rem" />
+        <p-skeleton height="4.5rem" />
+      </div>
+      <p-skeleton width="100%" height="8rem" />
+      <p-skeleton width="100%" height="6rem" />
+    </div>
+  } @else if (product(); as selected) {
+    <div class="detail-panel__header">
+      <span class="detail-panel__eyebrow">Selected Item</span>
+      <button
+        type="button"
+        class="detail-panel__close"
+        aria-label="Close product details"
+        (click)="onClose()"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="detail-panel__summary">
+      @if (selected.primaryImageUrl) {
+        <img
+          class="detail-panel__summary-image"
+          [src]="resolveImageUrl(selected.primaryImageUrl)"
+          [alt]="selected.nameEn"
+        />
+      } @else {
+        <span class="detail-panel__summary-icon" aria-hidden="true">
+          <i class="pi pi-box"></i>
+        </span>
+      }
+      <div class="detail-panel__summary-copy">
+        <h2 class="detail-panel__title">{{ selected.nameEn }}</h2>
+        <p class="detail-panel__source">Source: {{ placeholders().source }}</p>
+      </div>
+    </div>
+
+    <div class="detail-panel__metric-grid">
+      <article class="detail-panel__metric-card">
+        <span class="detail-panel__metric-label">Live Stock</span>
+        <strong class="detail-panel__metric-value detail-panel__metric-value--warning">
+          {{ placeholders().liveStock }}
+        </strong>
+      </article>
+      <article class="detail-panel__metric-card">
+        <span class="detail-panel__metric-label">Avg Margin</span>
+        <strong class="detail-panel__metric-value detail-panel__metric-value--success">
+          {{ placeholders().avgMargin }}
+        </strong>
+      </article>
+    </div>
+
+    <nav class="detail-panel__tabs" aria-label="Product detail sections">
+      @for (tab of tabs; track tab) {
+        <button
+          type="button"
+          class="detail-panel__tab"
+          [class.detail-panel__tab--active]="tab === activeTab"
+          disabled
+          aria-disabled="true"
+        >
+          {{ tab }}
+        </button>
+      }
+    </nav>
+
+    <section class="detail-panel__section">
+      <dl class="detail-panel__facts">
+        <div class="detail-panel__fact">
+          <dt>Category</dt>
+          <dd>
+            <p-tag [value]="selected.categoryName || 'Uncategorized'" severity="info" />
+          </dd>
+        </div>
+        <div class="detail-panel__fact">
+          <dt>Price</dt>
+          <dd>{{ selected.price | hamboxCurrency }}</dd>
+        </div>
+        <div class="detail-panel__fact">
+          <dt>Product Id</dt>
+          <dd><code>{{ selected.id }}</code></dd>
+        </div>
+        <div class="detail-panel__fact">
+          <dt>Internal SKU</dt>
+          <dd>{{ placeholders().internalSku }}</dd>
+        </div>
+        <div class="detail-panel__fact">
+          <dt>Catalog Status</dt>
+          <dd>
+            <p-tag
+              [value]="statusLabel(selected.status)"
+              [severity]="statusSeverity(selected.status)"
+            />
+          </dd>
+        </div>
+        <div class="detail-panel__fact">
+          <dt>Last Restock</dt>
+          <dd>{{ placeholders().lastRestock }}</dd>
+        </div>
+      </dl>
+
+      <div class="detail-panel__description">
+        <h3 class="detail-panel__section-title">Description</h3>
+        <p>{{ selected.descriptionEn || 'No English description provided.' }}</p>
+      </div>
+
+      <div class="detail-panel__chart-placeholder" aria-hidden="true">
+        <div class="detail-panel__chart-header">
+          <span>Daily Sales Velocity</span>
+          <span class="detail-panel__chart-note">Placeholder</span>
+        </div>
+        <div class="detail-panel__chart-bars">
+          @for (bar of [38, 52, 44, 68, 58, 72, 49]; track $index) {
+            <span class="detail-panel__chart-bar" [style.height.%]="bar"></span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-panel__operations">
+      <h3 class="detail-panel__section-title">Storefront</h3>
+
+      <a
+        pButton
+        class="detail-panel__action-btn"
+        [routerLink]="['/admin/inventory', selected.id, 'edit']"
+        label="Manage Product"
+        icon="pi pi-pencil"
+        severity="secondary"
+      ></a>
+
+      @if (statusError()) {
+        <p class="detail-panel__status-error" role="alert">{{ statusError() }}</p>
+      }
+
+      @if (selected.status === 'Active') {
+        <p class="detail-panel__status-hint">
+          This product is visible on the storefront.
+        </p>
+      } @else if (selected.status === 'Draft') {
+        <p class="detail-panel__status-hint">
+          Draft products are hidden from the storefront. Publish to make them available to customers.
+        </p>
+      } @else if (selected.status === 'Inactive') {
+        <p class="detail-panel__status-hint">
+          This product is hidden from the storefront. Publish to show it again.
+        </p>
+      }
+
+      @if (canPublish(selected.status)) {
+        <button
+          pButton
+          type="button"
+          label="Publish to Storefront"
+          icon="pi pi-globe"
+          class="detail-panel__action-btn detail-panel__action-btn--primary"
+          [loading]="updatingStatus()"
+          [disabled]="updatingStatus()"
+          (click)="onPublish()"
+        ></button>
+      }
+
+      @if (canHide(selected.status)) {
+        <button
+          pButton
+          type="button"
+          label="Hide from Storefront"
+          icon="pi pi-eye-slash"
+          severity="secondary"
+          class="detail-panel__action-btn"
+          [loading]="updatingStatus()"
+          [disabled]="updatingStatus()"
+          (click)="onHide()"
+        ></button>
+      }
+    </section>
+
+    <button
+      pButton
+      type="button"
+      class="detail-panel__sync-btn"
+      label="Force Global Sync"
+      icon="pi pi-sync"
+      disabled
+      aria-disabled="true"
+    ></button>
+  } @else {
+    <div class="detail-panel__empty" role="status">
+      <i class="pi pi-arrow-left detail-panel__empty-icon" aria-hidden="true"></i>
+      <h2 class="detail-panel__empty-title">Select a product</h2>
+      <p class="detail-panel__empty-copy">Choose a row from the catalog table to inspect product details.</p>
+    </div>
+  }
+</aside>

@@ -1,0 +1,45 @@
+<section class="payment-panel" aria-label="Payment method">
+  <h2 class="payment-panel__title">Payment Method</h2>
+
+  <div class="payment-panel__methods" role="tablist" aria-label="Payment methods">
+    @for (method of methods; track method.id) {
+      <button
+        type="button"
+        class="payment-panel__method"
+        role="tab"
+        [class.payment-panel__method--active]="isSelected(method.id)"
+        [attr.aria-selected]="isSelected(method.id)"
+        (click)="selectMethod(method.id)"
+      >
+        @switch (method.id) {
+          @case ('card') {
+            <svg class="payment-panel__icon" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" />
+              <path d="M1 5h18" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          }
+          @case ('paypal') {
+            <svg class="payment-panel__icon" width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+              <path d="M7 1h6a5 5 0 015 5 2 2 0 01-2 2h-3l-1 6H5l2-13z" stroke="currentColor" stroke-width="1.3" />
+            </svg>
+          }
+          @case ('crypto') {
+            <svg class="payment-panel__icon payment-panel__icon--crypto" width="13" height="18" viewBox="0 0 13 18" fill="none" aria-hidden="true">
+              <path d="M6.5 1v16M1 4.5h11M1 9h11M1 13.5h11" stroke="currentColor" stroke-width="1.3" />
+            </svg>
+          }
+          @case ('apple-pay') {
+            <svg class="payment-panel__icon payment-panel__icon--apple" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.05 12.54c-.02-2.17 1.77-3.21 1.85-3.27-1.01-1.47-2.58-1.67-3.14-1.7-1.34-.14-2.61.79-3.29.79-.68 0-1.73-.77-2.85-.75-1.47.02-2.82.85-3.57 2.16-1.53 2.65-.39 6.57 1.09 8.72.73 1.05 1.59 2.23 2.72 2.19 1.09-.04 1.5-.71 2.82-.71 1.32 0 1.69.71 2.85.69 1.18-.02 1.93-1.07 2.65-2.12.84-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.32-3.5zM14.52 4.38c.6-.73 1-1.74.89-2.76-.86.04-1.9.57-2.52 1.3-.56.64-1.05 1.67-.92 2.65.97.08 1.97-.49 2.55-1.19z" />
+            </svg>
+          }
+        }
+        <span>{{ method.label }}</span>
+      </button>
+    }
+  </div>
+
+  @if (selectedMethod() === 'card') {
+    <app-checkout-card-form />
+  }
+</section>

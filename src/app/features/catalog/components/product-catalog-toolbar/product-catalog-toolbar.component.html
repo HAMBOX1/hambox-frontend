@@ -1,0 +1,90 @@
+<header class="catalog-toolbar">
+  <div class="catalog-toolbar__header">
+    <div class="catalog-toolbar__heading">
+      <h1 class="catalog-toolbar__title">{{ title() }}</h1>
+      <p class="catalog-toolbar__subtitle">{{ subtitle() }}</p>
+    </div>
+
+    <div class="catalog-toolbar__header-actions">
+      <button
+        pButton
+        type="button"
+        class="catalog-toolbar__attention-btn"
+        [label]="'Needs Attention (' + needsAttentionCount() + ')'"
+        icon="pi pi-exclamation-circle"
+        severity="danger"
+        [outlined]="true"
+        disabled
+        aria-disabled="true"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        class="catalog-toolbar__filters-btn"
+        label="Filters"
+        icon="pi pi-sliders-h"
+        severity="secondary"
+        [outlined]="true"
+        disabled
+        aria-disabled="true"
+      ></button>
+
+      <a
+        pButton
+        class="catalog-toolbar__create-btn"
+        routerLink="/admin/inventory/new"
+        label="Create Product"
+        icon="pi pi-plus"
+      ></a>
+    </div>
+  </div>
+
+  <div class="catalog-toolbar__filters">
+    <div class="catalog-toolbar__filter-group">
+      <span class="catalog-toolbar__filter-label">Platforms</span>
+      <div class="catalog-toolbar__chips" role="list" aria-label="Platform filters (coming soon)">
+        @for (platform of platformFilters; track platform; let index = $index) {
+          <button
+            type="button"
+            class="catalog-toolbar__chip"
+            [class.catalog-toolbar__chip--active]="index < 2"
+            disabled
+            aria-disabled="true"
+          >
+            {{ platform }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="catalog-toolbar__filter-group">
+      <span class="catalog-toolbar__filter-label">Sources</span>
+      <div class="catalog-toolbar__chips" role="list" aria-label="Source filters (coming soon)">
+        @for (source of sourceFilters; track source; let index = $index) {
+          <button
+            type="button"
+            class="catalog-toolbar__chip"
+            [class.catalog-toolbar__chip--active]="index === 0"
+            disabled
+            aria-disabled="true"
+          >
+            {{ source }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <label class="catalog-toolbar__search">
+    <i class="pi pi-search catalog-toolbar__search-icon" aria-hidden="true"></i>
+    <input
+      pInputText
+      class="catalog-toolbar__search-input"
+      type="search"
+      placeholder="Search products by name, category, or description..."
+      [value]="searchTerm()"
+      (input)="onSearchInput($event)"
+    />
+  </label>
+</header>

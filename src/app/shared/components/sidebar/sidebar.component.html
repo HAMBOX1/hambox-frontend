@@ -1,0 +1,8 @@
+<p-drawer [visible]="visible" (onHide)="onHide()" position="left" [modal]="true">
+  <ng-template pTemplate="header">
+    <h2 class="sidebar-brand text-primary m-0">HAMBOX</h2>
+  </ng-template>
+  <div class="sidebar-content">
+    <p-menu [model]="items" styleClass="w-full border-none"></p-menu>
+  </div>
+</p-drawer>

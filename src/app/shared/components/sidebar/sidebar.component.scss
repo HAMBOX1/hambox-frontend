@@ -1,0 +1,20 @@
+.sidebar-brand {
+  font-weight: 700;
+  font-size: var(--hambox-font-size-2xl);
+}
+.sidebar-content {
+  margin-top: var(--hambox-spacing-4);
+}
+:host ::ng-deep .p-drawer {
+  background-color: var(--surface-card);
+}
+:host ::ng-deep .p-menu {
+  background: transparent;
+  .p-menuitem-link {
+    padding: var(--hambox-spacing-3) var(--hambox-spacing-4);
+    border-radius: var(--hambox-radius-md);
+    &:hover {
+      background: var(--surface-hover);
+    }
+  }
+}
