@@ -1,3 +1,5 @@
+import { environment } from '../../../../environments/environment';
+
 export const PRODUCT_IMAGE_MAX_COUNT = 10;
 export const PRODUCT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 
@@ -21,5 +23,11 @@ export function resolveProductImageUrl(imageUrl?: string | null): string {
     return imageUrl;
   }
 
-  return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  const normalized = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+
+  if (normalized.startsWith('/uploads') && environment.apiUrl) {
+    return `${environment.apiUrl.replace(/\/$/, '')}${normalized}`;
+  }
+
+  return normalized;
 }
