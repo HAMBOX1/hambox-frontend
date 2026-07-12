@@ -1,17 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 import { AccountWishlistFacade } from '../../services/account-wishlist.facade';
 import { resolveWishlistItemImageUrl } from '../../utils/wishlist-image.util';
 
 @Component({
   selector: 'app-account-wishlist-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe],
+  imports: [RouterLink, HamboxCurrencyPipe, TranslatePipe, HamboxTranslateRefreshDirective],
   templateUrl: './account-wishlist-page.component.html',
   styleUrl: './account-wishlist-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountWishlistPageComponent implements OnInit {
   private readonly facade = inject(AccountWishlistFacade);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -6,7 +6,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
-import { CategoryOption, CreateProductRequest, ProductDraftFormSnapshot } from '../../models/product.model';
+import { CategoryOption } from '../../models/category.model';
+import { CreateProductRequest, ProductDraftFormSnapshot } from '../../models/product.model';
 
 const FIELD_LABELS = {
   nameEn: 'Product name (EN)',
@@ -32,6 +33,8 @@ export class ProductBasicInfoFormComponent {
   readonly categoriesLoading = input(false);
   readonly categoriesError = input<string | null>(null);
   readonly disabled = input(false);
+  readonly initialSnapshot = input<ProductDraftFormSnapshot | null>(null);
+  readonly section = input<'general' | 'pricing' | 'full'>('full');
 
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
@@ -41,6 +44,16 @@ export class ProductBasicInfoFormComponent {
     price: [0, [Validators.required, Validators.min(0)]],
     categoryId: ['', [Validators.required]],
   });
+
+  constructor() {
+    effect(() => {
+      const snapshot = this.initialSnapshot();
+      if (snapshot) {
+        this.form.patchValue(snapshot, { emitEvent: false });
+        this.form.markAsPristine();
+      }
+    });
+  }
 
   validate(): boolean {
     this.form.markAllAsTouched();
@@ -52,8 +65,38 @@ export class ProductBasicInfoFormComponent {
       return null;
     }
 
-    const value = this.getDraftSnapshot();
+    return this.buildRequest();
+  }
 
+  getGeneralValue(): Omit<CreateProductRequest, 'price'> | null {
+    const controls = ['nameEn', 'nameAr', 'descriptionEn', 'descriptionAr', 'categoryId'] as const;
+    controls.forEach((name) => this.form.controls[name].markAsTouched());
+
+    if (controls.some((name) => this.form.controls[name].invalid)) {
+      return null;
+    }
+
+    const value = this.getDraftSnapshot();
+    return {
+      nameEn: value.nameEn.trim(),
+      nameAr: value.nameAr.trim(),
+      descriptionEn: value.descriptionEn.trim(),
+      descriptionAr: value.descriptionAr.trim(),
+      categoryId: value.categoryId,
+    };
+  }
+
+  getPriceValue(): number | null {
+    this.form.controls.price.markAsTouched();
+    if (this.form.controls.price.invalid) {
+      return null;
+    }
+
+    return this.getDraftSnapshot().price;
+  }
+
+  private buildRequest(): CreateProductRequest {
+    const value = this.getDraftSnapshot();
     return {
       nameEn: value.nameEn.trim(),
       nameAr: value.nameAr.trim(),

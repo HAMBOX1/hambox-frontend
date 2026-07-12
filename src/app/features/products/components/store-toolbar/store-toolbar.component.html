@@ -1,38 +1,80 @@
 <div class="store-toolbar">
-  <div class="store-toolbar__pills" role="tablist" aria-label="Product categories">
-    @for (category of categories(); track category.id) {
-      <button
-        type="button"
-        class="store-toolbar__pill"
-        [class.store-toolbar__pill--active]="activeCategoryId() === category.id"
-        role="tab"
-        [attr.aria-selected]="activeCategoryId() === category.id"
-        (click)="onCategorySelect(category.id)"
-      >
-        {{ category.label }}
-      </button>
-    }
-  </div>
+  @if (resultCount(); as count) {
+    <span class="store-toolbar__count">
+      {{ 'PRODUCT.RESULT_COUNT' | translate:{ count: count } }}
+    </span>
+  }
 
-  <div class="store-toolbar__sort">
-    <label class="store-toolbar__sort-label" for="store-sort">Sort by:</label>
-    <div class="store-toolbar__select">
-      <select
-        id="store-sort"
-        class="store-toolbar__select-native"
-        [value]="selectedSort()"
-        (change)="onSortSelect($event)"
-      >
-        @for (option of sortOptions(); track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-      <span class="store-toolbar__select-value">
-        {{ sortOptions().find((o) => o.value === selectedSort())?.label ?? 'Popular' }}
-      </span>
-      <svg class="store-toolbar__select-icon" width="21" height="21" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      </svg>
+  <div class="store-toolbar__actions">
+    <div class="store-toolbar__sort store-toolbar__sort--desktop">
+      <label class="store-toolbar__sort-label" for="store-sort">{{ 'PRODUCTS.TOOLBAR.SORT_LABEL' | translate }}</label>
+      <div class="store-toolbar__select">
+        <select
+          id="store-sort"
+          class="store-toolbar__select-native"
+          [value]="selectedSort()"
+          (change)="onSortSelect($event)"
+        >
+          @for (option of sortOptions(); track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+        <span class="store-toolbar__select-value">
+          {{ sortOptions().find((o) => o.value === selectedSort())?.label ?? 'Popular' }}
+        </span>
+        <svg class="store-toolbar__select-icon" width="21" height="21" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </div>
     </div>
+
+    <button
+      type="button"
+      class="store-toolbar__sort-mobile"
+      (click)="openSortSheet()"
+    >
+      <i class="pi pi-sort-alt" aria-hidden="true"></i>
+      <span>{{ currentSortLabel() }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="store-toolbar__compare"
+      disabled
+      [attr.title]="'PRODUCTS.TOOLBAR.COMPARE_SOON' | translate"
+      [attr.aria-label]="'PRODUCTS.TOOLBAR.COMPARE_SOON' | translate"
+    >
+      <i class="pi pi-sliders-h" aria-hidden="true"></i>
+      <span>{{ 'PRODUCTS.TOOLBAR.COMPARE' | translate }}</span>
+    </button>
+
+    <app-store-view-mode-switcher
+      [filterCount]="activeFilterCount()"
+      (openFilters)="onOpenFilters()"
+    />
   </div>
 </div>
+
+<app-hambox-bottom-sheet
+  [open]="sortSheetOpen()"
+  [title]="'MOBILE_NAV.SORT' | translate"
+  (closed)="closeSortSheet()"
+>
+  <ul class="store-toolbar__sort-list">
+    @for (option of sortOptions(); track option.value) {
+      <li>
+        <button
+          type="button"
+          class="store-toolbar__sort-option"
+          [class.store-toolbar__sort-option--active]="selectedSort() === option.value"
+          (click)="selectSort(option.value)"
+        >
+          {{ option.label }}
+          @if (selectedSort() === option.value) {
+            <i class="pi pi-check" aria-hidden="true"></i>
+          }
+        </button>
+      </li>
+    }
+  </ul>
+</app-hambox-bottom-sheet>

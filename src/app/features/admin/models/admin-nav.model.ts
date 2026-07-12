@@ -1,23 +1,118 @@
+import { PERMISSIONS } from '../../../core/permissions/permission.constants';
+
 export type AdminNavId =
   | 'dashboard'
-  | 'inventory'
+  | 'products'
   | 'categories'
+  | 'inventory'
+  | 'roles'
+  | 'promotions'
+  | 'memberships'
+  | 'themes'
   | 'orders'
+  | 'operations'
   | 'analytics'
+  | 'reports'
   | 'settings';
 
 export interface AdminNavItem {
   readonly id: AdminNavId;
-  readonly label: string;
+  readonly labelKey: string;
   readonly route: string;
   readonly icon: string;
+  readonly permission?: string | readonly string[];
 }
 
 export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', route: '/admin/dashboard', icon: 'pi pi-th-large' },
-  { id: 'inventory', label: 'Inventory', route: '/admin/inventory', icon: 'pi pi-box' },
-  { id: 'categories', label: 'Categories', route: '/admin/categories', icon: 'pi pi-tags' },
-  { id: 'orders', label: 'Orders', route: '/admin/orders', icon: 'pi pi-shopping-bag' },
-  { id: 'analytics', label: 'Analytics', route: '/admin/analytics', icon: 'pi pi-chart-line' },
-  { id: 'settings', label: 'Settings', route: '/admin/settings', icon: 'pi pi-cog' },
+  {
+    id: 'dashboard',
+    labelKey: 'ADMIN.NAV.DASHBOARD',
+    route: '/admin/dashboard',
+    icon: 'pi pi-th-large',
+    permission: PERMISSIONS.Dashboard.View,
+  },
+  {
+    id: 'products',
+    labelKey: 'ADMIN.NAV.PRODUCTS',
+    route: '/admin/products',
+    icon: 'pi pi-shopping-bag',
+    permission: PERMISSIONS.Catalog.Products.View,
+  },
+  {
+    id: 'categories',
+    labelKey: 'ADMIN.NAV.CATEGORIES',
+    route: '/admin/categories',
+    icon: 'pi pi-tags',
+    permission: PERMISSIONS.Catalog.Categories.View,
+  },
+  {
+    id: 'inventory',
+    labelKey: 'ADMIN.NAV.INVENTORY',
+    route: '/admin/inventory',
+    icon: 'pi pi-box',
+    permission: PERMISSIONS.Catalog.Inventory.View,
+  },
+  {
+    id: 'roles',
+    labelKey: 'ADMIN.NAV.ROLES',
+    route: '/admin/roles',
+    icon: 'pi pi-shield',
+    permission: PERMISSIONS.Roles.View,
+  },
+  {
+    id: 'promotions',
+    labelKey: 'ADMIN.NAV.PROMOTIONS',
+    route: '/admin/promotions',
+    icon: 'pi pi-percentage',
+    permission: PERMISSIONS.Promotions.View,
+  },
+  {
+    id: 'memberships',
+    labelKey: 'ADMIN.NAV.MEMBERSHIPS',
+    route: '/admin/memberships',
+    icon: 'pi pi-id-card',
+    permission: PERMISSIONS.Memberships.View,
+  },
+  {
+    id: 'themes',
+    labelKey: 'ADMIN.NAV.THEMES',
+    route: '/admin/themes',
+    icon: 'pi pi-palette',
+    permission: PERMISSIONS.Themes.View,
+  },
+  {
+    id: 'orders',
+    labelKey: 'ADMIN.NAV.ORDERS',
+    route: '/admin/orders',
+    icon: 'pi pi-shopping-bag',
+    permission: PERMISSIONS.Orders.View,
+  },
+  {
+    id: 'operations',
+    labelKey: 'ADMIN.NAV.OPERATIONS',
+    route: '/admin/operations',
+    icon: 'pi pi-sitemap',
+    permission: PERMISSIONS.Operations.View,
+  },
+  {
+    id: 'analytics',
+    labelKey: 'ADMIN.NAV.ANALYTICS',
+    route: '/admin/analytics',
+    icon: 'pi pi-chart-line',
+    permission: PERMISSIONS.Analytics.View,
+  },
+  {
+    id: 'reports',
+    labelKey: 'ADMIN.NAV.REPORTS',
+    route: '/admin/reports',
+    icon: 'pi pi-file',
+    permission: PERMISSIONS.Reports.View,
+  },
+  {
+    id: 'settings',
+    labelKey: 'ADMIN.NAV.SETTINGS',
+    route: '/admin/settings',
+    icon: 'pi pi-cog',
+    permission: PERMISSIONS.Settings.View,
+  },
 ] as const;

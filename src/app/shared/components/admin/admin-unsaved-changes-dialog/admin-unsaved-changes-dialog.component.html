@@ -1,0 +1,41 @@
+<p-dialog
+  [header]="title() | translate"
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog admin-unsaved-changes-dialog"
+  (onHide)="onHide()"
+>
+  <p class="admin-unsaved-changes-dialog__message">{{ message() | translate }}</p>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="cancelLabel() | translate"
+      severity="secondary"
+      (click)="onHide()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="discardLabel() | translate"
+      severity="danger"
+      [outlined]="true"
+      [disabled]="saving()"
+      (click)="onDiscard()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="saveLabel() | translate"
+      icon="pi pi-save"
+      [loading]="saving()"
+      (click)="onSave()"
+    ></button>
+  </ng-template>
+</p-dialog>

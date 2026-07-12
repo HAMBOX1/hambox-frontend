@@ -10,16 +10,22 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { debounceTime, interval, merge, Subject } from 'rxjs';
 
+import {
+  AdminPageHeaderComponent,
+  AdminSectionCardComponent,
+  AdminStickySaveBarComponent,
+} from '../../../../shared/components/admin';
+import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { ProductAssetsUploadComponent } from '../../components/product-assets-upload/product-assets-upload.component';
 import { ProductBasicInfoFormComponent } from '../../components/product-basic-info-form/product-basic-info-form.component';
 import { ProductCreateStepperComponent } from '../../components/product-create-stepper/product-create-stepper.component';
-import { ProductFormFooterComponent } from '../../components/product-form-footer/product-form-footer.component';
 import { PRODUCT_CREATE_STEPS, ProductCreateStepId } from '../../models/product.model';
 import { ProductCreateFacade } from '../../services/product-create.facade';
 import { ProductDraftService } from '../../services/product-draft.service';
@@ -31,14 +37,16 @@ const DRAFT_INTERVAL_MS = 30_000;
   selector: 'app-product-create-page',
   standalone: true,
   imports: [
-    RouterLink,
     ToastModule,
     FormsModule,
+    ButtonModule,
     CheckboxModule,
+    AdminPageHeaderComponent,
+    AdminSectionCardComponent,
+    AdminStickySaveBarComponent,
     ProductCreateStepperComponent,
     ProductBasicInfoFormComponent,
     ProductAssetsUploadComponent,
-    ProductFormFooterComponent,
   ],
   providers: [ProductCreateFacade, MessageService],
   templateUrl: './product-create-page.component.html',
@@ -56,6 +64,10 @@ export class ProductCreatePageComponent implements OnInit {
   private readonly assetsUpload = viewChild(ProductAssetsUploadComponent);
   private readonly assetsChanged$ = new Subject<void>();
 
+  protected readonly breadcrumbs = adminBreadcrumbs(
+    { label: 'Products', route: '/admin/products' },
+    { label: 'Create Product' },
+  );
   protected readonly steps = PRODUCT_CREATE_STEPS;
   protected readonly activeStep = signal<ProductCreateStepId>('basic-information');
 
@@ -90,7 +102,7 @@ export class ProductCreatePageComponent implements OnInit {
   }
 
   protected onCancel(): void {
-    void this.router.navigate(['/admin/inventory']);
+    void this.router.navigate(['/admin/products']);
   }
 
   protected async onCreate(): Promise<void> {
@@ -129,7 +141,7 @@ export class ProductCreatePageComponent implements OnInit {
           : `"${request.nameEn}" was saved as a draft.`,
         life: 4000,
       });
-      void this.router.navigate(['/admin/inventory']);
+      void this.router.navigate(['/admin/products', createdId, 'edit']);
       return;
     }
 

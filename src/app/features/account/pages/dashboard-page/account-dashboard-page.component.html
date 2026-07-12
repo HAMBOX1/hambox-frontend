@@ -1,35 +1,49 @@
-<section class="dashboard-page">
+<section class="dashboard-page" hamboxTranslateRefresh>
   @if (loading()) {
-    <div class="dashboard-page__loading">Loading your dashboard...</div>
+    <div class="dashboard-page__loading">{{ 'ACCOUNT.DASHBOARD_UI.LOADING' | translate }}</div>
   } @else if (error()) {
     <div class="dashboard-page__error">
       <p>{{ error() }}</p>
-      <button type="button" class="dashboard-page__retry" (click)="retry()">Retry</button>
+      <button type="button" class="dashboard-page__retry" (click)="retry()">{{ 'ACCOUNT.DASHBOARD_UI.RETRY' | translate }}</button>
     </div>
   } @else {
     <header class="dashboard-page__header">
       <div>
-        <h1 class="dashboard-page__title">Welcome back, {{ displayName() }}</h1>
-        <p class="dashboard-page__subtitle">Your gaming kingdom is ready for the next quest.</p>
+        <h1 class="dashboard-page__title">{{ 'ACCOUNT.DASHBOARD_UI.WELCOME' | translate:{ name: displayName() } }}</h1>
+        <p class="dashboard-page__subtitle">{{ 'ACCOUNT.DASHBOARD_UI.SUBTITLE' | translate }}</p>
       </div>
 
-      @if (membership(); as card) {
-        <div class="dashboard-page__membership">
-          <p class="dashboard-page__membership-tier">Premium Tier</p>
-          <h2 class="dashboard-page__membership-title">{{ card.tier }} Member</h2>
-          <p class="dashboard-page__membership-meta">
-            Valid until {{ card.nextTierThreshold | hamboxCurrency:'1.0-0' }} tier
-            · {{ card.progressPercent | number:'1.0-0' }}% progress
-          </p>
-        </div>
+      @if (hasMembershipPlan()) {
+        @if (membership(); as card) {
+          <a class="dashboard-page__membership" routerLink="/account/membership">
+            <p class="dashboard-page__membership-tier">
+              {{ card.badgeLabel || card.status }}
+            </p>
+            <h2 class="dashboard-page__membership-title">{{ card.planName }}</h2>
+            <p class="dashboard-page__membership-meta">
+              @if (card.expiresOnUtc) {
+                {{ 'ACCOUNT.DASHBOARD_UI.EXPIRES' | translate }} {{ card.expiresOnUtc | hamboxDate:'mediumDate' }}
+              }
+              @if (card.discountPercent != null) {
+                · {{ 'ACCOUNT.DASHBOARD_UI.MEMBER_DISCOUNT' | translate:{ percent: (card.discountPercent | number:'1.0-0') } }}
+              }
+            </p>
+          </a>
+        }
+      } @else {
+        <a class="dashboard-page__membership dashboard-page__membership--empty" routerLink="/account/membership">
+          <p class="dashboard-page__membership-tier">{{ 'ACCOUNT.DASHBOARD_UI.MEMBERSHIP' | translate }}</p>
+          <h2 class="dashboard-page__membership-title">{{ 'ACCOUNT.DASHBOARD_UI.NO_ACTIVE_PLAN' | translate }}</h2>
+          <p class="dashboard-page__membership-meta">{{ 'ACCOUNT.DASHBOARD_UI.EXPLORE_PLANS' | translate }}</p>
+        </a>
       }
     </header>
 
     <div class="dashboard-page__grid">
       <section class="dashboard-page__wishlist">
         <div class="dashboard-page__section-head">
-          <h2>Your Wishlist</h2>
-          <a routerLink="/account/wishlist">View All</a>
+          <h2>{{ 'ACCOUNT.DASHBOARD_UI.WISHLIST' | translate }}</h2>
+          <a routerLink="/account/wishlist">{{ 'ACCOUNT.DASHBOARD_UI.VIEW_ALL' | translate }}</a>
         </div>
 
         @if (wishlistPreview().length) {
@@ -46,7 +60,7 @@
                     type="button"
                     class="wishlist-card__cart-btn"
                     (click)="moveToCart(item.productId)"
-                    aria-label="Move to cart"
+                    [attr.aria-label]="'ACCOUNT.DASHBOARD_UI.MOVE_TO_CART' | translate"
                   >
                     <i class="pi pi-shopping-bag" aria-hidden="true"></i>
                   </button>
@@ -55,22 +69,22 @@
             }
           </div>
         } @else {
-          <p class="dashboard-page__empty">Your vault is empty. Browse the marketplace to save favorites.</p>
+          <p class="dashboard-page__empty">{{ 'ACCOUNT.DASHBOARD_UI.EMPTY_WISHLIST' | translate }}</p>
         }
       </section>
 
       @if (referral(); as ref) {
         <aside class="dashboard-page__referral">
-          <p class="dashboard-page__referral-label">Referral Status</p>
+          <p class="dashboard-page__referral-label">{{ 'ACCOUNT.DASHBOARD_UI.REFERRAL_STATUS' | translate }}</p>
           <p class="dashboard-page__referral-points">
-            Lifetime Rewards: <strong>{{ ref.lifetimePoints | number }} Points</strong>
+            {{ 'ACCOUNT.DASHBOARD_UI.LIFETIME_REWARDS' | translate }}: <strong>{{ ref.lifetimePoints | number }} {{ 'ACCOUNT.DASHBOARD_UI.POINTS' | translate }}</strong>
           </p>
           <div class="dashboard-page__progress">
             <div class="dashboard-page__progress-bar" [style.width.%]="referralProgress()"></div>
           </div>
-          <p class="dashboard-page__referral-tier">{{ ref.tier }} Goal · {{ ref.successfulReferrals }} referrals</p>
+          <p class="dashboard-page__referral-tier">{{ 'ACCOUNT.DASHBOARD_UI.TIER_GOAL' | translate:{ tier: ref.tier, count: ref.successfulReferrals } }}</p>
           <button type="button" class="dashboard-page__invite-btn" (click)="copyInviteLink()">
-            {{ copiedInvite() ? 'Link Copied' : 'Copy Invite Link' }}
+            {{ copiedInvite() ? ('ACCOUNT.DASHBOARD_UI.LINK_COPIED' | translate) : ('ACCOUNT.DASHBOARD_UI.COPY_INVITE' | translate) }}
           </button>
         </aside>
       }
@@ -78,17 +92,17 @@
 
     <section class="dashboard-page__activity">
       <div class="dashboard-page__section-head">
-        <h2>Recent Activity</h2>
-        <button type="button" class="dashboard-page__section-link" (click)="markAllRead()">Mark all read</button>
+        <h2>{{ 'ACCOUNT.DASHBOARD_UI.RECENT_ACTIVITY' | translate }}</h2>
+        <button type="button" class="dashboard-page__section-link" (click)="markAllRead()">{{ 'ACCOUNT.DASHBOARD_UI.MARK_ALL_READ' | translate }}</button>
       </div>
 
       @if (recentActivity().length) {
         <div class="activity-table">
           <div class="activity-table__head">
-            <span>Transaction</span>
-            <span>Date</span>
-            <span>Status</span>
-            <span>Value</span>
+            <span>{{ 'ACCOUNT.DASHBOARD_UI.TRANSACTION' | translate }}</span>
+            <span>{{ 'ACCOUNT.DASHBOARD_UI.DATE' | translate }}</span>
+            <span>{{ 'ACCOUNT.DASHBOARD_UI.STATUS' | translate }}</span>
+            <span>{{ 'ACCOUNT.DASHBOARD_UI.VALUE' | translate }}</span>
           </div>
           @for (item of recentActivity(); track item.title + item.occurredOnUtc) {
             <div class="activity-table__row">
@@ -96,14 +110,14 @@
                 <strong>{{ item.title }}</strong>
                 <p>{{ item.description }}</p>
               </div>
-              <span>{{ item.occurredOnUtc | date:'MMM d, y' }}</span>
-              <span class="activity-table__status">Completed</span>
-              <span>{{ item.type }}</span>
+              <span>{{ item.occurredOnUtc | hamboxDate:'MMM d, y' }}</span>
+              <span class="activity-table__status">{{ 'ACCOUNT.DASHBOARD_UI.COMPLETED' | translate }}</span>
+              <span>{{ activityTypeLabel(item.type) }}</span>
             </div>
           }
         </div>
       } @else {
-        <p class="dashboard-page__empty">No recent activity yet.</p>
+        <p class="dashboard-page__empty">{{ 'ACCOUNT.DASHBOARD_UI.EMPTY_ACTIVITY' | translate }}</p>
       }
     </section>
   }

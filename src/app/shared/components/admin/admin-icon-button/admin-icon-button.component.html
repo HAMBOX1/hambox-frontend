@@ -1,0 +1,35 @@
+@if (routerLink()) {
+  <a
+    pButton
+    class="admin-icon-button"
+    [class.admin-icon-button--disabled]="disabled()"
+    [routerLink]="disabled() ? null : routerLink()!"
+    [icon]="icon()"
+    [severity]="severity()"
+    [loading]="loading()"
+    [rounded]="true"
+    [text]="true"
+    [pTooltip]="label()"
+    tooltipPosition="top"
+    [attr.aria-label]="label()"
+    [attr.aria-disabled]="disabled()"
+    [attr.tabindex]="disabled() ? -1 : 0"
+    (click)="disabled() ? $event.preventDefault() : null"
+  ></a>
+} @else {
+  <button
+    pButton
+    type="button"
+    class="admin-icon-button"
+    [icon]="icon()"
+    [severity]="severity()"
+    [disabled]="disabled()"
+    [loading]="loading()"
+    [rounded]="true"
+    [text]="true"
+    [pTooltip]="label()"
+    tooltipPosition="top"
+    [attr.aria-label]="label()"
+    (click)="pressed.emit()"
+  ></button>
+}

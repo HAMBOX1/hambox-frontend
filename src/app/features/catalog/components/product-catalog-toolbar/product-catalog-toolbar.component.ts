@@ -1,40 +1,43 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
+
+import {
+  AdminSearchBarComponent,
+  AdminToolbarComponent,
+} from '../../../../shared/components/admin';
+import { ProductStatus } from '../../models/product.model';
+
+const STATUS_OPTIONS: { label: string; value: string }[] = [
+  { label: 'All statuses', value: '' },
+  { label: 'Active', value: 'Active' },
+  { label: 'Draft', value: 'Draft' },
+  { label: 'Inactive', value: 'Inactive' },
+  { label: 'Archived', value: 'Archived' },
+];
 
 @Component({
   selector: 'app-product-catalog-toolbar',
   standalone: true,
-  imports: [RouterLink, ButtonModule, InputTextModule],
+  imports: [FormsModule, SelectModule, AdminToolbarComponent, AdminSearchBarComponent],
   templateUrl: './product-catalog-toolbar.component.html',
   styleUrl: './product-catalog-toolbar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCatalogToolbarComponent {
-  readonly title = input('Product Catalog');
-  readonly subtitle = input('');
   readonly searchTerm = input('');
-  readonly needsAttentionCount = input(12);
-
+  readonly statusFilter = input('');
+  readonly searchPlaceholder = input('Search products…');
   readonly searchChange = output<string>();
+  readonly statusChange = output<ProductStatus | ''>();
 
-  protected readonly platformFilters = [
-    'Xbox Live',
-    'PlayStation',
-    'Steam',
-    'Epic Games',
-    'Switch',
-  ] as const;
+  protected readonly statusOptions = STATUS_OPTIONS;
 
-  protected readonly sourceFilters = [
-    'All Sources',
-    'Manual Intake',
-    'Direct API',
-    'Reseller Pool',
-  ] as const;
+  protected onSearchChange(term: string): void {
+    this.searchChange.emit(term);
+  }
 
-  protected onSearchInput(event: Event): void {
-    this.searchChange.emit((event.target as HTMLInputElement).value);
+  protected onStatusChange(value: string): void {
+    this.statusChange.emit(value as ProductStatus | '');
   }
 }

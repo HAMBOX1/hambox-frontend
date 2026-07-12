@@ -9,43 +9,16 @@
   align-items: flex-start;
   gap: 0.625rem;
   padding: 0.75rem 0.875rem;
-  border: 1px solid rgba(248, 113, 113, 0.35);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
   border-radius: var(--admin-radius-sm);
-  background: rgba(248, 113, 113, 0.08);
+  background: var(--color-danger-muted);
   color: var(--admin-accent-red);
   font-size: 0.875rem;
-}
-
-.category-create-form__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.category-create-form__label {
-  color: var(--admin-text-secondary);
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
-
-.category-create-form__input {
-  width: 100%;
-  border: 1px solid var(--admin-border-default);
-  border-radius: var(--admin-radius-sm);
-  background: var(--admin-bg-input);
-  color: var(--admin-text-primary);
-  font-family: var(--admin-font-body);
 }
 
 .category-create-form__error {
   margin: 0;
   color: var(--admin-accent-red);
-  font-size: 0.75rem;
-}
-
-.category-create-form__hint {
-  margin: 0;
-  color: var(--admin-text-muted);
   font-size: 0.75rem;
 }
 
@@ -57,10 +30,6 @@
 }
 
 :host ::ng-deep {
-  .category-create-form__input.p-inputtext {
-    padding: 0.625rem 0.875rem;
-  }
-
   .category-create-form__btn.p-button {
     padding: 0.625rem 1rem;
     border-radius: var(--admin-radius-sm);

@@ -1,0 +1,138 @@
+<p-toast position="top-right" />
+
+<section class="admin-page role-edit-page">
+  <app-admin-page-header
+    [title]="
+      isCreateMode()
+        ? ('ADMIN.ROLES.EDIT.CREATE_TITLE' | translate)
+        : ('ADMIN.ROLES.EDIT.EDIT_TITLE' | translate)
+    "
+    [subtitle]="'ADMIN.ROLES.LIST.SUBTITLE' | translate"
+    [backLink]="'/admin/roles'"
+    [backLabel]="'ADMIN.ROLES.EDIT.BACK' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  />
+
+  @if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  }
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="form" />
+  } @else {
+    <div class="admin-detail-layout role-edit-page__detail">
+      <app-admin-section-card
+        [title]="'ADMIN.ROLES.EDIT.DETAILS' | translate"
+        [padded]="true"
+      >
+        <div class="admin-form-grid admin-form-grid--single">
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.ROLES.EDIT.NAME' | translate }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [ngModel]="name()"
+              (ngModelChange)="name.set($event)"
+              [disabled]="formDisabled()"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">
+              {{ 'ADMIN.ROLES.EDIT.DESCRIPTION' | translate }}
+            </span>
+            <textarea
+              pTextarea
+              class="admin-field__input"
+              rows="3"
+              [ngModel]="description()"
+              (ngModelChange)="description.set($event)"
+              [disabled]="formDisabled()"
+            ></textarea>
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">
+              {{ 'ADMIN.ROLES.EDIT.PRIORITY' | translate }}
+            </span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="number"
+              [ngModel]="priorityLevel()"
+              (ngModelChange)="priorityLevel.set(+$event)"
+              [disabled]="formDisabled()"
+            />
+          </label>
+
+          @if (!isCreateMode()) {
+            <label class="role-edit-page__checkbox">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="isDefault()"
+                (ngModelChange)="isDefault.set($event)"
+                [disabled]="formDisabled()"
+                inputId="role-is-default"
+              />
+              <span>{{ 'ADMIN.ROLES.EDIT.IS_DEFAULT' | translate }}</span>
+            </label>
+          }
+        </div>
+      </app-admin-section-card>
+
+      <app-admin-section-card
+        [title]="'ADMIN.ROLES.PERMISSIONS.TITLE' | translate"
+        [padded]="false"
+        [noDivider]="true"
+      >
+        @if (matrixError()) {
+          <div class="role-edit-page__matrix-error">
+            <app-admin-error-alert [message]="matrixError()!" />
+          </div>
+        }
+
+        <app-permission-matrix
+          [groups]="matrix()"
+          [modules]="matrixModules()"
+          [selectedIds]="selectedPermissionIds()"
+          [loading]="matrixLoading()"
+          [disabled]="formDisabled()"
+          (permissionToggle)="onPermissionToggle($event)"
+          (selectAllGroup)="facade.selectAllInGroup($event)"
+          (clearAllGroup)="facade.clearAllInGroup($event)"
+        />
+      </app-admin-section-card>
+    </div>
+
+    @if (!isCreateMode() && roleId()) {
+      <app-admin-section-card
+        [title]="'ADMIN.ROLES.USERS.TITLE' | translate"
+        [description]="'ADMIN.ROLES.USERS.SUBTITLE' | translate"
+        [padded]="false"
+      >
+        <app-role-users-panel [roleId]="roleId()!" [disabled]="formDisabled()" />
+      </app-admin-section-card>
+    }
+
+    <app-admin-sticky-save-bar>
+      <a
+        pButton
+        [routerLink]="'/admin/roles'"
+        [label]="'ADMIN.ROLES.ACTIONS.CANCEL' | translate"
+        severity="secondary"
+        [text]="true"
+      ></a>
+      <button
+        *hamboxHasPermission="isCreateMode() ? permissions.Roles.Create : permissions.Roles.Edit"
+        pButton
+        type="button"
+        [label]="'ADMIN.ROLES.ACTIONS.SAVE' | translate"
+        icon="pi pi-check"
+        [loading]="detailSaving()"
+        [disabled]="!name().trim() || formDisabled()"
+        (click)="saveRole()"
+      ></button>
+    </app-admin-sticky-save-bar>
+  }
+</section>

@@ -1,57 +1,124 @@
 <div class="storefront-store">
   <app-storefront-nav [links]="navLinks" />
 
-  <div class="storefront-store__container">
-    <app-store-filters-sidebar [platforms]="platformFilters" />
+  <div class="storefront-store__page">
+    @if (flashDealsVisible()) {
+      <section class="storefront-store__hero-section">
+        <app-store-flash-hero
+          [sectionTitle]="flashSectionTitle()"
+          [sectionSubtitle]="flashSectionSubtitle()"
+          [initialCountdownSeconds]="flashCountdownSeconds()"
+          [countdownEnabled]="flashCountdownEnabled()"
+          [dealCount]="flashDealCount()"
+        />
+      </section>
+    }
 
-    <main class="storefront-store__main">
-      <app-store-toolbar
+    <section class="storefront-store__category-nav-section">
+      <app-store-category-nav
         [categories]="categories()"
-        [sortOptions]="sortOptions()"
         [activeCategoryId]="selectedCategoryId()"
-        [selectedSort]="selectedSort()"
         (categoryChange)="onCategoryChange($event)"
+      />
+    </section>
+
+    <section class="storefront-store__toolbar-section">
+      <app-store-toolbar
+        [sortOptions]="sortOptions()"
+        [selectedSort]="selectedSort()"
+        [activeFilterCount]="activeFilterCount()"
+        [resultCount]="totalCount()"
         (sortChange)="onSortChange($event)"
+        (openFilters)="onOpenMobileFilters()"
+      />
+    </section>
+
+    <div
+      class="storefront-store__content"
+      [class.storefront-store__content--filters-collapsed]="filtersCollapsed()"
+    >
+      <app-store-filters-sidebar
+        [filterGroups]="dynamicFilterGroups()"
+        [activeFilters]="clientFilters()"
+        [collapsed]="filtersCollapsed()"
+        [mobileOpen]="filtersMobileOpen()"
+        [activeFilterCount]="activeFilterCount()"
+        (filtersChange)="onFiltersChange($event)"
+        (resetFilters)="onFiltersReset()"
+        (toggleCollapse)="onToggleFiltersCollapse()"
+        (closeMobile)="onCloseMobileFilters()"
       />
 
-      <app-store-promo-banner [banner]="promoBanner" />
-
-      @if (error()) {
-        <app-empty-state
-          icon="pi pi-exclamation-triangle"
-          title="Unable to load products"
-          [description]="error() ?? 'Something went wrong while loading the catalog.'"
-          actionLabel="Try again"
-          actionIcon="pi pi-refresh"
-          (action)="retryLoad()"
-        />
-      } @else if (loading() && products().length === 0) {
-        <app-loading-skeleton type="card" [count]="8" />
-      } @else if (isEmpty()) {
-        <app-empty-state
-          icon="pi pi-search"
-          title="No products found"
-          [description]="
-            searchTerm()
-              ? 'Try a different search term or browse all items.'
-              : 'Active products will appear here once they are published in the catalog.'
-          "
-        />
-      } @else {
-        <div class="storefront-store__grid">
-          @for (product of products(); track product.id) {
-            <app-store-product-card [product]="product" />
-          }
-        </div>
-
-        @if (hasMore()) {
-          <app-store-load-more
-            [loading]="loadingMore()"
-            (loadMore)="onLoadMore()"
-          />
+      <main class="storefront-store__main">
+        @if (appliedFilterChips().length > 0) {
+          <section class="storefront-store__applied-filters" aria-label="Applied filters">
+            <app-store-applied-filters
+              [chips]="appliedFilterChips()"
+              (removeChip)="onRemoveFilter($event)"
+              (clearAll)="onFiltersReset()"
+            />
+          </section>
         }
-      }
-    </main>
+
+        @if (error()) {
+          <app-empty-state
+            icon="pi pi-exclamation-triangle"
+            title="Unable to load products"
+            [description]="error() ?? 'Something went wrong while loading the catalog.'"
+            actionLabel="Try again"
+            actionIcon="pi pi-refresh"
+            (action)="retryLoad()"
+          />
+        } @else if (loading() && products().length === 0) {
+          <app-loading-skeleton type="card" [count]="8" />
+        } @else if (isEmpty()) {
+          <app-empty-state
+            icon="pi pi-search"
+            title="No products found"
+            [description]="
+              searchTerm() || hasActiveClientFilters()
+                ? 'Try a different search term or adjust your filters.'
+                : 'Active products will appear here once they are published in the catalog.'
+            "
+          />
+        } @else {
+          @switch (viewMode()) {
+            @case ('list') {
+              <div class="storefront-store__list-cards" role="list">
+                @for (product of products(); track product.id) {
+                  <app-store-product-list-item [product]="product" />
+                }
+              </div>
+            }
+            @default {
+              <div
+                class="storefront-store__grid"
+                [class.storefront-store__grid--compact]="viewMode() === 'compact'"
+              >
+                @for (product of products(); track product.id) {
+                  <app-store-product-card
+                    [product]="product"
+                    [compact]="viewMode() === 'compact'"
+                  />
+                }
+              </div>
+            }
+          }
+
+          @if (totalCount() > pageSize()) {
+            <nav class="storefront-store__pagination" aria-label="Products pagination">
+              <p-paginator
+                [rows]="pageSize()"
+                [totalRecords]="totalCount()"
+                [first]="(pageNumber() - 1) * pageSize()"
+                [rowsPerPageOptions]="[12, 24, 48]"
+                (onPageChange)="onPageChange($event)"
+              />
+            </nav>
+          }
+        }
+      </main>
+    </div>
   </div>
 
   <app-storefront-footer />

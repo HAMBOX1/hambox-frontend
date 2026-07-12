@@ -1,0 +1,52 @@
+.admin-dashboard-page {
+  gap: 1rem;
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__stats {
+    flex-shrink: 0;
+  }
+
+  &__grid {
+    display: grid;
+    gap: 1rem;
+
+    @media (min-width: 992px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__grid ::ng-deep .admin-section-card {
+    min-height: 18rem;
+  }
+
+  &__grid ::ng-deep .admin-section-card__body {
+    padding-top: 0.5rem;
+  }
+
+  &__alerts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__customer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+
+    small {
+      color: var(--admin-text-muted);
+      font-size: 0.75rem;
+    }
+  }
+
+  &__empty {
+    color: var(--admin-text-muted);
+    margin: 0;
+  }
+}

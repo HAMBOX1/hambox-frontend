@@ -1,9 +1,10 @@
-// Semantic design tokens — the public API for all components.
-// Pages and components should prefer --color-* over legacy --sf-* / --admin-*.
+// Legacy + extended aliases — map to semantic short tokens (--background, --surface, …).
 :root,
 [data-theme] {
-  --color-background: var(--theme-background);
-  --color-surface: var(--theme-surface);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-elevated: var(--surface-elevated);
   --color-card: var(--theme-card);
   --color-elevated: var(--theme-elevated);
   --color-sidebar: var(--theme-sidebar);
@@ -39,6 +40,22 @@
   --color-cta-gradient-start: var(--theme-cta-gradient-start);
   --color-cta-gradient-end: var(--theme-cta-gradient-end);
   --color-cta-icon-filter: var(--theme-cta-icon-filter);
+  --color-accent: var(--theme-accent);
+  --color-accent-hover: var(--theme-accent-hover);
+  --color-accent-muted: var(--theme-accent-muted);
+  --color-accent-border: var(--theme-accent-border);
+  --color-accent-focus: var(--theme-accent-focus);
+  --color-accent-buy: var(--theme-accent-buy);
+  --color-accent-buy-hover: var(--theme-accent-buy-hover);
+  --color-price-display: var(--theme-price-display);
+  --color-band: var(--theme-band);
+  --color-cta-cart-bg: var(--theme-cta-cart-bg);
+  --color-cta-cart-text: var(--theme-cta-cart-text);
+  --color-cta-cart-shadow: var(--theme-cta-cart-shadow);
+  --color-cta-buy-bg: var(--theme-cta-buy-bg);
+  --color-cta-buy-hover: var(--theme-cta-buy-hover);
+  --color-cta-buy-text: var(--theme-cta-buy-text);
+  --color-cta-buy-border: var(--theme-cta-buy-border);
   --color-panel-bg: var(--theme-panel-bg);
   --color-panel-border: var(--theme-panel-border);
   --color-mobile-nav-bg: var(--theme-mobile-nav-bg);
@@ -54,12 +71,12 @@
   --color-card-hover-shadow: var(--theme-card-hover-shadow);
   --color-text-caption: var(--theme-text-caption);
 
-  --color-border: var(--theme-border);
-  --color-border-subtle: var(--theme-border-subtle);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-light);
   --color-border-strong: var(--theme-border-strong);
   --color-divider: var(--theme-divider);
 
-  --color-primary: var(--theme-primary);
+  --color-primary: var(--primary);
   --color-primary-hover: var(--theme-primary-hover);
   --color-primary-active: var(--theme-primary-active);
   --color-primary-muted: var(--theme-primary-muted);
@@ -67,18 +84,19 @@
   --color-primary-text: var(--theme-primary-text);
   --color-primary-text-on: var(--theme-text-on-primary);
 
-  --color-success: var(--theme-success);
+  --color-success: var(--success);
   --color-success-muted: var(--theme-success-muted);
-  --color-warning: var(--theme-warning);
+  --color-warning: var(--warning);
   --color-warning-muted: var(--theme-warning-muted);
-  --color-danger: var(--theme-danger);
+  --color-danger: var(--danger);
   --color-danger-muted: var(--theme-danger-muted);
   --color-info: var(--theme-info);
   --color-info-muted: var(--theme-info-muted);
 
-  --color-text-primary: var(--theme-text-primary);
-  --color-text-secondary: var(--theme-text-secondary);
-  --color-text-muted: var(--theme-text-muted);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-disabled: var(--theme-text-disabled);
   --color-text-inverse: var(--theme-text-inverse);
 
   --color-input-bg: var(--theme-input-bg);
@@ -87,6 +105,7 @@
 
   --color-table-header: var(--theme-table-header);
   --color-table-row-hover: var(--theme-table-row-hover);
+  --color-table-row-selected: var(--theme-table-row-selected);
   --color-table-border: var(--theme-table-border);
 
   --color-scrollbar-track: var(--theme-scrollbar-track);
@@ -178,8 +197,12 @@
   --admin-bg-panel: var(--color-card);
   --admin-bg-sidebar: var(--color-sidebar);
   --admin-bg-input: var(--color-input-bg);
-  --admin-bg-hover: var(--color-table-row-hover);
-  --admin-bg-active: var(--color-primary-muted);
+  --admin-bg-hover: var(--color-surface-hover);
+  --admin-bg-active: var(--color-table-row-selected);
+  --admin-surface-elevated: var(--color-surface-elevated);
+  --admin-surface-muted: var(--color-section);
+  --admin-border-color: var(--color-border);
+  --admin-primary: var(--color-primary);
   --admin-border-subtle: var(--color-border-subtle);
   --admin-border-default: var(--color-border);
   --admin-border-strong: var(--color-border-strong);

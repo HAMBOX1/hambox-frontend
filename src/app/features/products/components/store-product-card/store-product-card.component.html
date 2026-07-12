@@ -2,6 +2,7 @@
   class="store-card"
   [class.store-card--highlighted]="product().highlighted"
   [class.store-card--out-of-stock]="product().outOfStock"
+  [class.store-card--compact]="compact()"
 >
   <a class="store-card__link" [routerLink]="['/products', product().id]">
     <div class="store-card__media">
@@ -21,8 +22,24 @@
         <span class="store-card__badge store-card__badge--featured">{{ 'PRODUCT.FEATURED' | translate }}</span>
       }
 
+      <span
+        class="store-card__stock-badge"
+        [class.store-card__stock-badge--in]="product().stockStatus === 'in-stock'"
+        [class.store-card__stock-badge--low]="product().stockStatus === 'low-stock'"
+        [class.store-card__stock-badge--out]="product().stockStatus === 'out-of-stock' || product().outOfStock"
+      >
+        {{ stockLabelKey(product()) | translate }}
+      </span>
+
       @if (!product().outOfStock) {
-        <span class="store-card__favorite" aria-hidden="true">
+        <button
+          type="button"
+          class="store-card__favorite"
+          [class.store-card__favorite--active]="wishlistAdded()"
+          [attr.aria-label]="(wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate"
+          [attr.aria-pressed]="wishlistAdded()"
+          (click)="toggleWishlist($event)"
+        >
           <svg width="16" height="15" viewBox="0 0 17 16" fill="none" aria-hidden="true">
             <path
               d="M8.5 14.5l-1.1-1C3.7 10.1 1.5 8.1 1.5 5.5 1.5 3.6 3 2 4.9 2c1.1 0 2.1.5 2.8 1.3L8.5 4.2l.8-0.9C10 2.5 11 2 12.1 2 14 2 15.5 3.6 15.5 5.5c0 2.6-2.2 4.6-5.9 8l-1.1 1z"
@@ -31,7 +48,7 @@
               fill="none"
             />
           </svg>
-        </span>
+        </button>
       }
 
       @if (product().outOfStock) {

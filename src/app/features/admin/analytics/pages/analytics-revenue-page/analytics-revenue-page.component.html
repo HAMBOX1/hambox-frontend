@@ -1,0 +1,76 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as revenue) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.GROSS_REVENUE' | translate" [value]="(revenue.grossRevenue | number: '1.0-2') ?? '—'" icon="pi-wallet" tone="success" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.NET_REVENUE' | translate" [value]="(revenue.netRevenue | number: '1.0-2') ?? '—'" icon="pi-chart-line" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.PENDING_REVENUE' | translate" [value]="(revenue.pendingRevenue | number: '1.0-2') ?? '—'" icon="pi-clock" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.REFUNDED_REVENUE' | translate" [value]="(revenue.refundedRevenue | number: '1.0-2') ?? '—'" icon="pi-replay" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AOV' | translate" [value]="(revenue.averageOrderValue | number: '1.0-2') ?? '—'" icon="pi-shopping-cart" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.PRODUCT_REVENUE' | translate" [value]="(revenue.productRevenue | number: '1.0-2') ?? '—'" icon="pi-box" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.MEMBERSHIP_REVENUE' | translate" [value]="(revenue.membershipRevenue | number: '1.0-2') ?? '—'" icon="pi-id-card" />
+  </app-admin-stat-grid>
+
+  <div class="analytics-shell__grid">
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.REVENUE_SERIES' | translate">
+      @if (revenue.series.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="seriesChart().series"
+          [chart]="seriesChart().chart"
+          [xaxis]="seriesChart().xaxis"
+          [yaxis]="seriesChart().yaxis"
+          [stroke]="seriesChart().stroke"
+          [dataLabels]="seriesChart().dataLabels"
+          [tooltip]="seriesChart().tooltip"
+          [fill]="seriesChart().fill!"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.BY_CATEGORY' | translate">
+      @if (revenue.byCategory.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="categoryDonut().series"
+          [chart]="categoryDonut().chart"
+          [labels]="categoryDonut().labels"
+          [colors]="categoryDonut().colors"
+          [legend]="categoryDonut().legend"
+          [dataLabels]="categoryDonut().dataLabels"
+          [tooltip]="categoryDonut().tooltip"
+          [plotOptions]="categoryDonut().plotOptions"
+        />
+      }
+    </app-admin-section-card>
+  </div>
+
+  <app-admin-section-card [title]="'ADMIN.ANALYTICS.TABLES.TOP_PRODUCTS' | translate">
+    @if (revenue.byProduct.length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.TABLE' | translate" />
+    } @else {
+      <div class="analytics-shell__table-wrap">
+        <p-table [value]="revenue.byProduct" [rows]="10">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.ANALYTICS.COLS.NAME' | translate }}</th>
+              <th>{{ 'ADMIN.ANALYTICS.COLS.VALUE' | translate }}</th>
+              <th>{{ 'ADMIN.ANALYTICS.COLS.COUNT' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.name }}</td>
+              <td>{{ row.value | number: '1.0-2' }}</td>
+              <td>{{ row.count ?? '—' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+  </app-admin-section-card>
+}

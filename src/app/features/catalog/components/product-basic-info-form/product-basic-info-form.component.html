@@ -7,105 +7,109 @@
   }
 
   <div class="basic-info-form__grid">
-    <div class="basic-info-form__field">
-      <label class="basic-info-form__label" for="product-name-en">Product Name (EN)</label>
-      <input
-        pInputText
-        id="product-name-en"
-        class="basic-info-form__input"
-        type="text"
-        formControlName="nameEn"
-        autocomplete="off"
-        [disabled]="disabled()"
-      />
-      @if (fieldError('nameEn'); as error) {
-        <p class="basic-info-form__error">{{ error }}</p>
-      }
-    </div>
+    @if (section() === 'general' || section() === 'full') {
+      <div class="basic-info-form__field">
+        <label class="basic-info-form__label" for="product-name-en">Product Name (EN)</label>
+        <input
+          pInputText
+          id="product-name-en"
+          class="basic-info-form__input"
+          type="text"
+          formControlName="nameEn"
+          autocomplete="off"
+          [disabled]="disabled()"
+        />
+        @if (fieldError('nameEn'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
 
-    <div class="basic-info-form__field">
-      <label class="basic-info-form__label" for="product-name-ar">Product Name (AR)</label>
-      <input
-        pInputText
-        id="product-name-ar"
-        class="basic-info-form__input"
-        type="text"
-        formControlName="nameAr"
-        dir="rtl"
-        autocomplete="off"
-        [disabled]="disabled()"
-      />
-      @if (fieldError('nameAr'); as error) {
-        <p class="basic-info-form__error">{{ error }}</p>
-      }
-    </div>
+      <div class="basic-info-form__field">
+        <label class="basic-info-form__label" for="product-name-ar">Product Name (AR)</label>
+        <input
+          pInputText
+          id="product-name-ar"
+          class="basic-info-form__input"
+          type="text"
+          formControlName="nameAr"
+          dir="rtl"
+          autocomplete="off"
+          [disabled]="disabled()"
+        />
+        @if (fieldError('nameAr'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
 
-    <div class="basic-info-form__field basic-info-form__field--full">
-      <label class="basic-info-form__label" for="product-description-en">Description (EN)</label>
-      <textarea
-        pTextarea
-        id="product-description-en"
-        class="basic-info-form__textarea"
-        rows="4"
-        formControlName="descriptionEn"
-        [disabled]="disabled()"
-      ></textarea>
-      @if (fieldError('descriptionEn'); as error) {
-        <p class="basic-info-form__error">{{ error }}</p>
-      }
-    </div>
+      <div class="basic-info-form__field basic-info-form__field--full">
+        <label class="basic-info-form__label" for="product-description-en">Description (EN)</label>
+        <textarea
+          pTextarea
+          id="product-description-en"
+          class="basic-info-form__textarea"
+          rows="4"
+          formControlName="descriptionEn"
+          [disabled]="disabled()"
+        ></textarea>
+        @if (fieldError('descriptionEn'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
 
-    <div class="basic-info-form__field basic-info-form__field--full">
-      <label class="basic-info-form__label" for="product-description-ar">Description (AR)</label>
-      <textarea
-        pTextarea
-        id="product-description-ar"
-        class="basic-info-form__textarea"
-        rows="4"
-        formControlName="descriptionAr"
-        dir="rtl"
-        [disabled]="disabled()"
-      ></textarea>
-      @if (fieldError('descriptionAr'); as error) {
-        <p class="basic-info-form__error">{{ error }}</p>
-      }
-    </div>
+      <div class="basic-info-form__field basic-info-form__field--full">
+        <label class="basic-info-form__label" for="product-description-ar">Description (AR)</label>
+        <textarea
+          pTextarea
+          id="product-description-ar"
+          class="basic-info-form__textarea"
+          rows="4"
+          formControlName="descriptionAr"
+          dir="rtl"
+          [disabled]="disabled()"
+        ></textarea>
+        @if (fieldError('descriptionAr'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
 
-    <div class="basic-info-form__field">
-      <label class="basic-info-form__label" for="product-price">Price</label>
-      <p-inputNumber
-        inputId="product-price"
-        class="basic-info-form__number"
-        formControlName="price"
-        mode="currency"
-        currency="USD"
-        locale="en-US"
-        [min]="0"
-        [minFractionDigits]="2"
-        [maxFractionDigits]="2"
-        [disabled]="disabled()"
-      />
-      @if (fieldError('price'); as error) {
-        <p class="basic-info-form__error">{{ error }}</p>
-      }
-    </div>
+      <div class="basic-info-form__field">
+        <label class="basic-info-form__label" for="product-category">Category</label>
+        <p-select
+          inputId="product-category"
+          class="basic-info-form__select"
+          formControlName="categoryId"
+          [options]="[...categories()]"
+          optionLabel="label"
+          optionValue="id"
+          placeholder="Select a category"
+          [loading]="categoriesLoading()"
+          [disabled]="disabled() || categoriesLoading()"
+        />
+        @if (fieldError('categoryId'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
+    }
 
-    <div class="basic-info-form__field">
-      <label class="basic-info-form__label" for="product-category">Category</label>
-      <p-select
-        inputId="product-category"
-        class="basic-info-form__select"
-        formControlName="categoryId"
-        [options]="[...categories()]"
-        optionLabel="label"
-        optionValue="id"
-        placeholder="Select a category"
-        [loading]="categoriesLoading()"
-        [disabled]="disabled() || categoriesLoading()"
-      />
-      @if (fieldError('categoryId'); as error) {
-        <p class="basic-info-form__error">{{ error }}</p>
-      }
-    </div>
+    @if (section() === 'pricing' || section() === 'full') {
+      <div class="basic-info-form__field">
+        <label class="basic-info-form__label" for="product-price">Base price</label>
+        <p-inputNumber
+          inputId="product-price"
+          class="basic-info-form__number"
+          formControlName="price"
+          mode="currency"
+          currency="USD"
+          locale="en-US"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [disabled]="disabled()"
+        />
+        @if (fieldError('price'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
+    }
   </div>
 </form>

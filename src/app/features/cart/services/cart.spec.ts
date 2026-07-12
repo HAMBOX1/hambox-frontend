@@ -13,10 +13,13 @@ const EMPTY_CART: CartApiDto = {
   items: [],
   totals: {
     subtotal: 0,
-    memberDiscount: 0,
+    totalDiscount: 0,
     tax: 0,
     total: 0,
     itemCount: 0,
+    appliedPromotions: [],
+    validationErrors: [],
+    appliedCouponCode: null,
   },
 };
 
@@ -34,10 +37,13 @@ const POPULATED_CART: CartApiDto = {
   ],
   totals: {
     subtotal: 50,
-    memberDiscount: 5,
+    totalDiscount: 5,
     tax: 2.25,
     total: 47.25,
     itemCount: 2,
+    appliedPromotions: [],
+    validationErrors: [],
+    appliedCouponCode: null,
   },
 };
 

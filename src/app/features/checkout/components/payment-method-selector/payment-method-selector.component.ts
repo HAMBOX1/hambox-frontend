@@ -1,8 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { PaymentMethodId } from '../../models/checkout';
-import { CHECKOUT_PAYMENT_METHODS } from '../../services/checkout.constants';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { CheckoutCardFormComponent } from '../checkout-card-form/checkout-card-form.component';
+
+const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
+  card: 'Card',
+  paypal: 'PayPal',
+  crypto: 'Crypto',
+  'apple-pay': 'Apple Pay',
+  development: 'Development',
+};
 
 @Component({
   selector: 'app-payment-method-selector',
@@ -15,8 +22,13 @@ import { CheckoutCardFormComponent } from '../checkout-card-form/checkout-card-f
 export class PaymentMethodSelectorComponent {
   private readonly checkout = inject(CheckoutFacade);
 
-  protected readonly methods = CHECKOUT_PAYMENT_METHODS;
   protected readonly selectedMethod = this.checkout.paymentMethod;
+  protected readonly methods = computed(() =>
+    this.checkout.availablePaymentMethods().map((id) => ({
+      id,
+      label: PAYMENT_LABELS[id],
+    })),
+  );
 
   protected selectMethod(method: PaymentMethodId): void {
     this.checkout.selectPaymentMethod(method);

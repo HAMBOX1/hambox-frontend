@@ -1,0 +1,58 @@
+// HAMBOX Enterprise Admin — design tokens (scoped; no global element selectors)
+// All color values derive from the global semantic token system.
+.admin-layout,
+.ui-auth {
+  --ui-space-1: 0.25rem; // 4px
+  --ui-space-2: 0.5rem; // 8px
+  --ui-space-3: 0.75rem; // 12px
+  --ui-space-4: 1rem; // 16px
+  --ui-space-6: 1.5rem; // 24px
+  --ui-space-8: 2rem; // 32px
+  --ui-space-10: 2.5rem; // 40px
+  --ui-space-12: 3rem; // 48px
+
+  --ui-radius-md: 0.75rem; // 12px
+  --ui-radius-lg: 1rem; // 16px
+  --ui-radius-xl: 1.25rem; // 20px
+
+  --ui-control-height: 2.5rem; // 40px
+  --ui-card-padding: 1.125rem; // 18px
+  --ui-section-gap: 1.25rem; // 20px
+
+  --ui-bg-base: var(--color-background);
+  --ui-bg-surface: var(--color-surface);
+  --ui-bg-elevated: var(--color-surface-elevated);
+  --ui-border: var(--color-border);
+  --ui-border-subtle: var(--color-border-subtle);
+
+  --ui-primary: var(--color-primary);
+  --ui-primary-hover: var(--color-primary-hover);
+  --ui-primary-soft: var(--color-primary-muted);
+  --ui-danger: var(--color-danger);
+  --ui-warning: var(--color-warning);
+  --ui-info: var(--color-info);
+
+  --ui-text-primary: var(--color-text-primary);
+  --ui-text-secondary: var(--color-text-secondary);
+  --ui-text-muted: var(--color-text-muted);
+
+  --ui-input-bg: var(--color-input-bg);
+  --ui-input-border: var(--color-input-border);
+  --ui-focus-ring: var(--color-focus-ring);
+
+  --ui-font-page-title: clamp(1.5rem, 2.4vw, 1.875rem);
+  --ui-font-section-title: 1.125rem;
+  --ui-font-card-title: 1rem;
+  --ui-font-label: 0.8125rem;
+  --ui-font-body: 0.9375rem;
+  --ui-font-caption: 0.75rem;
+  --ui-font-numeric: 1.125rem;
+
+  --ui-shadow-panel: var(--color-shadow-lg);
+  --ui-transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-layout {
+  background: var(--ui-bg-base);
+  color: var(--ui-text-primary);
+}

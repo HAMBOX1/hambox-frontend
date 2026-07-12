@@ -1,0 +1,54 @@
+.product-variants-panel {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.product-variants-panel__groups {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.product-variants-panel__group-card {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--admin-border-color);
+  border-radius: 0.875rem;
+  background: var(--admin-surface-muted);
+}
+
+.product-variants-panel__group-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.product-variants-panel__group-key {
+  color: var(--admin-text-muted);
+  font-size: 0.8125rem;
+}
+
+.product-variants-panel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.875rem 0;
+}
+
+.product-variants-panel__inline-form,
+.product-variants-panel__create-variant {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+:host ::ng-deep .product-variants-panel__table {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .product-variants-panel__inline-form,
+  .product-variants-panel__create-variant {
+    grid-template-columns: 1fr;
+  }
+}

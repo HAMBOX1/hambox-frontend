@@ -68,6 +68,24 @@
     border-color: var(--color-border-strong);
     background: var(--color-table-row-hover);
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.order-summary__promo-error {
+  margin: -12px 0 0;
+  color: var(--color-danger, #dc2626);
+  font-size: 13px;
+}
+
+.order-summary__promo-applied {
+  margin: -12px 0 0;
+  color: var(--color-success, #16a34a);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .order-summary__breakdown {

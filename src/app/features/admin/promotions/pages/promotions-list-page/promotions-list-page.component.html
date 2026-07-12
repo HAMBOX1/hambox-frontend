@@ -1,0 +1,287 @@
+<p-toast position="top-right" />
+
+<section class="admin-page promotions-list-page">
+  <app-admin-page-header
+    [title]="'ADMIN.PROMOTIONS.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.PROMOTIONS.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Promotions.Create"
+      pButton
+      class="admin-btn-primary"
+      routerLink="/admin/promotions/new"
+      [label]="'ADMIN.PROMOTIONS.LIST.NEW' | translate"
+      icon="pi pi-plus"
+    ></a>
+  </app-admin-page-header>
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.PROMOTIONS.STATS.TOTAL' | translate"
+      [value]="listStats().total"
+      icon="pi-percentage"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.PROMOTIONS.STATS.ACTIVE' | translate"
+      [value]="listStats().active"
+      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
+      icon="pi-check-circle"
+      tone="success"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.PROMOTIONS.STATS.REDEMPTIONS' | translate"
+      [value]="listStats().redemptions"
+      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
+      icon="pi-shopping-cart"
+      tone="info"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.PROMOTIONS.STATS.COUPONS' | translate"
+      [value]="listStats().coupons"
+      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
+      icon="pi-ticket"
+      tone="warning"
+    />
+  </app-admin-stat-grid>
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.PROMOTIONS.LIST.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="promotions-list-page__filter"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      [placeholder]="'ADMIN.PROMOTIONS.LIST.FILTER_STATUS' | translate"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="promotions-list-page__filter"
+      [options]="typeOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="typeFilter()"
+      (ngModelChange)="onTypeChange($event)"
+      [placeholder]="'ADMIN.PROMOTIONS.LIST.FILTER_TYPE' | translate"
+    />
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-bulk-bar
+    [selectedCount]="selectedPromotions().length"
+    (clearSelection)="clearSelection()"
+  >
+    <button
+      *hamboxHasPermission="permissions.Promotions.Publish"
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.PUBLISH' | translate"
+      icon="pi pi-send"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="publishSelected()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Promotions.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.ARCHIVE' | translate"
+      icon="pi pi-inbox"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="archiveSelected()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Promotions.Delete"
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.DELETE' | translate"
+      icon="pi pi-trash"
+      severity="danger"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="requestDeleteSelected()"
+    ></button>
+  </app-admin-bulk-bar>
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table"
+      [value]="[...promotions()]"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="totalCount() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [selection]="selectedPromotions()"
+      (selectionChange)="onSelectionChange($event)"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3.5rem">
+            <p-tableHeaderCheckbox />
+          </th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.NAME' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.TYPE' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.DISCOUNT' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.REDEMPTIONS' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.COUPONS' | translate }}</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-promotion>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="promotion" />
+          </td>
+          <td>
+            <a class="admin-cell-primary" [routerLink]="['/admin/promotions', promotion.id]">
+              {{ promotion.name }}
+            </a>
+          </td>
+          <td>
+            <span class="admin-cell-secondary">{{ promotion.type }}</span>
+          </td>
+          <td>
+            <span class="admin-cell-badge">{{ formatDiscount(promotion) }}</span>
+          </td>
+          <td>
+            <app-admin-status-badge
+              [label]="promotion.status"
+              [tone]="statusTone(promotion.status)"
+            />
+          </td>
+          <td>
+            <span class="admin-cell-badge">{{ promotion.totalRedemptions }}</span>
+          </td>
+          <td>
+            <span class="admin-cell-badge">{{ promotion.couponCount }}</span>
+          </td>
+          <td>
+            @let menuItems = promotionActionMenuItems(promotion);
+            <div class="admin-actions-row">
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Promotions.Edit"
+                icon="pi pi-pencil"
+                [label]="'ADMIN.PROMOTIONS.ACTIONS.EDIT' | translate"
+                [routerLink]="'/admin/promotions/' + promotion.id + '/edit'"
+              />
+              @if (menuItems.length > 0) {
+                <app-admin-action-menu
+                  [items]="menuItems"
+                  [disabled]="actionLoading()"
+                />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">
+            <app-admin-empty-state
+              icon="pi pi-percentage"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.PROMOTIONS.LIST.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.PROMOTIONS.LIST.EMPTY' | translate)
+              "
+              [primaryLabel]="'ADMIN.PROMOTIONS.LIST.NEW' | translate"
+              primaryIcon="pi pi-plus"
+              (primaryAction)="navigateToNew()"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<p-dialog
+  [header]="'ADMIN.PROMOTIONS.DUPLICATE.TITLE' | translate"
+  [visible]="duplicateDialogOpen()"
+  (visibleChange)="duplicateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeDuplicateDialog()"
+>
+  <label class="promotions-list-page__field">
+    <span class="promotions-list-page__field-label">{{ 'ADMIN.PROMOTIONS.DUPLICATE.NAME_LABEL' | translate }}</span>
+    <input
+      pInputText
+      class="promotions-list-page__field-input"
+      type="text"
+      [value]="duplicateName()"
+      (input)="duplicateName.set(($any($event.target)).value)"
+    />
+  </label>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (click)="closeDuplicateDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.DUPLICATE' | translate"
+      icon="pi pi-copy"
+      [disabled]="!duplicateName().trim() || actionLoading()"
+      (click)="confirmDuplicate()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="onDeleteDialogVisibleChange($event)"
+  [title]="'ADMIN.CONFIRM.DELETE_PROMOTION_TITLE' | translate"
+  [message]="deleteDialogMessage()"
+  [confirmLabel]="'ADMIN.PROMOTIONS.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDeletePromotion()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="bulkDeleteDialogOpen()"
+  (visibleChange)="bulkDeleteDialogOpen.set($event)"
+  [title]="'ADMIN.CONFIRM.DELETE_PROMOTIONS_TITLE' | translate"
+  [message]="bulkDeleteDialogMessage()"
+  [confirmLabel]="'ADMIN.PROMOTIONS.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDeleteSelected()"
+/>

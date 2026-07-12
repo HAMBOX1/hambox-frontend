@@ -8,7 +8,8 @@ function isCommerceRequest(url: string): boolean {
   return (
     url.includes(COMMERCE_API.cart) ||
     url.includes(COMMERCE_API.checkout) ||
-    url.includes('/api/v1/orders/')
+    url.includes('/api/v1/orders/') ||
+    url.includes('/cart/promotions')
   );
 }
 

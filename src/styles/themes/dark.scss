@@ -4,7 +4,8 @@ html:not([data-theme]) {
   // Raw palette (future themes override these blocks only)
   --theme-background: #131314;
   --theme-surface: #1a1a1c;
-  --theme-card: #2a2a2b;
+  --theme-surface-hover: rgba(255, 255, 255, 0.06);
+  --theme-card: #242426;
   --theme-elevated: #2a2a2b;
   --theme-sidebar: #0e0e0f;
   --theme-header: rgba(19, 19, 20, 0.92);
@@ -39,9 +40,10 @@ html:not([data-theme]) {
   --theme-info-muted: rgba(176, 198, 255, 0.16);
 
   --theme-text-primary: #e5e2e3;
-  --theme-text-secondary: #bbcbbc;
-  --theme-text-muted: rgba(187, 203, 188, 0.55);
-  --theme-text-caption: rgba(187, 203, 188, 0.7);
+  --theme-text-secondary: #b8c4b9;
+  --theme-text-muted: rgba(187, 203, 188, 0.72);
+  --theme-text-caption: rgba(187, 203, 188, 0.82);
+  --theme-text-disabled: rgba(187, 203, 188, 0.42);
   --theme-text-inverse: #111111;
   --theme-text-on-primary: var(--theme-primary-text);
 
@@ -49,8 +51,9 @@ html:not([data-theme]) {
   --theme-input-border: rgba(255, 255, 255, 0.1);
   --theme-input-placeholder: rgba(187, 203, 188, 0.5);
 
-  --theme-table-header: rgba(255, 255, 255, 0.04);
-  --theme-table-row-hover: rgba(255, 255, 255, 0.03);
+  --theme-table-header: rgba(255, 255, 255, 0.06);
+  --theme-table-row-hover: rgba(255, 255, 255, 0.06);
+  --theme-table-row-selected: rgba(80, 237, 149, 0.12);
   --theme-table-border: var(--theme-border-subtle);
 
   --theme-scrollbar-track: rgba(255, 255, 255, 0.04);
@@ -66,6 +69,7 @@ html:not([data-theme]) {
   --theme-btn-secondary-border: var(--theme-border);
   --theme-btn-ghost-hover: rgba(255, 255, 255, 0.04);
 
+  --theme-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   --theme-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
   --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --theme-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
@@ -132,6 +136,34 @@ html:not([data-theme]) {
   --theme-membership-bg: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(19, 19, 20, 0.9));
   --theme-membership-text: #b0c6ff;
   --theme-avatar-gradient: linear-gradient(135deg, #3b82f6, #50ed95);
+
+  // Commerce accent (dark marketplace — green CTAs)
+  --theme-accent: var(--theme-primary);
+  --theme-accent-hover: var(--theme-primary-hover);
+  --theme-accent-muted: var(--theme-primary-muted);
+  --theme-accent-border: var(--theme-primary-border);
+  --theme-accent-focus: var(--theme-focus-ring);
+  --theme-accent-buy: var(--theme-danger);
+  --theme-accent-buy-hover: #ef4444;
+  --theme-price-display: var(--theme-price-green);
+  --theme-band: var(--theme-section);
+  --theme-cta-cart-bg: linear-gradient(180deg, var(--theme-primary) 0%, var(--theme-primary-hover) 100%);
+  --theme-cta-cart-hover: var(--theme-primary-hover);
+  --theme-cta-cart-text: var(--theme-primary-text);
+  --theme-cta-cart-shadow: var(--theme-shadow-accent-sm);
+  --theme-cta-buy-bg: var(--theme-surface);
+  --theme-cta-buy-hover: var(--theme-surface-hover);
+  --theme-cta-buy-text: var(--theme-text-primary);
+  --theme-cta-buy-border: var(--theme-border);
+
+  // Auth surfaces (hero overlay stays dark; form uses semantic tokens)
+  --theme-auth-panel-bg: var(--theme-surface);
+  --theme-auth-panel-border: var(--theme-border);
+  --theme-auth-hero-text: #f4f4f5;
+  --theme-auth-hero-muted: #d2d5d8;
+  --theme-auth-feature-bg: rgba(10, 12, 14, 0.62);
+  --theme-auth-feature-border: rgba(255, 255, 255, 0.08);
+  --theme-auth-divider: rgba(255, 255, 255, 0.12);
 
   // Brand orange scale (global marketing)
   --hambox-primary-50: #fff3ec;

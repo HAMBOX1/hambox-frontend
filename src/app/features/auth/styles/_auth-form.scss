@@ -68,7 +68,7 @@
 .auth-form__error {
   margin: 0;
   font-size: 0.8125rem;
-  color: #ffb4ab;
+  color: var(--danger);
 }
 
 .auth-form__row {
@@ -126,9 +126,9 @@
 }
 
 .auth-form__banner--error {
-  border: 1px solid rgba(255, 180, 171, 0.35);
-  background: rgba(105, 0, 5, 0.35);
-  color: #ffb4ab;
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  background: var(--color-danger-muted);
+  color: var(--danger);
 }
 
 .auth-form__banner--success {
@@ -167,8 +167,8 @@
 }
 
 .auth-status__icon--error {
-  background: rgba(105, 0, 5, 0.35);
-  color: #ffb4ab;
+  background: var(--color-danger-muted);
+  color: var(--danger);
 }
 
 .auth-status__icon--loading {

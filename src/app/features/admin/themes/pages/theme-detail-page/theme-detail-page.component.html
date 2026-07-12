@@ -1,0 +1,127 @@
+<p-toast position="top-right" />
+
+<section class="admin-page theme-detail-page">
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton [rows]="6" />
+  } @else if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" (retry)="retryDetail()" />
+  } @else if (detail(); as theme) {
+    <app-admin-page-header
+      [title]="theme.name"
+      [subtitle]="theme.slug"
+      [breadcrumbs]="breadcrumbs()"
+    >
+      <app-admin-status-badge adminHeaderMeta [label]="theme.status" [tone]="statusTone(theme.status)" />
+      @if (theme.isDefault) {
+        <span adminHeaderMeta class="theme-detail-page__default">{{ 'ADMIN.THEMES.LIST.DEFAULT' | translate }}</span>
+      }
+
+      @if (theme.status === 'Draft' && permissionServicePublic.hasPermission(permissions.Themes.Publish)) {
+        <button
+          adminHeaderActions
+          pButton
+          type="button"
+          class="admin-btn-primary"
+          [label]="'ADMIN.THEMES.ACTIONS.PUBLISH' | translate"
+          icon="pi pi-send"
+          [disabled]="actionLoading()"
+          (click)="publish()"
+        ></button>
+      }
+
+      <app-admin-action-menu adminHeaderActions [items]="overflowMenuItems(theme)" />
+    </app-admin-page-header>
+
+    <app-admin-stat-grid>
+      <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.BASE_MODE' | translate" [value]="theme.baseMode" icon="pi-moon" />
+      <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.VERSIONS' | translate" [value]="theme.versionCounter" icon="pi-history" />
+      <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.SCHEDULES' | translate" [value]="theme.schedules.length" icon="pi-calendar" />
+      <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.ASSIGNMENTS' | translate" [value]="theme.assignments.length" icon="pi-link" />
+    </app-admin-stat-grid>
+
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="0">{{ 'ADMIN.THEMES.DETAIL.TAB_OVERVIEW' | translate }}</p-tab>
+        <p-tab value="1">{{ 'ADMIN.THEMES.DETAIL.TAB_HISTORY' | translate }}</p-tab>
+        <p-tab value="2">{{ 'ADMIN.THEMES.DETAIL.TAB_SCHEDULE' | translate }}</p-tab>
+        <p-tab value="3">{{ 'ADMIN.THEMES.DETAIL.TAB_ASSIGNMENTS' | translate }}</p-tab>
+        <p-tab value="4">{{ 'ADMIN.THEMES.DETAIL.TAB_COMPARE' | translate }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <app-admin-section-card [title]="'ADMIN.THEMES.DETAIL.OVERVIEW' | translate">
+            <p>{{ theme.description || ('ADMIN.THEMES.DETAIL.NO_DESCRIPTION' | translate) }}</p>
+            @if (latestVersion(); as version) {
+              <p class="theme-detail-page__meta">
+                {{ 'ADMIN.THEMES.DETAIL.CURRENT_VERSION' | translate }}: v{{ version.versionNumber }}
+                @if (version.isPublished) {
+                  · {{ 'ADMIN.THEMES.DETAIL.PUBLISHED' | translate }}
+                }
+              </p>
+            }
+          </app-admin-section-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          <app-theme-history-panel
+            [history]="history()"
+            [loading]="historyLoading()"
+            [error]="historyError()"
+            (retryLoad)="retryHistory()"
+          />
+
+          @if (detail()?.versions?.length) {
+            <app-admin-section-card [title]="'ADMIN.THEMES.DETAIL.VERSIONS_LIST' | translate">
+              <ul class="theme-detail-page__versions">
+                @for (version of detail()!.versions; track version.id) {
+                  <li>
+                    <div>
+                      <strong>v{{ version.versionNumber }}</strong>
+                      @if (version.isPublished) {
+                        <span class="theme-detail-page__published">{{ 'ADMIN.THEMES.DETAIL.PUBLISHED' | translate }}</span>
+                      }
+                      @if (version.notes) {
+                        <p>{{ version.notes }}</p>
+                      }
+                    </div>
+                    <button
+                      *hamboxHasPermission="permissions.Themes.Rollback"
+                      pButton
+                      type="button"
+                      class="p-button-text p-button-sm"
+                      [label]="'ADMIN.THEMES.ACTIONS.ROLLBACK' | translate"
+                      icon="pi pi-replay"
+                      [disabled]="actionLoading()"
+                      (click)="rollback(version.id)"
+                    ></button>
+                  </li>
+                }
+              </ul>
+            </app-admin-section-card>
+          }
+        </p-tabpanel>
+
+        <p-tabpanel value="2">
+          <app-theme-scheduler-panel
+            [schedules]="theme.schedules"
+            [actionLoading]="actionLoading()"
+            (schedule)="scheduleTheme($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="3">
+          <app-theme-assignments-panel
+            [assignments]="theme.assignments"
+            [actionLoading]="actionLoading()"
+            (assign)="assignTheme($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="4">
+          <app-theme-compare-panel [themes]="themes()" [currentThemeId]="theme.id" />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+</section>

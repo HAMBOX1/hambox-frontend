@@ -7,20 +7,34 @@
       type="text"
       placeholder="Promo code"
       [value]="promoCode()"
+      [disabled]="couponApplying()"
       (input)="onPromoInput($event)"
     />
-    <button type="button" class="order-summary__promo-btn" (click)="applyPromo()">Apply</button>
+    <button
+      type="button"
+      class="order-summary__promo-btn"
+      [disabled]="couponApplying()"
+      (click)="applyPromo()"
+    >
+      Apply
+    </button>
   </div>
+  @if (promoError()) {
+    <p class="order-summary__promo-error" role="alert">{{ promoError() }}</p>
+  }
+  @if (summary().appliedCouponCode) {
+    <p class="order-summary__promo-applied">Applied: {{ summary().appliedCouponCode }}</p>
+  }
 
   <dl class="order-summary__breakdown">
     <div class="order-summary__row">
       <dt>Subtotal</dt>
       <dd>{{ summary().subtotal | hamboxCurrency }}</dd>
     </div>
-    @if (summary().discountAmount > 0) {
+    @if (summary().totalDiscount > 0) {
       <div class="order-summary__row order-summary__row--discount">
-        <dt>{{ summary().discountLabel }}</dt>
-        <dd>-{{ summary().discountAmount | hamboxCurrency }}</dd>
+        <dt>Discount</dt>
+        <dd>-{{ summary().totalDiscount | hamboxCurrency }}</dd>
       </div>
     }
     <div class="order-summary__row">

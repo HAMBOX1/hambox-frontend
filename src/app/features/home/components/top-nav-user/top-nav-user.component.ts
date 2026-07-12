@@ -9,28 +9,32 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { InputTextModule } from 'primeng/inputtext';
 import { CartNavWidgetComponent } from '../../../cart/components/cart-nav-widget/cart-nav-widget.component';
 import { Auth } from '../../../auth/services/auth';
 import { NavLink } from '../../models/storefront-home';
 import { LanguageSwitcherComponent } from '../../../../shared/components/language-switcher/language-switcher.component';
 import { CurrencySwitcherComponent } from '../../../../shared/components/currency-switcher/currency-switcher.component';
 import { ThemeToggleComponent } from '../../../../shared/components/theme-toggle/theme-toggle.component';
+import { StorefrontSearchComponent } from '../../../../shared/components/storefront-search/storefront-search.component';
 import { StorefrontNavMode } from '../../../../shared/components/storefront-nav/storefront-nav.model';
+import { isStorefrontNavLinkActive, navLinkQueryParams } from '../../../../shared/utils/storefront-nav.utils';
+import { AccountMenuComponent } from '../../../../shared/components/account-menu/account-menu.component';
+import { NotificationBellComponent } from '../../../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-top-nav-user',
   standalone: true,
   imports: [
-    InputTextModule,
     RouterLink,
-    RouterLinkActive,
     CartNavWidgetComponent,
     ThemeToggleComponent,
     LanguageSwitcherComponent,
     CurrencySwitcherComponent,
+    StorefrontSearchComponent,
+    NotificationBellComponent,
+    AccountMenuComponent,
     TranslatePipe,
   ],
   templateUrl: './top-nav-user.component.html',
@@ -48,9 +52,6 @@ export class TopNavUserComponent {
   elevated = input(false);
 
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
-  protected readonly searchIconSrc = 'assets/images/top-nav/search-icon.svg';
-
-  protected readonly searchValue = signal('');
   protected readonly menuOpen = signal(false);
   protected readonly userMenuOpen = signal(false);
 
@@ -74,18 +75,15 @@ export class TopNavUserComponent {
     }
   }
 
-  protected onSearchInput(event: Event): void {
-    this.searchValue.set((event.target as HTMLInputElement).value);
+  protected isLinkActive(link: NavLink): boolean {
+    const tree = this.router.parseUrl(this.router.url);
+    const segments = tree.root.children['primary']?.segments ?? [];
+    const path = segments.length ? `/${segments.map((segment) => segment.path).join('/')}` : '/';
+    return isStorefrontNavLinkActive(link, path, tree.queryParamMap);
   }
 
-  protected onSearchSubmit(event: Event): void {
-    event.preventDefault();
-    const term = this.searchValue().trim();
-
-    void this.router.navigate(['/products'], {
-      queryParams: term ? { q: term } : {},
-    });
-    this.closeMenu();
+  protected linkQueryParams(link: NavLink): Record<string, string> | null {
+    return navLinkQueryParams(link) ?? null;
   }
 
   protected toggleMenu(): void {

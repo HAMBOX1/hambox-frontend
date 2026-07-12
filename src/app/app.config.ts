@@ -15,12 +15,17 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { provideRouter } from '@angular/router';
-
 import { providePrimeNG } from 'primeng/config';
+
+import {
+  HAMBOX_PRIME_DARK_MODE_SELECTOR,
+  HamboxPrimePreset,
+} from './core/theme/hambox-prime-preset';
 
 
 
 import { environment } from '../environments/environment';
+import { HAMBOX_API_BASE_URL } from '../environments/api-url';
 
 import { Auth } from './features/auth/services/auth';
 
@@ -42,6 +47,7 @@ import { TranslationService } from './core/i18n/translation.service';
 import { API_BASE_URL } from './core/tokens/api-base-url.token';
 
 import { ThemeService } from './core/theme/theme.service';
+import { ThemeEngineService } from './core/theme/theme-engine.service';
 
 import { routes } from './app.routes';
 
@@ -66,16 +72,20 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
 
     providePrimeNG({
-
       ripple: true,
-
+      theme: {
+        preset: HamboxPrimePreset,
+        options: {
+          darkModeSelector: HAMBOX_PRIME_DARK_MODE_SELECTOR,
+        },
+      },
     }),
 
     {
 
       provide: API_BASE_URL,
 
-      useValue: environment.apiUrl,
+      useValue: environment.production ? HAMBOX_API_BASE_URL : '',
 
     },
 
@@ -86,6 +96,7 @@ export const appConfig: ApplicationConfig = {
       const cartFacade = inject(CartFacade);
 
       const theme = inject(ThemeService);
+      const themeEngine = inject(ThemeEngineService);
 
       const translation = inject(TranslationService);
       const currency = inject(CurrencyService);
@@ -93,6 +104,7 @@ export const appConfig: ApplicationConfig = {
 
 
       theme.init();
+      void themeEngine.init();
 
 
 
@@ -104,9 +116,10 @@ export const appConfig: ApplicationConfig = {
         await translation.syncFromAuthenticatedUser();
         await currency.syncFromAuthenticatedUser();
 
-        await cartFacade.mergeGuestCartIfNeeded();
-
-        await cartFacade.load();
+        if (auth.isAuthenticated()) {
+          await cartFacade.mergeGuestCartIfNeeded();
+          await cartFacade.load();
+        }
 
       });
 

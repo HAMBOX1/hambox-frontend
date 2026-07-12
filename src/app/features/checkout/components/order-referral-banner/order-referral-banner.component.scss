@@ -36,7 +36,7 @@
 .referral-banner__text {
   margin: 0;
   max-width: 360px;
-  color: rgba(255, 255, 255, 0.88);
+  color: color-mix(in srgb, var(--color-text-inverse) 88%, transparent);
   font-family: var(--sf-font-body);
   font-size: 14px;
   line-height: 1.55;

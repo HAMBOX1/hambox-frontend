@@ -1,0 +1,213 @@
+@if (error()) {
+  <app-admin-error-alert [message]="error()!" />
+}
+
+<app-admin-section-card [title]="'ADMIN.REPORTS.SCHEDULES.FORM_TITLE' | translate">
+  <form class="reports-schedules__form" (ngSubmit)="createSchedule()">
+    <label>
+      <span>{{ 'ADMIN.REPORTS.SCHEDULES.TYPE' | translate }}</span>
+      <p-select
+        [options]="typeOptions()"
+        [ngModel]="reportType()"
+        (ngModelChange)="reportType.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        name="reportType"
+      />
+    </label>
+
+    <label>
+      <span>{{ 'ADMIN.REPORTS.SCHEDULES.FORMAT' | translate }}</span>
+      <p-select
+        [options]="formatOptions"
+        [ngModel]="format()"
+        (ngModelChange)="format.set($event)"
+        name="format"
+      />
+    </label>
+
+    <label>
+      <span>{{ 'ADMIN.REPORTS.SCHEDULES.FREQUENCY' | translate }}</span>
+      <p-select
+        [options]="frequencyOptions"
+        [ngModel]="frequency()"
+        (ngModelChange)="frequency.set($event)"
+        optionLabel="labelKey"
+        optionValue="value"
+        name="frequency"
+      >
+        <ng-template pTemplate="item" let-item>
+          {{ item.labelKey | translate }}
+        </ng-template>
+        <ng-template pTemplate="selectedItem" let-item>
+          @if (item) {
+            {{ item.labelKey | translate }}
+          }
+        </ng-template>
+      </p-select>
+    </label>
+
+    <label class="reports-schedules__emails">
+      <span>{{ 'ADMIN.REPORTS.SCHEDULES.EMAILS' | translate }}</span>
+      <textarea
+        pTextarea
+        rows="3"
+        [ngModel]="emails()"
+        (ngModelChange)="emails.set($event)"
+        name="emails"
+        [placeholder]="'ADMIN.REPORTS.SCHEDULES.EMAILS_PLACEHOLDER' | translate"
+      ></textarea>
+    </label>
+
+    <label class="reports-schedules__enabled">
+      <p-checkbox
+        [binary]="true"
+        [ngModel]="isEnabled()"
+        (ngModelChange)="isEnabled.set($event)"
+        name="isEnabled"
+        inputId="scheduleEnabled"
+      />
+      <span>{{ 'ADMIN.REPORTS.SCHEDULES.ENABLED' | translate }}</span>
+    </label>
+
+    <button
+      *hamboxHasPermission="permissions.Reports.Schedule"
+      pButton
+      type="submit"
+      [label]="'ADMIN.REPORTS.ACTIONS.CREATE_SCHEDULE' | translate"
+      icon="pi pi-calendar-plus"
+      [loading]="actionLoading()"
+      [disabled]="!reportType()"
+    ></button>
+  </form>
+</app-admin-section-card>
+
+<app-admin-section-card [title]="'ADMIN.REPORTS.SCHEDULES.LIST_TITLE' | translate">
+  <div class="reports-schedules__toolbar">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.REPORTS.ACTIONS.REFRESH' | translate"
+      icon="pi pi-refresh"
+      [loading]="loading()"
+      (click)="reload()"
+    ></button>
+  </div>
+
+  @if (loading() && schedules().length === 0) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (schedules().length === 0) {
+    <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.SCHEDULES' | translate" />
+  } @else {
+    <div class="reports-schedules__table-wrap">
+      <p-table [value]="schedules()" [rows]="50" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.REPORTS.COLS.TYPE' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.FREQUENCY' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.FORMAT' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.ENABLED' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.NEXT_RUN' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.LAST_RUN' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.ACTIONS' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-schedule>
+          <tr
+            [class.reports-schedules__row--selected]="selectedScheduleId() === schedule.id"
+            (click)="selectSchedule(schedule)"
+          >
+            <td>{{ schedule.reportType }}</td>
+            <td>{{ schedule.frequency }}</td>
+            <td>{{ schedule.format }}</td>
+            <td>
+              <app-admin-status-badge
+                [label]="
+                  schedule.isEnabled
+                    ? ('ADMIN.REPORTS.SCHEDULES.ENABLED' | translate)
+                    : ('ADMIN.REPORTS.SCHEDULES.DISABLED' | translate)
+                "
+                [tone]="schedule.isEnabled ? 'success' : 'neutral'"
+              />
+            </td>
+            <td>{{ schedule.nextRunOnUtc ? (schedule.nextRunOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ schedule.lastRunOnUtc ? (schedule.lastRunOnUtc | date: 'short') : '—' }}</td>
+            <td>
+              <div class="reports-schedules__actions" (click)="$event.stopPropagation()">
+                <button
+                  *hamboxHasPermission="permissions.Reports.Schedule"
+                  pButton
+                  type="button"
+                  [label]="'ADMIN.REPORTS.ACTIONS.RUN' | translate"
+                  severity="secondary"
+                  [loading]="actionLoading()"
+                  (click)="run(schedule)"
+                ></button>
+                <button
+                  *hamboxHasPermission="permissions.Reports.Schedule"
+                  pButton
+                  type="button"
+                  [label]="
+                    schedule.isEnabled
+                      ? ('ADMIN.REPORTS.ACTIONS.DISABLE' | translate)
+                      : ('ADMIN.REPORTS.ACTIONS.ENABLE' | translate)
+                  "
+                  severity="secondary"
+                  [loading]="actionLoading()"
+                  (click)="toggleEnabled(schedule)"
+                ></button>
+                <button
+                  *hamboxHasPermission="permissions.Reports.Schedule"
+                  pButton
+                  type="button"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  [loading]="actionLoading()"
+                  (click)="remove(schedule)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</app-admin-section-card>
+
+<app-admin-section-card [title]="'ADMIN.REPORTS.SCHEDULES.EXECUTIONS' | translate">
+  @if (!selectedScheduleId()) {
+    <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.SELECT_SCHEDULE' | translate" />
+  } @else if (loading() && executions().length === 0) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (executions().length === 0) {
+    <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.EXECUTIONS' | translate" />
+  } @else {
+    <div class="reports-schedules__table-wrap">
+      <p-table [value]="executions()" [rows]="50" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.REPORTS.COLS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.TRIGGER' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.STARTED' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.FINISHED' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.ERROR' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-execution>
+          <tr>
+            <td>
+              <app-admin-status-badge
+                [label]="execution.status"
+                [tone]="statusTone(execution.status)"
+              />
+            </td>
+            <td>{{ execution.triggeredBy }}</td>
+            <td>{{ execution.startedOnUtc ? (execution.startedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ execution.finishedOnUtc ? (execution.finishedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ execution.error || '—' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</app-admin-section-card>

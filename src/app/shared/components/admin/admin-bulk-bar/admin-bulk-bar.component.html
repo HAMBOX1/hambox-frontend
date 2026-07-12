@@ -1,0 +1,19 @@
+@if (selectedCount() > 0) {
+  <div class="admin-bulk-bar admin-glass-card" role="status" aria-live="polite">
+    <span class="admin-bulk-bar__count">
+      {{ 'ADMIN.BULK.SELECTED' | translate: { count: selectedCount() } }}
+    </span>
+    <div class="admin-bulk-bar__actions">
+      <ng-content />
+      <button
+        pButton
+        type="button"
+        [label]="clearLabel() | translate"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        (click)="onClear()"
+      ></button>
+    </div>
+  </div>
+}

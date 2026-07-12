@@ -1,11 +1,9 @@
 <nav class="create-stepper" aria-label="Product creation steps">
-  @for (step of steps(); track step.id) {
+  @for (step of visibleSteps(); track step.id) {
     <button
       type="button"
       class="create-stepper__item"
       [class.create-stepper__item--active]="step.id === activeStep()"
-      [class.create-stepper__item--disabled]="!step.enabled"
-      [disabled]="!step.enabled"
       (click)="onStepClick(step)"
     >
       {{ step.label }}

@@ -6,12 +6,12 @@
     </div>
   }
 
-  <div class="category-create-form__field">
-    <label class="category-create-form__label" for="category-name-en">English name</label>
+  <div class="admin-field">
+    <label class="admin-field__label" for="category-name-en">English name</label>
     <input
       pInputText
       id="category-name-en"
-      class="category-create-form__input"
+      class="admin-field__input"
       type="text"
       formControlName="nameEn"
       autocomplete="off"
@@ -22,12 +22,12 @@
     }
   </div>
 
-  <div class="category-create-form__field">
-    <label class="category-create-form__label" for="category-name-ar">Arabic name</label>
+  <div class="admin-field">
+    <label class="admin-field__label" for="category-name-ar">Arabic name</label>
     <input
       pInputText
       id="category-name-ar"
-      class="category-create-form__input"
+      class="admin-field__input"
       type="text"
       formControlName="nameAr"
       dir="rtl"
@@ -38,12 +38,12 @@
     }
   </div>
 
-  <div class="category-create-form__field">
-    <label class="category-create-form__label" for="category-slug">Slug</label>
+  <div class="admin-field">
+    <label class="admin-field__label" for="category-slug">Slug</label>
     <input
       pInputText
       id="category-slug"
-      class="category-create-form__input"
+      class="admin-field__input"
       type="text"
       formControlName="slug"
       autocomplete="off"
@@ -52,8 +52,28 @@
     @if (fieldError('slug'); as error) {
       <p class="category-create-form__error">{{ error }}</p>
     }
-    <p class="category-create-form__hint">Lowercase URL segment used in storefront routes.</p>
+    <p class="admin-field__hint">Lowercase URL segment used in storefront routes.</p>
   </div>
+
+  <div class="admin-field">
+    <label class="admin-field__label" for="category-parent">Parent category</label>
+    <p-select
+      inputId="category-parent"
+      formControlName="parentId"
+      [options]="parentDropdownOptions()"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="None (top-level)"
+    />
+    <p class="admin-field__hint">Optional. Nest this category under another.</p>
+  </div>
+
+  @if (mode() === 'edit') {
+    <div class="admin-field admin-field--checkbox">
+      <p-checkbox formControlName="isActive" inputId="category-active" [binary]="true" />
+      <label for="category-active">Active</label>
+    </div>
+  }
 
   <div class="category-create-form__actions">
     <button
@@ -70,8 +90,8 @@
       pButton
       type="submit"
       class="category-create-form__btn category-create-form__btn--primary"
-      label="Create Category"
-      icon="pi pi-plus"
+      [label]="submitLabel()"
+      [icon]="mode() === 'edit' ? 'pi pi-check' : 'pi pi-plus'"
       [loading]="submitting()"
       [disabled]="submitting()"
     ></button>

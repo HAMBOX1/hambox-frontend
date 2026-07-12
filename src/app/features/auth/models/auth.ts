@@ -50,7 +50,26 @@ export interface UserSession {
   readonly accessToken: string;
   readonly refreshToken: string;
   readonly expiresAt: string;
+  readonly authContext: 'customer' | 'admin';
   readonly user: AuthUser;
+}
+
+export interface AdminLoginChallengeResponse {
+  readonly challengeId: string;
+  readonly expiresAt: string;
+  readonly resendAvailableAt: string;
+  readonly maskedEmail: string;
+  /**
+   * Populated only when Admin OTP is disabled via Platform Settings
+   * (Authentication.AdminOtpEnabled = false) — the caller is already
+   * fully authenticated and should skip the OTP step entirely.
+   */
+  readonly token?: AuthTokenResponse | null;
+}
+
+export interface VerifyAdminOtpRequest {
+  readonly challengeId: string;
+  readonly code: string;
 }
 
 export interface HamboxJwtPayload {
@@ -67,7 +86,10 @@ export interface HamboxJwtPayload {
   readonly 'http://schemas.microsoft.com/ws/2008/06/identity/claims/permission'?:
     | string
     | string[];
+  readonly auth_context?: string;
+  readonly otp_verified?: string | boolean;
+  readonly session_id?: string;
   readonly [claim: string]: unknown;
 }
 
-export const ADMIN_ROLES = ['Admin', 'SuperAdmin'] as const;
+export { ADMIN_ROLES } from '../../../core/auth/jwt-utils';

@@ -1,0 +1,14 @@
+<button
+  pButton
+  class="ui-button"
+  [class.ui-button--full]="fullWidth()"
+  [class.ui-button--sm]="size() === 'sm'"
+  [type]="type()"
+  [label]="label()"
+  [icon]="icon()"
+  [loading]="loading()"
+  [disabled]="disabled()"
+  [severity]="severity()"
+  [text]="text()"
+  (click)="onClick($event)"
+></button>

@@ -1,0 +1,51 @@
+<section class="flash-hero" aria-labelledby="flash-hero-title">
+  <img class="flash-hero__bg" [src]="backgroundImageUrl()" alt="" aria-hidden="true" />
+  <div class="flash-hero__glow" aria-hidden="true"></div>
+  <div class="flash-hero__overlay" aria-hidden="true"></div>
+
+  <div class="flash-hero__content">
+    <div class="flash-hero__copy">
+      <div class="flash-hero__badge">
+        <img [src]="flashIconSrc" alt="" aria-hidden="true" />
+        <span>{{ sectionTitle() }}</span>
+      </div>
+
+      <h2 id="flash-hero-title" class="flash-hero__headline">
+        {{ sectionSubtitle() || sectionTitle() }}
+      </h2>
+
+      @if (dealCount() > 0) {
+        <p class="flash-hero__meta">
+          {{ 'PRODUCTS.HERO.DEAL_COUNT' | translate:{ count: dealCount() } }}
+        </p>
+      }
+
+      <a class="flash-hero__cta" routerLink="/products" [queryParams]="{ section: 'deals' }">
+        {{ 'PRODUCTS.HERO.CTA' | translate }}
+        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    @if (countdownEnabled()) {
+      <div class="flash-hero__countdown" aria-label="Sale countdown">
+        <span class="flash-hero__countdown-label">{{ 'PRODUCTS.HERO.ENDS_IN' | translate }}</span>
+        <div class="flash-hero__countdown-blocks">
+          <div class="flash-hero__time-block">
+            <span class="flash-hero__time-value">{{ hours() }}</span>
+            <span class="flash-hero__time-unit">{{ 'PRODUCTS.HERO.HOURS' | translate }}</span>
+          </div>
+          <span class="flash-hero__time-sep" aria-hidden="true">:</span>
+          <div class="flash-hero__time-block">
+            <span class="flash-hero__time-value">{{ minutes() }}</span>
+            <span class="flash-hero__time-unit">{{ 'PRODUCTS.HERO.MINS' | translate }}</span>
+          </div>
+          <span class="flash-hero__time-sep" aria-hidden="true">:</span>
+          <div class="flash-hero__time-block">
+            <span class="flash-hero__time-value">{{ seconds() }}</span>
+            <span class="flash-hero__time-unit">{{ 'PRODUCTS.HERO.SECS' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

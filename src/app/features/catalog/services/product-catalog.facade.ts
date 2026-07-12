@@ -16,12 +16,14 @@ export class ProductCatalogFacade {
   private readonly itemsState = signal<readonly Product[]>([]);
   private readonly loadingState = signal(false);
   private readonly searchTermState = signal('');
+  private readonly statusFilterState = signal('');
   private readonly errorState = signal<string | null>(null);
   private readonly totalCountState = signal(0);
   private readonly pageNumberState = signal(1);
   private readonly pageSizeState = signal(DEFAULT_PAGE_SIZE);
   private readonly selectedProductIdState = signal<string | null>(null);
   private readonly updatingStatusState = signal(false);
+  private readonly actionLoadingState = signal(false);
   private readonly statusErrorState = signal<string | null>(null);
 
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -30,15 +32,20 @@ export class ProductCatalogFacade {
   readonly items = this.itemsState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
   readonly searchTerm = this.searchTermState.asReadonly();
+  readonly statusFilter = this.statusFilterState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly totalCount = this.totalCountState.asReadonly();
   readonly pageNumber = this.pageNumberState.asReadonly();
   readonly pageSize = this.pageSizeState.asReadonly();
   readonly selectedProductId = this.selectedProductIdState.asReadonly();
   readonly updatingStatus = this.updatingStatusState.asReadonly();
+  readonly actionLoading = this.actionLoadingState.asReadonly();
   readonly statusError = this.statusErrorState.asReadonly();
 
   readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
+  readonly hasActiveFilters = computed(
+    () => this.hasActiveSearch() || this.statusFilterState().trim().length > 0,
+  );
   readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
 
   readonly selectedProduct = computed(() => {
@@ -55,7 +62,7 @@ export class ProductCatalogFacade {
     const count = this.totalCount();
     const noun = count === 1 ? 'listing' : 'listings';
 
-    if (this.hasActiveSearch()) {
+    if (this.hasActiveFilters()) {
       return `Showing ${count} matching enterprise ${noun}`;
     }
 
@@ -66,6 +73,12 @@ export class ProductCatalogFacade {
     this.searchTermState.set(term);
     this.pageNumberState.set(1);
     this.scheduleReload();
+  }
+
+  setStatusFilter(status: string): void {
+    this.statusFilterState.set(status);
+    this.pageNumberState.set(1);
+    void this.fetchProducts();
   }
 
   setPage(pageNumber: number, pageSize: number): void {
@@ -97,15 +110,19 @@ export class ProductCatalogFacade {
     this.statusErrorState.set(null);
 
     try {
-      await firstValueFrom(
-        this.api.updateProduct(product.id, toUpdateProductRequest(product, status)),
-      );
+      if (status === 'Active') {
+        await firstValueFrom(this.api.publishProduct(product.id));
+      } else if (status === 'Inactive') {
+        await firstValueFrom(this.api.deactivateProduct(product.id));
+      } else if (status === 'Archived') {
+        await firstValueFrom(this.api.archiveProduct(product.id));
+      } else {
+        await firstValueFrom(
+          this.api.updateProduct(product.id, toUpdateProductRequest(product, status)),
+        );
+      }
 
-      const updatedProduct: Product = { ...product, status };
-      this.itemsState.update((products) =>
-        products.map((item) => (item.id === product.id ? updatedProduct : item)),
-      );
-
+      await this.fetchProducts(true);
       return true;
     } catch (error) {
       this.statusErrorState.set(this.toErrorMessage(error, 'Failed to update product status.'));
@@ -115,8 +132,72 @@ export class ProductCatalogFacade {
     }
   }
 
+  async deleteProduct(productId: string): Promise<boolean> {
+    this.actionLoadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      await firstValueFrom(this.api.deleteProduct(productId));
+      if (this.selectedProductIdState() === productId) {
+        this.selectedProductIdState.set(null);
+      }
+      await this.fetchProducts(true);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to delete product.'));
+      return false;
+    } finally {
+      this.actionLoadingState.set(false);
+    }
+  }
+
+  async duplicateProduct(productId: string, nameSuffix?: string | null): Promise<string | null> {
+    this.actionLoadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const newId = await firstValueFrom(this.api.duplicateProduct(productId, nameSuffix));
+      await this.fetchProducts(true);
+      return newId;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to duplicate product.'));
+      return null;
+    } finally {
+      this.actionLoadingState.set(false);
+    }
+  }
+
+  async publishProduct(productId: string): Promise<boolean> {
+    return this.runProductAction(productId, () => firstValueFrom(this.api.publishProduct(productId)));
+  }
+
+  async archiveProduct(productId: string): Promise<boolean> {
+    return this.runProductAction(productId, () => firstValueFrom(this.api.archiveProduct(productId)));
+  }
+
+  async restoreProduct(productId: string): Promise<boolean> {
+    return this.runProductAction(productId, () => firstValueFrom(this.api.restoreProduct(productId)));
+  }
+
   reload(): Promise<void> {
     return this.fetchProducts(true);
+  }
+
+  private async runProductAction(productId: string, action: () => Promise<void>): Promise<boolean> {
+    this.actionLoadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      await action();
+      await this.fetchProducts(true);
+      this.selectedProductIdState.set(productId);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Product action failed.'));
+      return false;
+    } finally {
+      this.actionLoadingState.set(false);
+    }
   }
 
   private scheduleReload(): void {
@@ -134,11 +215,13 @@ export class ProductCatalogFacade {
     this.errorState.set(null);
 
     try {
+      const status = this.statusFilterState().trim();
       const result = await firstValueFrom(
         this.api.getProducts({
           pageNumber: this.pageNumberState(),
           pageSize: this.pageSizeState(),
           searchTerm: this.searchTermState(),
+          ...(status ? { status: status as ProductStatus } : {}),
         }),
       );
 

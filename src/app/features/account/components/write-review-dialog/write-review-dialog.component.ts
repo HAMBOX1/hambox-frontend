@@ -1,13 +1,15 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
+
+import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 
 @Component({
   selector: 'app-write-review-dialog',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe, HamboxTranslateRefreshDirective],
   templateUrl: './write-review-dialog.component.html',
   styleUrl: './write-review-dialog.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WriteReviewDialogComponent {
   readonly visible = input(false);

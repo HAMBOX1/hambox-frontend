@@ -9,6 +9,7 @@ import {
   ThemeId,
   isThemeId,
 } from './theme.model';
+import { stripInlineThemeTokenOverrides } from './theme-dom.util';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -45,12 +46,19 @@ export class ThemeService {
     this.setTheme(this.isDark() ? 'hambox-light' : 'hambox-dark');
   }
 
+  hasStoredPreference(): boolean {
+    return this.readStoredTheme() !== null;
+  }
+
   private apply(themeId: ThemeId, persist: boolean): void {
     this.themeState.set(themeId);
 
     const root = this.document.documentElement;
     root.dataset['theme'] = themeId;
     root.style.colorScheme = themeId === 'hambox-dark' ? 'dark' : 'light';
+
+    // SCSS `html[data-theme]` is the storefront source of truth — clear API inline overrides.
+    stripInlineThemeTokenOverrides(root);
 
     if (persist && typeof localStorage !== 'undefined') {
       localStorage.setItem(THEME_STORAGE_KEY, themeId);

@@ -9,46 +9,156 @@
   color: var(--sf-text-primary);
 }
 
-.storefront-store__container {
+// —— Page container: header → hero → category nav → toolbar → content → pagination ——
+.storefront-store__page {
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
+  flex-direction: column;
+  gap: 2rem;
   max-width: var(--sf-container-max);
   margin: 0 auto;
-  padding: 32px var(--sf-container-px);
+  padding: 2rem var(--sf-container-px);
+}
+
+.storefront-store__hero-section,
+.storefront-store__category-nav-section,
+.storefront-store__toolbar-section {
+  width: 100%;
+}
+
+// —— Content: sidebar + product grid ——
+.storefront-store__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  width: 100%;
+  transition: gap 240ms ease;
+}
+
+.storefront-store__content--filters-collapsed {
+  gap: 1rem;
 }
 
 .storefront-store__main {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 32px;
+  gap: 1.5rem;
   min-width: 0;
 }
 
-.storefront-store__grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--sf-grid-gap);
+.storefront-store__applied-filters {
+  padding: 0;
 }
 
-@media (max-width: 991px) {
-  .storefront-store__container {
-    flex-direction: column;
-    padding: 32px var(--sf-container-px-tablet);
-  }
+// —— Product grid ——
+// Column count depends on BOTH the view mode (comfortable vs compact) and,
+// from the tablet breakpoint up where the sidebar sits inline, whether the
+// filter sidebar is open or collapsed. Opening the sidebar never squeezes
+// cards — it reduces the column count instead, so remaining cards get more
+// room, matching Steam/Instant Gaming/Epic behavior.
+.storefront-store__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  transition: gap 240ms ease;
 
-  .storefront-store__grid {
+  &--compact {
+    gap: 0.875rem;
+  }
+}
+
+.storefront-store__pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.storefront-store__list-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+// Small mobile → large mobile: 1 → 2 columns, same for both view modes
+// (there isn't enough width to meaningfully differentiate density yet).
+@media (min-width: 576px) {
+  .storefront-store__grid,
+  .storefront-store__grid--compact {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 767px) {
-  .storefront-store__container {
-    padding: 24px var(--sf-container-px-mobile);
+// Tablet: sidebar renders as a drawer here, not inline, so it never affects
+// column count — comfortable gets 3, compact gets 4.
+@media (min-width: 768px) {
+  .storefront-store__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
   }
 
-  .storefront-store__grid {
-    grid-template-columns: 1fr;
+  .storefront-store__grid--compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+// Desktop: sidebar is inline from here up. While open, column count is
+// pinned (comfortable 3 / compact 4) regardless of viewport — opening
+// filters always means fewer, larger cards, never squeezed ones.
+@media (min-width: 992px) {
+  .storefront-store__content:not(.storefront-store__content--filters-collapsed) .storefront-store__grid,
+  .storefront-store__content--filters-collapsed .storefront-store__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .storefront-store__content:not(.storefront-store__content--filters-collapsed) .storefront-store__grid--compact,
+  .storefront-store__content--filters-collapsed .storefront-store__grid--compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+// With the sidebar collapsed to its icon rail, the freed-up width lets the
+// grid grow by one column — capped here (4 comfortable / 5 compact) rather
+// than growing further at ultra-wide widths, so cards stay comfortably wide
+// instead of thinning out.
+@media (min-width: 1200px) {
+  .storefront-store__content--filters-collapsed .storefront-store__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .storefront-store__content--filters-collapsed .storefront-store__grid--compact {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .storefront-store__page {
+    padding: 1.5rem var(--sf-container-px-tablet);
+    gap: 1.5rem;
+  }
+
+  .storefront-store__content {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 575px) {
+  .storefront-store__page {
+    padding: 1.25rem var(--sf-container-px-mobile);
+    gap: 1.25rem;
+  }
+
+  .storefront-store__main {
+    gap: 1rem;
+  }
+
+  .storefront-store__grid,
+  .storefront-store__grid--compact {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

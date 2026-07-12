@@ -14,6 +14,8 @@ export interface UserProfileApiDto {
   readonly memberSince: string;
   readonly preferredLanguage: string;
   readonly preferredCurrency: string;
+  readonly roles: readonly string[];
+  readonly permissions: readonly string[];
 }
 
 export interface UpdateProfileRequest {
@@ -29,11 +31,22 @@ export interface ChangePasswordRequest {
   readonly newPassword: string;
 }
 
+export interface MembershipBenefitApiDto {
+  readonly type: string;
+  readonly value: string;
+  readonly displayName: string;
+  readonly sortOrder: number;
+}
+
 export interface MembershipCardApiDto {
-  readonly tier: string;
+  readonly planName: string;
+  readonly badgeLabel: string | null;
+  readonly status: string;
+  readonly expiresOnUtc: string | null;
+  readonly discountPercent: number | null;
+  readonly referralMultiplier: number;
   readonly lifetimeSpend: number;
-  readonly nextTierThreshold: number;
-  readonly progressPercent: number;
+  readonly benefits: readonly MembershipBenefitApiDto[];
 }
 
 export interface WishlistPreviewItemApiDto {
@@ -94,7 +107,44 @@ export interface OrderLicenseKeyApiDto {
   readonly orderItemId: string;
   readonly productId: string;
   readonly productNameEn: string;
+  readonly maskedLicenseKey: string;
+  readonly licenseKeyId: string;
+}
+
+export interface CustomerLibraryItemApiDto {
+  readonly id: string;
+  readonly orderId: string;
+  readonly orderItemId: string;
+  readonly productId: string;
+  readonly productVariantId: string | null;
+  readonly productNameEn: string;
+  readonly productImageUrl: string | null;
+  readonly platform: string | null;
+  readonly edition: string | null;
+  readonly region: string | null;
+  readonly purchaseDate: string;
+  readonly orderNumber: string;
+  readonly orderStatus: string;
+  readonly deliveryStatus: string;
+  readonly maskedLicenseKey: string;
+  readonly canReveal: boolean;
+  readonly redeemInstructions: string | null;
+  readonly invoiceUrl: string | null;
+  readonly supportUrl: string | null;
+  readonly isRecentPurchase: boolean;
+}
+
+export interface RevealCustomerLibraryKeyApiDto {
   readonly licenseKey: string;
+}
+
+export interface CustomerLibraryQuery {
+  readonly pageNumber?: number;
+  readonly pageSize?: number;
+  readonly searchTerm?: string;
+  readonly deliveryStatus?: string;
+  readonly sort?: 'recent' | 'oldest' | 'name';
+  readonly group?: 'recent' | 'older';
 }
 
 export interface OrderItemReviewStatusApiDto {
@@ -152,6 +202,7 @@ export interface UserNotificationApiDto {
   readonly category: string;
   readonly isRead: boolean;
   readonly createdOnUtc: string;
+  readonly actionUrl?: string | null;
 }
 
 export interface ReferralTierApiDto {

@@ -1,0 +1,56 @@
+<header class="mobile-top-bar" [class.mobile-top-bar--checkout]="mode() === 'checkout'" [class.mobile-top-bar--titled]="showPageTitle()">
+  <div class="mobile-top-bar__inner">
+    <div class="mobile-top-bar__slot mobile-top-bar__slot--start">
+      @if (showBackButton()) {
+        <button
+          type="button"
+          class="mobile-top-bar__icon-btn"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+          (click)="goBack()"
+        >
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        </button>
+      } @else if (showSearchButton()) {
+        <button
+          type="button"
+          class="mobile-top-bar__icon-btn"
+          [attr.aria-label]="'COMMON.SEARCH' | translate"
+          (click)="openSearch()"
+        >
+          <i class="pi pi-search" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+
+    @if (showPageTitle()) {
+      <h1 class="mobile-top-bar__title">{{ mobile.pageTitleKey()! | translate }}</h1>
+    } @else {
+      <a class="mobile-top-bar__logo" routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate">
+        <img [src]="logoSrc" alt="HAMBOX" width="120" height="28" />
+      </a>
+    }
+
+    <div class="mobile-top-bar__slot mobile-top-bar__slot--end">
+      @if (mode() === 'checkout') {
+        <span class="mobile-top-bar__checkout">
+          <i class="pi pi-lock" aria-hidden="true"></i>
+        </span>
+      } @else if (isAuthenticated()) {
+        <app-notification-bell [compact]="true" />
+        <app-account-menu [compact]="true" />
+      } @else {
+        <app-theme-toggle [compact]="true" />
+      }
+    </div>
+  </div>
+</header>
+
+@if (searchOpen()) {
+  <app-hambox-bottom-sheet
+    [open]="searchOpen()"
+    [title]="'COMMON.SEARCH' | translate"
+    (closed)="closeSearch()"
+  >
+    <app-storefront-search [mobile]="true" (submitted)="closeSearch()" />
+  </app-hambox-bottom-sheet>
+}

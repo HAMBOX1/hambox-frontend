@@ -1,0 +1,10 @@
+@use '../../../../../styles/enterprise-admin-mixins' as enterprise;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.ui-input {
+  @include enterprise.ui-control-base;
+}

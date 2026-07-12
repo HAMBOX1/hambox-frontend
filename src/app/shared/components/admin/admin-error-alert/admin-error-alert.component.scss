@@ -1,0 +1,26 @@
+.admin-error-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid color-mix(in srgb, var(--admin-accent-amber) 35%, transparent);
+  border-radius: var(--admin-radius-lg);
+  background: color-mix(in srgb, var(--admin-accent-amber) 10%, var(--admin-bg-panel));
+}
+
+.admin-error-alert__icon {
+  flex-shrink: 0;
+  color: var(--admin-accent-amber);
+  font-size: 1.125rem;
+}
+
+.admin-error-alert__message {
+  flex: 1;
+  color: var(--admin-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.admin-error-alert__retry {
+  margin-left: auto;
+}

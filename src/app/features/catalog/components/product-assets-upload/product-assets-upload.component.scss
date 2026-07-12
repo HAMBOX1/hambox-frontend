@@ -62,7 +62,7 @@
 
 .assets-upload__error {
   margin: 0;
-  color: #ffb4ab;
+  color: var(--danger);
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -83,7 +83,7 @@
   cursor: grab;
 
   &.cdk-drag-preview {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--color-shadow-lg);
   }
 
   &.cdk-drag-placeholder {
@@ -97,7 +97,7 @@
   left: 0.5rem;
   padding: 0.125rem 0.5rem;
   border-radius: var(--admin-radius-pill);
-  background: rgba(80, 237, 149, 0.18);
+  background: var(--admin-accent-green-soft);
   color: var(--admin-accent-green);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -180,7 +180,7 @@
   padding: 0;
   border: 1px solid var(--admin-border-default);
   border-radius: 50%;
-  background: rgba(11, 12, 14, 0.82);
+  background: color-mix(in srgb, var(--color-background) 82%, transparent);
   color: var(--admin-text-primary);
   cursor: pointer;
 }

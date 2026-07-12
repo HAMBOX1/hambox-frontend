@@ -9,6 +9,8 @@ import { CartOrderSummaryComponent } from '../../components/cart-order-summary/c
 import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
 import { CartFacade } from '../../services/cart.facade';
 
+import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+
 @Component({
   selector: 'app-cart-page',
   standalone: true,
@@ -20,6 +22,7 @@ import { CartFacade } from '../../services/cart.facade';
     EmptyStateComponent,
     CartLineItemComponent,
     CartOrderSummaryComponent,
+    HamboxCurrencyPipe,
   ],
   templateUrl: './cart-page.component.html',
   styleUrl: './cart-page.component.scss',

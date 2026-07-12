@@ -1,17 +1,13 @@
 <p-toast position="top-right" />
 
-<section class="product-create-page">
-  <header class="product-create-page__header">
-    <a class="product-create-page__back" routerLink="/admin/inventory">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>
-      <span>Back to Catalog</span>
-    </a>
-
-    <div class="product-create-page__heading">
-      <h1 class="product-create-page__title">Create Product</h1>
-      <p class="product-create-page__subtitle">Add a new enterprise listing to the HAMBOX catalog.</p>
-    </div>
-  </header>
+<section class="admin-page product-create-page">
+  <app-admin-page-header
+    title="Create Product"
+    subtitle="Add a new enterprise listing to the HAMBOX catalog."
+    backLink="/admin/products"
+    backLabel="Back to Catalog"
+    [breadcrumbs]="breadcrumbs"
+  />
 
   @if (showDraftBanner()) {
     <div
@@ -37,38 +33,33 @@
 
   <div class="product-create-page__content">
     @if (activeStep() === 'overview') {
-      <section class="product-create-page__panel">
-        <h2 class="product-create-page__section-title">Overview</h2>
+      <app-admin-section-card title="Overview">
         <p class="product-create-page__section-copy">
           Start with the required product details in Basic Information. Variants, fulfillment,
           pricing, inventory, SEO, and visibility controls will be enabled in later phases.
         </p>
-      </section>
+      </app-admin-section-card>
     }
 
     @if (activeStep() === 'basic-information') {
-      <section class="product-create-page__panel">
-        <h2 class="product-create-page__section-title">Basic Information</h2>
-        <p class="product-create-page__section-copy">
-          Enter the core catalog fields required to publish a new product listing.
-        </p>
-
+      <app-admin-section-card
+        title="Basic Information"
+        description="Enter the core catalog fields required to publish a new product listing."
+      >
         <app-product-basic-info-form
           [categories]="categories()"
           [categoriesLoading]="categoriesLoading()"
           [categoriesError]="categoriesError()"
           [disabled]="submitting()"
         />
-      </section>
+      </app-admin-section-card>
 
-      <section class="product-create-page__panel">
-        <h2 class="product-create-page__section-title">Product Assets</h2>
-        <p class="product-create-page__section-copy">
-          Upload product imagery. The first image becomes the primary storefront image unless you choose another.
-        </p>
-
+      <app-admin-section-card
+        title="Product Assets"
+        description="Upload product imagery. The first image becomes the primary storefront image unless you choose another."
+      >
         <app-product-assets-upload (assetsChanged)="onAssetsChanged()" />
-      </section>
+      </app-admin-section-card>
     }
   </div>
 
@@ -88,9 +79,23 @@
     </span>
   </label>
 
-  <app-product-form-footer
-    [submitting]="submitting()"
-    (cancel)="onCancel()"
-    (create)="onCreate()"
-  />
+  <app-admin-sticky-save-bar>
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      severity="secondary"
+      [disabled]="submitting()"
+      (click)="onCancel()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Create Product"
+      icon="pi pi-check"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+      (click)="onCreate()"
+    ></button>
+  </app-admin-sticky-save-bar>
 </section>

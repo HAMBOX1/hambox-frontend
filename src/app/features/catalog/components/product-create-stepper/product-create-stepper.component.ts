@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { ProductCreateStep, ProductCreateStepId } from '../../models/product.model';
 
@@ -15,11 +15,9 @@ export class ProductCreateStepperComponent {
 
   readonly stepSelect = output<ProductCreateStepId>();
 
-  protected onStepClick(step: ProductCreateStep): void {
-    if (!step.enabled) {
-      return;
-    }
+  protected readonly visibleSteps = computed(() => this.steps().filter((step) => step.enabled));
 
+  protected onStepClick(step: ProductCreateStep): void {
     this.stepSelect.emit(step.id);
   }
 }

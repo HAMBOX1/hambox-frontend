@@ -8,7 +8,14 @@
   <app-storefront-nav [links]="navLinks()" mode="checkout" />
 
   <main class="payment-processing__main">
-    <app-payment-processing-card [progress]="progress()" />
+    @if (error()) {
+      <div class="payment-processing__error" role="alert">
+        <p>{{ error() }}</p>
+        <a routerLink="/checkout">Return to checkout</a>
+      </div>
+    } @else {
+      <app-payment-processing-card [progress]="progress()" [stageLabel]="stageLabel()" />
+    }
   </main>
 
   <app-storefront-footer />

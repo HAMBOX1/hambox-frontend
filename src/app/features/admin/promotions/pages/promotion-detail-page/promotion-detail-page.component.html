@@ -1,0 +1,244 @@
+<p-toast position="top-right" />
+
+<section class="admin-page promotion-detail-page">
+  <app-admin-page-header
+    [backLink]="'/admin/promotions'"
+    [backLabel]="'ADMIN.PROMOTIONS.EDIT.BACK' | translate"
+    [title]="detail()?.name ?? ('ADMIN.PROMOTIONS.LIST.TITLE' | translate)"
+    [subtitle]="detail()?.description ?? ''"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    @if (detail(); as promo) {
+      <div adminHeaderActions class="promotion-detail-page__header-actions">
+        <app-admin-status-badge [label]="promo.status" [tone]="statusTone(promo.status)" />
+        @if (canPublish() && primaryActionLabel(promo.status); as label) {
+          <button
+            pButton
+            type="button"
+            [label]="label"
+            [icon]="primaryActionIcon(promo.status)"
+            [severity]="primaryActionSeverity(promo.status)"
+            [disabled]="actionLoading()"
+            (click)="runPrimaryAction(promo.status)"
+          ></button>
+        }
+        @if (overflowMenuItems(promo).length > 0) {
+          <app-admin-action-menu [items]="overflowMenuItems(promo)" />
+        }
+      </div>
+    }
+  </app-admin-page-header>
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" (retry)="retryDetail()" />
+  } @else if (detail(); as promo) {
+    <section class="admin-detail-hero">
+      @if (statisticsLoading()) {
+        <app-admin-loading-skeleton variant="detail" [rows]="2" />
+      } @else if (statistics(); as stats) {
+        <app-admin-stat-grid>
+          <app-admin-stat-card
+            [label]="'ADMIN.PROMOTIONS.STATS.REDEMPTIONS' | translate"
+            [value]="stats.totalRedemptions"
+            icon="pi-shopping-cart"
+            tone="info"
+          />
+          <app-admin-stat-card
+            [label]="'ADMIN.PROMOTIONS.DETAIL.TOTAL_DISCOUNT' | translate"
+            [value]="stats.totalDiscountGiven | hamboxCurrency"
+            icon="pi-wallet"
+            tone="success"
+          />
+          <app-admin-stat-card
+            [label]="'ADMIN.PROMOTIONS.DETAIL.UNIQUE_USERS' | translate"
+            [value]="stats.uniqueUsers"
+            icon="pi-users"
+          />
+        </app-admin-stat-grid>
+      } @else {
+        <app-admin-stat-grid>
+          <app-admin-stat-card
+            [label]="'ADMIN.PROMOTIONS.LIST.COLUMNS.REDEMPTIONS' | translate"
+            [value]="promo.totalRedemptions"
+            icon="pi-shopping-cart"
+            tone="info"
+          />
+          <app-admin-stat-card
+            [label]="'ADMIN.PROMOTIONS.LIST.COLUMNS.COUPONS' | translate"
+            [value]="promo.couponCodes.length"
+            icon="pi-ticket"
+          />
+        </app-admin-stat-grid>
+      }
+    </section>
+
+    <p-tabs class="admin-detail-tabs" [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="0">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_OVERVIEW' | translate }}</p-tab>
+        <p-tab value="1">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_STATISTICS' | translate }}</p-tab>
+        <p-tab value="2">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_REDEMPTIONS' | translate }}</p-tab>
+        <p-tab value="3">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_COUPONS' | translate }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <div class="promotion-detail-page__preview">
+            <dl class="admin-meta-grid">
+              <div>
+                <dt>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.TYPE' | translate }}</dt>
+                <dd>{{ promo.type }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.DISCOUNT' | translate }}</dt>
+                <dd>{{ formatDiscount() }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ADMIN.PROMOTIONS.EDIT.START_DATE' | translate }}</dt>
+                <dd>{{ promo.startDateUtc || '—' }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ADMIN.PROMOTIONS.EDIT.END_DATE' | translate }}</dt>
+                <dd>{{ promo.endDateUtc || '—' }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.REDEMPTIONS' | translate }}</dt>
+                <dd>{{ promo.totalRedemptions }}</dd>
+              </div>
+            </dl>
+
+            @if (promo.conditions.length > 0) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.CONDITIONS' | translate" [padded]="true">
+                <ul class="promotion-detail-page__list">
+                  @for (condition of promo.conditions; track condition.type + condition.value) {
+                    <li>
+                      <span class="admin-cell-primary">{{ condition.type }}</span>
+                      <span class="admin-cell-secondary">{{ condition.value }}</span>
+                    </li>
+                  }
+                </ul>
+              </app-admin-section-card>
+            }
+
+            @if (promo.targets.length > 0) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.TARGETS' | translate" [padded]="true">
+                <ul class="promotion-detail-page__list">
+                  @for (target of promo.targets; track target.type + target.targetId) {
+                    <li>
+                      <span class="admin-cell-primary">{{ target.type }}</span>
+                      <span class="admin-cell-secondary">{{ target.targetId }}</span>
+                    </li>
+                  }
+                </ul>
+              </app-admin-section-card>
+            }
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          @if (statisticsLoading()) {
+            <app-admin-loading-skeleton variant="detail" [rows]="3" />
+          } @else if (statistics(); as stats) {
+            <app-admin-stat-grid>
+              <app-admin-stat-card
+                [label]="'ADMIN.PROMOTIONS.STATS.REDEMPTIONS' | translate"
+                [value]="stats.totalRedemptions"
+                icon="pi-shopping-cart"
+                tone="info"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.PROMOTIONS.DETAIL.TOTAL_DISCOUNT' | translate"
+                [value]="stats.totalDiscountGiven | hamboxCurrency"
+                icon="pi-wallet"
+                tone="success"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.PROMOTIONS.DETAIL.UNIQUE_USERS' | translate"
+                [value]="stats.uniqueUsers"
+                icon="pi-users"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.PROMOTIONS.DETAIL.ACTIVE_COUPONS' | translate"
+                [value]="stats.activeCoupons"
+                icon="pi-ticket"
+                tone="success"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.PROMOTIONS.DETAIL.EXPIRED_COUPONS' | translate"
+                [value]="stats.expiredCoupons"
+                icon="pi-clock"
+                tone="warning"
+              />
+            </app-admin-stat-grid>
+          }
+        </p-tabpanel>
+
+        <p-tabpanel value="2">
+          <app-admin-data-table-shell>
+            <p-table
+              class="admin-data-table"
+              [value]="[...redemptions()]"
+              [loading]="redemptionsLoading()"
+              [lazy]="true"
+              [paginator]="redemptionsTotal() > 0"
+              [rows]="redemptionsPageSize()"
+              [totalRecords]="redemptionsTotal()"
+              [first]="tableFirst()"
+              [rowsPerPageOptions]="[10, 20, 50]"
+              (onLazyLoad)="onRedemptionsPageChange($event)"
+              dataKey="id"
+              scrollable
+              scrollHeight="flex"
+              responsiveLayout="scroll"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>{{ 'ADMIN.PROMOTIONS.DETAIL.COUPON' | translate }}</th>
+                  <th>{{ 'ADMIN.PROMOTIONS.DETAIL.DISCOUNT' | translate }}</th>
+                  <th>{{ 'ADMIN.PROMOTIONS.DETAIL.USER' | translate }}</th>
+                  <th>{{ 'ADMIN.PROMOTIONS.DETAIL.ORDER' | translate }}</th>
+                  <th>{{ 'ADMIN.PROMOTIONS.DETAIL.REDEEMED' | translate }}</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td>
+                    <span class="admin-cell-primary">{{ row.couponCode || '—' }}</span>
+                  </td>
+                  <td>
+                    <span class="admin-cell-badge">{{ row.discountAmount | hamboxCurrency }}</span>
+                  </td>
+                  <td>
+                    <span class="admin-cell-secondary">{{ row.userId || '—' }}</span>
+                  </td>
+                  <td>
+                    <span class="admin-cell-secondary">{{ row.orderId || '—' }}</span>
+                  </td>
+                  <td>
+                    <span class="admin-cell-secondary">{{ row.redeemedOnUtc }}</span>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="5">
+                    <app-admin-empty-state
+                      icon="pi pi-shopping-cart"
+                      [title]="'ADMIN.PROMOTIONS.DETAIL.NO_REDEMPTIONS' | translate"
+                      [compact]="true"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </app-admin-data-table-shell>
+        </p-tabpanel>
+
+        <p-tabpanel value="3">
+          <app-promotion-coupons-panel [promotionId]="promo.id" [coupons]="promo.couponCodes" />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+</section>

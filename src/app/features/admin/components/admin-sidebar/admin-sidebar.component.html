@@ -1,25 +1,70 @@
 <aside
   class="admin-sidebar"
+  [class.admin-sidebar--collapsed]="sidebarState.collapsed()"
   [class.admin-sidebar--mobile-open]="mobileOpen()"
-  aria-label="Admin navigation"
+  [attr.aria-label]="'ADMIN.SIDEBAR.NAV_ARIA' | translate"
 >
-  <div class="admin-sidebar__brand">
-    <a class="admin-sidebar__logo-link" routerLink="/admin/inventory" (click)="onNavigate()">
-      <img class="admin-sidebar__logo" [src]="logoSrc" alt="HAMBOX" />
-    </a>
+  <div class="admin-sidebar__header">
+    <div class="admin-sidebar__brand">
+      <a
+        class="admin-sidebar__logo-link"
+        routerLink="/admin/products"
+        [attr.title]="'ADMIN.SIDEBAR.HOME' | translate"
+        (click)="onNavigate()"
+      >
+        @if (sidebarState.collapsed()) {
+          <span class="admin-sidebar__logo-mark" aria-hidden="true">H</span>
+        } @else {
+          <img class="admin-sidebar__logo" [src]="logoSrc" alt="HAMBOX" />
+        }
+      </a>
+    </div>
+
+    <div class="admin-sidebar__header-actions">
+      <button
+        type="button"
+        class="admin-sidebar__collapse-btn"
+        [attr.aria-label]="
+          (sidebarState.collapsed() ? 'ADMIN.SIDEBAR.EXPAND' : 'ADMIN.SIDEBAR.COLLAPSE') | translate
+        "
+        [attr.title]="
+          (sidebarState.collapsed() ? 'ADMIN.SIDEBAR.EXPAND' : 'ADMIN.SIDEBAR.COLLAPSE') | translate
+        "
+        (click)="toggleCollapsed()"
+      >
+        <i
+          class="pi"
+          [class.pi-angle-right]="sidebarState.collapsed()"
+          [class.pi-angle-left]="!sidebarState.collapsed()"
+          aria-hidden="true"
+        ></i>
+      </button>
+
+      @if (mobileOpen()) {
+        <button
+          type="button"
+          class="admin-sidebar__close"
+          [attr.aria-label]="'ADMIN.SIDEBAR.CLOSE' | translate"
+          (click)="onNavigate()"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
   </div>
 
   <nav class="admin-sidebar__nav">
-    @for (item of navItems; track item.id) {
+    @for (item of navItems(); track item.id) {
       <a
         class="admin-sidebar__link"
         [routerLink]="item.route"
         routerLinkActive="admin-sidebar__link--active"
         [routerLinkActiveOptions]="{ exact: false }"
+        [attr.title]="navTooltip(item.labelKey)"
         (click)="onNavigate()"
       >
         <i class="admin-sidebar__icon" [class]="item.icon" aria-hidden="true"></i>
-        <span class="admin-sidebar__label">{{ item.label }}</span>
+        <span class="admin-sidebar__label">{{ item.labelKey | translate }}</span>
       </a>
     }
   </nav>

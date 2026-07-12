@@ -12,4 +12,5 @@ import { StorefrontCategory } from '../../models/storefront-home';
 })
 export class PopularCategoriesComponent {
   categories = input.required<readonly StorefrontCategory[]>();
+  sectionTitle = input('Popular Categories');
 }

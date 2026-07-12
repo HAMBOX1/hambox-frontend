@@ -1,0 +1,44 @@
+<div class="reports-filters">
+  <div class="reports-filters__field">
+    <label class="reports-filters__label">{{ 'ADMIN.REPORTS.FILTERS.PRESET' | translate }}</label>
+    <p-select
+      [options]="presetOptions"
+      [ngModel]="filters().preset"
+      (ngModelChange)="onPresetChange($event)"
+      optionLabel="labelKey"
+      optionValue="value"
+      [placeholder]="'ADMIN.REPORTS.FILTERS.PRESET' | translate"
+      styleClass="reports-filters__control"
+    >
+      <ng-template pTemplate="item" let-item>
+        {{ item.labelKey | translate }}
+      </ng-template>
+      <ng-template pTemplate="selectedItem" let-item>
+        @if (item) {
+          {{ item.labelKey | translate }}
+        }
+      </ng-template>
+    </p-select>
+  </div>
+
+  @if (filters().preset === 'Custom') {
+    <div class="reports-filters__field">
+      <label class="reports-filters__label">{{ 'ADMIN.REPORTS.FILTERS.FROM' | translate }}</label>
+      <input
+        pInputText
+        type="date"
+        [ngModel]="filters().from"
+        (ngModelChange)="onFromChange($event)"
+      />
+    </div>
+    <div class="reports-filters__field">
+      <label class="reports-filters__label">{{ 'ADMIN.REPORTS.FILTERS.TO' | translate }}</label>
+      <input
+        pInputText
+        type="date"
+        [ngModel]="filters().to"
+        (ngModelChange)="onToChange($event)"
+      />
+    </div>
+  }
+</div>

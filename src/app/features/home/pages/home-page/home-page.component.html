@@ -18,41 +18,62 @@
       <app-loading-skeleton type="card" [count]="4" />
     </main>
   } @else {
+    @if (content()!.announcementBar.visible && content()!.announcementBar.displayPosition === 'top') {
+      <app-announcement-bar [announcement]="content()!.announcementBar" />
+    }
+
     <main class="storefront-home__main">
-      <app-hero-section [hero]="content()!.hero" />
-      <app-trust-bar [features]="trustFeatures" />
-
-      @if (hasCategories()) {
-        <app-popular-categories [categories]="categories()" />
-      } @else {
-        <section class="storefront-home__empty-section" aria-label="Categories unavailable">
-          <app-empty-state
-            icon="pi pi-folder-open"
-            title="No categories yet"
-            description="Active categories will appear here once they are published in the catalog."
-          />
-        </section>
+      @if (content()!.hero.visible) {
+        <app-hero-section [hero]="content()!.hero" />
       }
 
-      @if (hasFeaturedProducts()) {
-        <app-flash-deals-section
-          [deals]="featuredProducts()"
-          [initialCountdownSeconds]="flashCountdownSeconds()"
-        />
-      } @else {
-        <section class="storefront-home__empty-section" aria-label="Featured products unavailable">
-          <app-empty-state
-            icon="pi pi-shopping-bag"
-            title="No featured products yet"
-            description="Active products will appear here once they are published in the catalog."
-            actionLabel="Browse store"
-            actionIcon="pi pi-arrow-right"
-            (action)="browseStore()"
-          />
-        </section>
+      @if (trustFeatures().length) {
+        <app-trust-bar [features]="trustFeatures()" />
       }
 
-      @if (hasTrending()) {
+      <app-promo-banner [banner]="content()!.promoBanner" />
+
+      @if (content()!.popularCategories.visible) {
+        @if (hasCategories()) {
+          <app-popular-categories
+            [categories]="categories()"
+            [sectionTitle]="content()!.popularCategories.sectionTitle"
+          />
+        } @else {
+          <section class="storefront-home__empty-section" aria-label="Categories unavailable">
+            <app-empty-state
+              icon="pi pi-folder-open"
+              title="No categories yet"
+              description="Active categories will appear here once they are published in the catalog."
+            />
+          </section>
+        }
+      }
+
+      @if (content()!.flashDeals.visible) {
+        @if (hasFeaturedProducts()) {
+          <app-flash-deals-section
+            [deals]="featuredProducts()"
+            [initialCountdownSeconds]="flashCountdownSeconds()"
+            [sectionTitle]="content()!.flashDeals.sectionTitle"
+            [sectionSubtitle]="content()!.flashDeals.sectionSubtitle"
+            [countdownEnabled]="content()!.flashDeals.countdownEnabled"
+          />
+        } @else {
+          <section class="storefront-home__empty-section" aria-label="Featured products unavailable">
+            <app-empty-state
+              icon="pi pi-shopping-bag"
+              title="No featured products yet"
+              description="Active products will appear here once they are published in the catalog."
+              actionLabel="Browse store"
+              actionIcon="pi pi-arrow-right"
+              (action)="browseStore()"
+            />
+          </section>
+        }
+      }
+
+      @if (content()!.featuredCollections.visible && hasTrending()) {
         <app-trending-section
           [featuredProduct]="featuredHighlight()"
           [rankItems]="trendingRanks()"
@@ -62,5 +83,5 @@
     </main>
   }
 
-  <app-storefront-footer />
+  <app-storefront-footer [footer]="content()?.footer ?? null" />
 </div>

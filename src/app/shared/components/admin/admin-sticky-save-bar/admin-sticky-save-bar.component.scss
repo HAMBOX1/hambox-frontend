@@ -1,0 +1,51 @@
+.admin-sticky-save-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin-top: auto;
+  padding-top: var(--admin-section-gap);
+}
+
+.admin-sticky-save-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-card);
+  background: color-mix(in srgb, var(--admin-bg-panel) 92%, transparent);
+  box-shadow: var(--admin-shadow-panel);
+  backdrop-filter: blur(12px);
+}
+
+.admin-sticky-save-bar--dirty .admin-sticky-save-bar__inner {
+  border-color: color-mix(in srgb, var(--admin-accent-amber) 35%, var(--admin-border-default));
+}
+
+.admin-sticky-save-bar__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--admin-text-muted);
+  font-size: var(--admin-type-caption);
+  font-weight: 600;
+
+  .pi {
+    color: var(--admin-accent-amber);
+  }
+}
+
+.admin-sticky-save-bar--dirty .admin-sticky-save-bar__hint {
+  color: var(--admin-text-secondary);
+}
+
+.admin-sticky-save-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  margin-left: auto;
+}

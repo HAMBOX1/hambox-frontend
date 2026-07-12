@@ -1,0 +1,162 @@
+@if (error()) {
+  <app-admin-error-alert [message]="error()!" />
+}
+
+@if (loading() && types().length === 0 && library().length === 0) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else {
+  <app-admin-section-card [title]="'ADMIN.REPORTS.LIBRARY.TYPES' | translate">
+    @if (types().length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.TYPES' | translate" />
+    } @else {
+      <div class="reports-library__grid">
+        @for (type of types(); track type.type) {
+          <a class="reports-library__card" [routerLink]="['/admin/reports/generate', type.type]">
+            <div class="reports-library__card-icon">
+              <i class="pi pi-file"></i>
+            </div>
+            <div class="reports-library__card-body">
+              <h3>{{ type.name }}</h3>
+              <p>{{ type.description }}</p>
+              @if (type.category) {
+                <span class="reports-library__chip">{{ type.category }}</span>
+              }
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </app-admin-section-card>
+
+  <app-admin-section-card [title]="'ADMIN.REPORTS.LIBRARY.FAVORITES' | translate">
+    @if (favorites().length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.FAVORITES' | translate" />
+    } @else {
+      <ul class="reports-library__list">
+        @for (favorite of favorites(); track favorite.id) {
+          <li class="reports-library__row">
+            <div>
+              <strong>{{ favorite.name }}</strong>
+              <span class="reports-library__meta">{{ favorite.reportType }}</span>
+            </div>
+            <div class="reports-library__actions">
+              <a
+                pButton
+                [routerLink]="['/admin/reports/generate', favorite.reportType]"
+                [label]="'ADMIN.REPORTS.ACTIONS.GENERATE' | translate"
+                severity="secondary"
+              ></a>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-star-fill"
+                severity="secondary"
+                [loading]="actionLoading()"
+                (click)="facade.removeFavorite(favorite.id)"
+                [attr.aria-label]="'ADMIN.REPORTS.ACTIONS.UNFAVORITE' | translate"
+              ></button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </app-admin-section-card>
+
+  <app-admin-section-card [title]="'ADMIN.REPORTS.LIBRARY.SAVED' | translate">
+    <div class="reports-library__toolbar">
+      <input
+        pInputText
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keyup.enter)="reload()"
+        [placeholder]="'ADMIN.REPORTS.LIBRARY.SEARCH' | translate"
+      />
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.REPORTS.ACTIONS.REFRESH' | translate"
+        icon="pi pi-refresh"
+        [loading]="loading()"
+        (click)="reload()"
+      ></button>
+    </div>
+
+    @if (savedDefinitions().length === 0 && systemDefinitions().length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.DEFINITIONS' | translate" />
+    } @else {
+      <ul class="reports-library__list">
+        @for (definition of savedDefinitions(); track definition.id) {
+          <li class="reports-library__row">
+            <div>
+              <strong>{{ definition.name }}</strong>
+              <span class="reports-library__meta">
+                {{ definition.reportType }} · {{ definition.formatDefault }}
+              </span>
+            </div>
+            <div class="reports-library__actions">
+              <a
+                pButton
+                [routerLink]="['/admin/reports/generate', definition.reportType]"
+                [label]="'ADMIN.REPORTS.ACTIONS.GENERATE' | translate"
+                severity="secondary"
+              ></a>
+              <button
+                pButton
+                type="button"
+                [icon]="isFavorite(definition) ? 'pi pi-star-fill' : 'pi pi-star'"
+                severity="secondary"
+                [loading]="actionLoading()"
+                (click)="toggleFavorite(definition)"
+              ></button>
+              <button
+                *hamboxHasPermission="permissions.Reports.Delete"
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                severity="danger"
+                [loading]="actionLoading()"
+                (click)="requestDelete(definition)"
+              ></button>
+            </div>
+          </li>
+        }
+
+        @for (definition of systemDefinitions(); track definition.id) {
+          <li class="reports-library__row">
+            <div>
+              <strong>{{ definition.name }}</strong>
+              <span class="reports-library__meta">
+                {{ definition.reportType }} · {{ 'ADMIN.REPORTS.LIBRARY.SYSTEM' | translate }}
+              </span>
+            </div>
+            <div class="reports-library__actions">
+              <a
+                pButton
+                [routerLink]="['/admin/reports/generate', definition.reportType]"
+                [label]="'ADMIN.REPORTS.ACTIONS.GENERATE' | translate"
+                severity="secondary"
+              ></a>
+              <button
+                pButton
+                type="button"
+                [icon]="isFavorite(definition) ? 'pi pi-star-fill' : 'pi pi-star'"
+                severity="secondary"
+                [loading]="actionLoading()"
+                (click)="toggleFavorite(definition)"
+              ></button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </app-admin-section-card>
+}
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  [title]="'ADMIN.REPORTS.LIBRARY.DELETE_TITLE' | translate"
+  [message]="'ADMIN.REPORTS.LIBRARY.DELETE_MESSAGE' | translate:{ name: deleteTarget()?.name }"
+  [destructive]="true"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  (confirmed)="confirmDelete()"
+/>

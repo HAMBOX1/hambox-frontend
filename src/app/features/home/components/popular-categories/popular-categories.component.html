@@ -1,6 +1,6 @@
 <section class="categories" aria-labelledby="popular-categories-title">
   <div class="categories__inner">
-    <h2 id="popular-categories-title" class="categories__title">Popular Categories</h2>
+    <h2 id="popular-categories-title" class="categories__title">{{ sectionTitle() }}</h2>
 
     <div class="categories__grid">
       @for (category of categories(); track category.id) {

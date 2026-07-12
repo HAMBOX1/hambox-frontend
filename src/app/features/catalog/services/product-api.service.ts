@@ -50,7 +50,7 @@ export class ProductApiService {
   }
 
   getProductById(id: string): Observable<Product> {
-    return this.api.get<Product>(`${CATALOG_API.products}/${id}`);
+    return this.api.get<Product>(CATALOG_API.product(id));
   }
 
   createProduct(request: CreateProductRequest): Observable<string> {
@@ -58,10 +58,34 @@ export class ProductApiService {
   }
 
   updateProduct(id: string, request: UpdateProductRequest): Observable<void> {
-    return this.api.put<void>(`${CATALOG_API.products}/${id}`, {
+    return this.api.put<void>(CATALOG_API.product(id), {
       ...request,
       status: productStatusToApi(request.status),
     });
+  }
+
+  deleteProduct(id: string): Observable<void> {
+    return this.api.delete<void>(CATALOG_API.product(id));
+  }
+
+  publishProduct(id: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productPublish(id), {});
+  }
+
+  deactivateProduct(id: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productDeactivate(id), {});
+  }
+
+  archiveProduct(id: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productArchive(id), {});
+  }
+
+  restoreProduct(id: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productRestore(id), {});
+  }
+
+  duplicateProduct(id: string, nameSuffix?: string | null): Observable<string> {
+    return this.api.post<string>(CATALOG_API.productDuplicate(id), { nameSuffix: nameSuffix ?? null });
   }
 
   getProductImages(productId: string): Observable<readonly ProductImage[]> {

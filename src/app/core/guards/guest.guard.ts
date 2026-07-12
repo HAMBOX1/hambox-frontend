@@ -10,9 +10,10 @@ export const guestGuard: CanActivateFn = async () => {
 
   if (!session.initialized()) {
     await inject(Auth).restoreSession();
+    session.markInitialized();
   }
 
-  if (!session.isAuthenticated()) {
+  if (!session.isCustomerAuthenticated()) {
     return true;
   }
 

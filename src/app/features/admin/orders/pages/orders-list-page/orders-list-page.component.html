@@ -1,0 +1,469 @@
+<p-toast position="top-right" />
+
+<section class="admin-page orders-list-page">
+  <app-admin-page-header
+    class="orders-list-page__header"
+    [title]="'ADMIN.ORDERS.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.ORDERS.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div adminHeaderActions class="orders-list-page__header-actions">
+      <button
+        pButton
+        type="button"
+        class="admin-btn-secondary"
+        icon="pi pi-file-export"
+        [label]="'ADMIN.ORDERS.ACTIONS.EXPORT_CSV' | translate"
+        (click)="exportCsv()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        class="admin-btn-secondary"
+        icon="pi pi-table"
+        [label]="'ADMIN.ORDERS.ACTIONS.EXPORT_EXCEL' | translate"
+        (click)="exportExcel()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        class="admin-btn-secondary"
+        icon="pi pi-print"
+        [label]="'ADMIN.ORDERS.ACTIONS.PRINT' | translate"
+        (click)="printTable()"
+      ></button>
+    </div>
+  </app-admin-page-header>
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ORDERS.STATS.TODAY' | translate"
+      [value]="statistics()?.todaysOrders ?? 0"
+      icon="pi-shopping-bag"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ORDERS.STATS.PENDING' | translate"
+      [value]="statistics()?.pendingOrders ?? 0"
+      icon="pi-clock"
+      tone="warning"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ORDERS.STATS.REVENUE_TODAY' | translate"
+      [value]="formatMoney(statistics()?.revenueToday)"
+      icon="pi-wallet"
+      tone="success"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ORDERS.STATS.AOV' | translate"
+      [value]="formatMoney(statistics()?.averageOrderValue)"
+      icon="pi-chart-line"
+      tone="info"
+    />
+  </app-admin-stat-grid>
+
+  <div class="orders-list-page__toolbar">
+    <div class="orders-list-page__toolbar-head">
+      <button
+        type="button"
+        class="orders-list-page__filters-toggle"
+        [attr.aria-expanded]="filtersOpen()"
+        (click)="toggleFilters()"
+      >
+        <i class="pi pi-filter" aria-hidden="true"></i>
+        <span>{{ 'ADMIN.ORDERS.LIST.FILTERS' | translate }}</span>
+        @if (hasActiveFilters()) {
+          <span class="orders-list-page__filters-badge" aria-hidden="true"></span>
+        }
+      </button>
+    </div>
+
+    @if (filtersOpen()) {
+      <button
+        type="button"
+        class="orders-list-page__filters-backdrop"
+        [attr.aria-label]="'ADMIN.ORDERS.LIST.CLOSE_FILTERS' | translate"
+        (click)="closeFilters()"
+      ></button>
+    }
+
+    <div
+      class="orders-list-page__filter-panel"
+      [class.orders-list-page__filter-panel--open]="filtersOpen()"
+    >
+      <div class="orders-list-page__filter-grid">
+        <div class="orders-list-page__search">
+          <app-admin-search-bar
+            [value]="searchTerm()"
+            [placeholder]="'ADMIN.ORDERS.LIST.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onSearchChange($event)"
+          />
+        </div>
+
+        <p-select
+          class="orders-list-page__field orders-list-page__field--status"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="orderStatusFilter()"
+          (ngModelChange)="onStatusChange($event)"
+          [placeholder]="'ADMIN.ORDERS.LIST.FILTER_STATUS' | translate"
+        />
+
+        <p-select
+          class="orders-list-page__field orders-list-page__field--payment"
+          [options]="paymentOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="paymentStatusFilter()"
+          (ngModelChange)="onPaymentChange($event)"
+          [placeholder]="'ADMIN.ORDERS.LIST.FILTER_PAYMENT' | translate"
+        />
+
+        <p-select
+          class="orders-list-page__field orders-list-page__field--delivery"
+          [options]="deliveryOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="deliveryStatusFilter()"
+          (ngModelChange)="onDeliveryChange($event)"
+          [placeholder]="'ADMIN.ORDERS.LIST.FILTER_DELIVERY' | translate"
+        />
+
+        <p-select
+          class="orders-list-page__field orders-list-page__field--date"
+          [options]="dateRangeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="dateRangeFilter()"
+          (ngModelChange)="onDateRangeChange($event)"
+          [placeholder]="'ADMIN.ORDERS.LIST.FILTER_DATE' | translate"
+        />
+
+        <p-select
+          class="orders-list-page__field orders-list-page__field--sort"
+          [options]="sortOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="sort()"
+          (ngModelChange)="onSortChange($event)"
+          [placeholder]="'ADMIN.ORDERS.LIST.SORT' | translate"
+        />
+
+        <p-select
+          class="orders-list-page__field orders-list-page__field--page-size"
+          [options]="pageSizeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="pageSize()"
+          (ngModelChange)="onPageSizeChange($event)"
+          [placeholder]="'ADMIN.ORDERS.LIST.PAGE_SIZE' | translate"
+        />
+
+        <button
+          type="button"
+          class="orders-list-page__advanced-toggle"
+          [attr.aria-expanded]="advancedFiltersOpen()"
+          (click)="toggleAdvancedFilters()"
+        >
+          <i class="pi pi-sliders-h" aria-hidden="true"></i>
+          <span>{{ 'ADMIN.ORDERS.LIST.ADVANCED_FILTERS' | translate }}</span>
+        </button>
+
+        @if (advancedFiltersOpen()) {
+          <div class="orders-list-page__advanced-panel">
+            <p-multiSelect
+              class="orders-list-page__field orders-list-page__field--columns"
+              [options]="columnOptions"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="visibleColumns()"
+              (ngModelChange)="visibleColumns.set($event)"
+              [placeholder]="'ADMIN.ORDERS.LIST.COLUMNS_TOGGLE' | translate"
+              display="chip"
+            />
+
+            <p-inputNumber
+              class="orders-list-page__field orders-list-page__field--min"
+              [ngModel]="amountMinInput()"
+              (ngModelChange)="amountMinInput.set($event)"
+              [placeholder]="'ADMIN.ORDERS.LIST.MIN_AMOUNT' | translate"
+              mode="decimal"
+              [minFractionDigits]="2"
+            />
+
+            <p-inputNumber
+              class="orders-list-page__field orders-list-page__field--max"
+              [ngModel]="amountMaxInput()"
+              (ngModelChange)="amountMaxInput.set($event)"
+              [placeholder]="'ADMIN.ORDERS.LIST.MAX_AMOUNT' | translate"
+              mode="decimal"
+              [minFractionDigits]="2"
+            />
+          </div>
+        }
+
+        <div class="orders-list-page__filter-actions">
+          <button
+            pButton
+            type="button"
+            size="small"
+            [label]="'ADMIN.ORDERS.LIST.APPLY' | translate"
+            (click)="applyAmountFilter()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            size="small"
+            severity="secondary"
+            [label]="'ADMIN.ORDERS.LIST.RESET' | translate"
+            (click)="clearFilters()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-bulk-bar
+    [selectedCount]="selectedOrders().length"
+    (clearSelection)="clearSelection()"
+  >
+    <button
+      *hamboxHasPermission="permissions.Orders.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.ACTIONS.BULK_PROCESSING' | translate"
+      icon="pi pi-sync"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="bulkAction('mark-processing')"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Orders.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.ACTIONS.BULK_COMPLETE' | translate"
+      icon="pi pi-check"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="bulkAction('mark-completed')"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Orders.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.ACTIONS.BULK_RESEND' | translate"
+      icon="pi pi-send"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="bulkAction('resend-codes')"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Orders.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.ACTIONS.BULK_CANCEL' | translate"
+      icon="pi pi-times"
+      severity="danger"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="bulkAction('cancel')"
+    ></button>
+  </app-admin-bulk-bar>
+
+  <div class="orders-list-page__table-wrap">
+    <app-admin-data-table-shell>
+      <p-table
+        class="admin-data-table"
+        [value]="[...orders()]"
+        [loading]="loading()"
+        [lazy]="true"
+        [paginator]="totalCount() > 0"
+        [rows]="pageSize()"
+        [totalRecords]="totalCount()"
+        [first]="tableFirst()"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [selection]="selectedOrders()"
+        (selectionChange)="onSelectionChange($event)"
+        (onLazyLoad)="onPageChange($event)"
+        dataKey="id"
+        scrollable
+        scrollHeight="flex"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3.5rem">
+              <p-tableHeaderCheckbox />
+            </th>
+            @if (isColumnVisible('orderNumber')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.ORDER_NUMBER' | translate }}</th>
+            }
+            @if (isColumnVisible('customer')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.CUSTOMER' | translate }}</th>
+            }
+            @if (isColumnVisible('email')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.EMAIL' | translate }}</th>
+            }
+            @if (isColumnVisible('itemsCount')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.ITEMS' | translate }}</th>
+            }
+            @if (isColumnVisible('products')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PRODUCTS' | translate }}</th>
+            }
+            @if (isColumnVisible('orderTotal')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.TOTAL' | translate }}</th>
+            }
+            @if (isColumnVisible('paymentMethod')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PAYMENT_METHOD' | translate }}</th>
+            }
+            @if (isColumnVisible('paymentStatus')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PAYMENT_STATUS' | translate }}</th>
+            }
+            @if (isColumnVisible('orderStatus')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.ORDER_STATUS' | translate }}</th>
+            }
+            @if (isColumnVisible('purchaseDate')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PURCHASE_DATE' | translate }}</th>
+            }
+            @if (isColumnVisible('deliveryStatus')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.DELIVERY' | translate }}</th>
+            }
+            @if (isColumnVisible('membershipDiscount')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.MEMBERSHIP' | translate }}</th>
+            }
+            @if (isColumnVisible('coupon')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.COUPON' | translate }}</th>
+            }
+            <th style="width: 6rem"></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-order>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="order" />
+            </td>
+            @if (isColumnVisible('orderNumber')) {
+              <td>
+                <a class="admin-cell-primary" [routerLink]="['/admin/orders', order.id]">
+                  {{ order.orderNumber }}
+                </a>
+              </td>
+            }
+            @if (isColumnVisible('customer')) {
+              <td><span class="admin-cell-primary">{{ order.customerName }}</span></td>
+            }
+            @if (isColumnVisible('email')) {
+              <td><span class="admin-cell-secondary">{{ order.email }}</span></td>
+            }
+            @if (isColumnVisible('itemsCount')) {
+              <td>{{ order.itemsCount }}</td>
+            }
+            @if (isColumnVisible('products')) {
+              <td><span class="admin-cell-secondary">{{ order.productsSummary }}</span></td>
+            }
+            @if (isColumnVisible('orderTotal')) {
+              <td>{{ order.orderTotal | hamboxCurrency }}</td>
+            }
+            @if (isColumnVisible('paymentMethod')) {
+              <td>{{ order.paymentMethod }}</td>
+            }
+            @if (isColumnVisible('paymentStatus')) {
+              <td>
+                <app-admin-status-badge
+                  [label]="order.paymentStatus"
+                  [tone]="statusTone(order.paymentStatus)"
+                />
+              </td>
+            }
+            @if (isColumnVisible('orderStatus')) {
+              <td>
+                <app-admin-status-badge
+                  [label]="order.orderStatus"
+                  [tone]="statusTone(order.orderStatus)"
+                />
+              </td>
+            }
+            @if (isColumnVisible('purchaseDate')) {
+              <td>{{ order.purchaseDate | date: 'medium' }}</td>
+            }
+            @if (isColumnVisible('deliveryStatus')) {
+              <td>
+                <app-admin-status-badge
+                  [label]="order.deliveryStatus"
+                  [tone]="statusTone(order.deliveryStatus)"
+                />
+              </td>
+            }
+            @if (isColumnVisible('membershipDiscount')) {
+              <td>{{ order.membershipDiscount | hamboxCurrency }}</td>
+            }
+            @if (isColumnVisible('coupon')) {
+              <td>{{ order.couponCode || '—' }}</td>
+            }
+            <td>
+              @let menuItems = orderActionMenuItems(order);
+              <div class="admin-actions-row">
+                <app-admin-icon-button
+                  icon="pi pi-eye"
+                  [label]="'ADMIN.ORDERS.ACTIONS.VIEW' | translate"
+                  [routerLink]="'/admin/orders/' + order.id"
+                />
+                @if (menuItems.length > 0) {
+                  <app-admin-action-menu [items]="menuItems" />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="15">
+              <app-admin-empty-state
+                icon="pi pi-shopping-bag"
+                [title]="
+                  hasActiveFilters()
+                    ? ('ADMIN.ORDERS.LIST.EMPTY_SEARCH' | translate)
+                    : ('ADMIN.ORDERS.LIST.EMPTY' | translate)
+                "
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-data-table-shell>
+  </div>
+</section>
+
+<p-dialog
+  [header]="'ADMIN.ORDERS.LIST.CUSTOM_DATE' | translate"
+  [visible]="customDateDialogOpen()"
+  (visibleChange)="customDateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  styleClass="admin-dialog"
+>
+  <div class="orders-list-page__date-dialog">
+    <label>
+      <span>{{ 'ADMIN.ORDERS.LIST.DATE_FROM' | translate }}</span>
+      <input pInputText type="date" [ngModel]="customDateFrom()" (ngModelChange)="customDateFrom.set($event)" />
+    </label>
+    <label>
+      <span>{{ 'ADMIN.ORDERS.LIST.DATE_TO' | translate }}</span>
+      <input pInputText type="date" [ngModel]="customDateTo()" (ngModelChange)="customDateTo.set($event)" />
+    </label>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.LIST.APPLY_DATE' | translate"
+      (click)="applyCustomDateRange()"
+    ></button>
+  </div>
+</p-dialog>

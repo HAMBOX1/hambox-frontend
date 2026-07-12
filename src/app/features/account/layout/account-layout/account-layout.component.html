@@ -1,4 +1,8 @@
-<div class="account-layout">
+<div class="account-layout" hamboxTranslateRefresh>
+  @if (mobile.isMobile()) {
+    <app-mobile-top-bar class="account-layout__mobile-header" />
+  }
+
   <app-account-sidebar />
 
   <div class="account-layout__main">

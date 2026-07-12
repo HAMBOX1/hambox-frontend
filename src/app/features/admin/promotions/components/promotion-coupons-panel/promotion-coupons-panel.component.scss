@@ -1,0 +1,15 @@
+.promotion-coupons-panel__code {
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--admin-radius-xs);
+  background: var(--admin-bg-input);
+  color: var(--admin-text-primary);
+  font-size: 0.8125rem;
+}
+
+.promotion-coupons-panel__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: var(--admin-text-primary);
+}

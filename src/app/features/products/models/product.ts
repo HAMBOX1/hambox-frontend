@@ -2,12 +2,15 @@ export type StoreProductCta = 'cart' | 'buy-now' | 'notify-me';
 
 export type StorePlatformTone = 'xbox' | 'psn' | 'pc' | 'nintendo';
 
+export type StoreProductStockStatus = 'in-stock' | 'low-stock' | 'out-of-stock' | 'unknown';
+
 export interface StoreProduct {
   id: string;
   title: string;
   imageUrl: string;
   platformLabel: string;
   platformTone: StorePlatformTone;
+  categoryName?: string;
   rating?: number;
   discountLabel?: string;
   featuredBadge?: boolean;
@@ -17,7 +20,12 @@ export interface StoreProduct {
   priceMuted?: boolean;
   cta: StoreProductCta;
   outOfStock?: boolean;
+  stockStatus?: StoreProductStockStatus;
   highlighted?: boolean;
+  createdOnUtc?: string;
+  listIndex?: number;
+  requiresOptionSelection?: boolean;
+  directVariantId?: string | null;
 }
 
 export interface StoreCategoryPill {
@@ -25,21 +33,7 @@ export interface StoreCategoryPill {
   label: string;
 }
 
-export interface StorePlatformFilter {
-  id: string;
-  label: string;
-  dotColor: string;
-  checked: boolean;
-}
-
 export interface StoreSortOption {
   value: string;
   label: string;
-}
-
-export interface StorePromoBanner {
-  headline: string;
-  subheadline: string;
-  backgroundImageUrl: string;
-  initialCountdownSeconds: number;
 }

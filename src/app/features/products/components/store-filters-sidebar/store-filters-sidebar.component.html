@@ -1,52 +1,190 @@
-<aside class="store-filters" aria-label="Product filters">
-  <div class="store-filters__header">
-    <h2 class="store-filters__title">Filters</h2>
-    <button type="button" class="store-filters__reset">Reset</button>
-  </div>
+@if (mobileOpen()) {
+  <button
+    type="button"
+    class="store-filters__backdrop"
+    [attr.aria-label]="'PRODUCTS.FILTERS.CLOSE' | translate"
+    (click)="onCloseMobile()"
+  ></button>
+}
 
-  <section class="store-filters__group" aria-labelledby="filter-platform">
-    <h3 id="filter-platform" class="store-filters__label">PLATFORM</h3>
-    <ul class="store-filters__list">
-      @for (platform of platforms(); track platform.id) {
-        <li>
+<aside
+  class="store-filters"
+  [class.store-filters--collapsed]="collapsed()"
+  [class.store-filters--mobile-open]="mobileOpen()"
+  [attr.aria-label]="'PRODUCTS.FILTERS.TITLE' | translate"
+>
+  @if (collapsed() && !mobileOpen()) {
+    <button
+      type="button"
+      class="store-filters__collapsed-toggle"
+      [attr.aria-label]="'PRODUCTS.FILTERS.EXPAND' | translate"
+      (click)="onToggleCollapse()"
+    >
+      <i class="pi pi-filter" aria-hidden="true"></i>
+      @if (activeFilterCount() > 0) {
+        <span class="store-filters__badge">{{ activeFilterCount() }}</span>
+      }
+    </button>
+  } @else {
+    <div class="store-filters__header">
+      <div class="store-filters__title-row">
+        <h2 class="store-filters__title">{{ 'PRODUCTS.FILTERS.TITLE' | translate }}</h2>
+        @if (activeFilterCount() > 0) {
+          <span class="store-filters__count">{{ activeFilterCount() }}</span>
+        }
+      </div>
+      <div class="store-filters__header-actions">
+        <button type="button" class="store-filters__reset" (click)="onReset()">
+          {{ 'PRODUCTS.FILTERS.CLEAR_ALL' | translate }}
+        </button>
+        <button
+          type="button"
+          class="store-filters__collapse"
+          [attr.aria-label]="'PRODUCTS.FILTERS.COLLAPSE' | translate"
+          (click)="onToggleCollapse()"
+        >
+          <i class="pi pi-angle-left" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          class="store-filters__mobile-close"
+          [attr.aria-label]="'PRODUCTS.FILTERS.CLOSE' | translate"
+          (click)="onCloseMobile()"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="store-filters__body">
+      @for (group of filterGroups(); track group.id) {
+        <section class="store-filters__group">
+          <button
+            type="button"
+            class="store-filters__group-header"
+            [attr.aria-expanded]="isExpanded(group.id)"
+            [attr.aria-controls]="'filter-panel-' + group.id"
+            (click)="toggleGroup(group.id)"
+          >
+            <span class="store-filters__label">{{ group.label }}</span>
+            <i
+              class="pi pi-chevron-down store-filters__chevron"
+              [class.store-filters__chevron--open]="isExpanded(group.id)"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <ul
+            [id]="'filter-panel-' + group.id"
+            class="store-filters__list"
+            [class.store-filters__list--collapsed]="!isExpanded(group.id)"
+          >
+            @for (option of group.options; track option.id) {
+              <li>
+                <label class="store-filters__option">
+                  <input
+                    type="checkbox"
+                    class="store-filters__checkbox"
+                    [checked]="isAttributeSelected(group.id, option.id)"
+                    (change)="toggleAttribute(group.id, option.id)"
+                  />
+                  <span class="store-filters__option-text">{{ option.label }}</span>
+                  <span class="store-filters__option-count">{{ option.count }}</span>
+                </label>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <section class="store-filters__group">
+        <button
+          type="button"
+          class="store-filters__group-header"
+          [attr.aria-expanded]="isExpanded('price')"
+          aria-controls="filter-panel-price"
+          (click)="toggleGroup('price')"
+        >
+          <span class="store-filters__label">{{ 'PRODUCTS.FILTERS.PRICE_RANGE' | translate }}</span>
+          <i
+            class="pi pi-chevron-down store-filters__chevron"
+            [class.store-filters__chevron--open]="isExpanded('price')"
+            aria-hidden="true"
+          ></i>
+        </button>
+
+        <div
+          id="filter-panel-price"
+          class="store-filters__price-inputs"
+          [class.store-filters__price-inputs--collapsed]="!isExpanded('price')"
+        >
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            class="store-filters__input"
+            [placeholder]="'PRODUCTS.FILTERS.MIN' | translate"
+            [attr.aria-label]="'PRODUCTS.FILTERS.MIN_PRICE' | translate"
+            [value]="minPrice()"
+            (input)="onMinPriceInput($event)"
+          />
+          <span class="store-filters__dash" aria-hidden="true">-</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            class="store-filters__input"
+            [placeholder]="'PRODUCTS.FILTERS.MAX' | translate"
+            [attr.aria-label]="'PRODUCTS.FILTERS.MAX_PRICE' | translate"
+            [value]="maxPrice()"
+            (input)="onMaxPriceInput($event)"
+          />
+        </div>
+      </section>
+
+      <section class="store-filters__group">
+        <button
+          type="button"
+          class="store-filters__group-header"
+          [attr.aria-expanded]="isExpanded('availability')"
+          aria-controls="filter-panel-availability"
+          (click)="toggleGroup('availability')"
+        >
+          <span class="store-filters__label">{{ 'PRODUCTS.FILTERS.AVAILABILITY' | translate }}</span>
+          <i
+            class="pi pi-chevron-down store-filters__chevron"
+            [class.store-filters__chevron--open]="isExpanded('availability')"
+            aria-hidden="true"
+          ></i>
+        </button>
+
+        <div
+          id="filter-panel-availability"
+          class="store-filters__list"
+          [class.store-filters__list--collapsed]="!isExpanded('availability')"
+        >
           <label class="store-filters__option">
             <input
               type="checkbox"
               class="store-filters__checkbox"
-              [checked]="platform.checked"
-              [attr.aria-label]="platform.label"
+              [checked]="stockOnly()"
+              (change)="onStockOnlyChange($event)"
             />
-            <span class="store-filters__dot" [style.background-color]="platform.dotColor"></span>
-            <span class="store-filters__option-text">{{ platform.label }}</span>
+            <span class="store-filters__option-text">{{ 'PRODUCTS.FILTERS.IN_STOCK_ONLY' | translate }}</span>
           </label>
-        </li>
-      }
-    </ul>
-  </section>
+        </div>
+      </section>
+    </div>
 
-  <section class="store-filters__group" aria-labelledby="filter-price">
-    <h3 id="filter-price" class="store-filters__label">PRICE RANGE</h3>
-    <div class="store-filters__price-inputs">
-      <input type="text" class="store-filters__input" placeholder="Min" aria-label="Minimum price" />
-      <span class="store-filters__dash" aria-hidden="true">-</span>
-      <input type="text" class="store-filters__input" placeholder="Max" aria-label="Maximum price" />
-    </div>
-    <div class="store-filters__slider" aria-hidden="true">
-      <div class="store-filters__slider-track">
-        <div class="store-filters__slider-range"></div>
-        <span class="store-filters__slider-thumb store-filters__slider-thumb--min"></span>
-        <span class="store-filters__slider-thumb store-filters__slider-thumb--max"></span>
-      </div>
-    </div>
-  </section>
-
-  <section class="store-filters__group" aria-labelledby="filter-region">
-    <h3 id="filter-region" class="store-filters__label">REGION</h3>
-    <div class="store-filters__select">
-      <span class="store-filters__select-value">{{ region() }}</span>
-      <svg class="store-filters__select-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      </svg>
-    </div>
-  </section>
+    @if (!collapsed() || mobileOpen()) {
+      <footer class="store-filters__mobile-footer">
+        <button type="button" class="store-filters__footer-btn store-filters__footer-btn--ghost" (click)="onReset()">
+          {{ 'PRODUCTS.FILTERS.RESET' | translate }}
+        </button>
+        <button type="button" class="store-filters__footer-btn store-filters__footer-btn--primary" (click)="onApplyMobile()">
+          {{ 'PRODUCTS.FILTERS.APPLY' | translate }}
+        </button>
+      </footer>
+    }
+  }
 </aside>

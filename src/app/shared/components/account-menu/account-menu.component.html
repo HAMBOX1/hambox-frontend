@@ -1,0 +1,57 @@
+<div #host class="account-menu" [class.account-menu--open]="menuExpanded()" [class.account-menu--mobile]="useSheet()">
+  <button
+    type="button"
+    class="account-menu__trigger"
+    [class.account-menu__trigger--compact]="compact()"
+    [class.account-menu__trigger--active]="menuExpanded()"
+    [attr.aria-expanded]="menuExpanded()"
+    [attr.aria-haspopup]="useSheet() ? 'dialog' : 'menu'"
+    [attr.aria-label]="'ACCOUNT_MENU.OPEN' | translate"
+    (click)="toggle($event)"
+  >
+    <span class="account-menu__avatar">{{ avatarInitial() }}</span>
+  </button>
+
+  @if (open() && !useSheet()) {
+    <div class="account-menu__dropdown" role="menu" [attr.aria-label]="'ACCOUNT_MENU.TITLE' | translate">
+      <header class="account-menu__profile">
+        <span class="account-menu__avatar account-menu__avatar--large">{{ avatarInitial() }}</span>
+        <div>
+          <strong>{{ displayName() }}</strong>
+          <p>{{ user()?.email }}</p>
+        </div>
+      </header>
+
+      <nav class="account-menu__nav">
+        <a class="account-menu__item" routerLink="/account/library" role="menuitem" (click)="close()">
+          {{ 'ACCOUNT_MENU.LIBRARY' | translate }}
+        </a>
+        <a class="account-menu__item" routerLink="/account/orders" role="menuitem" (click)="close()">
+          {{ 'ACCOUNT_MENU.ORDERS' | translate }}
+        </a>
+        <a class="account-menu__item" routerLink="/account/membership" role="menuitem" (click)="close()">
+          {{ 'ACCOUNT_MENU.MEMBERSHIP' | translate }}
+        </a>
+        <a class="account-menu__item" routerLink="/account/wishlist" role="menuitem" (click)="close()">
+          {{ 'ACCOUNT_MENU.WISHLIST' | translate }}
+        </a>
+        <a class="account-menu__item" routerLink="/account/notifications" role="menuitem" (click)="close()">
+          {{ 'ACCOUNT_MENU.NOTIFICATIONS' | translate }}
+        </a>
+        <a class="account-menu__item" routerLink="/account/profile" role="menuitem" (click)="close()">
+          {{ 'ACCOUNT_MENU.SETTINGS' | translate }}
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="account-menu__logout"
+        role="menuitem"
+        [disabled]="isLoggingOut()"
+        (click)="logout()"
+      >
+        {{ (isLoggingOut() ? 'ACCOUNT.SIGNING_OUT' : 'ACCOUNT.LOGOUT') | translate }}
+      </button>
+    </div>
+  }
+</div>

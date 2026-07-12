@@ -1,32 +1,38 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
+
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 import { AccountApiService } from '../../services/account-api.service';
 import { AccountOrdersFacade } from '../../services/account-orders.facade';
 import { WriteReviewDialogComponent } from '../../components/write-review-dialog/write-review-dialog.component';
 import { OrderItemReviewStatusApiDto } from '../../models/account-api.model';
+import { TranslationService } from '../../../../core/i18n/translation.service';
 
 @Component({
   selector: 'app-account-order-detail-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, DatePipe, WriteReviewDialogComponent],
+  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, TranslatePipe, WriteReviewDialogComponent, HamboxTranslateRefreshDirective],
   templateUrl: './account-order-detail-page.component.html',
   styleUrl: './account-order-detail-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountOrderDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly facade = inject(AccountOrdersFacade);
   private readonly api = inject(AccountApiService);
+  private readonly translate = inject(TranslateService);
+  private readonly i18n = inject(TranslationService);
 
   protected readonly order = this.facade.selectedOrder;
   protected readonly loading = this.facade.detailLoading;
   protected readonly error = this.facade.error;
   protected readonly reviewTarget = signal<OrderItemReviewStatusApiDto | null>(null);
   protected readonly reviewOpen = signal(false);
+  protected readonly reviewError = signal<string | null>(null);
 
   ngOnInit(): void {
     const orderId = this.route.snapshot.paramMap.get('orderId');
@@ -45,6 +51,18 @@ export class AccountOrderDetailPageComponent implements OnInit {
     this.reviewTarget.set(null);
   }
 
+  protected statusLabel(status: string): string {
+    const key = `ACCOUNT.ORDER_STATUS.${status.toUpperCase().replace(/\s+/g, '_')}`;
+    const translated = this.i18n.instant(key);
+    return translated === key ? status : translated;
+  }
+
+  protected timelineEventLabel(eventType: string): string {
+    const key = `ACCOUNT.TIMELINE_EVENT.${eventType.toUpperCase().replace(/\s+/g, '_')}`;
+    const translated = this.i18n.instant(key);
+    return translated === key ? eventType : translated;
+  }
+
   protected async submitReview(payload: { rating: number; comment: string }): Promise<void> {
     const target = this.reviewTarget();
     const order = this.order();
@@ -52,16 +70,22 @@ export class AccountOrderDetailPageComponent implements OnInit {
       return;
     }
 
-    await firstValueFrom(
-      this.api.createReview({
-        productId: target.productId,
-        orderId: order.id,
-        rating: payload.rating,
-        comment: payload.comment,
-      }),
-    );
+    this.reviewError.set(null);
 
-    this.closeReview();
-    await this.facade.loadOrder(order.id);
+    try {
+      await firstValueFrom(
+        this.api.createReview({
+          productId: target.productId,
+          orderId: order.id,
+          rating: payload.rating,
+          comment: payload.comment,
+        }),
+      );
+
+      this.closeReview();
+      await this.facade.loadOrder(order.id);
+    } catch {
+      this.reviewError.set(this.translate.instant('ACCOUNT.ORDER_DETAIL_UI.REVIEW_ERROR'));
+    }
   }
 }

@@ -1,0 +1,42 @@
+.admin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--admin-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.admin-status-badge--neutral {
+  background: color-mix(in srgb, var(--admin-text-muted) 16%, transparent);
+  color: var(--admin-text-secondary);
+}
+
+.admin-status-badge--success {
+  background: var(--admin-accent-green-soft);
+  color: var(--admin-accent-green);
+}
+
+.admin-status-badge--info {
+  background: var(--admin-accent-blue-soft);
+  color: var(--admin-accent-blue);
+}
+
+.admin-status-badge--warning {
+  background: color-mix(in srgb, var(--admin-accent-amber) 18%, transparent);
+  color: var(--admin-accent-amber);
+}
+
+.admin-status-badge--danger {
+  background: color-mix(in srgb, var(--admin-accent-red) 16%, transparent);
+  color: var(--admin-accent-red);
+}
+
+.admin-status-badge--outlined {
+  background: transparent;
+  border: 1px solid currentColor;
+}

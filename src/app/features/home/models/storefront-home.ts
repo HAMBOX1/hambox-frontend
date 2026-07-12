@@ -3,13 +3,15 @@ export type StorefrontPriceTone = 'green' | 'blue' | 'peach';
 export interface NavLink {
   labelKey: string;
   route: string;
+  section?: string;
   active?: boolean;
 }
 
 export interface TrustFeature {
+  id: string;
   iconSrc: string;
-  titleKey: string;
-  descriptionKey: string;
+  title: string;
+  description: string;
 }
 
 export interface StorefrontCategory {

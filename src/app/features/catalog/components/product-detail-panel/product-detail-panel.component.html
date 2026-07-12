@@ -1,200 +1,260 @@
-<aside class="detail-panel" aria-label="Selected product details">
+<aside
+  class="detail-panel"
+  aria-label="Selected product details"
+  tabindex="-1"
+  (keydown.escape)="onClose()"
+>
   @if (loading() && !product()) {
-    <div class="detail-panel__skeleton" aria-hidden="true">
-      <p-skeleton width="40%" height="0.75rem" />
-      <p-skeleton width="75%" height="1.5rem" styleClass="detail-panel__skeleton-gap" />
-      <div class="detail-panel__metric-grid">
-        <p-skeleton height="4.5rem" />
-        <p-skeleton height="4.5rem" />
-      </div>
-      <p-skeleton width="100%" height="8rem" />
-      <p-skeleton width="100%" height="6rem" />
-    </div>
+    <app-admin-loading-skeleton variant="form" />
   } @else if (product(); as selected) {
-    <div class="detail-panel__header">
-      <span class="detail-panel__eyebrow">Selected Item</span>
-      <button
-        type="button"
-        class="detail-panel__close"
-        aria-label="Close product details"
-        (click)="onClose()"
-      >
-        <i class="pi pi-times" aria-hidden="true"></i>
-      </button>
-    </div>
+    <header class="detail-panel__header">
+      <div class="detail-panel__identity">
+        @if (selected.primaryImageUrl) {
+          <img
+            class="detail-panel__thumb"
+            [src]="resolveImageUrl(selected.primaryImageUrl)"
+            [alt]="selected.nameEn"
+          />
+        } @else {
+          <span class="detail-panel__thumb detail-panel__thumb--placeholder" aria-hidden="true">
+            <i class="pi pi-box"></i>
+          </span>
+        }
 
-    <div class="detail-panel__summary">
-      @if (selected.primaryImageUrl) {
-        <img
-          class="detail-panel__summary-image"
-          [src]="resolveImageUrl(selected.primaryImageUrl)"
-          [alt]="selected.nameEn"
-        />
-      } @else {
-        <span class="detail-panel__summary-icon" aria-hidden="true">
-          <i class="pi pi-box"></i>
-        </span>
-      }
-      <div class="detail-panel__summary-copy">
-        <h2 class="detail-panel__title">{{ selected.nameEn }}</h2>
-        <p class="detail-panel__source">Source: {{ placeholders().source }}</p>
-      </div>
-    </div>
-
-    <div class="detail-panel__metric-grid">
-      <article class="detail-panel__metric-card">
-        <span class="detail-panel__metric-label">Live Stock</span>
-        <strong class="detail-panel__metric-value detail-panel__metric-value--warning">
-          {{ placeholders().liveStock }}
-        </strong>
-      </article>
-      <article class="detail-panel__metric-card">
-        <span class="detail-panel__metric-label">Avg Margin</span>
-        <strong class="detail-panel__metric-value detail-panel__metric-value--success">
-          {{ placeholders().avgMargin }}
-        </strong>
-      </article>
-    </div>
-
-    <nav class="detail-panel__tabs" aria-label="Product detail sections">
-      @for (tab of tabs; track tab) {
-        <button
-          type="button"
-          class="detail-panel__tab"
-          [class.detail-panel__tab--active]="tab === activeTab"
-          disabled
-          aria-disabled="true"
-        >
-          {{ tab }}
-        </button>
-      }
-    </nav>
-
-    <section class="detail-panel__section">
-      <dl class="detail-panel__facts">
-        <div class="detail-panel__fact">
-          <dt>Category</dt>
-          <dd>
-            <p-tag [value]="selected.categoryName || 'Uncategorized'" severity="info" />
-          </dd>
-        </div>
-        <div class="detail-panel__fact">
-          <dt>Price</dt>
-          <dd>{{ selected.price | hamboxCurrency }}</dd>
-        </div>
-        <div class="detail-panel__fact">
-          <dt>Product Id</dt>
-          <dd><code>{{ selected.id }}</code></dd>
-        </div>
-        <div class="detail-panel__fact">
-          <dt>Internal SKU</dt>
-          <dd>{{ placeholders().internalSku }}</dd>
-        </div>
-        <div class="detail-panel__fact">
-          <dt>Catalog Status</dt>
-          <dd>
-            <p-tag
-              [value]="statusLabel(selected.status)"
-              [severity]="statusSeverity(selected.status)"
+        <div class="detail-panel__identity-copy">
+          <h2 class="detail-panel__name" [title]="selected.nameEn">{{ selected.nameEn }}</h2>
+          <div class="detail-panel__badges">
+            <app-admin-status-badge
+              [label]="statusLabel(selected.status)"
+              [tone]="statusTone(selected.status)"
             />
-          </dd>
+            @if (selected.categoryName) {
+              <span class="detail-panel__category-chip">{{ selected.categoryName }}</span>
+            }
+          </div>
         </div>
-        <div class="detail-panel__fact">
-          <dt>Last Restock</dt>
-          <dd>{{ placeholders().lastRestock }}</dd>
-        </div>
-      </dl>
-
-      <div class="detail-panel__description">
-        <h3 class="detail-panel__section-title">Description</h3>
-        <p>{{ selected.descriptionEn || 'No English description provided.' }}</p>
       </div>
 
-      <div class="detail-panel__chart-placeholder" aria-hidden="true">
-        <div class="detail-panel__chart-header">
-          <span>Daily Sales Velocity</span>
-          <span class="detail-panel__chart-note">Placeholder</span>
-        </div>
-        <div class="detail-panel__chart-bars">
-          @for (bar of [38, 52, 44, 68, 58, 72, 49]; track $index) {
-            <span class="detail-panel__chart-bar" [style.height.%]="bar"></span>
+      <div class="detail-panel__header-actions">
+        <app-admin-icon-button
+          [icon]="copiedField() === 'id' ? 'pi pi-check' : 'pi pi-copy'"
+          [label]="copiedField() === 'id' ? 'Copied!' : 'Copy product ID'"
+          (pressed)="copyValue(selected.id, 'id')"
+        />
+        <button type="button" class="detail-panel__close" aria-label="Close product details" (click)="onClose()">
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="detail-panel__body">
+      <app-admin-section-card title="General Information">
+        <dl class="detail-panel__facts">
+          <div class="detail-panel__fact">
+            <dt>Category</dt>
+            <dd>{{ selected.categoryName || 'Uncategorized' }}</dd>
+          </div>
+          <div class="detail-panel__fact">
+            <dt>Status</dt>
+            <dd>{{ statusLabel(selected.status) }}</dd>
+          </div>
+          @if (selected.createdOnUtc) {
+            <div class="detail-panel__fact">
+              <dt>Created</dt>
+              <dd>{{ selected.createdOnUtc | date: 'mediumDate' }}</dd>
+            </div>
           }
+        </dl>
+      </app-admin-section-card>
+
+      <app-admin-section-card title="Pricing">
+        <div class="detail-panel__price-display">
+          <span class="detail-panel__price-value">{{ selected.price | hamboxCurrency }}</span>
+          <span class="detail-panel__price-label">Storefront price (USD)</span>
         </div>
-      </div>
-    </section>
+      </app-admin-section-card>
 
-    <section class="detail-panel__operations">
-      <h3 class="detail-panel__section-title">Storefront</h3>
+      <app-admin-section-card title="Identifiers">
+        <dl class="detail-panel__facts">
+          <div class="detail-panel__fact detail-panel__fact--id">
+            <dt>Product ID</dt>
+            <dd>
+              <button
+                type="button"
+                class="detail-panel__id-value"
+                [pTooltip]="selected.id"
+                tooltipPosition="top"
+                [attr.aria-label]="'Copy product ID ' + selected.id"
+                (click)="copyValue(selected.id, 'id')"
+              >
+                <code>{{ formatShortGuid(selected.id) }}</code>
+                <i [class]="copiedField() === 'id' ? 'pi pi-check' : 'pi pi-copy'" aria-hidden="true"></i>
+              </button>
+            </dd>
+          </div>
+          <div class="detail-panel__fact detail-panel__fact--id">
+            <dt>Category ID</dt>
+            <dd>
+              <button
+                type="button"
+                class="detail-panel__id-value"
+                [pTooltip]="selected.categoryId"
+                tooltipPosition="top"
+                [attr.aria-label]="'Copy category ID ' + selected.categoryId"
+                (click)="copyValue(selected.categoryId, 'categoryId')"
+              >
+                <code>{{ formatShortGuid(selected.categoryId) }}</code>
+                <i [class]="copiedField() === 'categoryId' ? 'pi pi-check' : 'pi pi-copy'" aria-hidden="true"></i>
+              </button>
+            </dd>
+          </div>
+        </dl>
+      </app-admin-section-card>
 
-      <a
-        pButton
-        class="detail-panel__action-btn"
-        [routerLink]="['/admin/inventory', selected.id, 'edit']"
-        label="Manage Product"
-        icon="pi pi-pencil"
-        severity="secondary"
-      ></a>
-
-      @if (statusError()) {
-        <p class="detail-panel__status-error" role="alert">{{ statusError() }}</p>
-      }
-
-      @if (selected.status === 'Active') {
-        <p class="detail-panel__status-hint">
-          This product is visible on the storefront.
+      <app-admin-section-card title="Description">
+        <p
+          class="detail-panel__description"
+          [class.detail-panel__description--clamped]="isLongDescription() && !descriptionExpanded()"
+        >
+          {{ selected.descriptionEn || 'No English description provided.' }}
         </p>
-      } @else if (selected.status === 'Draft') {
-        <p class="detail-panel__status-hint">
-          Draft products are hidden from the storefront. Publish to make them available to customers.
-        </p>
-      } @else if (selected.status === 'Inactive') {
-        <p class="detail-panel__status-hint">
-          This product is hidden from the storefront. Publish to show it again.
-        </p>
-      }
+        @if (isLongDescription()) {
+          <button
+            type="button"
+            class="detail-panel__description-toggle"
+            [attr.aria-expanded]="descriptionExpanded()"
+            (click)="toggleDescription()"
+          >
+            {{ descriptionExpanded() ? 'Show less' : 'Show more' }}
+          </button>
+        }
+      </app-admin-section-card>
 
-      @if (canPublish(selected.status)) {
-        <button
-          pButton
-          type="button"
-          label="Publish to Storefront"
-          icon="pi pi-globe"
-          class="detail-panel__action-btn detail-panel__action-btn--primary"
-          [loading]="updatingStatus()"
-          [disabled]="updatingStatus()"
-          (click)="onPublish()"
-        ></button>
-      }
+      <app-admin-section-card title="Storefront">
+        <div class="detail-panel__storefront">
+          <a
+            class="detail-panel__storefront-link"
+            [routerLink]="storefrontPath()"
+            target="_blank"
+            rel="noopener"
+          >
+            <i class="pi pi-external-link" aria-hidden="true"></i>
+            Open product page
+          </a>
+          <button type="button" class="detail-panel__storefront-copy" (click)="copyValue(storefrontUrl(), 'url')">
+            <i [class]="copiedField() === 'url' ? 'pi pi-check' : 'pi pi-link'" aria-hidden="true"></i>
+            {{ copiedField() === 'url' ? 'Link copied' : 'Copy URL' }}
+          </button>
+        </div>
 
-      @if (canHide(selected.status)) {
-        <button
-          pButton
-          type="button"
-          label="Hide from Storefront"
-          icon="pi pi-eye-slash"
-          severity="secondary"
-          class="detail-panel__action-btn"
-          [loading]="updatingStatus()"
-          [disabled]="updatingStatus()"
-          (click)="onHide()"
-        ></button>
-      }
-    </section>
+        @if (selected.status === 'Active') {
+          <p class="detail-panel__status-hint">This product is visible on the storefront.</p>
+        } @else if (selected.status === 'Draft') {
+          <p class="detail-panel__status-hint">
+            Draft products are hidden from the storefront. Publish to make them available to customers.
+          </p>
+        } @else if (selected.status === 'Inactive') {
+          <p class="detail-panel__status-hint">
+            This product is hidden from the storefront. Publish to show it again.
+          </p>
+        }
+      </app-admin-section-card>
 
-    <button
-      pButton
-      type="button"
-      class="detail-panel__sync-btn"
-      label="Force Global Sync"
-      icon="pi pi-sync"
-      disabled
-      aria-disabled="true"
-    ></button>
-  } @else {
-    <div class="detail-panel__empty" role="status">
-      <i class="pi pi-arrow-left detail-panel__empty-icon" aria-hidden="true"></i>
-      <h2 class="detail-panel__empty-title">Select a product</h2>
-      <p class="detail-panel__empty-copy">Choose a row from the catalog table to inspect product details.</p>
+      <app-admin-section-card title="Actions">
+        @if (statusError()) {
+          <app-admin-error-alert [message]="statusError()!" [showRetry]="false" />
+        }
+
+        <a
+          *hamboxHasPermission="permissions.Catalog.Products.Edit"
+          class="detail-panel__primary-action"
+          [routerLink]="['/admin/products', selected.id, 'edit']"
+        >
+          <i class="pi pi-pencil" aria-hidden="true"></i>
+          Edit Product
+        </a>
+
+        <div class="detail-panel__action-row">
+          @if (canPublish(selected.status)) {
+            <button
+              *hamboxHasPermission="permissions.Catalog.Products.Edit"
+              pButton
+              type="button"
+              label="Publish"
+              icon="pi pi-globe"
+              severity="secondary"
+              class="detail-panel__action-btn"
+              [loading]="updatingStatus()"
+              [disabled]="updatingStatus()"
+              (click)="onPublish()"
+            ></button>
+          }
+
+          @if (canHide(selected.status)) {
+            <button
+              *hamboxHasPermission="permissions.Catalog.Products.Edit"
+              pButton
+              type="button"
+              label="Hide"
+              icon="pi pi-eye-slash"
+              severity="secondary"
+              class="detail-panel__action-btn"
+              [loading]="updatingStatus()"
+              [disabled]="updatingStatus()"
+              (click)="onHide()"
+            ></button>
+          }
+
+          <button
+            *hamboxHasPermission="permissions.Catalog.Products.Create"
+            pButton
+            type="button"
+            label="Duplicate"
+            icon="pi pi-copy"
+            severity="secondary"
+            class="detail-panel__action-btn"
+            [loading]="actionLoading()"
+            (click)="onDuplicate()"
+          ></button>
+        </div>
+
+        <div class="detail-panel__danger-zone">
+          <span class="detail-panel__danger-label">Danger zone</span>
+          <div class="detail-panel__action-row">
+            @if (canArchive(selected.status)) {
+              <button
+                *hamboxHasPermission="permissions.Catalog.Products.Edit"
+                pButton
+                type="button"
+                label="Archive"
+                icon="pi pi-inbox"
+                severity="secondary"
+                class="detail-panel__action-btn"
+                [loading]="updatingStatus() || actionLoading()"
+                (click)="onArchive()"
+              ></button>
+            }
+
+            <button
+              *hamboxHasPermission="permissions.Catalog.Products.Delete"
+              pButton
+              type="button"
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              class="detail-panel__action-btn"
+              [loading]="actionLoading()"
+              (click)="onDelete()"
+            ></button>
+          </div>
+        </div>
+      </app-admin-section-card>
     </div>
+  } @else {
+    <app-admin-empty-state
+      icon="pi pi-arrow-left"
+      title="Select a product"
+      description="Choose a row from the catalog table to inspect product details."
+    />
   }
 </aside>

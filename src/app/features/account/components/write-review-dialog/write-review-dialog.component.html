@@ -1,9 +1,9 @@
 @if (visible()) {
-  <div class="review-dialog" role="dialog" aria-modal="true" aria-labelledby="review-dialog-title">
+  <div class="review-dialog" hamboxTranslateRefresh role="dialog" aria-modal="true" aria-labelledby="review-dialog-title">
     <div class="review-dialog__panel">
       <header class="review-dialog__header">
-        <h2 id="review-dialog-title">Write a Review</h2>
-        <button type="button" class="review-dialog__close" aria-label="Close" (click)="discard()">
+        <h2 id="review-dialog-title">{{ 'ACCOUNT.REVIEW_DIALOG_UI.TITLE' | translate }}</h2>
+        <button type="button" class="review-dialog__close" [attr.aria-label]="'COMMON.CLOSE' | translate" (click)="discard()">
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>
       </header>
@@ -11,8 +11,8 @@
       <p class="review-dialog__product">{{ productName() }}</p>
 
       <div class="review-dialog__field">
-        <label>Overall Rating</label>
-        <div class="review-dialog__stars" role="group" aria-label="Rating">
+        <label>{{ 'ACCOUNT.REVIEW_DIALOG_UI.OVERALL_RATING' | translate }}</label>
+        <div class="review-dialog__stars" role="group" [attr.aria-label]="'ACCOUNT.REVIEW_DIALOG_UI.RATING' | translate">
           @for (star of [1, 2, 3, 4, 5]; track star) {
             <button
               type="button"
@@ -27,19 +27,19 @@
       </div>
 
       <div class="review-dialog__field">
-        <label for="review-comment">Your Thoughts</label>
+        <label for="review-comment">{{ 'ACCOUNT.REVIEW_DIALOG_UI.YOUR_THOUGHTS' | translate }}</label>
         <textarea
           id="review-comment"
           rows="5"
-          placeholder="Share details of your experience with the product..."
+          [placeholder]="'ACCOUNT.REVIEW_DIALOG_UI.PLACEHOLDER' | translate"
           [value]="comment()"
           (input)="onCommentInput($event)"
         ></textarea>
       </div>
 
       <footer class="review-dialog__footer">
-        <button type="button" class="review-dialog__submit" (click)="submit()">Submit Review</button>
-        <button type="button" class="review-dialog__discard" (click)="discard()">Discard</button>
+        <button type="button" class="review-dialog__submit" (click)="submit()">{{ 'ACCOUNT.REVIEW_DIALOG_UI.SUBMIT' | translate }}</button>
+        <button type="button" class="review-dialog__discard" (click)="discard()">{{ 'ACCOUNT.REVIEW_DIALOG_UI.DISCARD' | translate }}</button>
       </footer>
     </div>
   </div>

@@ -1,0 +1,50 @@
+<app-admin-section-card [title]="'ADMIN.THEMES.ASSIGNMENTS.TITLE' | translate">
+  <form class="theme-assignments-panel__form" (ngSubmit)="submitAssignment()">
+    <label>
+      <span>{{ 'ADMIN.THEMES.ASSIGNMENTS.TYPE' | translate }}</span>
+      <p-select
+        [options]="assignmentTypeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="assignmentType()"
+        (ngModelChange)="assignmentType.set($event)"
+        name="assignmentType"
+      />
+    </label>
+    <label>
+      <span>{{ 'ADMIN.THEMES.ASSIGNMENTS.TARGET' | translate }}</span>
+      <input pInputText [ngModel]="targetKey()" (ngModelChange)="targetKey.set($event)" name="targetKey" required />
+    </label>
+    <label>
+      <span>{{ 'ADMIN.THEMES.ASSIGNMENTS.PRIORITY' | translate }}</span>
+      <p-inputNumber [ngModel]="priority()" (ngModelChange)="priority.set($event)" name="priority" />
+    </label>
+    <button
+      *hamboxHasPermission="permissions.Themes.Assign"
+      pButton
+      type="submit"
+      class="admin-btn-primary"
+      [label]="'ADMIN.THEMES.ASSIGNMENTS.ADD' | translate"
+      icon="pi pi-link"
+      [disabled]="actionLoading() || !targetKey().trim()"
+    ></button>
+  </form>
+
+  @if (assignments().length === 0) {
+    <app-admin-empty-state [title]="'ADMIN.THEMES.ASSIGNMENTS.EMPTY' | translate" />
+  } @else {
+    <ul class="theme-assignments-panel__list">
+      @for (item of assignments(); track item.id) {
+        <li>
+          <strong>{{ item.assignmentType }}</strong>
+          <span>{{ item.targetKey }}</span>
+          <span class="theme-assignments-panel__meta">
+            {{ 'ADMIN.THEMES.ASSIGNMENTS.PRIORITY' | translate }}: {{ item.priority }}
+            ·
+            {{ item.isActive ? ('ADMIN.THEMES.ASSIGNMENTS.ACTIVE' | translate) : ('ADMIN.THEMES.ASSIGNMENTS.INACTIVE' | translate) }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</app-admin-section-card>

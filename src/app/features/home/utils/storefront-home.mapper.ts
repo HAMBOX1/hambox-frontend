@@ -1,6 +1,9 @@
 import { Category } from '../../catalog/models/category.model';
 import { Product } from '../../catalog/models/product.model';
-import { StorefrontContent } from '../models/storefront-content.model';
+import {
+  StorefrontContent,
+  StorefrontTrustItemContent,
+} from '../models/storefront-content.model';
 import {
   FlashDeal,
   StorefrontCategory,
@@ -8,6 +11,7 @@ import {
   StorefrontPriceTone,
   TrendingRankItem,
   TrendingValueItem,
+  TrustFeature,
 } from '../models/storefront-home';
 
 const PRODUCT_PLACEHOLDER_IMAGES = [
@@ -101,16 +105,30 @@ export function mapProductToTrendingValue(product: Product): TrendingValueItem {
   };
 }
 
-export function mapProductToFeaturedProduct(product: Product, index = 0): StorefrontFeaturedProduct {
+export function mapProductToFeaturedProduct(
+  product: Product,
+  index = 0,
+  badge = "EDITOR'S CHOICE",
+  ctaLabel = 'View Product',
+): StorefrontFeaturedProduct {
   return {
     id: product.id,
-    badge: "EDITOR'S CHOICE",
+    badge,
     title: product.nameEn,
     description: product.descriptionEn,
     imageUrl: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
-    ctaLabel: 'View Product',
+    ctaLabel,
     route: `/products/${product.id}`,
   };
+}
+
+export function mapTrustItems(items: readonly StorefrontTrustItemContent[]): TrustFeature[] {
+  return items.map((item) => ({
+    id: item.id,
+    iconSrc: resolveStorefrontImageUrl(item.iconUrl, 'assets/images/trust/instant-delivery.svg'),
+    title: item.title,
+    description: item.description,
+  }));
 }
 
 export function mapStorefrontContent(response: StorefrontContent): StorefrontContent {
@@ -122,17 +140,20 @@ export function mapStorefrontContent(response: StorefrontContent): StorefrontCon
         response.hero.backgroundImageUrl,
         'assets/images/hambox-hero-background.png',
       ),
-      overlayImageUrl: resolveStorefrontImageUrl(
-        response.hero.overlayImageUrl,
-        'assets/images/hambox-hero-overlay.png',
-      ),
+      overlayImageUrl: response.hero.overlayImageUrl
+        ? resolveStorefrontImageUrl(
+            response.hero.overlayImageUrl,
+            'assets/images/hambox-hero-overlay.png',
+          )
+        : null,
     },
     promoBanner: {
       ...response.promoBanner,
-      backgroundImageUrl: resolveStorefrontImageUrl(
-        response.promoBanner.backgroundImageUrl,
+      imageUrl: resolveStorefrontImageUrl(
+        response.promoBanner.imageUrl,
         'assets/images/hambox-hero-background.png',
       ),
     },
+    trustBar: response.trustBar ?? [],
   };
 }

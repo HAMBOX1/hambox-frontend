@@ -1,0 +1,71 @@
+<div
+  #searchRoot
+  class="storefront-search"
+  [class.storefront-search--mobile]="mobile()"
+  [class.storefront-search--open]="open()"
+>
+  <form class="storefront-search__form" (submit)="onSubmit($event)">
+    <span class="storefront-search__icon" aria-hidden="true">
+      <img [src]="searchIconSrc" alt="" />
+    </span>
+    <input
+      class="storefront-search__input"
+      type="search"
+      name="q"
+      autocomplete="off"
+      role="combobox"
+      [attr.aria-expanded]="open()"
+      aria-controls="storefront-search-listbox"
+      aria-autocomplete="list"
+      [attr.aria-activedescendant]="activeIndex() >= 0 ? 'storefront-search-option-' + activeIndex() : null"
+      [placeholder]="'NAVBAR.SEARCH_PLACEHOLDER' | translate"
+      [value]="value()"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (keydown)="onKeydown($event)"
+    />
+  </form>
+
+  @if (open()) {
+    <div
+      id="storefront-search-listbox"
+      class="storefront-search__dropdown"
+      role="listbox"
+      [attr.aria-label]="'NAVBAR.SEARCH_PLACEHOLDER' | translate"
+    >
+      @if (loading()) {
+        <p class="storefront-search__status">{{ 'NAVBAR.SEARCH_LOADING' | translate }}</p>
+      } @else if (!suggestions().length) {
+        <p class="storefront-search__status">{{ 'NAVBAR.SEARCH_EMPTY' | translate }}</p>
+      } @else {
+        <ul class="storefront-search__list">
+          @for (item of suggestions(); track item.id; let index = $index) {
+            <li>
+              <button
+                type="button"
+                class="storefront-search__option"
+                [class.storefront-search__option--active]="activeIndex() === index"
+                role="option"
+                [id]="'storefront-search-option-' + index"
+                [attr.aria-selected]="activeIndex() === index"
+                (mouseenter)="onSuggestionMouseEnter(index)"
+                (click)="onSuggestionClick(item)"
+              >
+                <i class="pi" [class]="suggestionIcon(item.type)" aria-hidden="true"></i>
+                <span class="storefront-search__option-copy">
+                  <span
+                    class="storefront-search__option-label"
+                    [innerHTML]="highlight(item.label, value())"
+                  ></span>
+                  @if (item.subtitle) {
+                    <span class="storefront-search__option-subtitle">{{ item.subtitle }}</span>
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

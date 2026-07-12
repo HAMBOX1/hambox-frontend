@@ -34,8 +34,11 @@ export class TranslationService {
 
   private readonly languageState = signal<SupportedLanguageId>(DEFAULT_LANGUAGE_ID);
   private readonly readyState = signal(false);
+  private readonly revisionState = signal(0);
 
   readonly language = this.languageState.asReadonly();
+  /** Bumped on every locale switch so templates can force refresh. */
+  readonly revision = this.revisionState.asReadonly();
   readonly languages: readonly LanguageDefinition[] = AVAILABLE_LANGUAGES;
   readonly isReady = this.readyState.asReadonly();
   readonly isRtl = computed(() => this.languageState() === 'ar');
@@ -66,9 +69,18 @@ export class TranslationService {
 
     try {
       const profile = await firstValueFrom(this.api.get<UserLocaleProfile>(AUTH_API.me));
-      if (isSupportedLanguageId(profile.preferredLanguage)) {
-        await this.applyLanguage(profile.preferredLanguage, true);
+      if (!isSupportedLanguageId(profile.preferredLanguage)) {
+        return;
       }
+
+      if (this.hasPersistedLanguagePreference()) {
+        if (profile.preferredLanguage !== this.languageState()) {
+          void this.syncPreferredLanguageToServer(this.languageState());
+        }
+        return;
+      }
+
+      await this.applyLanguage(profile.preferredLanguage, true);
     } catch {
       // Keep client-side preference when profile sync fails.
     }
@@ -87,6 +99,7 @@ export class TranslationService {
   private async applyLanguage(languageId: SupportedLanguageId, persist: boolean): Promise<void> {
     await firstValueFrom(this.translate.use(languageId));
     this.languageState.set(languageId);
+    this.revisionState.update((value) => value + 1);
     this.applyDocument(languageId);
 
     if (persist) {
@@ -115,6 +128,17 @@ export class TranslationService {
       const maxAge = 60 * 60 * 24 * 365;
       document.cookie = `${LANGUAGE_COOKIE_NAME}=${languageId};path=/;max-age=${maxAge};SameSite=Lax`;
     }
+  }
+
+  private hasPersistedLanguagePreference(): boolean {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (isSupportedLanguageId(stored)) {
+        return true;
+      }
+    }
+
+    return this.readCookieLanguage() !== null;
   }
 
   private resolveInitialLanguage(): SupportedLanguageId {

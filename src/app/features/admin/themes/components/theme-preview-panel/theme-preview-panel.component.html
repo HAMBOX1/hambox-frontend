@@ -1,0 +1,27 @@
+<app-admin-section-card [title]="'ADMIN.THEMES.PREVIEW.TITLE' | translate">
+  <p class="theme-preview-panel__hint">{{ 'ADMIN.THEMES.PREVIEW.HINT' | translate }}</p>
+
+  <div class="theme-preview-panel__canvas">
+    <header class="theme-preview-panel__nav">
+      <span>{{ themeName() || ('ADMIN.THEMES.PREVIEW.SAMPLE_STORE' | translate) }}</span>
+      <span class="theme-preview-panel__mode">{{ baseMode() }}</span>
+    </header>
+
+    <div class="theme-preview-panel__hero">
+      <h3>{{ 'ADMIN.THEMES.PREVIEW.HERO_TITLE' | translate }}</h3>
+      <p>{{ 'ADMIN.THEMES.PREVIEW.HERO_TEXT' | translate }}</p>
+      <button pButton type="button" class="theme-preview-panel__cta" [label]="'ADMIN.THEMES.PREVIEW.CTA' | translate"></button>
+    </div>
+
+    <div class="theme-preview-panel__cards">
+      <article class="theme-preview-panel__card">
+        <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_TITLE' | translate }}</h4>
+        <p>{{ 'ADMIN.THEMES.PREVIEW.CARD_TEXT' | translate }}</p>
+      </article>
+      <article class="theme-preview-panel__card theme-preview-panel__card--elevated">
+        <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_ELEVATED' | translate }}</h4>
+        <p>{{ 'ADMIN.THEMES.PREVIEW.CARD_TEXT' | translate }}</p>
+      </article>
+    </div>
+  </div>
+</app-admin-section-card>

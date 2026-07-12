@@ -1,0 +1,48 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.HEALTH.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.HEALTH.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div adminHeaderActions>
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.OPERATIONS.ACTIONS.REFRESH' | translate"
+        (click)="facade.loadHealth()"
+      ></button>
+    </div>
+  </app-admin-page-header>
+
+  @if (loading() && !health()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (health(); as data) {
+    <app-admin-section-card [title]="'ADMIN.OPERATIONS.HEALTH.OVERALL' | translate">
+      <app-admin-status-badge [label]="data.overallStatus" [tone]="tone(data.overallStatus)" />
+      <p>{{ data.checkedOnUtc | date: 'medium' }}</p>
+    </app-admin-section-card>
+
+    <app-admin-section-card>
+      <p-table [value]="data.components">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.NAME' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.DETAIL' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.LATENCY' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-c>
+          <tr>
+            <td>{{ c.name }}</td>
+            <td><app-admin-status-badge [label]="c.status" [tone]="tone(c.status)" /></td>
+            <td>{{ c.detail || '—' }}</td>
+            <td>{{ c.latencyMs != null ? c.latencyMs + 'ms' : '—' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+  }
+</section>

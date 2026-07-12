@@ -1,0 +1,79 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.API_LOGS.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.API_LOGS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-section-card [title]="'ADMIN.OPERATIONS.FILTERS' | translate">
+    <div class="admin-filters admin-filters--sticky">
+      <input
+        pInputText
+        [ngModel]="path()"
+        (ngModelChange)="path.set($event)"
+        (keyup.enter)="reload()"
+        [placeholder]="'ADMIN.OPERATIONS.COLS.PATH' | translate"
+      />
+      <input
+        pInputText
+        [ngModel]="userId()"
+        (ngModelChange)="userId.set($event)"
+        (keyup.enter)="reload()"
+        [placeholder]="'ADMIN.OPERATIONS.COLS.USER' | translate"
+      />
+      <input
+        pInputText
+        type="number"
+        [ngModel]="minStatus()"
+        (ngModelChange)="minStatus.set($event)"
+        [placeholder]="'ADMIN.OPERATIONS.COLS.MIN_STATUS' | translate"
+      />
+      <button pButton type="button" [label]="'ADMIN.OPERATIONS.ACTIONS.REFRESH' | translate" (click)="reload()"></button>
+    </div>
+  </app-admin-section-card>
+
+  @if (loading() && !apiLogs()) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (rows().length === 0) {
+    <app-admin-section-card>
+      <p>{{ 'ADMIN.OPERATIONS.EMPTY.API_LOGS' | translate }}</p>
+    </app-admin-section-card>
+  } @else {
+    <app-admin-section-card>
+      <p-table [value]="rows()" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.TIME' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.PATH' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.METHOD' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.DURATION' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.CORRELATION' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.REQ_SIZE' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.RES_SIZE' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.EXCEPTION' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.USER' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.IP' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-log>
+          <tr>
+            <td>{{ log.timestampUtc | date: 'short' }}</td>
+            <td>{{ log.path }}</td>
+            <td>{{ log.method }}</td>
+            <td>{{ log.durationMs }}ms</td>
+            <td><app-admin-status-badge [label]="'' + log.statusCode" [tone]="tone(log.statusCode)" /></td>
+            <td class="admin-mono">{{ log.correlationId || '—' }}</td>
+            <td>{{ log.requestSizeBytes ?? '—' }}</td>
+            <td>{{ log.responseSizeBytes ?? '—' }}</td>
+            <td>{{ log.exception || '—' }}</td>
+            <td>{{ log.userId || '—' }}</td>
+            <td>{{ log.ipAddress || '—' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+  }
+</section>

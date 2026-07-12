@@ -1,14 +1,18 @@
 import { HttpContext } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { catchError, finalize, firstValueFrom, Observable, of, tap } from 'rxjs';
 
 import { AUTH_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
+import { ApiError } from '../../../core/models/api-error.model';
+import { AUTH_CONTEXT } from '../../../core/auth/auth-context';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { TokenStorageService } from '../../../core/auth/token-storage.service';
+import { PermissionService } from '../../../core/permissions/permission.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { CurrencyService } from '../../../core/currency/currency.service';
 import { SKIP_AUTH_INTERCEPTOR } from '../../../core/tokens/http-context.tokens';
+import { UserProfileApiDto } from '../../account/models/account-api.model';
 import {
   AuthTokenResponse,
   ForgotPasswordRequest,
@@ -28,13 +32,14 @@ export class Auth {
   private readonly api = inject(ApiClientService);
   private readonly session = inject(AuthSessionService);
   private readonly tokenStorage = inject(TokenStorageService);
+  private readonly permissions = inject(PermissionService);
   private readonly translation = inject(TranslationService);
   private readonly currency = inject(CurrencyService);
 
-  readonly user = this.session.user;
-  readonly isAuthenticated = this.session.isAuthenticated;
-  readonly isAdmin = this.session.isAdmin;
-  readonly accessToken = this.session.accessToken;
+  readonly user = this.session.customerUser;
+  readonly isAuthenticated = this.session.isCustomerAuthenticated;
+  readonly isAdmin = computed(() => false);
+  readonly accessToken = computed(() => this.session.getAccessToken(AUTH_CONTEXT.Customer));
   readonly initialized = this.session.initialized;
 
   login(request: LoginRequest): Observable<AuthTokenResponse> {
@@ -44,7 +49,8 @@ export class Auth {
       })
       .pipe(
         tap((tokens) => {
-          this.session.setSession(tokens);
+          this.session.setSession(AUTH_CONTEXT.Customer, tokens);
+          void this.syncAccessFromProfile();
           void this.translation.syncFromAuthenticatedUser();
           void this.currency.syncFromAuthenticatedUser();
         }),
@@ -59,7 +65,8 @@ export class Auth {
 
   refresh(): Observable<AuthTokenResponse> {
     const refreshToken =
-      this.session.session()?.refreshToken ?? this.tokenStorage.getRefreshToken();
+      this.session.getSession(AUTH_CONTEXT.Customer)?.refreshToken ??
+      this.tokenStorage.getRefreshToken(AUTH_CONTEXT.Customer);
     if (!refreshToken) {
       throw new Error('No refresh token is available.');
     }
@@ -69,11 +76,16 @@ export class Auth {
       .post<AuthTokenResponse>(AUTH_API.refresh, request, {
         context: new HttpContext().set(SKIP_AUTH_INTERCEPTOR, true),
       })
-      .pipe(tap((tokens) => this.session.setSession(tokens)));
+      .pipe(
+        tap((tokens) => {
+          this.session.setSession(AUTH_CONTEXT.Customer, tokens);
+          void this.syncAccessFromProfile();
+        }),
+      );
   }
 
   logout(): Observable<void> {
-    const refreshToken = this.session.session()?.refreshToken;
+    const refreshToken = this.session.getSession(AUTH_CONTEXT.Customer)?.refreshToken;
 
     const logout$ = refreshToken
       ? this.api
@@ -81,7 +93,7 @@ export class Auth {
           .pipe(catchError(() => of(void 0)))
       : of(void 0);
 
-    return logout$.pipe(finalize(() => this.session.clearSession()));
+    return logout$.pipe(finalize(() => this.session.clearSession(AUTH_CONTEXT.Customer)));
   }
 
   verifyEmail(token: string): Observable<void> {
@@ -103,14 +115,14 @@ export class Auth {
   }
 
   restoreSession(): Promise<UserSession | null> {
-    const restored = this.session.tryRestoreFromStorage();
+    const restored = this.session.tryRestoreFromStorage(AUTH_CONTEXT.Customer);
     if (restored) {
       this.session.markInitialized();
       return Promise.resolve(restored);
     }
 
-    if (!this.session.hasRefreshToken()) {
-      this.session.clearSession();
+    if (!this.session.hasRefreshToken(AUTH_CONTEXT.Customer)) {
+      this.session.clearSession(AUTH_CONTEXT.Customer);
       this.session.markInitialized();
       return Promise.resolve(null);
     }
@@ -118,17 +130,38 @@ export class Auth {
     return firstValueFrom(
       this.refresh().pipe(
         catchError(() => {
-          this.session.clearSession();
+          this.session.clearSession(AUTH_CONTEXT.Customer);
           return of(null);
         }),
       ),
-    ).then((tokens) => {
+    ).then(async (tokens) => {
       this.session.markInitialized();
-      return tokens ? this.session.session() : null;
+      if (tokens) {
+        await this.syncAccessFromProfile();
+      }
+      return tokens ? this.session.getSession(AUTH_CONTEXT.Customer) : null;
     });
   }
 
+  async syncAccessFromProfile(): Promise<void> {
+    if (!this.session.isCustomerAuthenticated()) {
+      return;
+    }
+
+    try {
+      const profile = await firstValueFrom(this.api.get<UserProfileApiDto>(AUTH_API.me));
+      this.permissions.syncFromProfile(AUTH_CONTEXT.Customer, {
+        roles: profile.roles ?? [],
+        permissions: profile.permissions ?? [],
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        this.session.clearSession(AUTH_CONTEXT.Customer);
+      }
+    }
+  }
+
   clearSession(): void {
-    this.session.clearSession();
+    this.session.clearSession(AUTH_CONTEXT.Customer);
   }
 }

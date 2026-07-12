@@ -8,6 +8,9 @@ import {
   AccountDashboardApiDto,
   ChangePasswordRequest,
   CreateReviewRequest,
+  CustomerLibraryItemApiDto,
+  CustomerLibraryQuery,
+  RevealCustomerLibraryKeyApiDto,
   OrderDetailApiDto,
   OrderSummaryApiDto,
   ProductReviewApiDto,
@@ -112,5 +115,34 @@ export class AccountApiService {
 
   getReferralHistory(): Observable<readonly ReferralHistoryApiDto[]> {
     return this.api.get<readonly ReferralHistoryApiDto[]>(ACCOUNT_API.referralHistory);
+  }
+
+  getLibrary(query: CustomerLibraryQuery = {}): Observable<PagedResult<CustomerLibraryItemApiDto>> {
+    const params: Record<string, string | number> = {
+      pageNumber: query.pageNumber ?? 1,
+      pageSize: query.pageSize ?? 20,
+    };
+
+    if (query.searchTerm?.trim()) {
+      params['searchTerm'] = query.searchTerm.trim();
+    }
+
+    if (query.deliveryStatus) {
+      params['deliveryStatus'] = query.deliveryStatus;
+    }
+
+    if (query.sort) {
+      params['sort'] = query.sort;
+    }
+
+    if (query.group) {
+      params['group'] = query.group;
+    }
+
+    return this.api.get(ACCOUNT_API.library, { params });
+  }
+
+  revealLibraryKey(libraryItemId: string): Observable<RevealCustomerLibraryKeyApiDto> {
+    return this.api.get<RevealCustomerLibraryKeyApiDto>(ACCOUNT_API.revealLibraryKey(libraryItemId));
   }
 }

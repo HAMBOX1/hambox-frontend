@@ -1,0 +1,121 @@
+:host {
+  display: none;
+}
+
+.mobile-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  min-height: 56px;
+  padding-top: env(safe-area-inset-top, 0px);
+  border-bottom: 1px solid var(--color-nav-border);
+  background: color-mix(in srgb, var(--color-nav-bg) 92%, transparent);
+  backdrop-filter: blur(var(--sf-blur-nav));
+  -webkit-backdrop-filter: blur(var(--sf-blur-nav));
+  box-shadow: var(--color-nav-shadow);
+}
+
+.mobile-top-bar__inner {
+  display: grid;
+  grid-template-columns: 72px 1fr 72px;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 0 var(--sf-container-px-mobile);
+}
+
+.mobile-top-bar__slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &--start {
+    justify-content: flex-start;
+  }
+
+  &--end {
+    justify-content: flex-end;
+  }
+}
+
+.mobile-top-bar__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  text-decoration: none;
+
+  img {
+    display: block;
+    width: auto;
+    max-width: 120px;
+    height: 28px;
+    object-fit: contain;
+  }
+}
+
+.mobile-top-bar__title {
+  margin: 0;
+  padding: 0 4px;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-top-bar--titled .mobile-top-bar__inner {
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+}
+
+.mobile-top-bar__icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+.mobile-top-bar__checkout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-primary);
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  :host {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  :host {
+    display: none !important;
+  }
+}

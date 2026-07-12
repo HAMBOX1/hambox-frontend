@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+.promotion-edit-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-page-gap);
+}
+
+.promotion-edit-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.promotion-edit-page__date-input {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg-input);
+  color: var(--admin-text-primary);
+  font-size: 0.875rem;
+}
+
+.promotion-edit-page__checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.promotion-edit-page__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--admin-text-primary);
+  font-size: 0.875rem;
+}

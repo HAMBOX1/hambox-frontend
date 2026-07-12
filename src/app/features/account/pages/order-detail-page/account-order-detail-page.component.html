@@ -1,69 +1,72 @@
-<section class="order-detail-page">
+<section class="order-detail-page" hamboxTranslateRefresh>
   <a routerLink="/account/orders" class="order-detail-page__back">
     <i class="pi pi-arrow-left" aria-hidden="true"></i>
-    Back to orders
+    {{ 'ACCOUNT.ORDER_DETAIL_UI.BACK' | translate }}
   </a>
 
   @if (loading()) {
-    <p class="order-detail-page__state">Loading order...</p>
+    <p class="order-detail-page__state">{{ 'ACCOUNT.ORDER_DETAIL_UI.LOADING' | translate }}</p>
   } @else if (error()) {
     <p class="order-detail-page__state">{{ error() }}</p>
   } @else if (order(); as current) {
     <header class="order-detail-page__header">
       <div>
         <h1>{{ current.orderNumber }}</h1>
-        <p>{{ current.createdOnUtc | date:'fullDate' }} · {{ current.status }}</p>
+        <p>{{ current.createdOnUtc | hamboxDate:'fullDate' }} · {{ statusLabel(current.status) }}</p>
       </div>
       <strong>{{ current.totalAmount | hamboxCurrency }}</strong>
     </header>
 
     <div class="order-detail-page__grid">
       <section class="order-detail-page__panel">
-        <h2>Timeline</h2>
+        <h2>{{ 'ACCOUNT.ORDER_DETAIL_UI.TIMELINE' | translate }}</h2>
         <ul class="order-detail-page__timeline">
           @for (event of current.timeline; track event.eventType + event.occurredOnUtc) {
             <li>
-              <strong>{{ event.eventType }}</strong>
+              <strong>{{ timelineEventLabel(event.eventType) }}</strong>
               <p>{{ event.description }}</p>
-              <span>{{ event.occurredOnUtc | date:'short' }}</span>
+              <span>{{ event.occurredOnUtc | hamboxDate:'short' }}</span>
             </li>
           }
         </ul>
       </section>
 
       <section class="order-detail-page__panel">
-        <h2>License Keys</h2>
+        <h2>{{ 'ACCOUNT.ORDER_DETAIL_UI.LICENSE_KEYS' | translate }}</h2>
         @if (current.licenseKeys.length) {
           <ul class="order-detail-page__keys">
-            @for (key of current.licenseKeys; track key.licenseKey) {
+            @for (key of current.licenseKeys; track key.licenseKeyId) {
               <li>
                 <span>{{ key.productNameEn }}</span>
-                <code>{{ key.licenseKey }}</code>
+                <code>{{ key.maskedLicenseKey }}</code>
+                <a [routerLink]="['/account/library']" [queryParams]="{ itemId: key.licenseKeyId }">
+                  {{ 'ACCOUNT.ORDER_DETAIL_UI.REVEAL_IN_LIBRARY' | translate }}
+                </a>
               </li>
             }
           </ul>
         } @else {
-          <p class="order-detail-page__empty">License keys will appear once delivery completes.</p>
+          <p class="order-detail-page__empty">{{ 'ACCOUNT.ORDER_DETAIL_UI.NO_KEYS' | translate }}</p>
         }
       </section>
     </div>
 
     <section class="order-detail-page__panel">
-      <h2>Items & Reviews</h2>
+      <h2>{{ 'ACCOUNT.ORDER_DETAIL_UI.ITEMS_REVIEWS' | translate }}</h2>
       <div class="order-detail-page__items">
         @for (item of current.itemReviewStatuses; track item.orderItemId) {
           <article class="order-detail-page__item">
             <div>
               <strong>{{ item.productNameEn }}</strong>
               @if (item.hasReview) {
-                <p>Review submitted</p>
+                <p>{{ 'ACCOUNT.ORDER_DETAIL_UI.REVIEW_SUBMITTED' | translate }}</p>
               } @else if (item.canReview) {
-                <p>Eligible for review</p>
+                <p>{{ 'ACCOUNT.ORDER_DETAIL_UI.ELIGIBLE_REVIEW' | translate }}</p>
               }
             </div>
             @if (item.canReview) {
               <button type="button" class="order-detail-page__review-btn" (click)="openReview(item)">
-                Write Review
+                {{ 'ACCOUNT.ORDER_DETAIL_UI.WRITE_REVIEW' | translate }}
               </button>
             }
           </article>
@@ -74,13 +77,17 @@
     <div class="order-detail-page__footer">
       @if (current.invoiceUrl) {
         <a class="order-detail-page__link" [href]="current.invoiceUrl" target="_blank" rel="noopener">
-          Download Invoice
+          {{ 'ACCOUNT.ORDER_DETAIL_UI.DOWNLOAD_INVOICE' | translate }}
         </a>
       }
       @if (current.supportUrl) {
-        <a class="order-detail-page__link" [href]="current.supportUrl">Contact Support</a>
+        <a class="order-detail-page__link" [href]="current.supportUrl">{{ 'ACCOUNT.ORDER_DETAIL_UI.CONTACT_SUPPORT' | translate }}</a>
       }
     </div>
+  }
+
+  @if (reviewError()) {
+    <p class="order-detail-page__state" role="alert">{{ reviewError() }}</p>
   }
 
   <app-write-review-dialog

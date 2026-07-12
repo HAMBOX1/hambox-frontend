@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.promotion-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-page-gap);
+}
+
+.promotion-detail-page__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.promotion-detail-page__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.promotion-detail-page__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+}

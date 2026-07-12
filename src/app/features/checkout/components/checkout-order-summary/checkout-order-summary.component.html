@@ -20,27 +20,71 @@
   </div>
 
   <div class="order-summary__discount">
-    <input
-      class="order-summary__discount-input"
-      type="text"
-      placeholder="Discount Code"
-      [value]="discountCode()"
-      (input)="onDiscountInput($event)"
-    />
-    <button type="button" class="order-summary__discount-btn" (click)="applyDiscount()">
-      Apply
-    </button>
+    @if (summary().appliedCouponCode) {
+      <div class="order-summary__applied-coupon">
+        <span class="order-summary__coupon-chip">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 5.5h10M5 2v3M9 2v3M3 5.5v5a1 1 0 001 1h6a1 1 0 001-1v-5" stroke="currentColor" stroke-width="1.2" />
+          </svg>
+          {{ summary().appliedCouponCode }}
+        </span>
+        <button
+          type="button"
+          class="order-summary__remove-coupon"
+          [disabled]="discountApplying()"
+          (click)="removeCoupon()"
+        >
+          Remove
+        </button>
+      </div>
+    } @else {
+      <input
+        class="order-summary__discount-input"
+        type="text"
+        placeholder="Discount Code"
+        [value]="discountCode()"
+        [disabled]="discountApplying()"
+        (input)="onDiscountInput($event)"
+      />
+      <button
+        type="button"
+        class="order-summary__discount-btn"
+        [disabled]="discountApplying()"
+        (click)="applyDiscount()"
+      >
+        {{ discountApplying() ? 'Applying...' : 'Apply' }}
+      </button>
+    }
   </div>
+
+  @if (discountError()) {
+    <p class="order-summary__promo-error" role="alert">{{ discountError() }}</p>
+  }
+
+  @for (validationError of summary().validationErrors; track validationError) {
+    <p class="order-summary__promo-error" role="alert">{{ validationError }}</p>
+  }
 
   <dl class="order-summary__breakdown">
     <div class="order-summary__row">
       <dt>Subtotal</dt>
       <dd>{{ summary().subtotal | hamboxCurrency }}</dd>
     </div>
-    @if (summary().memberDiscount > 0) {
-      <div class="order-summary__row">
-        <dt>Member Discount</dt>
-        <dd>-{{ summary().memberDiscount | hamboxCurrency }}</dd>
+    @for (promo of summary().appliedPromotions; track promo.promotionId) {
+      <div class="order-summary__row order-summary__row--promo">
+        <dt>
+          {{ promo.name }}
+          @if (promo.couponCode) {
+            <span class="order-summary__promo-code">({{ promo.couponCode }})</span>
+          }
+        </dt>
+        <dd>-{{ promo.discountAmount | hamboxCurrency }}</dd>
+      </div>
+    }
+    @if (summary().totalDiscount > 0 && summary().appliedPromotions.length === 0) {
+      <div class="order-summary__row order-summary__row--promo">
+        <dt>Discount</dt>
+        <dd>-{{ summary().totalDiscount | hamboxCurrency }}</dd>
       </div>
     }
     <div class="order-summary__row">
@@ -63,7 +107,7 @@
     [disabled]="submitting()"
     (click)="completePurchase()"
   >
-    {{ submitting() ? 'Processing...' : 'Complete Purchase' }}
+    {{ submitting() ? 'Processing...' : (isDevelopmentCheckout() ? 'Complete Purchase (Development)' : 'Complete Purchase') }}
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </svg>

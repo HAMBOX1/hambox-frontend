@@ -28,6 +28,11 @@
   font-size: 0.8125rem;
 }
 
+.category-table__actions {
+  display: flex;
+  gap: 0.375rem;
+}
+
 .category-table__empty {
   display: flex;
   flex-direction: column;
@@ -123,7 +128,7 @@
     }
 
     .p-datatable-mask {
-      background: rgba(11, 12, 14, 0.72);
+      background: var(--color-overlay);
     }
 
     .p-datatable-loading-icon {

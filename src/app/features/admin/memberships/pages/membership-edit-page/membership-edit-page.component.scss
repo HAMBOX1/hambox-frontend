@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.membership-edit-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-page-gap);
+}
+
+.membership-edit-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.membership-edit-page__field--wide {
+  grid-column: 1 / -1;
+}
+
+.membership-edit-page__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--admin-text-primary);
+  font-size: 0.875rem;
+}

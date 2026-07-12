@@ -1,0 +1,84 @@
+<app-hambox-bottom-sheet
+  [open]="open()"
+  [showHeader]="false"
+  [heightVh]="80"
+  [ariaLabel]="'ACCOUNT_MENU.TITLE' | translate"
+  (closed)="close()"
+>
+  <header class="account-sheet__profile">
+    <span class="account-sheet__avatar">{{ avatarInitial() }}</span>
+    <div class="account-sheet__identity">
+      <strong>{{ displayName() }}</strong>
+      <p>{{ user()?.email }}</p>
+    </div>
+    <button
+      type="button"
+      class="account-sheet__close"
+      [attr.aria-label]="'COMMON.CLOSE' | translate"
+      (click)="close()"
+    >
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
+  </header>
+
+  <div class="account-sheet__divider" role="presentation"></div>
+
+  <nav class="account-sheet__nav" [attr.aria-label]="'ACCOUNT_MENU.TITLE' | translate">
+    @for (link of accountLinks; track link.route) {
+      <button type="button" class="account-sheet__row" (click)="navigate(link.route)">
+        <i [class]="link.icon + ' account-sheet__row-icon'" aria-hidden="true"></i>
+        <span class="account-sheet__row-label">{{ link.labelKey | translate }}</span>
+        <i class="pi pi-chevron-right account-sheet__chevron" aria-hidden="true"></i>
+      </button>
+    }
+  </nav>
+
+  <div class="account-sheet__divider" role="presentation"></div>
+
+  <section class="account-sheet__section" [attr.aria-label]="'MOBILE_NAV.PREFERENCES' | translate">
+    <h3 class="account-sheet__section-label">{{ 'MOBILE_NAV.PREFERENCES' | translate }}</h3>
+    <a class="account-sheet__row" routerLink="/support-chat" (click)="close()">
+      <i class="pi pi-comments account-sheet__row-icon" aria-hidden="true"></i>
+      <span class="account-sheet__row-label">{{ 'MOBILE_NAV.SUPPORT' | translate }}</span>
+      <i class="pi pi-chevron-right account-sheet__chevron" aria-hidden="true"></i>
+    </a>
+  </section>
+
+  <div class="account-sheet__divider" role="presentation"></div>
+
+  <section class="account-sheet__prefs">
+    <div class="account-sheet__pref-row">
+      <span class="account-sheet__pref-label">
+        <i class="pi pi-moon" aria-hidden="true"></i>
+        {{ 'ACCOUNT_MENU.THEME' | translate }}
+      </span>
+      <app-theme-toggle [compact]="true" />
+    </div>
+    <div class="account-sheet__pref-row">
+      <span class="account-sheet__pref-label">
+        <i class="pi pi-globe" aria-hidden="true"></i>
+        {{ 'ACCOUNT_MENU.LANGUAGE' | translate }}
+      </span>
+      <app-language-switcher />
+    </div>
+    <div class="account-sheet__pref-row">
+      <span class="account-sheet__pref-label">
+        <i class="pi pi-dollar" aria-hidden="true"></i>
+        {{ 'ACCOUNT_MENU.CURRENCY' | translate }}
+      </span>
+      <app-currency-switcher />
+    </div>
+  </section>
+
+  <div class="account-sheet__divider" role="presentation"></div>
+
+  <button
+    type="button"
+    class="account-sheet__logout"
+    [disabled]="isLoggingOut()"
+    (click)="logout()"
+  >
+    <i class="pi pi-sign-out" aria-hidden="true"></i>
+    {{ (isLoggingOut() ? 'ACCOUNT.SIGNING_OUT' : 'ACCOUNT.LOGOUT') | translate }}
+  </button>
+</app-hambox-bottom-sheet>

@@ -1,0 +1,28 @@
+<app-admin-section-card [title]="'ADMIN.THEMES.HISTORY.TITLE' | translate">
+  @if (loading()) {
+    <app-admin-loading-skeleton [rows]="4" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad.emit()" />
+  } @else if (history().length === 0) {
+    <app-admin-empty-state [title]="'ADMIN.THEMES.HISTORY.EMPTY' | translate" />
+  } @else {
+    <app-admin-data-table-shell>
+      <p-table [value]="[...history()]" [paginator]="history().length > 10" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.THEMES.HISTORY.ACTION' | translate }}</th>
+            <th>{{ 'ADMIN.THEMES.HISTORY.ACTOR' | translate }}</th>
+            <th>{{ 'ADMIN.THEMES.HISTORY.DATE' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-entry>
+          <tr>
+            <td>{{ entry.action }}</td>
+            <td>{{ entry.actorUserId || '—' }}</td>
+            <td>{{ entry.createdOnUtc | date: 'medium' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-data-table-shell>
+  }
+</app-admin-section-card>

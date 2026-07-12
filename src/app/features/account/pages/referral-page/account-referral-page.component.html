@@ -1,45 +1,45 @@
-<section class="referral-page">
+<section class="referral-page" hamboxTranslateRefresh>
   <header class="referral-page__header">
-    <h1>Referral Program</h1>
-    <p>Invite friends and earn lifetime rewards.</p>
+    <h1>{{ 'ACCOUNT.REFERRAL_UI.TITLE' | translate }}</h1>
+    <p>{{ 'ACCOUNT.REFERRAL_UI.SUBTITLE' | translate }}</p>
   </header>
 
   @if (loading()) {
-    <p class="referral-page__state">Loading referral dashboard...</p>
+    <p class="referral-page__state">{{ 'ACCOUNT.REFERRAL_UI.LOADING' | translate }}</p>
   } @else if (error()) {
     <p class="referral-page__state">{{ error() }}</p>
   } @else if (dashboard(); as data) {
     <div class="referral-page__grid">
       <section class="referral-page__card">
-        <p class="referral-page__label">Lifetime Rewards</p>
-        <h2>{{ data.lifetimePoints | number }} Points</h2>
-        <p>{{ data.successfulReferrals }} successful referrals · {{ data.tier }} tier</p>
+        <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.LIFETIME_REWARDS' | translate }}</p>
+        <h2>{{ data.lifetimePoints | number }} {{ 'ACCOUNT.REFERRAL_UI.POINTS' | translate }}</h2>
+        <p>{{ 'ACCOUNT.REFERRAL_UI.REFERRAL_TIER' | translate:{ count: data.successfulReferrals, tier: data.tier } }}</p>
 
         <div class="referral-page__progress">
           <div class="referral-page__progress-bar" [style.width.%]="tierProgress()"></div>
         </div>
-        <p class="referral-page__progress-label">Tier progress {{ tierProgress() | number:'1.0-0' }}%</p>
+        <p class="referral-page__progress-label">{{ 'ACCOUNT.REFERRAL_UI.TIER_PROGRESS' | translate:{ percent: (tierProgress() | number:'1.0-0') } }}</p>
 
         <button type="button" class="referral-page__copy" (click)="copyLink()">
-          {{ copied() ? 'Copied!' : 'Copy Invite Link' }}
+          {{ copied() ? ('ACCOUNT.REFERRAL_UI.COPIED' | translate) : ('ACCOUNT.REFERRAL_UI.COPY_INVITE' | translate) }}
         </button>
-        <p class="referral-page__code">Code: {{ data.referralCode }}</p>
+        <p class="referral-page__code">{{ 'ACCOUNT.REFERRAL_UI.CODE' | translate }}: {{ data.referralCode }}</p>
         <p class="referral-page__link">{{ inviteLink() }}</p>
       </section>
 
       <section class="referral-page__card">
-        <h3>Recent Referrals</h3>
+        <h3>{{ 'ACCOUNT.REFERRAL_UI.RECENT_REFERRALS' | translate }}</h3>
         @if (data.recentHistory.length) {
           <ul>
             @for (entry of data.recentHistory; track entry.id) {
               <li>
-                <strong>+{{ entry.pointsEarned }} pts</strong>
-                <span>{{ entry.createdOnUtc | date:'mediumDate' }}</span>
+                <strong>{{ 'ACCOUNT.REFERRAL_UI.POINTS_GAINED' | translate:{ points: entry.pointsEarned } }}</strong>
+                <span>{{ entry.createdOnUtc | hamboxDate:'mediumDate' }}</span>
               </li>
             }
           </ul>
         } @else {
-          <p class="referral-page__empty">No referral history yet.</p>
+          <p class="referral-page__empty">{{ 'ACCOUNT.REFERRAL_UI.EMPTY_HISTORY' | translate }}</p>
         }
       </section>
     </div>

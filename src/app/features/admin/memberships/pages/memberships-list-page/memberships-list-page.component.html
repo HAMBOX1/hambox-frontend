@@ -1,0 +1,239 @@
+<p-toast position="top-right" />
+
+<section class="admin-page memberships-list-page">
+  <app-admin-page-header
+    [title]="'ADMIN.MEMBERSHIPS.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.MEMBERSHIPS.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Memberships.Create"
+      pButton
+      class="admin-btn-primary"
+      routerLink="/admin/memberships/new"
+      [label]="'ADMIN.MEMBERSHIPS.LIST.NEW' | translate"
+      icon="pi pi-plus"
+    ></a>
+  </app-admin-page-header>
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.MEMBERSHIPS.STATS.TOTAL' | translate"
+      [value]="listStats().total"
+      icon="pi-id-card"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.MEMBERSHIPS.STATS.ACTIVE' | translate"
+      [value]="listStats().active"
+      [hint]="statistics() ? undefined : ('ADMIN.STATS.ON_PAGE' | translate)"
+      icon="pi-check-circle"
+      tone="success"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.MEMBERSHIPS.STATS.SUBSCRIBERS' | translate"
+      [value]="listStats().subscribers"
+      [hint]="statistics() ? undefined : ('ADMIN.STATS.ON_PAGE' | translate)"
+      icon="pi-users"
+      tone="info"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.MEMBERSHIPS.STATS.EXPIRING' | translate"
+      [value]="listStats().expiring"
+      icon="pi-clock"
+      tone="warning"
+    />
+    @if (statistics(); as stats) {
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.MEMBERSHIPS.STATS.MRR' | translate"
+        [value]="stats.monthlyRecurringRevenue | hamboxCurrency"
+        icon="pi-chart-line"
+        tone="success"
+      />
+    }
+  </app-admin-stat-grid>
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.MEMBERSHIPS.LIST.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="memberships-list-page__filter"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      [placeholder]="'ADMIN.MEMBERSHIPS.LIST.FILTER_STATUS' | translate"
+    />
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert
+      [message]="error()!"
+      [retryLabel]="'ADMIN.MEMBERSHIPS.ACTIONS.RETRY' | translate"
+      (retry)="retryLoad()"
+    />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table"
+      [value]="[...plans()]"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="totalCount() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.MEMBERSHIPS.LIST.COLUMNS.NAME' | translate }}</th>
+          <th>{{ 'ADMIN.MEMBERSHIPS.LIST.COLUMNS.PRICE' | translate }}</th>
+          <th>{{ 'ADMIN.MEMBERSHIPS.LIST.COLUMNS.DURATION' | translate }}</th>
+          <th>{{ 'ADMIN.MEMBERSHIPS.LIST.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.MEMBERSHIPS.LIST.COLUMNS.BENEFITS' | translate }}</th>
+          <th>{{ 'ADMIN.MEMBERSHIPS.LIST.COLUMNS.SUBSCRIBERS' | translate }}</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-plan>
+        <tr>
+          <td>
+            <a class="admin-cell-primary" [routerLink]="['/admin/memberships', plan.id]">
+              {{ plan.name }}
+            </a>
+            @if (plan.badgeLabel) {
+              <span class="admin-cell-secondary">{{ plan.badgeLabel }}</span>
+            }
+          </td>
+          <td>{{ plan.price | hamboxCurrency }}</td>
+          <td>{{ plan.durationDays }}d</td>
+          <td>
+            <app-admin-status-badge [label]="plan.status" [tone]="statusTone(plan.status)" />
+          </td>
+          <td>
+            <span class="admin-cell-badge">{{ plan.benefitCount }}</span>
+          </td>
+          <td>
+            <span class="admin-cell-badge">{{ plan.activeSubscribers }}</span>
+          </td>
+          <td>
+            @let menuItems = planActionMenuItems(plan);
+            <div class="admin-actions-row">
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Memberships.Edit"
+                icon="pi pi-pencil"
+                [label]="'ADMIN.MEMBERSHIPS.ACTIONS.EDIT' | translate"
+                [routerLink]="'/admin/memberships/' + plan.id + '/edit'"
+              />
+              @if (menuItems.length > 0) {
+                <app-admin-action-menu
+                  [items]="menuItems"
+                  [disabled]="actionLoading()"
+                />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <app-admin-empty-state
+              icon="pi pi-id-card"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.MEMBERSHIPS.LIST.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.MEMBERSHIPS.LIST.EMPTY' | translate)
+              "
+              [primaryLabel]="'ADMIN.MEMBERSHIPS.LIST.NEW' | translate"
+              primaryIcon="pi pi-plus"
+              (primaryAction)="navigateToNew()"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<p-dialog
+  [header]="'ADMIN.MEMBERSHIPS.DUPLICATE.TITLE' | translate"
+  [visible]="duplicateDialogOpen()"
+  (visibleChange)="duplicateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeDuplicateDialog()"
+>
+  <div class="admin-form-grid admin-form-grid--single">
+    <label class="memberships-list-page__field">
+      <span class="memberships-list-page__field-label">{{ 'ADMIN.MEMBERSHIPS.DUPLICATE.NAME_LABEL' | translate }}</span>
+      <input
+        pInputText
+        class="memberships-list-page__field-input"
+        type="text"
+        [value]="duplicateName()"
+        (input)="duplicateName.set(($any($event.target)).value)"
+      />
+    </label>
+
+    <label class="memberships-list-page__field">
+      <span class="memberships-list-page__field-label">{{ 'ADMIN.MEMBERSHIPS.DUPLICATE.SLUG_LABEL' | translate }}</span>
+      <input
+        pInputText
+        class="memberships-list-page__field-input"
+        type="text"
+        [value]="duplicateSlug()"
+        (input)="duplicateSlug.set(($any($event.target)).value)"
+      />
+    </label>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.MEMBERSHIPS.ACTIONS.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (click)="closeDuplicateDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.MEMBERSHIPS.ACTIONS.DUPLICATE' | translate"
+      icon="pi pi-copy"
+      [disabled]="!duplicateName().trim() || !duplicateSlug().trim() || actionLoading()"
+      (click)="confirmDuplicate()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="onDeleteDialogVisibleChange($event)"
+  [title]="'ADMIN.CONFIRM.DELETE_PLAN_TITLE' | translate"
+  [message]="deleteDialogMessage()"
+  [confirmLabel]="'ADMIN.MEMBERSHIPS.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDeletePlan()"
+/>

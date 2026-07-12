@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { CartFacade } from '../../cart/services/cart.facade';
 import { WishlistItemApiDto } from '../models/account-api.model';
 import { AccountApiService } from './account-api.service';
 
@@ -9,6 +10,7 @@ import { AccountApiService } from './account-api.service';
 })
 export class AccountWishlistFacade {
   private readonly api = inject(AccountApiService);
+  private readonly cartFacade = inject(CartFacade);
 
   private readonly itemsState = signal<readonly WishlistItemApiDto[]>([]);
   private readonly loadingState = signal(false);
@@ -67,6 +69,7 @@ export class AccountWishlistFacade {
     this.actionState.set(null);
     try {
       await firstValueFrom(this.api.moveWishlistToCart(productId));
+      await this.cartFacade.load();
       this.itemsState.update((items) => items.filter((i) => i.productId !== productId));
     } catch {
       this.actionState.set('Unable to move item to cart.');

@@ -1,12 +1,29 @@
 // Layout rhythm — identical in dark and light; colors come from theme tokens only.
+// All dimensions route through custom properties so the comfortable/compact
+// variants stay genuinely distinct (card size, image ratio, type scale) rather
+// than differing only by a couple of spacing tweaks.
 :host {
   --store-card-pad: 24px;
-  --store-card-media-height: 170px;
-  --store-card-media-inset: 12px;
-  --store-card-gap-after-media: 20px;
-  --store-card-gap-after-title: 16px;
-  --store-card-gap-before-footer: 24px;
-  --store-card-favorite-size: 40px;
+  // Image scales with the card's actual (grid-driven) width instead of a
+  // fixed pixel height, so it never looks disproportionately tall on narrow
+  // columns — the ratio is the source of truth, not an absolute size.
+  --store-card-media-ratio: 16 / 10;
+  --store-card-media-inset: 10px;
+  --store-card-badge-stack-offset: 28px;
+  --store-card-gap-after-media: 18px;
+  --store-card-gap-after-title: 14px;
+  --store-card-gap-before-footer: 20px;
+  --store-card-favorite-size: 38px;
+  --store-card-title-size: 17px;
+  --store-card-title-lines: 2;
+  --store-card-price-size: 22px;
+  --store-card-original-size: 14px;
+  --store-card-badge-size: 11px;
+  --store-card-badge-pad-y: 4px;
+  --store-card-badge-pad-x: 9px;
+  --store-card-cta-size: 44px;
+  --store-card-tag-display: inline-flex;
+  --store-card-radius: var(--sf-radius-xl);
 
   display: block;
   height: 100%;
@@ -18,13 +35,14 @@
   height: 100%;
   padding: var(--store-card-pad);
   border: 1px solid var(--color-card-shell-border);
-  border-radius: var(--sf-radius-xl);
+  border-radius: var(--store-card-radius);
   background: var(--color-card-shell);
   box-shadow: var(--color-shadow-xs);
   transition:
     transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.28s ease;
+    border-color 0.28s ease,
+    padding 0.28s ease;
 
   &:hover {
     border-color: var(--color-border);
@@ -33,12 +51,35 @@
   }
 
   &--highlighted {
-    border-color: var(--color-primary-border);
+    border-color: var(--color-accent-border);
     box-shadow: var(--color-shadow-accent-sm);
   }
 
   &--out-of-stock {
     opacity: 0.78;
+  }
+
+  // Compact grid: a dense, scannable browsing mode — small image ratio, tight
+  // padding, single-line title. This must read as a different card, not a
+  // shrunk copy of the comfortable one.
+  &--compact {
+    --store-card-pad: 14px;
+    --store-card-media-inset: 6px;
+    --store-card-badge-stack-offset: 18px;
+    --store-card-gap-after-media: 8px;
+    --store-card-gap-after-title: 6px;
+    --store-card-gap-before-footer: 10px;
+    --store-card-favorite-size: 24px;
+    --store-card-title-size: 12.5px;
+    --store-card-title-lines: 1;
+    --store-card-price-size: 14px;
+    --store-card-original-size: 10.5px;
+    --store-card-badge-size: 9px;
+    --store-card-badge-pad-y: 2px;
+    --store-card-badge-pad-x: 6px;
+    --store-card-cta-size: 30px;
+    --store-card-tag-display: none;
+    --store-card-radius: var(--sf-radius-lg);
   }
 }
 
@@ -55,11 +96,13 @@
 .store-card__media {
   position: relative;
   flex-shrink: 0;
-  height: var(--store-card-media-height);
+  width: 100%;
+  aspect-ratio: var(--store-card-media-ratio);
   overflow: hidden;
   border-radius: var(--sf-radius-md);
   background: var(--color-section);
   isolation: isolate;
+  transition: height 0.28s ease;
 }
 
 .store-card__image {
@@ -100,13 +143,14 @@
   z-index: 3;
   top: var(--store-card-media-inset);
   left: var(--store-card-media-inset);
-  padding: 4px 9px;
+  padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
   border-radius: var(--sf-radius-sm);
   font-family: var(--sf-font-body);
-  font-size: 11px;
+  font-size: var(--store-card-badge-size);
   font-weight: 600;
   line-height: 16px;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 
   &--discount {
     background: var(--color-flash-badge-bg);
@@ -121,7 +165,37 @@
 }
 
 .store-card__badge--discount ~ .store-card__badge--featured {
-  top: calc(var(--store-card-media-inset) + 28px);
+  top: calc(var(--store-card-media-inset) + var(--store-card-badge-stack-offset));
+}
+
+.store-card__stock-badge {
+  position: absolute;
+  z-index: 3;
+  bottom: calc(var(--store-card-media-inset) + var(--store-card-badge-stack-offset) + 2px);
+  left: var(--store-card-media-inset);
+  padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-platform-badge-bg);
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-body);
+  font-size: var(--store-card-badge-size);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: var(--color-shadow-xs);
+  white-space: nowrap;
+
+  &--in {
+    color: var(--color-success, #16a34a);
+  }
+
+  &--low {
+    color: var(--color-warning, #d97706);
+  }
+
+  &--out {
+    color: var(--color-text-muted);
+  }
 }
 
 .store-card__favorite {
@@ -145,10 +219,29 @@
   cursor: pointer;
   transition: var(--hambox-transition-theme);
 
+  svg {
+    width: 55%;
+    height: 55%;
+  }
+
   &:hover {
-    color: var(--color-primary);
-    border-color: var(--color-primary-border);
+    color: var(--accent);
+    border-color: var(--color-accent-border);
     transform: scale(1.04);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  &--active {
+    color: var(--color-danger, var(--accent));
+    border-color: var(--color-accent-border);
+
+    svg path {
+      fill: currentColor;
+    }
   }
 }
 
@@ -175,18 +268,23 @@
   text-transform: uppercase;
 }
 
+.store-card--compact .store-card__stock-label {
+  padding: 5px 9px;
+  font-size: 10px;
+}
+
 .store-card__platform {
   position: absolute;
   z-index: 2;
   bottom: var(--store-card-media-inset);
   left: var(--store-card-media-inset);
-  padding: 4px 9px;
+  padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--sf-radius-sm);
   background: var(--color-platform-badge-bg);
   color: var(--color-text-primary);
   font-family: var(--sf-font-body);
-  font-size: 11px;
+  font-size: var(--store-card-badge-size);
   font-weight: 600;
   line-height: 16px;
   letter-spacing: 0.02em;
@@ -201,18 +299,20 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
   border-radius: var(--sf-radius-sm);
   background: color-mix(in srgb, var(--color-platform-badge-bg) 88%, transparent);
   color: var(--color-rating);
   font-family: var(--sf-font-body);
-  font-size: 11px;
+  font-size: var(--store-card-badge-size);
   font-weight: 600;
   line-height: 16px;
   box-shadow: var(--color-shadow-xs);
 
   svg {
     flex-shrink: 0;
+    width: 10px;
+    height: 10px;
     color: var(--color-rating);
   }
 }
@@ -231,14 +331,15 @@
   margin: 0;
   color: var(--color-text-primary);
   font-family: var(--sf-font-heading);
-  font-size: 17px;
+  font-size: var(--store-card-title-size);
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
   letter-spacing: -0.01em;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: var(--store-card-title-lines);
   overflow: hidden;
+  transition: font-size 0.2s ease;
 }
 
 .store-card--out-of-stock .store-card__title {
@@ -246,15 +347,15 @@
 }
 
 .store-card__tag {
-  display: inline-flex;
+  display: var(--store-card-tag-display);
   align-items: center;
   align-self: flex-start;
   gap: 5px;
   min-height: 26px;
   padding: 4px 10px;
   border-radius: var(--sf-radius-sm);
-  background: var(--color-primary-muted);
-  color: var(--color-primary);
+  background: var(--color-accent-muted);
+  color: var(--accent);
   font-family: var(--sf-font-body);
   font-size: 10px;
   font-weight: 600;
@@ -274,36 +375,42 @@
 .store-card__footer {
   display: flex;
   flex-shrink: 0;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  column-gap: 12px;
+  row-gap: 10px;
   margin-top: var(--store-card-gap-before-footer);
 }
 
 .store-card__pricing {
+  // No min-width: 0 here on purpose — it must never shrink below its text's
+  // content width, otherwise the footer "fits" from flexbox's perspective
+  // while the price text silently overflows into the CTA button instead of
+  // wrapping to its own line.
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
-  min-width: 0;
 }
 
 .store-card__original {
   color: var(--color-text-muted);
   font-family: var(--sf-font-body);
-  font-size: 13px;
+  font-size: var(--store-card-original-size);
   line-height: 1.2;
   text-decoration: line-through;
 }
 
 .store-card__price {
-  color: var(--color-price-green);
+  color: var(--color-price-display);
   font-family: var(--sf-font-heading);
-  font-size: 21px;
+  font-size: var(--store-card-price-size);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
-  text-shadow: var(--color-price-glow);
+  text-shadow: none;
+  transition: font-size 0.2s ease;
 }
 
 .store-card__pricing--muted .store-card__price {
@@ -318,6 +425,7 @@
 
 .store-card__cta {
   flex-shrink: 0;
+  margin-inline-start: auto;
   border: 0;
   cursor: pointer;
   font-family: var(--sf-font-body);
@@ -330,17 +438,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: var(--store-card-cta-size);
+    height: var(--store-card-cta-size);
     padding: 0;
-    border: 1px solid var(--color-primary-border);
+    border: 1px solid var(--color-accent-border);
     border-radius: var(--sf-radius-md);
-    background: linear-gradient(180deg, var(--color-cta-gradient-start) 0%, var(--color-cta-gradient-end) 100%);
-    box-shadow: var(--color-shadow-accent-sm);
+    background: var(--color-cta-cart-bg);
+    box-shadow: var(--color-cta-cart-shadow);
 
     img {
-      width: 18px;
-      height: 18px;
+      width: 44%;
+      height: 44%;
       filter: var(--color-cta-icon-filter);
     }
 
@@ -351,13 +459,13 @@
   }
 
   &--buy {
-    min-height: 40px;
+    min-height: var(--store-card-cta-size);
     padding: 0 16px;
     border: 1px solid var(--color-primary-border);
     border-radius: var(--sf-radius-md);
-    background: linear-gradient(180deg, var(--color-cta-gradient-start) 0%, var(--color-cta-gradient-end) 100%);
-    box-shadow: var(--color-shadow-accent-sm);
-    color: var(--color-primary-text-on);
+    background: linear-gradient(180deg, var(--color-cta-cart-bg) 0%, var(--color-cta-gradient-end) 100%);
+    box-shadow: var(--color-cta-cart-shadow);
+    color: var(--color-cta-cart-text);
     font-weight: 700;
     white-space: nowrap;
 
@@ -367,7 +475,7 @@
   }
 
   &--notify {
-    min-height: 40px;
+    min-height: var(--store-card-cta-size);
     padding: 0 14px;
     border: 1px solid var(--color-border);
     border-radius: var(--sf-radius-md);
@@ -383,19 +491,19 @@
   }
 }
 
+.store-card--compact .store-card__cta {
+  font-size: 11px;
+}
+
+.store-card--compact .store-card__cta--buy,
+.store-card--compact .store-card__cta--notify {
+  padding: 0 10px;
+}
+
 @media (max-width: 767px) {
   :host {
-    --store-card-pad: 20px;
-    --store-card-media-height: 156px;
+    --store-card-media-ratio: 16 / 9;
     --store-card-gap-after-media: 16px;
-    --store-card-gap-before-footer: 20px;
-  }
-
-  .store-card__title {
-    font-size: 16px;
-  }
-
-  .store-card__price {
-    font-size: 19px;
+    --store-card-gap-before-footer: 18px;
   }
 }

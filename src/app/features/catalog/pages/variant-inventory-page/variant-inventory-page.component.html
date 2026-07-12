@@ -1,0 +1,42 @@
+<section class="admin-page variant-inventory-page">
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (variant(); as current) {
+    <app-admin-page-header
+      title="Inventory Manager"
+      [subtitle]="optionSummary(current)"
+      [breadcrumbs]="breadcrumbs()"
+      [backLink]="'/admin/products/' + productId() + '/edit'"
+      backLabel="Back to product"
+    />
+
+    <div class="variant-inventory-page__meta">
+      <div>
+        <span class="variant-inventory-page__meta-label">Product</span>
+        <strong>{{ product()?.nameEn }}</strong>
+      </div>
+      <div>
+        <span class="variant-inventory-page__meta-label">Variant</span>
+        <strong>{{ optionSummary(current) }}</strong>
+      </div>
+      <div>
+        <span class="variant-inventory-page__meta-label">SKU</span>
+        <strong>{{ current.sku }}</strong>
+      </div>
+      <div>
+        <span class="variant-inventory-page__meta-label">Status</span>
+        <app-admin-status-badge [label]="current.status" />
+      </div>
+    </div>
+
+    <app-admin-stat-grid>
+      @for (stat of statItems(); track stat.label) {
+        <app-admin-stat-card [compact]="true" [label]="stat.label" [value]="stat.value" [tone]="stat.tone" />
+      }
+    </app-admin-stat-grid>
+
+    <app-variant-inventory-panel />
+  }
+</section>

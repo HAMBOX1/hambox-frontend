@@ -1,0 +1,30 @@
+<section class="admin-page reports-shell">
+  <app-admin-page-header
+    [title]="'ADMIN.REPORTS.TITLE' | translate"
+    [subtitle]="'ADMIN.REPORTS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <nav class="reports-shell__nav" aria-label="Reports sections">
+    @for (item of navItems; track item.path) {
+      <a
+        class="reports-shell__tab"
+        [routerLink]="item.path"
+        routerLinkActive="reports-shell__tab--active"
+        [routerLinkActiveOptions]="{ exact: item.exact }"
+      >
+        {{ item.labelKey | translate }}
+      </a>
+    }
+  </nav>
+
+  <app-admin-section-card [title]="'ADMIN.REPORTS.FILTERS.TITLE' | translate">
+    <div class="reports-shell__filters">
+      <app-reports-filters />
+    </div>
+  </app-admin-section-card>
+
+  <div class="reports-shell__outlet">
+    <router-outlet />
+  </div>
+</section>

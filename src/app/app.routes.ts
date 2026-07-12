@@ -1,10 +1,39 @@
 import { Routes } from '@angular/router';
 
-import { adminGuard } from './core/guards/admin.guard';
+import { adminAuthenticationGuard } from './core/guards/admin-authentication.guard';
+import { adminGuestGuard } from './core/guards/admin-guest.guard';
+import { adminOtpGuard } from './core/guards/admin-otp.guard';
 import { authGuard } from './core/guards/auth.guard';
+import { customerGuard } from './core/guards/customer.guard';
 import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
+  {
+    path: 'login',
+    redirectTo: 'auth/login',
+    pathMatch: 'full',
+  },
+  {
+    path: 'register',
+    redirectTo: 'auth/register',
+    pathMatch: 'full',
+  },
+  {
+    path: 'admin/login',
+    canActivate: [adminGuestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/admin-login-page/admin-login-page.component').then(
+        (c) => c.AdminLoginPageComponent,
+      ),
+  },
+  {
+    path: 'admin/login/verify-otp',
+    canActivate: [adminOtpGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/admin-otp-page/admin-otp-page.component').then(
+        (c) => c.AdminOtpPageComponent,
+      ),
+  },
   {
     path: 'auth/login',
     canActivate: [guestGuard],
@@ -32,7 +61,15 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'access-denied',
+    loadComponent: () =>
+      import('./features/auth/pages/access-denied-page/access-denied-page.component').then(
+        (c) => c.AccessDeniedPageComponent,
+      ),
+  },
+  {
     path: '',
+    canActivate: [customerGuard],
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(c => c.MainLayoutComponent),
     children: [
       {
@@ -98,7 +135,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [adminGuard],
+    canActivate: [adminAuthenticationGuard],
     loadComponent: () =>
       import('./layouts/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
     loadChildren: () => import('./features/admin/admin.routes').then((m) => m.routes),

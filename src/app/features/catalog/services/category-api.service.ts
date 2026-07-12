@@ -8,6 +8,7 @@ import {
   CategoryListQuery,
   CreateCategoryRequest,
   PagedResult,
+  UpdateCategoryRequest,
 } from '../models/category.model';
 
 @Injectable({
@@ -34,7 +35,23 @@ export class CategoryApiService {
     return this.api.get<PagedResult<Category>>(CATALOG_API.categories, { params });
   }
 
+  getCategoryById(id: string): Observable<Category> {
+    return this.api.get<Category>(CATALOG_API.category(id));
+  }
+
   createCategory(request: CreateCategoryRequest): Observable<string> {
     return this.api.post<string>(CATALOG_API.categories, request);
+  }
+
+  updateCategory(id: string, request: UpdateCategoryRequest): Observable<void> {
+    return this.api.put<void>(CATALOG_API.category(id), request);
+  }
+
+  deleteCategory(id: string): Observable<void> {
+    return this.api.delete<void>(CATALOG_API.category(id));
+  }
+
+  restoreCategory(id: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.categoryRestore(id), {});
   }
 }

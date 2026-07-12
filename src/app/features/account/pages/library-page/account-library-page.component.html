@@ -1,0 +1,191 @@
+<section class="library-page" hamboxTranslateRefresh>
+  <p-toast position="top-right" />
+
+  <header class="library-page__header">
+    <div>
+      <h1>{{ 'ACCOUNT.LIBRARY.TITLE' | translate }}</h1>
+      <p>{{ 'ACCOUNT.LIBRARY.SUBTITLE' | translate }}</p>
+    </div>
+    <span class="library-page__count">{{ totalCount() }} {{ 'ACCOUNT.LIBRARY.ITEMS' | translate }}</span>
+  </header>
+
+  <div class="library-page__toolbar">
+    <input
+      class="library-page__search"
+      type="search"
+      [value]="searchTerm()"
+      [placeholder]="'ACCOUNT.LIBRARY.SEARCH_PLACEHOLDER' | translate"
+      (input)="onSearchInput($event)"
+    />
+
+    <select class="library-page__select" [value]="deliveryFilter()" (change)="onDeliveryChange($event)">
+      @for (option of deliveryOptions; track option.value) {
+        <option [value]="option.value">{{ option.labelKey | translate }}</option>
+      }
+    </select>
+
+    <select class="library-page__select" [value]="sort()" (change)="onSortChange($event)">
+      @for (option of sortOptions; track option.value) {
+        <option [value]="option.value">{{ option.labelKey | translate }}</option>
+      }
+    </select>
+
+    <div class="library-page__group-tabs" role="tablist" [attr.aria-label]="'ACCOUNT.LIBRARY_UI.GROUPS_ARIA' | translate">
+      <button type="button" [class.is-active]="!groupFilter()" (click)="setGroup('')">{{ 'ACCOUNT.LIBRARY_UI.GROUP_ALL' | translate }}</button>
+      <button type="button" [class.is-active]="groupFilter() === 'recent'" (click)="setGroup('recent')">
+        {{ 'ACCOUNT.LIBRARY.RECENT' | translate }}
+      </button>
+      <button type="button" [class.is-active]="groupFilter() === 'older'" (click)="setGroup('older')">
+        {{ 'ACCOUNT.LIBRARY.OLDER' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton type="card" [count]="6" />
+  } @else if (error()) {
+    <div class="library-page__state">
+      <p>{{ error() }}</p>
+      <button type="button" (click)="retry()">{{ 'ACCOUNT.LIBRARY.RETRY' | translate }}</button>
+    </div>
+  } @else if (isEmpty()) {
+    <div class="library-page__empty">
+      <i class="pi pi-inbox" aria-hidden="true"></i>
+      <h2>{{ 'ACCOUNT.LIBRARY.EMPTY_TITLE' | translate }}</h2>
+      <p>{{ 'ACCOUNT.LIBRARY.EMPTY_HINT' | translate }}</p>
+      <a routerLink="/products">{{ 'ACCOUNT.LIBRARY.BROWSE' | translate }}</a>
+    </div>
+  } @else if (showGroupedSections()) {
+    @if (recentItems().length) {
+      <section class="library-page__section">
+        <h2>{{ 'ACCOUNT.LIBRARY.RECENT_PURCHASES' | translate }}</h2>
+        <div class="library-page__grid">
+          @for (item of recentItems(); track item.id; let i = $index) {
+            <ng-container
+              *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i }"
+            ></ng-container>
+          }
+        </div>
+      </section>
+    }
+
+    @if (olderItems().length) {
+      <section class="library-page__section">
+        <h2>{{ 'ACCOUNT.LIBRARY.OLDER_PURCHASES' | translate }}</h2>
+        <div class="library-page__grid">
+          @for (item of olderItems(); track item.id; let i = $index) {
+            <ng-container
+              *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i + recentItems().length }"
+            ></ng-container>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    <div class="library-page__grid">
+      @for (item of items(); track item.id; let i = $index) {
+        <ng-container *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i }"></ng-container>
+      }
+    </div>
+  }
+
+  @if (!loading() && !isEmpty() && totalPages() > 1) {
+    <nav class="library-page__pagination" [attr.aria-label]="'ACCOUNT.LIBRARY_UI.PAGINATION_ARIA' | translate">
+      <button type="button" [disabled]="pageNumber() <= 1" (click)="goToPage(pageNumber() - 1)">{{ 'ACCOUNT.LIBRARY_UI.PREVIOUS' | translate }}</button>
+      <span>{{ 'ACCOUNT.LIBRARY_UI.PAGE_OF' | translate:{ page: pageNumber(), total: totalPages() } }}</span>
+      <button
+        type="button"
+        [disabled]="pageNumber() >= totalPages()"
+        (click)="goToPage(pageNumber() + 1)"
+      >
+        {{ 'ACCOUNT.LIBRARY_UI.NEXT' | translate }}
+      </button>
+    </nav>
+  }
+</section>
+
+<ng-template #libraryCard let-item let-index="index">
+  <article
+    class="library-card"
+    [id]="'library-item-' + item.id"
+    [class.library-card--highlighted]="highlightItemId() === item.id"
+  >
+    <img class="library-card__image" [src]="imageUrl(item, index)" [alt]="item.productNameEn" loading="lazy" />
+
+    <div class="library-card__body">
+      <header class="library-card__header">
+        <h3>{{ item.productNameEn }}</h3>
+        <span class="library-card__status" [class.is-delivered]="item.deliveryStatus === 'Delivered'">
+          {{ item.deliveryStatus }}
+        </span>
+      </header>
+
+      <dl class="library-card__meta">
+        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_PLATFORM' | translate }}</dt><dd>{{ metaValue(item.platform) }}</dd></div>
+        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_EDITION' | translate }}</dt><dd>{{ metaValue(item.edition) }}</dd></div>
+        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_REGION' | translate }}</dt><dd>{{ metaValue(item.region) }}</dd></div>
+        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_PURCHASED' | translate }}</dt><dd>{{ item.purchaseDate | hamboxDate: 'mediumDate' }}</dd></div>
+        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_ORDER' | translate }}</dt><dd>{{ item.orderNumber }}</dd></div>
+        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_STATUS' | translate }}</dt><dd>{{ item.orderStatus }}</dd></div>
+      </dl>
+
+      <div class="library-card__key" [class.library-card__key--revealed]="isKeyRevealed(item.id)">
+        <code>{{ displayKey(item) }}</code>
+        @if (isKeyRevealed(item.id)) {
+          <span class="library-card__reveal-hint">{{ 'ACCOUNT.LIBRARY_UI.AUTO_HIDE' | translate }}</span>
+        }
+      </div>
+
+      @if (instructionsOpen(item.id) && item.redeemInstructions) {
+        <p class="library-card__instructions">{{ item.redeemInstructions }}</p>
+      }
+
+      <div class="library-card__actions">
+        <button
+          type="button"
+          [disabled]="!item.canReveal || isRevealing(item.id)"
+          (click)="requestReveal(item)"
+        >
+          {{
+            isKeyRevealed(item.id)
+              ? ('ACCOUNT.LIBRARY_UI.HIDE_CODE' | translate)
+              : isRevealing(item.id)
+                ? ('ACCOUNT.LIBRARY_UI.REVEALING' | translate)
+                : ('ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate)
+          }}
+        </button>
+        <button type="button" [disabled]="!isKeyRevealed(item.id)" (click)="copyKey(item)">
+          {{ copyFeedbackId() === item.id ? ('ACCOUNT.LIBRARY_UI.COPIED' | translate) : ('ACCOUNT.LIBRARY_UI.COPY_CODE' | translate) }}
+        </button>
+        <button type="button" (click)="toggleInstructions(item.id)">{{ 'ACCOUNT.LIBRARY_UI.HOW_TO_REDEEM' | translate }}</button>
+        <a [routerLink]="['/account/orders', item.orderId]">{{ 'ACCOUNT.LIBRARY_UI.VIEW_DETAILS' | translate }}</a>
+        @if (item.invoiceUrl) {
+          <a [href]="item.invoiceUrl" target="_blank" rel="noopener">{{ 'ACCOUNT.LIBRARY_UI.DOWNLOAD_INVOICE' | translate }}</a>
+        }
+        @if (item.supportUrl) {
+          <a [href]="item.supportUrl">{{ 'ACCOUNT.LIBRARY_UI.SUPPORT' | translate }}</a>
+        }
+      </div>
+    </div>
+  </article>
+</ng-template>
+
+@if (pendingRevealItem(); as revealItem) {
+  <div class="library-reveal-modal" role="dialog" aria-modal="true" aria-labelledby="reveal-title">
+    <div class="library-reveal-modal__backdrop" (click)="cancelReveal()"></div>
+    <div class="library-reveal-modal__panel">
+      <h2 id="reveal-title">{{ 'ACCOUNT.LIBRARY_UI.REVEAL_MODAL_TITLE' | translate }}</h2>
+      <p>
+        {{ 'ACCOUNT.LIBRARY_UI.REVEAL_MODAL_BODY' | translate:{ product: revealItem.productNameEn } }}
+      </p>
+      <div class="library-reveal-modal__actions">
+        <button type="button" class="library-reveal-modal__btn library-reveal-modal__btn--ghost" (click)="cancelReveal()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button type="button" class="library-reveal-modal__btn library-reveal-modal__btn--primary" (click)="confirmReveal()">
+          {{ 'ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

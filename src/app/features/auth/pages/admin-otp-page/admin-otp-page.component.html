@@ -1,0 +1,64 @@
+<ui-auth-card
+  eyebrow="Verification required"
+  title="Enter OTP"
+  [subtitle]="'We sent a 6-digit code to ' + maskedEmail() + '.'"
+>
+  <button
+    uiAuthHeaderActions
+    type="button"
+    class="admin-otp-page__theme"
+    (click)="toggleTheme()"
+    aria-label="Toggle theme"
+  >
+    <i class="pi" [class.pi-moon]="theme.isLight()" [class.pi-sun]="theme.isDark()"></i>
+  </button>
+
+  @if (errorMessage()) {
+    <div class="admin-otp-page__alert" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <p class="admin-otp-page__dev-hint">
+    Development: OTP is not sent to your real inbox unless Gmail SMTP is configured. Check the API
+    terminal log for <strong>Development OTP</strong>, or open
+    <a href="http://localhost:8025" target="_blank" rel="noopener">Mailpit</a> if it is running.
+  </p>
+
+  <form class="admin-otp-page__form" [formGroup]="form" (ngSubmit)="submit()">
+    <ui-field
+      label="One-time code"
+      [error]="fieldError()"
+      [hint]="fieldError() ? '' : 'Use the latest code from your most recent sign-in attempt.'"
+    >
+      <p-inputOtp
+        formControlName="code"
+        [length]="6"
+        [integerOnly]="true"
+        [autofocus]="true"
+        styleClass="admin-otp-page__otp"
+        aria-label="One-time password"
+      />
+    </ui-field>
+
+    <ui-button
+      type="submit"
+      label="Verify and continue"
+      [loading]="isSubmitting()"
+      [disabled]="isSubmitting() || !canSubmit()"
+      [fullWidth]="true"
+    />
+  </form>
+
+  <div class="admin-otp-page__resend">
+    @if (resendSeconds() > 0) {
+      <span>Resend available in {{ resendSeconds() }}s</span>
+    } @else {
+      <button type="button" class="admin-otp-page__resend-btn" (click)="resend()" [disabled]="isResending()">
+        Resend code
+      </button>
+    }
+  </div>
+
+  <p class="admin-otp-page__footer">
+    <a routerLink="/admin/login">Back to sign in</a>
+  </p>
+</ui-auth-card>

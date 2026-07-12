@@ -1,0 +1,27 @@
+// PrimeNG ↔ HAMBOX semantic token bridge.
+html[data-theme='hambox-dark'],
+html:not([data-theme]),
+html[data-theme='hambox-light'] {
+  --p-primary-color: var(--primary);
+  --p-primary-contrast-color: var(--color-primary-text-on);
+  --p-primary-hover-color: var(--color-primary-hover);
+  --p-surface-0: var(--surface);
+  --p-surface-50: var(--background);
+  --p-surface-100: var(--surface-elevated);
+  --p-surface-900: var(--text-primary);
+  --p-surface-950: var(--background);
+  --p-content-background: var(--surface);
+  --p-content-border-color: var(--border);
+  --p-content-color: var(--text-primary);
+  --p-text-color: var(--text-primary);
+  --p-text-muted-color: var(--text-muted);
+  --p-inputtext-background: var(--color-input-bg);
+  --p-inputtext-border-color: var(--border);
+  --p-inputtext-color: var(--text-primary);
+  --p-inputtext-placeholder-color: var(--color-input-placeholder);
+  --p-form-field-background: var(--color-input-bg);
+  --p-form-field-border-color: var(--border);
+  --p-form-field-color: var(--text-primary);
+  --p-form-field-placeholder-color: var(--color-input-placeholder);
+  --p-mask-background: var(--color-overlay);
+}

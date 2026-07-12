@@ -1,0 +1,327 @@
+<div #host class="notification-bell" hamboxTranslateRefresh [class.notification-bell--compact]="compact()" [class.notification-bell--mobile]="useSheet()">
+
+  <button
+
+    type="button"
+
+    class="notification-bell__trigger"
+
+    [attr.aria-expanded]="open()"
+
+    [attr.aria-haspopup]="useSheet() ? 'dialog' : 'true'"
+
+    [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate"
+
+    (click)="toggle($event)"
+
+  >
+
+    <i class="pi pi-bell" aria-hidden="true"></i>
+
+    @if (hasUnread()) {
+
+      <span class="notification-bell__badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+
+    }
+
+  </button>
+
+
+
+  @if (open() && useSheet()) {
+
+    <app-hambox-bottom-sheet
+
+      [open]="open()"
+
+      [showHeader]="false"
+
+      [heightVh]="80"
+
+      [ariaLabel]="'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate"
+
+      (closed)="close()"
+
+    >
+
+      <ng-container *ngTemplateOutlet="mobileSheet" />
+
+    </app-hambox-bottom-sheet>
+
+  } @else if (open()) {
+
+    <div class="notification-bell__dropdown" role="menu" [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate">
+
+      <ng-container *ngTemplateOutlet="desktopPanel" />
+
+    </div>
+
+  }
+
+</div>
+
+
+
+<ng-template #mobileSheet>
+
+  <header class="notification-sheet__header">
+
+    <div class="notification-sheet__title-row">
+
+      <h2 class="notification-sheet__title">{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</h2>
+
+      @if (hasUnread()) {
+
+        <span class="notification-sheet__unread-badge">{{ unreadCount() }}</span>
+
+      }
+
+    </div>
+
+    <div class="notification-sheet__header-actions">
+
+      @if (hasUnread()) {
+
+        <button type="button" class="notification-sheet__action" (click)="markAllRead()">
+
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}
+
+        </button>
+
+      }
+
+      <button
+
+        type="button"
+
+        class="notification-sheet__close"
+
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+
+        (click)="close()"
+
+      >
+
+        <i class="pi pi-times" aria-hidden="true"></i>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+
+  <div class="notification-sheet__divider" role="presentation"></div>
+
+
+
+  @if (loading() && !items().length) {
+
+    <p class="notification-sheet__empty">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
+
+  } @else if (!items().length) {
+
+    <p class="notification-sheet__empty">{{ 'ACCOUNT.NOTIFICATIONS_UI.EMPTY' | translate }}</p>
+
+  } @else {
+
+    <div class="notification-sheet__groups">
+
+      @for (group of groups(); track group.labelKey) {
+
+        <section class="notification-sheet__group">
+
+          <h3 class="notification-sheet__group-label">{{ group.labelKey | translate }}</h3>
+
+          @for (item of group.items; track item.id) {
+
+            <button
+
+              type="button"
+
+              class="notification-sheet__item"
+
+              [class.notification-sheet__item--unread]="!item.isRead"
+
+              (click)="openNotification(item)"
+
+            >
+
+              <span class="notification-sheet__icon" aria-hidden="true">
+
+                <i [class]="notificationIcon(item)"></i>
+
+              </span>
+
+              <span class="notification-sheet__copy">
+
+                <span class="notification-sheet__item-title" [class.notification-sheet__item-title--unread]="!item.isRead">
+
+                  {{ item.title }}
+
+                </span>
+
+                <span class="notification-sheet__item-body">{{ item.body }}</span>
+
+                <time class="notification-sheet__item-time">{{ item.createdOnUtc | hamboxDate: 'shortTime' }}</time>
+
+              </span>
+
+              @if (!item.isRead) {
+
+                <span class="notification-sheet__unread-dot" aria-hidden="true"></span>
+
+              }
+
+            </button>
+
+          }
+
+        </section>
+
+      }
+
+    </div>
+
+  }
+
+
+
+  <a class="notification-sheet__footer" routerLink="/account/notifications" (click)="close()">
+
+    {{ 'ACCOUNT.NOTIFICATIONS_UI.VIEW_ALL' | translate }}
+
+    <i class="pi pi-chevron-right" aria-hidden="true"></i>
+
+  </a>
+
+</ng-template>
+
+
+
+<ng-template #desktopPanel>
+
+  <header class="notification-bell__header">
+
+    <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</strong>
+
+    <div class="notification-bell__header-actions">
+
+      @if (hasUnread()) {
+
+        <button type="button" class="notification-bell__text-btn" (click)="markAllRead()">
+
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}
+
+        </button>
+
+      }
+
+      @if (items().length) {
+
+        <button type="button" class="notification-bell__text-btn" (click)="clearAll()">
+
+          {{ 'NOTIFICATIONS.CLEAR_ALL' | translate }}
+
+        </button>
+
+      }
+
+    </div>
+
+  </header>
+
+
+
+  @if (loading() && !items().length) {
+
+    <p class="notification-bell__empty">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
+
+  } @else if (!items().length) {
+
+    <p class="notification-bell__empty">{{ 'ACCOUNT.NOTIFICATIONS_UI.EMPTY' | translate }}</p>
+
+  } @else {
+
+    <div class="notification-bell__groups">
+
+      @for (group of groups(); track group.labelKey) {
+
+        <section class="notification-bell__group">
+
+          <h3>{{ group.labelKey | translate }}</h3>
+
+          @for (item of group.items; track item.id) {
+
+            <article
+
+              class="notification-bell__item"
+
+              [class.notification-bell__item--unread]="!item.isRead"
+
+              role="menuitem"
+
+            >
+
+              <button type="button" class="notification-bell__item-main" (click)="openNotification(item)">
+
+                <span class="notification-bell__indicator" [class.notification-bell__indicator--read]="item.isRead"></span>
+
+                <div class="notification-bell__item-copy">
+
+                  <span class="notification-bell__category">{{ item.category }}</span>
+
+                  <strong [class.notification-bell__title--unread]="!item.isRead">{{ item.title }}</strong>
+
+                  <p>{{ item.body }}</p>
+
+                  <time>{{ item.createdOnUtc | hamboxDate: 'shortTime' }}</time>
+
+                </div>
+
+              </button>
+
+              <div class="notification-bell__item-actions">
+
+                @if (!item.isRead) {
+
+                  <button type="button" class="notification-bell__text-btn" (click)="markRead(item, $event)">
+
+                    {{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate }}
+
+                  </button>
+
+                }
+
+                <button type="button" class="notification-bell__text-btn" (click)="openNotification(item)">
+
+                  {{ actionLabel(item) | translate }}
+
+                </button>
+
+              </div>
+
+            </article>
+
+          }
+
+        </section>
+
+      }
+
+    </div>
+
+  }
+
+
+
+  <a class="notification-bell__footer" routerLink="/account/notifications" (click)="close()">
+
+    {{ 'ACCOUNT.NOTIFICATIONS_UI.VIEW_ALL' | translate }}
+
+  </a>
+
+</ng-template>
+
+

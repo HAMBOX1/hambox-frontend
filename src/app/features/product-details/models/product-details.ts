@@ -1,5 +1,3 @@
-import { StorefrontSelectOption } from '../../../shared/components/storefront-field-select/storefront-field-select.component';
-
 export interface ProductDetailsTrustFeature {
   iconSrc: string;
   label: string;
@@ -24,10 +22,6 @@ export interface ProductDetailsItem {
   originalPriceUsd: number;
   discountLabel: string;
   categoryName?: string;
-  regions: readonly StorefrontSelectOption[];
-  values: readonly StorefrontSelectOption[];
-  defaultRegion: string;
-  defaultValue: string;
   trustFeatures: readonly ProductDetailsTrustFeature[];
   redeemSteps: readonly ProductDetailsRedeemStep[];
 }

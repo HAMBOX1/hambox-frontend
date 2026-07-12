@@ -1,0 +1,48 @@
+<label class="admin-search-bar">
+
+  <i class="pi pi-search admin-search-bar__icon" aria-hidden="true"></i>
+
+  <input
+
+    pInputText
+
+    class="admin-search-bar__input"
+
+    type="search"
+
+    [attr.aria-label]="ariaLabel()"
+
+    [placeholder]="placeholder()"
+
+    [value]="value()"
+
+    (input)="onInput($event)"
+
+  />
+
+  @if (value()) {
+
+    <button
+
+      type="button"
+
+      class="admin-search-bar__clear"
+
+      aria-label="Clear search"
+
+      (click)="clear()"
+
+    >
+
+      <i class="pi pi-times" aria-hidden="true"></i>
+
+    </button>
+
+  } @else if (shortcutHint()) {
+
+    <kbd class="admin-search-bar__shortcut" aria-hidden="true">{{ shortcutHint() }}</kbd>
+
+  }
+
+</label>
+

@@ -1,0 +1,112 @@
+@if (loading()) {
+  <app-admin-loading-skeleton variant="table" />
+} @else {
+  <div class="product-variants-panel">
+    <app-admin-section-card title="Option Groups" description="Define purchasable dimensions such as platform, region, and edition.">
+      @if (optionGroups().length) {
+        <div class="product-variants-panel__groups">
+          @for (group of optionGroups(); track group.id) {
+            <article class="product-variants-panel__group-card">
+              <header>
+                <h3>{{ group.displayName }}</h3>
+                <span class="product-variants-panel__group-key">{{ group.key }}</span>
+              </header>
+              <div class="product-variants-panel__chips">
+                @for (option of group.options; track option.id) {
+                  <p-chip [label]="option.label" />
+                }
+              </div>
+              <div class="product-variants-panel__inline-form" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
+                <input
+                  pInputText
+                  placeholder="Add option"
+                  [ngModel]="pendingOption(group.id)"
+                  (ngModelChange)="setPendingOption(group.id, $event)"
+                  (keyup.enter)="addOptionToGroup(group.id)"
+                />
+                <button pButton type="button" label="Add Option" icon="pi pi-plus" severity="secondary" (click)="addOptionToGroup(group.id)"></button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <app-admin-empty-state icon="pi pi-sliders-h" title="No option groups" description="Create option groups before adding variants." />
+      }
+
+      <div class="product-variants-panel__inline-form" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
+        <input pInputText placeholder="Key (platform)" [ngModel]="newGroupKey()" (ngModelChange)="newGroupKey.set($event)" />
+        <input pInputText placeholder="Display name (Platform)" [ngModel]="newGroupLabel()" (ngModelChange)="newGroupLabel.set($event)" />
+        <button pButton type="button" label="Add Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
+      </div>
+    </app-admin-section-card>
+
+    <app-admin-section-card title="Variants" description="Each row is a unique option combination with its own SKU and inventory pool.">
+      <p-table
+        [value]="variantsTable()"
+        [rowHover]="true"
+        responsiveLayout="scroll"
+        styleClass="product-variants-panel__table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>SKU</th>
+            <th>Options</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-variant>
+          <tr>
+            <td><strong>{{ variant.sku }}</strong></td>
+            <td>{{ variant.optionsLabel }}</td>
+            <td>{{ variant.priceOverride ?? 'Base price' }}</td>
+            <td>{{ variant.stockLabel }}</td>
+            <td>
+              <p-tag [value]="variant.status" [severity]="statusSeverity(variant)" />
+              @if (variant.isOutOfStock) {
+                <p-tag value="Out of Stock" severity="danger" />
+              }
+            </td>
+            <td>
+              <button
+                pButton
+                type="button"
+                label="Manage Codes"
+                size="small"
+                severity="secondary"
+                (click)="manageCodes(variant)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">No variants yet. Create option groups, then add a variant below.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div class="product-variants-panel__create-variant" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
+        <input pInputText placeholder="SKU" [ngModel]="newSku()" (ngModelChange)="newSku.set($event)" />
+        <p-multiSelect
+          [options]="optionChoices()"
+          [ngModel]="selectedOptionIds()"
+          (ngModelChange)="selectedOptionIds.set($event)"
+          placeholder="Option combination"
+          optionLabel="label"
+          optionValue="value"
+          display="chip"
+        />
+        <button pButton type="button" label="Create Variant" icon="pi pi-plus" [loading]="creatingVariant()" (click)="createVariant()"></button>
+      </div>
+    </app-admin-section-card>
+  </div>
+
+  <app-product-variant-codes-dialog
+    [visible]="codesDialogVisible()"
+    (visibleChange)="codesDialogVisible.set($event)"
+    [variant]="selectedVariantForCodes()"
+  />
+}

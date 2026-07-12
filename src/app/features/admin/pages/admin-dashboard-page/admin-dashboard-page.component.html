@@ -1,0 +1,267 @@
+<section class="admin-page admin-dashboard-page">
+  <app-admin-page-header
+    [title]="'ADMIN.DASHBOARD.TITLE' | translate"
+    [subtitle]="'ADMIN.DASHBOARD.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div adminHeaderActions class="admin-dashboard-page__actions">
+      <a
+        *hamboxHasPermission="permissions.Orders.View"
+        pButton
+        routerLink="/admin/orders"
+        [label]="'ADMIN.DASHBOARD.VIEW_ORDERS' | translate"
+        icon="pi pi-shopping-bag"
+        severity="secondary"
+      ></a>
+      <a
+        *hamboxHasPermission="permissions.Catalog.Inventory.View"
+        pButton
+        routerLink="/admin/inventory"
+        [label]="'ADMIN.DASHBOARD.VIEW_INVENTORY' | translate"
+        icon="pi pi-box"
+        severity="secondary"
+      ></a>
+    </div>
+  </app-admin-page-header>
+
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (dashboard(); as data) {
+    <app-admin-stat-grid class="admin-dashboard-page__stats">
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.REVENUE_TODAY' | translate"
+        [value]="formatMoney(data.orders.revenueToday)"
+        icon="pi-wallet"
+        tone="success"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.ORDERS_TODAY' | translate"
+        [value]="data.orders.todaysOrders"
+        icon="pi-shopping-bag"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.PENDING' | translate"
+        [value]="data.orders.pendingOrders"
+        icon="pi-clock"
+        tone="warning"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.TOTAL_REVENUE' | translate"
+        [value]="formatMoney(data.orders.totalRevenue)"
+        icon="pi-chart-line"
+        tone="success"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.FAILED' | translate"
+        [value]="data.orders.failedOrders"
+        icon="pi-times-circle"
+        tone="warning"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.MANUAL_REVIEW' | translate"
+        [value]="data.orders.manualReviewOrders"
+        icon="pi-hourglass"
+        tone="warning"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.LOW_STOCK' | translate"
+        [value]="data.inventory.lowStockVariants"
+        icon="pi-box"
+        tone="warning"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.OUT_OF_STOCK' | translate"
+        [value]="data.inventory.outOfStockVariants"
+        icon="pi-exclamation-triangle"
+        tone="warning"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.ACTIVE_PROMOTIONS' | translate"
+        [value]="data.promotions.activePromotions"
+        icon="pi-tags"
+        tone="info"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.ACTIVE_COUPONS' | translate"
+        [value]="data.promotions.activeCoupons"
+        icon="pi-ticket"
+        tone="info"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.MEMBERSHIPS' | translate"
+        [value]="data.memberships.activeSubscriptions"
+        icon="pi-users"
+        tone="info"
+      />
+      <app-admin-stat-card [compact]="true"
+        [label]="'ADMIN.DASHBOARD.STATS.MRR' | translate"
+        [value]="formatMoney(data.memberships.monthlyRecurringRevenue)"
+        icon="pi-money-bill"
+        tone="success"
+      />
+    </app-admin-stat-grid>
+
+    @if (hasAlerts(data.alerts)) {
+      <app-admin-section-card
+        [title]="'ADMIN.DASHBOARD.ALERTS.TITLE' | translate"
+        [description]="'ADMIN.DASHBOARD.ALERTS.SUBTITLE' | translate"
+      >
+        <div class="admin-dashboard-page__alerts">
+          @if (data.alerts.failedOrders > 0) {
+            <app-admin-status-badge
+              [label]="('ADMIN.DASHBOARD.ALERTS.FAILED_ORDERS' | translate) + ': ' + data.alerts.failedOrders"
+              tone="danger"
+            />
+          }
+          @if (data.alerts.failedPayments > 0) {
+            <app-admin-status-badge
+              [label]="('ADMIN.DASHBOARD.ALERTS.FAILED_PAYMENTS' | translate) + ': ' + data.alerts.failedPayments"
+              tone="danger"
+            />
+          }
+          @if (data.alerts.lowStockVariants > 0) {
+            <app-admin-status-badge
+              [label]="('ADMIN.DASHBOARD.ALERTS.LOW_STOCK' | translate) + ': ' + data.alerts.lowStockVariants"
+              tone="warning"
+            />
+          }
+          @if (data.alerts.outOfStockVariants > 0) {
+            <app-admin-status-badge
+              [label]="('ADMIN.DASHBOARD.ALERTS.OUT_OF_STOCK' | translate) + ': ' + data.alerts.outOfStockVariants"
+              tone="danger"
+            />
+          }
+        </div>
+      </app-admin-section-card>
+    }
+
+    <div class="admin-dashboard-page__grid">
+      <app-admin-section-card [title]="'ADMIN.DASHBOARD.RECENT_ORDERS.TITLE' | translate">
+        @if (recentOrdersTable().length) {
+          <p-table [value]="recentOrdersTable()" [rows]="8">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_ORDERS.ORDER' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_ORDERS.CUSTOMER' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_ORDERS.TOTAL' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_ORDERS.STATUS' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_ORDERS.DATE' | translate }}</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{ row.orderNumber }}</td>
+                <td>
+                  <div class="admin-dashboard-page__customer">
+                    <span>{{ row.customerName }}</span>
+                    <small>{{ row.email }}</small>
+                  </div>
+                </td>
+                <td>{{ row.totalAmount | hamboxCurrency }}</td>
+                <td>
+                  <app-admin-status-badge
+                    [label]="row.orderStatus"
+                    [tone]="statusTone(row.orderStatus)"
+                  />
+                </td>
+                <td>{{ row.purchaseDate | date: 'short' }}</td>
+                <td>
+                  <a
+                    *hamboxHasPermission="permissions.Orders.View"
+                    pButton
+                    type="button"
+                    [routerLink]="['/admin/orders', row.id]"
+                    [label]="'ADMIN.DASHBOARD.RECENT_ORDERS.VIEW' | translate"
+                    severity="secondary"
+                    size="small"
+                  ></a>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        } @else {
+          <p class="admin-dashboard-page__empty">
+            {{ 'ADMIN.DASHBOARD.RECENT_ORDERS.EMPTY' | translate }}
+          </p>
+        }
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="'ADMIN.DASHBOARD.RECENT_CUSTOMERS.TITLE' | translate">
+        @if (recentCustomersTable().length) {
+          <p-table [value]="recentCustomersTable()" [rows]="8">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_CUSTOMERS.CUSTOMER' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_CUSTOMERS.ORDERS' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_CUSTOMERS.SPENT' | translate }}</th>
+                <th>{{ 'ADMIN.DASHBOARD.RECENT_CUSTOMERS.LAST_ORDER' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>
+                  <div class="admin-dashboard-page__customer">
+                    <span>{{ row.customerName }}</span>
+                    <small>{{ row.email }}</small>
+                  </div>
+                </td>
+                <td>{{ row.orderCount }}</td>
+                <td>{{ row.totalSpent | hamboxCurrency }}</td>
+                <td>{{ row.lastOrderDate | date: 'short' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        } @else {
+          <p class="admin-dashboard-page__empty">
+            {{ 'ADMIN.DASHBOARD.RECENT_CUSTOMERS.EMPTY' | translate }}
+          </p>
+        }
+      </app-admin-section-card>
+    </div>
+
+    <app-admin-section-card [title]="'ADMIN.DASHBOARD.LOW_STOCK.TITLE' | translate">
+      @if (lowStockTable().length) {
+        <p-table [value]="lowStockTable()" [rows]="8">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.DASHBOARD.LOW_STOCK.PRODUCT' | translate }}</th>
+              <th>{{ 'ADMIN.DASHBOARD.LOW_STOCK.SKU' | translate }}</th>
+              <th>{{ 'ADMIN.DASHBOARD.LOW_STOCK.AVAILABLE' | translate }}</th>
+              <th>{{ 'ADMIN.DASHBOARD.LOW_STOCK.THRESHOLD' | translate }}</th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.productName }}</td>
+              <td>{{ row.sku }}</td>
+              <td>
+                <app-admin-status-badge
+                  [label]="row.availableStock.toString()"
+                  [tone]="row.isOutOfStock ? 'danger' : 'warning'"
+                />
+              </td>
+              <td>{{ row.lowStockThreshold }}</td>
+              <td>
+                <a
+                  *hamboxHasPermission="permissions.Catalog.Inventory.View"
+                  pButton
+                  type="button"
+                  [routerLink]="['/admin/inventory', row.variantId]"
+                  [label]="'ADMIN.DASHBOARD.LOW_STOCK.MANAGE' | translate"
+                  severity="secondary"
+                  size="small"
+                ></a>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <p class="admin-dashboard-page__empty">{{ 'ADMIN.DASHBOARD.LOW_STOCK.EMPTY' | translate }}</p>
+      }
+    </app-admin-section-card>
+  }
+</section>

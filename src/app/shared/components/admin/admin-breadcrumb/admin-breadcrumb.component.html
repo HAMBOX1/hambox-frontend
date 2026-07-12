@@ -1,0 +1,18 @@
+<nav class="admin-breadcrumb" [attr.aria-label]="'ADMIN.BREADCRUMB.ARIA' | translate">
+  <ol class="admin-breadcrumb__list">
+    @for (item of items(); track $index; let last = $last) {
+      <li class="admin-breadcrumb__item" [class.admin-breadcrumb__item--current]="last">
+        @if (!last && item.route) {
+          <a class="admin-breadcrumb__link" [routerLink]="item.route">{{ item.label | translate }}</a>
+        } @else {
+          <span class="admin-breadcrumb__current" [attr.aria-current]="last ? 'page' : null">
+            {{ item.label | translate }}
+          </span>
+        }
+        @if (!last) {
+          <i class="pi pi-chevron-right admin-breadcrumb__separator" aria-hidden="true"></i>
+        }
+      </li>
+    }
+  </ol>
+</nav>

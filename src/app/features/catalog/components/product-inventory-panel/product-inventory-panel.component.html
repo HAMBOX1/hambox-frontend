@@ -1,0 +1,529 @@
+@if (statistics(); as stats) {
+
+  <div class="product-inventory-panel__stats">
+
+    <article><span>{{ 'ADMIN.INVENTORY_PANEL.STATS.AVAILABLE' | translate }}</span><strong>{{ stats.available }}</strong></article>
+
+    <article><span>{{ 'ADMIN.INVENTORY_PANEL.STATS.RESERVED' | translate }}</span><strong>{{ stats.reserved }}</strong></article>
+
+    <article><span>{{ 'ADMIN.INVENTORY_PANEL.STATS.SOLD' | translate }}</span><strong>{{ stats.sold }}</strong></article>
+
+    <article><span>{{ 'ADMIN.INVENTORY_PANEL.STATS.EXPIRED' | translate }}</span><strong>{{ stats.expired }}</strong></article>
+
+    <article><span>{{ 'ADMIN.INVENTORY_PANEL.STATS.VALUE' | translate }}</span><strong>{{ stats.inventoryValue | number: '1.2-2' }}</strong></article>
+
+  </div>
+
+}
+
+
+
+<app-admin-section-card [title]="'ADMIN.INVENTORY_PANEL.TITLE' | translate" [description]="'ADMIN.INVENTORY_PANEL.DESCRIPTION' | translate">
+
+  @if (variants().length) {
+
+    <div class="product-inventory-panel__variant-tabs">
+
+      @for (variant of variants(); track variant.id) {
+
+        <button
+
+          type="button"
+
+          class="product-inventory-panel__variant-tab"
+
+          [class.product-inventory-panel__variant-tab--active]="selectedVariantId() === variant.id"
+
+          (click)="selectVariant(variant.id)"
+
+        >
+
+          {{ variant.sku }}
+
+          <small>{{ 'ADMIN.INVENTORY_PANEL.VARIANT_AVAILABLE' | translate:{ count: variant.availableStock } }}</small>
+
+        </button>
+
+      }
+
+    </div>
+
+  } @else {
+
+    <app-admin-empty-state
+
+      icon="pi pi-database"
+
+      [title]="'ADMIN.INVENTORY_PANEL.EMPTY_VARIANTS_TITLE' | translate"
+
+      [description]="'ADMIN.INVENTORY_PANEL.EMPTY_VARIANTS_DESC' | translate"
+
+    />
+
+  }
+
+
+
+  @if (inventoryLoading()) {
+
+    <app-admin-loading-skeleton variant="table" />
+
+  } @else if (selectedVariant(); as variant) {
+
+    <div class="product-inventory-panel__toolbar">
+
+      <input
+
+        pInputText
+
+        [placeholder]="'ADMIN.INVENTORY_PANEL.SEARCH_CODES' | translate"
+
+        [ngModel]="searchTerm()"
+
+        (ngModelChange)="searchTerm.set($event)"
+
+        (keyup.enter)="applyFilters()"
+
+      />
+
+      <p-select
+
+        [options]="statusOptions()"
+
+        optionLabel="label"
+
+        optionValue="value"
+
+        [placeholder]="'ADMIN.INVENTORY_PANEL.FILTER_STATUS' | translate"
+
+        [ngModel]="statusFilter()"
+
+        (ngModelChange)="statusFilter.set($event)"
+
+      />
+
+      <button pButton type="button" [label]="'ADMIN.INVENTORY_PANEL.APPLY_FILTERS' | translate" severity="secondary" (click)="applyFilters()"></button>
+
+      <button
+
+        pButton
+
+        type="button"
+
+        [label]="'ADMIN.INVENTORY_PANEL.EXPORT_CSV' | translate"
+
+        icon="pi pi-download"
+
+        severity="secondary"
+
+        [loading]="actionLoading()"
+
+        (click)="exportCodes()"
+
+      ></button>
+
+    </div>
+
+
+
+    <div class="product-inventory-panel__batch-form" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
+
+      <input pInputText [placeholder]="'ADMIN.INVENTORY_PANEL.BATCH_NAME' | translate" [ngModel]="newBatchName()" (ngModelChange)="newBatchName.set($event)" />
+
+      <button
+
+        pButton
+
+        type="button"
+
+        [label]="'ADMIN.INVENTORY_PANEL.CREATE_BATCH' | translate"
+
+        icon="pi pi-folder-plus"
+
+        [loading]="creatingBatch()"
+
+        (click)="createBatch()"
+
+      ></button>
+
+    </div>
+
+
+
+    @if (batchesTable().length) {
+
+      <div class="product-inventory-panel__batch-select">
+
+        <label for="batch-select">{{ 'ADMIN.INVENTORY_PANEL.IMPORT_TARGET_BATCH' | translate }}</label>
+
+        <p-select
+
+          inputId="batch-select"
+
+          [options]="batchOptions()"
+
+          optionLabel="label"
+
+          optionValue="value"
+
+          [ngModel]="selectedBatchId()"
+
+          (ngModelChange)="onBatchChange($event)"
+
+          [placeholder]="'ADMIN.INVENTORY_PANEL.SELECT_BATCH' | translate"
+
+        />
+
+      </div>
+
+
+
+      <p-table [value]="batchesTable()" class="product-inventory-panel__table">
+
+        <ng-template pTemplate="header">
+
+          <tr>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.TABLE.BATCH' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.TABLE.SUPPLIER' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.TABLE.AVAILABLE' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.TABLE.SOLD' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.TABLE.RESERVED' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.TABLE.EXPIRED' | translate }}</th>
+
+          </tr>
+
+        </ng-template>
+
+        <ng-template pTemplate="body" let-batch>
+
+          <tr [class.product-inventory-panel__batch-row--active]="selectedBatchId() === batch.id">
+
+            <td>{{ batch.name }}</td>
+
+            <td>{{ batch.supplierId ?? ('ADMIN.INVENTORY_PANEL.NA' | translate) }}</td>
+
+            <td>{{ batch.availableCodes }}</td>
+
+            <td>{{ batch.soldCodes }}</td>
+
+            <td>{{ batch.reservedCodes }}</td>
+
+            <td>{{ batch.expiredCodes }}</td>
+
+          </tr>
+
+        </ng-template>
+
+      </p-table>
+
+    } @else {
+
+      <app-admin-empty-state
+
+        icon="pi pi-folder"
+
+        [title]="'ADMIN.INVENTORY_PANEL.EMPTY_BATCHES_TITLE' | translate"
+
+        [description]="'ADMIN.INVENTORY_PANEL.EMPTY_BATCHES_DESC' | translate:{ sku: variant.sku }"
+
+      />
+
+    }
+
+
+
+    <div class="product-inventory-panel__import" *hamboxHasPermission="permissions.Catalog.Inventory.Import">
+
+      <label for="bulk-codes">{{ 'ADMIN.INVENTORY_PANEL.BULK_IMPORT_LABEL' | translate }}</label>
+
+      <textarea
+
+        id="bulk-codes"
+
+        pTextarea
+
+        rows="6"
+
+        placeholder="XXXX-XXXX-XXXX&#10;YYYY-YYYY-YYYY"
+
+        [ngModel]="bulkCodes()"
+
+        (ngModelChange)="bulkCodes.set($event)"
+
+        [disabled]="!selectedBatchId()"
+
+      ></textarea>
+
+      <button
+
+        pButton
+
+        type="button"
+
+        [label]="'ADMIN.INVENTORY_PANEL.IMPORT_CODES' | translate"
+
+        icon="pi pi-upload"
+
+        [loading]="importing()"
+
+        [disabled]="!selectedBatchId()"
+
+        (click)="importCodes()"
+
+      ></button>
+
+    </div>
+
+
+
+    @if (selectedCodeIds().length) {
+
+      <div class="product-inventory-panel__bulk-bar">
+
+        <span>{{ 'ADMIN.BULK.SELECTED' | translate:{ count: selectedCodeIds().length } }}</span>
+
+        <button
+
+          pButton
+
+          type="button"
+
+          [label]="'ADMIN.INVENTORY_PANEL.DISABLE' | translate"
+
+          severity="secondary"
+
+          size="small"
+
+          [loading]="actionLoading()"
+
+          *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+
+          (click)="bulkDisableSelected()"
+
+        ></button>
+
+        <button
+
+          pButton
+
+          type="button"
+
+          [label]="'ADMIN.INVENTORY_PANEL.DELETE' | translate"
+
+          severity="danger"
+
+          size="small"
+
+          [loading]="actionLoading()"
+
+          *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+
+          (click)="requestBulkDelete()"
+
+        ></button>
+
+      </div>
+
+    }
+
+
+
+    @if (codesTable().length) {
+
+      <p-table [value]="codesTable()" class="product-inventory-panel__table">
+
+        <ng-template pTemplate="header">
+
+          <tr>
+
+            <th style="width: 3rem">
+
+              <p-checkbox
+
+                [binary]="true"
+
+                [ngModel]="selectedCodeIds().length === codesTable().length"
+
+                (ngModelChange)="toggleSelectAll($event)"
+
+              />
+
+            </th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.CODES_TABLE.CODE' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.CODES_TABLE.STATUS' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.CODES_TABLE.BATCH' | translate }}</th>
+
+            <th>{{ 'ADMIN.INVENTORY_PANEL.CODES_TABLE.EXPIRES' | translate }}</th>
+
+            <th></th>
+
+          </tr>
+
+        </ng-template>
+
+        <ng-template pTemplate="body" let-code>
+
+          <tr>
+
+            <td>
+
+              <p-checkbox
+
+                [binary]="true"
+
+                [ngModel]="selectedCodeIds().includes(code.id)"
+
+                (ngModelChange)="toggleCodeSelection(code.id, $event)"
+
+              />
+
+            </td>
+
+            <td><code>{{ code.digitalCode }}</code></td>
+
+            <td><app-admin-status-badge [label]="code.status" /></td>
+
+            <td>{{ code.batchId }}</td>
+
+            <td>{{ code.expirationDate ?? ('ADMIN.INVENTORY_PANEL.NA' | translate) }}</td>
+
+            <td>
+
+              <div class="product-inventory-panel__code-actions">
+
+                @if (code.status === 'Disabled') {
+
+                  <button
+
+                    pButton
+
+                    type="button"
+
+                    icon="pi pi-check"
+
+                    size="small"
+
+                    severity="secondary"
+
+                    *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+
+                    [loading]="actionLoading()"
+
+                    (click)="enableCode(code)"
+
+                  ></button>
+
+                } @else {
+
+                  <button
+
+                    pButton
+
+                    type="button"
+
+                    icon="pi pi-ban"
+
+                    size="small"
+
+                    severity="secondary"
+
+                    *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+
+                    [loading]="actionLoading()"
+
+                    (click)="disableCode(code)"
+
+                  ></button>
+
+                }
+
+                <button
+
+                  pButton
+
+                  type="button"
+
+                  icon="pi pi-trash"
+
+                  size="small"
+
+                  severity="danger"
+
+                  *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+
+                  [loading]="actionLoading()"
+
+                  (click)="deleteCode(code)"
+
+                ></button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </ng-template>
+
+      </p-table>
+
+
+
+      <div class="product-inventory-panel__pagination">
+
+        <button pButton type="button" [label]="'ADMIN.INVENTORY_PANEL.PREVIOUS' | translate" severity="secondary" size="small" [disabled]="codesPage() <= 1" (click)="previousPage()"></button>
+
+        <span>{{ 'ADMIN.INVENTORY_PANEL.PAGE' | translate:{ page: codesPage() } }}</span>
+
+        <button pButton type="button" [label]="'ADMIN.INVENTORY_PANEL.NEXT' | translate" severity="secondary" size="small" [disabled]="!codesHasMore()" (click)="nextPage()"></button>
+
+      </div>
+
+    } @else {
+
+      <app-admin-empty-state
+
+        icon="pi pi-key"
+
+        [title]="'ADMIN.INVENTORY_PANEL.EMPTY_CODES_TITLE' | translate"
+
+        [description]="'ADMIN.INVENTORY_PANEL.EMPTY_CODES_DESC' | translate"
+
+      />
+
+    }
+
+  }
+
+</app-admin-section-card>
+
+
+
+<app-admin-confirm-dialog
+
+  [visible]="bulkDeleteDialogOpen()"
+
+  [title]="'ADMIN.INVENTORY_PANEL.DELETE_SELECTED_TITLE' | translate"
+
+  [message]="'ADMIN.INVENTORY_PANEL.DELETE_SELECTED_MESSAGE' | translate:{ count: selectedCodeIds().length }"
+
+  [destructive]="true"
+
+  [loading]="actionLoading()"
+
+  (visibleChange)="bulkDeleteDialogOpen.set($event)"
+
+  (confirmed)="confirmBulkDelete()"
+
+/>
+
+

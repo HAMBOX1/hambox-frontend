@@ -1,0 +1,354 @@
+<p-toast position="top-right" />
+
+<section class="admin-page membership-detail-page">
+  <app-admin-page-header
+    [title]="detail()?.name ?? ('ADMIN.MEMBERSHIPS.DETAIL.TAB_OVERVIEW' | translate)"
+    [subtitle]="detail() ? detail()!.slug + ' · ' + detail()!.status : ''"
+    backLink="/admin/memberships"
+    [backLabel]="'ADMIN.MEMBERSHIPS.EDIT.BACK' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    @if (detail(); as plan) {
+      <a
+        adminHeaderActions
+        *hamboxHasPermission="permissions.Memberships.Edit"
+        pButton
+        [routerLink]="['/admin/memberships', plan.id, 'edit']"
+        [label]="'ADMIN.MEMBERSHIPS.ACTIONS.EDIT' | translate"
+        icon="pi pi-pencil"
+      ></a>
+    }
+  </app-admin-page-header>
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  } @else if (detail(); as plan) {
+<section class="admin-detail-hero">
+      <app-admin-stat-grid>
+        <app-admin-stat-card
+          [label]="'ADMIN.MEMBERSHIPS.EDIT.PRICE' | translate"
+          [value]="plan.price | hamboxCurrency"
+          icon="pi-wallet"
+          tone="success"
+        />
+        <app-admin-stat-card
+          [label]="'ADMIN.MEMBERSHIPS.DETAIL.SUBSCRIBERS' | translate"
+          [value]="membersTotal()"
+          icon="pi-users"
+          tone="info"
+        />
+        <app-admin-stat-card
+          [label]="'ADMIN.MEMBERSHIPS.DETAIL.BENEFITS' | translate"
+          [value]="plan.benefits.length"
+          icon="pi-star"
+        />
+        <app-admin-stat-card
+          [label]="'ADMIN.MEMBERSHIPS.LIST.COLUMNS.STATUS' | translate"
+          [value]="plan.status"
+          icon="pi-check-circle"
+          [tone]="plan.status === 'Active' ? 'success' : 'warning'"
+        />
+      </app-admin-stat-grid>
+    </section>
+
+    <p-tabs class="admin-detail-tabs" [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="0">{{ 'ADMIN.MEMBERSHIPS.DETAIL.TAB_OVERVIEW' | translate }}</p-tab>
+        <p-tab value="1">{{ 'ADMIN.MEMBERSHIPS.DETAIL.TAB_STATS' | translate }}</p-tab>
+        <p-tab value="2">{{ 'ADMIN.MEMBERSHIPS.DETAIL.TAB_MEMBERS' | translate }}</p-tab>
+        <p-tab value="3">{{ 'ADMIN.MEMBERSHIPS.DETAIL.TAB_COMPARISON' | translate }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <div class="admin-detail-layout">
+            <app-admin-section-card [title]="'ADMIN.MEMBERSHIPS.EDIT.DETAILS' | translate">
+              <dl class="admin-meta-grid">
+                <div>
+                  <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.PRICE' | translate }}</dt>
+                  <dd>{{ plan.price | hamboxCurrency }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.DURATION' | translate }}</dt>
+                  <dd>{{ plan.durationDays }} days</dd>
+                </div>
+                <div>
+                  <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.BADGE' | translate }}</dt>
+                  <dd>{{ plan.badgeLabel || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.THEME' | translate }}</dt>
+                  <dd>{{ plan.themeKey || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.IS_DEFAULT' | translate }}</dt>
+                  <dd>{{ plan.isDefault ? 'Yes' : 'No' }}</dd>
+                </div>
+              </dl>
+              @if (plan.description) {
+                <p class="membership-detail-page__description">{{ plan.description }}</p>
+              }
+            </app-admin-section-card>
+
+            <app-admin-section-card [title]="'ADMIN.MEMBERSHIPS.BENEFITS.TITLE' | translate">
+              @if (plan.benefits.length) {
+                <ul class="membership-detail-page__benefits">
+                  @for (benefit of plan.benefits; track benefit.displayName + benefit.sortOrder) {
+                    <li>
+                      <span class="admin-cell-primary">{{ benefit.displayName }}</span>
+                      <span class="admin-cell-secondary">{{ benefit.type }} · {{ benefit.value }}</span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <app-admin-empty-state
+                  icon="pi pi-gift"
+                  [title]="'ADMIN.MEMBERSHIPS.BENEFITS.EMPTY' | translate"
+                  [compact]="true"
+                />
+              }
+            </app-admin-section-card>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          @if (statisticsLoading()) {
+            <app-admin-loading-skeleton variant="detail" [rows]="3" />
+          } @else if (statistics(); as stats) {
+            <app-admin-stat-grid>
+              <app-admin-stat-card
+                [label]="'ADMIN.MEMBERSHIPS.STATS.TOTAL' | translate"
+                [value]="stats.totalPlans"
+                icon="pi-id-card"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.MEMBERSHIPS.STATS.ACTIVE' | translate"
+                [value]="stats.activePlans"
+                icon="pi-check-circle"
+                tone="success"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.MEMBERSHIPS.STATS.SUBSCRIBERS' | translate"
+                [value]="stats.activeSubscriptions"
+                icon="pi-users"
+                tone="info"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.MEMBERSHIPS.STATS.EXPIRING' | translate"
+                [value]="stats.expiringWithin7Days"
+                icon="pi-clock"
+                tone="warning"
+              />
+              <app-admin-stat-card
+                [label]="'ADMIN.MEMBERSHIPS.STATS.MRR' | translate"
+                [value]="stats.monthlyRecurringRevenue | hamboxCurrency"
+                icon="pi-chart-line"
+                tone="success"
+              />
+            </app-admin-stat-grid>
+          }
+        </p-tabpanel>
+
+        <p-tabpanel value="2">
+          <app-admin-toolbar>
+            <app-admin-search-bar
+              adminToolbarSearch
+              [value]="membersSearch()"
+              [placeholder]="'ADMIN.MEMBERSHIPS.MEMBERS.SEARCH' | translate"
+              (searchChange)="onMembersSearchChange($event)"
+            />
+
+            <button
+              adminToolbarActions
+              *hamboxHasPermission="permissions.Memberships.Assign"
+              pButton
+              type="button"
+              icon="pi pi-user-plus"
+              [label]="'ADMIN.MEMBERSHIPS.MEMBERS.ASSIGN' | translate"
+              (click)="openAssignDialog()"
+            ></button>
+          </app-admin-toolbar>
+
+          @if (membersError()) {
+            <app-admin-error-alert [message]="membersError()!" />
+          }
+
+          <app-admin-data-table-shell>
+            <p-table
+              class="admin-data-table"
+              [value]="[...members()]"
+              [loading]="membersLoading()"
+              [lazy]="true"
+              [paginator]="membersTotal() > 0"
+              [rows]="membersPageSize()"
+              [totalRecords]="membersTotal()"
+              [first]="membersTableFirst()"
+              [rowsPerPageOptions]="[10, 20, 50]"
+              (onLazyLoad)="onMembersPageChange($event)"
+              dataKey="subscriptionId"
+              scrollable
+              scrollHeight="flex"
+              responsiveLayout="scroll"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>{{ 'ADMIN.MEMBERSHIPS.MEMBERS.COLUMNS.USER' | translate }}</th>
+                  <th>{{ 'ADMIN.MEMBERSHIPS.MEMBERS.COLUMNS.PLAN' | translate }}</th>
+                  <th>{{ 'ADMIN.MEMBERSHIPS.MEMBERS.COLUMNS.STATUS' | translate }}</th>
+                  <th>{{ 'ADMIN.MEMBERSHIPS.MEMBERS.COLUMNS.EXPIRES' | translate }}</th>
+                  <th style="width: 7rem"></th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-member>
+                <tr>
+                  <td>
+                    <span class="admin-cell-primary">{{ member.userId }}</span>
+                  </td>
+                  <td>
+                    <span class="admin-cell-secondary">{{ member.planName }}</span>
+                  </td>
+                  <td>
+                    <app-admin-status-badge
+                      [label]="member.status"
+                      [tone]="memberStatusTone(member.status)"
+                    />
+                  </td>
+                  <td>{{ member.expiresOnUtc | date:'mediumDate' }}</td>
+                  <td>
+                    <div class="admin-actions-row">
+                      <app-admin-icon-button
+                        *hamboxHasPermission="permissions.Memberships.Renew"
+                        icon="pi pi-refresh"
+                        [label]="'Renew subscription'"
+                        [disabled]="actionLoading()"
+                        (pressed)="renewMember(member)"
+                      />
+                      <app-admin-icon-button
+                        *hamboxHasPermission="permissions.Memberships.Cancel"
+                        icon="pi pi-times"
+                        severity="danger"
+                        [label]="'Cancel subscription'"
+                        [disabled]="actionLoading()"
+                        (pressed)="requestCancelMember(member)"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="5">
+                    <app-admin-empty-state
+                      icon="pi pi-users"
+                      [title]="'ADMIN.MEMBERSHIPS.MEMBERS.EMPTY' | translate"
+                      [compact]="true"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </app-admin-data-table-shell>
+
+          <p class="membership-detail-page__plan-members-note">
+            {{ 'ADMIN.MEMBERSHIPS.MEMBERS.PLAN_COUNT' | translate }}: {{ planMembers().length }}
+          </p>
+        </p-tabpanel>
+
+        <p-tabpanel value="3">
+          @if (comparisonLoading()) {
+            <app-admin-loading-skeleton variant="table" [rows]="3" />
+          } @else if (comparison(); as data) {
+            <div class="membership-detail-page__comparison">
+              @for (comparePlan of data.plans; track comparePlan.id) {
+                <app-admin-section-card
+                  [title]="comparePlan.name"
+                  [class.membership-detail-page__comparison-card--current]="comparePlan.id === plan.id"
+                >
+                  <p class="admin-cell-primary membership-detail-page__comparison-price">
+                    {{ comparePlan.price | hamboxCurrency }}
+                  </p>
+                  <p class="admin-cell-secondary">
+                    {{ comparePlan.durationDays }} days · {{ comparePlan.status }}
+                  </p>
+                  <ul class="membership-detail-page__comparison-benefits">
+                    @for (benefit of comparePlan.benefits; track benefit.displayName) {
+                      <li>{{ benefit.displayName }}</li>
+                    }
+                  </ul>
+                </app-admin-section-card>
+              }
+            </div>
+          }
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+</section>
+
+<p-dialog
+  [header]="'ADMIN.MEMBERSHIPS.MEMBERS.ASSIGN_TITLE' | translate"
+  [visible]="assignDialogOpen()"
+  (visibleChange)="assignDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeAssignDialog()"
+>
+  <div class="admin-form-grid admin-form-grid--single">
+    <label class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.MEMBERS.USER_ID' | translate }}</span>
+      <input
+        pInputText
+        class="admin-field__input"
+        type="text"
+        [value]="assignUserId()"
+        (input)="assignUserId.set(($any($event.target)).value)"
+      />
+    </label>
+
+    <label class="membership-detail-page__checkbox">
+      <p-checkbox
+        [ngModel]="assignAutoRenew()"
+        (ngModelChange)="assignAutoRenew.set($event)"
+        [binary]="true"
+      />
+      <span>{{ 'ADMIN.MEMBERSHIPS.MEMBERS.AUTO_RENEW' | translate }}</span>
+    </label>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.MEMBERSHIPS.ACTIONS.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (click)="closeAssignDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.MEMBERSHIPS.MEMBERS.ASSIGN' | translate"
+      icon="pi pi-user-plus"
+      [disabled]="!assignUserId().trim() || actionLoading()"
+      (click)="confirmAssign()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="cancelDialogOpen()"
+  (visibleChange)="onCancelDialogVisibleChange($event)"
+  [title]="'ADMIN.CONFIRM.CANCEL_MEMBERSHIP_TITLE' | translate"
+  [message]="'ADMIN.CONFIRM.CANCEL_MEMBERSHIP' | translate"
+  [confirmLabel]="'ADMIN.CONFIRM.CONFIRM'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmCancelMember()"
+/>

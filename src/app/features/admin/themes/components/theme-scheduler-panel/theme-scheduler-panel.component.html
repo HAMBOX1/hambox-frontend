@@ -1,0 +1,46 @@
+<app-admin-section-card [title]="'ADMIN.THEMES.SCHEDULE.TITLE' | translate">
+  <form class="theme-scheduler-panel__form" (ngSubmit)="submitSchedule()">
+    <label>
+      <span>{{ 'ADMIN.THEMES.SCHEDULE.STARTS' | translate }}</span>
+      <input pInputText type="datetime-local" [ngModel]="startsAt()" (ngModelChange)="startsAt.set($event)" name="startsAt" required />
+    </label>
+    <label>
+      <span>{{ 'ADMIN.THEMES.SCHEDULE.ENDS' | translate }}</span>
+      <input pInputText type="datetime-local" [ngModel]="endsAt()" (ngModelChange)="endsAt.set($event)" name="endsAt" />
+    </label>
+    <label>
+      <span>{{ 'ADMIN.THEMES.SCHEDULE.RECURRENCE' | translate }}</span>
+      <input pInputText [ngModel]="recurrenceRule()" (ngModelChange)="recurrenceRule.set($event)" name="recurrenceRule" [placeholder]="'ADMIN.THEMES.SCHEDULE.RECURRENCE_PLACEHOLDER' | translate" />
+    </label>
+    <button
+      *hamboxHasPermission="permissions.Themes.Schedule"
+      pButton
+      type="submit"
+      class="admin-btn-primary"
+      [label]="'ADMIN.THEMES.SCHEDULE.ADD' | translate"
+      icon="pi pi-calendar-plus"
+      [disabled]="actionLoading() || !startsAt()"
+    ></button>
+  </form>
+
+  @if (schedules().length === 0) {
+    <app-admin-empty-state [title]="'ADMIN.THEMES.SCHEDULE.EMPTY' | translate" />
+  } @else {
+    <ul class="theme-scheduler-panel__list">
+      @for (item of schedules(); track item.id) {
+        <li>
+          <strong>{{ item.startsAtUtc | date: 'medium' }}</strong>
+          @if (item.endsAtUtc) {
+            <span> → {{ item.endsAtUtc | date: 'medium' }}</span>
+          }
+          @if (item.recurrenceRule) {
+            <span class="theme-scheduler-panel__recurrence">{{ item.recurrenceRule }}</span>
+          }
+          <span class="theme-scheduler-panel__status" [class.is-active]="item.isActive">
+            {{ item.isActive ? ('ADMIN.THEMES.SCHEDULE.ACTIVE' | translate) : ('ADMIN.THEMES.SCHEDULE.INACTIVE' | translate) }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</app-admin-section-card>

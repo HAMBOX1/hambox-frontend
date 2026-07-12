@@ -1,7 +1,25 @@
-<aside class="account-sidebar" aria-label="Account navigation">
-  <a class="account-sidebar__logo" routerLink="/home" aria-label="HAMBOX home">
-    <img [src]="logoSrc" alt="HAMBOX" />
-  </a>
+<aside
+  class="account-sidebar"
+  hamboxTranslateRefresh
+  [class.account-sidebar--collapsed]="collapsed()"
+  [class.account-sidebar--mobile-open]="mobileOpen()"
+  [attr.aria-label]="'ACCOUNT.SIDEBAR_UI.NAV_ARIA' | translate"
+>
+  <div class="account-sidebar__top">
+    <a class="account-sidebar__logo" routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate" (click)="closeMobile()">
+      <img [src]="logoSrc" alt="HAMBOX" />
+    </a>
+
+    <button
+      type="button"
+      class="account-sidebar__collapse-btn"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-label]="collapsed() ? ('ACCOUNT.SIDEBAR_UI.EXPAND' | translate) : ('ACCOUNT.SIDEBAR_UI.COLLAPSE' | translate)"
+      (click)="toggleCollapsed()"
+    >
+      <i class="pi" [class]="collapsed() ? 'pi-angle-right' : 'pi-angle-left'" aria-hidden="true"></i>
+    </button>
+  </div>
 
   <nav class="account-sidebar__nav">
     @for (item of navItems; track item.route) {
@@ -10,16 +28,34 @@
         [routerLink]="item.route"
         routerLinkActive="account-sidebar__link--active"
         [routerLinkActiveOptions]="{ exact: item.route === '/account/dashboard' }"
+        [attr.title]="collapsed() ? (item.labelKey | translate) : null"
+        (click)="closeMobile()"
       >
         <i class="pi" [class]="item.icon" aria-hidden="true"></i>
-        <span>{{ item.label }}</span>
+        <span class="account-sidebar__link-label">{{ item.labelKey | translate }}</span>
       </a>
     }
   </nav>
 
   <div class="account-sidebar__support">
-    <p class="account-sidebar__support-label">Support</p>
-    <p class="account-sidebar__support-copy">Need help with a digital delivery?</p>
-    <a routerLink="/support-chat" class="account-sidebar__support-btn">Contact Expert</a>
+    <p class="account-sidebar__support-label">{{ 'ACCOUNT.SIDEBAR_UI.SUPPORT' | translate }}</p>
+    @if (!collapsed()) {
+      <p class="account-sidebar__support-copy">{{ 'ACCOUNT.SIDEBAR_UI.SUPPORT_COPY' | translate }}</p>
+    }
+    <a routerLink="/support-chat" class="account-sidebar__support-btn" (click)="closeMobile()">
+      <i class="pi pi-comments" aria-hidden="true"></i>
+      @if (!collapsed()) {
+        <span>{{ 'ACCOUNT.SIDEBAR_UI.CONTACT_EXPERT' | translate }}</span>
+      }
+    </a>
   </div>
 </aside>
+
+@if (mobileOpen()) {
+  <button
+    type="button"
+    class="account-sidebar__backdrop"
+    [attr.aria-label]="'ACCOUNT.SIDEBAR_UI.CLOSE_NAV' | translate"
+    (click)="closeMobile()"
+  ></button>
+}

@@ -1,15 +1,17 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
+import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
+import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 import { AccountReferralFacade } from '../../services/account-referral.facade';
 
 @Component({
   selector: 'app-account-referral-page',
   standalone: true,
-  imports: [DatePipe, DecimalPipe],
+  imports: [HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective],
   templateUrl: './account-referral-page.component.html',
   styleUrl: './account-referral-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountReferralPageComponent implements OnInit {
   private readonly facade = inject(AccountReferralFacade);

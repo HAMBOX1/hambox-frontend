@@ -1,0 +1,53 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as referrals) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.INVITES' | translate" [value]="referrals.invites" icon="pi-send" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.SUCCESSFUL_REFERRALS' | translate" [value]="referrals.successful" icon="pi-check" tone="success" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.CONVERSION_RATE' | translate" [value]="(referrals.conversionRate | number: '1.0-1') + '%'" icon="pi-percentage" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.ATTRIBUTED_REVENUE' | translate" [value]="(referrals.attributedRevenue | number: '1.0-2') ?? '—'" icon="pi-wallet" />
+  </app-admin-stat-grid>
+
+  <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.REFERRAL_SERIES' | translate">
+    @if (referrals.series.length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+    } @else {
+      <apx-chart
+        [series]="seriesChart().series"
+        [chart]="seriesChart().chart"
+        [xaxis]="seriesChart().xaxis"
+        [yaxis]="seriesChart().yaxis"
+        [stroke]="seriesChart().stroke"
+        [dataLabels]="seriesChart().dataLabels"
+        [tooltip]="seriesChart().tooltip"
+      />
+    }
+  </app-admin-section-card>
+
+  <app-admin-section-card [title]="'ADMIN.ANALYTICS.TABLES.TOP_REFERRERS' | translate">
+    @if (referrals.topReferrers.length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.TABLE' | translate" />
+    } @else {
+      <div class="analytics-shell__table-wrap">
+        <p-table [value]="referrals.topReferrers" [rows]="10">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.ANALYTICS.COLS.NAME' | translate }}</th>
+              <th>{{ 'ADMIN.ANALYTICS.COLS.VALUE' | translate }}</th>
+              <th>{{ 'ADMIN.ANALYTICS.COLS.COUNT' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.name }}</td>
+              <td>{{ row.value | number: '1.0-2' }}</td>
+              <td>{{ row.count ?? '—' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+  </app-admin-section-card>
+}

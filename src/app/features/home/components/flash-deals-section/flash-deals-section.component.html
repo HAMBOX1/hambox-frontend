@@ -4,12 +4,21 @@
       <div class="flash-deals__heading">
         <div class="flash-deals__label">
           <img [src]="flashIconSrc" alt="" aria-hidden="true" />
-          <span>FLASH DEALS</span>
+          <span>{{ sectionTitle() }}</span>
         </div>
-        <h2 id="flash-deals-title" class="flash-deals__title">{{ countdownLabel() }}</h2>
+        @if (sectionSubtitle()) {
+          <p class="flash-deals__subtitle">{{ sectionSubtitle() }}</p>
+        }
+        @if (countdownEnabled()) {
+          <h2 id="flash-deals-title" class="flash-deals__title">{{ countdownLabel() }}</h2>
+        } @else {
+          <h2 id="flash-deals-title" class="flash-deals__title">{{ sectionTitle() }}</h2>
+        }
       </div>
 
-      <a routerLink="/products" class="flash-deals__link">View all deals</a>
+      @if (showViewAllLink()) {
+        <a routerLink="/products" class="flash-deals__link">View all deals</a>
+      }
     </header>
 
     <div class="flash-deals__grid">

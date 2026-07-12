@@ -1,0 +1,167 @@
+<p-toast position="top-right" />
+
+<section class="admin-page themes-list-page">
+  <app-admin-page-header
+    [title]="'ADMIN.THEMES.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.THEMES.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Themes.Create"
+      pButton
+      class="admin-btn-primary"
+      routerLink="/admin/themes/new"
+      [label]="'ADMIN.THEMES.LIST.NEW' | translate"
+      icon="pi pi-plus"
+    ></a>
+  </app-admin-page-header>
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card
+      [label]="'ADMIN.THEMES.STATS.TOTAL' | translate"
+      [value]="listStats().total"
+      icon="pi-palette"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.THEMES.STATS.PUBLISHED' | translate"
+      [value]="listStats().published"
+      icon="pi-check-circle"
+      tone="success"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.THEMES.STATS.DRAFT' | translate"
+      [value]="listStats().draft"
+      icon="pi-pencil"
+      tone="info"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.THEMES.STATS.ARCHIVED' | translate"
+      [value]="listStats().archived"
+      icon="pi-inbox"
+      tone="default"
+    />
+  </app-admin-stat-grid>
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.THEMES.LIST.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="themes-list-page__filter"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      [placeholder]="'ADMIN.THEMES.LIST.FILTER_STATUS' | translate"
+    />
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      [value]="[...themes()]"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [loading]="loading()"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.THEMES.LIST.COLUMNS.NAME' | translate }}</th>
+          <th>{{ 'ADMIN.THEMES.LIST.COLUMNS.SLUG' | translate }}</th>
+          <th>{{ 'ADMIN.THEMES.LIST.COLUMNS.BASE_MODE' | translate }}</th>
+          <th>{{ 'ADMIN.THEMES.LIST.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.THEMES.LIST.COLUMNS.VERSIONS' | translate }}</th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-theme>
+        <tr>
+          <td>
+            <a [routerLink]="['/admin/themes', theme.id]">{{ theme.name }}</a>
+            @if (theme.isDefault) {
+              <span class="themes-list-page__badge">{{ 'ADMIN.THEMES.LIST.DEFAULT' | translate }}</span>
+            }
+          </td>
+          <td>{{ theme.slug }}</td>
+          <td>{{ theme.baseMode }}</td>
+          <td>
+            <app-admin-status-badge [label]="theme.status" [tone]="statusTone(theme.status)" />
+          </td>
+          <td>{{ theme.versionCount }}</td>
+          <td class="themes-list-page__actions">
+            <a
+              pButton
+              class="p-button-text p-button-sm"
+              [routerLink]="['/admin/themes', theme.id, 'edit']"
+              icon="pi pi-pencil"
+            ></a>
+            <app-admin-action-menu [items]="themeActionMenuItems(theme)" />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            <app-admin-empty-state
+              icon="pi pi-palette"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.THEMES.LIST.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.THEMES.LIST.EMPTY' | translate)
+              "
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<p-dialog
+  [header]="'ADMIN.THEMES.DUPLICATE.TITLE' | translate"
+  [visible]="duplicateDialogOpen()"
+  (visibleChange)="duplicateDialogOpen.set($event)"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  <div class="themes-list-page__dialog-field">
+    <label>{{ 'ADMIN.THEMES.DUPLICATE.NAME_LABEL' | translate }}</label>
+    <input pInputText [ngModel]="duplicateName()" (ngModelChange)="duplicateName.set($event)" />
+  </div>
+  <div class="themes-list-page__dialog-field">
+    <label>{{ 'ADMIN.THEMES.DUPLICATE.SLUG_LABEL' | translate }}</label>
+    <input pInputText [ngModel]="duplicateSlug()" (ngModelChange)="duplicateSlug.set($event)" />
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'ADMIN.THEMES.ACTIONS.CANCEL' | translate" (click)="closeDuplicateDialog()"></button>
+    <button pButton type="button" class="admin-btn-primary" [label]="'ADMIN.THEMES.ACTIONS.DUPLICATE' | translate" [disabled]="actionLoading()" (click)="confirmDuplicate()"></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="onDeleteDialogVisibleChange($event)"
+  [title]="'ADMIN.THEMES.ACTIONS.DELETE' | translate"
+  [message]="deleteDialogMessage()"
+  [confirmLabel]="'ADMIN.THEMES.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDeleteTheme()"
+/>

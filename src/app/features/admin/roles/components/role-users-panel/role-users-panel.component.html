@@ -1,0 +1,320 @@
+<section class="role-users-panel">
+
+  <app-admin-toolbar>
+
+    <app-admin-search-bar
+
+      adminToolbarSearch
+
+      [value]="usersSearch()"
+
+      [placeholder]="'ADMIN.ROLES.USERS.SEARCH_PLACEHOLDER' | translate"
+
+      (searchChange)="onUsersSearchChange($event)"
+
+    />
+
+
+
+    <button
+
+      adminToolbarActions
+
+      *hamboxHasPermission="permissions.Roles.AssignUsers"
+
+      pButton
+
+      type="button"
+
+      class="role-users-panel__assign-btn"
+
+      [label]="'ADMIN.ROLES.USERS.ASSIGN' | translate"
+
+      icon="pi pi-user-plus"
+
+      [disabled]="disabled() || actionLoading()"
+
+      (click)="openAssignDialog()"
+
+    ></button>
+
+  </app-admin-toolbar>
+
+
+
+  @if (usersError()) {
+
+    <div class="role-users-panel__alert">
+
+      <app-admin-error-alert [message]="usersError()!" />
+
+    </div>
+
+  }
+
+
+
+  <app-admin-data-table-shell>
+
+    <p-table
+
+      class="admin-data-table role-users-panel__table"
+
+      [value]="[...users()]"
+
+      [loading]="usersLoading()"
+
+      dataKey="id"
+
+      scrollable
+
+      scrollHeight="flex"
+
+      responsiveLayout="scroll"
+
+    >
+
+      <ng-template pTemplate="header">
+
+        <tr>
+
+          <th>{{ 'ADMIN.ROLES.USERS.COLUMNS.NAME' | translate }}</th>
+
+          <th>{{ 'ADMIN.ROLES.USERS.COLUMNS.EMAIL' | translate }}</th>
+
+          <th>{{ 'ADMIN.ROLES.USERS.COLUMNS.STATUS' | translate }}</th>
+
+          <th style="width: 5rem"></th>
+
+        </tr>
+
+      </ng-template>
+
+
+
+      <ng-template pTemplate="body" let-user>
+
+        <tr>
+
+          <td>
+
+            <span class="admin-cell-primary">{{ displayName(user) }}</span>
+
+          </td>
+
+          <td>
+
+            <span class="admin-cell-secondary">{{ user.email }}</span>
+
+          </td>
+
+          <td>
+
+            <app-admin-status-badge [label]="user.status" [tone]="statusTone(user.status)" />
+
+          </td>
+
+          <td>
+
+            <div class="admin-actions-row">
+
+              <app-admin-icon-button
+
+                *hamboxHasPermission="permissions.Roles.AssignUsers"
+
+                icon="pi pi-user-minus"
+
+                severity="danger"
+
+                [label]="'ADMIN.ROLES.USERS.REMOVE' | translate"
+
+                [disabled]="disabled() || actionLoading()"
+
+                (pressed)="removeUser(user)"
+
+              />
+
+            </div>
+
+          </td>
+
+        </tr>
+
+      </ng-template>
+
+
+
+      <ng-template pTemplate="emptymessage">
+
+        <tr>
+
+          <td colspan="4">
+
+            <app-admin-empty-state
+
+              icon="pi pi-users"
+
+              [title]="'ADMIN.ROLES.USERS.EMPTY' | translate"
+
+              [compact]="true"
+
+            />
+
+          </td>
+
+        </tr>
+
+      </ng-template>
+
+    </p-table>
+
+  </app-admin-data-table-shell>
+
+</section>
+
+
+
+<p-dialog
+
+  [header]="'ADMIN.ROLES.USERS.ASSIGN_DIALOG_TITLE' | translate"
+
+  [visible]="assignDialogOpen()"
+
+  (visibleChange)="assignDialogOpen.set($event)"
+
+  [modal]="true"
+
+  [draggable]="false"
+
+  [resizable]="false"
+
+  [style]="{ width: 'min(40rem, 92vw)' }"
+
+  styleClass="admin-dialog"
+
+  (onHide)="closeAssignDialog()"
+
+>
+
+  <app-admin-search-bar
+
+    class="role-users-panel__dialog-search"
+
+    [value]="userSearchTerm()"
+
+    [placeholder]="'ADMIN.ROLES.USERS.ASSIGN_SEARCH_PLACEHOLDER' | translate"
+
+    (searchChange)="onAssignSearchChange($event)"
+
+  />
+
+
+
+  @if (userSearchError()) {
+
+    <div class="role-users-panel__dialog-alert">
+
+      <app-admin-error-alert [message]="userSearchError()!" />
+
+    </div>
+
+  }
+
+
+
+  <div class="role-users-panel__dialog-results">
+
+    @if (userSearchLoading()) {
+      <app-admin-loading-skeleton variant="table" [rows]="4" />
+    } @else if (userSearchResults().length === 0) {
+
+      <app-admin-empty-state
+
+        icon="pi pi-search"
+
+        [title]="'ADMIN.ROLES.USERS.ASSIGN_EMPTY' | translate"
+
+        [compact]="true"
+
+      />
+
+    } @else {
+
+      <ul class="role-users-panel__candidate-list">
+
+        @for (user of userSearchResults(); track user.id) {
+
+          <li>
+
+            <label class="role-users-panel__candidate">
+
+              <input
+
+                type="checkbox"
+
+                [checked]="isUserSelected(user.id)"
+
+                (change)="toggleUserSelection(user.id, $any($event.target).checked)"
+
+              />
+
+              <span class="role-users-panel__candidate-text">
+
+                <span class="role-users-panel__candidate-name">{{ displayName(user) }}</span>
+
+                <span class="role-users-panel__candidate-email">{{ user.email }}</span>
+
+              </span>
+
+            </label>
+
+          </li>
+
+        }
+
+      </ul>
+
+    }
+
+  </div>
+
+
+
+  <ng-template pTemplate="footer">
+
+    <button
+
+      pButton
+
+      type="button"
+
+      [label]="'ADMIN.ROLES.ACTIONS.CANCEL' | translate"
+
+      severity="secondary"
+
+      [text]="true"
+
+      (click)="closeAssignDialog()"
+
+    ></button>
+
+    <button
+
+      pButton
+
+      type="button"
+
+      [label]="'ADMIN.ROLES.USERS.ASSIGN_SELECTED' | translate"
+
+      icon="pi pi-check"
+
+      [disabled]="selectedUserIds().length === 0 || actionLoading()"
+
+      (click)="assignSelectedUsers()"
+
+    ></button>
+
+  </ng-template>
+
+</p-dialog>
+

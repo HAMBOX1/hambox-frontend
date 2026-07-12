@@ -1,0 +1,17 @@
+@if (visible()) {
+  <div class="admin-sticky-save-bar" [class.admin-sticky-save-bar--dirty]="dirty()">
+    <div class="admin-sticky-save-bar__inner">
+      @if (hint() || dirty()) {
+        <p class="admin-sticky-save-bar__hint">
+          @if (dirty()) {
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          }
+          {{ dirty() ? hint() || 'You have unsaved changes' : hint() }}
+        </p>
+      }
+      <div class="admin-sticky-save-bar__actions">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+}

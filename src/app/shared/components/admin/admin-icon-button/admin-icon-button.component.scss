@@ -1,0 +1,25 @@
+:host {
+  display: inline-flex;
+}
+
+:host ::ng-deep .admin-icon-button.p-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  transition:
+    transform var(--admin-transition, 180ms ease),
+    background var(--admin-transition, 180ms ease);
+
+  .p-button-icon {
+    font-size: 1rem;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+    background: var(--admin-bg-hover);
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(0);
+  }
+}

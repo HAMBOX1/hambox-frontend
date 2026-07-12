@@ -1,0 +1,29 @@
+<section class="admin-page analytics-shell">
+  <app-admin-page-header
+    [title]="'ADMIN.ANALYTICS.TITLE' | translate"
+    [subtitle]="'ADMIN.ANALYTICS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <nav class="analytics-shell__nav" aria-label="Analytics sections">
+    @for (item of navItems; track item.path) {
+      <a
+        class="analytics-shell__tab"
+        [routerLink]="item.path"
+        routerLinkActive="analytics-shell__tab--active"
+      >
+        {{ item.labelKey | translate }}
+      </a>
+    }
+  </nav>
+
+  <app-admin-section-card [title]="'ADMIN.ANALYTICS.FILTERS.TITLE' | translate">
+    <div class="analytics-shell__filters">
+      <app-analytics-filters />
+    </div>
+  </app-admin-section-card>
+
+  <div class="analytics-shell__outlet">
+    <router-outlet />
+  </div>
+</section>

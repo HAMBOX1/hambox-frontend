@@ -57,36 +57,54 @@
           <p class="pdp__description">{{ product()!.description }}</p>
 
           <div class="pdp__pricing">
-            <span class="pdp__price">{{ product()!.priceUsd | hamboxCurrency }}</span>
-            @if (product()!.discountLabel) {
-              <span class="pdp__original">{{ product()!.originalPriceUsd | hamboxCurrency }}</span>
+            <span class="pdp__price">{{ displayPrice() | hamboxCurrency }}</span>
+            @if (displayComparePrice() > displayPrice()) {
+              <span class="pdp__original">{{ displayComparePrice() | hamboxCurrency }}</span>
+            }
+            @if (product()!.discountLabel && !hasVariants()) {
               <span class="pdp__discount">{{ product()!.discountLabel }}</span>
             }
           </div>
 
+          <p class="pdp__stock" [class.pdp__stock--danger]="stockLabel() === 'Out of Stock'">
+            {{ stockLabel() }}
+            @if (resolvedVariant().sku) {
+              <span class="pdp__sku">SKU: {{ resolvedVariant().sku }}</span>
+            }
+          </p>
+
+          <p class="pdp__delivery">
+            <i class="pi pi-bolt" aria-hidden="true"></i>
+            Estimated delivery: <strong>Instant</strong> after payment
+          </p>
+
           <div class="pdp__options">
-            <app-storefront-field-select
-              selectId="pdp-region"
-              label="SELECT REGION"
-              [options]="product()!.regions"
-              [value]="selectedRegion()"
-              (valueChange)="selectedRegion.set($event)"
-            />
-            <app-storefront-field-select
-              selectId="pdp-value"
-              label="SELECT VALUE"
-              [options]="product()!.values"
-              [value]="selectedValue()"
-              (valueChange)="selectedValue.set($event)"
-            />
+            @if (variantConfigLoading()) {
+              <app-loading-skeleton type="detail" [count]="2" />
+            } @else if (variantConfigError()) {
+              <p class="pdp__config-error" role="alert">{{ variantConfigError() }}</p>
+            } @else if (hasVariants() && configuration(); as config) {
+              @for (group of config.optionGroups; track group.id) {
+                @if (group.options.length > 0) {
+                  <app-variant-option-group
+                    [groupLabel]="group.displayName"
+                    [options]="variantFacade.optionsForGroup(group)"
+                    [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
+                    (optionSelected)="onOptionChange(group.id, $event)"
+                  />
+                }
+              }
+            } @else if (variantFacade.hasOptionGroups()) {
+              <p class="pdp__config-hint">Variants for this product are being configured. Check back soon.</p>
+            }
           </div>
 
           <div class="pdp__actions">
-            <button type="button" class="pdp__cta pdp__cta--cart" (click)="addToCart()">
+            <button type="button" class="pdp__cta pdp__cta--cart" [disabled]="!canPurchase()" (click)="addToCart()">
               <img [src]="cartIconSrc" alt="" aria-hidden="true" />
               Add to Cart
             </button>
-            <button type="button" class="pdp__cta pdp__cta--buy" (click)="buyNow()">Buy Now</button>
+            <button type="button" class="pdp__cta pdp__cta--buy" [disabled]="!canPurchase()" (click)="buyNow()">Buy Now</button>
             <button type="button" class="pdp__cta pdp__cta--wishlist" (click)="addToWishlist()">
               <i class="pi pi-heart" aria-hidden="true"></i>
               Save to Vault
@@ -127,6 +145,33 @@
       </section>
     }
   </main>
+
+  @if (product() && !loading() && !error()) {
+    <aside class="pdp__mobile-bar" aria-label="Purchase actions">
+      <div class="pdp__mobile-bar-price">
+        <span class="pdp__mobile-bar-label">Price</span>
+        <strong>{{ displayPrice() | hamboxCurrency }}</strong>
+      </div>
+      <div class="pdp__mobile-bar-actions">
+        <button
+          type="button"
+          class="pdp__mobile-bar-btn pdp__mobile-bar-btn--cart"
+          [disabled]="!canPurchase()"
+          (click)="addToCart()"
+        >
+          Add to Cart
+        </button>
+        <button
+          type="button"
+          class="pdp__mobile-bar-btn pdp__mobile-bar-btn--buy"
+          [disabled]="!canPurchase()"
+          (click)="buyNow()"
+        >
+          Buy Now
+        </button>
+      </div>
+    </aside>
+  }
 
   <app-storefront-footer />
 </div>

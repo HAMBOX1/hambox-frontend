@@ -41,16 +41,29 @@ export class AccountNotificationsFacade {
   }
 
   async markRead(id: string): Promise<void> {
-    await firstValueFrom(this.api.markNotificationRead(id));
-    this.itemsState.update((items) =>
-      items.map((item) => (item.id === id ? { ...item, isRead: true } : item)),
-    );
-    this.unreadCountState.update((count) => Math.max(0, count - 1));
+    try {
+      await firstValueFrom(this.api.markNotificationRead(id));
+      this.itemsState.update((items) =>
+        items.map((item) => (item.id === id ? { ...item, isRead: true } : item)),
+      );
+      this.unreadCountState.update((count) => Math.max(0, count - 1));
+    } catch {
+      this.errorState.set('Unable to mark notification as read.');
+    }
   }
 
   async markAllRead(): Promise<void> {
-    await firstValueFrom(this.api.markAllNotificationsRead());
-    this.itemsState.update((items) => items.map((item) => ({ ...item, isRead: true })));
-    this.unreadCountState.set(0);
+    try {
+      await firstValueFrom(this.api.markAllNotificationsRead());
+      this.itemsState.update((items) => items.map((item) => ({ ...item, isRead: true })));
+      this.unreadCountState.set(0);
+    } catch {
+      this.errorState.set('Unable to mark all notifications as read.');
+    }
+  }
+
+  async clearAll(): Promise<void> {
+    await this.markAllRead();
+    this.itemsState.set([]);
   }
 }

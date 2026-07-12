@@ -2,40 +2,56 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiError } from '../../../core/models/api-error.model';
-import { CreateCategoryRequest, Category } from '../models/category.model';
+import {
+  Category,
+  CategoryOption,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from '../models/category.model';
 import { CategoryApiService } from './category-api.service';
 
 const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
+const PARENT_PAGE_SIZE = 100;
 
 @Injectable()
 export class CategoryListFacade {
   private readonly api = inject(CategoryApiService);
 
   private readonly itemsState = signal<readonly Category[]>([]);
+  private readonly parentOptionsState = signal<readonly CategoryOption[]>([]);
   private readonly loadingState = signal(false);
   private readonly creatingState = signal(false);
+  private readonly updatingState = signal(false);
   private readonly searchTermState = signal('');
   private readonly errorState = signal<string | null>(null);
   private readonly createErrorState = signal<string | null>(null);
+  private readonly updateErrorState = signal<string | null>(null);
   private readonly totalCountState = signal(0);
   private readonly pageNumberState = signal(1);
   private readonly pageSizeState = signal(DEFAULT_PAGE_SIZE);
   private readonly createDialogOpenState = signal(false);
+  private readonly editDialogOpenState = signal(false);
+  private readonly editingCategoryState = signal<Category | null>(null);
 
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   private readonly hasLoadedState = signal(false);
 
   readonly items = this.itemsState.asReadonly();
+  readonly parentOptions = this.parentOptionsState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
   readonly creating = this.creatingState.asReadonly();
+  readonly updating = this.updatingState.asReadonly();
   readonly searchTerm = this.searchTermState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly createError = this.createErrorState.asReadonly();
+  readonly updateError = this.updateErrorState.asReadonly();
   readonly totalCount = this.totalCountState.asReadonly();
   readonly pageNumber = this.pageNumberState.asReadonly();
   readonly pageSize = this.pageSizeState.asReadonly();
   readonly createDialogOpen = this.createDialogOpenState.asReadonly();
+  readonly editDialogOpen = this.editDialogOpenState.asReadonly();
+  readonly editingCategory = this.editingCategoryState.asReadonly();
 
   readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
   readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
@@ -52,6 +68,7 @@ export class CategoryListFacade {
 
   load(): void {
     void this.fetchCategories(true);
+    void this.loadParentOptions();
   }
 
   reload(): Promise<void> {
@@ -88,6 +105,18 @@ export class CategoryListFacade {
     this.createErrorState.set(null);
   }
 
+  openEditDialog(category: Category): void {
+    this.updateErrorState.set(null);
+    this.editingCategoryState.set(category);
+    this.editDialogOpenState.set(true);
+  }
+
+  closeEditDialog(): void {
+    this.editDialogOpenState.set(false);
+    this.editingCategoryState.set(null);
+    this.updateErrorState.set(null);
+  }
+
   async createCategory(request: CreateCategoryRequest): Promise<boolean> {
     this.creatingState.set(true);
     this.createErrorState.set(null);
@@ -97,12 +126,69 @@ export class CategoryListFacade {
       this.createDialogOpenState.set(false);
       this.pageNumberState.set(1);
       await this.fetchCategories(true);
+      await this.loadParentOptions();
       return true;
     } catch (error) {
       this.createErrorState.set(this.toErrorMessage(error, 'Failed to create category.'));
       return false;
     } finally {
       this.creatingState.set(false);
+    }
+  }
+
+  async updateCategory(request: UpdateCategoryRequest): Promise<boolean> {
+    const category = this.editingCategoryState();
+    if (!category) {
+      return false;
+    }
+
+    this.updatingState.set(true);
+    this.updateErrorState.set(null);
+
+    try {
+      await firstValueFrom(this.api.updateCategory(category.id, request));
+      this.editDialogOpenState.set(false);
+      this.editingCategoryState.set(null);
+      await this.fetchCategories(true);
+      await this.loadParentOptions();
+      return true;
+    } catch (error) {
+      this.updateErrorState.set(this.toErrorMessage(error, 'Failed to update category.'));
+      return false;
+    } finally {
+      this.updatingState.set(false);
+    }
+  }
+
+  async deleteCategory(categoryId: string): Promise<boolean> {
+    try {
+      await firstValueFrom(this.api.deleteCategory(categoryId));
+      await this.fetchCategories(true);
+      await this.loadParentOptions();
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to delete category.'));
+      return false;
+    }
+  }
+
+  async restoreCategory(category: Category): Promise<boolean> {
+    try {
+      await firstValueFrom(
+        this.api.updateCategory(category.id, {
+          nameAr: category.nameAr,
+          nameEn: category.nameEn,
+          slug: category.slug,
+          isActive: true,
+          parentId: category.parentId,
+        }),
+      );
+      await this.fetchCategories(true);
+      await this.loadParentOptions();
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to reactivate category.'));
+      return false;
     }
   }
 
@@ -140,6 +226,27 @@ export class CategoryListFacade {
       this.errorState.set(this.toErrorMessage(error, 'Failed to load categories.'));
     } finally {
       this.loadingState.set(false);
+    }
+  }
+
+  private async loadParentOptions(): Promise<void> {
+    try {
+      const result = await firstValueFrom(
+        this.api.getCategories({
+          pageNumber: 1,
+          pageSize: PARENT_PAGE_SIZE,
+          activeOnly: true,
+        }),
+      );
+
+      this.parentOptionsState.set(
+        (result.items ?? []).map((category) => ({
+          id: category.id,
+          label: category.nameEn,
+        })),
+      );
+    } catch {
+      this.parentOptionsState.set([]);
     }
   }
 

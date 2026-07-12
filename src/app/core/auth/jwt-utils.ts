@@ -6,6 +6,12 @@ import {
   HamboxJwtPayload,
   UserSession,
 } from '../../features/auth/models/auth';
+import {
+  AUTH_CONTEXT,
+  AUTH_CONTEXT_CLAIM,
+  AuthContextType,
+  OTP_VERIFIED_CLAIM,
+} from './auth-context';
 
 const ROLE_CLAIM_KEYS = [
   'role',
@@ -48,13 +54,39 @@ export function extractClaimValues(
   return [...values];
 }
 
-export function mapTokenResponseToSession(tokens: AuthTokenResponse): UserSession {
+export function getAuthContextFromPayload(accessToken: string): AuthContextType | null {
+  try {
+    const payload = decodeAccessToken(accessToken);
+    const value = payload[AUTH_CONTEXT_CLAIM];
+    if (value === AUTH_CONTEXT.Admin || value === AUTH_CONTEXT.Customer) {
+      return value;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function isOtpVerified(accessToken: string): boolean {
+  try {
+    const payload = decodeAccessToken(accessToken);
+    return payload[OTP_VERIFIED_CLAIM] === 'true' || payload[OTP_VERIFIED_CLAIM] === true;
+  } catch {
+    return false;
+  }
+}
+
+export function mapTokenResponseToSession(
+  tokens: AuthTokenResponse,
+  context: AuthContextType,
+): UserSession {
   const payload = decodeAccessToken(tokens.accessToken);
 
   return {
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
     expiresAt: tokens.expiresAt,
+    authContext: context,
     user: mapPayloadToUser(payload),
   };
 }
@@ -90,6 +122,10 @@ export function isAccessTokenExpired(
   }
 }
 
+export const ADMIN_ROLES = ['Owner', 'Administrator', 'SuperAdmin', 'Admin'] as const;
+
 export function hasAdminRole(roles: readonly string[]): boolean {
-  return roles.some((role) => role === 'Admin' || role === 'SuperAdmin');
+  return roles.some((role) =>
+    ADMIN_ROLES.some((adminRole) => adminRole === role),
+  );
 }

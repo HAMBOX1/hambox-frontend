@@ -8,6 +8,7 @@ import {
   StorefrontFeaturedProduct,
   TrendingRankItem,
   TrendingValueItem,
+  TrustFeature,
 } from '../models/storefront-home';
 import { Home } from './home';
 
@@ -23,6 +24,7 @@ export class HomeFacade {
   private readonly featuredHighlightState = signal<StorefrontFeaturedProduct | null>(null);
   private readonly trendingRanksState = signal<readonly TrendingRankItem[]>([]);
   private readonly trendingValueState = signal<TrendingValueItem | null>(null);
+  private readonly trustFeaturesState = signal<readonly TrustFeature[]>([]);
 
   readonly loading = this.loadingState.asReadonly();
   readonly error = this.errorState.asReadonly();
@@ -32,8 +34,9 @@ export class HomeFacade {
   readonly featuredHighlight = this.featuredHighlightState.asReadonly();
   readonly trendingRanks = this.trendingRanksState.asReadonly();
   readonly trendingValue = this.trendingValueState.asReadonly();
+  readonly trustFeatures = this.trustFeaturesState.asReadonly();
   readonly flashCountdownSeconds = computed(
-    () => this.contentState()?.flashDealsCountdownSeconds ?? 0,
+    () => this.contentState()?.flashDeals.countdownSeconds ?? 0,
   );
 
   readonly hasCategories = computed(() => this.categoriesState().length > 0);
@@ -58,6 +61,7 @@ export class HomeFacade {
       this.featuredHighlightState.set(data.featuredHighlight);
       this.trendingRanksState.set(data.trendingRanks);
       this.trendingValueState.set(data.trendingValue);
+      this.trustFeaturesState.set(data.trustFeatures);
     } catch (error) {
       this.contentState.set(null);
       this.categoriesState.set([]);
@@ -65,6 +69,7 @@ export class HomeFacade {
       this.featuredHighlightState.set(null);
       this.trendingRanksState.set([]);
       this.trendingValueState.set(null);
+      this.trustFeaturesState.set([]);
       this.errorState.set(this.toErrorMessage(error, 'Failed to load the storefront home page.'));
     } finally {
       this.loadingState.set(false);

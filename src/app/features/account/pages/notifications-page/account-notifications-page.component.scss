@@ -49,6 +49,17 @@
   border-radius: var(--sf-radius-lg);
   background: var(--color-panel-bg);
   box-shadow: var(--color-shadow-xs);
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
 
   &--unread {
     border-color: var(--color-primary-border);

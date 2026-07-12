@@ -1,0 +1,99 @@
+<p-toast position="top-right" />
+
+<section class="admin-page theme-editor-page">
+  <app-admin-page-header
+    [title]="(isCreateMode() ? 'ADMIN.THEMES.EDIT.CREATE_TITLE' : 'ADMIN.THEMES.EDIT.EDIT_TITLE') | translate"
+    [subtitle]="'ADMIN.THEMES.EDIT.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    <a
+      adminHeaderActions
+      pButton
+      class="p-button-text"
+      routerLink="/admin/themes"
+      [label]="'ADMIN.THEMES.EDIT.BACK' | translate"
+      icon="pi pi-arrow-left"
+    ></a>
+    @if (!isCreateMode()) {
+      <button
+        adminHeaderActions
+        pButton
+        type="button"
+        class="p-button-outlined"
+        [label]="'ADMIN.THEMES.ACTIONS.PREVIEW' | translate"
+        icon="pi pi-eye"
+        [disabled]="detailSaving()"
+        (click)="startPreview()"
+      ></button>
+    }
+  </app-admin-page-header>
+
+  @if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  }
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton [rows]="8" />
+  } @else {
+    <div class="theme-editor-page__layout">
+      <div class="theme-editor-page__form">
+        <app-admin-section-card [title]="'ADMIN.THEMES.EDIT.DETAILS' | translate">
+          <div class="theme-editor-page__fields">
+            <label>
+              <span>{{ 'ADMIN.THEMES.EDIT.NAME' | translate }}</span>
+              <input pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.THEMES.EDIT.SLUG' | translate }}</span>
+              <input pInputText [ngModel]="slug()" (ngModelChange)="slug.set($event)" [disabled]="!isCreateMode()" />
+            </label>
+            <label>
+              <span>{{ 'ADMIN.THEMES.EDIT.BASE_MODE' | translate }}</span>
+              <p-select
+                [options]="baseModeOptions"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="baseMode()"
+                (ngModelChange)="baseMode.set($event)"
+              />
+            </label>
+            <label class="theme-editor-page__full">
+              <span>{{ 'ADMIN.THEMES.EDIT.DESCRIPTION' | translate }}</span>
+              <textarea pTextarea rows="3" [ngModel]="description()" (ngModelChange)="description.set($event)"></textarea>
+            </label>
+            @if (!isCreateMode()) {
+              <label class="theme-editor-page__full">
+                <span>{{ 'ADMIN.THEMES.EDIT.NOTES' | translate }}</span>
+                <textarea pTextarea rows="2" [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
+              </label>
+            }
+          </div>
+        </app-admin-section-card>
+
+        <app-theme-token-editor [tokens]="tokens()" (tokensChange)="onTokensChange($event)" [disabled]="detailSaving()" />
+      </div>
+
+      <aside class="theme-editor-page__preview">
+        <app-theme-preview-panel [themeName]="name()" [baseMode]="baseMode()" />
+      </aside>
+    </div>
+  }
+
+  <app-admin-sticky-save-bar>
+    <a
+      pButton
+      class="p-button-text"
+      routerLink="/admin/themes"
+      [label]="'ADMIN.THEMES.ACTIONS.CANCEL' | translate"
+    ></a>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.THEMES.ACTIONS.SAVE' | translate"
+      icon="pi pi-check"
+      [loading]="detailSaving()"
+      (click)="save()"
+    ></button>
+  </app-admin-sticky-save-bar>
+</section>

@@ -24,7 +24,7 @@
 
 .payment-panel__methods {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
   gap: 12px;
 }
 
@@ -68,6 +68,16 @@
     width: 24px;
     height: 24px;
   }
+}
+
+.payment-panel__dev-note {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border-radius: var(--sf-radius-md);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 @media (max-width: 767px) {

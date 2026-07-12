@@ -1,0 +1,19 @@
+.product-publishing-panel__current {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.product-publishing-panel__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.product-publishing-panel__note {
+  margin: 0;
+  color: var(--admin-text-muted);
+  line-height: 1.5;
+}

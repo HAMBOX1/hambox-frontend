@@ -37,10 +37,10 @@ import { ThemeService } from '../../../core/theme/theme.service';
       min-width: 2.5rem;
       height: 2.5rem;
       padding: 0 0.75rem;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-nav-border, var(--color-border));
       border-radius: var(--sf-radius-sm);
-      background: var(--color-btn-secondary-bg);
-      color: var(--color-text-secondary);
+      background: var(--color-nav-panel, var(--color-btn-secondary-bg));
+      color: var(--color-nav-text, var(--color-text-secondary));
       font-family: var(--sf-font-body);
       font-size: 0.8125rem;
       font-weight: 600;
@@ -48,9 +48,9 @@ import { ThemeService } from '../../../core/theme/theme.service';
       transition: var(--hambox-transition-theme);
 
       &:hover {
-        color: var(--color-text-primary);
+        color: var(--color-nav-heading, var(--color-text-primary));
         border-color: var(--color-border-strong);
-        background: var(--color-table-row-hover);
+        background: var(--color-nav-hover, var(--color-surface-hover));
       }
 
       &:focus-visible {

@@ -1,0 +1,27 @@
+<header class="admin-page-header">
+  @if (breadcrumbs().length > 0) {
+    <app-admin-breadcrumb class="admin-page-header__breadcrumb" [items]="breadcrumbs()" />
+  }
+
+  <div class="admin-page-header__row">
+    <div class="admin-page-header__main">
+      @if (backLink()) {
+        <a class="admin-page-header__back" [routerLink]="backLink()!">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+          <span>{{ backLabel() }}</span>
+        </a>
+      }
+
+      <div class="admin-page-header__text">
+        <h1 class="admin-page-header__title">{{ title() }}</h1>
+        @if (subtitle()) {
+          <p class="admin-page-header__subtitle">{{ subtitle() }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="admin-page-header__actions">
+      <ng-content select="[adminHeaderActions]" />
+    </div>
+  </div>
+</header>

@@ -1,0 +1,54 @@
+@if (open()) {
+  <div
+    class="hambox-sheet"
+    role="presentation"
+    (click)="onBackdropClick()"
+  >
+    <div
+      class="hambox-sheet__panel"
+      role="dialog"
+      [attr.aria-label]="ariaLabel() || title() || null"
+      aria-modal="true"
+      [style.height]="panelHeightStyle()"
+      [style.max-height]="panelHeightStyle()"
+      [style.transform]="panelTransform()"
+      [class.hambox-sheet__panel--dragging]="isDragging()"
+      (click)="onPanelClick($event)"
+    >
+      @if (dragToDismiss()) {
+        <div
+          class="hambox-sheet__handle"
+          aria-hidden="true"
+          (touchstart)="onDragHandleTouchStart($event)"
+          (touchmove)="onDragHandleTouchMove($event)"
+          (touchend)="onDragHandleTouchEnd($event)"
+          (touchcancel)="onDragHandleTouchEnd($event)"
+        >
+          <span class="hambox-sheet__handle-bar"></span>
+        </div>
+      }
+
+      @if (showHeader() && title()) {
+        <header class="hambox-sheet__header">
+          <h2 class="hambox-sheet__title">{{ title() }}</h2>
+          <button
+            type="button"
+            class="hambox-sheet__close"
+            [attr.aria-label]="'COMMON.CLOSE' | translate"
+            (click)="closed.emit()"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </header>
+      }
+
+      <div class="hambox-sheet__body">
+        <ng-content />
+      </div>
+
+      <footer class="hambox-sheet__footer">
+        <ng-content select="[sheetFooter]" />
+      </footer>
+    </div>
+  </div>
+}

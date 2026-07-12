@@ -1,0 +1,28 @@
+.themes-list-page__filter {
+  min-width: 180px;
+}
+
+.themes-list-page__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.themes-list-page__badge {
+  display: inline-block;
+  margin-inline-start: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: var(--theme-primary-muted);
+  color: var(--theme-primary);
+}
+
+.themes-list-page__dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}

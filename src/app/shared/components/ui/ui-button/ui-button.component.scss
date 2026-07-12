@@ -1,0 +1,29 @@
+:host {
+  display: inline-flex;
+}
+
+:host(.ui-button-host--full) {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep {
+  .ui-button.p-button {
+    min-height: var(--ui-control-height);
+    padding-inline: var(--ui-space-6);
+    border-radius: var(--ui-radius-md);
+    font-size: var(--ui-font-body);
+    font-weight: 600;
+    justify-content: center;
+  }
+
+  .ui-button--sm.p-button {
+    min-height: 2.25rem;
+    padding-inline: var(--ui-space-4);
+    font-size: var(--ui-font-caption);
+  }
+
+  .ui-button--full.p-button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,78 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as products) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.OUT_OF_STOCK' | translate" [value]="products.outOfStockVariants" icon="pi-ban" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.LOW_STOCK' | translate" [value]="products.lowStockVariants" icon="pi-exclamation-triangle" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.INVENTORY_VALUE' | translate" [value]="(products.inventoryValue | number: '1.0-2') ?? '—'" icon="pi-box" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.TURNOVER' | translate" [value]="(products.turnoverRatio | number: '1.0-2') ?? '—'" icon="pi-sync" />
+  </app-admin-stat-grid>
+
+  <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.TOP_BY_REVENUE' | translate">
+    @if (products.topByRevenue.length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+    } @else {
+      <apx-chart
+        [series]="topRevenueChart().series"
+        [chart]="topRevenueChart().chart"
+        [xaxis]="topRevenueChart().xaxis"
+        [yaxis]="topRevenueChart().yaxis"
+        [dataLabels]="topRevenueChart().dataLabels"
+        [plotOptions]="topRevenueChart().plotOptions"
+        [tooltip]="topRevenueChart().tooltip"
+      />
+    }
+  </app-admin-section-card>
+
+  <div class="analytics-shell__grid">
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.TABLES.TOP_BY_QUANTITY' | translate">
+      @if (products.topByQuantity.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.TABLE' | translate" />
+      } @else {
+        <div class="analytics-shell__table-wrap">
+          <p-table [value]="products.topByQuantity" [rows]="8">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.NAME' | translate }}</th>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.VALUE' | translate }}</th>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.COUNT' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.value | number: '1.0-2' }}</td>
+                <td>{{ row.count ?? '—' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.TABLES.MOST_VIEWED' | translate">
+      @if (products.mostViewed.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.TABLE' | translate" />
+      } @else {
+        <div class="analytics-shell__table-wrap">
+          <p-table [value]="products.mostViewed" [rows]="8">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.NAME' | translate }}</th>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.VALUE' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.value | number: '1.0-0' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      }
+    </app-admin-section-card>
+  </div>
+}

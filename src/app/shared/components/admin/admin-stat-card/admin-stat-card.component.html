@@ -1,0 +1,14 @@
+<article class="admin-stat-card" [class]="'admin-stat-card--' + tone()" [class.admin-stat-card--compact]="compact()">
+  <div class="admin-stat-card__top">
+    <span class="admin-stat-card__label">{{ label() }}</span>
+    @if (icon()) {
+      <span class="admin-stat-card__icon-wrap" aria-hidden="true">
+        <i [class]="'pi ' + icon()"></i>
+      </span>
+    }
+  </div>
+  <strong class="admin-stat-card__value">{{ value() }}</strong>
+  @if (hint()) {
+    <span class="admin-stat-card__hint">{{ hint() }}</span>
+  }
+</article>

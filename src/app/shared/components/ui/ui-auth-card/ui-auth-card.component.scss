@@ -1,0 +1,54 @@
+@use '../../../../../styles/enterprise-admin-mixins' as enterprise;
+
+:host.ui-auth {
+  display: block;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--ui-primary) 16%, transparent), transparent 42%),
+    var(--ui-bg-base);
+  color: var(--ui-text-primary);
+}
+
+.ui-auth__shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: var(--ui-space-8) var(--ui-space-4);
+}
+
+.ui-auth__card {
+  @include enterprise.ui-card-surface;
+  width: min(100%, 28rem);
+  padding: var(--ui-space-8);
+}
+
+.ui-auth__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  margin-bottom: var(--ui-space-6);
+}
+
+.ui-auth__eyebrow {
+  margin: 0 0 var(--ui-space-2);
+  color: var(--ui-primary);
+  font-size: var(--ui-font-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ui-auth__title {
+  margin: 0;
+  font-size: var(--ui-font-page-title);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.ui-auth__subtitle {
+  margin: var(--ui-space-3) 0 0;
+  color: var(--ui-text-secondary);
+  font-size: var(--ui-font-body);
+  line-height: 1.55;
+}

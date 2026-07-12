@@ -1,0 +1,35 @@
+.theme-detail-page__default {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--theme-primary);
+}
+
+.theme-detail-page__meta {
+  margin-top: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.theme-detail-page__versions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.theme-detail-page__versions li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--hambox-radius-sm);
+}
+
+.theme-detail-page__published {
+  margin-inline-start: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--theme-success);
+  font-weight: 600;
+}

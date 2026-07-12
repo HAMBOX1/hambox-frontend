@@ -1,30 +1,39 @@
-<section class="notifications-page">
+<section class="notifications-page" hamboxTranslateRefresh>
   <header class="notifications-page__header">
     <div>
-      <h1>Notifications</h1>
-      <p>Stay updated on orders, referrals, and account activity.</p>
+      <h1>{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</h1>
+      <p>{{ 'ACCOUNT.NOTIFICATIONS_UI.SUBTITLE' | translate }}</p>
     </div>
-    <button type="button" (click)="markAllRead()">Mark all read</button>
+    <button type="button" (click)="markAllRead()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}</button>
   </header>
 
   @if (loading()) {
-    <p class="notifications-page__state">Loading notifications...</p>
+    <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
   } @else if (error()) {
     <p class="notifications-page__state">{{ error() }}</p>
   } @else if (!items().length) {
-    <p class="notifications-page__state">You are all caught up.</p>
+    <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.EMPTY' | translate }}</p>
   } @else {
     <div class="notifications-page__list">
       @for (item of items(); track item.id) {
-        <article class="notifications-page__item" [class.notifications-page__item--unread]="!item.isRead">
+        <article
+          class="notifications-page__item"
+          [class.notifications-page__item--unread]="!item.isRead"
+          [class.notifications-page__item--clickable]="true"
+          role="button"
+          tabindex="0"
+          (click)="openItem(item)"
+          (keydown.enter)="openItem(item)"
+          (keydown.space)="openItem(item); $event.preventDefault()"
+        >
           <div>
             <span class="notifications-page__category">{{ item.category }}</span>
             <h2>{{ item.title }}</h2>
             <p>{{ item.body }}</p>
-            <time>{{ item.createdOnUtc | date:'medium' }}</time>
+            <time>{{ item.createdOnUtc | hamboxDate:'medium' }}</time>
           </div>
           @if (!item.isRead) {
-            <button type="button" (click)="markRead(item.id)">Mark read</button>
+            <button type="button" (click)="markRead(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate }}</button>
           }
         </article>
       }

@@ -1,0 +1,15 @@
+@if (chips().length > 0) {
+  <div class="store-applied-filters" aria-label="Applied filters">
+    <div class="store-applied-filters__chips">
+      @for (chip of chips(); track chip.id) {
+        <button type="button" class="store-applied-filters__chip" (click)="onRemove(chip.id)">
+          <span>{{ chip.label }}</span>
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+    <button type="button" class="store-applied-filters__clear" (click)="onClearAll()">
+      Clear all
+    </button>
+  </div>
+}

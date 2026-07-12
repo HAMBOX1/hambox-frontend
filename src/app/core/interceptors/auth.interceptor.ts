@@ -5,9 +5,11 @@ import {
   HttpInterceptorFn,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 
 import { AUTH_API } from '../api/api-endpoints';
+import { AUTH_CONTEXT, AuthContextType } from '../auth/auth-context';
 import { AuthSessionService } from '../auth/auth-session.service';
 import { TokenStorageService } from '../auth/token-storage.service';
 import { API_BASE_URL } from '../tokens/api-base-url.token';
@@ -17,6 +19,9 @@ import { AuthTokenResponse } from '../../features/auth/models/auth';
 function isAuthEndpoint(url: string): boolean {
   return (
     url.includes(AUTH_API.login) ||
+    url.includes(AUTH_API.adminLogin) ||
+    url.includes(AUTH_API.adminVerifyOtp) ||
+    url.includes(AUTH_API.adminResendOtp) ||
     url.includes(AUTH_API.register) ||
     url.includes(AUTH_API.refresh)
   );
@@ -28,15 +33,21 @@ function resolveUrl(baseUrl: string, path: string): string {
   return `${base}${normalizedPath}`;
 }
 
+function resolveAuthContext(routerUrl: string): AuthContextType {
+  return routerUrl.startsWith('/admin') ? AUTH_CONTEXT.Admin : AUTH_CONTEXT.Customer;
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const session = inject(AuthSessionService);
   const tokenStorage = inject(TokenStorageService);
   const apiBaseUrl = inject(API_BASE_URL);
   const httpBackend = inject(HttpBackend);
+  const router = inject(Router);
   const rawHttp = new HttpClient(httpBackend);
 
+  const context = resolveAuthContext(router.url);
   const skipAuth = req.context.get(SKIP_AUTH_INTERCEPTOR) || isAuthEndpoint(req.url);
-  const accessToken = session.accessToken();
+  const accessToken = session.getAccessToken(context);
 
   const authReq =
     !skipAuth && accessToken
@@ -54,9 +65,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       const refreshToken =
-        session.session()?.refreshToken ?? tokenStorage.getRefreshToken();
+        session.getSession(context)?.refreshToken ?? tokenStorage.getRefreshToken(context);
       if (!refreshToken) {
-        session.clearSession();
+        session.clearSession(context);
         return throwError(() => error);
       }
 
@@ -66,7 +77,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         })
         .pipe(
           switchMap((tokens) => {
-            session.setSession(tokens);
+            session.setSession(context, tokens);
             const retryReq = req.clone({
               setHeaders: {
                 Authorization: `Bearer ${tokens.accessToken}`,
@@ -75,7 +86,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             return next(retryReq);
           }),
           catchError((refreshError) => {
-            session.clearSession();
+            session.clearSession(context);
             return throwError(() => refreshError);
           }),
         );

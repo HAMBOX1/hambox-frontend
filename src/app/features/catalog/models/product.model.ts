@@ -50,11 +50,6 @@ export interface UpdateProductRequest {
   readonly status: ProductStatus;
 }
 
-export interface CategoryOption {
-  readonly id: string;
-  readonly label: string;
-}
-
 export interface ProductAssetFile {
   readonly id: string;
   readonly name: string;

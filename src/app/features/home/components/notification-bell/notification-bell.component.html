@@ -1,0 +1,60 @@
+<div #host class="notification-bell" [class.notification-bell--compact]="compact()">
+  <button
+    type="button"
+    class="notification-bell__trigger"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="true"
+    [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate"
+    (click)="toggle($event)"
+  >
+    <i class="pi pi-bell" aria-hidden="true"></i>
+    @if (hasUnread()) {
+      <span class="notification-bell__badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="notification-bell__dropdown" role="menu" [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate">
+      <header class="notification-bell__header">
+        <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</strong>
+        @if (hasUnread()) {
+          <button type="button" class="notification-bell__mark-all" (click)="markAllRead()">
+            {{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}
+          </button>
+        }
+      </header>
+
+      @if (loading() && !items().length) {
+        <p class="notification-bell__empty">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
+      } @else if (!items().length) {
+        <p class="notification-bell__empty">{{ 'ACCOUNT.NOTIFICATIONS_UI.EMPTY' | translate }}</p>
+      } @else {
+        <div class="notification-bell__groups">
+          @for (group of groups(); track group.labelKey) {
+            <section class="notification-bell__group">
+              <h3>{{ group.labelKey | translate }}</h3>
+              @for (item of group.items; track item.id) {
+                <button
+                  type="button"
+                  class="notification-bell__item"
+                  [class.notification-bell__item--unread]="!item.isRead"
+                  role="menuitem"
+                  (click)="openNotification(item)"
+                >
+                  <span class="notification-bell__category">{{ item.category }}</span>
+                  <strong>{{ item.title }}</strong>
+                  <p>{{ item.body }}</p>
+                  <time>{{ item.createdOnUtc | hamboxDate: 'shortTime' }}</time>
+                </button>
+              }
+            </section>
+          }
+        </div>
+      }
+
+      <a class="notification-bell__footer" routerLink="/account/notifications" (click)="close()">
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.VIEW_ALL' | translate }}
+      </a>
+    </div>
+  }
+</div>

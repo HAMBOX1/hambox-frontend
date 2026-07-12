@@ -1,0 +1,39 @@
+@use '../../../../../styles/enterprise-admin-mixins' as enterprise;
+
+.ui-field {
+  display: grid;
+  gap: var(--ui-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.ui-field__label {
+  color: var(--ui-text-primary);
+  font-size: var(--ui-font-label);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ui-field__required {
+  margin-left: 0.125rem;
+  color: var(--ui-danger);
+}
+
+.ui-field__control {
+  min-width: 0;
+}
+
+.ui-field__message {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-font-caption);
+  line-height: 1.45;
+}
+
+.ui-field__message--error {
+  color: color-mix(in srgb, var(--ui-danger) 82%, var(--color-text-primary) 18%);
+}
+
+.ui-field--error :host ::ng-deep .ui-input,
+.ui-field--error :host ::ng-deep .ui-password-input {
+  border-color: var(--ui-danger);
+}

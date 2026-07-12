@@ -1,0 +1,34 @@
+<p-dialog
+  [header]="title()"
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!loading()"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog admin-confirm-dialog"
+  (onHide)="onHide()"
+>
+  <p class="admin-confirm-dialog__message">{{ message() }}</p>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="cancelLabel() | translate"
+      severity="secondary"
+      [text]="true"
+      [disabled]="loading()"
+      (click)="visibleChange.emit(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="confirmLabel() | translate"
+      [severity]="destructive() ? 'danger' : 'primary'"
+      [loading]="loading()"
+      (click)="onConfirm()"
+    ></button>
+  </ng-template>
+</p-dialog>

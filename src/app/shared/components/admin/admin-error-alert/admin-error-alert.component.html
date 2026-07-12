@@ -1,0 +1,30 @@
+<div class="admin-error-alert" role="alert">
+
+  <i class="pi pi-exclamation-triangle admin-error-alert__icon" aria-hidden="true"></i>
+
+  <span class="admin-error-alert__message">{{ message() }}</span>
+
+  @if (showRetry()) {
+
+    <button
+
+      pButton
+
+      type="button"
+
+      class="admin-error-alert__retry"
+
+      [label]="retryLabel()"
+
+      severity="secondary"
+
+      size="small"
+
+      (click)="retry.emit()"
+
+    ></button>
+
+  }
+
+</div>
+

@@ -1,0 +1,24 @@
+<div
+  class="ui-field"
+  [class.ui-field--error]="!!error()"
+  [class.ui-field--disabled]="disabled()"
+>
+  @if (label()) {
+    <label class="ui-field__label" [attr.for]="inputId()">
+      {{ label() }}
+      @if (required()) {
+        <span class="ui-field__required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="ui-field__control">
+    <ng-content />
+  </div>
+
+  @if (error()) {
+    <small class="ui-field__message ui-field__message--error" role="alert">{{ error() }}</small>
+  } @else if (hint()) {
+    <small class="ui-field__message">{{ hint() }}</small>
+  }
+</div>

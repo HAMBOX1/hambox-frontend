@@ -1,0 +1,45 @@
+@if (error()) {
+  <app-admin-error-alert [message]="error()!" />
+}
+
+<app-admin-section-card [title]="'ADMIN.REPORTS.DOWNLOADS.TITLE' | translate">
+  <div class="reports-downloads__toolbar">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.REPORTS.ACTIONS.REFRESH' | translate"
+      icon="pi pi-refresh"
+      [loading]="loading()"
+      (click)="reload()"
+    ></button>
+  </div>
+
+  @if (loading() && downloads().length === 0) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (downloads().length === 0) {
+    <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.DOWNLOADS' | translate" />
+  } @else {
+    <div class="reports-downloads__table-wrap">
+      <p-table [value]="downloads()" [rows]="50" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.REPORTS.COLS.FILE' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.TYPE' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.FORMAT' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.SIZE' | translate }}</th>
+            <th>{{ 'ADMIN.REPORTS.COLS.CREATED' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.fileName }}</td>
+            <td>{{ row.reportType }}</td>
+            <td>{{ row.format }}</td>
+            <td>{{ formatBytes(row.fileSizeBytes) }}</td>
+            <td>{{ row.createdOnUtc | date: 'short' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+</app-admin-section-card>

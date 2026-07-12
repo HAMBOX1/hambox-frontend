@@ -1,62 +1,119 @@
 <p-toast position="top-right" />
 
-<section class="product-edit-page">
-  <header class="product-edit-page__header">
-    <a class="product-edit-page__back" routerLink="/admin/inventory">
-      <i class="pi pi-arrow-left" aria-hidden="true"></i>
-      <span>Back to Catalog</span>
-    </a>
-
-    <div class="product-edit-page__heading">
-      <h1 class="product-edit-page__title">Edit Product</h1>
-      <p class="product-edit-page__subtitle">Update catalog details and manage product imagery.</p>
-    </div>
-  </header>
-
+<section class="admin-page product-edit-page">
   @if (loading()) {
-    <p class="product-edit-page__state">Loading product...</p>
+    <app-admin-loading-skeleton variant="detail" />
   } @else if (error()) {
-    <p class="product-edit-page__state product-edit-page__state--error">{{ error() }}</p>
+    <app-admin-error-alert [message]="error()!" />
+    <button pButton type="button" label="Back to products" class="product-edit-page__back" (click)="onCancel()"></button>
   } @else if (product(); as current) {
-    <div class="product-edit-page__content">
-      <section class="product-edit-page__panel">
-        <h2 class="product-edit-page__section-title">Basic Information</h2>
-        <app-product-basic-info-form
-          [categories]="categories()"
-          [categoriesLoading]="categoriesLoading()"
-          [categoriesError]="categoriesError()"
-          [disabled]="submitting()"
-        />
-      </section>
+    <header class="product-edit-page__hero">
+      <nav class="product-edit-page__breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/admin/products">Products</a>
+        <span aria-hidden="true">/</span>
+        <span>Edit Product</span>
+      </nav>
 
-      <section class="product-edit-page__panel">
-        <h2 class="product-edit-page__section-title">Product Images</h2>
-        <p class="product-edit-page__section-copy">
-          Upload, reorder, remove, and set the primary image for {{ current.nameEn }}.
-        </p>
+      <div class="product-edit-page__hero-row">
+        <div class="product-edit-page__title-block">
+          <h1>{{ current.nameEn }}</h1>
+          <p class="product-edit-page__meta">
+            {{ current.categoryName }} · {{ variants().length }} variant(s) · {{ (current.images?.length ?? 0) }} image(s)
+          </p>
+          <app-admin-status-badge [label]="current.status" [tone]="statusTone(current.status)" />
+        </div>
 
-        <app-product-assets-upload [productId]="productId()" />
-      </section>
-    </div>
+        <div class="product-edit-page__hero-actions">
+          <button pButton type="button" label="Cancel" severity="secondary" (click)="onCancel()"></button>
+          <button
+            pButton
+            type="button"
+            label="Save"
+            icon="pi pi-save"
+            severity="secondary"
+            [loading]="submitting()"
+            (click)="onSave(false)"
+          ></button>
+          @if (current.status === 'Draft' || current.status === 'Inactive') {
+            <button
+              pButton
+              type="button"
+              label="Publish"
+              icon="pi pi-check"
+              [loading]="submitting()"
+              *hamboxHasPermission="permissions.Catalog.Products.Edit"
+              (click)="onPublish()"
+            ></button>
+          }
+        </div>
+      </div>
+    </header>
 
-    <footer class="product-edit-page__footer">
-      <button
-        pButton
-        type="button"
-        label="Cancel"
-        severity="secondary"
-        [disabled]="submitting()"
-        (click)="onCancel()"
-      ></button>
+    <p-tabs class="admin-detail-tabs product-edit-page__tabs" [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="general">General</p-tab>
+        <p-tab value="media">Media</p-tab>
+        <p-tab value="pricing">Pricing</p-tab>
+        <p-tab value="options">Option Groups</p-tab>
+        <p-tab value="variants">Variants</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="general">
+          <app-admin-section-card title="General" description="Names, descriptions, and category.">
+            <app-product-basic-info-form
+              #generalForm
+              section="general"
+              [initialSnapshot]="formSnapshot()"
+              [categories]="categories()"
+              [categoriesLoading]="categoriesLoading()"
+              [categoriesError]="error()"
+              [disabled]="submitting()"
+            />
+          </app-admin-section-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="media">
+          <app-admin-section-card
+            title="Media"
+            description="Upload, reorder, and set the primary storefront image."
+          >
+            <app-product-assets-upload [productId]="productId()!" />
+          </app-admin-section-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="pricing">
+          <app-admin-section-card title="Pricing" description="Base price used when variants do not override pricing.">
+            <app-product-basic-info-form
+              #pricingForm
+              section="pricing"
+              [initialSnapshot]="formSnapshot()"
+              [categories]="categories()"
+              [disabled]="submitting()"
+            />
+          </app-admin-section-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="options">
+          <app-product-option-groups-panel />
+        </p-tabpanel>
+
+        <p-tabpanel value="variants">
+          <app-product-variant-manager />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+
+    <app-admin-sticky-save-bar>
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="submitting()" (click)="onCancel()"></button>
       <button
         pButton
         type="button"
         label="Save Changes"
         icon="pi pi-check"
         [loading]="submitting()"
-        [disabled]="submitting()"
         (click)="onSave()"
       ></button>
-    </footer>
+    </app-admin-sticky-save-bar>
   }
 </section>

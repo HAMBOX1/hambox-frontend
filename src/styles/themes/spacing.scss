@@ -20,10 +20,17 @@
   --sf-section-gap: 32px;
   --sf-grid-gap: 24px;
 
-  --admin-sidebar-width: 15.5rem;
+  --admin-sidebar-width: 16rem;
+  --admin-sidebar-width-collapsed: 4.5rem;
+  --admin-sidebar-current-width: var(--admin-sidebar-width);
   --admin-topbar-height: 4.5rem;
-  --admin-content-padding: 1.5rem;
-  --admin-content-padding-mobile: 1rem;
-  --admin-page-gap: 1.25rem;
-  --admin-panel-padding: 1.25rem;
+  --admin-content-padding: 2.5rem;
+  --admin-content-padding-mobile: 1.25rem;
+  --admin-page-gap: 2rem;
+  --admin-section-gap: 2rem;
+  --admin-form-gap: 1.5rem;
+  --admin-field-gap: 1.25rem;
+  --admin-toolbar-gap: 1.25rem;
+  --admin-panel-padding: 1.5rem;
+  --admin-card-padding: 1.5rem;
 }

@@ -12,10 +12,24 @@
     <div class="cart-item__header">
       <div class="cart-item__info">
         <h2 class="cart-item__title">{{ item().title }}</h2>
+        @if (item().variantSummary) {
+          <p class="cart-item__variant">{{ item().variantSummary }}</p>
+        }
+        <div class="cart-item__attrs">
+          @if (item().platform) {
+            <span class="cart-item__attr">{{ item().platform }}</span>
+          }
+          @if (item().region) {
+            <span class="cart-item__attr">{{ item().region }}</span>
+          }
+          @if (item().edition) {
+            <span class="cart-item__attr">{{ item().edition }}</span>
+          }
+        </div>
         @if (item().instantDelivery) {
           <span class="cart-item__badge">
             <img src="assets/images/flash-bolt.svg" alt="" aria-hidden="true" />
-            Instant Digital Delivery
+            {{ 'PRODUCT.INSTANT_DIGITAL' | translate }}
           </span>
         }
       </div>
@@ -23,7 +37,7 @@
       <button
         type="button"
         class="cart-item__remove"
-        aria-label="Remove item"
+        [attr.aria-label]="'CART.REMOVE' | translate"
         (click)="onRemove()"
       >
         <svg width="16" height="18" viewBox="0 0 16 18" fill="none" aria-hidden="true">
@@ -43,7 +57,7 @@
         <button
           type="button"
           class="cart-item__stepper-btn"
-          aria-label="Decrease quantity"
+          [attr.aria-label]="'CART.DECREASE_QUANTITY' | translate"
           (click)="onDecrement()"
         >
           <svg width="12" height="2" viewBox="0 0 12 2" fill="none" aria-hidden="true">
@@ -54,7 +68,7 @@
         <button
           type="button"
           class="cart-item__stepper-btn"
-          aria-label="Increase quantity"
+          [attr.aria-label]="'CART.INCREASE_QUANTITY' | translate"
           (click)="onIncrement()"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">

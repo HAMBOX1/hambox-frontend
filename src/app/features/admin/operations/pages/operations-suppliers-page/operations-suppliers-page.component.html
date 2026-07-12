@@ -1,0 +1,40 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.SUPPLIERS.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.SUPPLIERS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (suppliers().length === 0) {
+    <app-admin-section-card>
+      <p>{{ 'ADMIN.OPERATIONS.EMPTY.SUPPLIERS' | translate }}</p>
+    </app-admin-section-card>
+  } @else {
+    <app-admin-section-card>
+      <p-table [value]="suppliers()">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.NAME' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.COUNTRY' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.AUDIT' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.CREATED' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-s>
+          <tr>
+            <td>{{ s.companyName }}</td>
+            <td><app-admin-status-badge [label]="s.status" [tone]="tone(s.status)" /></td>
+            <td>{{ s.country || '—' }}</td>
+            <td>{{ s.recentAuditCount }}</td>
+            <td>{{ s.createdOnUtc | date: 'short' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+  }
+</section>

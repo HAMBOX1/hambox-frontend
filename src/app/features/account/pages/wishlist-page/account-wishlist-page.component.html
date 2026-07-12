@@ -1,7 +1,7 @@
-<section class="wishlist-page">
+<section class="wishlist-page" hamboxTranslateRefresh>
   <header class="wishlist-page__header">
-    <h1>Your Vault</h1>
-    <p>Saved products ready for your next purchase.</p>
+    <h1>{{ 'ACCOUNT.WISHLIST_UI.TITLE' | translate }}</h1>
+    <p>{{ 'ACCOUNT.WISHLIST_UI.SUBTITLE' | translate }}</p>
   </header>
 
   @if (actionError()) {
@@ -9,13 +9,13 @@
   }
 
   @if (loading()) {
-    <p class="wishlist-page__state">Loading wishlist...</p>
+    <p class="wishlist-page__state">{{ 'ACCOUNT.WISHLIST_UI.LOADING' | translate }}</p>
   } @else if (error()) {
     <p class="wishlist-page__state">{{ error() }}</p>
   } @else if (!items().length) {
     <div class="wishlist-page__empty">
-      <p>Your vault is empty.</p>
-      <a routerLink="/products">Browse Marketplace</a>
+      <p>{{ 'ACCOUNT.WISHLIST_UI.EMPTY' | translate }}</p>
+      <a routerLink="/products">{{ 'ACCOUNT.WISHLIST_UI.BROWSE' | translate }}</a>
     </div>
   } @else {
     <div class="wishlist-page__grid">
@@ -26,9 +26,9 @@
             <h2>{{ item.productNameEn }}</h2>
             <p>{{ item.unitPrice | hamboxCurrency }}</p>
             <div class="wishlist-page__actions">
-              <button type="button" (click)="moveToCart(item.productId)">Move to Cart</button>
+              <button type="button" (click)="moveToCart(item.productId)">{{ 'ACCOUNT.WISHLIST_UI.MOVE_TO_CART' | translate }}</button>
               <button type="button" class="wishlist-page__remove" (click)="remove(item.productId)">
-                Remove
+                {{ 'ACCOUNT.WISHLIST_UI.REMOVE' | translate }}
               </button>
             </div>
           </div>

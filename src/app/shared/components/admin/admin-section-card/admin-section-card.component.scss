@@ -1,0 +1,51 @@
+.admin-section-card {
+  overflow: hidden;
+}
+
+.admin-section-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.5rem var(--admin-card-padding) 1.25rem;
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.admin-section-card__header--plain {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.admin-section-card__title {
+  margin: 0;
+  color: var(--admin-text-primary);
+  font-family: var(--admin-font-heading);
+  font-size: var(--admin-type-card-title);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.admin-section-card__description {
+  margin: 0.5rem 0 0;
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-type-caption);
+  line-height: 1.55;
+}
+
+.admin-section-card__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.admin-section-card__body--padded {
+  padding: var(--admin-card-padding);
+}
+
+@media (max-width: 767px) {
+  .admin-section-card__header,
+  .admin-section-card__body--padded {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}

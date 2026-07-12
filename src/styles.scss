@@ -5,10 +5,13 @@
 @use './styles/themes/dark';
 @use './styles/themes/light';
 @use './styles/themes/tokens';
+@use './styles/themes/semantic';
 @use './styles/themes/shadows';
-@use './styles/themes/primeng-overrides';
+@use './styles/themes/prime-bridge';
 @use './styles/storefront-tokens';
 @use './styles/admin-tokens';
+@use './styles/admin-design-system';
+@use './styles/enterprise-admin-tokens';
 @use './styles/rtl';
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;600;700&family=Sora:wght@400;600;700&display=swap');
 @import 'primeicons/primeicons.css';
@@ -22,6 +25,21 @@
 
 html {
   color-scheme: light dark;
+  scrollbar-color: var(--color-scrollbar-thumb) var(--color-scrollbar-track);
+}
+
+html::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: var(--sf-radius-pill);
 }
 
 html[data-theme='hambox-dark'],
@@ -41,8 +59,8 @@ body {
   min-height: 100vh;
   font-family: var(--hambox-font-family);
   font-size: 16px;
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
+  background-color: var(--background);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: var(--hambox-transition-theme);
@@ -55,7 +73,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: var(--hambox-spacing-4);
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
   line-height: 1.2;
 }
 
@@ -70,11 +88,11 @@ p {
   margin-top: 0;
   margin-bottom: var(--hambox-spacing-4);
   line-height: 1.6;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--primary);
   text-decoration: none;
   transition: color var(--hambox-transition-default);
 
@@ -97,7 +115,7 @@ a {
   --surface-card: var(--color-card);
   --surface-overlay: var(--color-surface);
   --surface-border: var(--color-border);
-  --surface-hover: var(--color-table-row-hover);
+  --surface-hover: var(--color-surface-hover);
   --text-color: var(--color-text-primary);
   --text-color-secondary: var(--color-text-secondary);
   --maskbg: var(--color-overlay);
@@ -124,6 +142,40 @@ a {
 .rounded-lg { border-radius: var(--hambox-radius-lg); }
 .rounded-full { border-radius: var(--hambox-radius-full); }
 
+/* ---------------------------------------------------------
+   Mobile shell (≤767px only)
+--------------------------------------------------------- */
+body.hambox-mobile-shell {
+  --hambox-mobile-bottom-inset: calc(64px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 767px) {
+  body.hambox-mobile-shell {
+    padding-bottom: var(--hambox-mobile-bottom-inset);
+  }
+}
+
 .m-0 { margin: 0; }
 .mb-4 { margin-bottom: var(--hambox-spacing-4); }
 .p-4 { padding: var(--hambox-spacing-4); }
+
+/* ---------------------------------------------------------
+   Product catalog detail drawer (appendTo="body", so this can't be
+   scoped via the component's own :host ::ng-deep — it renders as a
+   sibling of <app-root>, outside any component's DOM subtree)
+--------------------------------------------------------- */
+.product-catalog-page__drawer.p-drawer {
+  // Headless drawer content means PrimeNG's own height-constrained
+  // `.p-drawer-content` wrapper doesn't exist for this drawer — its pMotion
+  // enter animation instead measures the natural (unconstrained) height of
+  // our content and can lock the drawer taller than the viewport. Capping it
+  // here restores "always fits the viewport, scrolls internally."
+  max-height: 100dvh !important;
+}
+
+@media (max-width: 767px) {
+  .product-catalog-page__drawer.p-drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+}

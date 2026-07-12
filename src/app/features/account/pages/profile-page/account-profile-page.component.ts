@@ -1,16 +1,17 @@
-import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
+import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
+import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 
 import { AccountProfileFacade } from '../../services/account-profile.facade';
 
 @Component({
   selector: 'app-account-profile-page',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, HamboxDatePipe, TranslatePipe, HamboxTranslateRefreshDirective],
   templateUrl: './account-profile-page.component.html',
   styleUrl: './account-profile-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountProfilePageComponent implements OnInit {
   private readonly facade = inject(AccountProfileFacade);

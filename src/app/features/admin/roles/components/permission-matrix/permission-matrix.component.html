@@ -1,0 +1,129 @@
+<section class="permission-matrix" [class.permission-matrix--loading]="loading()">
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="permissionSearchTerm()"
+      [placeholder]="'ADMIN.ROLES.PERMISSIONS.SEARCH_PLACEHOLDER' | translate"
+      [ariaLabel]="'ADMIN.ROLES.PERMISSIONS.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <div adminToolbarFilters class="admin-filter-chips permission-matrix__module-filters">
+      <span class="permission-matrix__module-label">
+        {{ 'ADMIN.ROLES.PERMISSIONS.MODULE_FILTER' | translate }}
+      </span>
+      @for (option of moduleOptions(); track option.value) {
+        <button
+          type="button"
+          class="admin-filter-chip"
+          [class.admin-filter-chip--active]="selectedModule() === option.value"
+          [disabled]="loading() || disabled()"
+          (click)="onModuleSelect(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </app-admin-toolbar>
+
+  <div class="permission-matrix__body">
+    @if (loading()) {
+      <app-admin-loading-skeleton variant="table" [rows]="5" />
+    } @else if (!hasVisibleGroups()) {
+      <app-admin-empty-state
+        icon="pi pi-shield"
+        [title]="'ADMIN.ROLES.PERMISSIONS.EMPTY' | translate"
+        [compact]="true"
+      />
+    } @else {
+      <div class="permission-matrix__groups">
+        @for (group of filteredGroups(); track group.id) {
+          @if (visiblePermissions(group).length > 0) {
+            <app-admin-section-card
+              class="permission-matrix__group-card"
+              [title]="group.name"
+              [description]="group.description ?? ''"
+              [padded]="true"
+            >
+              <div adminSectionActions class="permission-matrix__group-actions">
+                <button
+                  pButton
+                  type="button"
+                  class="permission-matrix__action-btn"
+                  [label]="'ADMIN.ROLES.PERMISSIONS.SELECT_ALL' | translate"
+                  severity="secondary"
+                  size="small"
+                  [disabled]="disabled()"
+                  (click)="onSelectAll(group)"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  class="permission-matrix__action-btn"
+                  [label]="'ADMIN.ROLES.PERMISSIONS.CLEAR_ALL' | translate"
+                  severity="secondary"
+                  size="small"
+                  [text]="true"
+                  [disabled]="disabled()"
+                  (click)="onClearAll(group)"
+                ></button>
+              </div>
+
+              <div class="permission-matrix__progress-wrap">
+                <div class="permission-matrix__progress-meta">
+                  <span class="permission-matrix__progress-label">
+                    {{ selectedCount(group) }}/{{ group.permissions.length }}
+                    {{ 'ADMIN.ROLES.PERMISSIONS.SELECTED' | translate }}
+                  </span>
+                  <span class="permission-matrix__module-badge">{{ group.module }}</span>
+                </div>
+                <div
+                  class="permission-matrix__progress"
+                  role="progressbar"
+                  [attr.aria-valuenow]="selectedCount(group)"
+                  [attr.aria-valuemin]="0"
+                  [attr.aria-valuemax]="group.permissions.length"
+                >
+                  <div
+                    class="permission-matrix__progress-bar"
+                    [style.width.%]="progressPercent(group)"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="permission-matrix__chip-grid">
+                @for (permission of visiblePermissions(group); track permission.id) {
+                  <label
+                    class="permission-matrix__chip"
+                    [class.permission-matrix__chip--selected]="isSelected(permission.id)"
+                    [class.permission-matrix__chip--disabled]="disabled()"
+                  >
+                    <input
+                      type="checkbox"
+                      class="permission-matrix__chip-input"
+                      [checked]="isSelected(permission.id)"
+                      [disabled]="disabled()"
+                      (change)="onPermissionChange(permission.id, $any($event.target).checked)"
+                    />
+                    <span class="permission-matrix__chip-indicator" aria-hidden="true">
+                      <i class="pi pi-check"></i>
+                    </span>
+                    <span class="permission-matrix__chip-content">
+                      <span class="permission-matrix__chip-name">{{ permission.name }}</span>
+                      @if (permission.description) {
+                        <span class="permission-matrix__chip-description">
+                          {{ permission.description }}
+                        </span>
+                      }
+                    </span>
+                  </label>
+                }
+              </div>
+            </app-admin-section-card>
+          }
+        }
+      </div>
+    }
+  </div>
+</section>

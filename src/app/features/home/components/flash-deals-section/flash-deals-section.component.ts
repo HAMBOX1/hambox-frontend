@@ -27,6 +27,10 @@ export class FlashDealsSectionComponent implements OnInit {
 
   deals = input.required<readonly FlashDeal[]>();
   initialCountdownSeconds = input.required<number>();
+  sectionTitle = input('Flash Deals');
+  sectionSubtitle = input('');
+  countdownEnabled = input(true);
+  showViewAllLink = input(true);
 
   private readonly countdownSeconds = signal(0);
 

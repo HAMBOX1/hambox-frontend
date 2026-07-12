@@ -1,50 +1,136 @@
-<section class="product-catalog-page">
-  <p-toast />
+<section class="admin-page product-catalog-page">
+  <p-toast position="top-right" />
+
+  <app-admin-page-header
+    [title]="'ADMIN.CATALOG_PAGE.TITLE' | translate"
+    [subtitle]="subtitle()"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Inventory.View"
+      pButton
+      severity="secondary"
+      routerLink="/admin/inventory"
+      [label]="'ADMIN.CATALOG_PAGE.INVENTORY_DASHBOARD' | translate"
+      icon="pi pi-chart-bar"
+    ></a>
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Products.Create"
+      pButton
+      class="admin-btn-primary"
+      routerLink="/admin/products/new"
+      [label]="'ADMIN.CATALOG_PAGE.CREATE_PRODUCT' | translate"
+      icon="pi pi-plus"
+    ></a>
+  </app-admin-page-header>
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card [compact]="true" [label]="'ADMIN.CATALOG_PAGE.STATS.TOTAL' | translate" [value]="listStats().total" icon="pi-box" />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.CATALOG_PAGE.STATS.PUBLISHED' | translate"
+      [value]="listStats().active"
+      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
+      icon="pi-check-circle"
+      tone="success"
+    />
+    <app-admin-stat-card [compact]="true" [label]="'ADMIN.CATALOG_PAGE.STATS.DRAFTS' | translate" [value]="listStats().draft" [hint]="'ADMIN.STATS.ON_PAGE' | translate" icon="pi-file" tone="info" />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.CATALOG_PAGE.STATS.NEEDS_ATTENTION' | translate"
+      [value]="listStats().needsAttention"
+      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
+      icon="pi-exclamation-circle"
+      tone="warning"
+    />
+  </app-admin-stat-grid>
 
   <app-product-catalog-toolbar
-    [subtitle]="subtitle()"
     [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
     (searchChange)="onSearchChange($event)"
+    (statusChange)="onStatusFilterChange($event)"
   />
 
   @if (error()) {
-    <div class="product-catalog-page__alert" role="alert">
-      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-      <span>{{ error() }}</span>
-      <button
-        pButton
-        type="button"
-        class="product-catalog-page__retry-btn"
-        label="Retry"
-        severity="secondary"
-        size="small"
-        (click)="retryLoad()"
-      ></button>
-    </div>
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
-  <div class="product-catalog-page__workspace">
-    <app-product-catalog-table
-      class="product-catalog-page__table"
-      [products]="items()"
-      [loading]="loading()"
-      [totalRecords]="totalCount()"
-      [pageSize]="pageSize()"
-      [first]="tableFirst()"
-      [selectedProductId]="selectedProductId()"
-      [searchActive]="hasActiveSearch()"
-      (pageChange)="onPageChange($event)"
-      (productSelect)="onProductSelect($event)"
-    />
+  <app-product-catalog-table
+    class="product-catalog-page__table"
+    [products]="items()"
+    [loading]="loading()"
+    [totalRecords]="totalCount()"
+    [pageSize]="pageSize()"
+    [first]="tableFirst()"
+    [selectedProductId]="selectedProductId()"
+    [searchActive]="hasActiveSearch()"
+    (pageChange)="onPageChange($event)"
+    (productSelect)="onProductSelect($event)"
+    (createProduct)="navigateToCreate()"
+  />
 
-    <app-product-detail-panel
-      class="product-catalog-page__panel"
-      [product]="selectedProduct()"
-      [loading]="loading()"
-      [updatingStatus]="updatingStatus()"
-      [statusError]="statusError()"
-      (closePanel)="onClosePanel()"
-      (statusChange)="onStatusChange($event)"
+  <p-drawer
+    [visible]="drawerVisible()"
+    (visibleChange)="onDrawerVisibleChange($event)"
+    position="right"
+    [modal]="true"
+    [dismissible]="true"
+    [closeOnEscape]="true"
+    appendTo="body"
+    [style]="{ width: 'min(34rem, 92vw)' }"
+    [maskStyle]="{ '--px-mask-background': 'var(--color-overlay)' }"
+    [transitionOptions]="'200ms cubic-bezier(0.4, 0, 0.2, 1)'"
+    styleClass="product-catalog-page__drawer"
+  >
+    <ng-template #headless>
+      <app-product-detail-panel
+        [product]="selectedProduct()"
+        [loading]="loading()"
+        [updatingStatus]="updatingStatus()"
+        [actionLoading]="actionLoading()"
+        [statusError]="statusError()"
+        (closePanel)="onClosePanel()"
+        (statusChange)="onStatusChange($event)"
+        (duplicate)="openDuplicateDialog()"
+        (deleteProduct)="requestDelete()"
+      />
+    </ng-template>
+  </p-drawer>
+</section>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.DUPLICATE.TITLE' | translate"
+  [visible]="duplicateDialogOpen()"
+  (visibleChange)="duplicateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="admin-field">
+    <label class="admin-field__label" for="duplicate-suffix">{{ 'ADMIN.CATALOG_PAGE.DUPLICATE.NAME_SUFFIX' | translate }}</label>
+    <input
+      pInputText
+      id="duplicate-suffix"
+      class="admin-field__input"
+      [ngModel]="duplicateNameSuffix()"
+      (ngModelChange)="duplicateNameSuffix.set($event)"
     />
   </div>
-</section>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="duplicateDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.DUPLICATE.ACTION' | translate" icon="pi pi-copy" [loading]="actionLoading()" (click)="confirmDuplicate()"></button>
+  </div>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  [title]="'ADMIN.CATALOG_PAGE.DELETE.TITLE' | translate"
+  [message]="deleteDialogMessage()"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  (confirmed)="confirmDelete()"
+/>

@@ -1,18 +1,18 @@
-<div class="product-catalog-table">
-  @if (loading() && products().length === 0) {
-    <div class="product-catalog-table__skeleton" aria-hidden="true">
-      @for (row of skeletonRows; track row) {
-        <div class="product-catalog-table__skeleton-row">
-          <p-skeleton width="42%" height="1rem" />
-          <p-skeleton width="18%" height="1rem" />
-          <p-skeleton width="14%" height="1rem" />
-          <p-skeleton width="12%" height="1rem" />
-        </div>
-      }
-    </div>
-  } @else {
+@if (loading() && products().length === 0) {
+  <div class="product-catalog-table__skeleton" aria-hidden="true">
+    @for (row of skeletonRows; track row) {
+      <div class="product-catalog-table__skeleton-row">
+        <p-skeleton width="42%" height="1rem" />
+        <p-skeleton width="18%" height="1rem" />
+        <p-skeleton width="14%" height="1rem" />
+        <p-skeleton width="12%" height="1rem" />
+      </div>
+    }
+  </div>
+} @else {
+  <app-admin-data-table-shell>
     <p-table
-      class="product-catalog-table__grid"
+      class="admin-data-table"
       [value]="[...products()]"
       [loading]="loading()"
       [lazy]="true"
@@ -26,11 +26,14 @@
       (selectionChange)="onSelectionChange($event)"
       (onLazyLoad)="onLazyLoad($event)"
       dataKey="id"
+      scrollable
+      scrollHeight="flex"
       responsiveLayout="scroll"
     >
       <ng-template pTemplate="header">
         <tr>
           <th>Product</th>
+          <th>ID</th>
           <th>Category</th>
           <th>Price</th>
           <th>Status</th>
@@ -45,25 +48,42 @@
                 <i class="pi pi-box"></i>
               </span>
               <span class="product-catalog-table__product-copy">
-                <span class="product-catalog-table__product-name">{{ product.nameEn }}</span>
-                <span class="product-catalog-table__product-meta">{{ product.descriptionEn || 'No description' }}</span>
+                <span class="admin-cell-primary">{{ product.nameEn }}</span>
+                <span class="admin-cell-secondary">{{ product.descriptionEn || 'No description' }}</span>
               </span>
             </div>
           </td>
           <td>
-            <p-tag
-              class="product-catalog-table__category-tag"
-              [value]="product.categoryName || 'Uncategorized'"
-              severity="info"
+            <div class="product-catalog-table__id">
+              <code
+                class="product-catalog-table__id-text"
+                [pTooltip]="product.id"
+                tooltipPosition="top"
+              >{{ formatShortGuid(product.id) }}</code>
+              <button
+                type="button"
+                class="product-catalog-table__id-copy"
+                [attr.aria-label]="'Copy product ID'"
+                (click)="copyProductId(product.id, $event)"
+              >
+                <i [class]="copiedId() === product.id ? 'pi pi-check' : 'pi pi-copy'" aria-hidden="true"></i>
+              </button>
+            </div>
+          </td>
+          <td>
+            <app-admin-status-badge
+              [label]="product.categoryName || 'Uncategorized'"
+              tone="info"
+              [outlined]="true"
             />
           </td>
           <td>
-            <span class="product-catalog-table__price">{{ product.price | hamboxCurrency }}</span>
+            <span class="admin-cell-primary">{{ product.price | hamboxCurrency }}</span>
           </td>
           <td>
-            <p-tag
-              [value]="statusLabel(product.status)"
-              [severity]="statusSeverity(product.status)"
+            <app-admin-status-badge
+              [label]="statusLabel(product.status)"
+              [tone]="statusTone(product.status)"
             />
           </td>
         </tr>
@@ -71,23 +91,22 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="4">
-            <div class="product-catalog-table__empty" role="status">
-              <i class="pi pi-inbox product-catalog-table__empty-icon" aria-hidden="true"></i>
-              <p class="product-catalog-table__empty-title">
-                {{ searchActive() ? 'No matching products' : 'No products yet' }}
-              </p>
-              <p class="product-catalog-table__empty-copy">
-                @if (searchActive()) {
-                  Try a different search term or clear the filter to see all products.
-                } @else {
-                  Create a product to start building your enterprise catalog.
-                }
-              </p>
-            </div>
+          <td colspan="5">
+            <app-admin-empty-state
+              icon="pi pi-inbox"
+              [title]="searchActive() ? 'No matching products' : 'No products yet'"
+              [description]="
+                searchActive()
+                  ? 'Try a different search term or clear the filter to see all products.'
+                  : 'Create a product to start building your enterprise catalog.'
+              "
+              [primaryLabel]="searchActive() ? null : 'Create Product'"
+              [primaryIcon]="searchActive() ? null : 'pi pi-plus'"
+              (primaryAction)="createProduct.emit()"
+            />
           </td>
         </tr>
       </ng-template>
     </p-table>
-  }
-</div>
+  </app-admin-data-table-shell>
+}

@@ -68,25 +68,27 @@ export class OrderSuccessPageComponent implements OnInit {
     this.error.set(null);
 
     try {
-      const [details, productPage] = await Promise.all([
-        this.checkoutFacade.loadOrder(orderId),
-        this.products.getActiveProducts({ pageNumber: 1, pageSize: 8 }),
-      ]);
-
+      const details = await this.checkoutFacade.loadOrder(orderId);
       this.orderDetails.set(details);
-      this.recommendations.set(
-        mapProductsToRecommendations(
-          (productPage.items ?? []).slice(0, 8).map((product) => {
-            const mapped = mapProductToStoreProduct(product);
-            return {
-              id: mapped.id,
-              title: mapped.title,
-              priceUsd: mapped.priceUsd,
-              imageUrl: mapped.imageUrl,
-            };
-          }),
-        ),
-      );
+
+      try {
+        const productPage = await this.products.getActiveProducts({ pageNumber: 1, pageSize: 8 });
+        this.recommendations.set(
+          mapProductsToRecommendations(
+            (productPage.items ?? []).slice(0, 8).map((product) => {
+              const mapped = mapProductToStoreProduct(product);
+              return {
+                id: mapped.id,
+                title: mapped.title,
+                priceUsd: mapped.priceUsd,
+                imageUrl: mapped.imageUrl,
+              };
+            }),
+          ),
+        );
+      } catch {
+        this.recommendations.set([]);
+      }
     } catch {
       this.orderDetails.set(null);
       this.recommendations.set([]);

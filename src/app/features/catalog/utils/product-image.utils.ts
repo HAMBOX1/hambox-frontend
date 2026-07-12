@@ -25,8 +25,11 @@ export function resolveProductImageUrl(imageUrl?: string | null): string {
 
   const normalized = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
 
-  if (normalized.startsWith('/uploads') && environment.apiUrl) {
-    return `${environment.apiUrl.replace(/\/$/, '')}${normalized}`;
+  if (normalized.startsWith('/uploads')) {
+    const baseUrl = environment.apiUrl as string;
+    if (baseUrl) {
+      return `${baseUrl.replace(/\/$/, '')}${normalized}`;
+    }
   }
 
   return normalized;

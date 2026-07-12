@@ -8,13 +8,14 @@ import {
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { HamboxTranslateRefreshDirective } from '../../../shared/directives/hambox-translate-refresh.directive';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { SupportedLanguageId } from '../../../core/i18n/locale.model';
 
 @Component({
   selector: 'app-language-switcher',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, HamboxTranslateRefreshDirective],
   templateUrl: './language-switcher.component.html',
   styleUrl: './language-switcher.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

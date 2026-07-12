@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { ProductImageCacheService } from '../../../core/product/product-image-cache.service';
 import { GuestCartSessionService } from '../../../core/cart/guest-cart-session.service';
 import { ApiError } from '../../../core/models/api-error.model';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
@@ -11,11 +12,13 @@ import { CartService } from './cart.service';
 
 const EMPTY_SUMMARY: CartSummary = {
   subtotal: 0,
-  discountLabel: 'Rebel Member Discount (10%)',
-  discountAmount: 0,
+  totalDiscount: 0,
   tax: 0,
   total: 0,
   itemCount: 0,
+  appliedPromotions: [],
+  validationErrors: [],
+  appliedCouponCode: null,
 };
 
 @Injectable({
@@ -25,6 +28,7 @@ export class CartFacade {
   private readonly cartService = inject(CartService);
   private readonly guestSession = inject(GuestCartSessionService);
   private readonly authSession = inject(AuthSessionService);
+  private readonly imageCache = inject(ProductImageCacheService);
 
   private readonly itemsState = signal<readonly CartLineItem[]>([]);
   private readonly summaryState = signal<CartSummary>(EMPTY_SUMMARY);
@@ -32,6 +36,7 @@ export class CartFacade {
   private readonly mutatingState = signal(false);
   private readonly errorState = signal<string | null>(null);
   private readonly addingProductIdState = signal<string | null>(null);
+  private readonly couponApplyingState = signal(false);
 
   readonly items = this.itemsState.asReadonly();
   readonly summary = this.summaryState.asReadonly();
@@ -39,6 +44,7 @@ export class CartFacade {
   readonly mutating = this.mutatingState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly addingProductId = this.addingProductIdState.asReadonly();
+  readonly couponApplying = this.couponApplyingState.asReadonly();
 
   readonly itemCount = computed(() => this.summaryState().itemCount);
   readonly isEmpty = computed(() => this.itemsState().length === 0);
@@ -49,7 +55,7 @@ export class CartFacade {
 
     try {
       const cart = await firstValueFrom(this.cartService.getCart());
-      this.applyCartResponse(cart);
+      await this.applyCartResponse(cart);
     } catch (error) {
       this.itemsState.set([]);
       this.summaryState.set(EMPTY_SUMMARY);
@@ -59,13 +65,15 @@ export class CartFacade {
     }
   }
 
-  async addItem(productId: string, quantity = 1): Promise<void> {
+  async addItem(productId: string, quantity = 1, productVariantId?: string | null): Promise<void> {
     this.addingProductIdState.set(productId);
     this.errorState.set(null);
 
     try {
-      const cart = await firstValueFrom(this.cartService.addItem({ productId, quantity }));
-      this.applyCartResponse(cart);
+      const cart = await firstValueFrom(
+        this.cartService.addItem({ productId, quantity, productVariantId }),
+      );
+      await this.applyCartResponse(cart);
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Unable to add this item to your cart.'));
       throw error;
@@ -74,30 +82,42 @@ export class CartFacade {
     }
   }
 
-  async removeItem(productId: string): Promise<void> {
-    await this.mutate(() => this.cartService.removeItem(productId));
-  }
-
-  async updateQuantity(productId: string, quantity: number): Promise<void> {
-    if (quantity < 1) {
-      await this.removeItem(productId);
+  async removeItem(lineId: string): Promise<void> {
+    const item = this.itemsState().find((entry) => entry.id === lineId);
+    if (!item) {
       return;
     }
 
-    await this.mutate(() => this.cartService.updateItem(productId, { quantity }));
+    await this.mutate(() => this.cartService.removeItem(item.productId, item.productVariantId));
   }
 
-  async incrementQuantity(productId: string): Promise<void> {
-    const item = this.itemsState().find((entry) => entry.id === productId);
+  async updateQuantity(lineId: string, quantity: number): Promise<void> {
+    const item = this.itemsState().find((entry) => entry.id === lineId);
+    if (!item) {
+      return;
+    }
+
+    if (quantity < 1) {
+      await this.removeItem(lineId);
+      return;
+    }
+
+    await this.mutate(() =>
+      this.cartService.updateItem(item.productId, { quantity }, item.productVariantId),
+    );
+  }
+
+  async incrementQuantity(lineId: string): Promise<void> {
+    const item = this.itemsState().find((entry) => entry.id === lineId);
     if (item) {
-      await this.updateQuantity(productId, item.quantity + 1);
+      await this.updateQuantity(lineId, item.quantity + 1);
     }
   }
 
-  async decrementQuantity(productId: string): Promise<void> {
-    const item = this.itemsState().find((entry) => entry.id === productId);
+  async decrementQuantity(lineId: string): Promise<void> {
+    const item = this.itemsState().find((entry) => entry.id === lineId);
     if (item) {
-      await this.updateQuantity(productId, item.quantity - 1);
+      await this.updateQuantity(lineId, item.quantity - 1);
     }
   }
 
@@ -117,6 +137,41 @@ export class CartFacade {
     }
   }
 
+  async applyCoupon(couponCode: string, country?: string): Promise<void> {
+    this.couponApplyingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const cart = await firstValueFrom(
+        this.cartService.applyCoupon({
+          couponCode: couponCode.trim(),
+          ...(country ? { country } : {}),
+        }),
+      );
+      await this.applyCartResponse(cart);
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Unable to apply this coupon.'));
+      throw error;
+    } finally {
+      this.couponApplyingState.set(false);
+    }
+  }
+
+  async removeCoupon(country?: string): Promise<void> {
+    this.couponApplyingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const cart = await firstValueFrom(this.cartService.removeCoupon(country));
+      await this.applyCartResponse(cart);
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Unable to remove the coupon.'));
+      throw error;
+    } finally {
+      this.couponApplyingState.set(false);
+    }
+  }
+
   async mergeGuestCartIfNeeded(): Promise<void> {
     const guestSessionId = this.guestSession.getGuestSessionId();
     if (!guestSessionId || !this.authSession.isAuthenticated()) {
@@ -128,7 +183,7 @@ export class CartFacade {
         this.cartService.mergeGuestCart({ guestSessionId }),
       );
       this.guestSession.clearGuestSessionId();
-      this.applyCartResponse(cart);
+      await this.applyCartResponse(cart);
     } catch {
       // Keep guest session so a later login retry can merge again.
     }
@@ -140,7 +195,7 @@ export class CartFacade {
 
     try {
       const result = await firstValueFrom(request());
-      this.applyCartResponse(result);
+      await this.applyCartResponse(result);
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Unable to update your cart.'));
       throw error;
@@ -149,13 +204,22 @@ export class CartFacade {
     }
   }
 
-  private applyCartResponse(cart: CartApiDto): void {
+  private async applyCartResponse(cart: CartApiDto): Promise<void> {
     if (cart.guestSessionId) {
       this.guestSession.setGuestSessionId(cart.guestSessionId);
     }
 
     const mapped = mapCartResponse(cart);
-    this.itemsState.set(mapped.items);
+    const imageUrls = await this.imageCache.resolveMany(
+      mapped.items.map((item) => item.productId),
+    );
+
+    const items = mapped.items.map((item, index) => ({
+      ...item,
+      imageUrl: imageUrls.get(item.productId) ?? item.imageUrl,
+    }));
+
+    this.itemsState.set(items);
     this.summaryState.set(mapped.summary);
   }
 

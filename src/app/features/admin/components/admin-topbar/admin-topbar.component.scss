@@ -13,8 +13,8 @@
   min-height: var(--admin-topbar-height);
   padding: 0 var(--admin-content-padding);
   border-bottom: 1px solid var(--admin-border-subtle);
-  background: rgba(11, 12, 14, 0.92);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--admin-bg-elevated) 88%, transparent);
+  backdrop-filter: blur(16px);
 }
 
 .admin-topbar__start {
@@ -48,43 +48,34 @@
   }
 }
 
-.admin-topbar__menu-btn {
+.admin-topbar__menu-btn,
+.admin-topbar__sidebar-btn {
   display: none;
 }
 
-.admin-topbar__search {
+.admin-topbar__sidebar-btn {
+  display: grid;
+}
+
+.admin-topbar__context {
   display: flex;
-  align-items: center;
-  flex: 1;
-  max-width: 34rem;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0;
   min-width: 0;
-  padding: 0.625rem 1rem;
-  border: 1px solid var(--admin-border-default);
-  border-radius: var(--admin-radius-pill);
-  background: var(--admin-bg-input);
 }
 
-.admin-topbar__search-icon {
-  margin-right: 0.625rem;
-  color: var(--admin-text-muted);
-  font-size: 0.95rem;
-}
-
-.admin-topbar__search-input {
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
+.admin-topbar__context-label {
   color: var(--admin-text-primary);
-  font-family: var(--admin-font-body);
-  font-size: 0.875rem;
-  outline: 0;
-  box-shadow: none;
+  font-size: var(--admin-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
 
-  &::placeholder {
-    color: var(--admin-text-muted);
-  }
+.admin-topbar__context-hint {
+  color: var(--admin-text-muted);
+  font-size: var(--admin-type-label);
+  font-weight: 500;
 }
 
 .admin-topbar__actions {
@@ -132,7 +123,7 @@
   height: 2.5rem;
   border: 1px solid var(--admin-border-strong);
   border-radius: 50%;
-  background: linear-gradient(135deg, #2a3140, #171b24);
+  background: color-mix(in srgb, var(--admin-bg-elevated) 82%, var(--admin-accent-green) 18%);
   color: var(--admin-text-primary);
   font-size: 0.875rem;
   font-weight: 700;
@@ -147,17 +138,17 @@
     display: grid;
   }
 
+  .admin-topbar__sidebar-btn {
+    display: none;
+  }
+
   .admin-topbar__profile-copy {
     display: none;
   }
 }
 
 @media (max-width: 767px) {
-  .admin-topbar__icon-btn {
+  .admin-topbar__context-hint {
     display: none;
-  }
-
-  .admin-topbar__search {
-    max-width: none;
   }
 }

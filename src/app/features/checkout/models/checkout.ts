@@ -1,4 +1,6 @@
-export type PaymentMethodId = 'card' | 'paypal' | 'crypto' | 'apple-pay';
+import type { AppliedPromotion } from '../../cart/models/cart';
+
+export type PaymentMethodId = 'card' | 'paypal' | 'crypto' | 'apple-pay' | 'development';
 
 export interface PaymentMethodOption {
   id: PaymentMethodId;
@@ -16,9 +18,12 @@ export interface CheckoutOrderItem {
 
 export interface CheckoutSummary {
   subtotal: number;
-  memberDiscount: number;
+  totalDiscount: number;
   tax: number;
   total: number;
+  appliedPromotions: readonly AppliedPromotion[];
+  validationErrors: readonly string[];
+  appliedCouponCode: string | null;
 }
 
 export interface CardPaymentDetails {
@@ -31,6 +36,10 @@ export interface CardPaymentDetails {
 export interface BillingDetails {
   email: string;
   country: string;
+}
+
+export interface CheckoutConfigurationDto {
+  readonly developmentCheckoutEnabled: boolean;
 }
 
 export interface CountryOption {

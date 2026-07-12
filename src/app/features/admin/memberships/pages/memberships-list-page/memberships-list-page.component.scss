@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.memberships-list-page__filter {
+  min-width: 11rem;
+}
+
+.memberships-list-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 0.875rem;
+}
+
+.memberships-list-page__field-label {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.memberships-list-page__field-input {
+  width: 100%;
+}
+
+a.admin-cell-primary {
+  text-decoration: none;
+
+  &:hover {
+    color: var(--admin-accent-green);
+  }
+}

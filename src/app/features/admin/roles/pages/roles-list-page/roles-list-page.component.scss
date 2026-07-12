@@ -1,0 +1,47 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.roles-list-page__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.roles-list-page__user-stack {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.roles-list-page__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--admin-accent-green-soft);
+  color: var(--admin-accent-green);
+  font-size: 0.6875rem;
+  font-weight: 800;
+}
+
+.roles-list-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roles-list-page__field-label {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.roles-list-page__field-input {
+  width: 100%;
+}

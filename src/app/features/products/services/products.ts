@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { CategoryApiService } from '../../catalog/services/category-api.service';
 import { ProductApiService } from '../../catalog/services/product-api.service';
 import { Category } from '../../catalog/models/category.model';
-import { Product, ProductListQuery } from '../../catalog/models/product.model';
+import { Product, ProductListQuery, ProductSortBy } from '../../catalog/models/product.model';
 import { PagedResult } from '../../catalog/models/category.model';
 import { StoreCategoryPill } from '../models/product';
 
@@ -15,6 +15,7 @@ export interface StorefrontProductQuery {
   readonly pageSize: number;
   readonly searchTerm?: string;
   readonly categoryId?: string;
+  readonly sortBy?: ProductSortBy;
 }
 
 @Injectable({
@@ -31,6 +32,7 @@ export class Products {
       searchTerm: query.searchTerm,
       status: 'Active',
       categoryId: query.categoryId,
+      sortBy: query.sortBy,
     };
 
     return firstValueFrom(this.productApi.getProducts(request));

@@ -54,11 +54,16 @@ export function mapProductToStoreProduct(product: Product, index = 0): StoreProd
     imageUrl: resolveImageUrl(product.primaryImageUrl, index),
     platformLabel: product.categoryName,
     platformTone: resolvePlatformTone(product.categoryName),
+    categoryName: product.categoryName,
+    rating: 4.8,
     instantDigital: isActive,
     priceUsd: product.price,
     cta: isActive ? 'cart' : 'notify-me',
     outOfStock: !isActive,
+    stockStatus: isActive ? 'unknown' : 'out-of-stock',
     highlighted: isActive,
+    createdOnUtc: product.createdOnUtc,
+    listIndex: index,
   };
 }
 

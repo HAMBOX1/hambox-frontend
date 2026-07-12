@@ -10,9 +10,16 @@ export const authGuard: CanActivateFn = async (_route, state) => {
 
   if (!session.initialized()) {
     await inject(Auth).restoreSession();
+    session.markInitialized();
   }
 
-  if (session.isAuthenticated()) {
+  if (session.isAdminAuthenticated()) {
+    return router.createUrlTree(['/access-denied'], {
+      queryParams: { context: 'admin-on-customer' },
+    });
+  }
+
+  if (session.isCustomerAuthenticated()) {
     return true;
   }
 

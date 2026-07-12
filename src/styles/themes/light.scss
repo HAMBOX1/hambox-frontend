@@ -1,7 +1,8 @@
-// HAMBOX Light — intentionally designed premium experience (not dark inverted)
+// HAMBOX Light — matches production (hambox.vercel.app)
 html[data-theme='hambox-light'] {
   --theme-background: #f4f6f8;
   --theme-surface: #ffffff;
+  --theme-surface-hover: #f1f5f9;
   --theme-card: #ffffff;
   --theme-elevated: #ffffff;
   --theme-sidebar: #ffffff;
@@ -40,6 +41,7 @@ html[data-theme='hambox-light'] {
   --theme-text-secondary: #475569;
   --theme-text-muted: #94a3b8;
   --theme-text-caption: #64748b;
+  --theme-text-disabled: #cbd5e1;
   --theme-text-inverse: #ffffff;
   --theme-text-on-primary: #ffffff;
 
@@ -49,6 +51,7 @@ html[data-theme='hambox-light'] {
 
   --theme-table-header: #f8fafc;
   --theme-table-row-hover: #f1f5f9;
+  --theme-table-row-selected: rgba(45, 187, 124, 0.1);
   --theme-table-border: #e8edf3;
 
   --theme-scrollbar-track: #edf2f7;
@@ -64,6 +67,7 @@ html[data-theme='hambox-light'] {
   --theme-btn-secondary-border: #e2e8f0;
   --theme-btn-ghost-hover: #f1f5f9;
 
+  --theme-shadow: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
   --theme-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
   --theme-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
   --theme-shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.04);
@@ -76,7 +80,6 @@ html[data-theme='hambox-light'] {
   --theme-blur-nav: 12px;
   --theme-blur-glass: 0px;
 
-  // Navbar (Linear / Stripe style)
   --theme-nav-bg: rgba(255, 255, 255, 0.94);
   --theme-nav-panel: #ffffff;
   --theme-nav-search-bg: #f1f4f8;
@@ -90,7 +93,6 @@ html[data-theme='hambox-light'] {
   --theme-nav-elevated-shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
   --theme-nav-height: 76px;
 
-  // Commerce surfaces
   --theme-card-shell: #ffffff;
   --theme-card-shell-border: #e8edf3;
   --theme-card-overlay: rgba(15, 23, 42, 0.45);
@@ -119,6 +121,7 @@ html[data-theme='hambox-light'] {
 
   --theme-price-green: #1f9460;
   --theme-price-blue: #2b6cb0;
+  --theme-price-display: #1f9460;
   --theme-price-peach: #dd6b20;
   --theme-flash-label: #c53030;
   --theme-flash-badge-bg: #fed7d7;
@@ -128,6 +131,31 @@ html[data-theme='hambox-light'] {
   --theme-membership-bg: linear-gradient(135deg, #eef4fc 0%, #f8fafc 50%, #ffffff 100%);
   --theme-membership-text: #2b6cb0;
   --theme-avatar-gradient: linear-gradient(135deg, #3182ce, #2dbb7c);
+
+  // Commerce accent aliases (same as brand primary in light)
+  --theme-accent: var(--theme-primary);
+  --theme-accent-hover: var(--theme-primary-hover);
+  --theme-accent-muted: var(--theme-primary-muted);
+  --theme-accent-border: var(--theme-primary-border);
+  --theme-accent-focus: var(--theme-focus-ring);
+  --theme-accent-buy: var(--theme-danger);
+  --theme-accent-buy-hover: #c53030;
+  --theme-band: var(--theme-section);
+  --theme-cta-cart-bg: linear-gradient(180deg, var(--theme-cta-gradient-start) 0%, var(--theme-cta-gradient-end) 100%);
+  --theme-cta-cart-text: var(--theme-primary-text);
+  --theme-cta-cart-shadow: var(--theme-shadow-accent-sm);
+  --theme-cta-buy-bg: var(--theme-surface);
+  --theme-cta-buy-hover: var(--theme-table-row-hover);
+  --theme-cta-buy-text: var(--theme-text-primary);
+  --theme-cta-buy-border: var(--theme-border);
+
+  --theme-auth-panel-bg: var(--theme-surface);
+  --theme-auth-panel-border: var(--theme-border);
+  --theme-auth-hero-text: #ffffff;
+  --theme-auth-hero-muted: rgba(255, 255, 255, 0.82);
+  --theme-auth-feature-bg: rgba(255, 255, 255, 0.12);
+  --theme-auth-feature-border: rgba(255, 255, 255, 0.18);
+  --theme-auth-divider: var(--theme-border);
 
   --hambox-primary-50: #ecfdf5;
   --hambox-primary-100: #d1fae5;

@@ -1,0 +1,238 @@
+:host {
+  display: block;
+}
+
+.flash-hero {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-panel-bg);
+  box-shadow: var(--color-promo-glow);
+}
+
+.flash-hero__bg {
+  position: absolute;
+  top: -144%;
+  left: 0;
+  width: 100%;
+  height: 388%;
+  max-width: none;
+  object-fit: cover;
+  mix-blend-mode: luminosity;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.flash-hero__glow {
+  position: absolute;
+  inset: -40% 30% auto auto;
+  width: 60%;
+  height: 140%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--sf-accent) 22%, transparent) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+.flash-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-promo-overlay);
+  pointer-events: none;
+}
+
+.flash-hero__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 3rem;
+}
+
+.flash-hero__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 560px;
+}
+
+.flash-hero__badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-accent-muted);
+  color: var(--sf-accent);
+  font-family: var(--sf-font-heading);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  img {
+    width: 14px;
+    height: 18px;
+  }
+}
+
+.flash-hero__headline {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-heading);
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.flash-hero__meta {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-family: var(--sf-font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.flash-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: var(--sf-radius-md);
+  background: linear-gradient(180deg, var(--color-cta-gradient-start), var(--color-cta-gradient-end));
+  box-shadow: var(--color-shadow-accent-sm);
+  color: var(--color-primary-text-on);
+  font-family: var(--sf-font-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--hambox-transition-theme), transform 0.2s ease;
+
+  i {
+    font-size: 0.8125rem;
+  }
+
+  &:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.flash-hero__countdown {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--sf-radius-lg);
+  background: color-mix(in srgb, var(--color-promo-countdown-bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--color-shadow-sm);
+}
+
+.flash-hero__countdown-label {
+  color: var(--color-text-caption);
+  font-family: var(--sf-font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.flash-hero__countdown-blocks {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.flash-hero__time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 2.5rem;
+}
+
+.flash-hero__time-value {
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.flash-hero__time-unit {
+  color: var(--color-text-caption);
+  font-family: var(--sf-font-body);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flash-hero__time-sep {
+  color: var(--sf-accent);
+  font-family: var(--sf-font-heading);
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  transform: translateY(-0.5rem);
+}
+
+@media (max-width: 991px) {
+  .flash-hero__content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem;
+  }
+
+  .flash-hero__countdown {
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 767px) {
+  .flash-hero {
+    min-height: 0;
+  }
+
+  .flash-hero__content {
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .flash-hero__headline {
+    font-size: 1.75rem;
+  }
+
+  .flash-hero__countdown {
+    width: 100%;
+    padding: 1rem 1.25rem;
+  }
+
+  .flash-hero__countdown-blocks {
+    gap: 0.75rem;
+  }
+
+  .flash-hero__time-value {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,78 @@
+.variant-codes-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-section-gap);
+}
+
+.variant-codes-page__grid {
+  display: grid;
+  gap: var(--ui-section-gap);
+
+  @media (min-width: 1100px) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: start;
+  }
+}
+
+.variant-codes-page__import,
+.variant-codes-page__batch {
+  display: grid;
+  gap: var(--ui-space-4);
+}
+
+.variant-codes-page__upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-3);
+}
+
+.variant-codes-page__file-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ui-control-height);
+  padding: 0 var(--ui-space-4);
+  border: 1px dashed var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text-secondary);
+  font-size: var(--ui-font-body);
+  cursor: pointer;
+  transition: border-color var(--ui-transition), color var(--ui-transition);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--ui-primary) 45%, var(--ui-border));
+    color: var(--ui-text-primary);
+  }
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+  }
+}
+
+.variant-codes-page__textarea {
+  width: 100%;
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.variant-codes-page__table {
+  min-height: 18rem;
+}
+
+.variant-codes-page__code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: var(--ui-font-caption);
+}
+
+.variant-codes-page__paginator {
+  margin-top: var(--ui-space-4);
+}
+
+:host ::ng-deep {
+  .variant-codes-page__batch ui-button,
+  .variant-codes-page__import ui-button {
+    justify-self: start;
+  }
+}

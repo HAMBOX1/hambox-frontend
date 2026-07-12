@@ -1,0 +1,88 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [blockScroll]="true"
+  appendTo="body"
+  styleClass="variant-codes-dialog"
+  contentStyleClass="variant-codes-dialog__content"
+  [style]="{ width: 'min(960px, 96vw)', maxWidth: '96vw' }"
+  [header]="variant() ? 'Manage Codes — ' + variant()!.sku : 'Manage Codes'"
+>
+  @if (variant(); as current) {
+    <div class="variant-codes-dialog__body">
+      <p class="variant-codes-dialog__summary">{{ optionSummary(current) }}</p>
+
+      @if (statistics(); as stats) {
+        <div class="variant-codes-dialog__stats">
+          <article><span>Available</span><strong>{{ stats.available }}</strong></article>
+          <article><span>Reserved</span><strong>{{ stats.reserved }}</strong></article>
+          <article><span>Sold</span><strong>{{ stats.sold }}</strong></article>
+          <article><span>Remaining</span><strong>{{ stats.available }}</strong></article>
+        </div>
+      }
+
+      <div class="variant-codes-dialog__batch" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
+        <input pInputText placeholder="Batch name" [ngModel]="newBatchName()" (ngModelChange)="newBatchName.set($event)" />
+        <button pButton type="button" label="Create Batch" icon="pi pi-folder-plus" (click)="createBatch()"></button>
+      </div>
+
+      <div class="variant-codes-dialog__import" *hamboxHasPermission="permissions.Catalog.Inventory.Import">
+        <label for="variant-bulk-codes">Upload / paste codes (one per line)</label>
+        <textarea
+          id="variant-bulk-codes"
+          pTextarea
+          rows="5"
+          [ngModel]="bulkCodes()"
+          (ngModelChange)="bulkCodes.set($event)"
+        ></textarea>
+        <div class="variant-codes-dialog__import-actions">
+          <button
+            pButton
+            type="button"
+            label="Import Codes"
+            icon="pi pi-upload"
+            [loading]="importing()"
+            (click)="importCodes()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            label="Export CSV"
+            icon="pi pi-download"
+            severity="secondary"
+            [disabled]="!codesTable().length"
+            (click)="exportCodes()"
+          ></button>
+        </div>
+      </div>
+
+      <div class="variant-codes-dialog__table-wrap">
+        <p-table [value]="codesTable()" [loading]="inventoryLoading()" class="variant-codes-dialog__table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Batch</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-code>
+            <tr>
+              <td><code>{{ code.digitalCode }}</code></td>
+              <td><app-admin-status-badge [label]="code.status" /></td>
+              <td>{{ code.batchId }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="3">No codes imported for this variant yet.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  }
+</p-dialog>

@@ -20,16 +20,23 @@ export class CheckoutOrderSummaryComponent {
   protected readonly items = this.checkout.orderItems;
   protected readonly summary = this.checkout.summary;
   protected readonly discountCode = this.checkout.discountCode;
+  protected readonly discountError = this.checkout.discountError;
+  protected readonly discountApplying = this.checkout.discountApplying;
   protected readonly submitting = this.checkout.submitting;
   protected readonly error = this.checkout.error;
+  protected readonly isDevelopmentCheckout = this.checkout.isDevelopmentCheckout;
   protected readonly actionError = signal<string | null>(null);
 
   protected onDiscountInput(event: Event): void {
     this.checkout.setDiscountCode((event.target as HTMLInputElement).value);
   }
 
-  protected applyDiscount(): void {
-    this.checkout.applyDiscount();
+  protected async applyDiscount(): Promise<void> {
+    await this.checkout.applyDiscount();
+  }
+
+  protected async removeCoupon(): Promise<void> {
+    await this.checkout.removeDiscount();
   }
 
   protected async completePurchase(): Promise<void> {
@@ -40,15 +47,14 @@ export class CheckoutOrderSummaryComponent {
       return;
     }
 
-    try {
-      const order = await this.checkout.submitOrder();
-      await this.router.navigate(['/checkout/processing'], {
-        queryParams: { orderId: order.id },
-      });
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : this.error() ?? 'Checkout failed. Please try again.';
-      this.actionError.set(message);
+    const billing = this.checkout.billingDetails();
+    if (!billing.email.trim()) {
+      this.actionError.set('Email is required to complete checkout.');
+      return;
     }
+
+    await this.router.navigate(['/checkout/processing'], {
+      queryParams: { mode: 'checkout' },
+    });
   }
 }

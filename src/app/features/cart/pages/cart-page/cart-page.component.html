@@ -48,6 +48,16 @@
         </div>
       </div>
     }
+
+    @if (!isEmpty()) {
+      <footer class="storefront-cart__mobile-checkout" aria-label="Cart checkout">
+        <div class="storefront-cart__mobile-subtotal">
+          <span>Subtotal</span>
+          <strong>{{ summary().subtotal | hamboxCurrency }}</strong>
+        </div>
+        <a routerLink="/checkout" class="storefront-cart__mobile-checkout-btn">Checkout</a>
+      </footer>
+    }
   </main>
 
   <app-storefront-footer />

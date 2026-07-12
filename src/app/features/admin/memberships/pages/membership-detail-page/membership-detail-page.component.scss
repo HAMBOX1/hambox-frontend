@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.membership-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-page-gap);
+}
+
+.membership-detail-page__description {
+  margin: 1rem 0 0;
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+}
+
+.membership-detail-page__benefits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--admin-border-subtle);
+  }
+}
+
+.membership-detail-page__plan-members-note {
+  margin-top: 1rem;
+  color: var(--admin-text-secondary);
+}
+
+.membership-detail-page__comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.membership-detail-page__comparison-price {
+  margin: 0;
+}
+
+.membership-detail-page__comparison-benefits {
+  margin: 0.75rem 0 0;
+  padding-left: 1.125rem;
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+}
+
+.membership-detail-page__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--admin-text-primary);
+}
+
+:host ::ng-deep {
+  .membership-detail-page__comparison-card--current.admin-section-card {
+    border-color: var(--admin-accent-green);
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+  }
+}

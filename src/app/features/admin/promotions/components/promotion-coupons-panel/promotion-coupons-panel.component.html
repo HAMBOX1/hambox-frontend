@@ -1,0 +1,118 @@
+<app-admin-section-card [title]="'ADMIN.PROMOTIONS.DETAIL.TAB_COUPONS' | translate">
+  <button
+    adminSectionActions
+    *hamboxHasPermission="permissions.Coupons.Generate"
+    pButton
+    type="button"
+    [label]="'ADMIN.PROMOTIONS.COUPONS.GENERATE' | translate"
+    icon="pi pi-bolt"
+    size="small"
+    (click)="generateDialogOpen.set(true)"
+  ></button>
+  <button
+    adminSectionActions
+    *hamboxHasPermission="permissions.Coupons.Create"
+    pButton
+    type="button"
+    [label]="'ADMIN.PROMOTIONS.COUPONS.ADD_CUSTOM' | translate"
+    icon="pi pi-plus"
+    severity="secondary"
+    size="small"
+    (click)="customDialogOpen.set(true)"
+  ></button>
+
+  <app-admin-data-table-shell>
+    <p-table class="admin-data-table" [value]="[...coupons()]" dataKey="id" scrollable scrollHeight="flex">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.PROMOTIONS.COUPONS.CODE' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.COUPONS.USES' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.COUPONS.EXPIRES' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.STATUS' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-coupon>
+        <tr>
+          <td>
+            <code class="promotion-coupons-panel__code">{{ coupon.code }}</code>
+          </td>
+          <td>
+            <span class="admin-cell-badge">{{ coupon.usedCount }} / {{ coupon.maxUses ?? '∞' }}</span>
+          </td>
+          <td>
+            <span class="admin-cell-secondary">{{ coupon.expiresOnUtc || '—' }}</span>
+          </td>
+          <td>
+            <app-admin-status-badge
+              [label]="coupon.isActive ? 'Active' : 'Inactive'"
+              [tone]="coupon.isActive ? 'success' : 'neutral'"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">
+            <app-admin-empty-state
+              icon="pi pi-ticket"
+              [title]="'ADMIN.PROMOTIONS.COUPONS.EMPTY' | translate"
+              [compact]="true"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</app-admin-section-card>
+
+<p-dialog
+  [header]="'ADMIN.PROMOTIONS.COUPONS.GENERATE_TITLE' | translate"
+  [visible]="generateDialogOpen()"
+  (visibleChange)="generateDialogOpen.set($event)"
+  [modal]="true"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="admin-form-grid admin-form-grid--single">
+    <label class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.COUPONS.COUNT' | translate }}</span>
+      <p-inputNumber [ngModel]="generateCount()" (ngModelChange)="generateCount.set($event)" [min]="1" [max]="500" />
+    </label>
+    <label class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.COUPONS.PREFIX' | translate }}</span>
+      <input pInputText class="admin-field__input" type="text" [ngModel]="generatePrefix()" (ngModelChange)="generatePrefix.set($event)" />
+    </label>
+  </div>
+  <label class="promotion-coupons-panel__check">
+    <p-checkbox [ngModel]="generateSingleUse()" (ngModelChange)="generateSingleUse.set($event)" [binary]="true" />
+    <span>{{ 'ADMIN.PROMOTIONS.COUPONS.SINGLE_USE' | translate }}</span>
+  </label>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'ADMIN.PROMOTIONS.ACTIONS.CANCEL' | translate" [text]="true" (click)="generateDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.PROMOTIONS.COUPONS.GENERATE' | translate" [disabled]="actionLoading()" (click)="confirmGenerate()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.PROMOTIONS.COUPONS.CUSTOM_TITLE' | translate"
+  [visible]="customDialogOpen()"
+  (visibleChange)="customDialogOpen.set($event)"
+  [modal]="true"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <label class="admin-field">
+    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.COUPONS.CODE' | translate }}</span>
+    <input pInputText class="admin-field__input" type="text" [ngModel]="customCode()" (ngModelChange)="customCode.set($event)" />
+  </label>
+  <label class="promotion-coupons-panel__check">
+    <p-checkbox [ngModel]="customSingleUse()" (ngModelChange)="customSingleUse.set($event)" [binary]="true" />
+    <span>{{ 'ADMIN.PROMOTIONS.COUPONS.SINGLE_USE' | translate }}</span>
+  </label>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'ADMIN.PROMOTIONS.ACTIONS.CANCEL' | translate" [text]="true" (click)="customDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.PROMOTIONS.COUPONS.ADD_CUSTOM' | translate" [disabled]="actionLoading() || !customCode().trim()" (click)="confirmCustomCoupon()"></button>
+  </ng-template>
+</p-dialog>

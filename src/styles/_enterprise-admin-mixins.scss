@@ -1,0 +1,48 @@
+@mixin ui-focus-ring {
+  outline: none;
+  border-color: var(--ui-primary);
+  box-shadow: 0 0 0 3px var(--ui-focus-ring);
+}
+
+@mixin ui-control-base {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--ui-control-height);
+  padding: 0 var(--ui-space-4);
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-input-bg);
+  color: var(--ui-text-primary);
+  font-size: var(--ui-font-body);
+  line-height: 1.5;
+  transition:
+    border-color var(--ui-transition),
+    box-shadow var(--ui-transition),
+    background-color var(--ui-transition);
+
+  &::placeholder {
+    color: var(--ui-text-muted);
+    opacity: 1;
+  }
+
+  &:enabled:hover {
+    border-color: color-mix(in srgb, var(--ui-input-border) 70%, var(--ui-primary) 30%);
+  }
+
+  &:enabled:focus {
+    @include ui-focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
+  }
+}
+
+@mixin ui-card-surface {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-bg-surface);
+  box-shadow: var(--ui-shadow-panel);
+}

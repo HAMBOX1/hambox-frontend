@@ -19,6 +19,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'library',
+        loadComponent: () =>
+          import('./pages/library-page/account-library-page.component').then(
+            (c) => c.AccountLibraryPageComponent,
+          ),
+      },
+      {
         path: 'wishlist',
         loadComponent: () =>
           import('./pages/wishlist-page/account-wishlist-page.component').then(
@@ -51,6 +58,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/referral-page/account-referral-page.component').then(
             (c) => c.AccountReferralPageComponent,
+          ),
+      },
+      {
+        path: 'membership',
+        loadComponent: () =>
+          import('./pages/membership-page/account-membership-page.component').then(
+            (c) => c.AccountMembershipPageComponent,
           ),
       },
       {

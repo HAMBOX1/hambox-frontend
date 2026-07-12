@@ -1,0 +1,39 @@
+<app-admin-section-card
+  title="Product Health"
+  description="Readiness score based on real catalog and inventory data for this product."
+>
+  @if (product(); as current) {
+    <div class="product-health">
+      <div class="product-health__score-row">
+        <div class="product-health__score">
+          <span class="product-health__score-value">{{ score() }}%</span>
+          <span class="product-health__score-label">Overall health</span>
+        </div>
+        <app-admin-status-badge
+          [label]="current.status"
+          [tone]="scoreTone(score())"
+        />
+      </div>
+
+      <ul class="product-health__checklist">
+        @for (check of checks(); track check.id) {
+          <li [class.is-passed]="check.passed" [class.is-failed]="!check.passed">
+            <i class="pi" [class.pi-check-circle]="check.passed" [class.pi-times-circle]="!check.passed" aria-hidden="true"></i>
+            <span>{{ check.label }}</span>
+          </li>
+        }
+      </ul>
+
+      @if (warnings().length) {
+        <div class="product-health__warnings">
+          <h3>Recommendations</h3>
+          <ul>
+            @for (warning of warnings(); track warning) {
+              <li>{{ warning }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  }
+</app-admin-section-card>

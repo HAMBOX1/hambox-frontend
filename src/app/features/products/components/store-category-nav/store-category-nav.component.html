@@ -1,0 +1,16 @@
+<nav class="category-nav" [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.LABEL' | translate">
+  <div class="category-nav__scroller" role="tablist" [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.LABEL' | translate">
+    @for (category of categories(); track category.id) {
+      <button
+        type="button"
+        class="category-nav__pill"
+        [class.category-nav__pill--active]="activeCategoryId() === category.id"
+        role="tab"
+        [attr.aria-selected]="activeCategoryId() === category.id"
+        (click)="select(category.id)"
+      >
+        {{ category.label }}
+      </button>
+    }
+  </div>
+</nav>

@@ -1,0 +1,48 @@
+<app-admin-section-card
+  title="Publishing Status"
+  description="Control whether this product is visible on the storefront."
+>
+  @if (product(); as current) {
+    <div class="product-publishing-panel__current">
+      <span>Current status</span>
+      <app-admin-status-badge [label]="current.status" [tone]="statusTone(current.status)" />
+    </div>
+
+    <div class="product-publishing-panel__form" *hamboxHasPermission="permissions.Catalog.Products.Edit">
+      <p-select
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="selectedStatus() || current.status"
+        (ngModelChange)="selectedStatus.set($event)"
+      />
+      <button
+        pButton
+        type="button"
+        label="Update Status"
+        icon="pi pi-save"
+        [loading]="submitting()"
+        (click)="saveStatus()"
+      ></button>
+      @if (current.status !== 'Active') {
+        <button
+          pButton
+          type="button"
+          label="Publish Now"
+          icon="pi pi-check"
+          [loading]="submitting()"
+          (click)="publish()"
+        ></button>
+      }
+    </div>
+  }
+</app-admin-section-card>
+
+<app-admin-section-card
+  title="Membership Restrictions"
+  description="Restrict purchase to specific membership tiers."
+>
+  <p class="product-publishing-panel__note">
+  Membership restrictions are configured per variant via <strong>membershipPlanId</strong>. Product-level membership gating is not yet implemented in the API.
+  </p>
+</app-admin-section-card>

@@ -2,6 +2,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   input,
   OnDestroy,
@@ -41,6 +42,17 @@ export class ProductAssetsUploadComponent implements OnDestroy {
   protected readonly validationError = signal<string | null>(null);
 
   private readonly previewUrls = new Set<string>();
+
+  constructor() {
+    effect(() => {
+      const productId = this.productId();
+      if (!productId) {
+        return;
+      }
+
+      void this.refreshPersistedImages(productId);
+    });
+  }
 
   ngOnDestroy(): void {
     this.revokeAllPreviews();

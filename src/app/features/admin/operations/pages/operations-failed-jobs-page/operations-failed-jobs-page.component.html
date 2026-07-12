@@ -1,0 +1,112 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.FAILED.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.FAILED.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div adminHeaderActions>
+      <button
+        *hamboxHasPermission="permissions.Operations.Retry"
+        pButton
+        type="button"
+        [label]="'ADMIN.OPERATIONS.ACTIONS.RETRY_ALL' | translate"
+        (click)="retryAll()"
+      ></button>
+    </div>
+  </app-admin-page-header>
+
+  @if (loading() && !jobs()) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (rows().length === 0) {
+    <app-admin-section-card>
+      <p>{{ 'ADMIN.OPERATIONS.EMPTY.FAILED' | translate }}</p>
+    </app-admin-section-card>
+  } @else {
+    <app-admin-section-card>
+      <p-table [value]="rows()" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.TYPE' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.ERROR' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.ATTEMPTS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.CREATED' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.LAST_RETRY' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.ACTIONS' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-job>
+          <tr>
+            <td>{{ job.jobType }}</td>
+            <td>{{ job.lastError || '—' }}</td>
+            <td>{{ job.attempts }}/{{ job.maxAttempts }}</td>
+            <td>{{ job.createdOnUtc | date: 'short' }}</td>
+            <td>{{ job.lastRetryOnUtc ? (job.lastRetryOnUtc | date: 'short') : '—' }}</td>
+            <td><app-admin-status-badge [label]="job.status" tone="danger" /></td>
+            <td class="admin-page__actions">
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [label]="'ADMIN.OPERATIONS.ACTIONS.DETAILS' | translate"
+                (click)="openDetails(job)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [label]="'ADMIN.OPERATIONS.ACTIONS.DOWNLOAD_LOGS' | translate"
+                (click)="downloadLogs(job)"
+              ></button>
+              <button
+                *hamboxHasPermission="permissions.Operations.Retry"
+                pButton
+                type="button"
+                size="small"
+                [label]="'ADMIN.OPERATIONS.ACTIONS.RETRY' | translate"
+                (click)="retry(job.id)"
+              ></button>
+              <button
+                *hamboxHasPermission="permissions.Operations.Manage"
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [label]="'ADMIN.OPERATIONS.ACTIONS.CANCEL' | translate"
+                (click)="cancel(job.id)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+  }
+
+  <p-drawer
+    [(visible)]="detailsVisible"
+    position="right"
+    [header]="'ADMIN.OPERATIONS.ACTIONS.DETAILS' | translate"
+    styleClass="admin-drawer"
+  >
+    @if (selectedJob(); as job) {
+      <dl class="admin-detail-list">
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.ID' | translate }}</dt>
+        <dd class="admin-mono">{{ job.id }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.TYPE' | translate }}</dt>
+        <dd>{{ job.jobType }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</dt>
+        <dd>{{ job.status }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.CORRELATION' | translate }}</dt>
+        <dd class="admin-mono">{{ job.correlationId || '—' }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.WORKER' | translate }}</dt>
+        <dd>{{ job.workerId || '—' }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.ERROR' | translate }}</dt>
+        <dd><pre class="admin-pre">{{ job.lastError || '—' }}</pre></dd>
+      </dl>
+    }
+  </p-drawer>
+</section>

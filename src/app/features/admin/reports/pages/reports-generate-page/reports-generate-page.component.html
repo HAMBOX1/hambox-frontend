@@ -1,0 +1,84 @@
+@if (error()) {
+  <app-admin-error-alert [message]="error()!" />
+}
+
+@if (loading() && types().length === 0) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (!selectedType()) {
+  <app-admin-section-card [title]="'ADMIN.REPORTS.GENERATE.PICK_TYPE' | translate">
+    @if (types().length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.REPORTS.EMPTY.TYPES' | translate" />
+    } @else {
+      <div class="reports-generate__picker">
+        @for (type of types(); track type.type) {
+          <button
+            type="button"
+            class="reports-generate__type"
+            (click)="selectType(type.type)"
+          >
+            <i class="pi pi-file"></i>
+            <span>{{ typeLabel(type) }}</span>
+          </button>
+        }
+      </div>
+    }
+  </app-admin-section-card>
+} @else {
+  <app-admin-section-card [title]="'ADMIN.REPORTS.GENERATE.TITLE' | translate">
+    <div class="reports-generate__form">
+      <div class="reports-generate__field">
+        <label>{{ 'ADMIN.REPORTS.GENERATE.TYPE' | translate }}</label>
+        <p-select
+          [options]="typeSelectOptions()"
+          [ngModel]="selectedType()"
+          (ngModelChange)="selectType($event)"
+          optionLabel="name"
+          optionValue="type"
+          [placeholder]="'ADMIN.REPORTS.GENERATE.TYPE' | translate"
+        />
+      </div>
+
+      <div class="reports-generate__field">
+        <label>{{ 'ADMIN.REPORTS.GENERATE.FORMAT' | translate }}</label>
+        <div class="reports-generate__formats">
+          @for (format of formatOptions(); track format) {
+            <button
+              pButton
+              type="button"
+              [label]="format.toUpperCase()"
+              [severity]="selectedFormat() === format ? 'primary' : 'secondary'"
+              (click)="selectedFormat.set(format)"
+            ></button>
+          }
+        </div>
+      </div>
+
+      @if (selectedTypeMeta(); as meta) {
+        <p class="reports-generate__hint">{{ meta.description }}</p>
+      }
+
+      @if (generating()) {
+        <p class="reports-generate__hint">{{ 'ADMIN.REPORTS.GENERATE.IN_PROGRESS' | translate }}</p>
+      }
+
+      <div class="reports-generate__actions">
+        <a
+          pButton
+          routerLink="/admin/reports/generate"
+          [label]="'ADMIN.REPORTS.ACTIONS.CHANGE_TYPE' | translate"
+          severity="secondary"
+        ></a>
+        <button
+          *hamboxHasPermission="permissions.Reports.Export"
+          pButton
+          type="button"
+          [label]="'ADMIN.REPORTS.ACTIONS.GENERATE' | translate"
+          icon="pi pi-download"
+          [loading]="generating()"
+          [disabled]="!selectedType()"
+          (click)="generate()"
+        ></button>
+      </div>
+    </div>
+  </app-admin-section-card>
+}

@@ -92,11 +92,10 @@
   width: 100%;
   max-width: 28rem;
   padding: 2rem;
-  border: 1px solid var(--sf-border-subtle);
+  border: 1px solid var(--theme-auth-panel-border);
   border-radius: var(--sf-radius-xl);
-  background: rgba(42, 42, 43, 0.72);
-  backdrop-filter: blur(var(--sf-blur-glass));
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  background: var(--theme-auth-panel-bg);
+  box-shadow: var(--shadow);
 }
 
 @media (max-width: 960px) {

@@ -9,17 +9,26 @@
       <i class="pi pi-bars" aria-hidden="true"></i>
     </button>
 
-    <label class="admin-topbar__search">
-      <i class="pi pi-search admin-topbar__search-icon" aria-hidden="true"></i>
-      <input
-        pInputText
-        class="admin-topbar__search-input"
-        type="search"
-        [placeholder]="'NAVBAR.SEARCH_MARKETPLACE' | translate"
-        [value]="searchValue()"
-        (input)="onSearchInput($event)"
-      />
-    </label>
+    <button
+      type="button"
+      class="admin-topbar__icon-btn admin-topbar__sidebar-btn"
+      [attr.aria-label]="
+        (sidebarState.collapsed() ? 'ADMIN.SIDEBAR.EXPAND' : 'ADMIN.SIDEBAR.COLLAPSE') | translate
+      "
+      (click)="toggleSidebar()"
+    >
+      <i
+        class="pi"
+        [class.pi-angle-double-right]="sidebarState.collapsed()"
+        [class.pi-angle-double-left]="!sidebarState.collapsed()"
+        aria-hidden="true"
+      ></i>
+    </button>
+
+    <p class="admin-topbar__context">
+      <span class="admin-topbar__context-label">{{ 'ADMIN.TOPBAR.WORKSPACE' | translate }}</span>
+      <span class="admin-topbar__context-hint">{{ 'ADMIN.TOPBAR.WORKSPACE_HINT' | translate }}</span>
+    </p>
   </div>
 
   <div class="admin-topbar__actions" [attr.aria-label]="'ADMIN.UTILITIES' | translate">
@@ -27,24 +36,16 @@
     <app-currency-switcher />
     <app-theme-toggle [compact]="true" />
 
-    <button type="button" class="admin-topbar__icon-btn" [attr.aria-label]="'ACCOUNT.NOTIFICATIONS' | translate">
-      <i class="pi pi-bell" aria-hidden="true"></i>
-    </button>
-
-    <button type="button" class="admin-topbar__icon-btn" [attr.aria-label]="'ADMIN.MESSAGES' | translate">
-      <i class="pi pi-comments" aria-hidden="true"></i>
-    </button>
-
-    <button type="button" class="admin-topbar__icon-btn" [attr.aria-label]="'ADMIN.NETWORK_STATUS' | translate">
-      <i class="pi pi-wifi" aria-hidden="true"></i>
-    </button>
-
-    <a class="admin-topbar__profile" routerLink="/admin/settings" [attr.aria-label]="'ADMIN.PROFILE' | translate">
+    <a
+      class="admin-topbar__profile"
+      routerLink="/account/profile"
+      [attr.aria-label]="'ADMIN.PROFILE' | translate"
+    >
       <span class="admin-topbar__profile-copy">
         <span class="admin-topbar__profile-name">{{ displayName() }}</span>
         <span class="admin-topbar__profile-badge">{{ clearanceLevel() | translate }}</span>
       </span>
-      <span class="admin-topbar__avatar">{{ avatarInitial() }}</span>
+      <span class="admin-topbar__avatar" aria-hidden="true">{{ avatarInitial() }}</span>
     </a>
   </div>
 </header>

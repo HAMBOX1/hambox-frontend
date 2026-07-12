@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
+import { ProductImageCacheService } from '../../../core/product/product-image-cache.service';
 import { ApiError } from '../../../core/models/api-error.model';
 import { CartFacade } from '../../cart/services/cart.facade';
 import { OrderApiDto } from '../../cart/models/cart-api.model';
@@ -34,22 +35,43 @@ export class CheckoutFacade {
   private readonly cartFacade = inject(CartFacade);
   private readonly checkoutService = inject(CheckoutService);
   private readonly authSession = inject(AuthSessionService);
+  private readonly imageCache = inject(ProductImageCacheService);
 
   private readonly paymentMethodState = signal<PaymentMethodId>('card');
   private readonly cardDetailsState = signal<CardPaymentDetails>({ ...INITIAL_CARD });
   private readonly billingDetailsState = signal<BillingDetails>({ ...INITIAL_BILLING });
   private readonly discountCodeState = signal('');
+  private readonly discountErrorState = signal<string | null>(null);
+  private readonly discountApplyingState = signal(false);
   private readonly submittingState = signal(false);
   private readonly errorState = signal<string | null>(null);
   private readonly lastOrderState = signal<OrderApiDto | null>(null);
+  private readonly developmentCheckoutEnabledState = signal(false);
+  private readonly configurationLoadingState = signal(false);
 
   readonly paymentMethod = this.paymentMethodState.asReadonly();
   readonly cardDetails = this.cardDetailsState.asReadonly();
   readonly billingDetails = this.billingDetailsState.asReadonly();
   readonly discountCode = this.discountCodeState.asReadonly();
+  readonly discountError = this.discountErrorState.asReadonly();
+  readonly discountApplying = this.discountApplyingState.asReadonly();
   readonly submitting = this.submittingState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly lastOrder = this.lastOrderState.asReadonly();
+  readonly developmentCheckoutEnabled = this.developmentCheckoutEnabledState.asReadonly();
+  readonly configurationLoading = this.configurationLoadingState.asReadonly();
+
+  readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
+    const methods: PaymentMethodId[] = ['card', 'paypal', 'crypto', 'apple-pay'];
+    if (this.developmentCheckoutEnabledState()) {
+      return ['development', ...methods];
+    }
+    return methods;
+  });
+
+  readonly isDevelopmentCheckout = computed(
+    () => this.paymentMethodState() === 'development' && this.developmentCheckoutEnabledState(),
+  );
 
   readonly orderItems = computed<readonly CheckoutOrderItem[]>(() =>
     this.cartFacade.items().map((item) => ({
@@ -66,9 +88,12 @@ export class CheckoutFacade {
     const cartSummary = this.cartFacade.summary();
     return {
       subtotal: cartSummary.subtotal,
-      memberDiscount: cartSummary.discountAmount,
+      totalDiscount: cartSummary.totalDiscount,
       tax: cartSummary.tax,
       total: cartSummary.total,
+      appliedPromotions: cartSummary.appliedPromotions,
+      validationErrors: cartSummary.validationErrors,
+      appliedCouponCode: cartSummary.appliedCouponCode,
     };
   });
 
@@ -78,6 +103,29 @@ export class CheckoutFacade {
       this.billingDetailsState.update((details) =>
         details.email ? details : { ...details, email: userEmail },
       );
+    }
+
+    const appliedCoupon = this.cartFacade.summary().appliedCouponCode;
+    if (appliedCoupon) {
+      this.discountCodeState.set(appliedCoupon);
+    }
+
+    void this.loadConfiguration();
+  }
+
+  async loadConfiguration(): Promise<void> {
+    this.configurationLoadingState.set(true);
+
+    try {
+      const configuration = await firstValueFrom(this.checkoutService.getConfiguration());
+      this.developmentCheckoutEnabledState.set(configuration.developmentCheckoutEnabled);
+      if (configuration.developmentCheckoutEnabled) {
+        this.paymentMethodState.set('development');
+      }
+    } catch {
+      this.developmentCheckoutEnabledState.set(false);
+    } finally {
+      this.configurationLoadingState.set(false);
     }
   }
 
@@ -101,10 +149,46 @@ export class CheckoutFacade {
 
   setDiscountCode(code: string): void {
     this.discountCodeState.set(code);
+    this.discountErrorState.set(null);
   }
 
-  applyDiscount(): void {
-    // Promo codes are not part of Sprint 1 checkout scope.
+  async applyDiscount(): Promise<void> {
+    const code = this.discountCodeState().trim();
+    if (!code) {
+      this.discountErrorState.set('Enter a coupon code.');
+      return;
+    }
+
+    this.discountApplyingState.set(true);
+    this.discountErrorState.set(null);
+
+    try {
+      const country = this.billingDetailsState().country;
+      await this.cartFacade.applyCoupon(code, country);
+      const validationErrors = this.cartFacade.summary().validationErrors;
+      if (validationErrors.length > 0) {
+        this.discountErrorState.set(validationErrors.join(' '));
+      }
+    } catch (error) {
+      this.discountErrorState.set(this.toErrorMessage(error, 'Unable to apply coupon.'));
+    } finally {
+      this.discountApplyingState.set(false);
+    }
+  }
+
+  async removeDiscount(): Promise<void> {
+    this.discountApplyingState.set(true);
+    this.discountErrorState.set(null);
+
+    try {
+      const country = this.billingDetailsState().country;
+      await this.cartFacade.removeCoupon(country);
+      this.discountCodeState.set('');
+    } catch (error) {
+      this.discountErrorState.set(this.toErrorMessage(error, 'Unable to remove coupon.'));
+    } finally {
+      this.discountApplyingState.set(false);
+    }
   }
 
   async submitOrder(): Promise<OrderApiDto> {
@@ -138,7 +222,16 @@ export class CheckoutFacade {
 
   async loadOrder(orderId: string): Promise<ReturnType<typeof mapOrderToSuccessDetails>> {
     const order = await firstValueFrom(this.checkoutService.getOrder(orderId));
-    return mapOrderToSuccessDetails(order);
+    const details = mapOrderToSuccessDetails(order);
+    const imageUrls = await this.imageCache.resolveMany(details.items.map((item) => item.id));
+
+    return {
+      ...details,
+      items: details.items.map((item, index) => ({
+        ...item,
+        imageUrl: imageUrls.get(item.id) ?? item.imageUrl,
+      })),
+    };
   }
 
   reset(): void {
@@ -146,6 +239,7 @@ export class CheckoutFacade {
     this.cardDetailsState.set({ ...INITIAL_CARD });
     this.billingDetailsState.set({ ...INITIAL_BILLING });
     this.discountCodeState.set('');
+    this.discountErrorState.set(null);
     this.errorState.set(null);
     this.lastOrderState.set(null);
     this.initialize();

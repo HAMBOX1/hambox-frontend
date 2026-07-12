@@ -1,0 +1,47 @@
+.theme-scheduler-panel__form {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.theme-scheduler-panel__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.theme-scheduler-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.theme-scheduler-panel__list li {
+  padding: 0.75rem;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--hambox-radius-sm);
+  background: var(--theme-surface);
+}
+
+.theme-scheduler-panel__recurrence {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.theme-scheduler-panel__status {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.theme-scheduler-panel__status.is-active {
+  color: var(--theme-success);
+}

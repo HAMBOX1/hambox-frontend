@@ -1,67 +1,83 @@
 <p-toast position="top-right" />
 
-<section class="category-list-page">
-  <header class="category-list-page__header">
-    <div class="category-list-page__heading">
-      <h1 class="category-list-page__title">Categories</h1>
-      <p class="category-list-page__subtitle">{{ subtitle() }}</p>
-    </div>
-
+<section class="admin-page category-list-page">
+  <app-admin-page-header
+    title="Categories"
+    [subtitle]="subtitle()"
+    [breadcrumbs]="breadcrumbs"
+  >
     <button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Categories.Create"
       pButton
       type="button"
-      class="category-list-page__create-btn"
+      class="admin-btn-primary"
       label="Create Category"
       icon="pi pi-plus"
       (click)="openCreateDialog()"
     ></button>
-  </header>
+  </app-admin-page-header>
 
-  <div class="category-list-page__toolbar">
-    <label class="category-list-page__search">
-      <i class="pi pi-search category-list-page__search-icon" aria-hidden="true"></i>
-      <input
-        pInputText
-        class="category-list-page__search-input"
-        type="search"
-        placeholder="Search categories by name or slug..."
-        [value]="searchTerm()"
-        (input)="onSearchInput($event)"
-      />
-    </label>
-  </div>
+  <app-admin-stat-grid>
+    <app-admin-stat-card
+      [compact]="true"
+      label="Total Categories"
+      [value]="listStats().total"
+      icon="pi-tags"
+    />
+    <app-admin-stat-card
+      [compact]="true"
+      label="Active"
+      [value]="listStats().active"
+      hint="On this page"
+      icon="pi-check-circle"
+      tone="success"
+    />
+    <app-admin-stat-card
+      [compact]="true"
+      label="Inactive"
+      [value]="listStats().inactive"
+      hint="On this page"
+      icon="pi-ban"
+      tone="default"
+    />
+  </app-admin-stat-grid>
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      placeholder="Search categories by name or slug..."
+      (searchChange)="onSearchChange($event)"
+    />
+  </app-admin-toolbar>
 
   @if (error()) {
-    <div class="category-list-page__alert" role="alert">
-      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-      <span>{{ error() }}</span>
-      <button
-        pButton
-        type="button"
-        class="category-list-page__retry-btn"
-        label="Retry"
-        severity="secondary"
-        size="small"
-        (click)="retryLoad()"
-      ></button>
-    </div>
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
-  <app-category-table
-    [categories]="items()"
-    [loading]="loading()"
-    [totalRecords]="totalCount()"
-    [pageSize]="pageSize()"
-    [first]="tableFirst()"
-    [searchActive]="hasActiveSearch()"
-    (pageChange)="onPageChange($event)"
-  />
+  <app-admin-data-table-shell>
+    <app-category-table
+      [categories]="items()"
+      [parentOptions]="items()"
+      [loading]="loading()"
+      [totalRecords]="totalCount()"
+      [pageSize]="pageSize()"
+      [first]="tableFirst()"
+      [searchActive]="hasActiveSearch()"
+      (pageChange)="onPageChange($event)"
+      (createCategory)="openCreateDialog()"
+      (editCategory)="openEditDialog($event)"
+      (deleteCategory)="requestDelete($event)"
+      (restoreCategory)="restoreCategory($event)"
+    />
+  </app-admin-data-table-shell>
 </section>
 
 <p-dialog
   header="Create Category"
   [visible]="createDialogOpen()"
-  (visibleChange)="onDialogVisibleChange($event)"
+  (visibleChange)="onCreateDialogVisibleChange($event)"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
@@ -70,10 +86,43 @@
   ariaLabelledBy="create-category-dialog-title"
 >
   <app-category-create-form
+    mode="create"
     [submitting]="creating()"
     [serverError]="createError()"
     [resetToken]="formResetToken()"
+    [parentOptions]="parentOptions()"
     (submitted)="onCreateSubmitted($event)"
     (cancelled)="onCreateCancelled()"
   />
 </p-dialog>
+
+<p-dialog
+  header="Edit Category"
+  [visible]="editDialogOpen()"
+  (visibleChange)="onEditDialogVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(32rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <app-category-create-form
+    mode="edit"
+    [submitting]="updating()"
+    [serverError]="updateError()"
+    [resetToken]="formResetToken()"
+    [parentOptions]="parentOptions()"
+    [initialCategory]="editingCategory()"
+    (updateSubmitted)="onUpdateSubmitted($event)"
+    (cancelled)="onEditCancelled()"
+  />
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  title="Delete category"
+  [message]="deleteDialogMessage()"
+  [destructive]="true"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  (confirmed)="confirmDelete()"
+/>

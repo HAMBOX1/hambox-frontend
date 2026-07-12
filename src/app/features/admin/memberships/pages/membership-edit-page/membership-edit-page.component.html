@@ -1,0 +1,155 @@
+<p-toast position="top-right" />
+
+<section class="admin-page membership-edit-page">
+  <app-admin-page-header
+    [title]="
+      isCreateMode()
+        ? ('ADMIN.MEMBERSHIPS.EDIT.CREATE_TITLE' | translate)
+        : ('ADMIN.MEMBERSHIPS.EDIT.EDIT_TITLE' | translate)
+    "
+    [subtitle]="'ADMIN.MEMBERSHIPS.LIST.SUBTITLE' | translate"
+    backLink="/admin/memberships"
+    [backLabel]="'ADMIN.MEMBERSHIPS.EDIT.BACK' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  />
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="form" />
+  } @else {
+    @if (detailError()) {
+      <app-admin-error-alert [message]="detailError()!" />
+    }
+
+    <form class="membership-edit-page__form" (ngSubmit)="$event.preventDefault(); save()">
+      <app-admin-section-card [title]="'ADMIN.MEMBERSHIPS.EDIT.DETAILS' | translate">
+        <div class="admin-form-grid">
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.NAME' | translate }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [ngModel]="name()"
+              (ngModelChange)="onNameInput($event)"
+              name="name"
+              required
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.SLUG' | translate }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [ngModel]="slug()"
+              (ngModelChange)="slug.set($event)"
+              name="slug"
+              required
+            />
+          </label>
+
+          <label class="admin-field membership-edit-page__field--wide">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.DESCRIPTION' | translate }}</span>
+            <textarea
+              pTextarea
+              class="admin-field__input"
+              rows="3"
+              [ngModel]="description()"
+              (ngModelChange)="description.set($event)"
+              name="description"
+            ></textarea>
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.PRICE' | translate }}</span>
+            <p-inputNumber
+              [ngModel]="price()"
+              (ngModelChange)="price.set($event ?? 0)"
+              name="price"
+              mode="decimal"
+              [minFractionDigits]="2"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.DURATION' | translate }}</span>
+            <p-inputNumber
+              [ngModel]="durationDays()"
+              (ngModelChange)="durationDays.set($event ?? 30)"
+              name="durationDays"
+              [min]="1"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.SORT_ORDER' | translate }}</span>
+            <p-inputNumber
+              [ngModel]="sortOrder()"
+              (ngModelChange)="sortOrder.set($event ?? 0)"
+              name="sortOrder"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.BADGE' | translate }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [ngModel]="badgeLabel()"
+              (ngModelChange)="badgeLabel.set($event)"
+              name="badgeLabel"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.EDIT.THEME' | translate }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [ngModel]="themeKey()"
+              (ngModelChange)="themeKey.set($event)"
+              name="themeKey"
+            />
+          </label>
+
+          <label class="membership-edit-page__checkbox">
+            <p-checkbox
+              [ngModel]="isDefault()"
+              (ngModelChange)="isDefault.set($event)"
+              name="isDefault"
+              [binary]="true"
+            />
+            <span>{{ 'ADMIN.MEMBERSHIPS.EDIT.IS_DEFAULT' | translate }}</span>
+          </label>
+        </div>
+      </app-admin-section-card>
+
+      <app-benefits-config-panel
+        *hamboxHasPermission="permissions.Memberships.ConfigureBenefits"
+        [benefits]="benefits()"
+        [disabled]="detailSaving()"
+        (benefitsChange)="benefits.set($event)"
+      />
+
+      <app-admin-sticky-save-bar>
+        <a
+          pButton
+          routerLink="/admin/memberships"
+          [label]="'ADMIN.MEMBERSHIPS.ACTIONS.CANCEL' | translate"
+          severity="secondary"
+          [text]="true"
+        ></a>
+        <button
+          pButton
+          type="submit"
+          [label]="'ADMIN.MEMBERSHIPS.ACTIONS.SAVE' | translate"
+          icon="pi pi-check"
+          [loading]="detailSaving()"
+        ></button>
+      </app-admin-sticky-save-bar>
+    </form>
+  }
+</section>

@@ -1,43 +1,46 @@
-<section class="hero" aria-labelledby="hambox-hero-title">
+<section
+  class="hero"
+  aria-labelledby="hambox-hero-title"
+  [style.--hero-overlay-opacity]="hero().overlayOpacity"
+>
   <div class="hero__media" aria-hidden="true">
     <img class="hero__image hero__image--background" [src]="hero().backgroundImageUrl" alt="" />
-    <img class="hero__image hero__image--overlay" [src]="hero().overlayImageUrl" alt="" />
+    @if (hero().overlayImageUrl) {
+      <img class="hero__image hero__image--overlay" [src]="hero().overlayImageUrl!" alt="" />
+    }
     <div class="hero__shade"></div>
   </div>
 
   <div class="hero__container">
     <div class="hero__copy">
-      <p class="hero__eyebrow">{{ hero().eyebrow }}</p>
+      @if (hero().badgeText) {
+        <p class="hero__eyebrow" [style.color]="hero().badgeColor">{{ hero().badgeText }}</p>
+      }
 
       <h1 id="hambox-hero-title" class="hero__title">
-        <span class="hero__title-line">
-          {{ hero().titleLine1 }}
-        </span>
-        <span class="hero__title-line hero__accent">{{ hero().titleAccent }}</span>
+        <span class="hero__title-line">{{ hero().title }}</span>
       </h1>
 
-      <p class="hero__description">
-        {{ hero().description }}
-      </p>
+      <p class="hero__description">{{ hero().subtitle }}</p>
 
       <div class="hero__actions" aria-label="Hero actions">
         <a
           pButton
-          [routerLink]="hero().primaryCtaRoute"
+          [routerLink]="hero().primaryButtonUrl"
           class="hero__button hero__button--primary"
           styleClass="hero__button hero__button--primary"
         >
-          <span class="hero__button-label">{{ hero().primaryCtaLabel }}</span>
+          <span class="hero__button-label">{{ hero().primaryButtonText }}</span>
           <img class="hero__button-icon" [src]="boltIcon" alt="" aria-hidden="true" />
         </a>
 
         <a
           pButton
-          [routerLink]="hero().secondaryCtaRoute"
+          [routerLink]="hero().secondaryButtonUrl"
           class="hero__button hero__button--secondary"
           styleClass="hero__button hero__button--secondary"
         >
-          <span class="hero__button-label">{{ hero().secondaryCtaLabel }}</span>
+          <span class="hero__button-label">{{ hero().secondaryButtonText }}</span>
         </a>
       </div>
     </div>

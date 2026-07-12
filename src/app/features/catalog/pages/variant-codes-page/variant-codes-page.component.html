@@ -1,0 +1,177 @@
+<section class="admin-page variant-codes-page">
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (variant(); as current) {
+    <app-admin-page-header
+      [title]="'Codes — ' + current.sku"
+      [subtitle]="optionSummary(current)"
+      [breadcrumbs]="breadcrumbs()"
+      backLink="/admin/inventory/{{ productId() }}/edit"
+      backLabel="Back to product"
+    >
+      <div adminHeaderActions>
+        <ui-button
+          variant="secondary"
+          label="Export CSV"
+          icon="pi pi-download"
+          [disabled]="!codesTable().length"
+          (clicked)="exportCodes()"
+        />
+      </div>
+    </app-admin-page-header>
+
+    <app-admin-stat-grid>
+      @for (stat of statItems(); track stat.label) {
+        <app-admin-stat-card [label]="stat.label" [value]="stat.value" [tone]="stat.tone" />
+      }
+    </app-admin-stat-grid>
+
+    <div class="variant-codes-page__grid">
+      <app-admin-section-card title="Import codes" description="Upload TXT/CSV, paste manually, or create a batch first.">
+        <div class="variant-codes-page__import" *hamboxHasPermission="permissions.Catalog.Inventory.Import">
+          <div class="variant-codes-page__upload-row">
+            <label class="variant-codes-page__file-btn">
+              <input type="file" accept=".txt,text/plain" (change)="onFileSelected($event, 'txt')" hidden />
+              <span><i class="pi pi-file" aria-hidden="true"></i> Upload TXT</span>
+            </label>
+            <label class="variant-codes-page__file-btn">
+              <input type="file" accept=".csv,text/csv" (change)="onFileSelected($event, 'csv')" hidden />
+              <span><i class="pi pi-file-excel" aria-hidden="true"></i> Upload CSV</span>
+            </label>
+          </div>
+
+          <ui-field label="Paste codes" hint="One code per line.">
+            <textarea
+              pTextarea
+              class="variant-codes-page__textarea"
+              rows="6"
+              [ngModel]="bulkCodes()"
+              (ngModelChange)="bulkCodes.set($event)"
+              placeholder="Paste or upload codes here"
+            ></textarea>
+          </ui-field>
+
+          <ui-button
+            label="Import codes"
+            icon="pi pi-upload"
+            [loading]="importing()"
+            (clicked)="importCodes()"
+          />
+        </div>
+      </app-admin-section-card>
+
+      <app-admin-section-card title="Batch management" description="Group imports into batches for traceability.">
+        <div class="variant-codes-page__batch" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
+          <ui-field label="New batch name">
+            <ui-input
+              [ngModel]="newBatchName()"
+              (ngModelChange)="newBatchName.set($event)"
+              placeholder="e.g. Supplier A — March"
+            />
+          </ui-field>
+          <ui-button label="Create batch" icon="pi pi-folder-plus" variant="secondary" (clicked)="createBatch()" />
+        </div>
+
+        <app-admin-data-table-shell>
+          <p-table class="admin-data-table" [value]="batchesTable()" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Batch</th>
+                <th>Currency</th>
+                <th>Cost</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-batch>
+              <tr>
+                <td>{{ batch.name }}</td>
+                <td>{{ batch.currency }}</td>
+                <td>{{ batch.purchaseCost | number: '1.2-2' }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="3">
+                  <app-admin-empty-state
+                    icon="pi pi-inbox"
+                    title="No batches yet"
+                    description="Create a batch before importing codes."
+                  />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </app-admin-section-card>
+    </div>
+
+    <app-admin-section-card title="Codes inventory" description="Search, filter, and review imported digital codes.">
+      <app-admin-toolbar>
+        <app-admin-search-bar
+          adminToolbarSearch
+          [value]="codeSearch()"
+          placeholder="Search codes…"
+          (searchChange)="codeSearch.set($event)"
+        />
+
+        <div adminToolbarFilters>
+          <p-select
+            [options]="statusFilterOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Status"
+            [ngModel]="codeStatusFilter()"
+            (ngModelChange)="codeStatusFilter.set($event)"
+          />
+          <ui-button label="Apply filters" variant="secondary" size="sm" (clicked)="applyCodeFilters()" />
+        </div>
+      </app-admin-toolbar>
+
+      <app-admin-data-table-shell>
+        <p-table
+          class="admin-data-table variant-codes-page__table"
+          [value]="codesTable()"
+          [loading]="inventoryLoading()"
+          responsiveLayout="scroll"
+          scrollable
+          scrollHeight="flex"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Code</th>
+              <th>Status</th>
+              <th>Batch</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-code>
+            <tr>
+              <td><code class="variant-codes-page__code">{{ code.digitalCode }}</code></td>
+              <td><app-admin-status-badge [label]="code.status" /></td>
+              <td>{{ code.batchId }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="3">
+                <app-admin-empty-state
+                  icon="pi pi-key"
+                  title="No codes imported"
+                  description="Import codes using TXT, CSV, or paste."
+                />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </app-admin-data-table-shell>
+
+      <p-paginator
+        class="variant-codes-page__paginator"
+        [rows]="codesPageSize()"
+        [totalRecords]="codesTable().length >= codesPageSize() ? codesPage() * codesPageSize() + 1 : codesTable().length"
+        [first]="(codesPage() - 1) * codesPageSize()"
+        (onPageChange)="onPaginatorChange($event)"
+      />
+    </app-admin-section-card>
+  }
+</section>

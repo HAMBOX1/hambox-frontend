@@ -1,14 +1,14 @@
-<section class="trust-bar" [attr.aria-label]="'HOME.TRUST.INSTANT_TITLE' | translate">
+<section class="trust-bar" [attr.aria-label]="features()[0]?.title || 'Trust'">
   <div class="trust-bar__inner">
     <ul class="trust-bar__grid">
-      @for (feature of features(); track feature.titleKey) {
+      @for (feature of features(); track feature.id) {
         <li class="trust-bar__item">
           <div class="trust-bar__icon" aria-hidden="true">
             <img [src]="feature.iconSrc" alt="" />
           </div>
           <div class="trust-bar__copy">
-            <h2 class="trust-bar__title">{{ feature.titleKey | translate }}</h2>
-            <p class="trust-bar__description">{{ feature.descriptionKey | translate }}</p>
+            <h2 class="trust-bar__title">{{ feature.title }}</h2>
+            <p class="trust-bar__description">{{ feature.description }}</p>
           </div>
         </li>
       }

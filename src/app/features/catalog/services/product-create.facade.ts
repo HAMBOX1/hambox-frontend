@@ -2,7 +2,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiError } from '../../../core/models/api-error.model';
-import { CategoryOption, CreateProductRequest, UpdateProductRequest } from '../models/product.model';
+import { CategoryOption } from '../models/category.model';
+import { CreateProductRequest, UpdateProductRequest } from '../models/product.model';
 import { CategoryApiService } from './category-api.service';
 import { ProductApiService } from './product-api.service';
 

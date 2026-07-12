@@ -1,0 +1,90 @@
+<div class="analytics-filters">
+  <div class="analytics-filters__field">
+    <label class="analytics-filters__label">{{ 'ADMIN.ANALYTICS.FILTERS.PRESET' | translate }}</label>
+    <p-select
+      [options]="presetOptions"
+      [ngModel]="filters().preset"
+      (ngModelChange)="onPresetChange($event)"
+      optionLabel="labelKey"
+      optionValue="value"
+      [placeholder]="'ADMIN.ANALYTICS.FILTERS.PRESET' | translate"
+      styleClass="analytics-filters__control"
+    >
+      <ng-template pTemplate="item" let-item>
+        {{ item.labelKey | translate }}
+      </ng-template>
+      <ng-template pTemplate="selectedItem" let-item>
+        @if (item) {
+          {{ item.labelKey | translate }}
+        }
+      </ng-template>
+    </p-select>
+  </div>
+
+  @if (filters().preset === 'Custom') {
+    <div class="analytics-filters__field">
+      <label class="analytics-filters__label">{{ 'ADMIN.ANALYTICS.FILTERS.FROM' | translate }}</label>
+      <input
+        pInputText
+        type="date"
+        [ngModel]="filters().from"
+        (ngModelChange)="onFromChange($event)"
+      />
+    </div>
+    <div class="analytics-filters__field">
+      <label class="analytics-filters__label">{{ 'ADMIN.ANALYTICS.FILTERS.TO' | translate }}</label>
+      <input
+        pInputText
+        type="date"
+        [ngModel]="filters().to"
+        (ngModelChange)="onToChange($event)"
+      />
+    </div>
+  }
+
+  <div class="analytics-filters__field">
+    <label class="analytics-filters__label">{{ 'ADMIN.ANALYTICS.FILTERS.COMPARE' | translate }}</label>
+    <p-select
+      [options]="compareOptions"
+      [ngModel]="filters().compare"
+      (ngModelChange)="onCompareChange($event)"
+      optionLabel="labelKey"
+      optionValue="value"
+      [placeholder]="'ADMIN.ANALYTICS.FILTERS.COMPARE' | translate"
+      styleClass="analytics-filters__control"
+    >
+      <ng-template pTemplate="item" let-item>
+        {{ item.labelKey | translate }}
+      </ng-template>
+      <ng-template pTemplate="selectedItem" let-item>
+        @if (item) {
+          {{ item.labelKey | translate }}
+        }
+      </ng-template>
+    </p-select>
+  </div>
+
+  <div class="analytics-filters__actions">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ANALYTICS.ACTIONS.REFRESH' | translate"
+      icon="pi pi-refresh"
+      [loading]="loading()"
+      (click)="refresh()"
+    ></button>
+
+    <ng-container *hamboxHasPermission="permissions.Analytics.Export">
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.ANALYTICS.ACTIONS.EXPORT' | translate"
+        icon="pi pi-download"
+        severity="secondary"
+        [loading]="exporting()"
+        (click)="toggleExport($event)"
+      ></button>
+      <p-menu #exportMenu [model]="exportItems" [popup]="true" appendTo="body" />
+    </ng-container>
+  </div>
+</div>

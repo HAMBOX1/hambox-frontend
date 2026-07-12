@@ -1,0 +1,53 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as orders) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.TOTAL_ORDERS' | translate" [value]="orders.total" icon="pi-list" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.PENDING' | translate" [value]="orders.pending" icon="pi-clock" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.PROCESSING' | translate" [value]="orders.processing" icon="pi-play" tone="info" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.COMPLETED_ORDERS' | translate" [value]="orders.completed" icon="pi-check" tone="success" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.CANCELLED' | translate" [value]="orders.cancelled" icon="pi-ban" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.REFUNDED' | translate" [value]="orders.refunded" icon="pi-replay" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.FAILED' | translate" [value]="orders.failed" icon="pi-times-circle" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.CONVERSION_RATE' | translate" [value]="(orders.conversionRate | number: '1.0-1') + '%'" icon="pi-percentage" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_PROCESSING' | translate" [value]="formatSeconds(orders.averageProcessingSeconds)" icon="pi-stopwatch" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_FULFILLMENT' | translate" [value]="formatSeconds(orders.averageFulfillmentSeconds)" icon="pi-send" />
+  </app-admin-stat-grid>
+
+  <div class="analytics-shell__grid">
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.BY_STATUS' | translate">
+      @if (orders.byStatus.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="statusDonut().series"
+          [chart]="statusDonut().chart"
+          [labels]="statusDonut().labels"
+          [colors]="statusDonut().colors"
+          [legend]="statusDonut().legend"
+          [dataLabels]="statusDonut().dataLabels"
+          [tooltip]="statusDonut().tooltip"
+          [plotOptions]="statusDonut().plotOptions"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.ORDERS_SERIES' | translate">
+      @if (orders.series.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="seriesChart().series"
+          [chart]="seriesChart().chart"
+          [xaxis]="seriesChart().xaxis"
+          [yaxis]="seriesChart().yaxis"
+          [dataLabels]="seriesChart().dataLabels"
+          [plotOptions]="seriesChart().plotOptions"
+          [tooltip]="seriesChart().tooltip"
+        />
+      }
+    </app-admin-section-card>
+  </div>
+}

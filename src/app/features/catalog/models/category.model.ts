@@ -4,12 +4,22 @@ export interface Category {
   readonly nameEn: string;
   readonly slug: string;
   readonly isActive: boolean;
+  readonly parentId: string | null;
 }
 
 export interface CreateCategoryRequest {
   readonly nameAr: string;
   readonly nameEn: string;
   readonly slug: string;
+  readonly parentId?: string | null;
+}
+
+export interface UpdateCategoryRequest {
+  readonly nameAr: string;
+  readonly nameEn: string;
+  readonly slug: string;
+  readonly isActive: boolean;
+  readonly parentId?: string | null;
 }
 
 export interface CategoryListQuery {
@@ -27,4 +37,9 @@ export interface PagedResult<T> {
   readonly totalPages?: number;
   readonly hasPreviousPage?: boolean;
   readonly hasNextPage?: boolean;
+}
+
+export interface CategoryOption {
+  readonly id: string;
+  readonly label: string;
 }

@@ -1,22 +1,24 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
+import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { AccountDashboardFacade } from '../../services/account-dashboard.facade';
 import { AccountNotificationsFacade } from '../../services/account-notifications.facade';
 import { AccountWishlistFacade } from '../../services/account-wishlist.facade';
 import { referralInviteLink, referralTierProgress } from '../../utils/referral-tier.util';
 import { resolveWishlistItemImageUrl } from '../../utils/wishlist-image.util';
+import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 
 @Component({
   selector: 'app-account-dashboard-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, DatePipe, DecimalPipe],
+  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective],
   templateUrl: './account-dashboard-page.component.html',
   styleUrl: './account-dashboard-page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountDashboardPageComponent implements OnInit {
   private readonly facade = inject(AccountDashboardFacade);
@@ -24,6 +26,7 @@ export class AccountDashboardPageComponent implements OnInit {
   private readonly wishlistFacade = inject(AccountWishlistFacade);
   private readonly session = inject(AuthSessionService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;
@@ -35,7 +38,7 @@ export class AccountDashboardPageComponent implements OnInit {
 
   protected readonly displayName = computed(() => {
     const user = this.session.user();
-    return user?.firstName || user?.email?.split('@')[0] || 'Gamer';
+    return user?.firstName || user?.email?.split('@')[0] || this.translate.instant('ACCOUNT.DASHBOARD_UI.DEFAULT_USER');
   });
 
   protected readonly referralProgress = computed(() => {
@@ -45,6 +48,11 @@ export class AccountDashboardPageComponent implements OnInit {
     }
 
     return referralTierProgress(ref.tier, ref.lifetimePoints);
+  });
+
+  protected readonly hasMembershipPlan = computed(() => {
+    const card = this.membership();
+    return !!card?.planName?.trim();
   });
 
   protected itemImageUrl(imageUrl: string | null | undefined, index: number): string {
@@ -79,5 +87,11 @@ export class AccountDashboardPageComponent implements OnInit {
     await this.wishlistFacade.moveToCart(productId);
     await this.facade.load();
     void this.router.navigate(['/cart']);
+  }
+
+  protected activityTypeLabel(type: string): string {
+    const key = `ACCOUNT.ACTIVITY_TYPE.${type.toUpperCase().replace(/\s+/g, '_')}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? type : translated;
   }
 }

@@ -1,0 +1,13 @@
+.admin-page__grid {
+  display: grid;
+  gap: var(--admin-field-gap, 1.25rem);
+  margin-block: var(--admin-page-gap, 1.25rem);
+
+  &--compact {
+    gap: 1rem;
+  }
+
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,472 @@
+<p-toast position="top-right" />
+
+<section class="admin-page order-detail-page">
+  <app-admin-page-header
+    [title]="detail()?.orderNumber ?? ('ADMIN.ORDERS.DETAIL.TITLE' | translate)"
+    [subtitle]="detail() ? detail()!.customerName + ' · ' + detail()!.email : ''"
+    backLink="/admin/orders"
+    [backLabel]="'ADMIN.ORDERS.DETAIL.BACK' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    @if (detail(); as order) {
+      <div adminHeaderActions class="order-detail-page__actions">
+        <app-admin-action-menu [items]="overflowActions(order)" [label]="'ADMIN.ORDERS.ACTIONS.MORE' | translate" />
+        <button
+          *hamboxHasPermission="permissions.Orders.Edit"
+          pButton
+          type="button"
+          class="admin-btn-primary"
+          icon="pi pi-sync"
+          [label]="'ADMIN.ORDERS.DETAIL.CHANGE_STATUS' | translate"
+          (click)="openStatusDialog()"
+        ></button>
+        <button
+          *hamboxHasPermission="permissions.Orders.Refund"
+          pButton
+          type="button"
+          severity="danger"
+          icon="pi pi-replay"
+          [label]="'ADMIN.ORDERS.DETAIL.REFUND' | translate"
+          (click)="refundDialogOpen.set(true)"
+        ></button>
+      </div>
+    }
+  </app-admin-page-header>
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (detailError()) {
+    <app-admin-error-alert
+      [message]="detailError() ?? ('ADMIN.ORDERS.DETAIL.LOAD_ERROR' | translate)"
+      (retry)="reloadDetail()"
+    />
+  } @else if (detail(); as order) {
+    <section class="admin-detail-hero">
+      <app-admin-stat-grid>
+        <app-admin-stat-card
+          [label]="'ADMIN.ORDERS.DETAIL.TOTAL' | translate"
+          [value]="formatMoney(order.totalAmount)"
+          icon="pi-wallet"
+          tone="success"
+        />
+        <app-admin-stat-card
+          [label]="'ADMIN.ORDERS.LIST.COLUMNS.ORDER_STATUS' | translate"
+          [value]="order.orderStatus"
+          icon="pi-info-circle"
+        />
+        <app-admin-stat-card
+          [label]="'ADMIN.ORDERS.LIST.COLUMNS.PAYMENT_STATUS' | translate"
+          [value]="order.paymentStatus"
+          icon="pi-credit-card"
+          tone="info"
+        />
+        <app-admin-stat-card
+          [label]="'ADMIN.ORDERS.LIST.COLUMNS.DELIVERY' | translate"
+          [value]="order.deliveryStatus"
+          icon="pi-box"
+          tone="warning"
+        />
+      </app-admin-stat-grid>
+    </section>
+
+    <div class="order-detail-page__grid">
+      <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.SUMMARY' | translate">
+        <dl class="admin-meta-grid">
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PURCHASE_DATE' | translate }}</dt>
+            <dd>{{ order.createdOnUtc | date: 'medium' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PAYMENT_METHOD' | translate }}</dt>
+            <dd>{{ order.paymentMethod }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.DETAIL.PROVIDER' | translate }}</dt>
+            <dd>{{ order.paymentProvider || '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.DETAIL.SUBTOTAL' | translate }}</dt>
+            <dd>{{ order.subtotal | hamboxCurrency }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.DETAIL.DISCOUNT' | translate }}</dt>
+            <dd>{{ order.discountAmount | hamboxCurrency }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.MEMBERSHIP' | translate }}</dt>
+            <dd>{{ order.membershipDiscount | hamboxCurrency }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.DETAIL.TAX' | translate }}</dt>
+            <dd>{{ order.taxAmount | hamboxCurrency }}</dd>
+          </div>
+        </dl>
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.CUSTOMER' | translate">
+        <dl class="admin-meta-grid">
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.CUSTOMER' | translate }}</dt>
+            <dd>{{ order.customerName }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.EMAIL' | translate }}</dt>
+            <dd>{{ order.email }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.DETAIL.COUNTRY' | translate }}</dt>
+            <dd>{{ order.country }}</dd>
+          </div>
+        </dl>
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.COUPON' | translate">
+        <dl class="admin-meta-grid">
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.COUPON' | translate }}</dt>
+            <dd>{{ order.couponCode || '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ORDERS.DETAIL.PROMOTION' | translate }}</dt>
+            <dd>{{ order.couponPromotionName || '—' }}</dd>
+          </div>
+        </dl>
+      </app-admin-section-card>
+    </div>
+
+    <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.TIMELINE' | translate">
+      @if (order.timeline.length) {
+        <ol class="order-detail-page__timeline">
+          @for (event of order.timeline; track event.eventType + event.occurredOnUtc) {
+            <li>
+              <strong>{{ event.eventType }}</strong>
+              <span>{{ event.description }}</span>
+              <time>{{ event.occurredOnUtc | date: 'medium' }}</time>
+            </li>
+          }
+        </ol>
+      } @else {
+        <app-admin-empty-state
+          icon="pi pi-history"
+          [title]="'ADMIN.ORDERS.DETAIL.TIMELINE_EMPTY' | translate"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.PRODUCTS' | translate">
+      <p-table class="admin-data-table" [value]="[...order.items]" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th></th>
+            <th>{{ 'ADMIN.ORDERS.DETAIL.PRODUCT' | translate }}</th>
+            <th>{{ 'ADMIN.ORDERS.DETAIL.VARIANT' | translate }}</th>
+            <th>{{ 'ADMIN.ORDERS.DETAIL.QTY' | translate }}</th>
+            <th>{{ 'ADMIN.ORDERS.DETAIL.UNIT_PRICE' | translate }}</th>
+            <th>{{ 'ADMIN.ORDERS.DETAIL.SUBTOTAL' | translate }}</th>
+            <th>{{ 'ADMIN.ORDERS.DETAIL.CODES' | translate }}</th>
+            <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.DELIVERY' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              @if (item.productImageUrl) {
+                <img class="order-detail-page__thumb" [src]="item.productImageUrl" [alt]="item.productName" />
+              }
+            </td>
+            <td>{{ item.productName }}</td>
+            <td>{{ item.variantSku || '—' }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice | hamboxCurrency }}</td>
+            <td>{{ item.subtotal | hamboxCurrency }}</td>
+            <td>{{ item.deliveredCodesCount }}</td>
+            <td>
+              <app-admin-status-badge
+                [label]="item.deliveryStatus"
+                [tone]="statusTone(item.deliveryStatus)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.DIGITAL_CODES' | translate">
+      @if (order.licenseKeys.length === 0) {
+        <p class="order-detail-page__muted">{{ 'ADMIN.ORDERS.DETAIL.NO_CODES' | translate }}</p>
+      } @else {
+        <div class="order-detail-page__codes">
+          @for (license of order.licenseKeys; track license.id) {
+            <article class="order-detail-page__code-card">
+              <div>
+                <strong>{{ license.productName }}</strong>
+                <app-admin-status-badge
+                  [label]="license.deliveryStatus"
+                  [tone]="statusTone(license.deliveryStatus)"
+                />
+              </div>
+              <code>
+                {{ revealedKeys()[license.id] ?? license.maskedKey }}
+              </code>
+              <div class="order-detail-page__code-actions">
+                @if (!revealedKeys()[license.id]) {
+                  <button
+                    *hamboxHasPermission="permissions.Orders.View"
+                    pButton
+                    type="button"
+                    size="small"
+                    severity="secondary"
+                    [label]="'ADMIN.ORDERS.DETAIL.REVEAL_CODE' | translate"
+                    (click)="revealKey(license.id)"
+                  ></button>
+                } @else {
+                  <button
+                    pButton
+                    type="button"
+                    size="small"
+                    severity="secondary"
+                    icon="pi pi-copy"
+                    [label]="'ADMIN.ORDERS.ACTIONS.COPY' | translate"
+                    (click)="copyText(revealedKeys()[license.id])"
+                  ></button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.CUSTOMER_HISTORY' | translate">
+      @if (order.customerOrderHistory.length) {
+        <p-table class="admin-data-table" [value]="[...order.customerOrderHistory]" [rows]="5" [paginator]="order.customerOrderHistory.length > 5">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.ORDER_NUMBER' | translate }}</th>
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.TOTAL' | translate }}</th>
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.ORDER_STATUS' | translate }}</th>
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PURCHASE_DATE' | translate }}</th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.orderNumber }}</td>
+              <td>{{ row.totalAmount | hamboxCurrency }}</td>
+              <td>
+                <app-admin-status-badge [label]="row.orderStatus" [tone]="statusTone(row.orderStatus)" />
+              </td>
+              <td>{{ row.purchaseDate | date: 'short' }}</td>
+              <td>
+                <a
+                  pButton
+                  type="button"
+                  [routerLink]="['/admin/orders', row.id]"
+                  [label]="'ADMIN.ORDERS.ACTIONS.VIEW' | translate"
+                  severity="secondary"
+                  size="small"
+                ></a>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      } @else {
+        <app-admin-empty-state
+          icon="pi pi-users"
+          [title]="'ADMIN.ORDERS.DETAIL.CUSTOMER_HISTORY_EMPTY' | translate"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.PAYMENT_CALLBACKS' | translate">
+      @if (order.paymentCallbacks.length) {
+        <div class="order-detail-page__callbacks">
+          @for (callback of order.paymentCallbacks; track callback.id) {
+            <article class="order-detail-page__callback-card">
+              <header>
+                <strong>{{ callback.eventType }}</strong>
+                <app-admin-status-badge [label]="callback.status" [tone]="statusTone(callback.status)" />
+                <small>{{ callback.occurredOnUtc | date: 'medium' }}</small>
+              </header>
+              <dl class="admin-meta-grid">
+                <div>
+                  <dt>{{ 'ADMIN.ORDERS.DETAIL.PROVIDER' | translate }}</dt>
+                  <dd>{{ callback.provider }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'ADMIN.ORDERS.ACTIONS.COPY_TXN' | translate }}</dt>
+                  <dd>{{ callback.transactionId || '—' }}</dd>
+                </div>
+              </dl>
+              <pre>{{ formatCallbackPayload(callback.payloadJson) }}</pre>
+            </article>
+          }
+        </div>
+      } @else {
+        <app-admin-empty-state
+          icon="pi pi-credit-card"
+          [title]="'ADMIN.ORDERS.DETAIL.PAYMENT_CALLBACKS_EMPTY' | translate"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.ADMIN_NOTES' | translate">
+      <div class="order-detail-page__note-form" *hamboxHasPermission="permissions.Orders.Edit">
+        <textarea
+          pTextarea
+          rows="4"
+          [ngModel]="noteBody()"
+          (ngModelChange)="noteBody.set($event)"
+          [placeholder]="'ADMIN.ORDERS.DETAIL.NOTE_PLACEHOLDER' | translate"
+        ></textarea>
+        <button
+          pButton
+          type="button"
+          [label]="(editingNoteId() ? 'ADMIN.ORDERS.DETAIL.UPDATE_NOTE' : 'ADMIN.ORDERS.DETAIL.ADD_NOTE') | translate"
+          [disabled]="actionLoading()"
+          (click)="saveNote()"
+        ></button>
+      </div>
+
+      @if (order.adminNotes.length) {
+        <ul class="order-detail-page__notes">
+          @for (note of order.adminNotes; track note.id) {
+            <li>
+              <p>{{ note.body }}</p>
+              <small>
+                {{ note.authorDisplayName }} · {{ note.createdOnUtc | date: 'medium' }}
+                @if (note.modifiedOnUtc) {
+                  · {{ 'ADMIN.ORDERS.DETAIL.EDITED' | translate }}
+                }
+              </small>
+              <button
+                *hamboxHasPermission="permissions.Orders.Edit"
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [label]="'ADMIN.ORDERS.DETAIL.EDIT_NOTE' | translate"
+                (click)="editNote(note.id, note.body)"
+              ></button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <app-admin-empty-state
+          icon="pi pi-comment"
+          [title]="'ADMIN.ORDERS.DETAIL.NOTES_EMPTY' | translate"
+        />
+      }
+
+      @if (order.auditHistory.length) {
+        <h4>{{ 'ADMIN.ORDERS.DETAIL.AUDIT' | translate }}</h4>
+        <ul class="order-detail-page__audit">
+          @for (entry of order.auditHistory; track entry.id) {
+            <li>
+              <strong>{{ entry.eventType }}</strong>
+              <span>{{ entry.description }}</span>
+              <small>{{ entry.actorDisplayName || 'System' }} · {{ entry.occurredOnUtc | date: 'medium' }}</small>
+            </li>
+          }
+        </ul>
+      }
+    </app-admin-section-card>
+  }
+</section>
+
+<p-dialog
+  [header]="'ADMIN.ORDERS.DETAIL.CHANGE_STATUS' | translate"
+  [visible]="statusDialogOpen()"
+  (visibleChange)="statusDialogOpen.set($event)"
+  [modal]="true"
+  styleClass="admin-dialog"
+>
+  <p>{{ 'ADMIN.ORDERS.DETAIL.STATUS_CONFIRM' | translate }}</p>
+  <p-select
+    [options]="statusOptions"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="selectedStatus()"
+    (ngModelChange)="selectedStatus.set($event)"
+  />
+  <ng-template pTemplate="footer">
+    <button pButton type="button" severity="secondary" [text]="true" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="statusDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate" [loading]="actionLoading()" (click)="confirmStatusChange()"></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="refundDialogOpen()"
+  (visibleChange)="refundDialogOpen.set($event)"
+  [title]="'ADMIN.ORDERS.DETAIL.REFUND' | translate"
+  [message]="'ADMIN.ORDERS.DETAIL.REFUND_CONFIRM' | translate"
+  [confirmLabel]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
+  [loading]="actionLoading()"
+  [destructive]="true"
+  (confirmed)="confirmRefund()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="resendDialogOpen()"
+  (visibleChange)="resendDialogOpen.set($event)"
+  [title]="'ADMIN.ORDERS.ACTIONS.RESEND_CODES' | translate"
+  [message]="'ADMIN.ORDERS.DETAIL.RESEND_CONFIRM' | translate"
+  [confirmLabel]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
+  [loading]="actionLoading()"
+  (confirmed)="confirmResendCodes()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="retryDialogOpen()"
+  (visibleChange)="retryDialogOpen.set($event)"
+  [title]="'ADMIN.ORDERS.DETAIL.RETRY_FULFILLMENT' | translate"
+  [message]="'ADMIN.ORDERS.DETAIL.RETRY_CONFIRM' | translate"
+  [confirmLabel]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
+  [loading]="actionLoading()"
+  (confirmed)="confirmRetryFulfillment()"
+/>
+
+<p-dialog
+  [header]="'ADMIN.ORDERS.DETAIL.ASSIGN_MANUAL_CODE' | translate"
+  [visible]="manualCodeDialogOpen()"
+  (visibleChange)="manualCodeDialogOpen.set($event)"
+  [modal]="true"
+  styleClass="admin-dialog"
+>
+  <label class="order-detail-page__field">
+    <span>{{ 'ADMIN.ORDERS.DETAIL.MANUAL_CODE_ITEM' | translate }}</span>
+    <p-select
+      [options]="manualCodeItemOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="manualCodeItemId()"
+      (ngModelChange)="manualCodeItemId.set($event)"
+    />
+  </label>
+  <label class="order-detail-page__field">
+    <span>{{ 'ADMIN.ORDERS.DETAIL.MANUAL_CODE_VALUE' | translate }}</span>
+    <input
+      pInputText
+      [ngModel]="manualCodeValue()"
+      (ngModelChange)="manualCodeValue.set($event)"
+      [placeholder]="'ADMIN.ORDERS.DETAIL.MANUAL_CODE_PLACEHOLDER' | translate"
+    />
+  </label>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [text]="true"
+      [label]="'ADMIN.CONFIRM.CANCEL' | translate"
+      (click)="manualCodeDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
+      [loading]="actionLoading()"
+      (click)="confirmManualCode()"
+    ></button>
+  </ng-template>
+</p-dialog>

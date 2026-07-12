@@ -1,0 +1,18 @@
+<div class="ui-auth__shell">
+  <article class="ui-auth__card">
+    <header class="ui-auth__header">
+      <div class="ui-auth__intro">
+        @if (eyebrow()) {
+          <p class="ui-auth__eyebrow">{{ eyebrow() }}</p>
+        }
+        <h1 class="ui-auth__title">{{ title() }}</h1>
+        @if (subtitle()) {
+          <p class="ui-auth__subtitle">{{ subtitle() }}</p>
+        }
+      </div>
+      <ng-content select="[uiAuthHeaderActions]" />
+    </header>
+
+    <ng-content />
+  </article>
+</div>

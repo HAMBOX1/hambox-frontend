@@ -1,0 +1,66 @@
+<div class="store-view-modes">
+  <button
+    type="button"
+    class="store-view-modes__filter"
+    [attr.aria-label]="'PRODUCTS.FILTERS.OPEN' | translate"
+    (click)="onOpenFilters()"
+  >
+    <i class="pi pi-filter" aria-hidden="true"></i>
+    <span class="store-view-modes__filter-label">{{ 'PRODUCTS.FILTERS.OPEN' | translate }}</span>
+    @if (filterCount() > 0) {
+      <span class="store-view-modes__filter-badge">{{ filterCount() }}</span>
+    }
+  </button>
+
+  <div class="store-view-modes__group" role="group" [attr.aria-label]="'PRODUCTS.VIEW_MODE.GROUP_LABEL' | translate">
+    <button
+      type="button"
+      class="store-view-modes__btn"
+      [class.store-view-modes__btn--active]="mode() === 'comfortable'"
+      [attr.aria-label]="'PRODUCTS.VIEW_MODE.COMFORTABLE' | translate"
+      [attr.aria-pressed]="mode() === 'comfortable'"
+      (click)="setMode('comfortable')"
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="10" y="1" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="1" y="10" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="10" y="10" width="7" height="7" rx="1.25" fill="currentColor" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="store-view-modes__btn"
+      [class.store-view-modes__btn--active]="mode() === 'compact'"
+      [attr.aria-label]="'PRODUCTS.VIEW_MODE.COMPACT' | translate"
+      [attr.aria-pressed]="mode() === 'compact'"
+      (click)="setMode('compact')"
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="6.75" y="1" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="12.5" y="1" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="1" y="6.75" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="1" y="12.5" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+        <rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.9" fill="currentColor" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="store-view-modes__btn"
+      [class.store-view-modes__btn--active]="mode() === 'list'"
+      [attr.aria-label]="'PRODUCTS.VIEW_MODE.LIST' | translate"
+      [attr.aria-pressed]="mode() === 'list'"
+      (click)="setMode('list')"
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <rect x="1" y="2" width="16" height="3" rx="1" fill="currentColor" />
+        <rect x="1" y="7.5" width="16" height="3" rx="1" fill="currentColor" />
+        <rect x="1" y="13" width="16" height="3" rx="1" fill="currentColor" />
+      </svg>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as overview) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ANALYTICS.STATS.GROSS_REVENUE' | translate"
+      [value]="(overview.grossRevenue | number: '1.0-2') ?? '—'"
+      icon="pi-wallet"
+      tone="success"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ANALYTICS.STATS.NET_REVENUE' | translate"
+      [value]="(overview.netRevenue | number: '1.0-2') ?? '—'"
+      icon="pi-chart-line"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ANALYTICS.STATS.TOTAL_ORDERS' | translate"
+      [value]="overview.totalOrders"
+      icon="pi-list"
+      tone="info"
+    />
+    <app-admin-stat-card [compact]="true"
+      [label]="'ADMIN.ANALYTICS.STATS.NEW_CUSTOMERS' | translate"
+      [value]="overview.newCustomers"
+      icon="pi-user-plus"
+    />
+  </app-admin-stat-grid>
+
+  <div class="analytics-shell__grid">
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.REVENUE_SERIES' | translate">
+      @if (overview.revenueSeries.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="revenueChart().series"
+          [chart]="revenueChart().chart"
+          [xaxis]="revenueChart().xaxis"
+          [yaxis]="revenueChart().yaxis"
+          [stroke]="revenueChart().stroke"
+          [dataLabels]="revenueChart().dataLabels"
+          [tooltip]="revenueChart().tooltip"
+          [fill]="revenueChart().fill!"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.ORDERS_SERIES' | translate">
+      @if (overview.ordersSeries.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="ordersChart().series"
+          [chart]="ordersChart().chart"
+          [xaxis]="ordersChart().xaxis"
+          [yaxis]="ordersChart().yaxis"
+          [dataLabels]="ordersChart().dataLabels"
+          [plotOptions]="ordersChart().plotOptions"
+          [tooltip]="ordersChart().tooltip"
+        />
+      }
+    </app-admin-section-card>
+  </div>
+}

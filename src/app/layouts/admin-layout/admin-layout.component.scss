@@ -4,11 +4,14 @@
   color: var(--admin-text-primary);
   font-family: var(--admin-font-body);
   background: var(--admin-bg-base);
+  --admin-sidebar-current-width: var(--admin-sidebar-width);
+}
+
+:host(.admin-layout--sidebar-collapsed) {
+  --admin-sidebar-current-width: var(--admin-sidebar-width-collapsed);
 }
 
 .admin-layout {
-  display: grid;
-  grid-template-columns: var(--admin-sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
   background: var(--admin-bg-base);
 }
@@ -19,7 +22,7 @@
   z-index: 120;
   padding: 0;
   border: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--color-overlay);
   cursor: pointer;
 }
 
@@ -28,13 +31,17 @@
   flex-direction: column;
   min-width: 0;
   min-height: 100vh;
+  margin-left: var(--admin-sidebar-current-width);
+  transition: margin-left 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .admin-layout__content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   padding: var(--admin-content-padding);
   overflow-x: clip;
+  overflow-y: auto;
 
   :where(h1, h2, h3, h4, h5, h6) {
     margin-top: 0;
@@ -63,8 +70,8 @@
 }
 
 @media (max-width: 991px) {
-  .admin-layout {
-    grid-template-columns: minmax(0, 1fr);
+  .admin-layout__main {
+    margin-left: 0;
   }
 
   .admin-layout__content {

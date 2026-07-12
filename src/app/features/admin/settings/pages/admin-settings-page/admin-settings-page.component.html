@@ -1,0 +1,231 @@
+<p-toast />
+
+<app-admin-page-header
+  title="Platform Settings"
+  subtitle="Configure HAMBOX platform behavior, branding, security, and operations."
+  [breadcrumbs]="breadcrumbs"
+/>
+
+@if (facade.loading()) {
+  <app-admin-loading-skeleton [rows]="8" />
+} @else if (facade.error()) {
+  <app-admin-error-alert [message]="facade.error()!" (retry)="facade.load()" />
+} @else {
+  <div class="settings-layout">
+    <aside class="settings-nav">
+      <div class="settings-nav__search">
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search" aria-hidden="true"></i>
+          <input
+            pInputText
+            class="w-full"
+            type="search"
+            placeholder="Search categories..."
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+          />
+        </span>
+      </div>
+
+      <nav class="settings-nav__list" aria-label="Settings categories">
+        @for (category of filteredCategories(); track category.key) {
+          <button
+            type="button"
+            class="settings-nav__item"
+            [class.settings-nav__item--active]="category.key === activeCategoryKey()"
+            (click)="selectCategory(category)"
+          >
+            <span class="settings-nav__label">{{ category.label }}</span>
+            <span class="settings-nav__group">{{ category.group }}</span>
+          </button>
+        }
+      </nav>
+    </aside>
+
+    <section class="settings-content">
+      @if (activeCategory(); as category) {
+        @if (isStorefrontCategory()) {
+          <app-storefront-settings-editor
+            [payload]="draftPayload()"
+            [disabled]="!canEdit()"
+            (payloadChange)="replaceDraft($event)"
+          />
+        } @else {
+        <app-admin-section-card
+          [title]="category.label"
+          [description]="category.hasPersistedOverride ? 'Custom configuration saved' : 'Using platform defaults'"
+        >
+          @if (activeCategoryKey() === 'branding') {
+            <div class="branding-preview" aria-label="Branding preview">
+              <div
+                class="branding-preview__bar"
+                [style.background]="brandingPreview().primary"
+              ></div>
+              <div class="branding-preview__body">
+                @if (brandingPreview().logoUrl) {
+                  <img [src]="brandingPreview().logoUrl" alt="" class="branding-preview__logo" />
+                }
+                <h3 [style.color]="brandingPreview().secondary">{{ brandingPreview().title }}</h3>
+                <span
+                  class="branding-preview__chip"
+                  [style.background]="brandingPreview().accent"
+                >
+                  Accent
+                </span>
+              </div>
+            </div>
+          }
+
+          <div class="settings-form">
+            @for (field of activeFields(); track field.key) {
+              <div class="settings-form__field">
+                <label [for]="field.key">{{ field.label }}</label>
+
+                @switch (field.type) {
+                  @case ('checkbox') {
+                    <p-checkbox
+                      [inputId]="field.key"
+                      [binary]="true"
+                      [ngModel]="readBoolean(field.key)"
+                      [disabled]="!canEdit()"
+                      (ngModelChange)="setField(field.key, $event)"
+                    />
+                  }
+                  @case ('number') {
+                    <p-inputNumber
+                      [inputId]="field.key"
+                      [ngModel]="readNumber(field.key)"
+                      [disabled]="!canEdit()"
+                      [min]="field.min"
+                      [max]="field.max"
+                      (ngModelChange)="setField(field.key, $event)"
+                    />
+                  }
+                  @case ('textarea') {
+                    <textarea
+                      pTextarea
+                      [id]="field.key"
+                      rows="4"
+                      class="w-full"
+                      [ngModel]="readText(field.key)"
+                      [disabled]="!canEdit()"
+                      (ngModelChange)="setField(field.key, $event)"
+                    ></textarea>
+                  }
+                  @case ('color') {
+                    <input
+                      [id]="field.key"
+                      type="color"
+                      class="settings-form__color"
+                      [ngModel]="readText(field.key)"
+                      [disabled]="!canEdit()"
+                      (ngModelChange)="setField(field.key, $event)"
+                    />
+                  }
+                  @default {
+                    <input
+                      pInputText
+                      class="w-full"
+                      [id]="field.key"
+                      [type]="field.type === 'email' ? 'email' : 'text'"
+                      [ngModel]="readText(field.key)"
+                      [disabled]="!canEdit()"
+                      (ngModelChange)="setField(field.key, $event)"
+                    />
+                  }
+                }
+
+                @if (field.hint) {
+                  <small class="settings-form__hint">{{ field.hint }}</small>
+                }
+
+                @if (field.key === 'password' && readField('hasStoredPassword')) {
+                  <small class="settings-form__hint">A password is already stored.</small>
+                }
+              </div>
+            }
+          </div>
+
+          @if (activeCategoryKey() === 'email' && canEdit()) {
+            <div class="settings-form__smtp-test">
+              <label for="testEmail">Test Email Recipient</label>
+              <div class="settings-form__smtp-row">
+                <input
+                  pInputText
+                  id="testEmail"
+                  type="email"
+                  class="w-full"
+                  [ngModel]="testEmail()"
+                  (ngModelChange)="testEmail.set($event)"
+                  placeholder="admin@example.com"
+                />
+                <p-button
+                  label="Test SMTP"
+                  icon="pi pi-send"
+                  [loading]="facade.saving()"
+                  (onClick)="sendTestEmail()"
+                />
+              </div>
+            </div>
+          }
+        </app-admin-section-card>
+        }
+
+        @if (facade.audit().length) {
+          <app-admin-section-card title="Recent Changes" description="Configuration audit trail">
+            <ul class="settings-audit">
+              @for (entry of facade.audit(); track entry.id) {
+                <li>
+                  <strong>{{ entry.categoryKey }}</strong>
+                  — {{ entry.action }}
+                  @if (entry.actorDisplayName) {
+                    <span>by {{ entry.actorDisplayName }}</span>
+                  }
+                  <time>{{ entry.occurredOnUtc | date: 'medium' }}</time>
+                </li>
+              }
+            </ul>
+          </app-admin-section-card>
+        }
+      }
+    </section>
+  </div>
+
+  <app-admin-sticky-save-bar [dirty]="dirty()" [visible]="canEdit()">
+  @if (canEdit()) {
+    <p-button
+      label="Restore Defaults"
+      severity="secondary"
+      [text]="true"
+      [disabled]="facade.saving()"
+      (onClick)="requestRestore()"
+    />
+    <p-button
+      label="Save Changes"
+      icon="pi pi-check"
+      [loading]="facade.saving()"
+      [disabled]="!dirty()"
+      (onClick)="saveActive()"
+    />
+  }
+  </app-admin-sticky-save-bar>
+}
+
+<app-admin-unsaved-changes-dialog
+  [visible]="unsavedDialogOpen()"
+  [saving]="facade.saving()"
+  (visibleChange)="onUnsavedDialogVisibleChange($event)"
+  (save)="onUnsavedSave()"
+  (discard)="onUnsavedDiscard()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="restoreDialogOpen()"
+  [title]="'ADMIN.UNSAVED.RESTORE_TITLE' | translate"
+  [message]="'ADMIN.UNSAVED.RESTORE_MESSAGE' | translate"
+  [confirmLabel]="'ADMIN.CONFIRM.CONFIRM'"
+  [destructive]="true"
+  [loading]="facade.saving()"
+  (visibleChange)="restoreDialogOpen.set($event)"
+  (confirmed)="confirmRestore()"
+/>

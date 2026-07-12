@@ -1,0 +1,34 @@
+@if (visible()) {
+  <nav class="mobile-bottom-nav" [attr.aria-label]="'MOBILE_NAV.ARIA' | translate">
+    @for (item of items; track item.id) {
+      @if (isAccountItem(item)) {
+        <button
+          type="button"
+          class="mobile-bottom-nav__item"
+          [class.mobile-bottom-nav__item--active]="accountSheetOpen()"
+          (click)="onAccountClick($event)"
+        >
+          <span class="mobile-bottom-nav__icon-wrap">
+            <i [class]="item.icon" aria-hidden="true"></i>
+          </span>
+          <span class="mobile-bottom-nav__label">{{ item.labelKey | translate }}</span>
+        </button>
+      } @else {
+        <a
+          class="mobile-bottom-nav__item"
+          [routerLink]="resolveRoute(item)"
+          routerLinkActive="mobile-bottom-nav__item--active"
+          [routerLinkActiveOptions]="{ exact: item.id === 'home' }"
+        >
+          <span class="mobile-bottom-nav__icon-wrap">
+            <i [class]="item.icon" aria-hidden="true"></i>
+            @if (badgeFor(item) > 0) {
+              <span class="mobile-bottom-nav__badge">{{ badgeFor(item) > 9 ? '9+' : badgeFor(item) }}</span>
+            }
+          </span>
+          <span class="mobile-bottom-nav__label">{{ item.labelKey | translate }}</span>
+        </a>
+      }
+    }
+  </nav>
+}

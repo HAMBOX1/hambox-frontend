@@ -1,0 +1,19 @@
+<div class="variant-option-group">
+  <span class="variant-option-group__label">{{ groupLabel() }}</span>
+  <div class="variant-option-group__chips" role="listbox" [attr.aria-label]="groupLabel()">
+    @for (option of options(); track option.id) {
+      <button
+        type="button"
+        class="variant-option-group__chip"
+        role="option"
+        [class.variant-option-group__chip--selected]="selectedId() === option.id"
+        [class.variant-option-group__chip--disabled]="option.disabled"
+        [disabled]="option.disabled"
+        [attr.aria-selected]="selectedId() === option.id"
+        (click)="selectOption(option)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

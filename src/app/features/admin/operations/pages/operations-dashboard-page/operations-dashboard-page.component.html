@@ -1,0 +1,65 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.DASHBOARD.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.DASHBOARD.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div adminHeaderActions class="admin-page__actions">
+      <a pButton routerLink="/admin/operations/jobs" [label]="'ADMIN.OPERATIONS.NAV.JOBS' | translate" severity="secondary"></a>
+      <a pButton routerLink="/admin/operations/failed-jobs" [label]="'ADMIN.OPERATIONS.NAV.FAILED_JOBS' | translate" severity="secondary"></a>
+      <a pButton routerLink="/admin/operations/health" [label]="'ADMIN.OPERATIONS.NAV.HEALTH' | translate" severity="secondary"></a>
+    </div>
+  </app-admin-page-header>
+
+  @if (loading() && !dashboard()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (error() && !dashboard()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (dashboard(); as data) {
+    <app-admin-stat-grid>
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.QUEUED' | translate" [value]="data.jobs.queued" icon="pi-list" />
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.FAILED_JOBS' | translate" [value]="data.jobs.failed" icon="pi-times-circle" tone="warning" />
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.WAITING_DELIVERY' | translate" [value]="data.orders.waitingDelivery" icon="pi-send" tone="warning" />
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.ALERTS' | translate" [value]="data.recentAlerts.length" icon="pi-bell" />
+    </app-admin-stat-grid>
+
+    <div class="admin-page__grid admin-page__grid--compact">
+      <app-admin-section-card [title]="'ADMIN.OPERATIONS.DASHBOARD.WORKER' | translate">
+        <p>{{ data.worker.workerId }}</p>
+        <p>
+          <app-admin-status-badge [label]="data.worker.isRunning ? 'Running' : 'Stopped'" [tone]="data.worker.isRunning ? 'success' : 'warning'" />
+        </p>
+        <p>{{ 'ADMIN.OPERATIONS.DASHBOARD.HEARTBEAT_AGE' | translate }}: {{ data.worker.heartbeatAgeSeconds ?? '—' }}s</p>
+        <p>{{ 'ADMIN.OPERATIONS.DASHBOARD.PROCESSED' | translate }}: {{ data.worker.processedCount }}</p>
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="'ADMIN.OPERATIONS.DASHBOARD.TIMINGS' | translate">
+        <p>{{ 'ADMIN.OPERATIONS.DASHBOARD.AVG_JOB' | translate }}: {{ data.timings.averageJobProcessingSeconds?.toFixed(1) ?? '—' }}s</p>
+        <p>{{ 'ADMIN.OPERATIONS.DASHBOARD.AVG_DELIVERY' | translate }}: {{ data.timings.averageDeliverySeconds?.toFixed(1) ?? '—' }}s</p>
+      </app-admin-section-card>
+    </div>
+
+    <app-admin-section-card [title]="'ADMIN.OPERATIONS.DASHBOARD.ALERTS' | translate">
+      @if (data.recentAlerts.length === 0) {
+        <p>{{ 'ADMIN.OPERATIONS.EMPTY.ALERTS' | translate }}</p>
+      } @else {
+        <p-table [value]="data.recentAlerts" [rows]="10">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.SEVERITY' | translate }}</th>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.TITLE' | translate }}</th>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.CREATED' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-alert>
+            <tr>
+              <td><app-admin-status-badge [label]="alert.severity" [tone]="statusTone(alert.severity)" /></td>
+              <td>{{ alert.title }}</td>
+              <td>{{ alert.createdOnUtc | date: 'short' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </app-admin-section-card>
+  }
+</section>

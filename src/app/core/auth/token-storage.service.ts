@@ -1,8 +1,19 @@
 import { Injectable } from '@angular/core';
 
-const ACCESS_TOKEN_KEY = 'hambox.accessToken';
-const REFRESH_TOKEN_KEY = 'hambox.refreshToken';
-const EXPIRES_AT_KEY = 'hambox.expiresAt';
+import { AuthContextType } from './auth-context';
+
+const STORAGE_KEYS: Record<AuthContextType, { access: string; refresh: string; expires: string }> = {
+  customer: {
+    access: 'hambox.customer.accessToken',
+    refresh: 'hambox.customer.refreshToken',
+    expires: 'hambox.customer.expiresAt',
+  },
+  admin: {
+    access: 'hambox.admin.accessToken',
+    refresh: 'hambox.admin.refreshToken',
+    expires: 'hambox.admin.expiresAt',
+  },
+};
 
 export interface StoredTokens {
   readonly accessToken: string;
@@ -14,10 +25,11 @@ export interface StoredTokens {
   providedIn: 'root',
 })
 export class TokenStorageService {
-  getTokens(): StoredTokens | null {
-    const accessToken = this.read(ACCESS_TOKEN_KEY);
-    const refreshToken = this.read(REFRESH_TOKEN_KEY);
-    const expiresAt = this.read(EXPIRES_AT_KEY);
+  getTokens(context: AuthContextType): StoredTokens | null {
+    const keys = STORAGE_KEYS[context];
+    const accessToken = this.read(keys.access);
+    const refreshToken = this.read(keys.refresh);
+    const expiresAt = this.read(keys.expires);
 
     if (!accessToken || !refreshToken || !expiresAt) {
       return null;
@@ -26,20 +38,27 @@ export class TokenStorageService {
     return { accessToken, refreshToken, expiresAt };
   }
 
-  saveTokens(tokens: StoredTokens): void {
-    this.write(ACCESS_TOKEN_KEY, tokens.accessToken);
-    this.write(REFRESH_TOKEN_KEY, tokens.refreshToken);
-    this.write(EXPIRES_AT_KEY, tokens.expiresAt);
+  saveTokens(context: AuthContextType, tokens: StoredTokens): void {
+    const keys = STORAGE_KEYS[context];
+    this.write(keys.access, tokens.accessToken);
+    this.write(keys.refresh, tokens.refreshToken);
+    this.write(keys.expires, tokens.expiresAt);
   }
 
-  clearTokens(): void {
-    this.remove(ACCESS_TOKEN_KEY);
-    this.remove(REFRESH_TOKEN_KEY);
-    this.remove(EXPIRES_AT_KEY);
+  clearTokens(context: AuthContextType): void {
+    const keys = STORAGE_KEYS[context];
+    this.remove(keys.access);
+    this.remove(keys.refresh);
+    this.remove(keys.expires);
   }
 
-  getRefreshToken(): string | null {
-    return this.read(REFRESH_TOKEN_KEY);
+  clearAll(): void {
+    this.clearTokens('customer');
+    this.clearTokens('admin');
+  }
+
+  getRefreshToken(context: AuthContextType): string | null {
+    return this.read(STORAGE_KEYS[context].refresh);
   }
 
   private read(key: string): string | null {
@@ -54,7 +73,7 @@ export class TokenStorageService {
     try {
       localStorage.setItem(key, value);
     } catch {
-      // Ignore storage failures (private mode, quota exceeded).
+      // Ignore storage failures.
     }
   }
 

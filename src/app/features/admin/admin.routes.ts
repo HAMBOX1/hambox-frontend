@@ -1,81 +1,136 @@
 import { Routes } from '@angular/router';
 
+import { permissionGuard } from '../../core/guards/permission.guard';
+import { unsavedChangesGuard } from '../../core/guards/unsaved-changes.guard';
+import { PERMISSIONS } from '../../core/permissions/permission.constants';
+
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'inventory',
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {
     path: 'dashboard',
+    canActivate: [permissionGuard([PERMISSIONS.Dashboard.View])],
     loadComponent: () =>
-      import('./pages/admin-stub-page/admin-stub-page.component').then(
-        (c) => c.AdminStubPageComponent,
+      import('./pages/admin-dashboard-page/admin-dashboard-page.component').then(
+        (c) => c.AdminDashboardPageComponent,
       ),
-    data: {
-      title: 'Dashboard',
-      description: 'Overview of catalog performance, orders, and inventory health.',
-    },
   },
   {
-    path: 'inventory',
+    path: 'products',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.View])],
     loadComponent: () =>
       import('../catalog/pages/product-catalog-page/product-catalog-page.component').then(
         (c) => c.ProductCatalogPageComponent,
       ),
   },
   {
-    path: 'inventory/new',
+    path: 'products/new',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.Create])],
     loadComponent: () =>
       import('../catalog/pages/product-create-page/product-create-page.component').then(
         (c) => c.ProductCreatePageComponent,
       ),
   },
   {
-    path: 'inventory/:id/edit',
+    path: 'products/:id/edit',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.Edit])],
     loadComponent: () =>
       import('../catalog/pages/product-edit-page/product-edit-page.component').then(
         (c) => c.ProductEditPageComponent,
       ),
   },
   {
+    path: 'inventory',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Inventory.View])],
+    loadComponent: () =>
+      import('../catalog/pages/inventory-dashboard-page/inventory-dashboard-page.component').then(
+        (c) => c.InventoryDashboardPageComponent,
+      ),
+  },
+  {
+    path: 'inventory/:variantId',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Inventory.View])],
+    loadComponent: () =>
+      import('../catalog/pages/variant-inventory-page/variant-inventory-page.component').then(
+        (c) => c.VariantInventoryPageComponent,
+      ),
+  },
+  {
+    path: 'inventory/dashboard',
+    redirectTo: 'inventory',
+    pathMatch: 'full',
+  },
+  {
+    path: 'inventory/new',
+    redirectTo: 'products/new',
+    pathMatch: 'full',
+  },
+  {
+    path: 'inventory/:id/edit',
+    redirectTo: 'products/:id/edit',
+  },
+  {
+    path: 'inventory/:productId/variants/:variantId/codes',
+    redirectTo: 'inventory/:variantId',
+  },
+  {
     path: 'categories',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Categories.View])],
     loadComponent: () =>
       import('../catalog/pages/category-list-page/category-list-page.component').then(
         (c) => c.CategoryListPageComponent,
       ),
   },
   {
+    path: 'roles',
+    loadChildren: () =>
+      import('./roles/admin-roles.routes').then((m) => m.routes),
+  },
+  {
+    path: 'promotions',
+    loadChildren: () =>
+      import('./promotions/admin-promotions.routes').then((m) => m.routes),
+  },
+  {
+    path: 'memberships',
+    loadChildren: () =>
+      import('./memberships/admin-memberships.routes').then((m) => m.routes),
+  },
+  {
+    path: 'themes',
+    loadChildren: () =>
+      import('./themes/admin-themes.routes').then((m) => m.routes),
+  },
+  {
     path: 'orders',
-    loadComponent: () =>
-      import('./pages/admin-stub-page/admin-stub-page.component').then(
-        (c) => c.AdminStubPageComponent,
-      ),
-    data: {
-      title: 'Orders',
-      description: 'Review and fulfill customer orders from the storefront.',
-    },
+    loadChildren: () =>
+      import('./orders/admin-orders.routes').then((m) => m.routes),
+  },
+  {
+    path: 'operations',
+    loadChildren: () =>
+      import('./operations/admin-operations.routes').then((m) => m.routes),
   },
   {
     path: 'analytics',
-    loadComponent: () =>
-      import('./pages/admin-stub-page/admin-stub-page.component').then(
-        (c) => c.AdminStubPageComponent,
-      ),
-    data: {
-      title: 'Analytics',
-      description: 'Review sales velocity, margins, and operational KPIs.',
-    },
+    loadChildren: () =>
+      import('./analytics/admin-analytics.routes').then((m) => m.routes),
+  },
+  {
+    path: 'reports',
+    loadChildren: () =>
+      import('./reports/admin-reports.routes').then((m) => m.routes),
   },
   {
     path: 'settings',
+    canActivate: [permissionGuard([PERMISSIONS.Settings.View])],
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () =>
-      import('./pages/admin-stub-page/admin-stub-page.component').then(
-        (c) => c.AdminStubPageComponent,
+      import('./settings/pages/admin-settings-page/admin-settings-page.component').then(
+        (c) => c.AdminSettingsPageComponent,
       ),
-    data: {
-      title: 'Settings',
-      description: 'Configure admin preferences and platform controls.',
-    },
   },
 ];

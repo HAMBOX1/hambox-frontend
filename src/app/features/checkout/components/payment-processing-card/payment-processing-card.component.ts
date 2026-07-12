@@ -9,4 +9,5 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 })
 export class PaymentProcessingCardComponent {
   progress = input(0);
+  stageLabel = input('Processing Transaction');
 }

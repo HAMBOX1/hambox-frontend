@@ -1,0 +1,13 @@
+<input
+  pInputText
+  class="ui-input"
+  [id]="id()"
+  [type]="type()"
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [disabled]="disabled()"
+  [attr.autocomplete]="autocomplete()"
+  [attr.inputmode]="inputmode()"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+/>

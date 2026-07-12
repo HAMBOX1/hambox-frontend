@@ -12,6 +12,7 @@ import {
   mapProductToTrendingRank,
   mapProductToTrendingValue,
   mapStorefrontContent,
+  mapTrustItems,
 } from '../utils/storefront-home.mapper';
 import {
   FlashDeal,
@@ -19,12 +20,9 @@ import {
   StorefrontFeaturedProduct,
   TrendingRankItem,
   TrendingValueItem,
+  TrustFeature,
 } from '../models/storefront-home';
 import { StorefrontApiService } from './storefront-api.service';
-
-const HOME_CATEGORY_LIMIT = 8;
-const FEATURED_PRODUCT_LIMIT = 3;
-const NEW_ARRIVAL_LIMIT = 6;
 
 export interface StorefrontHomeData {
   readonly content: StorefrontContent;
@@ -34,6 +32,7 @@ export interface StorefrontHomeData {
   readonly featuredHighlight: StorefrontFeaturedProduct | null;
   readonly trendingRanks: readonly TrendingRankItem[];
   readonly trendingValue: TrendingValueItem | null;
+  readonly trustFeatures: readonly TrustFeature[];
 }
 
 @Injectable({
@@ -45,44 +44,77 @@ export class Home {
   private readonly productApi = inject(ProductApiService);
 
   async loadHomeData(): Promise<StorefrontHomeData> {
-    const [contentResponse, categoriesResult, featuredResult, newArrivalsResult] = await Promise.all([
-      firstValueFrom(this.storefrontApi.getContent()),
-      firstValueFrom(
-        this.categoryApi.getCategories({
-          pageNumber: 1,
-          pageSize: HOME_CATEGORY_LIMIT,
-          activeOnly: true,
-        }),
-      ),
-      firstValueFrom(
-        this.productApi.getProducts({
-          pageNumber: 1,
-          pageSize: FEATURED_PRODUCT_LIMIT,
-          status: 'Active',
-          sortBy: 'PriceDesc',
-        }),
-      ),
-      firstValueFrom(
-        this.productApi.getProducts({
-          pageNumber: 1,
-          pageSize: NEW_ARRIVAL_LIMIT,
-          status: 'Active',
-          sortBy: 'Newest',
-        }),
-      ),
+    const contentResponse = await firstValueFrom(this.storefrontApi.getContent());
+    const content = mapStorefrontContent(contentResponse);
+
+    const categoryLimit = content.popularCategories.maximumCategories || 8;
+    const flashLimit = content.flashDeals.maximumProducts || 3;
+    const collectionLimit = content.featuredCollections.maximumItems || 6;
+    const flashSort = (['Newest', 'PriceAsc', 'PriceDesc'] as const).includes(
+      content.flashDeals.sortMethod as 'Newest' | 'PriceAsc' | 'PriceDesc',
+    )
+      ? (content.flashDeals.sortMethod as 'Newest' | 'PriceAsc' | 'PriceDesc')
+      : 'PriceDesc';
+
+    const [categoriesResult, featuredResult, newArrivalsResult] = await Promise.all([
+      content.popularCategories.visible
+        ? firstValueFrom(
+            this.categoryApi.getCategories({
+              pageNumber: 1,
+              pageSize: categoryLimit,
+              activeOnly: true,
+            }),
+          )
+        : Promise.resolve({ items: [] as never[] }),
+      content.flashDeals.visible
+        ? firstValueFrom(
+            this.productApi.getProducts({
+              pageNumber: 1,
+              pageSize: flashLimit,
+              status: 'Active',
+              sortBy: flashSort,
+            }),
+          )
+        : Promise.resolve({ items: [] as never[] }),
+      content.featuredCollections.visible
+        ? firstValueFrom(
+            this.productApi.getProducts({
+              pageNumber: 1,
+              pageSize: collectionLimit,
+              status: 'Active',
+              sortBy: 'Newest',
+            }),
+          )
+        : Promise.resolve({ items: [] as never[] }),
     ]);
 
-    const content = mapStorefrontContent(contentResponse);
     const categories = (categoriesResult.items ?? []).map(mapCategoryToStorefrontCategory);
     const featuredProducts = (featuredResult.items ?? []).map((product, index) =>
       mapProductToFlashDeal(product, index),
     );
     const newArrivals = newArrivalsResult.items ?? [];
 
-    const featuredHighlightSource = featuredResult.items?.[0] ?? newArrivals[0] ?? null;
+    let featuredHighlight: StorefrontFeaturedProduct | null = null;
+    if (content.featuredProduct.visible) {
+      const preferredId = content.featuredProduct.productId;
+      const preferred =
+        preferredId != null
+          ? (featuredResult.items ?? []).find((p) => p.id === preferredId) ??
+            newArrivals.find((p) => p.id === preferredId)
+          : null;
+      const source = preferred ?? featuredResult.items?.[0] ?? newArrivals[0] ?? null;
+      featuredHighlight = source
+        ? mapProductToFeaturedProduct(
+            source,
+            0,
+            content.featuredProduct.badge,
+            content.featuredProduct.callToAction,
+          )
+        : null;
+    }
+
     const trendingRankSources = newArrivals.slice(0, 2);
     const trendingValueSource = newArrivals[2] ?? newArrivals[0] ?? null;
-
     const trendingRanks = trendingRankSources.map((product, index) =>
       mapProductToTrendingRank(product, index),
     );
@@ -92,11 +124,10 @@ export class Home {
       categories,
       featuredProducts,
       newArrivals,
-      featuredHighlight: featuredHighlightSource
-        ? mapProductToFeaturedProduct(featuredHighlightSource)
-        : null,
+      featuredHighlight,
       trendingRanks,
       trendingValue: trendingValueSource ? mapProductToTrendingValue(trendingValueSource) : null,
+      trustFeatures: mapTrustItems(content.trustBar),
     };
   }
 }

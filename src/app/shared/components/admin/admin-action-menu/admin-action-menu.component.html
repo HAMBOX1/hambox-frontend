@@ -1,0 +1,11 @@
+<button
+  type="button"
+  class="admin-action-menu__trigger"
+  [attr.aria-label]="label()"
+  [disabled]="disabled()"
+  (click)="toggle($event)"
+>
+  <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
+</button>
+
+<p-menu #menu [model]="items()" [popup]="true" styleClass="admin-action-menu__panel" />

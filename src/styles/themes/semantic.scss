@@ -1,0 +1,21 @@
+// HAMBOX semantic design tokens — public API for all components.
+// Use var(--surface), var(--text-primary), etc. Never hardcode hex in components.
+:root,
+[data-theme] {
+  --background: var(--theme-background);
+  --surface: var(--theme-surface);
+  --surface-elevated: var(--theme-elevated);
+  --surface-hover: var(--theme-surface-hover);
+  --border: var(--theme-border);
+  --border-light: var(--theme-border-subtle);
+  --text-primary: var(--theme-text-primary);
+  --text-secondary: var(--theme-text-secondary);
+  --text-muted: var(--theme-text-muted);
+  --primary: var(--theme-primary);
+  --success: var(--theme-success);
+  --warning: var(--theme-warning);
+  --danger: var(--theme-danger);
+  --shadow: var(--theme-shadow);
+  --accent: var(--theme-accent);
+  --accent-buy: var(--theme-accent-buy);
+}

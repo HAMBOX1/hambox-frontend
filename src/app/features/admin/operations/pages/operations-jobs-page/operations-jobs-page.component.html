@@ -1,0 +1,92 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.JOBS.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.JOBS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div adminHeaderActions class="admin-page__actions">
+      <button
+        *hamboxHasPermission="permissions.Operations.Export"
+        pButton
+        type="button"
+        [label]="'ADMIN.OPERATIONS.ACTIONS.EXPORT_CSV' | translate"
+        severity="secondary"
+        (click)="export('csv')"
+      ></button>
+      <button
+        *hamboxHasPermission="permissions.Operations.Clear"
+        pButton
+        type="button"
+        [label]="'ADMIN.OPERATIONS.ACTIONS.CLEAR_COMPLETED' | translate"
+        severity="secondary"
+        (click)="facade.clearCompleted().then(() => reload())"
+      ></button>
+    </div>
+  </app-admin-page-header>
+
+  <app-admin-section-card [title]="'ADMIN.OPERATIONS.FILTERS' | translate">
+    <div class="admin-filters admin-filters--sticky">
+      <p-select
+        [options]="statusOptions"
+        [ngModel]="status()"
+        (ngModelChange)="status.set($event); reload()"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'ADMIN.OPERATIONS.COLS.STATUS' | translate"
+      />
+      <input
+        pInputText
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keyup.enter)="reload()"
+        [placeholder]="'ADMIN.OPERATIONS.SEARCH' | translate"
+      />
+      <button pButton type="button" [label]="'ADMIN.OPERATIONS.ACTIONS.REFRESH' | translate" (click)="reload()"></button>
+    </div>
+  </app-admin-section-card>
+
+  @if (loading() && !jobs()) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (rows().length === 0) {
+    <app-admin-section-card>
+      <p>{{ 'ADMIN.OPERATIONS.EMPTY.JOBS' | translate }}</p>
+    </app-admin-section-card>
+  } @else {
+    <app-admin-section-card>
+      <p-table [value]="rows()" [rows]="50" [scrollable]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.ID' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.TYPE' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.CREATED' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.STARTED' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.FINISHED' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.DURATION' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.ATTEMPTS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.PRIORITY' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.WORKER' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.CORRELATION' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-job>
+          <tr>
+            <td class="admin-mono">{{ job.id | slice: 0:8 }}</td>
+            <td>{{ job.jobType }}</td>
+            <td>{{ job.createdOnUtc | date: 'short' }}</td>
+            <td>{{ job.startedOnUtc ? (job.startedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ job.finishedOnUtc ? (job.finishedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ job.durationSeconds != null ? (job.durationSeconds | number: '1.0-1') + 's' : '—' }}</td>
+            <td>{{ job.attempts }}/{{ job.maxAttempts }}</td>
+            <td><app-admin-status-badge [label]="job.status" [tone]="statusTone(job.status)" /></td>
+            <td>{{ job.priority }}</td>
+            <td>{{ job.workerId || '—' }}</td>
+            <td class="admin-mono">{{ job.correlationId || '—' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+  }
+</section>

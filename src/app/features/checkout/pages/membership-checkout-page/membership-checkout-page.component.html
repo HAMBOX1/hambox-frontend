@@ -1,0 +1,54 @@
+<app-storefront-nav mode="checkout" [links]="navLinks()" />
+
+<main class="membership-checkout-page">
+  <div class="membership-checkout-page__container">
+    @if (loading()) {
+      <app-loading-skeleton [count]="6" />
+    } @else if (error()) {
+      <section class="membership-checkout-page__state">
+        <p>{{ error() }}</p>
+        <a routerLink="/account/membership">{{ 'MEMBERSHIP_CHECKOUT.BACK' | translate }}</a>
+      </section>
+    } @else if (preview(); as plan) {
+      <header class="membership-checkout-page__header">
+        <button type="button" class="membership-checkout-page__back" (click)="backToMembership()">
+          {{ 'MEMBERSHIP_CHECKOUT.BACK' | translate }}
+        </button>
+        <h1>{{ 'MEMBERSHIP_CHECKOUT.TITLE' | translate }}</h1>
+        <p>{{ 'MEMBERSHIP_CHECKOUT.SUBTITLE' | translate }}</p>
+      </header>
+
+      <div class="membership-checkout-page__grid">
+        <section class="membership-checkout-page__review">
+          <h2>{{ plan.planName }}</h2>
+          <p>{{ 'MEMBERSHIP_CHECKOUT.ACTION' | translate:{ action: plan.action } }}</p>
+          <p>{{ 'MEMBERSHIP_CHECKOUT.DURATION' | translate:{ days: plan.durationDays } }}</p>
+          <p>{{ 'MEMBERSHIP_CHECKOUT.BENEFITS' | translate:{ count: plan.benefitCount } }}</p>
+          @if (plan.currentPlanName) {
+            <p>{{ 'MEMBERSHIP_CHECKOUT.CURRENT_PLAN' | translate:{ name: plan.currentPlanName } }}</p>
+          }
+          <strong class="membership-checkout-page__price">{{ plan.price | hamboxCurrency }}</strong>
+        </section>
+
+        <section class="membership-checkout-page__forms">
+          <app-checkout-billing-form />
+          <app-payment-method-selector />
+
+          <div class="membership-checkout-page__coupon">
+            <label for="membership-coupon">{{ 'MEMBERSHIP_CHECKOUT.COUPON' | translate }}</label>
+            <div class="membership-checkout-page__coupon-row">
+              <input id="membership-coupon" type="text" [value]="discountCode()" (input)="setDiscountCode($event)" />
+              <button type="button" (click)="applyCoupon()">{{ 'MEMBERSHIP_CHECKOUT.APPLY_COUPON' | translate }}</button>
+            </div>
+          </div>
+
+          <button type="button" class="membership-checkout-page__submit" (click)="proceedToPayment()">
+            {{ 'MEMBERSHIP_CHECKOUT.PROCEED' | translate }}
+          </button>
+        </section>
+      </div>
+    }
+  </div>
+</main>
+
+<app-storefront-footer />

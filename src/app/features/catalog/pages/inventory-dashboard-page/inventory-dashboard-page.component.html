@@ -1,0 +1,77 @@
+<p-toast position="top-right" />
+
+<section class="admin-page inventory-dashboard-page">
+  <app-admin-page-header
+    title="Inventory Dashboard"
+    subtitle="Monitor digital code pools, reservations, and inventory health."
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Products.View"
+      pButton
+      routerLink="/admin/products"
+      label="Manage Products"
+      icon="pi pi-shopping-bag"
+      severity="secondary"
+    ></a>
+  </app-admin-page-header>
+
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="detail" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (statistics(); as stats) {
+    <app-admin-stat-grid>
+      <app-admin-stat-card [compact]="true" label="Available" [value]="stats.available" icon="pi-check-circle" tone="success" />
+      <app-admin-stat-card [compact]="true" label="Reserved" [value]="stats.reserved" icon="pi-clock" tone="warning" />
+      <app-admin-stat-card [compact]="true" label="Low Stock Variants" [value]="stats.lowStockVariants" icon="pi-exclamation-triangle" />
+      <app-admin-stat-card [compact]="true" label="Out of Stock" [value]="stats.outOfStockVariants" icon="pi-times-circle" tone="warning" />
+    </app-admin-stat-grid>
+
+    <div class="inventory-dashboard-page__grid">
+      <app-admin-section-card title="Financial Overview">
+        <dl class="inventory-dashboard-page__meta">
+          <div><dt>Purchase Cost</dt><dd>{{ stats.purchaseCost | hamboxCurrency }}</dd></div>
+          <div><dt>Estimated Revenue</dt><dd>{{ stats.estimatedRevenue | hamboxCurrency }}</dd></div>
+          <div><dt>Estimated Profit</dt><dd>{{ stats.estimatedProfit | hamboxCurrency }}</dd></div>
+        </dl>
+      </app-admin-section-card>
+
+      <app-admin-section-card title="Reservation Monitor" description="Active 15-minute checkout reservations.">
+        @if (reservations().length) {
+          <p-table [value]="reservationsTable()" [rows]="10" [paginator]="reservations().length > 10">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Code ID</th>
+                <th>Variant</th>
+                <th>Expires</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{ row.codeId }}</td>
+                <td>{{ row.variantId }}</td>
+                <td>{{ row.expiresOnUtc | date: 'short' }}</td>
+                <td>
+                  <button
+                    *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+                    pButton
+                    type="button"
+                    label="Release"
+                    severity="secondary"
+                    size="small"
+                    (click)="releaseReservation(row.codeId)"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        } @else {
+          <p class="inventory-dashboard-page__empty">No active reservations.</p>
+        }
+      </app-admin-section-card>
+    </div>
+  }
+</section>

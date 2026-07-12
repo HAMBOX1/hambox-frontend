@@ -1,0 +1,93 @@
+<article
+  class="store-list-card"
+  [class.store-list-card--out-of-stock]="product().outOfStock"
+>
+  <a class="store-list-card__media" [routerLink]="['/products', product().id]">
+    <img
+      class="store-list-card__image"
+      [src]="product().imageUrl"
+      [alt]="product().title"
+      loading="lazy"
+    />
+    @if (product().discountLabel) {
+      <span class="store-list-card__discount">{{ product().discountLabel }}</span>
+    }
+  </a>
+
+  <div class="store-list-card__body">
+    <a class="store-list-card__title" [routerLink]="['/products', product().id]">
+      {{ product().title }}
+    </a>
+
+    <div class="store-list-card__meta">
+      <span class="store-list-card__platform">{{ product().platformLabel }}</span>
+
+      @if (product().instantDigital) {
+        <span class="store-list-card__tag">{{ 'PRODUCT.INSTANT_DIGITAL' | translate }}</span>
+      }
+
+      @if (product().categoryName) {
+        <span class="store-list-card__category">{{ product().categoryName }}</span>
+      }
+
+      @if (product().rating !== undefined) {
+        <span class="store-list-card__rating">
+          <i class="pi pi-star-fill" aria-hidden="true"></i>
+          {{ product().rating }}
+        </span>
+      }
+
+      <span
+        class="store-list-card__stock"
+        [class.store-list-card__stock--in]="product().stockStatus === 'in-stock'"
+        [class.store-list-card__stock--low]="product().stockStatus === 'low-stock'"
+        [class.store-list-card__stock--out]="product().stockStatus === 'out-of-stock' || product().outOfStock"
+      >
+        {{ stockLabelKey(product()) | translate }}
+      </span>
+    </div>
+  </div>
+
+  <div class="store-list-card__aside">
+    <div class="store-list-card__pricing">
+      @if (product().originalPriceUsd) {
+        <span class="store-list-card__original">{{ product().originalPriceUsd | hamboxCurrency }}</span>
+      }
+      <span class="store-list-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
+    </div>
+
+    <div class="store-list-card__actions">
+      <button
+        type="button"
+        class="store-list-card__wishlist"
+        [class.store-list-card__wishlist--active]="wishlistAdded()"
+        [attr.aria-label]="(wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate"
+        [attr.aria-pressed]="wishlistAdded()"
+        (click)="toggleWishlist($event)"
+      >
+        <i class="pi" [class.pi-heart]="!wishlistAdded()" [class.pi-heart-fill]="wishlistAdded()" aria-hidden="true"></i>
+      </button>
+
+      @switch (product().cta) {
+        @case ('cart') {
+          <button type="button" class="store-list-card__btn store-list-card__btn--secondary" (click)="addToCart($event)">
+            {{ 'PRODUCT.ADD_TO_CART' | translate }}
+          </button>
+          <a class="store-list-card__btn store-list-card__btn--primary" [routerLink]="['/products', product().id]">
+            {{ 'PRODUCT.BUY_NOW' | translate }}
+          </a>
+        }
+        @case ('buy-now') {
+          <a class="store-list-card__btn store-list-card__btn--primary" [routerLink]="['/products', product().id]">
+            {{ 'PRODUCT.BUY_NOW' | translate }}
+          </a>
+        }
+        @case ('notify-me') {
+          <button type="button" class="store-list-card__btn store-list-card__btn--ghost">
+            {{ 'PRODUCT.NOTIFY_ME' | translate }}
+          </button>
+        }
+      }
+    </div>
+  </div>
+</article>

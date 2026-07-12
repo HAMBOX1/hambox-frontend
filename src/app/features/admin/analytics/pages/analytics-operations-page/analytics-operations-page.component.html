@@ -1,0 +1,49 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as operations) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_QUEUE' | translate" [value]="formatSeconds(operations.averageQueueSeconds)" icon="pi-clock" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_DELIVERY' | translate" [value]="formatSeconds(operations.averageDeliverySeconds)" icon="pi-send" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.FAILED_JOBS' | translate" [value]="operations.failedJobs" icon="pi-times-circle" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.RETRY_SUCCESS' | translate" [value]="(operations.retrySuccessRate | number: '1.0-1') + '%'" icon="pi-refresh" tone="success" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.INACTIVE_SUPPLIERS' | translate" [value]="operations.inactiveSuppliers" icon="pi-building" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.API_5XX' | translate" [value]="operations.api5xxCount" icon="pi-exclamation-triangle" tone="warning" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.WORKER_UPTIME' | translate" [value]="formatPercent(operations.workerUptimePercent)" icon="pi-server" />
+  </app-admin-stat-grid>
+
+  <div class="analytics-shell__grid">
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.FAILED_JOBS' | translate">
+      @if (operations.failedJobsSeries.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="failedJobsChart().series"
+          [chart]="failedJobsChart().chart"
+          [xaxis]="failedJobsChart().xaxis"
+          [yaxis]="failedJobsChart().yaxis"
+          [stroke]="failedJobsChart().stroke"
+          [dataLabels]="failedJobsChart().dataLabels"
+          [tooltip]="failedJobsChart().tooltip"
+        />
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.API_5XX' | translate">
+      @if (operations.api5xxSeries.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+      } @else {
+        <apx-chart
+          [series]="api5xxChart().series"
+          [chart]="api5xxChart().chart"
+          [xaxis]="api5xxChart().xaxis"
+          [yaxis]="api5xxChart().yaxis"
+          [stroke]="api5xxChart().stroke"
+          [dataLabels]="api5xxChart().dataLabels"
+          [tooltip]="api5xxChart().tooltip"
+        />
+      }
+    </app-admin-section-card>
+  </div>
+}

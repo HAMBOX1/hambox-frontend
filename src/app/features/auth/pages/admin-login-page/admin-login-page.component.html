@@ -1,0 +1,56 @@
+<ui-auth-card
+  eyebrow="HAMBOX Admin Portal"
+  title="Sign in"
+  subtitle="Administrative access requires email verification."
+>
+  <button
+    uiAuthHeaderActions
+    type="button"
+    class="admin-login-page__theme"
+    (click)="toggleTheme()"
+    aria-label="Toggle theme"
+  >
+    <i class="pi" [class.pi-moon]="theme.isLight()" [class.pi-sun]="theme.isDark()"></i>
+  </button>
+
+  @if (errorMessage()) {
+    <div class="admin-login-page__alert" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <form class="admin-login-page__form" [formGroup]="form" (ngSubmit)="submit()">
+    <ui-field label="Email" [required]="true" [error]="fieldError('email')">
+      <ui-input
+        formControlName="email"
+        type="email"
+        placeholder="you@company.com"
+        autocomplete="username"
+      />
+    </ui-field>
+
+    <ui-field label="Password" [required]="true" [error]="fieldError('password')">
+      <ui-password-input formControlName="password" placeholder="Enter your password" />
+    </ui-field>
+
+    <div class="admin-login-page__meta-row">
+      <label class="admin-login-page__remember">
+        <input type="checkbox" formControlName="rememberMe" />
+        <span>Remember me</span>
+      </label>
+      <span class="admin-login-page__forgot" aria-disabled="true">Forgot password?</span>
+    </div>
+
+    <ui-button
+      class="admin-login-page__submit"
+      type="submit"
+      label="Continue"
+      [loading]="isSubmitting()"
+      [disabled]="isSubmitting()"
+      [fullWidth]="true"
+    />
+  </form>
+
+  <p class="admin-login-page__footer">
+    Storefront customer?
+    <a routerLink="/auth/login">Sign in here</a>
+  </p>
+</ui-auth-card>

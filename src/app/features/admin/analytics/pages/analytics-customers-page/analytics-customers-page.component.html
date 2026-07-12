@@ -1,0 +1,76 @@
+@if (loading() && !data()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else if (error() && !data()) {
+  <app-admin-error-alert [message]="error()!" />
+} @else if (data(); as customers) {
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.NEW_CUSTOMERS' | translate" [value]="customers.newCustomers" icon="pi-user-plus" tone="success" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.RETURNING_CUSTOMERS' | translate" [value]="customers.returningCustomers" icon="pi-users" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.DISTINCT_BUYERS' | translate" [value]="customers.totalDistinctBuyers" icon="pi-user" />
+    <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_LTV' | translate" [value]="(customers.averageLifetimeValue | number: '1.0-2') ?? '—'" icon="pi-wallet" />
+  </app-admin-stat-grid>
+
+  <app-admin-section-card [title]="'ADMIN.ANALYTICS.CHARTS.NEW_CUSTOMERS' | translate">
+    @if (customers.newCustomersSeries.length === 0) {
+      <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.CHART' | translate" />
+    } @else {
+      <apx-chart
+        [series]="seriesChart().series"
+        [chart]="seriesChart().chart"
+        [xaxis]="seriesChart().xaxis"
+        [yaxis]="seriesChart().yaxis"
+        [stroke]="seriesChart().stroke"
+        [dataLabels]="seriesChart().dataLabels"
+        [tooltip]="seriesChart().tooltip"
+      />
+    }
+  </app-admin-section-card>
+
+  <div class="analytics-shell__grid">
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.TABLES.TOP_LTV' | translate">
+      @if (customers.topByLifetimeValue.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.TABLE' | translate" />
+      } @else {
+        <div class="analytics-shell__table-wrap">
+          <p-table [value]="customers.topByLifetimeValue" [rows]="8">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.NAME' | translate }}</th>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.VALUE' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.value | number: '1.0-2' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.ANALYTICS.TABLES.BY_COUNTRY' | translate">
+      @if (customers.byCountry.length === 0) {
+        <app-admin-empty-state [title]="'ADMIN.ANALYTICS.EMPTY.TABLE' | translate" />
+      } @else {
+        <div class="analytics-shell__table-wrap">
+          <p-table [value]="customers.byCountry" [rows]="8">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.NAME' | translate }}</th>
+                <th>{{ 'ADMIN.ANALYTICS.COLS.COUNT' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.count ?? row.value }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      }
+    </app-admin-section-card>
+  </div>
+}

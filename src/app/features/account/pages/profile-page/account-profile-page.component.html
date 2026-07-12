@@ -1,11 +1,11 @@
-<section class="profile-page">
+<section class="profile-page" hamboxTranslateRefresh>
   <header class="profile-page__header">
-    <h1>Account Settings</h1>
-    <p>Manage your profile and security preferences.</p>
+    <h1>{{ 'ACCOUNT.PROFILE_UI.TITLE' | translate }}</h1>
+    <p>{{ 'ACCOUNT.PROFILE_UI.SUBTITLE' | translate }}</p>
   </header>
 
   @if (loading()) {
-    <p class="profile-page__state">Loading profile...</p>
+    <p class="profile-page__state">{{ 'ACCOUNT.PROFILE_UI.LOADING' | translate }}</p>
   } @else if (error()) {
     <p class="profile-page__state profile-page__state--error">{{ error() }}</p>
   } @else if (profile(); as current) {
@@ -15,39 +15,39 @@
 
     <div class="profile-page__grid">
       <section class="profile-page__card">
-        <h2>Profile</h2>
-        <p class="profile-page__meta">Member since {{ current.memberSince | date:'mediumDate' }}</p>
+        <h2>{{ 'ACCOUNT.PROFILE_UI.PROFILE' | translate }}</h2>
+        <p class="profile-page__meta">{{ 'ACCOUNT.PROFILE_UI.MEMBER_SINCE' | translate }} {{ current.memberSince | hamboxDate:'mediumDate' }}</p>
 
         <label>
-          First name
+          {{ 'AUTH.FIRST_NAME' | translate }}
           <input type="text" [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" />
         </label>
 
         <label>
-          Last name
+          {{ 'AUTH.LAST_NAME' | translate }}
           <input type="text" [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" />
         </label>
 
         <label>
-          Email
+          {{ 'AUTH.EMAIL' | translate }}
           <input type="email" [value]="current.email" disabled />
         </label>
 
         <label>
-          Phone
+          {{ 'ACCOUNT.PROFILE_UI.PHONE' | translate }}
           <input type="tel" [ngModel]="phoneNumber()" (ngModelChange)="phoneNumber.set($event)" />
         </label>
 
         <button type="button" [disabled]="saving()" (click)="saveProfile()">
-          {{ saving() ? 'Saving...' : 'Save Profile' }}
+          {{ saving() ? ('ACCOUNT.PROFILE_UI.SAVING' | translate) : ('ACCOUNT.PROFILE_UI.SAVE_PROFILE' | translate) }}
         </button>
       </section>
 
       <section class="profile-page__card">
-        <h2>Change Password</h2>
+        <h2>{{ 'ACCOUNT.PROFILE_UI.CHANGE_PASSWORD' | translate }}</h2>
 
         <label>
-          Current password
+          {{ 'ACCOUNT.PROFILE_UI.CURRENT_PASSWORD' | translate }}
           <input
             type="password"
             [ngModel]="currentPassword()"
@@ -56,12 +56,12 @@
         </label>
 
         <label>
-          New password
+          {{ 'ACCOUNT.PROFILE_UI.NEW_PASSWORD' | translate }}
           <input type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" />
         </label>
 
         <button type="button" [disabled]="saving()" (click)="changePassword()">
-          {{ saving() ? 'Updating...' : 'Update Password' }}
+          {{ saving() ? ('ACCOUNT.PROFILE_UI.UPDATING' | translate) : ('ACCOUNT.PROFILE_UI.UPDATE_PASSWORD' | translate) }}
         </button>
       </section>
     </div>
