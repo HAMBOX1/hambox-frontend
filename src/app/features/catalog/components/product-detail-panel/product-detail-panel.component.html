@@ -29,18 +29,13 @@
               [tone]="statusTone(selected.status)"
             />
             @if (selected.categoryName) {
-              <span class="detail-panel__category-chip">{{ selected.categoryName }}</span>
+              <app-admin-status-badge [label]="selected.categoryName" tone="info" [outlined]="true" />
             }
           </div>
         </div>
       </div>
 
       <div class="detail-panel__header-actions">
-        <app-admin-icon-button
-          [icon]="copiedField() === 'id' ? 'pi pi-check' : 'pi pi-copy'"
-          [label]="copiedField() === 'id' ? 'Copied!' : 'Copy product ID'"
-          (pressed)="copyValue(selected.id, 'id')"
-        />
         <button type="button" class="detail-panel__close" aria-label="Close product details" (click)="onClose()">
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>

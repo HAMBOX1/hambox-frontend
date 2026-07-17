@@ -6,11 +6,13 @@ import { ApiClientService } from '../../../../core/api/api-client.service';
 import { ApiError } from '../../../../core/models/api-error.model';
 import {
   ApiRequestLogDto,
+  BackgroundJobExecutionHistoryDto,
   DeliveryMonitorItemDto,
   OperationalAlertDto,
   OperationalJobDto,
   OperationsDashboardDto,
   PagedResult,
+  RecurringJobDefinitionDto,
   SupplierOperationsItemDto,
   SystemHealthDto,
 } from '../models/operations-api.model';
@@ -23,6 +25,8 @@ export class OperationsFacade {
 
   private readonly dashboardState = signal<OperationsDashboardDto | null>(null);
   private readonly jobsState = signal<PagedResult<OperationalJobDto> | null>(null);
+  private readonly jobHistoryState = signal<BackgroundJobExecutionHistoryDto[]>([]);
+  private readonly recurringJobsState = signal<RecurringJobDefinitionDto[]>([]);
   private readonly deliveryState = signal<PagedResult<DeliveryMonitorItemDto> | null>(null);
   private readonly suppliersState = signal<SupplierOperationsItemDto[]>([]);
   private readonly apiLogsState = signal<PagedResult<ApiRequestLogDto> | null>(null);
@@ -33,6 +37,8 @@ export class OperationsFacade {
 
   readonly dashboard = this.dashboardState.asReadonly();
   readonly jobs = this.jobsState.asReadonly();
+  readonly jobHistory = this.jobHistoryState.asReadonly();
+  readonly recurringJobs = this.recurringJobsState.asReadonly();
   readonly delivery = this.deliveryState.asReadonly();
   readonly suppliers = this.suppliersState.asReadonly();
   readonly apiLogs = this.apiLogsState.asReadonly();
@@ -59,6 +65,24 @@ export class OperationsFacade {
         ),
       );
     }, 'Unable to load operational jobs.');
+  }
+
+  async loadJobHistory(id: string): Promise<void> {
+    await this.run(async () => {
+      this.jobHistoryState.set(
+        await firstValueFrom(
+          this.api.get<BackgroundJobExecutionHistoryDto[]>(OPERATIONS_API.jobHistory(id)),
+        ),
+      );
+    }, 'Unable to load job execution history.');
+  }
+
+  async loadRecurringJobs(): Promise<void> {
+    await this.run(async () => {
+      this.recurringJobsState.set(
+        await firstValueFrom(this.api.get<RecurringJobDefinitionDto[]>(OPERATIONS_API.recurringJobs)),
+      );
+    }, 'Unable to load recurring jobs.');
   }
 
   async retryJob(id: string): Promise<boolean> {

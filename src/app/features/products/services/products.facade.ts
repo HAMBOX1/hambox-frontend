@@ -6,6 +6,7 @@ import { StoreCategoryPill, StoreProduct, StoreSortOption } from '../models/prod
 import { STOREFRONT_SORT_OPTIONS } from '../services/storefront-products-data';
 import { StorefrontProductEnrichmentService } from '../services/storefront-product-enrichment.service';
 import { mapProductToStoreProduct } from '../utils/storefront-product.mapper';
+import { TranslationService } from '../../../core/i18n/translation.service';
 import {
   buildDynamicFilterGroups,
   countActiveAttributeFilters,
@@ -53,6 +54,7 @@ export interface StorefrontAppliedFilterChip {
 export class ProductsFacade {
   private readonly productsService = inject(Products);
   private readonly enrichment = inject(StorefrontProductEnrichmentService);
+  private readonly translation = inject(TranslationService);
 
   private readonly itemsState = signal<readonly StoreProduct[]>([]);
   private readonly categoriesState = signal<readonly StoreCategoryPill[]>([
@@ -311,7 +313,7 @@ export class ProductsFacade {
 
       const baseIndex = append ? this.itemsState().length : 0;
       const mapped = (result.items ?? []).map((product, index) =>
-        mapProductToStoreProduct(product, baseIndex + index),
+        mapProductToStoreProduct(product, this.translation.language(), baseIndex + index),
       );
 
       const nextItems = append ? [...this.itemsState(), ...mapped] : mapped;

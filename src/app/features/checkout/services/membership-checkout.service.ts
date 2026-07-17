@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import { COMMERCE_API } from '../../../core/api/api-endpoints';
@@ -38,7 +38,9 @@ export class MembershipCheckoutService {
     return this.http.get<MembershipCheckoutPreviewApiDto>(COMMERCE_API.membershipCheckoutPreview, { params });
   }
 
-  checkout(body: MembershipCheckoutRequestApiDto) {
-    return this.http.post<OrderApiDto>(COMMERCE_API.membershipCheckout, body);
+  checkout(body: MembershipCheckoutRequestApiDto, idempotencyKey: string) {
+    return this.http.post<OrderApiDto>(COMMERCE_API.membershipCheckout, body, {
+      headers: new HttpHeaders({ 'Idempotency-Key': idempotencyKey }),
+    });
   }
 }

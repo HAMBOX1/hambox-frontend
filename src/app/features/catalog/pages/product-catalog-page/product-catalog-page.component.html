@@ -48,8 +48,10 @@
   <app-product-catalog-toolbar
     [searchTerm]="searchTerm()"
     [statusFilter]="statusFilter()"
+    [hasActiveFilters]="hasActiveFilters()"
     (searchChange)="onSearchChange($event)"
     (statusChange)="onStatusFilterChange($event)"
+    (clearFilters)="onClearFilters()"
   />
 
   @if (error()) {

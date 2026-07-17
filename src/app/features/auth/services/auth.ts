@@ -16,6 +16,7 @@ import { UserProfileApiDto } from '../../account/models/account-api.model';
 import {
   AuthTokenResponse,
   ForgotPasswordRequest,
+  GoogleLoginRequest,
   LoginRequest,
   LogoutRequest,
   RefreshTokenRequest,
@@ -40,11 +41,26 @@ export class Auth {
   readonly isAuthenticated = this.session.isCustomerAuthenticated;
   readonly isAdmin = computed(() => false);
   readonly accessToken = computed(() => this.session.getAccessToken(AUTH_CONTEXT.Customer));
-  readonly initialized = this.session.initialized;
+  readonly initialized = computed(() => this.session.initialized(AUTH_CONTEXT.Customer));
 
   login(request: LoginRequest): Observable<AuthTokenResponse> {
     return this.api
       .post<AuthTokenResponse>(AUTH_API.login, request, {
+        context: new HttpContext().set(SKIP_AUTH_INTERCEPTOR, true),
+      })
+      .pipe(
+        tap((tokens) => {
+          this.session.setSession(AUTH_CONTEXT.Customer, tokens);
+          void this.syncAccessFromProfile();
+          void this.translation.syncFromAuthenticatedUser();
+          void this.currency.syncFromAuthenticatedUser();
+        }),
+      );
+  }
+
+  loginWithGoogle(idToken: string): Observable<AuthTokenResponse> {
+    return this.api
+      .post<AuthTokenResponse>(AUTH_API.google, { idToken } satisfies GoogleLoginRequest, {
         context: new HttpContext().set(SKIP_AUTH_INTERCEPTOR, true),
       })
       .pipe(
@@ -117,13 +133,13 @@ export class Auth {
   restoreSession(): Promise<UserSession | null> {
     const restored = this.session.tryRestoreFromStorage(AUTH_CONTEXT.Customer);
     if (restored) {
-      this.session.markInitialized();
+      this.session.markInitialized(AUTH_CONTEXT.Customer);
       return Promise.resolve(restored);
     }
 
     if (!this.session.hasRefreshToken(AUTH_CONTEXT.Customer)) {
       this.session.clearSession(AUTH_CONTEXT.Customer);
-      this.session.markInitialized();
+      this.session.markInitialized(AUTH_CONTEXT.Customer);
       return Promise.resolve(null);
     }
 
@@ -135,7 +151,7 @@ export class Auth {
         }),
       ),
     ).then(async (tokens) => {
-      this.session.markInitialized();
+      this.session.markInitialized(AUTH_CONTEXT.Customer);
       if (tokens) {
         await this.syncAccessFromProfile();
       }

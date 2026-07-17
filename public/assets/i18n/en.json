@@ -133,7 +133,37 @@
     "SIGN_IN": "Sign in",
     "CREATE_ACCOUNT": "Create account",
     "ALREADY_HAVE_ACCOUNT": "Already have an account?",
-    "DONT_HAVE_ACCOUNT": "Don't have an account?"
+    "DONT_HAVE_ACCOUNT": "Don't have an account?",
+    "LEGAL": {
+      "DIALOG_TITLE": "Legal Documents",
+      "LOADING": "Loading documents…",
+      "AGREE_LABEL": "I have read and agree to the Terms & Conditions and Privacy Policy.",
+      "ACCEPT": "I Agree & Continue",
+      "CLOSE": "Close",
+      "TYPES": {
+        "Terms": "Terms & Conditions",
+        "Privacy": "Privacy Policy",
+        "Refund": "Refund Policy"
+      }
+    }
+  },
+  "LEGAL": {
+    "LAST_UPDATED": "Last updated",
+    "VERSION": "Version",
+    "NOT_AVAILABLE": "This document is not available yet.",
+    "READING_TIME": "{{minutes}} min read",
+    "TABLE_OF_CONTENTS": "On this page",
+    "BACK_TO_LEGAL": "Back to Legal Center",
+    "MENU": "Legal documents",
+    "NOT_FOUND_TITLE": "Document not found",
+    "NOT_FOUND_DESCRIPTION": "We couldn't find the legal document you're looking for.",
+    "LANDING": {
+      "EYEBROW": "HAMBOX Legal Center",
+      "TITLE": "Legal Center",
+      "SUBTITLE": "Terms, policies, and information governing your use of HAMBOX.",
+      "COMING_SOON": "Coming soon",
+      "UNCATEGORIZED": "General"
+    }
   },
   "PRODUCT": {
     "ADD_TO_CART": "Add to cart",
@@ -312,7 +342,21 @@
       "VIEW_ALL": "View all notifications",
       "TODAY": "Today",
       "YESTERDAY": "Yesterday",
-      "EARLIER": "Earlier"
+      "EARLIER": "Earlier",
+      "PREFERENCES": "Preferences",
+      "SEARCH_PLACEHOLDER": "Search notifications…",
+      "ALL_CATEGORIES": "All categories",
+      "SHOW_ARCHIVED": "Show archived",
+      "ARCHIVE": "Archive",
+      "DELETE": "Delete",
+      "PREFS": {
+        "EMAIL": "Email notifications",
+        "IN_APP": "In-app notifications",
+        "ORDER": "Order updates",
+        "MEMBERSHIP": "Membership updates",
+        "MARKETING": "Marketing & promotions",
+        "SECURITY": "Security alerts (always on)"
+      }
     },
     "SIDEBAR_UI": {
       "NAV_ARIA": "Account navigation",
@@ -644,6 +688,7 @@
     "CONFIRM": {
       "CONFIRM": "Confirm",
       "CANCEL": "Cancel",
+      "REVEAL": "Reveal",
       "DELETE_ROLE_TITLE": "Delete role?",
       "DELETE_ROLE": "Delete \"{{name}}\"? This cannot be undone.",
       "DELETE_ROLES_TITLE": "Delete selected roles?",
@@ -655,7 +700,11 @@
       "DELETE_PLAN_TITLE": "Delete plan?",
       "DELETE_PLAN": "Delete \"{{name}}\"? This cannot be undone.",
       "CANCEL_MEMBERSHIP_TITLE": "Cancel membership?",
-      "CANCEL_MEMBERSHIP": "Cancel membership for this user? This cannot be undone."
+      "CANCEL_MEMBERSHIP": "Cancel membership for this user? This cannot be undone.",
+      "DELETE_SUPPLIER_TITLE": "Delete supplier?",
+      "DELETE_SUPPLIER": "Delete \"{{name}}\"? This cannot be undone.",
+      "DELETE_MAPPING_TITLE": "Delete mapping?",
+      "DELETE_MAPPING": "Delete this product mapping? This cannot be undone."
     },
     "BULK": {
       "SELECTED": "{{count}} selected",
@@ -674,16 +723,124 @@
       "PROMOTIONS": "Promotions",
       "MEMBERSHIPS": "Memberships",
       "THEMES": "Themes",
+      "LEGAL": "Legal Center",
       "ORDERS": "Orders",
       "OPERATIONS": "Operations",
       "ANALYTICS": "Analytics",
       "REPORTS": "Reports",
-      "SETTINGS": "Settings"
+      "SETTINGS": "Settings",
+      "SUPPLIERS": "Suppliers",
+      "SECURITY": "Security Center",
+      "COMMUNICATION": "Communication"
+    },
+    "COMMUNICATION": {
+      "NAV": {
+        "TEMPLATES": "Templates",
+        "MESSAGES": "Notifications",
+        "FAILED_DELIVERIES": "Failed deliveries",
+        "PROVIDERS": "Providers"
+      },
+      "DASHBOARD": {
+        "TITLE": "Communication center",
+        "SUBTITLE": "Templates, delivery history, providers, and notification volume.",
+        "NOTIFICATIONS_TODAY": "Notifications today",
+        "EMAILS_SENT": "Emails sent today",
+        "FAILURES": "Failures today",
+        "RETRYING": "Retrying",
+        "UNREAD": "Unread notifications",
+        "AVG_DELIVERY": "Avg. delivery time",
+        "QUEUE_SIZE": "Queue size",
+        "PROVIDER_ENABLED": "Enabled",
+        "PROVIDER_DISABLED": "Disabled"
+      },
+      "TEMPLATES": {
+        "TITLE": "Communication templates",
+        "SUBTITLE": "Edit and publish notification templates for each channel.",
+        "NEW": "New template",
+        "EDIT": "Edit",
+        "EDIT_TITLE": "Edit template",
+        "PUBLISHED": "Published",
+        "DRAFT": "Draft",
+        "SAVE_DRAFT": "Save draft",
+        "PUBLISH": "Publish",
+        "CREATE": "Create",
+        "EMPTY": "No templates yet.",
+        "COLUMNS": {
+          "KEY": "Key",
+          "CHANNEL": "Channel",
+          "CATEGORY": "Category",
+          "STATUS": "Status"
+        },
+        "FIELDS": {
+          "KEY": "Key",
+          "CHANNEL": "Channel",
+          "CATEGORY": "Category",
+          "SUBJECT_EN": "Subject (English)",
+          "SUBJECT_AR": "Subject (Arabic)",
+          "BODY_EN": "Body (English)",
+          "BODY_AR": "Body (Arabic)"
+        },
+        "MESSAGES": {
+          "SAVED": "Draft saved.",
+          "SAVE_FAILED": "Failed to save draft.",
+          "PUBLISHED": "Template published.",
+          "PUBLISH_FAILED": "Failed to publish template.",
+          "CREATED": "Template created.",
+          "CREATE_FAILED": "Failed to create template."
+        }
+      },
+      "MESSAGES": {
+        "TITLE": "Notifications",
+        "SUBTITLE": "Every notification sent through the Communication Platform.",
+        "SEARCH_PLACEHOLDER": "Search subject, user, or template…",
+        "FILTER_STATUS": "Status",
+        "FILTER_CHANNEL": "Channel",
+        "EMPTY": "No notifications match your filters.",
+        "COLUMNS": {
+          "SUBJECT": "Subject",
+          "CHANNEL": "Channel",
+          "CATEGORY": "Category",
+          "STATUS": "Status",
+          "CREATED": "Created"
+        }
+      },
+      "FAILED_DELIVERIES": {
+        "TITLE": "Failed deliveries",
+        "SUBTITLE": "Notifications that failed to deliver — retry individually.",
+        "RETRY": "Retry",
+        "EMPTY": "No failed deliveries.",
+        "COLUMNS": {
+          "SUBJECT": "Subject",
+          "CHANNEL": "Channel",
+          "RETRY_COUNT": "Retries",
+          "ERROR": "Last error"
+        },
+        "MESSAGES": {
+          "RETRIED": "Delivery re-queued.",
+          "RETRY_FAILED": "Failed to retry delivery."
+        }
+      },
+      "PROVIDERS": {
+        "TITLE": "Communication providers",
+        "SUBTITLE": "Enable, disable, and prioritize delivery channels.",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "COLUMNS": {
+          "NAME": "Name",
+          "CHANNEL": "Channel",
+          "PRIORITY": "Priority",
+          "ENABLED": "Enabled"
+        },
+        "MESSAGES": {
+          "UPDATE_FAILED": "Failed to update provider."
+        }
+      }
     },
     "OPERATIONS": {
       "NAV": {
         "JOBS": "Jobs",
         "FAILED_JOBS": "Failed jobs",
+        "RECURRING_JOBS": "Recurring jobs",
         "HEALTH": "Health"
       },
       "FILTERS": "Filters",
@@ -706,6 +863,10 @@
       "FAILED": {
         "TITLE": "Failed jobs",
         "SUBTITLE": "Retry or cancel jobs that exhausted attempts."
+      },
+      "RECURRING": {
+        "TITLE": "Recurring jobs",
+        "SUBTITLE": "Periodic jobs registered with the background-job scheduler."
       },
       "DELIVERY": {
         "TITLE": "Delivery monitor",
@@ -776,7 +937,12 @@
         "IP": "IP",
         "REQ_SIZE": "Request size",
         "RES_SIZE": "Response size",
-        "MIN_STATUS": "Min status"
+        "MIN_STATUS": "Min status",
+        "QUEUE": "Queue",
+        "PROGRESS": "Progress",
+        "INTERVAL": "Interval",
+        "LAST_RUN": "Last run",
+        "KEY": "Key"
       },
       "ACTIONS": {
         "REFRESH": "Refresh",
@@ -786,7 +952,8 @@
         "CLEAR_COMPLETED": "Clear completed",
         "EXPORT_CSV": "Export CSV",
         "DETAILS": "View details",
-        "DOWNLOAD_LOGS": "Download logs"
+        "DOWNLOAD_LOGS": "Download logs",
+        "HISTORY": "Execution history"
       },
       "EMPTY": {
         "ALERTS": "No alerts.",
@@ -794,7 +961,9 @@
         "FAILED": "No failed jobs.",
         "DELIVERY": "No delivery rows.",
         "SUPPLIERS": "No suppliers.",
-        "API_LOGS": "No API logs yet."
+        "API_LOGS": "No API logs yet.",
+        "RECURRING": "No recurring jobs registered.",
+        "HISTORY": "No execution history yet."
       }
     },
     "ANALYTICS": {
@@ -1560,6 +1729,132 @@
         "ROLLBACK": "Rollback"
       }
     },
+    "LEGAL": {
+      "NAV": {
+        "DASHBOARD": "Dashboard",
+        "SECTIONS": "Sections",
+        "ACCEPTANCE": "Acceptance Tracking"
+      },
+      "DASHBOARD": {
+        "TITLE": "Legal Center",
+        "SUBTITLE": "Overview of your legal sections.",
+        "STATS": {
+          "TOTAL": "Total sections",
+          "PUBLISHED": "Published",
+          "DRAFT": "Draft",
+          "ARCHIVED": "Archived"
+        }
+      },
+      "LIST": {
+        "TITLE": "Legal Sections",
+        "SUBTITLE": "Create, edit, and publish any legal document — no code changes required.",
+        "NEW": "New section",
+        "EDIT": "Edit",
+        "HAS_DRAFT": "Unpublished draft",
+        "SEARCH_PLACEHOLDER": "Search sections by slug or title…",
+        "FILTER_CATEGORY": "Category",
+        "FILTER_STATUS": "Status",
+        "STATUS_PUBLISHED": "Published",
+        "STATUS_DRAFT": "Draft",
+        "STATUS_ARCHIVED": "Archived",
+        "EMPTY": "No legal sections yet. Create your first one.",
+        "EMPTY_SEARCH": "No sections match your filters.",
+        "COLUMNS": {
+          "TITLE": "Section",
+          "CATEGORY": "Category",
+          "STATUS": "Status",
+          "VERSION": "Version",
+          "PUBLISHED_ON": "Published on"
+        }
+      },
+      "CREATE": {
+        "TITLE": "New legal section",
+        "SLUG_LABEL": "Slug",
+        "SLUG_HINT": "Lowercase letters, numbers, and hyphens only — becomes /legal/{{slug}}",
+        "TITLE_LABEL": "Title (EN)",
+        "CATEGORY_LABEL": "Category",
+        "ICON_LABEL": "Icon"
+      },
+      "DUPLICATE": {
+        "TITLE": "Duplicate section",
+        "SLUG_LABEL": "New slug",
+        "TITLE_LABEL": "New title (EN)"
+      },
+      "DETAIL": {
+        "SUBTITLE": "Edit bilingual content and publish new versions.",
+        "TAB_EDIT": "Edit",
+        "TAB_SETTINGS": "SEO & Visibility",
+        "TAB_HISTORY": "History",
+        "CONTENT": "Section content"
+      },
+      "FORM": {
+        "SLUG": "Slug",
+        "TITLE_EN": "Title (EN)",
+        "TITLE_AR": "Title (AR)",
+        "CONTENT_EN": "Content (EN)",
+        "CONTENT_AR": "Content (AR)",
+        "CATEGORY": "Category",
+        "ICON": "Icon",
+        "SORT_ORDER": "Sort order",
+        "DESCRIPTION_EN": "Description (EN)",
+        "DESCRIPTION_AR": "Description (AR)",
+        "SEO_TITLE": "SEO title",
+        "SEO_DESCRIPTION": "SEO description",
+        "SEO_KEYWORDS": "SEO keywords",
+        "SHOW_IN_FOOTER": "Show in footer",
+        "SHOW_IN_NAVIGATION": "Show in navigation",
+        "REQUIRE_ACCEPTANCE": "Require user acceptance",
+        "VERSION_NOTES": "Version notes",
+        "OPTIONAL_FALLBACK": "(optional — defaults to English)"
+      },
+      "ACTIONS": {
+        "SAVE_DRAFT": "Save draft",
+        "PUBLISH": "Publish",
+        "PREVIEW": "Preview",
+        "DUPLICATE": "Duplicate",
+        "ARCHIVE": "Archive",
+        "UNARCHIVE": "Unarchive",
+        "DELETE": "Delete",
+        "RESTORE": "Restore this version",
+        "CANCEL": "Cancel",
+        "CREATE": "Create"
+      },
+      "HISTORY": {
+        "TITLE": "Version history",
+        "EMPTY": "No changes yet.",
+        "ACTION": "Action",
+        "ACTOR": "Actor",
+        "DATE": "Date"
+      },
+      "ACCEPTANCE_TRACKING": {
+        "TITLE": "Acceptance Tracking",
+        "SUBTITLE": "Sections that require users to accept the current published version.",
+        "COLUMNS": {
+          "SECTION": "Section",
+          "VERSION": "Published version",
+          "PUBLISHED_ON": "Published on"
+        },
+        "EMPTY": "No sections currently require acceptance."
+      },
+      "MESSAGES": {
+        "SAVED": "Draft saved.",
+        "SAVE_FAILED": "Failed to save draft.",
+        "PUBLISHED": "Published successfully.",
+        "PUBLISH_FAILED": "Failed to publish.",
+        "CREATED": "Section created.",
+        "CREATE_FAILED": "Failed to create section.",
+        "DUPLICATED": "Section duplicated.",
+        "DUPLICATE_FAILED": "Failed to duplicate section.",
+        "ARCHIVED": "Section archived.",
+        "UNARCHIVED": "Section unarchived.",
+        "ARCHIVE_FAILED": "Failed to update section.",
+        "DELETED": "Section deleted.",
+        "DELETE_FAILED": "Failed to delete section.",
+        "RESTORED": "Version restored and published.",
+        "CONFIRM_DELETE": "Delete \"{{slug}}\"? This can't be undone from the UI.",
+        "CONFIRM_DELETE_TITLE": "Delete legal section"
+      }
+    },
     "MEMBERSHIPS": {
       "LIST": {
         "TITLE": "Membership plans",
@@ -1650,6 +1945,207 @@
         "DUPLICATE": "Duplicate",
         "ARCHIVE": "Archive",
         "ACTIVATE": "Activate"
+      }
+    },
+    "SUPPLIERS": {
+      "LIST": {
+        "TITLE": "Suppliers",
+        "SUBTITLE": "Manage external supplier integrations, credentials, and priority.",
+        "NEW": "New Supplier",
+        "SEARCH_PLACEHOLDER": "Search by name or code...",
+        "FILTER_STATUS": "Status",
+        "EMPTY": "No suppliers yet.",
+        "EMPTY_SEARCH": "No suppliers match your search.",
+        "COLUMNS": {
+          "NAME": "Name",
+          "CODE": "Code",
+          "PROVIDER": "Provider",
+          "PRIORITY": "Priority",
+          "STATUS": "Status",
+          "CREATED": "Created"
+        }
+      },
+      "DETAIL": {
+        "NEW": "New Supplier",
+        "SUBTITLE": "Configure the provider integration, credentials, and capabilities.",
+        "GENERAL": "General",
+        "NAME": "Name",
+        "CODE": "Code",
+        "CODE_HINT": "e.g. BAMBOO-EU",
+        "PROVIDER_TYPE": "Provider type",
+        "PROVIDER_TYPE_HINT": "Select or type a provider key",
+        "AUTH_TYPE": "Authentication type",
+        "BASE_URL": "Base URL",
+        "PRIORITY": "Priority",
+        "CAPABILITIES": "Capabilities",
+        "SUPPORTS_INVENTORY_SYNC": "Inventory sync",
+        "SUPPORTS_PRICE_SYNC": "Price sync",
+        "SUPPORTS_RESERVATIONS": "Reservations",
+        "SUPPORTS_ORDER_STATUS": "Order status",
+        "SUPPORTS_WEBHOOKS": "Webhooks",
+        "SETTINGS_JSON": "Provider settings (JSON)",
+        "INVALID_JSON": "This must be valid JSON.",
+        "CREDENTIALS": "Credentials",
+        "CREDENTIALS_HINT": "Leave a field blank to keep its current stored value.",
+        "API_KEY": "API key",
+        "API_SECRET": "API secret",
+        "USERNAME": "Username",
+        "PASSWORD": "Password",
+        "BEARER_TOKEN": "Bearer token",
+        "STORED": "Stored"
+      },
+      "MAPPINGS": {
+        "TITLE": "Product Mappings",
+        "SUBTITLE": "Map HAMBOX products to this supplier's external products.",
+        "NEW": "New Mapping",
+        "EDIT_TITLE": "Edit Mapping",
+        "EMPTY": "No product mappings yet.",
+        "INTERNAL_PRODUCT_ID": "Internal product ID",
+        "EXTERNAL_PRODUCT_ID": "External product ID",
+        "SKU": "SKU",
+        "NAME": "External name",
+        "BUYING_PRICE": "Buying price",
+        "CURRENCY": "Currency",
+        "PRIORITY": "Priority",
+        "STATUS": "Status",
+        "COLUMNS": {
+          "INTERNAL_PRODUCT": "Internal Product",
+          "EXTERNAL_PRODUCT": "External Product",
+          "SKU": "SKU",
+          "BUYING_PRICE": "Buying Price",
+          "PRIORITY": "Priority",
+          "STATUS": "Status"
+        }
+      },
+      "DISABLED": "Disabled",
+      "ACTIONS": {
+        "EDIT": "Edit",
+        "SAVE": "Save",
+        "CREATE": "Create supplier",
+        "SAVE_CREDENTIALS": "Save credentials",
+        "TEST_CONNECTION": "Test connection",
+        "MAPPINGS": "Mappings",
+        "ENABLE": "Enable",
+        "DISABLE": "Disable",
+        "DELETE": "Delete"
+      },
+      "MESSAGES": {
+        "CREATED": "Supplier created.",
+        "SAVED": "Supplier saved.",
+        "SAVE_FAILED": "Failed to save supplier.",
+        "CREDENTIALS_SAVED": "Credentials updated.",
+        "DELETED": "Supplier deleted.",
+        "ENABLED": "Supplier enabled.",
+        "DISABLED": "Supplier disabled.",
+        "MAPPING_SAVED": "Mapping saved.",
+        "MAPPING_DELETED": "Mapping deleted.",
+        "ACTION_FAILED": "Action failed."
+      }
+    },
+    "SECURITY": {
+      "TITLE": "Security Center",
+      "SUBTITLE": "Manage blocked users, emails, countries, IP addresses, and review security events.",
+      "TABS": {
+        "DASHBOARD": "Dashboard",
+        "USERS": "Users",
+        "EMAILS": "Emails",
+        "IPS": "IP Addresses",
+        "COUNTRIES": "Countries",
+        "EVENTS": "Events"
+      },
+      "STATS": {
+        "BLOCKED_USERS": "Blocked Users",
+        "SUSPENDED_USERS": "Suspended Users",
+        "BLOCKED_EMAILS": "Blocked Emails",
+        "BLOCKED_DOMAINS": "Blocked Domains",
+        "BLOCKED_COUNTRIES": "Blocked Countries",
+        "BLOCKED_IPS": "Blocked IPs",
+        "EVENTS_TODAY": "Events Today",
+        "FAILED_LOGINS_TODAY": "Failed Logins Today",
+        "RECENT_EVENTS": "Recent Events"
+      },
+      "FORM": {
+        "REASON": "Reason",
+        "NOTES": "Notes",
+        "EXPIRES_ON": "Expires on"
+      },
+      "USERS": {
+        "SEARCH_PLACEHOLDER": "Search by name or email...",
+        "FILTER_ALL": "All statuses",
+        "EMPTY": "No restricted users.",
+        "RESTORE_CONFIRM": "Restore this user's account to Active?",
+        "COLUMNS": {
+          "NAME": "Name",
+          "EMAIL": "Email",
+          "STATUS": "Status",
+          "REASON": "Reason",
+          "EXPIRES": "Expires"
+        },
+        "ACTIONS": {
+          "BLOCK": "Block",
+          "SUSPEND": "Suspend",
+          "BAN": "Ban",
+          "RESTORE": "Restore access"
+        }
+      },
+      "EMAILS": {
+        "ADD": "Block Email",
+        "REMOVE": "Remove",
+        "REMOVE_CONFIRM": "Remove this blocked email entry?",
+        "SEARCH_PLACEHOLDER": "Search blocked emails...",
+        "EMPTY": "No blocked emails or domains.",
+        "COLUMNS": {
+          "PATTERN": "Email / Domain",
+          "REASON": "Reason",
+          "EXPIRES": "Expires"
+        },
+        "FORM": {
+          "PATTERN": "Email address or *@domain.com"
+        }
+      },
+      "IPS": {
+        "ADD": "Block IP",
+        "REMOVE": "Remove",
+        "REMOVE_CONFIRM": "Remove this blocked IP entry?",
+        "SEARCH_PLACEHOLDER": "Search blocked IPs...",
+        "EMPTY": "No blocked IP addresses.",
+        "COLUMNS": {
+          "ADDRESS": "IP / CIDR Range",
+          "REASON": "Reason",
+          "EXPIRES": "Expires"
+        },
+        "FORM": {
+          "ADDRESS": "IP address or CIDR range"
+        }
+      },
+      "COUNTRIES": {
+        "SEARCH_PLACEHOLDER": "Search countries...",
+        "OVERRIDDEN_ONLY": "Show restricted only",
+        "EMPTY": "No countries match your search.",
+        "EDIT": "Set restriction",
+        "CLEAR": "Allow",
+        "COLUMNS": {
+          "COUNTRY": "Country",
+          "STATUS": "Status",
+          "REASON": "Reason"
+        }
+      },
+      "EVENTS": {
+        "SEARCH_PLACEHOLDER": "Search security events...",
+        "EMPTY": "No security events recorded.",
+        "COLUMNS": {
+          "SEVERITY": "Severity",
+          "TYPE": "Type",
+          "DESCRIPTION": "Description",
+          "IP": "IP Address",
+          "OCCURRED": "Occurred"
+        }
+      },
+      "MESSAGES": {
+        "ACTION_SUCCEEDED": "Action completed successfully.",
+        "ACTION_FAILED": "Action failed.",
+        "EMAIL_BLOCKED": "Email blocked.",
+        "IP_BLOCKED": "IP address blocked."
       }
     }
   }

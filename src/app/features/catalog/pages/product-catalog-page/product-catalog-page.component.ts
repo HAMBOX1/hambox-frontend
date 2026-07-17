@@ -72,6 +72,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly selectedProduct = this.facade.selectedProduct;
   protected readonly selectedProductId = this.facade.selectedProductId;
   protected readonly hasActiveSearch = this.facade.hasActiveSearch;
+  protected readonly hasActiveFilters = this.facade.hasActiveFilters;
   protected readonly subtitle = this.facade.subtitle;
   protected readonly updatingStatus = this.facade.updatingStatus;
   protected readonly actionLoading = this.facade.actionLoading;
@@ -110,6 +111,10 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onStatusFilterChange(status: ProductStatus | ''): void {
     this.facade.setStatusFilter(status);
+  }
+
+  protected onClearFilters(): void {
+    this.facade.clearFilters();
   }
 
   protected onPageChange(event: TableLazyLoadEvent): void {

@@ -1,0 +1,54 @@
+<p-toast position="top-right" />
+
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.COMMUNICATION.PROVIDERS.TITLE' | translate"
+    [subtitle]="'ADMIN.COMMUNICATION.PROVIDERS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table class="admin-data-table" [value]="[...providers()]" [loading]="loading()" dataKey="id" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.COMMUNICATION.PROVIDERS.COLUMNS.NAME' | translate }}</th>
+          <th>{{ 'ADMIN.COMMUNICATION.PROVIDERS.COLUMNS.CHANNEL' | translate }}</th>
+          <th>{{ 'ADMIN.COMMUNICATION.PROVIDERS.COLUMNS.PRIORITY' | translate }}</th>
+          <th>{{ 'ADMIN.COMMUNICATION.PROVIDERS.COLUMNS.ENABLED' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-provider>
+        <tr>
+          <td>{{ provider.name }}</td>
+          <td>{{ provider.channel }}</td>
+          <td>
+            <p-inputNumber
+              [ngModel]="provider.priority"
+              (ngModelChange)="updatePriority(provider, $event)"
+              [showButtons]="true"
+              [min]="0"
+              [disabled]="actionLoading()"
+              styleClass="admin-priority-input"
+            />
+          </td>
+          <td>
+            <p-toggleswitch
+              *hamboxHasPermission="permissions.Communication.ManageProviders; else readonlyStatus"
+              [ngModel]="provider.isEnabled"
+              (ngModelChange)="toggleEnabled(provider, $event)"
+              [disabled]="actionLoading()"
+            />
+            <ng-template #readonlyStatus>
+              <span>{{ provider.isEnabled ? ('ADMIN.COMMUNICATION.PROVIDERS.ENABLED' | translate) : ('ADMIN.COMMUNICATION.PROVIDERS.DISABLED' | translate) }}</span>
+            </ng-template>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>

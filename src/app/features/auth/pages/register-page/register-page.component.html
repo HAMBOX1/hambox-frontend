@@ -205,23 +205,10 @@
             </div>
           </div>
 
-          <div class="register-form__terms">
-            <p-checkbox
-              inputId="register-accept-terms"
-              formControlName="acceptTerms"
-              [binary]="true"
-            />
-            <label class="register-form__terms-label" for="register-accept-terms">
-              I acknowledge the
-              <a href="#" (click)="$event.preventDefault()">Terms of Service</a>
-              and
-              <a href="#" (click)="$event.preventDefault()">Privacy Protocol</a>.
-              I understand that account security is my responsibility.
-            </label>
-          </div>
-          @if (fieldError('acceptTerms'); as message) {
-            <p class="register-form__error register-form__error--terms">{{ message }}</p>
-          }
+          <p class="register-form__terms-note">
+            By continuing you'll be asked to review and accept the Terms of Service, Privacy Policy
+            and Refund Policy.
+          </p>
 
           <button
             pButton
@@ -256,3 +243,10 @@
     </section>
   </div>
 </div>
+
+<app-legal-acceptance-dialog
+  [visible]="legalDialogVisible()"
+  [slugs]="requiredLegalSlugs()"
+  (visibleChange)="legalDialogVisible.set($event)"
+  (accepted)="onLegalAccepted()"
+/>

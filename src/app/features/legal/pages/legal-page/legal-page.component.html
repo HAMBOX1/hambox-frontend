@@ -1,0 +1,105 @@
+<div class="legal-page">
+  <div class="legal-page__progress" role="progressbar" [attr.aria-valuenow]="readingProgress()" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'LEGAL.TABLE_OF_CONTENTS' | translate">
+    <div class="legal-page__progress-bar" [style.width.%]="readingProgress()"></div>
+  </div>
+
+  <app-storefront-nav [links]="navLinks" />
+
+  <main class="legal-page__main">
+    <nav class="legal-page__breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/legal" class="legal-page__crumb-link">{{ 'LEGAL.LANDING.TITLE' | translate }}</a>
+      @if (activeItem(); as item) {
+        <span class="legal-page__crumb-sep" aria-hidden="true">›</span>
+        <span class="legal-page__crumb-current" aria-current="page">{{ navLabel(item) }}</span>
+      }
+    </nav>
+
+    <button type="button" class="legal-page__mobile-nav-toggle" (click)="openMobileNav()">
+      <i class="pi pi-bars" aria-hidden="true"></i>
+      {{ 'LEGAL.MENU' | translate }}
+    </button>
+
+    <div class="legal-page__layout">
+      <aside class="legal-page__sidebar" aria-label="Legal documents">
+        <ng-container [ngTemplateOutlet]="navList" />
+      </aside>
+
+      <article class="legal-page__content">
+        @if (notFound()) {
+          <app-empty-state
+            icon="pi pi-question-circle"
+            [title]="'LEGAL.NOT_FOUND_TITLE' | translate"
+            [description]="'LEGAL.NOT_FOUND_DESCRIPTION' | translate"
+            [actionLabel]="'LEGAL.BACK_TO_LEGAL' | translate"
+            actionIcon="pi pi-arrow-left"
+            (action)="goToLandingPage()"
+          />
+        } @else if (loading()) {
+          <app-loading-skeleton type="detail" />
+        } @else if (error() || !document()) {
+          <app-empty-state
+            icon="pi pi-file-excel"
+            [title]="'LEGAL.NOT_FOUND_TITLE' | translate"
+            [description]="error() ?? ('LEGAL.NOT_AVAILABLE' | translate)"
+          />
+        } @else if (document(); as doc) {
+          <h1 class="legal-page__title">{{ docTitle() }}</h1>
+
+          <p class="legal-page__meta">
+            <span>{{ 'LEGAL.LAST_UPDATED' | translate }} {{ doc.publishedOnUtc | hamboxDate: 'mediumDate' }}</span>
+            <span class="legal-page__meta-dot" aria-hidden="true">·</span>
+            <span>{{ 'LEGAL.VERSION' | translate }} {{ doc.versionNumber }}</span>
+            <span class="legal-page__meta-dot" aria-hidden="true">·</span>
+            <span>{{ 'LEGAL.READING_TIME' | translate: { minutes: readingMinutes() } }}</span>
+          </p>
+
+          @if (toc().length > 1) {
+            <nav class="legal-page__toc" aria-label="Table of contents">
+              <p class="legal-page__toc-title">{{ 'LEGAL.TABLE_OF_CONTENTS' | translate }}</p>
+              <ul>
+                @for (entry of toc(); track entry.id) {
+                  <li [class.legal-page__toc-item--sub]="entry.level === 3">
+                    <a href="#{{ entry.id }}" (click)="$event.preventDefault(); scrollToHeading(entry.id)">
+                      {{ entry.text }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </nav>
+          }
+
+          <div class="legal-page__body" [innerHTML]="sanitizedContent()"></div>
+        }
+      </article>
+    </div>
+  </main>
+
+  <app-storefront-footer />
+</div>
+
+<app-hambox-bottom-sheet
+  [open]="mobileNavOpen()"
+  [title]="'LEGAL.MENU' | translate"
+  (closed)="closeMobileNav()"
+>
+  <ng-container [ngTemplateOutlet]="navList" />
+</app-hambox-bottom-sheet>
+
+<ng-template #navList>
+  <ul class="legal-page__nav-list">
+    @for (item of navItems(); track item.slug) {
+      <li>
+        <a
+          [routerLink]="['/legal', item.slug]"
+          class="legal-page__nav-link"
+          [class.legal-page__nav-link--active]="isActive(item)"
+          [attr.aria-current]="isActive(item) ? 'page' : null"
+          (click)="closeMobileNav()"
+        >
+          <i [class]="item.icon" aria-hidden="true"></i>
+          {{ navLabel(item) }}
+        </a>
+      </li>
+    }
+  </ul>
+</ng-template>

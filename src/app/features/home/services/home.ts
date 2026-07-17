@@ -23,6 +23,7 @@ import {
   TrustFeature,
 } from '../models/storefront-home';
 import { StorefrontApiService } from './storefront-api.service';
+import { TranslationService } from '../../../core/i18n/translation.service';
 
 export interface StorefrontHomeData {
   readonly content: StorefrontContent;
@@ -42,8 +43,10 @@ export class Home {
   private readonly storefrontApi = inject(StorefrontApiService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly productApi = inject(ProductApiService);
+  private readonly translation = inject(TranslationService);
 
   async loadHomeData(): Promise<StorefrontHomeData> {
+    const lang = this.translation.language();
     const contentResponse = await firstValueFrom(this.storefrontApi.getContent());
     const content = mapStorefrontContent(contentResponse);
 
@@ -88,9 +91,11 @@ export class Home {
         : Promise.resolve({ items: [] as never[] }),
     ]);
 
-    const categories = (categoriesResult.items ?? []).map(mapCategoryToStorefrontCategory);
+    const categories = (categoriesResult.items ?? []).map((category) =>
+      mapCategoryToStorefrontCategory(category, lang),
+    );
     const featuredProducts = (featuredResult.items ?? []).map((product, index) =>
-      mapProductToFlashDeal(product, index),
+      mapProductToFlashDeal(product, lang, index),
     );
     const newArrivals = newArrivalsResult.items ?? [];
 
@@ -106,6 +111,7 @@ export class Home {
       featuredHighlight = source
         ? mapProductToFeaturedProduct(
             source,
+            lang,
             0,
             content.featuredProduct.badge,
             content.featuredProduct.callToAction,
@@ -116,7 +122,7 @@ export class Home {
     const trendingRankSources = newArrivals.slice(0, 2);
     const trendingValueSource = newArrivals[2] ?? newArrivals[0] ?? null;
     const trendingRanks = trendingRankSources.map((product, index) =>
-      mapProductToTrendingRank(product, index),
+      mapProductToTrendingRank(product, lang, index),
     );
 
     return {
@@ -126,7 +132,7 @@ export class Home {
       newArrivals,
       featuredHighlight,
       trendingRanks,
-      trendingValue: trendingValueSource ? mapProductToTrendingValue(trendingValueSource) : null,
+      trendingValue: trendingValueSource ? mapProductToTrendingValue(trendingValueSource, lang) : null,
       trustFeatures: mapTrustItems(content.trustBar),
     };
   }

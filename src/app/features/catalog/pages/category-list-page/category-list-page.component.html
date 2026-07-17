@@ -50,28 +50,47 @@
       placeholder="Search categories by name or slug..."
       (searchChange)="onSearchChange($event)"
     />
+    <p-select
+      adminToolbarFilters
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter status"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusFilterChange($event)"
+    />
+    @if (hasActiveFilters()) {
+      <button
+        adminToolbarActions
+        pButton
+        type="button"
+        label="Clear filters"
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        text
+        (click)="onClearFilters()"
+      ></button>
+    }
   </app-admin-toolbar>
 
   @if (error()) {
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
-  <app-admin-data-table-shell>
-    <app-category-table
-      [categories]="items()"
-      [parentOptions]="items()"
-      [loading]="loading()"
-      [totalRecords]="totalCount()"
-      [pageSize]="pageSize()"
-      [first]="tableFirst()"
-      [searchActive]="hasActiveSearch()"
-      (pageChange)="onPageChange($event)"
-      (createCategory)="openCreateDialog()"
-      (editCategory)="openEditDialog($event)"
-      (deleteCategory)="requestDelete($event)"
-      (restoreCategory)="restoreCategory($event)"
-    />
-  </app-admin-data-table-shell>
+  <app-category-table
+    [categories]="items()"
+    [parentOptions]="items()"
+    [loading]="loading()"
+    [totalRecords]="totalCount()"
+    [pageSize]="pageSize()"
+    [first]="tableFirst()"
+    [searchActive]="hasActiveSearch()"
+    (pageChange)="onPageChange($event)"
+    (createCategory)="openCreateDialog()"
+    (editCategory)="openEditDialog($event)"
+    (deleteCategory)="requestDelete($event)"
+    (restoreCategory)="restoreCategory($event)"
+  />
 </section>
 
 <p-dialog
@@ -123,6 +142,7 @@
   title="Delete category"
   [message]="deleteDialogMessage()"
   [destructive]="true"
+  [loading]="deleting()"
   (visibleChange)="deleteDialogOpen.set($event)"
   (confirmed)="confirmDelete()"
 />

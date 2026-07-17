@@ -1,0 +1,238 @@
+<p-toast position="top-right" />
+
+<section class="admin-page supplier-detail-page">
+  <app-admin-page-header
+    [title]="isCreateMode() ? ('ADMIN.SUPPLIERS.DETAIL.NEW' | translate) : (detail()?.name ?? '')"
+    [subtitle]="'ADMIN.SUPPLIERS.DETAIL.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    @if (!isCreateMode() && detail(); as d) {
+      <ng-container adminHeaderActions>
+        <app-admin-status-badge
+          [label]="d.isEnabled ? d.status : ('ADMIN.SUPPLIERS.DISABLED' | translate)"
+          [tone]="d.isEnabled ? 'success' : 'neutral'"
+        />
+        <a pButton class="admin-btn-secondary" [routerLink]="['/admin/suppliers', d.id, 'mappings']">
+          {{ 'ADMIN.SUPPLIERS.ACTIONS.MAPPINGS' | translate }}
+        </a>
+        <button
+          *hamboxHasPermission="permissions.Suppliers.Edit"
+          pButton
+          type="button"
+          class="admin-btn-secondary"
+          [disabled]="actionLoading()"
+          (click)="toggleEnabled()"
+        >
+          {{ (d.isEnabled ? 'ADMIN.SUPPLIERS.ACTIONS.DISABLE' : 'ADMIN.SUPPLIERS.ACTIONS.ENABLE') | translate }}
+        </button>
+        <button
+          *hamboxHasPermission="permissions.Suppliers.Delete"
+          pButton
+          type="button"
+          severity="danger"
+          [disabled]="actionLoading()"
+          (click)="requestDelete()"
+        >
+          {{ 'ADMIN.SUPPLIERS.ACTIONS.DELETE' | translate }}
+        </button>
+      </ng-container>
+    }
+  </app-admin-page-header>
+
+  @if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  }
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton />
+  } @else {
+    <app-admin-section-card [title]="'ADMIN.SUPPLIERS.DETAIL.GENERAL' | translate">
+      <form class="admin-form-grid" [formGroup]="form">
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.NAME' | translate }}</span>
+          <input pInputText formControlName="name" />
+        </label>
+
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.CODE' | translate }}</span>
+          <input pInputText formControlName="code" [placeholder]="'ADMIN.SUPPLIERS.DETAIL.CODE_HINT' | translate" />
+        </label>
+
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.PROVIDER_TYPE' | translate }}</span>
+          <p-select
+            formControlName="providerType"
+            [options]="[...providerTypes()]"
+            [editable]="true"
+            [placeholder]="'ADMIN.SUPPLIERS.DETAIL.PROVIDER_TYPE_HINT' | translate"
+          />
+        </label>
+
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.AUTH_TYPE' | translate }}</span>
+          <p-select formControlName="authenticationType" [options]="authTypeOptions" optionLabel="label" optionValue="value" />
+        </label>
+
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.BASE_URL' | translate }}</span>
+          <input pInputText formControlName="baseUrl" placeholder="https://api.example.com" />
+        </label>
+
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.PRIORITY' | translate }}</span>
+          <p-inputnumber formControlName="priority" [min]="0" [showButtons]="true" />
+        </label>
+      </form>
+
+      <div class="supplier-detail-page__capabilities">
+        <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.CAPABILITIES' | translate }}</span>
+        <div class="supplier-detail-page__checkbox-grid" [formGroup]="form">
+          <label class="supplier-detail-page__checkbox">
+            <p-checkbox formControlName="supportsInventorySync" [binary]="true" />
+            {{ 'ADMIN.SUPPLIERS.DETAIL.SUPPORTS_INVENTORY_SYNC' | translate }}
+          </label>
+          <label class="supplier-detail-page__checkbox">
+            <p-checkbox formControlName="supportsPriceSync" [binary]="true" />
+            {{ 'ADMIN.SUPPLIERS.DETAIL.SUPPORTS_PRICE_SYNC' | translate }}
+          </label>
+          <label class="supplier-detail-page__checkbox">
+            <p-checkbox formControlName="supportsReservations" [binary]="true" />
+            {{ 'ADMIN.SUPPLIERS.DETAIL.SUPPORTS_RESERVATIONS' | translate }}
+          </label>
+          <label class="supplier-detail-page__checkbox">
+            <p-checkbox formControlName="supportsOrderStatus" [binary]="true" />
+            {{ 'ADMIN.SUPPLIERS.DETAIL.SUPPORTS_ORDER_STATUS' | translate }}
+          </label>
+          <label class="supplier-detail-page__checkbox">
+            <p-checkbox formControlName="supportsWebhooks" [binary]="true" />
+            {{ 'ADMIN.SUPPLIERS.DETAIL.SUPPORTS_WEBHOOKS' | translate }}
+          </label>
+        </div>
+      </div>
+
+      @if (!isCreateMode()) {
+        <label class="supplier-detail-page__field supplier-detail-page__field--full" [formGroup]="form">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.SETTINGS_JSON' | translate }}</span>
+          <textarea pTextarea rows="6" formControlName="settingsJson" (blur)="validateSettingsJson()"></textarea>
+          @if (settingsJsonError()) {
+            <span class="supplier-detail-page__field-error">{{ settingsJsonError() }}</span>
+          }
+        </label>
+      }
+
+      <div class="supplier-detail-page__actions">
+        <button
+          pButton
+          type="button"
+          [disabled]="saving() || form.invalid"
+          [loading]="saving()"
+          (click)="save()"
+        >
+          {{ (isCreateMode() ? 'ADMIN.SUPPLIERS.ACTIONS.CREATE' : 'ADMIN.SUPPLIERS.ACTIONS.SAVE') | translate }}
+        </button>
+      </div>
+    </app-admin-section-card>
+
+    @if (!isCreateMode()) {
+      <app-admin-section-card [title]="'ADMIN.SUPPLIERS.DETAIL.CREDENTIALS' | translate">
+        <form class="admin-form-grid" [formGroup]="credentialsForm">
+          <label class="supplier-detail-page__field">
+            <span class="supplier-detail-page__field-label">
+              {{ 'ADMIN.SUPPLIERS.DETAIL.API_KEY' | translate }}
+              @if (detail()?.hasApiKey) {
+                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+              }
+            </span>
+            <p-password formControlName="apiKey" [feedback]="false" [toggleMask]="true" />
+          </label>
+
+          <label class="supplier-detail-page__field">
+            <span class="supplier-detail-page__field-label">
+              {{ 'ADMIN.SUPPLIERS.DETAIL.API_SECRET' | translate }}
+              @if (detail()?.hasApiSecret) {
+                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+              }
+            </span>
+            <p-password formControlName="apiSecret" [feedback]="false" [toggleMask]="true" />
+          </label>
+
+          <label class="supplier-detail-page__field">
+            <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.USERNAME' | translate }}</span>
+            <input pInputText formControlName="username" />
+          </label>
+
+          <label class="supplier-detail-page__field">
+            <span class="supplier-detail-page__field-label">
+              {{ 'ADMIN.SUPPLIERS.DETAIL.PASSWORD' | translate }}
+              @if (detail()?.hasPassword) {
+                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+              }
+            </span>
+            <p-password formControlName="password" [feedback]="false" [toggleMask]="true" />
+          </label>
+
+          <label class="supplier-detail-page__field">
+            <span class="supplier-detail-page__field-label">
+              {{ 'ADMIN.SUPPLIERS.DETAIL.BEARER_TOKEN' | translate }}
+              @if (detail()?.hasBearerToken) {
+                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+              }
+            </span>
+            <p-password formControlName="bearerToken" [feedback]="false" [toggleMask]="true" />
+          </label>
+        </form>
+
+        <p class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.CREDENTIALS_HINT' | translate }}</p>
+
+        <div class="supplier-detail-page__actions">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [disabled]="saving()"
+            [loading]="saving()"
+            (click)="saveCredentials()"
+          >
+            {{ 'ADMIN.SUPPLIERS.ACTIONS.SAVE_CREDENTIALS' | translate }}
+          </button>
+
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [disabled]="actionLoading()"
+            [loading]="actionLoading()"
+            (click)="testConnection()"
+          >
+            {{ 'ADMIN.SUPPLIERS.ACTIONS.TEST_CONNECTION' | translate }}
+          </button>
+        </div>
+
+        @if (testResult(); as result) {
+          <app-admin-status-badge
+            [label]="result.message"
+            [tone]="result.isSuccess ? 'success' : 'warning'"
+          />
+        }
+      </app-admin-section-card>
+    }
+  }
+</section>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  [title]="'ADMIN.CONFIRM.DELETE_SUPPLIER_TITLE' | translate"
+  [message]="'ADMIN.CONFIRM.DELETE_SUPPLIER' | translate: { name: detail()?.name }"
+  [confirmLabel]="'ADMIN.SUPPLIERS.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDelete()"
+/>
+
+<app-admin-unsaved-changes-dialog
+  [visible]="unsavedDialogOpen()"
+  (visibleChange)="onUnsavedDialogVisibleChange($event)"
+  (save)="onUnsavedSave()"
+  (discard)="onUnsavedDiscard()"
+/>

@@ -476,6 +476,66 @@
   color: var(--login-green);
 }
 
+// Google Sign-In button — colors/logo/label follow Google's branding guidelines
+// (https://developers.google.com/identity/branding-guidelines); radius/focus-ring
+// match the rest of the HAMBOX form controls.
+.login-form__google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid #747775;
+  border-radius: 12px;
+  background: #fff;
+  color: #1f1f1f;
+  font-family: 'Roboto', var(--sf-font-body), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-form__google-btn:hover:not(:disabled) {
+  background: #f8f9fa;
+}
+
+.login-form__google-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.login-form__google-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-form__google-logo {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.login-form__google-label {
+  line-height: 1;
+}
+
+html:not([data-theme='hambox-light']) {
+  .login-form__google-btn {
+    background: #131314;
+    border-color: #8e918f;
+    color: #e3e3e3;
+  }
+
+  .login-form__google-btn:hover:not(:disabled) {
+    background: #1e1f20;
+  }
+}
+
 .login-form__footer {
   margin: 0;
   text-align: center;

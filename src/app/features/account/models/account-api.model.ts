@@ -203,6 +203,26 @@ export interface UserNotificationApiDto {
   readonly isRead: boolean;
   readonly createdOnUtc: string;
   readonly actionUrl?: string | null;
+  readonly isArchived?: boolean;
+}
+
+export interface NotificationQuery {
+  readonly includeArchived?: boolean;
+  readonly isRead?: boolean;
+  readonly category?: string;
+  readonly search?: string;
+}
+
+export interface CommunicationPreferencesApiDto {
+  readonly emailEnabled: boolean;
+  readonly inAppEnabled: boolean;
+  readonly marketingEnabled: boolean;
+  readonly securityEnabled: boolean;
+  readonly orderEnabled: boolean;
+  readonly membershipEnabled: boolean;
+  readonly supportEnabled: boolean;
+  readonly promotionEnabled: boolean;
+  readonly generalEnabled: boolean;
 }
 
 export interface ReferralTierApiDto {

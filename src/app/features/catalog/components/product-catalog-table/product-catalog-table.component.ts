@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
   AdminDataTableShellComponent,
   AdminEmptyStateComponent,
+  AdminLoadingSkeletonComponent,
   AdminStatusBadgeComponent,
   AdminStatusTone,
 } from '../../../../shared/components/admin';
@@ -14,19 +14,20 @@ import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pip
 import { copyToClipboard, formatShortGuid } from '../../../../shared/utils/guid-display.util';
 import { Product, ProductStatus } from '../../models/product.model';
 import { productStatusLabel } from '../../utils/product-display.utils';
+import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
 @Component({
   selector: 'app-product-catalog-table',
   standalone: true,
   imports: [
     TableModule,
-    SkeletonModule,
     ButtonModule,
     TooltipModule,
     HamboxCurrencyPipe,
     AdminDataTableShellComponent,
     AdminStatusBadgeComponent,
     AdminEmptyStateComponent,
+    AdminLoadingSkeletonComponent,
   ],
   templateUrl: './product-catalog-table.component.html',
   styleUrl: './product-catalog-table.component.scss',
@@ -46,8 +47,6 @@ export class ProductCatalogTableComponent {
   readonly pageChange = output<TableLazyLoadEvent>();
   readonly productSelect = output<string>();
 
-  protected readonly skeletonRows = Array.from({ length: 6 }, (_, index) => index);
-
   protected readonly tableSelection = computed(() => {
     const selectedId = this.selectedProductId();
     if (!selectedId) {
@@ -59,7 +58,9 @@ export class ProductCatalogTableComponent {
 
   protected readonly statusLabel = productStatusLabel;
   protected readonly formatShortGuid = formatShortGuid;
+  protected readonly resolveImageUrl = resolveProductImageUrl;
   protected readonly copiedId = signal<string | null>(null);
+  protected readonly failedImageIds = signal<ReadonlySet<string>>(new Set());
 
   protected statusTone(status: ProductStatus): AdminStatusTone {
     switch (status) {
@@ -86,6 +87,14 @@ export class ProductCatalogTableComponent {
     }
 
     this.productSelect.emit(product.id);
+  }
+
+  protected isImageFailed(productId: string): boolean {
+    return this.failedImageIds().has(productId);
+  }
+
+  protected onImageError(productId: string): void {
+    this.failedImageIds.update((ids) => new Set(ids).add(productId));
   }
 
   protected async copyProductId(id: string, event: Event): Promise<void> {

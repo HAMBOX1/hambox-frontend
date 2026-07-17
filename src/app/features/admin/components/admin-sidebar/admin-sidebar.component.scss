@@ -86,16 +86,9 @@
 }
 
 .admin-sidebar__logo-mark {
-  display: grid;
-  place-items: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: var(--admin-radius-lg);
-  background: var(--admin-accent-green-soft);
-  color: var(--admin-accent-green);
-  font-family: var(--admin-font-heading);
-  font-size: 1rem;
-  font-weight: 800;
+  object-fit: contain;
 }
 
 .admin-sidebar__nav {

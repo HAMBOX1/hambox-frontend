@@ -1,0 +1,584 @@
+<p-toast position="top-right" />
+
+<section class="admin-page security-center-page">
+  <app-admin-page-header
+    [title]="'ADMIN.SECURITY.TITLE' | translate"
+    [subtitle]="'ADMIN.SECURITY.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+    <p-tablist>
+      <p-tab value="0">{{ 'ADMIN.SECURITY.TABS.DASHBOARD' | translate }}</p-tab>
+      <p-tab value="1">{{ 'ADMIN.SECURITY.TABS.USERS' | translate }}</p-tab>
+      <p-tab value="2">{{ 'ADMIN.SECURITY.TABS.EMAILS' | translate }}</p-tab>
+      <p-tab value="3">{{ 'ADMIN.SECURITY.TABS.IPS' | translate }}</p-tab>
+      <p-tab value="4">{{ 'ADMIN.SECURITY.TABS.COUNTRIES' | translate }}</p-tab>
+      <p-tab value="5">{{ 'ADMIN.SECURITY.TABS.EVENTS' | translate }}</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- Dashboard -->
+      <p-tabpanel value="0">
+        @if (facade.dashboardLoading()) {
+          <app-admin-empty-state icon="pi pi-spin pi-spinner" [title]="'COMMON.LOADING' | translate" [compact]="true" />
+        } @else if (facade.dashboardError()) {
+          <app-admin-error-alert [message]="facade.dashboardError()!" (retry)="retryDashboard()" />
+        } @else if (facade.dashboard(); as stats) {
+          <app-admin-stat-grid>
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_USERS' | translate" [value]="stats.blockedUsers" icon="pi pi-user-minus" tone="warning" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.SUSPENDED_USERS' | translate" [value]="stats.suspendedUsers" icon="pi pi-pause" tone="warning" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_EMAILS' | translate" [value]="stats.blockedEmails" icon="pi pi-envelope" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_DOMAINS' | translate" [value]="stats.blockedDomains" icon="pi pi-at" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_COUNTRIES' | translate" [value]="stats.blockedCountries" icon="pi pi-flag" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_IPS' | translate" [value]="stats.blockedIps" icon="pi pi-desktop" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.EVENTS_TODAY' | translate" [value]="stats.securityEventsToday" icon="pi pi-bell" tone="info" />
+            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.FAILED_LOGINS_TODAY' | translate" [value]="stats.failedLoginsToday" icon="pi pi-exclamation-triangle" tone="warning" />
+          </app-admin-stat-grid>
+
+          <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.RECENT_EVENTS' | translate">
+            @if (stats.recentEvents.length === 0) {
+              <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate" [compact]="true" />
+            } @else {
+              <ul class="security-center-page__event-list">
+                @for (event of stats.recentEvents; track event.id) {
+                  <li>
+                    <app-admin-status-badge [label]="event.severity" [tone]="eventSeverityTone(event.severity)" />
+                    <span class="security-center-page__event-desc">{{ event.description }}</span>
+                    <span class="security-center-page__event-date">{{ event.occurredOnUtc | date: 'short' }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </app-admin-section-card>
+        }
+      </p-tabpanel>
+
+      <!-- Users -->
+      <p-tabpanel value="1">
+        <app-admin-toolbar>
+          <app-admin-search-bar
+            adminToolbarSearch
+            [value]="userSearchTerm()"
+            [placeholder]="'ADMIN.SECURITY.USERS.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onUserSearchChange($event)"
+          />
+          <p-select
+            adminToolbarFilters
+            [options]="[
+              { label: 'ADMIN.SECURITY.USERS.FILTER_ALL' | translate, value: 'all' },
+              { label: 'Suspended', value: 'Suspended' },
+              { label: 'Blocked', value: 'Blocked' },
+              { label: 'Banned', value: 'Banned' },
+            ]"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="userStatusFilter()"
+            (ngModelChange)="onUserStatusChange($event)"
+          />
+        </app-admin-toolbar>
+
+        @if (facade.usersError()) {
+          <app-admin-error-alert [message]="facade.usersError()!" (retry)="retryUsers()" />
+        }
+
+        <app-admin-data-table-shell>
+          <p-table
+            class="admin-data-table"
+            [value]="[...users()]"
+            [loading]="facade.usersLoading()"
+            [lazy]="true"
+            [paginator]="usersTotal() > 0"
+            [rows]="userPageSize()"
+            [totalRecords]="usersTotal()"
+            [first]="userTableFirst()"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (onLazyLoad)="onUserPageChange($event)"
+            dataKey="id"
+            scrollable
+            scrollHeight="flex"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.SECURITY.USERS.COLUMNS.NAME' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.USERS.COLUMNS.EMAIL' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.USERS.COLUMNS.STATUS' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.USERS.COLUMNS.REASON' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.USERS.COLUMNS.EXPIRES' | translate }}</th>
+                <th style="width: 4rem"></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-user>
+              <tr>
+                <td>{{ user.firstName }} {{ user.lastName }}</td>
+                <td>{{ user.email }}</td>
+                <td><app-admin-status-badge [label]="user.status" [tone]="userStatusTone(user.status)" /></td>
+                <td>{{ user.blockReason ?? '—' }}</td>
+                <td>{{ user.blockExpiresOnUtc ? (user.blockExpiresOnUtc | date: 'short') : '—' }}</td>
+                <td>
+                  @let menuItems = userActionMenuItems(user);
+                  @if (menuItems.length > 0) {
+                    <app-admin-action-menu [items]="menuItems" [disabled]="facade.actionLoading()" />
+                  }
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6">
+                  <app-admin-empty-state icon="pi pi-users" [title]="'ADMIN.SECURITY.USERS.EMPTY' | translate" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </p-tabpanel>
+
+      <!-- Emails -->
+      <p-tabpanel value="2">
+        <app-admin-toolbar>
+          <app-admin-search-bar
+            adminToolbarSearch
+            [value]="emailSearchTerm()"
+            [placeholder]="'ADMIN.SECURITY.EMAILS.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onEmailSearchChange($event)"
+          />
+          <button
+            adminToolbarActions
+            *hamboxHasPermission="permissions.Security.ManageEmails"
+            pButton
+            type="button"
+            class="admin-btn-primary"
+            [label]="'ADMIN.SECURITY.EMAILS.ADD' | translate"
+            icon="pi pi-plus"
+            (click)="openEmailDialog()"
+          ></button>
+        </app-admin-toolbar>
+
+        @if (facade.emailsError()) {
+          <app-admin-error-alert [message]="facade.emailsError()!" />
+        }
+
+        <app-admin-data-table-shell>
+          <p-table
+            class="admin-data-table"
+            [value]="[...emails()]"
+            [loading]="facade.emailsLoading()"
+            [lazy]="true"
+            [paginator]="emailsTotal() > 0"
+            [rows]="emailPageSize()"
+            [totalRecords]="emailsTotal()"
+            [first]="emailTableFirst()"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (onLazyLoad)="onEmailPageChange($event)"
+            dataKey="id"
+            scrollable
+            scrollHeight="flex"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.SECURITY.EMAILS.COLUMNS.PATTERN' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.EMAILS.COLUMNS.REASON' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.EMAILS.COLUMNS.EXPIRES' | translate }}</th>
+                <th style="width: 4rem"></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-email>
+              <tr>
+                <td>{{ email.pattern }}</td>
+                <td>{{ email.reason }}</td>
+                <td>{{ email.expiresOnUtc ? (email.expiresOnUtc | date: 'short') : '—' }}</td>
+                <td>
+                  <app-admin-icon-button
+                    *hamboxHasPermission="permissions.Security.ManageEmails"
+                    icon="pi pi-trash"
+                    [label]="'ADMIN.SECURITY.EMAILS.REMOVE' | translate"
+                    (pressed)="requestDeleteEmail(email)"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4">
+                  <app-admin-empty-state icon="pi pi-envelope" [title]="'ADMIN.SECURITY.EMAILS.EMPTY' | translate" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </p-tabpanel>
+
+      <!-- IPs -->
+      <p-tabpanel value="3">
+        <app-admin-toolbar>
+          <app-admin-search-bar
+            adminToolbarSearch
+            [value]="ipSearchTerm()"
+            [placeholder]="'ADMIN.SECURITY.IPS.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onIpSearchChange($event)"
+          />
+          <button
+            adminToolbarActions
+            *hamboxHasPermission="permissions.Security.ManageIPs"
+            pButton
+            type="button"
+            class="admin-btn-primary"
+            [label]="'ADMIN.SECURITY.IPS.ADD' | translate"
+            icon="pi pi-plus"
+            (click)="openIpDialog()"
+          ></button>
+        </app-admin-toolbar>
+
+        @if (facade.ipsError()) {
+          <app-admin-error-alert [message]="facade.ipsError()!" />
+        }
+
+        <app-admin-data-table-shell>
+          <p-table
+            class="admin-data-table"
+            [value]="[...ips()]"
+            [loading]="facade.ipsLoading()"
+            [lazy]="true"
+            [paginator]="ipsTotal() > 0"
+            [rows]="ipPageSize()"
+            [totalRecords]="ipsTotal()"
+            [first]="ipTableFirst()"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (onLazyLoad)="onIpPageChange($event)"
+            dataKey="id"
+            scrollable
+            scrollHeight="flex"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.SECURITY.IPS.COLUMNS.ADDRESS' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.IPS.COLUMNS.REASON' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.IPS.COLUMNS.EXPIRES' | translate }}</th>
+                <th style="width: 4rem"></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ip>
+              <tr>
+                <td>{{ ip.cidrOrAddress }}</td>
+                <td>{{ ip.reason }}</td>
+                <td>{{ ip.expiresOnUtc ? (ip.expiresOnUtc | date: 'short') : '—' }}</td>
+                <td>
+                  <app-admin-icon-button
+                    *hamboxHasPermission="permissions.Security.ManageIPs"
+                    icon="pi pi-trash"
+                    [label]="'ADMIN.SECURITY.IPS.REMOVE' | translate"
+                    (pressed)="requestDeleteIp(ip)"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4">
+                  <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.IPS.EMPTY' | translate" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </p-tabpanel>
+
+      <!-- Countries -->
+      <p-tabpanel value="4">
+        <app-admin-toolbar>
+          <app-admin-search-bar
+            adminToolbarSearch
+            [value]="countrySearchTerm()"
+            [placeholder]="'ADMIN.SECURITY.COUNTRIES.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onCountrySearchChange($event)"
+          />
+          <label adminToolbarFilters class="security-center-page__checkbox-label">
+            <p-checkbox [ngModel]="countryOverriddenOnly()" (ngModelChange)="onCountryOverriddenOnlyChange($event)" [binary]="true" />
+            {{ 'ADMIN.SECURITY.COUNTRIES.OVERRIDDEN_ONLY' | translate }}
+          </label>
+        </app-admin-toolbar>
+
+        @if (facade.countriesError()) {
+          <app-admin-error-alert [message]="facade.countriesError()!" />
+        }
+
+        <app-admin-data-table-shell>
+          <p-table
+            class="admin-data-table"
+            [value]="[...facade.countries()]"
+            [loading]="facade.countriesLoading()"
+            dataKey="countryCode"
+            scrollable
+            scrollHeight="flex"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.SECURITY.COUNTRIES.COLUMNS.COUNTRY' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.COUNTRIES.COLUMNS.STATUS' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.COUNTRIES.COLUMNS.REASON' | translate }}</th>
+                <th style="width: 10rem"></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-country>
+              <tr>
+                <td>{{ country.countryName }} ({{ country.countryCode }})</td>
+                <td><app-admin-status-badge [label]="country.status" [tone]="countryStatusTone(country.status)" /></td>
+                <td>{{ country.reason ?? '—' }}</td>
+                <td>
+                  <div class="admin-actions-row" *hamboxHasPermission="permissions.Security.ManageCountries">
+                    <app-admin-icon-button
+                      icon="pi pi-pencil"
+                      [label]="'ADMIN.SECURITY.COUNTRIES.EDIT' | translate"
+                      (pressed)="openCountryDialog(country)"
+                    />
+                    @if (country.status !== 'Allowed') {
+                      <app-admin-icon-button
+                        icon="pi pi-check"
+                        [label]="'ADMIN.SECURITY.COUNTRIES.CLEAR' | translate"
+                        (pressed)="clearCountryRestriction(country)"
+                      />
+                    }
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4">
+                  <app-admin-empty-state icon="pi pi-flag" [title]="'ADMIN.SECURITY.COUNTRIES.EMPTY' | translate" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </p-tabpanel>
+
+      <!-- Events -->
+      <p-tabpanel value="5">
+        <app-admin-toolbar>
+          <app-admin-search-bar
+            adminToolbarSearch
+            [value]="eventSearchTerm()"
+            [placeholder]="'ADMIN.SECURITY.EVENTS.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onEventSearchChange($event)"
+          />
+        </app-admin-toolbar>
+
+        @if (facade.eventsError()) {
+          <app-admin-error-alert [message]="facade.eventsError()!" />
+        }
+
+        <app-admin-data-table-shell>
+          <p-table
+            class="admin-data-table"
+            [value]="[...events()]"
+            [loading]="facade.eventsLoading()"
+            [lazy]="true"
+            [paginator]="eventsTotal() > 0"
+            [rows]="eventPageSize()"
+            [totalRecords]="eventsTotal()"
+            [first]="eventTableFirst()"
+            [rowsPerPageOptions]="[20, 50, 100]"
+            (onLazyLoad)="onEventPageChange($event)"
+            dataKey="id"
+            scrollable
+            scrollHeight="flex"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.SEVERITY' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.TYPE' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.DESCRIPTION' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.IP' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.OCCURRED' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-event>
+              <tr>
+                <td><app-admin-status-badge [label]="event.severity" [tone]="eventSeverityTone(event.severity)" /></td>
+                <td>{{ event.eventType }}</td>
+                <td>{{ event.description }}</td>
+                <td>{{ event.ipAddress ?? '—' }}</td>
+                <td>{{ event.occurredOnUtc | date: 'short' }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">
+                  <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</section>
+
+<!-- User action dialog (block / suspend / ban) -->
+<p-dialog [visible]="userActionDialogOpen()" (visibleChange)="userActionDialogOpen.set($event)" [modal]="true" [style]="{ width: '32rem' }" [header]="userActionDialogTitleKey() | translate">
+  <div class="security-center-page__form">
+    <label for="security-action-reason">{{ 'ADMIN.SECURITY.FORM.REASON' | translate }} *</label>
+    <input pInputText id="security-action-reason" type="text" [ngModel]="actionReason()" (ngModelChange)="actionReason.set($event)" />
+
+    <label for="security-action-notes">{{ 'ADMIN.SECURITY.FORM.NOTES' | translate }}</label>
+    <textarea pTextarea id="security-action-notes" rows="3" [ngModel]="actionNotes()" (ngModelChange)="actionNotes.set($event)"></textarea>
+
+    @if (userActionMode() === 'block') {
+      <label for="security-action-expires">{{ 'ADMIN.SECURITY.FORM.EXPIRES_ON' | translate }}</label>
+      <input
+        id="security-action-expires"
+        type="date"
+        class="security-center-page__native-date"
+        [ngModel]="actionExpiresOn()"
+        (ngModelChange)="actionExpiresOn.set($event)"
+      />
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="admin-btn-secondary" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="userActionDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.CONFIRM.CONFIRM' | translate"
+      [disabled]="!actionReason().trim() || facade.actionLoading()"
+      (click)="confirmUserAction()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="unblockDialogOpen()"
+  (visibleChange)="unblockDialogOpen.set($event)"
+  [title]="'ADMIN.SECURITY.USERS.ACTIONS.RESTORE' | translate"
+  [message]="'ADMIN.SECURITY.USERS.RESTORE_CONFIRM' | translate"
+  [loading]="facade.actionLoading()"
+  (confirmed)="confirmUnblock()"
+/>
+
+<!-- Create blocked email dialog -->
+<p-dialog [visible]="emailDialogOpen()" (visibleChange)="emailDialogOpen.set($event)" [modal]="true" [style]="{ width: '32rem' }" [header]="'ADMIN.SECURITY.EMAILS.ADD' | translate">
+  <div class="security-center-page__form">
+    <label for="security-email-pattern">{{ 'ADMIN.SECURITY.EMAILS.FORM.PATTERN' | translate }} *</label>
+    <input pInputText id="security-email-pattern" type="text" placeholder="user@example.com or *@domain.com" [ngModel]="emailPattern()" (ngModelChange)="emailPattern.set($event)" />
+
+    <label for="security-email-reason">{{ 'ADMIN.SECURITY.FORM.REASON' | translate }} *</label>
+    <input pInputText id="security-email-reason" type="text" [ngModel]="actionReason()" (ngModelChange)="actionReason.set($event)" />
+
+    <label for="security-email-notes">{{ 'ADMIN.SECURITY.FORM.NOTES' | translate }}</label>
+    <textarea pTextarea id="security-email-notes" rows="3" [ngModel]="actionNotes()" (ngModelChange)="actionNotes.set($event)"></textarea>
+
+    <label for="security-email-expires">{{ 'ADMIN.SECURITY.FORM.EXPIRES_ON' | translate }}</label>
+    <input id="security-email-expires" type="date" class="security-center-page__native-date" [ngModel]="actionExpiresOn()" (ngModelChange)="actionExpiresOn.set($event)" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="admin-btn-secondary" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="emailDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.CONFIRM.CONFIRM' | translate"
+      [disabled]="!emailPattern().trim() || !actionReason().trim() || facade.actionLoading()"
+      (click)="confirmCreateEmail()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteEmailDialogOpen()"
+  (visibleChange)="deleteEmailDialogOpen.set($event)"
+  [title]="'ADMIN.SECURITY.EMAILS.REMOVE' | translate"
+  [message]="'ADMIN.SECURITY.EMAILS.REMOVE_CONFIRM' | translate"
+  [destructive]="true"
+  [loading]="facade.actionLoading()"
+  (confirmed)="confirmDeleteEmail()"
+/>
+
+<!-- Create blocked IP dialog -->
+<p-dialog [visible]="ipDialogOpen()" (visibleChange)="ipDialogOpen.set($event)" [modal]="true" [style]="{ width: '32rem' }" [header]="'ADMIN.SECURITY.IPS.ADD' | translate">
+  <div class="security-center-page__form">
+    <label for="security-ip-address">{{ 'ADMIN.SECURITY.IPS.FORM.ADDRESS' | translate }} *</label>
+    <input pInputText id="security-ip-address" type="text" placeholder="203.0.113.5 or 203.0.113.0/24" [ngModel]="ipCidrOrAddress()" (ngModelChange)="ipCidrOrAddress.set($event)" />
+
+    <label for="security-ip-reason">{{ 'ADMIN.SECURITY.FORM.REASON' | translate }} *</label>
+    <input pInputText id="security-ip-reason" type="text" [ngModel]="actionReason()" (ngModelChange)="actionReason.set($event)" />
+
+    <label for="security-ip-notes">{{ 'ADMIN.SECURITY.FORM.NOTES' | translate }}</label>
+    <textarea pTextarea id="security-ip-notes" rows="3" [ngModel]="actionNotes()" (ngModelChange)="actionNotes.set($event)"></textarea>
+
+    <label for="security-ip-expires">{{ 'ADMIN.SECURITY.FORM.EXPIRES_ON' | translate }}</label>
+    <input id="security-ip-expires" type="date" class="security-center-page__native-date" [ngModel]="actionExpiresOn()" (ngModelChange)="actionExpiresOn.set($event)" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="admin-btn-secondary" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="ipDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.CONFIRM.CONFIRM' | translate"
+      [disabled]="!ipCidrOrAddress().trim() || !actionReason().trim() || facade.actionLoading()"
+      (click)="confirmCreateIp()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteIpDialogOpen()"
+  (visibleChange)="deleteIpDialogOpen.set($event)"
+  [title]="'ADMIN.SECURITY.IPS.REMOVE' | translate"
+  [message]="'ADMIN.SECURITY.IPS.REMOVE_CONFIRM' | translate"
+  [destructive]="true"
+  [loading]="facade.actionLoading()"
+  (confirmed)="confirmDeleteIp()"
+/>
+
+<!-- Country restriction dialog -->
+<p-dialog [visible]="countryDialogOpen()" (visibleChange)="countryDialogOpen.set($event)" [modal]="true" [style]="{ width: '32rem' }" [header]="'ADMIN.SECURITY.COUNTRIES.EDIT' | translate">
+  @if (countryDialogTarget(); as country) {
+    <div class="security-center-page__form">
+      <p>{{ country.countryName }} ({{ country.countryCode }})</p>
+
+      <label for="security-country-status">{{ 'ADMIN.SECURITY.COUNTRIES.COLUMNS.STATUS' | translate }}</label>
+      <p-select
+        id="security-country-status"
+        [options]="countryStatusOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="countryStatus()"
+        (ngModelChange)="countryStatus.set($event)"
+      />
+
+      <label for="security-country-reason">{{ 'ADMIN.SECURITY.FORM.REASON' | translate }} *</label>
+      <input pInputText id="security-country-reason" type="text" [ngModel]="actionReason()" (ngModelChange)="actionReason.set($event)" />
+
+      <label for="security-country-notes">{{ 'ADMIN.SECURITY.FORM.NOTES' | translate }}</label>
+      <textarea pTextarea id="security-country-notes" rows="3" [ngModel]="actionNotes()" (ngModelChange)="actionNotes.set($event)"></textarea>
+
+      <label for="security-country-expires">{{ 'ADMIN.SECURITY.FORM.EXPIRES_ON' | translate }}</label>
+      <input id="security-country-expires" type="date" class="security-center-page__native-date" [ngModel]="actionExpiresOn()" (ngModelChange)="actionExpiresOn.set($event)" />
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="admin-btn-secondary" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="countryDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.CONFIRM.CONFIRM' | translate"
+      [disabled]="!actionReason().trim() || facade.actionLoading()"
+      (click)="confirmCountryRestriction()"
+    ></button>
+  </ng-template>
+</p-dialog>

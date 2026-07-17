@@ -14,4 +14,16 @@
     [ngModel]="statusFilter()"
     (ngModelChange)="onStatusChange($event)"
   />
+  @if (hasActiveFilters()) {
+    <button
+      adminToolbarActions
+      pButton
+      type="button"
+      label="Clear filters"
+      icon="pi pi-filter-slash"
+      severity="secondary"
+      text
+      (click)="clearFilters.emit()"
+    ></button>
+  }
 </app-admin-toolbar>

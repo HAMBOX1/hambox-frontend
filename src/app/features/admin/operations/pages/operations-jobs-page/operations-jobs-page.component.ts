@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
+import { DrawerModule } from 'primeng/drawer';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -26,6 +27,7 @@ import {
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
+import { OperationalJobDto } from '../../models/operations-api.model';
 import { OperationsFacade } from '../../services/operations.facade';
 import {
   exportRowsToCsv,
@@ -43,6 +45,7 @@ import {
     FormsModule,
     TranslatePipe,
     ButtonModule,
+    DrawerModule,
     InputTextModule,
     SelectModule,
     TableModule,
@@ -69,7 +72,9 @@ export class OperationsJobsPageComponent implements OnInit, OnDestroy {
   protected readonly jobs = this.facade.jobs;
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;
+  protected readonly jobHistory = this.facade.jobHistory;
   protected readonly status = signal<string | undefined>(undefined);
+  protected readonly queue = signal<string | undefined>(undefined);
   protected readonly search = signal('');
   protected readonly statusOptions = [
     { label: 'All', value: undefined },
@@ -79,9 +84,23 @@ export class OperationsJobsPageComponent implements OnInit, OnDestroy {
     { label: 'Failed', value: 'Failed' },
     { label: 'Retrying', value: 'Retrying' },
     { label: 'Cancelled', value: 'Cancelled' },
+    { label: 'Dead Letter', value: 'DeadLetter' },
+  ];
+  protected readonly queueOptions = [
+    { label: 'All queues', value: undefined },
+    { label: 'default', value: 'default' },
+    { label: 'emails', value: 'emails' },
+    { label: 'notifications', value: 'notifications' },
+    { label: 'suppliers', value: 'suppliers' },
+    { label: 'reports', value: 'reports' },
+    { label: 'maintenance', value: 'maintenance' },
+    { label: 'high-priority', value: 'high-priority' },
+    { label: 'future-payment', value: 'future-payment' },
   ];
 
   protected readonly rows = computed(() => this.jobs()?.items ?? []);
+  protected readonly selectedJob = signal<OperationalJobDto | null>(null);
+  protected detailsVisible = false;
 
   ngOnInit(): void {
     void this.reload();
@@ -100,6 +119,7 @@ export class OperationsJobsPageComponent implements OnInit, OnDestroy {
     }
     await this.facade.loadJobs({
       status: this.status(),
+      queue: this.queue(),
       search: this.search() || undefined,
       page: 1,
       pageSize: 50,
@@ -109,6 +129,7 @@ export class OperationsJobsPageComponent implements OnInit, OnDestroy {
   protected statusTone(status: string): AdminStatusTone {
     switch (status) {
       case 'Failed':
+      case 'DeadLetter':
         return 'danger';
       case 'Retrying':
       case 'Queued':
@@ -122,14 +143,43 @@ export class OperationsJobsPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  protected async openDetails(job: OperationalJobDto): Promise<void> {
+    this.selectedJob.set(job);
+    this.detailsVisible = true;
+    await this.facade.loadJobHistory(job.id);
+  }
+
+  protected async retrySelected(): Promise<void> {
+    const job = this.selectedJob();
+    if (!job) {
+      return;
+    }
+    if (await this.facade.retryJob(job.id)) {
+      this.detailsVisible = false;
+      await this.reload();
+    }
+  }
+
+  protected async cancelSelected(): Promise<void> {
+    const job = this.selectedJob();
+    if (!job) {
+      return;
+    }
+    if (await this.facade.cancelJob(job.id)) {
+      this.detailsVisible = false;
+      await this.reload();
+    }
+  }
+
   protected export(format: 'csv' | 'excel' | 'json'): void {
     const items = this.rows();
-    const headers = ['Id', 'JobType', 'Status', 'Priority', 'Attempts', 'LastError', 'CreatedOnUtc'];
+    const headers = ['Id', 'JobType', 'Status', 'Priority', 'Queue', 'Attempts', 'LastError', 'CreatedOnUtc'];
     const data = items.map((j) => [
       j.id,
       j.jobType,
       j.status,
       j.priority,
+      j.queue,
       j.attempts,
       j.lastError,
       j.createdOnUtc,

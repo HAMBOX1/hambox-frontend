@@ -1,0 +1,60 @@
+.supplier-detail-page {
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-1);
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__field-label {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+  }
+
+  &__field-error {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-danger);
+  }
+
+  &__set-flag {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-success);
+  }
+
+  &__capabilities {
+    margin-top: var(--admin-field-gap, 1.25rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-2);
+  }
+
+  &__checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hambox-spacing-4);
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--hambox-spacing-3);
+    margin-top: var(--admin-field-gap, 1.25rem);
+  }
+
+  &__hint {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--hambox-spacing-2);
+  }
+}

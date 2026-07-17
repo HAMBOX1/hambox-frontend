@@ -1,4 +1,4 @@
-const DEV_API_TARGET = 'https://localhost:7148';
+const DEV_API_TARGET = 'http://localhost:5163';
 const apiUrlConfig = require('./src/environments/api-url.json');
 
 /**

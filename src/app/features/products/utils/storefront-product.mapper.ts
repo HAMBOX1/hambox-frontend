@@ -4,6 +4,8 @@ import { productPlaceholderImage, resolveStorefrontImageUrl } from '../../home/u
 import { ProductDetailsItem } from '../../product-details/models/product-details';
 import { DEFAULT_PRODUCT_DETAILS_EXTRAS } from '../services/storefront-products-data';
 import { StoreProduct, StorePlatformTone } from '../models/product';
+import { resolveLocalizedText } from '../../../core/i18n/localized-text.util';
+import { SupportedLanguageId } from '../../../core/i18n/locale.model';
 
 function resolveImageUrl(imageUrl?: string | null, index = 0): string {
   const resolved = resolveProductImageUrl(imageUrl ?? '');
@@ -45,16 +47,21 @@ function resolvePlatformTone(categoryName: string): StorePlatformTone {
   return 'pc';
 }
 
-export function mapProductToStoreProduct(product: Product, index = 0): StoreProduct {
+export function mapProductToStoreProduct(
+  product: Product,
+  lang: SupportedLanguageId,
+  index = 0,
+): StoreProduct {
   const isActive = product.status === 'Active';
+  const categoryName = resolveLocalizedText(product.categoryName, product.categoryNameAr, lang);
 
   return {
     id: product.id,
-    title: product.nameEn,
+    title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
     imageUrl: resolveImageUrl(product.primaryImageUrl, index),
-    platformLabel: product.categoryName,
+    platformLabel: categoryName,
     platformTone: resolvePlatformTone(product.categoryName),
-    categoryName: product.categoryName,
+    categoryName,
     rating: 4.8,
     instantDigital: isActive,
     priceUsd: product.price,
@@ -67,14 +74,14 @@ export function mapProductToStoreProduct(product: Product, index = 0): StoreProd
   };
 }
 
-export function mapProductToDetailsItem(product: Product): ProductDetailsItem {
+export function mapProductToDetailsItem(product: Product, lang: SupportedLanguageId): ProductDetailsItem {
   const galleryImages = resolveGalleryImages(product);
   const primaryImage = galleryImages[0] ?? productPlaceholderImage(0);
 
   return {
     id: product.id,
-    title: product.nameEn,
-    description: product.descriptionEn,
+    title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
+    description: resolveLocalizedText(product.descriptionEn, product.descriptionAr, lang),
     imageUrl: primaryImage,
     thumbnailUrl: primaryImage,
     galleryImages,
@@ -83,7 +90,7 @@ export function mapProductToDetailsItem(product: Product): ProductDetailsItem {
     priceUsd: product.price,
     originalPriceUsd: product.price,
     discountLabel: '',
-    categoryName: product.categoryName,
+    categoryName: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     ...DEFAULT_PRODUCT_DETAILS_EXTRAS,
   };
 }

@@ -34,6 +34,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'recurring-jobs',
+    canActivate: [permissionGuard([PERMISSIONS.Operations.View])],
+    loadComponent: () =>
+      import('./pages/operations-recurring-jobs-page/operations-recurring-jobs-page.component').then(
+        (c) => c.OperationsRecurringJobsPageComponent,
+      ),
+  },
+  {
     path: 'delivery',
     canActivate: [permissionGuard([PERMISSIONS.Operations.View])],
     loadComponent: () =>

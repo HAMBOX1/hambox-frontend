@@ -69,6 +69,7 @@
               [categoriesLoading]="categoriesLoading()"
               [categoriesError]="error()"
               [disabled]="submitting()"
+              (categoryCreated)="onCategoryCreated()"
             />
           </app-admin-section-card>
         </p-tabpanel>

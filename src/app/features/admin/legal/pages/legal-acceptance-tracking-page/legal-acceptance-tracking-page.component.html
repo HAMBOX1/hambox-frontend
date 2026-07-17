@@ -1,0 +1,35 @@
+<section class="admin-page legal-acceptance-tracking-page">
+  <app-admin-page-header
+    [title]="'ADMIN.LEGAL.ACCEPTANCE_TRACKING.TITLE' | translate"
+    [subtitle]="'ADMIN.LEGAL.ACCEPTANCE_TRACKING.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-data-table-shell>
+    <p-table [value]="[...sections()]" [loading]="loading()" dataKey="id">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.LEGAL.ACCEPTANCE_TRACKING.COLUMNS.SECTION' | translate }}</th>
+          <th>{{ 'ADMIN.LEGAL.ACCEPTANCE_TRACKING.COLUMNS.VERSION' | translate }}</th>
+          <th>{{ 'ADMIN.LEGAL.ACCEPTANCE_TRACKING.COLUMNS.PUBLISHED_ON' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-section>
+        <tr>
+          <td>
+            <a class="admin-cell-primary" [routerLink]="['/admin/legal', section.slug]">{{ section.titleEn }}</a>
+          </td>
+          <td>{{ section.publishedVersionNumber ?? '—' }}</td>
+          <td>{{ section.publishedOnUtc ? (section.publishedOnUtc | date: 'medium') : '—' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3">
+            <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.LEGAL.ACCEPTANCE_TRACKING.EMPTY' | translate" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>

@@ -1,0 +1,55 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.legal-sections-list-page__filter {
+  min-width: 10rem;
+}
+
+.legal-sections-list-page__filter--tri {
+  min-width: 8rem;
+}
+
+.legal-sections-list-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: var(--admin-field-gap, 1.25rem);
+}
+
+.legal-sections-list-page__field-label {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.legal-sections-list-page__field-input {
+  width: 100%;
+}
+
+.legal-sections-list-page__field-hint {
+  color: var(--admin-text-secondary);
+  font-size: 0.75rem;
+}
+
+.legal-sections-list-page__draft-flag {
+  display: inline-block;
+  margin-inline-start: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-info-muted);
+  color: var(--color-info);
+  font-size: 0.75rem;
+}
+
+a.admin-cell-primary {
+  text-decoration: none;
+  display: block;
+
+  &:hover {
+    color: var(--admin-accent-green);
+  }
+}

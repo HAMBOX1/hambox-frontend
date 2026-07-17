@@ -6,9 +6,13 @@ export type AdminNavId =
   | 'categories'
   | 'inventory'
   | 'roles'
+  | 'security'
   | 'promotions'
   | 'memberships'
   | 'themes'
+  | 'legal'
+  | 'suppliers'
+  | 'communication'
   | 'orders'
   | 'operations'
   | 'analytics'
@@ -60,6 +64,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     permission: PERMISSIONS.Roles.View,
   },
   {
+    id: 'security',
+    labelKey: 'ADMIN.NAV.SECURITY',
+    route: '/admin/security',
+    icon: 'pi pi-lock',
+    permission: PERMISSIONS.Security.View,
+  },
+  {
     id: 'promotions',
     labelKey: 'ADMIN.NAV.PROMOTIONS',
     route: '/admin/promotions',
@@ -79,6 +90,27 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/themes',
     icon: 'pi pi-palette',
     permission: PERMISSIONS.Themes.View,
+  },
+  {
+    id: 'legal',
+    labelKey: 'ADMIN.NAV.LEGAL',
+    route: '/admin/legal',
+    icon: 'pi pi-file-check',
+    permission: PERMISSIONS.Legal.View,
+  },
+  {
+    id: 'suppliers',
+    labelKey: 'ADMIN.NAV.SUPPLIERS',
+    route: '/admin/suppliers',
+    icon: 'pi pi-truck',
+    permission: PERMISSIONS.Suppliers.View,
+  },
+  {
+    id: 'communication',
+    labelKey: 'ADMIN.NAV.COMMUNICATION',
+    route: '/admin/communication',
+    icon: 'pi pi-send',
+    permission: PERMISSIONS.Communication.View,
   },
   {
     id: 'orders',

@@ -7,3 +7,6 @@ import apiUrlConfig from './api-url.json';
  * to this URL (see `proxy.conf.js`). Production builds use this value directly.
  */
 export const HAMBOX_API_BASE_URL = apiUrlConfig.baseUrl;
+
+/** Google OAuth client ID for production builds — set via `HAMBOX_GOOGLE_CLIENT_ID` at build time. */
+export const HAMBOX_GOOGLE_CLIENT_ID = apiUrlConfig.googleClientId;

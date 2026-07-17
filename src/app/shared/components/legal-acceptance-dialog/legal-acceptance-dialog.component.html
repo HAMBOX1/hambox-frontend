@@ -1,0 +1,53 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(960px, 96vw)', height: 'min(720px, 90vh)' }"
+  [header]="'AUTH.LEGAL.DIALOG_TITLE' | translate"
+>
+  @if (loading()) {
+    <p class="legal-acceptance-dialog__loading">{{ 'AUTH.LEGAL.LOADING' | translate }}</p>
+  } @else {
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        @for (document of documents(); track document.slug; let i = $index) {
+          <p-tab [value]="i.toString()">{{ localizedTitle(document) }}</p-tab>
+        }
+      </p-tablist>
+
+      <p-tabpanels>
+        @for (document of documents(); track document.slug; let i = $index) {
+          <p-tabpanel [value]="i.toString()">
+            <h3 class="legal-acceptance-dialog__title">{{ localizedTitle(document) }}</h3>
+            <div class="legal-acceptance-dialog__body" [innerHTML]="sanitizedContent(document)"></div>
+          </p-tabpanel>
+        }
+      </p-tabpanels>
+    </p-tabs>
+  }
+
+  <div class="legal-acceptance-dialog__agree">
+    <p-checkbox
+      inputId="legal-acceptance-agree"
+      [binary]="true"
+      [ngModel]="agreed()"
+      (ngModelChange)="agreed.set($event)"
+    />
+    <label for="legal-acceptance-agree">{{ 'AUTH.LEGAL.AGREE_LABEL' | translate }}</label>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="p-button-text" [label]="'AUTH.LEGAL.CLOSE' | translate" (click)="close()"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'AUTH.LEGAL.ACCEPT' | translate"
+      [disabled]="!agreed()"
+      (click)="confirm()"
+    ></button>
+  </ng-template>
+</p-dialog>

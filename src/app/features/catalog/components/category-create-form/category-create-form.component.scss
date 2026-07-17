@@ -1,19 +1,7 @@
 .category-create-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-}
-
-.category-create-form__alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.625rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
-  border-radius: var(--admin-radius-sm);
-  background: var(--color-danger-muted);
-  color: var(--admin-accent-red);
-  font-size: 0.875rem;
+  gap: var(--admin-field-gap);
 }
 
 .category-create-form__error {
@@ -22,34 +10,64 @@
   font-size: 0.75rem;
 }
 
+.category-create-form__type-toggle {
+  display: flex;
+  gap: 1rem;
+}
+
+.category-create-form__type-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--admin-type-caption, 0.875rem);
+  color: var(--admin-text-primary);
+  cursor: pointer;
+}
+
+.category-create-form__new-parent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-field-gap);
+  padding: 1rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-surface-muted);
+}
+
+.category-create-form__new-parent-title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+}
+
+.category-create-form__subcategories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-surface-muted);
+}
+
+.category-create-form__subcategory-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-field-gap);
+  padding: 0.75rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-md, 0.5rem);
+  background: var(--admin-surface-default, transparent);
+}
+
+.category-create-form__subcategory-remove {
+  align-self: flex-end;
+}
+
 .category-create-form__actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 0.75rem;
-}
-
-:host ::ng-deep {
-  .category-create-form__btn.p-button {
-    padding: 0.625rem 1rem;
-    border-radius: var(--admin-radius-sm);
-    font-family: var(--admin-font-body);
-    font-weight: 700;
-  }
-
-  .category-create-form__btn--ghost.p-button {
-    border-color: var(--admin-border-default);
-    background: transparent;
-    color: var(--admin-text-secondary);
-  }
-
-  .category-create-form__btn--primary.p-button {
-    border-color: transparent;
-    background: var(--admin-accent-green);
-    color: var(--admin-text-inverse);
-  }
-
-  .category-create-form__btn--primary.p-button:enabled:hover {
-    filter: brightness(1.05);
-  }
 }

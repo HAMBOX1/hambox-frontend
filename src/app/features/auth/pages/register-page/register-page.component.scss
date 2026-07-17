@@ -458,33 +458,11 @@
   color: var(--danger);
 }
 
-.register-form__error--terms {
-  margin-top: -0.5rem;
-}
-
-.register-form__terms {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.register-form__terms-label {
-  margin: 0;
+.register-form__terms-note {
+  margin: 0.25rem 0 0;
   font-size: 0.75rem;
   line-height: 1.55;
   color: var(--register-text-soft);
-  cursor: pointer;
-}
-
-.register-form__terms-label a {
-  color: var(--register-green);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.register-form__terms-label a:hover {
-  text-decoration: underline;
 }
 
 .register-form__submit.p-button {
@@ -582,28 +560,6 @@
 
 .register-form__sign-in a:hover {
   text-decoration: underline;
-}
-
-:host ::ng-deep .register-form__terms .p-checkbox {
-  margin-top: 0.125rem;
-}
-
-:host ::ng-deep .register-form__terms .p-checkbox-box {
-  width: 1.125rem;
-  height: 1.125rem;
-  border-radius: 4px;
-  border-color: var(--border);
-  background: var(--register-input-bg);
-}
-
-:host ::ng-deep .register-form__terms .p-checkbox-checked .p-checkbox-box {
-  border-color: var(--register-green);
-  background: var(--register-green);
-}
-
-:host ::ng-deep .register-form__terms .p-checkbox-icon {
-  color: var(--register-green-dark);
-  font-size: 0.7rem;
 }
 
 @media (max-width: 1080px) {

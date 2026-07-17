@@ -6,6 +6,7 @@ import {
   Category,
   CategoryOption,
   CreateCategoryRequest,
+  NewParentDraft,
   UpdateCategoryRequest,
 } from '../models/category.model';
 import { CategoryApiService } from './category-api.service';
@@ -24,6 +25,8 @@ export class CategoryListFacade {
   private readonly creatingState = signal(false);
   private readonly updatingState = signal(false);
   private readonly searchTermState = signal('');
+  private readonly statusFilterState = signal('');
+  private readonly deletingState = signal(false);
   private readonly errorState = signal<string | null>(null);
   private readonly createErrorState = signal<string | null>(null);
   private readonly updateErrorState = signal<string | null>(null);
@@ -43,6 +46,8 @@ export class CategoryListFacade {
   readonly creating = this.creatingState.asReadonly();
   readonly updating = this.updatingState.asReadonly();
   readonly searchTerm = this.searchTermState.asReadonly();
+  readonly statusFilter = this.statusFilterState.asReadonly();
+  readonly deleting = this.deletingState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly createError = this.createErrorState.asReadonly();
   readonly updateError = this.updateErrorState.asReadonly();
@@ -55,11 +60,14 @@ export class CategoryListFacade {
 
   readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
   readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
+  readonly hasActiveFilters = computed(
+    () => this.hasActiveSearch() || this.statusFilterState().trim().length > 0,
+  );
   readonly subtitle = computed(() => {
     const count = this.totalCount();
     const noun = count === 1 ? 'category' : 'categories';
 
-    if (this.hasActiveSearch()) {
+    if (this.hasActiveFilters()) {
       return `Showing ${count} matching ${noun}`;
     }
 
@@ -79,6 +87,23 @@ export class CategoryListFacade {
     this.searchTermState.set(term);
     this.pageNumberState.set(1);
     this.scheduleReload();
+  }
+
+  setStatusFilter(status: string): void {
+    this.statusFilterState.set(status);
+    this.pageNumberState.set(1);
+    void this.fetchCategories();
+  }
+
+  clearFilters(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    this.searchTermState.set('');
+    this.statusFilterState.set('');
+    this.pageNumberState.set(1);
+    void this.fetchCategories();
   }
 
   setPage(pageNumber: number, pageSize: number): void {
@@ -122,7 +147,29 @@ export class CategoryListFacade {
     this.createErrorState.set(null);
 
     try {
-      await firstValueFrom(this.api.createCategory(request));
+      const parentId = await this.resolveParentId(request);
+      const rootId = await firstValueFrom(
+        this.api.createCategory({
+          nameEn: request.nameEn,
+          nameAr: request.nameAr,
+          slug: request.slug,
+          parentId,
+        }),
+      );
+
+      // ponytail: subcategories are created as separate sequential calls (same non-transactional
+      // trade-off as the inline new-parent creation below) — no batch/nested endpoint exists.
+      for (const child of request.subcategories ?? []) {
+        await firstValueFrom(
+          this.api.createCategory({
+            nameEn: child.nameEn,
+            nameAr: child.nameAr,
+            slug: child.slug,
+            parentId: rootId,
+          }),
+        );
+      }
+
       this.createDialogOpenState.set(false);
       this.pageNumberState.set(1);
       await this.fetchCategories(true);
@@ -146,7 +193,16 @@ export class CategoryListFacade {
     this.updateErrorState.set(null);
 
     try {
-      await firstValueFrom(this.api.updateCategory(category.id, request));
+      const parentId = await this.resolveParentId(request);
+      await firstValueFrom(
+        this.api.updateCategory(category.id, {
+          nameEn: request.nameEn,
+          nameAr: request.nameAr,
+          slug: request.slug,
+          isActive: request.isActive,
+          parentId,
+        }),
+      );
       this.editDialogOpenState.set(false);
       this.editingCategoryState.set(null);
       await this.fetchCategories(true);
@@ -161,6 +217,8 @@ export class CategoryListFacade {
   }
 
   async deleteCategory(categoryId: string): Promise<boolean> {
+    this.deletingState.set(true);
+
     try {
       await firstValueFrom(this.api.deleteCategory(categoryId));
       await this.fetchCategories(true);
@@ -169,6 +227,8 @@ export class CategoryListFacade {
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Failed to delete category.'));
       return false;
+    } finally {
+      this.deletingState.set(false);
     }
   }
 
@@ -192,6 +252,27 @@ export class CategoryListFacade {
     }
   }
 
+  private async resolveParentId(request: {
+    parentId?: string | null;
+    newParent?: NewParentDraft | null;
+  }): Promise<string | null> {
+    if (!request.newParent) {
+      return request.parentId ?? null;
+    }
+
+    // ponytail: parent + child are created as two separate calls (no cross-entity transaction
+    // exists for this). If the child create fails after this succeeds, the new parent is left
+    // standalone rather than rolled back — acceptable since it's still a valid category on its own.
+    return firstValueFrom(
+      this.api.createCategory({
+        nameEn: request.newParent.nameEn,
+        nameAr: request.newParent.nameAr,
+        slug: request.newParent.slug,
+        parentId: null,
+      }),
+    );
+  }
+
   private scheduleReload(): void {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
@@ -207,11 +288,15 @@ export class CategoryListFacade {
     this.errorState.set(null);
 
     try {
+      const status = this.statusFilterState().trim();
+      const activeOnly = status === 'active' ? true : status === 'inactive' ? false : undefined;
+
       const result = await firstValueFrom(
         this.api.getCategories({
           pageNumber: this.pageNumberState(),
           pageSize: this.pageSizeState(),
           searchTerm: this.searchTermState(),
+          activeOnly,
         }),
       );
 

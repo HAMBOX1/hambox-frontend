@@ -14,7 +14,6 @@ import { copyToClipboard, formatShortGuid } from '../../../../shared/utils/guid-
 import {
   AdminEmptyStateComponent,
   AdminErrorAlertComponent,
-  AdminIconButtonComponent,
   AdminLoadingSkeletonComponent,
   AdminSectionCardComponent,
   AdminStatusBadgeComponent,
@@ -39,7 +38,6 @@ type CopiedField = 'id' | 'categoryId' | 'url' | null;
     AdminStatusBadgeComponent,
     AdminErrorAlertComponent,
     AdminSectionCardComponent,
-    AdminIconButtonComponent,
   ],
   templateUrl: './product-detail-panel.component.html',
   styleUrl: './product-detail-panel.component.scss',

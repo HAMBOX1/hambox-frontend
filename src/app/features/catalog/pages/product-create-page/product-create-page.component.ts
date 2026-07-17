@@ -101,6 +101,10 @@ export class ProductCreatePageComponent implements OnInit {
     this.assetsChanged$.next();
   }
 
+  protected onCategoryCreated(): void {
+    void this.facade.loadCategories();
+  }
+
   protected onCancel(): void {
     void this.router.navigate(['/admin/products']);
   }

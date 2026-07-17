@@ -1,0 +1,17 @@
+.supplier-mappings-page {
+  &__mono {
+    font-family: monospace;
+    font-size: var(--hambox-font-size-xs);
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-1);
+  }
+
+  &__field-label {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+  }
+}

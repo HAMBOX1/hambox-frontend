@@ -1,5 +1,7 @@
 import { Category } from '../../catalog/models/category.model';
 import { Product } from '../../catalog/models/product.model';
+import { resolveLocalizedText } from '../../../core/i18n/localized-text.util';
+import { SupportedLanguageId } from '../../../core/i18n/locale.model';
 import {
   StorefrontContent,
   StorefrontTrustItemContent,
@@ -55,23 +57,27 @@ export function resolveStorefrontImageUrl(imageUrl?: string | null, fallback: st
     .replace(/categories\/(.+)\.jpg$/, 'categories/$1.svg');
 }
 
-export function mapCategoryToStorefrontCategory(category: Category): StorefrontCategory {
+export function mapCategoryToStorefrontCategory(
+  category: Category,
+  lang: SupportedLanguageId,
+): StorefrontCategory {
   const normalizedSlug = category.slug.trim().toLowerCase();
+  const name = resolveLocalizedText(category.nameEn, category.nameAr, lang);
 
   return {
     id: category.id,
-    title: category.nameEn,
-    subtitle: `Browse ${category.nameEn}`,
+    title: name,
+    subtitle: `Browse ${name}`,
     imageUrl: CATEGORY_IMAGE_BY_SLUG[normalizedSlug] ?? CATEGORY_PLACEHOLDER_IMAGE,
     route: `/products?category=${category.id}`,
   };
 }
 
-export function mapProductToFlashDeal(product: Product, index: number): FlashDeal {
+export function mapProductToFlashDeal(product: Product, lang: SupportedLanguageId, index: number): FlashDeal {
   return {
     id: product.id,
-    title: product.nameEn,
-    subtitle: product.categoryName,
+    title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
+    subtitle: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     imageUrl: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
     discountLabel: '',
     originalPriceUsd: product.price,
@@ -80,26 +86,30 @@ export function mapProductToFlashDeal(product: Product, index: number): FlashDea
   };
 }
 
-export function mapProductToTrendingRank(product: Product, index: number): TrendingRankItem {
+export function mapProductToTrendingRank(
+  product: Product,
+  lang: SupportedLanguageId,
+  index: number,
+): TrendingRankItem {
   return {
     id: product.id,
     rank: `#${index + 1}`,
     rankTone: RANK_TONES[index % RANK_TONES.length] ?? 'green',
     iconSrc: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
-    title: product.nameEn,
-    subtitle: product.categoryName,
+    title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
+    subtitle: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     priceUsd: product.price,
     priceTone: RANK_TONES[index % RANK_TONES.length] ?? 'green',
     route: `/products/${product.id}`,
   };
 }
 
-export function mapProductToTrendingValue(product: Product): TrendingValueItem {
+export function mapProductToTrendingValue(product: Product, lang: SupportedLanguageId): TrendingValueItem {
   return {
     id: product.id,
     badge: 'BEST VALUE',
-    title: product.nameEn,
-    subtitle: product.categoryName,
+    title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
+    subtitle: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     priceUsd: product.price,
     route: `/products/${product.id}`,
   };
@@ -107,6 +117,7 @@ export function mapProductToTrendingValue(product: Product): TrendingValueItem {
 
 export function mapProductToFeaturedProduct(
   product: Product,
+  lang: SupportedLanguageId,
   index = 0,
   badge = "EDITOR'S CHOICE",
   ctaLabel = 'View Product',
@@ -114,8 +125,8 @@ export function mapProductToFeaturedProduct(
   return {
     id: product.id,
     badge,
-    title: product.nameEn,
-    description: product.descriptionEn,
+    title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
+    description: resolveLocalizedText(product.descriptionEn, product.descriptionAr, lang),
     imageUrl: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
     ctaLabel,
     route: `/products/${product.id}`,

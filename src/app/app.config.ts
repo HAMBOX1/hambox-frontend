@@ -79,6 +79,14 @@ export const appConfig: ApplicationConfig = {
           darkModeSelector: HAMBOX_PRIME_DARK_MODE_SELECTOR,
         },
       },
+      // Portal every overlay (Select/MultiSelect/AutoComplete/DatePicker/Popover/Menu/
+      // TieredMenu/ContextMenu/Dialog/…) to <body> by default so containers with
+      // overflow:hidden/scroll can never clip them. Every PrimeNG overlay component
+      // resolves its target via `this.appendTo() || this.config.overlayAppendTo()`,
+      // so this one signal is the actual global switch — `overlayOptions` (a
+      // different, per-instance-only bag) is not read back by any component and has
+      // no global effect.
+      overlayAppendTo: 'body',
     }),
 
     {

@@ -15,6 +15,25 @@
     </div>
   </app-admin-page-header>
 
+  <div class="admin-filters">
+    <button
+      pButton
+      type="button"
+      size="small"
+      label="Failed"
+      [severity]="statusFilter() === 'Failed' ? 'primary' : 'secondary'"
+      (click)="setStatusFilter('Failed')"
+    ></button>
+    <button
+      pButton
+      type="button"
+      size="small"
+      label="Dead Letter"
+      [severity]="statusFilter() === 'DeadLetter' ? 'primary' : 'secondary'"
+      (click)="setStatusFilter('DeadLetter')"
+    ></button>
+  </div>
+
   @if (loading() && !jobs()) {
     <app-admin-loading-skeleton variant="table" />
   } @else if (error()) {

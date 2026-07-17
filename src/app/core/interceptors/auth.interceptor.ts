@@ -19,6 +19,7 @@ import { AuthTokenResponse } from '../../features/auth/models/auth';
 function isAuthEndpoint(url: string): boolean {
   return (
     url.includes(AUTH_API.login) ||
+    url.includes(AUTH_API.google) ||
     url.includes(AUTH_API.adminLogin) ||
     url.includes(AUTH_API.adminVerifyOtp) ||
     url.includes(AUTH_API.adminResendOtp) ||

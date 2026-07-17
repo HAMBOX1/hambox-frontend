@@ -13,7 +13,7 @@
         (click)="onNavigate()"
       >
         @if (sidebarState.collapsed()) {
-          <span class="admin-sidebar__logo-mark" aria-hidden="true">H</span>
+          <img class="admin-sidebar__logo-mark" [src]="logoMarkSrc" alt="HAMBOX" />
         } @else {
           <img class="admin-sidebar__logo" [src]="logoSrc" alt="HAMBOX" />
         }

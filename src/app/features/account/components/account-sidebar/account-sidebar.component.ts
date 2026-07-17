@@ -22,6 +22,7 @@ export class AccountSidebarComponent {
   private readonly sidebarState = inject(AccountSidebarStateService);
 
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
+  protected readonly logoMarkSrc = 'assets/images/top-nav/hambox-mark.png';
   protected readonly collapsed = this.sidebarState.collapsed;
   protected readonly mobileOpen = this.sidebarState.mobileOpen;
 

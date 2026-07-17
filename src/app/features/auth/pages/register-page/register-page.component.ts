@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
 import { finalize } from 'rxjs';
 
 import { ApiError } from '../../../../core/models/api-error.model';
+import { LegalAcceptanceDialogComponent } from '../../../../shared/components/legal-acceptance-dialog/legal-acceptance-dialog.component';
+import { LegalService } from '../../../legal/services/legal.service';
 import { Auth } from '../../services/auth';
 import {
   applyServerValidationErrors,
@@ -20,13 +21,12 @@ const FIELD_LABELS = {
   password: 'Password',
   confirmPassword: 'Confirm password',
   referralCode: 'Referral code',
-  acceptTerms: 'Terms acceptance',
 };
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, ButtonModule, CheckboxModule],
+  imports: [ReactiveFormsModule, RouterLink, ButtonModule, LegalAcceptanceDialogComponent],
   templateUrl: './register-page.component.html',
   styleUrl: './register-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,12 +34,21 @@ const FIELD_LABELS = {
 export class RegisterPageComponent {
   private readonly auth = inject(Auth);
   private readonly fb = inject(FormBuilder);
+  private readonly legal = inject(LegalService);
 
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly successMessage = signal<string | null>(null);
   protected readonly showPassword = signal(false);
   protected readonly showConfirmPassword = signal(false);
+  protected readonly legalDialogVisible = signal(false);
+  protected readonly requiredLegalSlugs = computed(() =>
+    this.legal.documents().filter((d) => d.requireAcceptance).map((d) => d.slug),
+  );
+
+  constructor() {
+    void this.legal.loadDocuments();
+  }
   protected readonly activeFeatureIndex = signal(2);
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
 
@@ -75,7 +84,6 @@ export class RegisterPageComponent {
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]],
       confirmPassword: ['', [Validators.required]],
       referralCode: [''],
-      acceptTerms: [false, Validators.requiredTrue],
     },
     { validators: passwordsMatchValidator },
   );
@@ -92,6 +100,15 @@ export class RegisterPageComponent {
     this.showConfirmPassword.update((value) => !value);
   }
 
+  protected openLegalDialog(): void {
+    this.legalDialogVisible.set(true);
+  }
+
+  protected onLegalAccepted(): void {
+    this.legalDialogVisible.set(false);
+    this.register();
+  }
+
   protected submit(): void {
     this.errorMessage.set(null);
     this.successMessage.set(null);
@@ -101,6 +118,10 @@ export class RegisterPageComponent {
       return;
     }
 
+    this.openLegalDialog();
+  }
+
+  private register(): void {
     const { fullName, email, password } = this.form.getRawValue();
     const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
     const firstName = nameParts[0] ?? '';
@@ -116,7 +137,7 @@ export class RegisterPageComponent {
           this.successMessage.set(
             'Commander profile initialized. Check your inbox for a verification link before signing in.',
           );
-          this.form.reset({ acceptTerms: false });
+          this.form.reset();
         },
         error: (error: unknown) => {
           if (error instanceof ApiError) {

@@ -67,6 +67,8 @@ export interface OperationalJobDto {
   jobType: string;
   status: string;
   priority: string;
+  queue: string;
+  progressPercent: number;
   attempts: number;
   maxAttempts: number;
   workerId: string | null;
@@ -80,6 +82,27 @@ export interface OperationalJobDto {
   nextVisibleOnUtc: string | null;
   lastRetryOnUtc: string | null;
   durationSeconds: number | null;
+}
+
+export interface BackgroundJobExecutionHistoryDto {
+  id: string;
+  attemptNumber: number;
+  status: string;
+  startedOnUtc: string;
+  finishedOnUtc: string | null;
+  durationMs: number | null;
+  exception: string | null;
+  workerId: string | null;
+  correlationId: string | null;
+}
+
+export interface RecurringJobDefinitionDto {
+  key: string;
+  jobType: string;
+  queue: string;
+  priority: string;
+  intervalMinutes: number;
+  lastEnqueuedOnUtc: string | null;
 }
 
 export interface DeliveryMonitorItemDto {

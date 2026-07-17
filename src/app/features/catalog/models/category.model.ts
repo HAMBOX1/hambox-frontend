@@ -7,11 +7,19 @@ export interface Category {
   readonly parentId: string | null;
 }
 
+export interface NewParentDraft {
+  readonly nameEn: string;
+  readonly nameAr: string;
+  readonly slug: string;
+}
+
 export interface CreateCategoryRequest {
   readonly nameAr: string;
   readonly nameEn: string;
   readonly slug: string;
   readonly parentId?: string | null;
+  readonly newParent?: NewParentDraft | null;
+  readonly subcategories?: readonly NewParentDraft[] | null;
 }
 
 export interface UpdateCategoryRequest {
@@ -20,6 +28,7 @@ export interface UpdateCategoryRequest {
   readonly slug: string;
   readonly isActive: boolean;
   readonly parentId?: string | null;
+  readonly newParent?: NewParentDraft | null;
 }
 
 export interface CategoryListQuery {

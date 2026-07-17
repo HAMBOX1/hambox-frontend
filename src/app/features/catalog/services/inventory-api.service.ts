@@ -27,6 +27,7 @@ import {
   ProductOptionGroupDto,
   ProductVariantDto,
   ReorderIdsRequest,
+  RevealInventoryCodeDto,
   StorefrontProductConfigurationDto,
   UpdateOptionGroupRequest,
   UpdateOptionRequest,
@@ -185,6 +186,10 @@ export class InventoryApiService {
 
   deleteCode(codeId: string): Observable<void> {
     return this.api.delete<void>(INVENTORY_API.code(codeId));
+  }
+
+  revealCode(codeId: string): Observable<RevealInventoryCodeDto> {
+    return this.api.post<RevealInventoryCodeDto>(INVENTORY_API.codeReveal(codeId), {});
   }
 
   bulkDisableCodes(variantId: string, request: BulkCodeIdsRequest): Observable<BulkCodeActionResultDto> {

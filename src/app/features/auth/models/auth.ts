@@ -3,6 +3,10 @@ export interface LoginRequest {
   readonly password: string;
 }
 
+export interface GoogleLoginRequest {
+  readonly idToken: string;
+}
+
 export interface RegisterRequest {
   readonly email: string;
   readonly password: string;

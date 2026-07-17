@@ -294,6 +294,12 @@
   line-height: 1.45;
 }
 
+.admin-field__optional {
+  color: var(--admin-text-muted);
+  font-size: var(--admin-type-label);
+  font-weight: 400;
+}
+
 .admin-field__input {
   width: 100%;
 }

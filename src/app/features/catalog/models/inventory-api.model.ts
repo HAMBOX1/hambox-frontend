@@ -243,3 +243,7 @@ export interface BulkCodeIdsRequest {
 export interface BulkCodeActionResultDto {
   readonly affected: number;
 }
+
+export interface RevealInventoryCodeDto {
+  readonly digitalCode: string;
+}

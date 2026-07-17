@@ -133,7 +133,37 @@
     "SIGN_IN": "تسجيل الدخول",
     "CREATE_ACCOUNT": "إنشاء حساب",
     "ALREADY_HAVE_ACCOUNT": "لديك حساب بالفعل؟",
-    "DONT_HAVE_ACCOUNT": "ليس لديك حساب؟"
+    "DONT_HAVE_ACCOUNT": "ليس لديك حساب؟",
+    "LEGAL": {
+      "DIALOG_TITLE": "المستندات القانونية",
+      "LOADING": "جارٍ تحميل المستندات…",
+      "AGREE_LABEL": "لقد قرأت وأوافق على الشروط والأحكام وسياسة الخصوصية.",
+      "ACCEPT": "أوافق ومتابعة",
+      "CLOSE": "إغلاق",
+      "TYPES": {
+        "Terms": "الشروط والأحكام",
+        "Privacy": "سياسة الخصوصية",
+        "Refund": "سياسة الاسترداد"
+      }
+    }
+  },
+  "LEGAL": {
+    "LAST_UPDATED": "آخر تحديث",
+    "VERSION": "الإصدار",
+    "NOT_AVAILABLE": "هذا المستند غير متوفر بعد.",
+    "READING_TIME": "قراءة {{minutes}} دقيقة",
+    "TABLE_OF_CONTENTS": "في هذه الصفحة",
+    "BACK_TO_LEGAL": "العودة إلى المركز القانوني",
+    "MENU": "المستندات القانونية",
+    "NOT_FOUND_TITLE": "المستند غير موجود",
+    "NOT_FOUND_DESCRIPTION": "تعذر العثور على المستند القانوني الذي تبحث عنه.",
+    "LANDING": {
+      "EYEBROW": "المركز القانوني لـ HAMBOX",
+      "TITLE": "المركز القانوني",
+      "SUBTITLE": "الشروط والسياسات والمعلومات التي تحكم استخدامك لمنصة HAMBOX.",
+      "COMING_SOON": "قريباً",
+      "UNCATEGORIZED": "عام"
+    }
   },
   "PRODUCT": {
     "ADD_TO_CART": "أضف إلى السلة",
@@ -312,7 +342,21 @@
       "VIEW_ALL": "عرض كل الإشعارات",
       "TODAY": "اليوم",
       "YESTERDAY": "أمس",
-      "EARLIER": "سابقاً"
+      "EARLIER": "سابقاً",
+      "PREFERENCES": "التفضيلات",
+      "SEARCH_PLACEHOLDER": "ابحث في الإشعارات…",
+      "ALL_CATEGORIES": "جميع الفئات",
+      "SHOW_ARCHIVED": "إظهار المؤرشفة",
+      "ARCHIVE": "أرشفة",
+      "DELETE": "حذف",
+      "PREFS": {
+        "EMAIL": "إشعارات البريد الإلكتروني",
+        "IN_APP": "الإشعارات داخل التطبيق",
+        "ORDER": "تحديثات الطلبات",
+        "MEMBERSHIP": "تحديثات العضوية",
+        "MARKETING": "التسويق والعروض",
+        "SECURITY": "تنبيهات الأمان (مفعّلة دائماً)"
+      }
     },
     "SIDEBAR_UI": {
       "NAV_ARIA": "تنقل الحساب",
@@ -635,6 +679,7 @@
     "CONFIRM": {
       "CONFIRM": "تأكيد",
       "CANCEL": "إلغاء",
+      "REVEAL": "كشف",
       "DELETE_ROLE_TITLE": "حذف الدور؟",
       "DELETE_ROLE": "حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
       "DELETE_ROLES_TITLE": "حذف الأدوار المحددة؟",
@@ -646,7 +691,11 @@
       "DELETE_PLAN_TITLE": "حذف الخطة؟",
       "DELETE_PLAN": "حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
       "CANCEL_MEMBERSHIP_TITLE": "إلغاء العضوية؟",
-      "CANCEL_MEMBERSHIP": "إلغاء عضوية هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء."
+      "CANCEL_MEMBERSHIP": "إلغاء عضوية هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
+      "DELETE_SUPPLIER_TITLE": "حذف المورد؟",
+      "DELETE_SUPPLIER": "حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "DELETE_MAPPING_TITLE": "حذف الربط؟",
+      "DELETE_MAPPING": "حذف ربط المنتج هذا؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "BULK": {
       "SELECTED": "{{count}} محدد",
@@ -664,16 +713,124 @@
       "PROMOTIONS": "العروض",
       "MEMBERSHIPS": "العضويات",
       "THEMES": "السمات",
+      "LEGAL": "المركز القانوني",
       "ORDERS": "الطلبات",
       "OPERATIONS": "العمليات",
       "ANALYTICS": "التحليلات",
       "REPORTS": "التقارير",
-      "SETTINGS": "الإعدادات"
+      "SETTINGS": "الإعدادات",
+      "SUPPLIERS": "الموردون",
+      "SECURITY": "مركز الأمان",
+      "COMMUNICATION": "التواصل"
+    },
+    "COMMUNICATION": {
+      "NAV": {
+        "TEMPLATES": "القوالب",
+        "MESSAGES": "الإشعارات",
+        "FAILED_DELIVERIES": "عمليات التسليم الفاشلة",
+        "PROVIDERS": "مزودو الخدمة"
+      },
+      "DASHBOARD": {
+        "TITLE": "مركز التواصل",
+        "SUBTITLE": "القوالب وسجل التسليم ومزودو الخدمة وحجم الإشعارات.",
+        "NOTIFICATIONS_TODAY": "الإشعارات اليوم",
+        "EMAILS_SENT": "الرسائل المرسلة اليوم",
+        "FAILURES": "الإخفاقات اليوم",
+        "RETRYING": "قيد إعادة المحاولة",
+        "UNREAD": "الإشعارات غير المقروءة",
+        "AVG_DELIVERY": "متوسط وقت التسليم",
+        "QUEUE_SIZE": "حجم قائمة الانتظار",
+        "PROVIDER_ENABLED": "مفعّل",
+        "PROVIDER_DISABLED": "معطّل"
+      },
+      "TEMPLATES": {
+        "TITLE": "قوالب التواصل",
+        "SUBTITLE": "تحرير ونشر قوالب الإشعارات لكل قناة.",
+        "NEW": "قالب جديد",
+        "EDIT": "تعديل",
+        "EDIT_TITLE": "تعديل القالب",
+        "PUBLISHED": "منشور",
+        "DRAFT": "مسودة",
+        "SAVE_DRAFT": "حفظ المسودة",
+        "PUBLISH": "نشر",
+        "CREATE": "إنشاء",
+        "EMPTY": "لا توجد قوالب حتى الآن.",
+        "COLUMNS": {
+          "KEY": "المفتاح",
+          "CHANNEL": "القناة",
+          "CATEGORY": "الفئة",
+          "STATUS": "الحالة"
+        },
+        "FIELDS": {
+          "KEY": "المفتاح",
+          "CHANNEL": "القناة",
+          "CATEGORY": "الفئة",
+          "SUBJECT_EN": "الموضوع (إنجليزي)",
+          "SUBJECT_AR": "الموضوع (عربي)",
+          "BODY_EN": "المحتوى (إنجليزي)",
+          "BODY_AR": "المحتوى (عربي)"
+        },
+        "MESSAGES": {
+          "SAVED": "تم حفظ المسودة.",
+          "SAVE_FAILED": "فشل حفظ المسودة.",
+          "PUBLISHED": "تم نشر القالب.",
+          "PUBLISH_FAILED": "فشل نشر القالب.",
+          "CREATED": "تم إنشاء القالب.",
+          "CREATE_FAILED": "فشل إنشاء القالب."
+        }
+      },
+      "MESSAGES": {
+        "TITLE": "الإشعارات",
+        "SUBTITLE": "كل إشعار تم إرساله عبر منصة التواصل.",
+        "SEARCH_PLACEHOLDER": "ابحث عن الموضوع أو المستخدم أو القالب…",
+        "FILTER_STATUS": "الحالة",
+        "FILTER_CHANNEL": "القناة",
+        "EMPTY": "لا توجد إشعارات مطابقة للفلاتر.",
+        "COLUMNS": {
+          "SUBJECT": "الموضوع",
+          "CHANNEL": "القناة",
+          "CATEGORY": "الفئة",
+          "STATUS": "الحالة",
+          "CREATED": "تاريخ الإنشاء"
+        }
+      },
+      "FAILED_DELIVERIES": {
+        "TITLE": "عمليات التسليم الفاشلة",
+        "SUBTITLE": "الإشعارات التي فشل تسليمها — أعد المحاولة بشكل فردي.",
+        "RETRY": "إعادة المحاولة",
+        "EMPTY": "لا توجد عمليات تسليم فاشلة.",
+        "COLUMNS": {
+          "SUBJECT": "الموضوع",
+          "CHANNEL": "القناة",
+          "RETRY_COUNT": "المحاولات",
+          "ERROR": "آخر خطأ"
+        },
+        "MESSAGES": {
+          "RETRIED": "تمت إعادة جدولة التسليم.",
+          "RETRY_FAILED": "فشل في إعادة محاولة التسليم."
+        }
+      },
+      "PROVIDERS": {
+        "TITLE": "مزودو خدمة التواصل",
+        "SUBTITLE": "تفعيل وتعطيل وترتيب أولوية قنوات التسليم.",
+        "ENABLED": "مفعّل",
+        "DISABLED": "معطّل",
+        "COLUMNS": {
+          "NAME": "الاسم",
+          "CHANNEL": "القناة",
+          "PRIORITY": "الأولوية",
+          "ENABLED": "مفعّل"
+        },
+        "MESSAGES": {
+          "UPDATE_FAILED": "فشل تحديث مزود الخدمة."
+        }
+      }
     },
     "OPERATIONS": {
       "NAV": {
         "JOBS": "المهام",
         "FAILED_JOBS": "المهام الفاشلة",
+        "RECURRING_JOBS": "المهام المتكررة",
         "HEALTH": "الصحة"
       },
       "FILTERS": "عوامل التصفية",
@@ -696,6 +853,10 @@
       "FAILED": {
         "TITLE": "المهام الفاشلة",
         "SUBTITLE": "أعد المحاولة أو ألغِ المهام التي استنفدت المحاولات."
+      },
+      "RECURRING": {
+        "TITLE": "المهام المتكررة",
+        "SUBTITLE": "المهام الدورية المسجَّلة لدى مجدول المهام الخلفية."
       },
       "DELIVERY": {
         "TITLE": "مراقبة التسليم",
@@ -766,7 +927,12 @@
         "IP": "IP",
         "REQ_SIZE": "حجم الطلب",
         "RES_SIZE": "حجم الاستجابة",
-        "MIN_STATUS": "أدنى حالة"
+        "MIN_STATUS": "أدنى حالة",
+        "QUEUE": "قائمة الانتظار",
+        "PROGRESS": "التقدّم",
+        "INTERVAL": "الفاصل الزمني",
+        "LAST_RUN": "آخر تشغيل",
+        "KEY": "المفتاح"
       },
       "ACTIONS": {
         "REFRESH": "تحديث",
@@ -776,7 +942,8 @@
         "CLEAR_COMPLETED": "مسح المكتملة",
         "EXPORT_CSV": "تصدير CSV",
         "DETAILS": "عرض التفاصيل",
-        "DOWNLOAD_LOGS": "تنزيل السجلات"
+        "DOWNLOAD_LOGS": "تنزيل السجلات",
+        "HISTORY": "سجل التنفيذ"
       },
       "EMPTY": {
         "ALERTS": "لا توجد تنبيهات.",
@@ -784,7 +951,9 @@
         "FAILED": "لا توجد مهام فاشلة.",
         "DELIVERY": "لا توجد صفوف تسليم.",
         "SUPPLIERS": "لا يوجد موردون.",
-        "API_LOGS": "لا توجد سجلات API بعد."
+        "API_LOGS": "لا توجد سجلات API بعد.",
+        "RECURRING": "لا توجد مهام متكررة مسجَّلة.",
+        "HISTORY": "لا يوجد سجل تنفيذ بعد."
       }
     },
     "ANALYTICS": {
@@ -1449,6 +1618,333 @@
         "EXPORT": "تصدير",
         "PREVIEW": "معاينة",
         "ROLLBACK": "تراجع"
+      }
+    },
+    "LEGAL": {
+      "NAV": {
+        "DASHBOARD": "لوحة المعلومات",
+        "SECTIONS": "الأقسام",
+        "ACCEPTANCE": "تتبع الموافقات"
+      },
+      "DASHBOARD": {
+        "TITLE": "المركز القانوني",
+        "SUBTITLE": "نظرة عامة على الأقسام القانونية.",
+        "STATS": {
+          "TOTAL": "إجمالي الأقسام",
+          "PUBLISHED": "منشور",
+          "DRAFT": "مسودة",
+          "ARCHIVED": "مؤرشف"
+        }
+      },
+      "LIST": {
+        "TITLE": "الأقسام القانونية",
+        "SUBTITLE": "إنشاء وتعديل ونشر أي مستند قانوني — دون الحاجة لتعديل الكود.",
+        "NEW": "قسم جديد",
+        "EDIT": "تعديل",
+        "HAS_DRAFT": "مسودة غير منشورة",
+        "SEARCH_PLACEHOLDER": "البحث بالرمز أو العنوان…",
+        "FILTER_CATEGORY": "الفئة",
+        "FILTER_STATUS": "الحالة",
+        "STATUS_PUBLISHED": "منشور",
+        "STATUS_DRAFT": "مسودة",
+        "STATUS_ARCHIVED": "مؤرشف",
+        "EMPTY": "لا توجد أقسام قانونية بعد. أنشئ أول قسم.",
+        "EMPTY_SEARCH": "لا توجد أقسام مطابقة لبحثك.",
+        "COLUMNS": {
+          "TITLE": "القسم",
+          "CATEGORY": "الفئة",
+          "STATUS": "الحالة",
+          "VERSION": "الإصدار",
+          "PUBLISHED_ON": "تاريخ النشر"
+        }
+      },
+      "CREATE": {
+        "TITLE": "قسم قانوني جديد",
+        "SLUG_LABEL": "الرمز",
+        "SLUG_HINT": "أحرف إنجليزية صغيرة وأرقام وشرطات فقط — يصبح /legal/{{slug}}",
+        "TITLE_LABEL": "العنوان (إنجليزي)",
+        "CATEGORY_LABEL": "الفئة",
+        "ICON_LABEL": "الأيقونة"
+      },
+      "DUPLICATE": {
+        "TITLE": "نسخ القسم",
+        "SLUG_LABEL": "الرمز الجديد",
+        "TITLE_LABEL": "العنوان الجديد (إنجليزي)"
+      },
+      "DETAIL": {
+        "SUBTITLE": "تحرير المحتوى ثنائي اللغة ونشر إصدارات جديدة.",
+        "TAB_EDIT": "تعديل",
+        "TAB_SETTINGS": "تحسين محركات البحث والظهور",
+        "TAB_HISTORY": "السجل",
+        "CONTENT": "محتوى القسم"
+      },
+      "FORM": {
+        "SLUG": "الرمز",
+        "TITLE_EN": "العنوان (إنجليزي)",
+        "TITLE_AR": "العنوان (عربي)",
+        "CONTENT_EN": "المحتوى (إنجليزي)",
+        "CONTENT_AR": "المحتوى (عربي)",
+        "CATEGORY": "الفئة",
+        "ICON": "الأيقونة",
+        "SORT_ORDER": "ترتيب العرض",
+        "DESCRIPTION_EN": "الوصف (إنجليزي)",
+        "DESCRIPTION_AR": "الوصف (عربي)",
+        "SEO_TITLE": "عنوان تحسين محركات البحث",
+        "SEO_DESCRIPTION": "وصف تحسين محركات البحث",
+        "SEO_KEYWORDS": "الكلمات المفتاحية",
+        "SHOW_IN_FOOTER": "إظهار في التذييل",
+        "SHOW_IN_NAVIGATION": "إظهار في قائمة التنقل",
+        "REQUIRE_ACCEPTANCE": "يتطلب موافقة المستخدم",
+        "VERSION_NOTES": "ملاحظات الإصدار",
+        "OPTIONAL_FALLBACK": "(اختياري — يُستخدم الإنجليزي افتراضياً)"
+      },
+      "ACTIONS": {
+        "SAVE_DRAFT": "حفظ المسودة",
+        "PUBLISH": "نشر",
+        "PREVIEW": "معاينة",
+        "DUPLICATE": "نسخ",
+        "ARCHIVE": "أرشفة",
+        "UNARCHIVE": "إلغاء الأرشفة",
+        "DELETE": "حذف",
+        "RESTORE": "استعادة هذا الإصدار",
+        "CANCEL": "إلغاء",
+        "CREATE": "إنشاء"
+      },
+      "HISTORY": {
+        "TITLE": "سجل الإصدارات",
+        "EMPTY": "لا توجد تغييرات بعد.",
+        "ACTION": "الإجراء",
+        "ACTOR": "المستخدم",
+        "DATE": "التاريخ"
+      },
+      "ACCEPTANCE_TRACKING": {
+        "TITLE": "تتبع الموافقات",
+        "SUBTITLE": "الأقسام التي تتطلب من المستخدمين الموافقة على الإصدار المنشور الحالي.",
+        "COLUMNS": {
+          "SECTION": "القسم",
+          "VERSION": "الإصدار المنشور",
+          "PUBLISHED_ON": "تاريخ النشر"
+        },
+        "EMPTY": "لا توجد أقسام تتطلب موافقة حالياً."
+      },
+      "MESSAGES": {
+        "SAVED": "تم حفظ المسودة.",
+        "SAVE_FAILED": "فشل حفظ المسودة.",
+        "PUBLISHED": "تم النشر بنجاح.",
+        "PUBLISH_FAILED": "فشل النشر.",
+        "CREATED": "تم إنشاء القسم.",
+        "CREATE_FAILED": "فشل إنشاء القسم.",
+        "DUPLICATED": "تم نسخ القسم.",
+        "DUPLICATE_FAILED": "فشل نسخ القسم.",
+        "ARCHIVED": "تمت أرشفة القسم.",
+        "UNARCHIVED": "تم إلغاء أرشفة القسم.",
+        "ARCHIVE_FAILED": "فشل تحديث القسم.",
+        "DELETED": "تم حذف القسم.",
+        "DELETE_FAILED": "فشل حذف القسم.",
+        "RESTORED": "تمت استعادة الإصدار ونشره.",
+        "CONFIRM_DELETE": "حذف \"{{slug}}\"؟ لا يمكن التراجع عن هذا من الواجهة.",
+        "CONFIRM_DELETE_TITLE": "حذف القسم القانوني"
+      }
+    },
+    "SUPPLIERS": {
+      "LIST": {
+        "TITLE": "الموردون",
+        "SUBTITLE": "إدارة تكاملات الموردين الخارجيين وبيانات الاعتماد والأولوية.",
+        "NEW": "مورد جديد",
+        "SEARCH_PLACEHOLDER": "البحث بالاسم أو الرمز...",
+        "FILTER_STATUS": "الحالة",
+        "EMPTY": "لا يوجد موردون بعد.",
+        "EMPTY_SEARCH": "لا يوجد موردون مطابقون لبحثك.",
+        "COLUMNS": {
+          "NAME": "الاسم",
+          "CODE": "الرمز",
+          "PROVIDER": "المزود",
+          "PRIORITY": "الأولوية",
+          "STATUS": "الحالة",
+          "CREATED": "تاريخ الإنشاء"
+        }
+      },
+      "DETAIL": {
+        "NEW": "مورد جديد",
+        "SUBTITLE": "قم بتكوين تكامل المزود وبيانات الاعتماد والإمكانيات.",
+        "GENERAL": "عام",
+        "NAME": "الاسم",
+        "CODE": "الرمز",
+        "CODE_HINT": "مثال: BAMBOO-EU",
+        "PROVIDER_TYPE": "نوع المزود",
+        "PROVIDER_TYPE_HINT": "اختر أو اكتب مفتاح المزود",
+        "AUTH_TYPE": "نوع المصادقة",
+        "BASE_URL": "عنوان URL الأساسي",
+        "PRIORITY": "الأولوية",
+        "CAPABILITIES": "الإمكانيات",
+        "SUPPORTS_INVENTORY_SYNC": "مزامنة المخزون",
+        "SUPPORTS_PRICE_SYNC": "مزامنة الأسعار",
+        "SUPPORTS_RESERVATIONS": "الحجوزات",
+        "SUPPORTS_ORDER_STATUS": "حالة الطلب",
+        "SUPPORTS_WEBHOOKS": "الويب هوك",
+        "SETTINGS_JSON": "إعدادات المزود (JSON)",
+        "INVALID_JSON": "يجب أن يكون هذا JSON صالحًا.",
+        "CREDENTIALS": "بيانات الاعتماد",
+        "CREDENTIALS_HINT": "اترك الحقل فارغًا للاحتفاظ بالقيمة المخزنة الحالية.",
+        "API_KEY": "مفتاح API",
+        "API_SECRET": "سر API",
+        "USERNAME": "اسم المستخدم",
+        "PASSWORD": "كلمة المرور",
+        "BEARER_TOKEN": "رمز الحامل",
+        "STORED": "مخزّن"
+      },
+      "MAPPINGS": {
+        "TITLE": "ربط المنتجات",
+        "SUBTITLE": "قم بربط منتجات HAMBOX بمنتجات هذا المورد الخارجية.",
+        "NEW": "ربط جديد",
+        "EDIT_TITLE": "تعديل الربط",
+        "EMPTY": "لا توجد روابط منتجات بعد.",
+        "INTERNAL_PRODUCT_ID": "معرف المنتج الداخلي",
+        "EXTERNAL_PRODUCT_ID": "معرف المنتج الخارجي",
+        "SKU": "SKU",
+        "NAME": "الاسم الخارجي",
+        "BUYING_PRICE": "سعر الشراء",
+        "CURRENCY": "العملة",
+        "PRIORITY": "الأولوية",
+        "STATUS": "الحالة",
+        "COLUMNS": {
+          "INTERNAL_PRODUCT": "المنتج الداخلي",
+          "EXTERNAL_PRODUCT": "المنتج الخارجي",
+          "SKU": "SKU",
+          "BUYING_PRICE": "سعر الشراء",
+          "PRIORITY": "الأولوية",
+          "STATUS": "الحالة"
+        }
+      },
+      "DISABLED": "معطّل",
+      "ACTIONS": {
+        "EDIT": "تعديل",
+        "SAVE": "حفظ",
+        "CREATE": "إنشاء مورد",
+        "SAVE_CREDENTIALS": "حفظ بيانات الاعتماد",
+        "TEST_CONNECTION": "اختبار الاتصال",
+        "MAPPINGS": "الروابط",
+        "ENABLE": "تفعيل",
+        "DISABLE": "تعطيل",
+        "DELETE": "حذف"
+      },
+      "MESSAGES": {
+        "CREATED": "تم إنشاء المورد.",
+        "SAVED": "تم حفظ المورد.",
+        "SAVE_FAILED": "فشل حفظ المورد.",
+        "CREDENTIALS_SAVED": "تم تحديث بيانات الاعتماد.",
+        "DELETED": "تم حذف المورد.",
+        "ENABLED": "تم تفعيل المورد.",
+        "DISABLED": "تم تعطيل المورد.",
+        "MAPPING_SAVED": "تم حفظ الربط.",
+        "MAPPING_DELETED": "تم حذف الربط.",
+        "ACTION_FAILED": "فشل الإجراء."
+      }
+    },
+    "SECURITY": {
+      "TITLE": "مركز الأمان",
+      "SUBTITLE": "إدارة المستخدمين المحظورين والبريد الإلكتروني والدول وعناوين IP، ومراجعة أحداث الأمان.",
+      "TABS": {
+        "DASHBOARD": "لوحة التحكم",
+        "USERS": "المستخدمون",
+        "EMAILS": "البريد الإلكتروني",
+        "IPS": "عناوين IP",
+        "COUNTRIES": "الدول",
+        "EVENTS": "الأحداث"
+      },
+      "STATS": {
+        "BLOCKED_USERS": "المستخدمون المحظورون",
+        "SUSPENDED_USERS": "المستخدمون المعلّقون",
+        "BLOCKED_EMAILS": "البريد الإلكتروني المحظور",
+        "BLOCKED_DOMAINS": "النطاقات المحظورة",
+        "BLOCKED_COUNTRIES": "الدول المحظورة",
+        "BLOCKED_IPS": "عناوين IP المحظورة",
+        "EVENTS_TODAY": "أحداث اليوم",
+        "FAILED_LOGINS_TODAY": "محاولات الدخول الفاشلة اليوم",
+        "RECENT_EVENTS": "الأحداث الأخيرة"
+      },
+      "FORM": {
+        "REASON": "السبب",
+        "NOTES": "ملاحظات",
+        "EXPIRES_ON": "تاريخ الانتهاء"
+      },
+      "USERS": {
+        "SEARCH_PLACEHOLDER": "البحث بالاسم أو البريد الإلكتروني...",
+        "FILTER_ALL": "كل الحالات",
+        "EMPTY": "لا يوجد مستخدمون مقيّدون.",
+        "RESTORE_CONFIRM": "هل تريد استعادة حساب هذا المستخدم إلى نشط؟",
+        "COLUMNS": {
+          "NAME": "الاسم",
+          "EMAIL": "البريد الإلكتروني",
+          "STATUS": "الحالة",
+          "REASON": "السبب",
+          "EXPIRES": "تاريخ الانتهاء"
+        },
+        "ACTIONS": {
+          "BLOCK": "حظر",
+          "SUSPEND": "تعليق",
+          "BAN": "حظر دائم",
+          "RESTORE": "استعادة الوصول"
+        }
+      },
+      "EMAILS": {
+        "ADD": "حظر بريد إلكتروني",
+        "REMOVE": "إزالة",
+        "REMOVE_CONFIRM": "إزالة إدخال البريد الإلكتروني المحظور هذا؟",
+        "SEARCH_PLACEHOLDER": "البحث في البريد الإلكتروني المحظور...",
+        "EMPTY": "لا يوجد بريد إلكتروني أو نطاقات محظورة.",
+        "COLUMNS": {
+          "PATTERN": "البريد الإلكتروني / النطاق",
+          "REASON": "السبب",
+          "EXPIRES": "تاريخ الانتهاء"
+        },
+        "FORM": {
+          "PATTERN": "بريد إلكتروني أو *@domain.com"
+        }
+      },
+      "IPS": {
+        "ADD": "حظر عنوان IP",
+        "REMOVE": "إزالة",
+        "REMOVE_CONFIRM": "إزالة إدخال عنوان IP المحظور هذا؟",
+        "SEARCH_PLACEHOLDER": "البحث في عناوين IP المحظورة...",
+        "EMPTY": "لا توجد عناوين IP محظورة.",
+        "COLUMNS": {
+          "ADDRESS": "عنوان IP / نطاق CIDR",
+          "REASON": "السبب",
+          "EXPIRES": "تاريخ الانتهاء"
+        },
+        "FORM": {
+          "ADDRESS": "عنوان IP أو نطاق CIDR"
+        }
+      },
+      "COUNTRIES": {
+        "SEARCH_PLACEHOLDER": "البحث عن الدول...",
+        "OVERRIDDEN_ONLY": "عرض المقيّدة فقط",
+        "EMPTY": "لا توجد دول مطابقة لبحثك.",
+        "EDIT": "تعيين قيد",
+        "CLEAR": "السماح",
+        "COLUMNS": {
+          "COUNTRY": "الدولة",
+          "STATUS": "الحالة",
+          "REASON": "السبب"
+        }
+      },
+      "EVENTS": {
+        "SEARCH_PLACEHOLDER": "البحث في أحداث الأمان...",
+        "EMPTY": "لا توجد أحداث أمان مسجلة.",
+        "COLUMNS": {
+          "SEVERITY": "الخطورة",
+          "TYPE": "النوع",
+          "DESCRIPTION": "الوصف",
+          "IP": "عنوان IP",
+          "OCCURRED": "وقت الحدوث"
+        }
+      },
+      "MESSAGES": {
+        "ACTION_SUCCEEDED": "تم تنفيذ الإجراء بنجاح.",
+        "ACTION_FAILED": "فشل الإجراء.",
+        "EMAIL_BLOCKED": "تم حظر البريد الإلكتروني.",
+        "IP_BLOCKED": "تم حظر عنوان IP."
       }
     }
   }

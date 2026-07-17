@@ -1,0 +1,172 @@
+<p-toast position="top-right" />
+
+<section class="admin-page supplier-mappings-page">
+  <app-admin-page-header
+    [title]="'ADMIN.SUPPLIERS.MAPPINGS.TITLE' | translate"
+    [subtitle]="'ADMIN.SUPPLIERS.MAPPINGS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    <button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      icon="pi pi-plus"
+      [label]="'ADMIN.SUPPLIERS.MAPPINGS.NEW' | translate"
+      (click)="openCreateDialog()"
+    ></button>
+  </app-admin-page-header>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table class="admin-data-table" [value]="[...mappings()]" [loading]="loading()" dataKey="id">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.INTERNAL_PRODUCT' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.EXTERNAL_PRODUCT' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SKU' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.BUYING_PRICE' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.PRIORITY' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.STATUS' | translate }}</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-mapping>
+        <tr>
+          <td class="supplier-mappings-page__mono">{{ mapping.internalProductId }}</td>
+          <td>
+            {{ mapping.externalProductId }}
+            @if (mapping.externalName) {
+              <span class="admin-cell-secondary">{{ mapping.externalName }}</span>
+            }
+          </td>
+          <td>{{ mapping.externalSku ?? '—' }}</td>
+          <td>{{ mapping.buyingPrice }} {{ mapping.currency }}</td>
+          <td>{{ mapping.priority }}</td>
+          <td>{{ mapping.status }}</td>
+          <td>
+            <div class="admin-actions-row">
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+                icon="pi pi-pencil"
+                [label]="'ADMIN.SUPPLIERS.ACTIONS.EDIT' | translate"
+                (pressed)="openEditDialog(mapping)"
+              />
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+                icon="pi pi-trash"
+                [label]="'ADMIN.SUPPLIERS.ACTIONS.DELETE' | translate"
+                (pressed)="requestDelete(mapping)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <app-admin-empty-state
+              icon="pi pi-sitemap"
+              [title]="'ADMIN.SUPPLIERS.MAPPINGS.EMPTY' | translate"
+              [primaryLabel]="'ADMIN.SUPPLIERS.MAPPINGS.NEW' | translate"
+              primaryIcon="pi pi-plus"
+              (primaryAction)="openCreateDialog()"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<p-dialog
+  [header]="(editingMappingId() ? 'ADMIN.SUPPLIERS.MAPPINGS.EDIT_TITLE' : 'ADMIN.SUPPLIERS.MAPPINGS.NEW') | translate"
+  [visible]="dialogOpen()"
+  (visibleChange)="dialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(32rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeDialog()"
+>
+  <form class="admin-form-grid admin-form-grid--single" [formGroup]="form">
+    @if (!editingMappingId()) {
+      <label class="supplier-mappings-page__field">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.INTERNAL_PRODUCT_ID' | translate }}</span>
+        <input pInputText formControlName="internalProductId" placeholder="00000000-0000-0000-0000-000000000000" />
+      </label>
+    }
+
+    <label class="supplier-mappings-page__field">
+      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.EXTERNAL_PRODUCT_ID' | translate }}</span>
+      <input pInputText formControlName="externalProductId" />
+    </label>
+
+    <label class="supplier-mappings-page__field">
+      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.SKU' | translate }}</span>
+      <input pInputText formControlName="externalSku" />
+    </label>
+
+    <label class="supplier-mappings-page__field">
+      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.NAME' | translate }}</span>
+      <input pInputText formControlName="externalName" />
+    </label>
+
+    <label class="supplier-mappings-page__field">
+      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.BUYING_PRICE' | translate }}</span>
+      <p-inputnumber formControlName="buyingPrice" mode="decimal" [minFractionDigits]="2" [min]="0" />
+    </label>
+
+    <label class="supplier-mappings-page__field">
+      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.CURRENCY' | translate }}</span>
+      <input pInputText formControlName="currency" maxlength="3" />
+    </label>
+
+    <label class="supplier-mappings-page__field">
+      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.PRIORITY' | translate }}</span>
+      <p-inputnumber formControlName="priority" [min]="0" [showButtons]="true" />
+    </label>
+
+    @if (editingMappingId()) {
+      <label class="supplier-mappings-page__field">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.STATUS' | translate }}</span>
+        <p-select formControlName="status" [options]="statusOptions" optionLabel="label" optionValue="value" />
+      </label>
+    }
+  </form>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CONFIRM.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (click)="closeDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.SUPPLIERS.ACTIONS.SAVE' | translate"
+      [disabled]="form.invalid"
+      (click)="saveMapping()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  [title]="'ADMIN.CONFIRM.DELETE_MAPPING_TITLE' | translate"
+  [message]="'ADMIN.CONFIRM.DELETE_MAPPING' | translate"
+  [confirmLabel]="'ADMIN.SUPPLIERS.ACTIONS.DELETE'"
+  [destructive]="true"
+  (confirmed)="confirmDelete()"
+/>

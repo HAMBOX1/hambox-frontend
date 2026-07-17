@@ -7,6 +7,7 @@ import { LoadingSkeletonComponent } from '../../../../shared/components/loading-
 import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
 import { Products } from '../../../products/services/products';
 import { mapProductToStoreProduct } from '../../../products/utils/storefront-product.mapper';
+import { TranslationService } from '../../../../core/i18n/translation.service';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { mapProductsToRecommendations } from '../../utils/checkout.mapper';
 import { OrderSuccessDetails, OrderRecommendation } from '../../models/order-success';
@@ -39,6 +40,7 @@ export class OrderSuccessPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly checkoutFacade = inject(CheckoutFacade);
   private readonly products = inject(Products);
+  private readonly translation = inject(TranslationService);
 
   protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
   protected readonly orderDetails = signal<OrderSuccessDetails | null>(null);
@@ -76,7 +78,7 @@ export class OrderSuccessPageComponent implements OnInit {
         this.recommendations.set(
           mapProductsToRecommendations(
             (productPage.items ?? []).slice(0, 8).map((product) => {
-              const mapped = mapProductToStoreProduct(product);
+              const mapped = mapProductToStoreProduct(product, this.translation.language());
               return {
                 id: mapped.id,
                 title: mapped.title,

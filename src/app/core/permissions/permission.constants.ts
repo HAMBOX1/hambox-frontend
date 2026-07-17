@@ -27,6 +27,7 @@ export const PERMISSIONS = {
       ViewCosts: 'Catalog.Inventory.ViewCosts',
       ManageBatches: 'Catalog.Inventory.ManageBatches',
       ManageSuppliers: 'Catalog.Inventory.ManageSuppliers',
+      RevealCodes: 'Catalog.Inventory.RevealCodes',
     },
   },
   Orders: {
@@ -91,6 +92,28 @@ export const PERMISSIONS = {
     Import: 'Themes.Import',
     Rollback: 'Themes.Rollback',
   },
+  Legal: {
+    View: 'Legal.View',
+    Create: 'Legal.Create',
+    Edit: 'Legal.Edit',
+    Publish: 'Legal.Publish',
+    Delete: 'Legal.Delete',
+  },
+  Suppliers: {
+    View: 'Suppliers.View',
+    Create: 'Suppliers.Create',
+    Edit: 'Suppliers.Edit',
+    Delete: 'Suppliers.Delete',
+    ManageMappings: 'Suppliers.ManageMappings',
+  },
+  Security: {
+    View: 'Security.View',
+    ManageUsers: 'Security.ManageUsers',
+    ManageEmails: 'Security.ManageEmails',
+    ManageCountries: 'Security.ManageCountries',
+    ManageIPs: 'Security.ManageIPs',
+    ViewEvents: 'Security.ViewEvents',
+  },
   Reviews: {
     View: 'Reviews.View',
     Moderate: 'Reviews.Moderate',
@@ -140,6 +163,13 @@ export const PERMISSIONS = {
     Compare: 'Analytics.Compare',
     Manage: 'Analytics.Manage',
   },
+  Communication: {
+    View: 'Communication.View',
+    Manage: 'Communication.Manage',
+    Send: 'Communication.Send',
+    ManageTemplates: 'Communication.ManageTemplates',
+    ManageProviders: 'Communication.ManageProviders',
+  },
 } as const;
 
 export const ALL_PERMISSIONS: readonly string[] = [
@@ -162,6 +192,7 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Catalog.Inventory.ViewCosts,
   PERMISSIONS.Catalog.Inventory.ManageBatches,
   PERMISSIONS.Catalog.Inventory.ManageSuppliers,
+  PERMISSIONS.Catalog.Inventory.RevealCodes,
   PERMISSIONS.Orders.View,
   PERMISSIONS.Orders.Edit,
   PERMISSIONS.Orders.Refund,
@@ -206,6 +237,22 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Themes.Export,
   PERMISSIONS.Themes.Import,
   PERMISSIONS.Themes.Rollback,
+  PERMISSIONS.Legal.View,
+  PERMISSIONS.Legal.Create,
+  PERMISSIONS.Legal.Edit,
+  PERMISSIONS.Legal.Publish,
+  PERMISSIONS.Legal.Delete,
+  PERMISSIONS.Suppliers.View,
+  PERMISSIONS.Suppliers.Create,
+  PERMISSIONS.Suppliers.Edit,
+  PERMISSIONS.Suppliers.Delete,
+  PERMISSIONS.Suppliers.ManageMappings,
+  PERMISSIONS.Security.View,
+  PERMISSIONS.Security.ManageUsers,
+  PERMISSIONS.Security.ManageEmails,
+  PERMISSIONS.Security.ManageCountries,
+  PERMISSIONS.Security.ManageIPs,
+  PERMISSIONS.Security.ViewEvents,
   PERMISSIONS.Reviews.View,
   PERMISSIONS.Reviews.Moderate,
   PERMISSIONS.Notifications.View,
@@ -233,6 +280,11 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Analytics.Export,
   PERMISSIONS.Analytics.Compare,
   PERMISSIONS.Analytics.Manage,
+  PERMISSIONS.Communication.View,
+  PERMISSIONS.Communication.Manage,
+  PERMISSIONS.Communication.Send,
+  PERMISSIONS.Communication.ManageTemplates,
+  PERMISSIONS.Communication.ManageProviders,
 ] as const;
 
 export const OWNER_ROLE_NAMES = ['Owner', 'SuperAdmin', 'Admin', 'Administrator'] as const;
@@ -249,6 +301,9 @@ export const ADMIN_AREA_PREFIXES = [
   'Promotions.',
   'Coupons.',
   'Themes.',
+  'Legal.',
+  'Suppliers.',
+  'Security.',
   'Reviews.',
   'Notifications.',
   'Referral.',
@@ -260,6 +315,7 @@ export const ADMIN_AREA_PREFIXES = [
   'AuditLogs.',
   'Operations.',
   'Analytics.',
+  'Communication.',
 ] as const;
 
 export function isAdminAccessPermission(permission: string): boolean {

@@ -1,0 +1,41 @@
+<div class="legal-landing">
+  <app-storefront-nav [links]="navLinks" />
+
+  <main class="legal-landing__main">
+    <header class="legal-landing__hero">
+      <span class="legal-landing__eyebrow">
+        <i class="pi pi-shield" aria-hidden="true"></i>
+        {{ 'LEGAL.LANDING.EYEBROW' | translate }}
+      </span>
+      <h1 class="legal-landing__title">{{ 'LEGAL.LANDING.TITLE' | translate }}</h1>
+      <p class="legal-landing__subtitle">{{ 'LEGAL.LANDING.SUBTITLE' | translate }}</p>
+    </header>
+
+    @if (loading()) {
+      <app-loading-skeleton type="card" [count]="6" />
+    } @else {
+      @for (group of groups(); track group.category) {
+        <h2 class="legal-landing__category">{{ group.category | translate }}</h2>
+        <div class="legal-landing__grid">
+          @for (item of group.items; track item.slug) {
+            <a class="legal-landing__card" [routerLink]="['/legal', item.slug]">
+              <span class="legal-landing__card-icon">
+                <i [class]="item.icon" aria-hidden="true"></i>
+              </span>
+              <span class="legal-landing__card-body">
+                <span class="legal-landing__card-title">{{ itemTitle(item) }}</span>
+                <span class="legal-landing__card-meta">
+                  {{ 'LEGAL.LAST_UPDATED' | translate }}
+                  {{ item.publishedOnUtc | hamboxDate: 'mediumDate' }}
+                </span>
+              </span>
+              <i class="pi pi-arrow-right legal-landing__card-arrow" aria-hidden="true"></i>
+            </a>
+          }
+        </div>
+      }
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

@@ -1331,6 +1331,19 @@ export class ProductEditorFacade {
 
 
 
+  /** Calls the dedicated reveal endpoint. Never caches the plaintext result. */
+  async revealCode(codeId: string): Promise<string | null> {
+    try {
+      const result = await firstValueFrom(this.inventoryApi.revealCode(codeId));
+      return result.digitalCode;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to reveal code.'));
+      return null;
+    }
+  }
+
+
+
   async bulkDisableCodes(codeIds: readonly string[]): Promise<boolean> {
 
     const variant = this.selectedVariant();
@@ -1559,7 +1572,7 @@ export class ProductEditorFacade {
 
 
 
-  private async loadCategories(): Promise<void> {
+  async loadCategories(): Promise<void> {
 
     this.categoriesLoadingState.set(true);
 

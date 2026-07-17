@@ -195,7 +195,42 @@
                   (ngModelChange)="toggleCodeSelection(code.id, $event)"
                 />
               </td>
-              <td><code class="variant-inventory-panel__code">{{ code.digitalCode }}</code></td>
+              <td>
+                @if (revealedCodeId() === code.id) {
+                  <code class="variant-inventory-panel__code variant-inventory-panel__code--revealed">{{ revealedValue() }}</code>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-copy"
+                    size="small"
+                    [text]="true"
+                    aria-label="Copy code"
+                    (click)="copyRevealed()"
+                  ></button>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-eye-slash"
+                    size="small"
+                    [text]="true"
+                    aria-label="Hide code"
+                    (click)="hideRevealed()"
+                  ></button>
+                } @else {
+                  <code class="variant-inventory-panel__code">{{ code.digitalCode }}</code>
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-eye"
+                    label="Reveal"
+                    size="small"
+                    severity="secondary"
+                    [text]="true"
+                    *hamboxHasPermission="permissions.Catalog.Inventory.RevealCodes"
+                    (click)="requestReveal(code)"
+                  ></button>
+                }
+              </td>
               <td>{{ batchName(code.batchId) }}</td>
               <td><app-admin-status-badge [label]="code.status" /></td>
               <td>{{ code.reservedOnUtc ? (code.reservedOnUtc | date: 'short') : '—' }}</td>
@@ -268,3 +303,15 @@
   (visibleChange)="bulkDeleteDialogOpen.set($event)"
   (confirmed)="confirmBulkDelete()"
 />
+
+<app-admin-confirm-dialog
+  [visible]="revealDialogOpen()"
+  title="Reveal inventory code"
+  message="This action will reveal a sensitive inventory code. This action is audited."
+  confirmLabel="ADMIN.CONFIRM.REVEAL"
+  [loading]="revealing()"
+  (visibleChange)="revealDialogOpen.set($event); revealTargetCode.set(null)"
+  (confirmed)="confirmReveal()"
+/>
+
+<p-toast />

@@ -81,6 +81,17 @@ export class ProductCatalogFacade {
     void this.fetchProducts();
   }
 
+  clearFilters(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    this.searchTermState.set('');
+    this.statusFilterState.set('');
+    this.pageNumberState.set(1);
+    void this.fetchProducts();
+  }
+
   setPage(pageNumber: number, pageSize: number): void {
     if (this.pageNumberState() === pageNumber && this.pageSizeState() === pageSize && this.hasLoaded) {
       return;
@@ -245,16 +256,9 @@ export class ProductCatalogFacade {
   private syncSelection(items: readonly Product[]): void {
     const selectedId = this.selectedProductIdState();
 
-    if (!items.length) {
+    if (selectedId && !items.some((product) => product.id === selectedId)) {
       this.selectedProductIdState.set(null);
-      return;
     }
-
-    if (selectedId && items.some((product) => product.id === selectedId)) {
-      return;
-    }
-
-    this.selectedProductIdState.set(items[0]?.id ?? null);
   }
 
   private toErrorMessage(error: unknown, fallback: string): string {

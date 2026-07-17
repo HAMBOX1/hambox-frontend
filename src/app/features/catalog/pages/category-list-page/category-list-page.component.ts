@@ -7,9 +7,11 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
+import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { TableLazyLoadEvent } from 'primeng/table';
 
@@ -21,7 +23,6 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
   AdminConfirmDialogComponent,
-  AdminDataTableShellComponent,
   AdminErrorAlertComponent,
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
@@ -31,12 +32,20 @@ import {
 } from '../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
 
+const STATUS_OPTIONS: { label: string; value: string }[] = [
+  { label: 'All statuses', value: '' },
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
+];
+
 @Component({
   selector: 'app-category-list-page',
   standalone: true,
   imports: [
     ButtonModule,
     DialogModule,
+    FormsModule,
+    SelectModule,
     ToastModule,
     CategoryTableComponent,
     CategoryCreateFormComponent,
@@ -47,7 +56,6 @@ import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-brea
     AdminToolbarComponent,
     AdminSearchBarComponent,
     AdminErrorAlertComponent,
-    AdminDataTableShellComponent,
     AdminConfirmDialogComponent,
   ],
   providers: [CategoryListFacade, MessageService],
@@ -61,13 +69,16 @@ export class CategoryListPageComponent implements OnInit {
 
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Categories' });
+  protected readonly statusOptions = STATUS_OPTIONS;
 
   protected readonly items = this.facade.items;
   protected readonly parentOptions = this.facade.parentOptions;
   protected readonly loading = this.facade.loading;
   protected readonly creating = this.facade.creating;
   protected readonly updating = this.facade.updating;
+  protected readonly deleting = this.facade.deleting;
   protected readonly searchTerm = this.facade.searchTerm;
+  protected readonly statusFilter = this.facade.statusFilter;
   protected readonly error = this.facade.error;
   protected readonly createError = this.facade.createError;
   protected readonly updateError = this.facade.updateError;
@@ -77,6 +88,7 @@ export class CategoryListPageComponent implements OnInit {
   protected readonly editDialogOpen = this.facade.editDialogOpen;
   protected readonly editingCategory = this.facade.editingCategory;
   protected readonly hasActiveSearch = this.facade.hasActiveSearch;
+  protected readonly hasActiveFilters = this.facade.hasActiveFilters;
   protected readonly subtitle = this.facade.subtitle;
 
   protected readonly formResetToken = signal(0);
@@ -111,6 +123,14 @@ export class CategoryListPageComponent implements OnInit {
 
   protected onSearchChange(term: string): void {
     this.facade.setSearchTerm(term);
+  }
+
+  protected onStatusFilterChange(status: string): void {
+    this.facade.setStatusFilter(status);
+  }
+
+  protected onClearFilters(): void {
+    this.facade.clearFilters();
   }
 
   protected onPageChange(event: TableLazyLoadEvent): void {

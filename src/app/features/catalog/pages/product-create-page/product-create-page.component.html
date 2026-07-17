@@ -51,6 +51,7 @@
           [categoriesLoading]="categoriesLoading()"
           [categoriesError]="categoriesError()"
           [disabled]="submitting()"
+          (categoryCreated)="onCategoryCreated()"
         />
       </app-admin-section-card>
 

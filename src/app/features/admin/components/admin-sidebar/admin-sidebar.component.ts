@@ -23,6 +23,7 @@ export class AdminSidebarComponent {
   readonly closeMobile = output<void>();
 
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
+  protected readonly logoMarkSrc = 'assets/images/top-nav/hambox-mark.png';
   protected readonly navItems = computed(() =>
     ADMIN_NAV_ITEMS.filter((item) => this.permissionService.canViewNavItem(item.permission)),
   );

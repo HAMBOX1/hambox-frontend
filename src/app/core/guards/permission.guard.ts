@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
 import { AuthSessionService } from '../auth/auth-session.service';
+import { AUTH_CONTEXT } from '../auth/auth-context';
 import { PermissionService } from '../permissions/permission.service';
 import { AdminAuth } from '../../features/auth/services/admin-auth';
 
@@ -16,9 +17,9 @@ export function permissionGuard(
     const permissionService = inject(PermissionService);
     const router = inject(Router);
 
-    if (!session.initialized()) {
+    if (!session.initialized(AUTH_CONTEXT.Admin)) {
       await adminAuth.restoreSession();
-      session.markInitialized();
+      session.markInitialized(AUTH_CONTEXT.Admin);
     }
 
     if (!session.isAdminAuthenticated()) {

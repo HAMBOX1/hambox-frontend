@@ -4,8 +4,90 @@
       <h1>{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</h1>
       <p>{{ 'ACCOUNT.NOTIFICATIONS_UI.SUBTITLE' | translate }}</p>
     </div>
-    <button type="button" (click)="markAllRead()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}</button>
+    <div class="notifications-page__header-actions">
+      <button type="button" (click)="togglePreferences()">{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFERENCES' | translate }}</button>
+      <button type="button" (click)="markAllRead()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}</button>
+    </div>
   </header>
+
+  @if (preferencesOpen()) {
+    <div class="notifications-page__preferences">
+      @if (preferencesLoading()) {
+        <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
+      } @else if (preferencesError()) {
+        <p class="notifications-page__state">{{ preferencesError() }}</p>
+      } @else if (preferences(); as prefs) {
+        <label>
+          <input
+            type="checkbox"
+            [checked]="prefs.emailEnabled"
+            [disabled]="preferencesSaving()"
+            (change)="togglePreference('emailEnabled', !prefs.emailEnabled)"
+          />
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.EMAIL' | translate }}
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="prefs.inAppEnabled"
+            [disabled]="preferencesSaving()"
+            (change)="togglePreference('inAppEnabled', !prefs.inAppEnabled)"
+          />
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.IN_APP' | translate }}
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="prefs.orderEnabled"
+            [disabled]="preferencesSaving()"
+            (change)="togglePreference('orderEnabled', !prefs.orderEnabled)"
+          />
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.ORDER' | translate }}
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="prefs.membershipEnabled"
+            [disabled]="preferencesSaving()"
+            (change)="togglePreference('membershipEnabled', !prefs.membershipEnabled)"
+          />
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.MEMBERSHIP' | translate }}
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="prefs.marketingEnabled"
+            [disabled]="preferencesSaving()"
+            (change)="togglePreference('marketingEnabled', !prefs.marketingEnabled)"
+          />
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.MARKETING' | translate }}
+        </label>
+        <label class="notifications-page__preferences-disabled">
+          <input type="checkbox" [checked]="prefs.securityEnabled" disabled />
+          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.SECURITY' | translate }}
+        </label>
+      }
+    </div>
+  }
+
+  <div class="notifications-page__toolbar">
+    <input
+      type="search"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearchChange($event)"
+      [placeholder]="'ACCOUNT.NOTIFICATIONS_UI.SEARCH_PLACEHOLDER' | translate"
+    />
+    <select [ngModel]="categoryFilter()" (ngModelChange)="onCategoryChange($event)">
+      <option value="all">{{ 'ACCOUNT.NOTIFICATIONS_UI.ALL_CATEGORIES' | translate }}</option>
+      @for (category of categories(); track category) {
+        <option [value]="category">{{ category }}</option>
+      }
+    </select>
+    <label>
+      <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="onShowArchivedChange($event)" />
+      {{ 'ACCOUNT.NOTIFICATIONS_UI.SHOW_ARCHIVED' | translate }}
+    </label>
+  </div>
 
   @if (loading()) {
     <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
@@ -32,9 +114,13 @@
             <p>{{ item.body }}</p>
             <time>{{ item.createdOnUtc | hamboxDate:'medium' }}</time>
           </div>
-          @if (!item.isRead) {
-            <button type="button" (click)="markRead(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate }}</button>
-          }
+          <div class="notifications-page__item-actions">
+            @if (!item.isRead) {
+              <button type="button" (click)="markRead(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate }}</button>
+            }
+            <button type="button" (click)="archive(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.ARCHIVE' | translate }}</button>
+            <button type="button" (click)="deleteNotification(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.DELETE' | translate }}</button>
+          </div>
         </article>
       }
     </div>

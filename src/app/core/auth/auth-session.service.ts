@@ -22,11 +22,11 @@ export class AuthSessionService {
 
   private readonly customerSessionState = signal<UserSession | null>(null);
   private readonly adminSessionState = signal<UserSession | null>(null);
-  private readonly initializedState = signal(false);
+  private readonly customerInitializedState = signal(false);
+  private readonly adminInitializedState = signal(false);
 
   readonly customerSession = this.customerSessionState.asReadonly();
   readonly adminSession = this.adminSessionState.asReadonly();
-  readonly initialized = this.initializedState.asReadonly();
 
   readonly customerUser = computed(() => this.customerSessionState()?.user ?? null);
   readonly adminUser = computed(() => this.adminSessionState()?.user ?? null);
@@ -156,8 +156,18 @@ export class AuthSessionService {
     return !!this.tokenStorage.getRefreshToken(context);
   }
 
-  markInitialized(): void {
-    this.initializedState.set(true);
+  initialized(context: AuthContextType): boolean {
+    return context === AUTH_CONTEXT.Admin
+      ? this.adminInitializedState()
+      : this.customerInitializedState();
+  }
+
+  markInitialized(context: AuthContextType): void {
+    if (context === AUTH_CONTEXT.Admin) {
+      this.adminInitializedState.set(true);
+    } else {
+      this.customerInitializedState.set(true);
+    }
   }
 
   restoreSession(context: AuthContextType): UserSession | null {

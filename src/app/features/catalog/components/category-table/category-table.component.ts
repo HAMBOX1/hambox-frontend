@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
+  AdminDataTableShellComponent,
   AdminEmptyStateComponent,
+  AdminIconButtonComponent,
+  AdminLoadingSkeletonComponent,
   AdminStatusBadgeComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
@@ -15,10 +17,12 @@ import { Category } from '../../models/category.model';
   standalone: true,
   imports: [
     TableModule,
-    ButtonModule,
     HasPermissionDirective,
     AdminStatusBadgeComponent,
     AdminEmptyStateComponent,
+    AdminIconButtonComponent,
+    AdminLoadingSkeletonComponent,
+    AdminDataTableShellComponent,
   ],
   templateUrl: './category-table.component.html',
   styleUrl: './category-table.component.scss',

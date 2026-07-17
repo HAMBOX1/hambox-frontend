@@ -90,6 +90,11 @@ export const routes: Routes = [
       import('./roles/admin-roles.routes').then((m) => m.routes),
   },
   {
+    path: 'security',
+    loadChildren: () =>
+      import('./security/admin-security.routes').then((m) => m.routes),
+  },
+  {
     path: 'promotions',
     loadChildren: () =>
       import('./promotions/admin-promotions.routes').then((m) => m.routes),
@@ -103,6 +108,21 @@ export const routes: Routes = [
     path: 'themes',
     loadChildren: () =>
       import('./themes/admin-themes.routes').then((m) => m.routes),
+  },
+  {
+    path: 'legal',
+    loadChildren: () =>
+      import('./legal/admin-legal.routes').then((m) => m.routes),
+  },
+  {
+    path: 'suppliers',
+    loadChildren: () =>
+      import('./suppliers/admin-suppliers.routes').then((m) => m.routes),
+  },
+  {
+    path: 'communication',
+    loadChildren: () =>
+      import('./communication/admin-communication.routes').then((m) => m.routes),
   },
   {
     path: 'orders',

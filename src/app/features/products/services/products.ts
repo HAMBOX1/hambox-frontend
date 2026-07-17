@@ -7,6 +7,8 @@ import { Category } from '../../catalog/models/category.model';
 import { Product, ProductListQuery, ProductSortBy } from '../../catalog/models/product.model';
 import { PagedResult } from '../../catalog/models/category.model';
 import { StoreCategoryPill } from '../models/product';
+import { TranslationService } from '../../../core/i18n/translation.service';
+import { resolveLocalizedText } from '../../../core/i18n/localized-text.util';
 
 const CATEGORY_PAGE_SIZE = 100;
 
@@ -24,6 +26,7 @@ export interface StorefrontProductQuery {
 export class Products {
   private readonly productApi = inject(ProductApiService);
   private readonly categoryApi = inject(CategoryApiService);
+  private readonly translation = inject(TranslationService);
 
   getActiveProducts(query: StorefrontProductQuery): Promise<PagedResult<Product>> {
     const request: ProductListQuery = {
@@ -53,11 +56,12 @@ export class Products {
   }
 
   private mapCategoryPills(categories: readonly Category[]): readonly StoreCategoryPill[] {
+    const lang = this.translation.language();
     return [
       { id: 'all', label: 'All Items' },
       ...categories.map((category) => ({
         id: category.id,
-        label: category.nameEn,
+        label: resolveLocalizedText(category.nameEn, category.nameAr, lang),
       })),
     ];
   }

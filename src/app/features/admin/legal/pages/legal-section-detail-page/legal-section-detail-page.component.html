@@ -1,0 +1,350 @@
+<p-toast position="top-right" />
+
+<section class="admin-page legal-section-detail-page">
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton [rows]="6" />
+  } @else if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" (retry)="retryDetail()" />
+  } @else if (detail(); as document) {
+    <app-admin-page-header
+      [title]="document.publishedVersion?.titleEn ?? document.draftVersion?.titleEn ?? document.slug"
+      [subtitle]="'ADMIN.LEGAL.DETAIL.SUBTITLE' | translate"
+      [breadcrumbs]="breadcrumbs()"
+    >
+      <a
+        adminHeaderActions
+        pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [label]="'ADMIN.LEGAL.ACTIONS.PREVIEW' | translate"
+        icon="pi pi-eye"
+        [href]="previewUrl()"
+        target="_blank"
+      ></a>
+
+      <button
+        *hamboxHasPermission="permissions.Legal.Create"
+        adminHeaderActions
+        pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [label]="'ADMIN.LEGAL.ACTIONS.DUPLICATE' | translate"
+        icon="pi pi-copy"
+        [disabled]="actionLoading()"
+        (click)="openDuplicateDialog()"
+      ></button>
+
+      <button
+        *hamboxHasPermission="permissions.Legal.Edit"
+        adminHeaderActions
+        pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [label]="(document.isArchived ? 'ADMIN.LEGAL.ACTIONS.UNARCHIVE' : 'ADMIN.LEGAL.ACTIONS.ARCHIVE') | translate"
+        icon="pi pi-inbox"
+        [disabled]="actionLoading()"
+        (click)="toggleArchive()"
+      ></button>
+
+      <button
+        *hamboxHasPermission="permissions.Legal.Delete"
+        adminHeaderActions
+        pButton
+        type="button"
+        severity="danger"
+        [text]="true"
+        [label]="'ADMIN.LEGAL.ACTIONS.DELETE' | translate"
+        icon="pi pi-trash"
+        [disabled]="actionLoading()"
+        (click)="requestDelete()"
+      ></button>
+
+      @if (permissionServicePublic.hasPermission(permissions.Legal.Publish) && document.draftVersion) {
+        <button
+          adminHeaderActions
+          pButton
+          type="button"
+          class="admin-btn-primary"
+          [label]="'ADMIN.LEGAL.ACTIONS.PUBLISH' | translate"
+          icon="pi pi-send"
+          [disabled]="actionLoading() || saving()"
+          (click)="publish()"
+        ></button>
+      }
+    </app-admin-page-header>
+
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="0">{{ 'ADMIN.LEGAL.DETAIL.TAB_EDIT' | translate }}</p-tab>
+        <p-tab value="1">{{ 'ADMIN.LEGAL.DETAIL.TAB_SETTINGS' | translate }}</p-tab>
+        <p-tab value="2">{{ 'ADMIN.LEGAL.DETAIL.TAB_HISTORY' | translate }}</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="0">
+          <app-admin-section-card [title]="'ADMIN.LEGAL.DETAIL.CONTENT' | translate">
+            <form [formGroup]="form" class="legal-section-detail-page__form">
+              <div class="legal-section-detail-page__field">
+                <label for="legal-title-en">{{ 'ADMIN.LEGAL.FORM.TITLE_EN' | translate }}</label>
+                <input pInputText id="legal-title-en" type="text" formControlName="titleEn" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-title-ar"
+                  >{{ 'ADMIN.LEGAL.FORM.TITLE_AR' | translate }}
+                  <span class="legal-section-detail-page__optional">{{
+                    'ADMIN.LEGAL.FORM.OPTIONAL_FALLBACK' | translate
+                  }}</span></label
+                >
+                <input pInputText id="legal-title-ar" type="text" formControlName="titleAr" dir="rtl" />
+              </div>
+
+              <div class="legal-section-detail-page__field legal-section-detail-page__field--full">
+                <label>{{ 'ADMIN.LEGAL.FORM.CONTENT_EN' | translate }}</label>
+                <p-editor formControlName="contentEn" [style]="{ height: '320px' }" />
+              </div>
+
+              <div class="legal-section-detail-page__field legal-section-detail-page__field--full">
+                <label
+                  >{{ 'ADMIN.LEGAL.FORM.CONTENT_AR' | translate }}
+                  <span class="legal-section-detail-page__optional">{{
+                    'ADMIN.LEGAL.FORM.OPTIONAL_FALLBACK' | translate
+                  }}</span></label
+                >
+                <p-editor formControlName="contentAr" [style]="{ height: '320px', direction: 'rtl' }" />
+              </div>
+
+              <div class="legal-section-detail-page__field legal-section-detail-page__field--full">
+                <label for="legal-version-notes">{{ 'ADMIN.LEGAL.FORM.VERSION_NOTES' | translate }}</label>
+                <input pInputText id="legal-version-notes" type="text" formControlName="versionNotes" />
+              </div>
+            </form>
+
+            @if (permissionServicePublic.hasPermission(permissions.Legal.Edit)) {
+              <div class="legal-section-detail-page__actions">
+                <button
+                  pButton
+                  type="button"
+                  class="admin-btn-primary"
+                  [label]="'ADMIN.LEGAL.ACTIONS.SAVE_DRAFT' | translate"
+                  icon="pi pi-save"
+                  [disabled]="saving() || form.invalid || !form.dirty"
+                  (click)="save()"
+                ></button>
+              </div>
+            }
+          </app-admin-section-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="1">
+          <app-admin-section-card [title]="'ADMIN.LEGAL.DETAIL.TAB_SETTINGS' | translate">
+            <form [formGroup]="form" class="legal-section-detail-page__form">
+              <div class="legal-section-detail-page__field">
+                <label for="legal-slug">{{ 'ADMIN.LEGAL.FORM.SLUG' | translate }}</label>
+                <input pInputText id="legal-slug" type="text" formControlName="slug" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-category">{{ 'ADMIN.LEGAL.FORM.CATEGORY' | translate }}</label>
+                <p-select
+                  id="legal-category"
+                  [options]="categoryOptions"
+                  formControlName="category"
+                  [editable]="true"
+                  [showClear]="true"
+                />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-icon">{{ 'ADMIN.LEGAL.FORM.ICON' | translate }}</label>
+                <input pInputText id="legal-icon" type="text" formControlName="icon" placeholder="pi pi-file" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-sort-order">{{ 'ADMIN.LEGAL.FORM.SORT_ORDER' | translate }}</label>
+                <p-inputNumber id="legal-sort-order" formControlName="sortOrder" [showButtons]="true" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-description-en">{{ 'ADMIN.LEGAL.FORM.DESCRIPTION_EN' | translate }}</label>
+                <input pInputText id="legal-description-en" type="text" formControlName="descriptionEn" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-description-ar">{{ 'ADMIN.LEGAL.FORM.DESCRIPTION_AR' | translate }}</label>
+                <input pInputText id="legal-description-ar" type="text" formControlName="descriptionAr" dir="rtl" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-seo-title">{{ 'ADMIN.LEGAL.FORM.SEO_TITLE' | translate }}</label>
+                <input pInputText id="legal-seo-title" type="text" formControlName="seoTitle" />
+              </div>
+
+              <div class="legal-section-detail-page__field">
+                <label for="legal-seo-keywords">{{ 'ADMIN.LEGAL.FORM.SEO_KEYWORDS' | translate }}</label>
+                <input pInputText id="legal-seo-keywords" type="text" formControlName="seoKeywords" />
+              </div>
+
+              <div class="legal-section-detail-page__field legal-section-detail-page__field--full">
+                <label for="legal-seo-description">{{ 'ADMIN.LEGAL.FORM.SEO_DESCRIPTION' | translate }}</label>
+                <input pInputText id="legal-seo-description" type="text" formControlName="seoDescription" />
+              </div>
+
+              <div class="legal-section-detail-page__field legal-section-detail-page__field--full legal-section-detail-page__toggles">
+                <label class="legal-section-detail-page__toggle">
+                  <p-checkbox formControlName="showInFooter" [binary]="true" />
+                  {{ 'ADMIN.LEGAL.FORM.SHOW_IN_FOOTER' | translate }}
+                </label>
+                <label class="legal-section-detail-page__toggle">
+                  <p-checkbox formControlName="showInNavigation" [binary]="true" />
+                  {{ 'ADMIN.LEGAL.FORM.SHOW_IN_NAVIGATION' | translate }}
+                </label>
+                <label class="legal-section-detail-page__toggle">
+                  <p-checkbox formControlName="requireAcceptance" [binary]="true" />
+                  {{ 'ADMIN.LEGAL.FORM.REQUIRE_ACCEPTANCE' | translate }}
+                </label>
+              </div>
+            </form>
+
+            @if (permissionServicePublic.hasPermission(permissions.Legal.Edit)) {
+              <div class="legal-section-detail-page__actions">
+                <button
+                  pButton
+                  type="button"
+                  class="admin-btn-primary"
+                  [label]="'ADMIN.LEGAL.ACTIONS.SAVE_DRAFT' | translate"
+                  icon="pi pi-save"
+                  [disabled]="saving() || form.invalid || !form.dirty"
+                  (click)="save()"
+                ></button>
+              </div>
+            }
+          </app-admin-section-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="2">
+          <app-admin-section-card [title]="'ADMIN.LEGAL.HISTORY.TITLE' | translate">
+            @if (document.versions.length > 0) {
+              <app-admin-data-table-shell>
+                <p-table [value]="[...document.versions]">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'ADMIN.LEGAL.LIST.COLUMNS.VERSION' | translate }}</th>
+                      <th>{{ 'ADMIN.LEGAL.LIST.COLUMNS.STATUS' | translate }}</th>
+                      <th>{{ 'ADMIN.LEGAL.LIST.COLUMNS.PUBLISHED_ON' | translate }}</th>
+                      <th style="width: 8rem"></th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-version>
+                    <tr>
+                      <td>{{ version.versionNumber }}</td>
+                      <td>{{ version.isPublished ? ('ADMIN.LEGAL.LIST.STATUS_PUBLISHED' | translate) : ('ADMIN.LEGAL.LIST.STATUS_DRAFT' | translate) }}</td>
+                      <td>{{ version.publishedOnUtc ? (version.publishedOnUtc | date: 'medium') : '—' }}</td>
+                      <td>
+                        @if (!version.isPublished && permissionServicePublic.hasPermission(permissions.Legal.Publish)) {
+                          <button
+                            pButton
+                            type="button"
+                            severity="secondary"
+                            size="small"
+                            [text]="true"
+                            [label]="'ADMIN.LEGAL.ACTIONS.RESTORE' | translate"
+                            icon="pi pi-replay"
+                            [disabled]="actionLoading()"
+                            (click)="restoreVersion(version)"
+                          ></button>
+                        }
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </app-admin-data-table-shell>
+            }
+
+            @if (historyLoading()) {
+              <app-admin-loading-skeleton [rows]="4" />
+            } @else if (historyError()) {
+              <app-admin-error-alert [message]="historyError()!" (retry)="retryHistory()" />
+            } @else if (history().length === 0) {
+              <app-admin-empty-state [title]="'ADMIN.LEGAL.HISTORY.EMPTY' | translate" />
+            } @else {
+              <app-admin-data-table-shell>
+                <p-table [value]="[...history()]" [paginator]="history().length > 10" [rows]="10">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'ADMIN.LEGAL.HISTORY.ACTION' | translate }}</th>
+                      <th>{{ 'ADMIN.LEGAL.HISTORY.ACTOR' | translate }}</th>
+                      <th>{{ 'ADMIN.LEGAL.HISTORY.DATE' | translate }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-entry>
+                    <tr>
+                      <td>{{ entry.action }}</td>
+                      <td>{{ entry.actorUserId || '—' }}</td>
+                      <td>{{ entry.createdOnUtc | date: 'medium' }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </app-admin-data-table-shell>
+            }
+          </app-admin-section-card>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+</section>
+
+<p-dialog
+  [header]="'ADMIN.LEGAL.DUPLICATE.TITLE' | translate"
+  [visible]="duplicateDialogOpen()"
+  (visibleChange)="duplicateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeDuplicateDialog()"
+>
+  <label class="legal-section-detail-page__field">
+    <span>{{ 'ADMIN.LEGAL.DUPLICATE.SLUG_LABEL' | translate }}</span>
+    <input pInputText type="text" [value]="duplicateSlug()" (input)="duplicateSlug.set(($any($event.target)).value)" />
+  </label>
+  <label class="legal-section-detail-page__field">
+    <span>{{ 'ADMIN.LEGAL.DUPLICATE.TITLE_LABEL' | translate }}</span>
+    <input pInputText type="text" [value]="duplicateTitle()" (input)="duplicateTitle.set(($any($event.target)).value)" />
+  </label>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'ADMIN.LEGAL.ACTIONS.CANCEL' | translate" severity="secondary" [text]="true" (click)="closeDuplicateDialog()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.LEGAL.ACTIONS.DUPLICATE' | translate"
+      icon="pi pi-copy"
+      [disabled]="!duplicateSlug().trim() || actionLoading()"
+      (click)="confirmDuplicate()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="onDeleteDialogVisibleChange($event)"
+  [title]="'ADMIN.LEGAL.MESSAGES.CONFIRM_DELETE_TITLE' | translate"
+  [message]="deleteDialogMessage()"
+  [confirmLabel]="'ADMIN.LEGAL.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDelete()"
+/>
+
+<app-admin-unsaved-changes-dialog
+  [visible]="unsavedDialogOpen()"
+  [saving]="saving()"
+  (visibleChange)="onUnsavedDialogVisibleChange($event)"
+  (save)="onUnsavedSave()"
+  (discard)="onUnsavedDiscard()"
+/>

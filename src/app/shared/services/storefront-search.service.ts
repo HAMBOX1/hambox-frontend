@@ -3,6 +3,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { CategoryApiService } from '../../features/catalog/services/category-api.service';
 import { Products } from '../../features/products/services/products';
 import { mapProductToStoreProduct } from '../../features/products/utils/storefront-product.mapper';
+import { TranslationService } from '../../core/i18n/translation.service';
+import { SupportedLanguageId } from '../../core/i18n/locale.model';
 
 const RECENT_SEARCHES_KEY = 'hambox.recent-searches';
 const MAX_RECENT = 6;
@@ -25,9 +27,11 @@ export interface StorefrontSearchSuggestion {
 export class StorefrontSearchService {
   private readonly products = inject(Products);
   private readonly categoryApi = inject(CategoryApiService);
+  private readonly translation = inject(TranslationService);
 
   private readonly recentSearchesState = signal<readonly string[]>(this.readRecentSearches());
   private categoryLabelsCache: readonly { id: string; label: string }[] | null = null;
+  private categoryLabelsCacheLang: SupportedLanguageId | null = null;
 
   readonly recentSearches = this.recentSearchesState.asReadonly();
 
@@ -53,8 +57,9 @@ export class StorefrontSearchService {
     ]);
 
     const lowered = normalized.toLowerCase();
+    const lang = this.translation.language();
     const productSuggestions: StorefrontSearchSuggestion[] = (productResult.items ?? [])
-      .map((product, index) => mapProductToStoreProduct(product, index))
+      .map((product, index) => mapProductToStoreProduct(product, lang, index))
       .map((product) => ({
         type: 'product' as const,
         id: product.id,
@@ -112,12 +117,14 @@ export class StorefrontSearchService {
   }
 
   private async loadCategoryLabels(): Promise<readonly { id: string; label: string }[]> {
-    if (this.categoryLabelsCache) {
+    const lang = this.translation.language();
+    if (this.categoryLabelsCache && this.categoryLabelsCacheLang === lang) {
       return this.categoryLabelsCache;
     }
 
     const pills = await this.products.getCategoryPills();
     this.categoryLabelsCache = pills.filter((pill) => pill.id !== 'all');
+    this.categoryLabelsCacheLang = lang;
     return this.categoryLabelsCache;
   }
 }

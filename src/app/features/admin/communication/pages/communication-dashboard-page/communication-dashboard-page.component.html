@@ -1,0 +1,70 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.COMMUNICATION.DASHBOARD.TITLE' | translate"
+    [subtitle]="'ADMIN.COMMUNICATION.DASHBOARD.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.NOTIFICATIONS_TODAY' | translate"
+      [value]="loading() ? '—' : (stats()?.notificationsToday ?? 0)"
+      icon="pi pi-bell"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.EMAILS_SENT' | translate"
+      [value]="loading() ? '—' : (stats()?.emailsSentToday ?? 0)"
+      icon="pi pi-envelope"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.FAILURES' | translate"
+      [value]="loading() ? '—' : (stats()?.failuresToday ?? 0)"
+      icon="pi pi-exclamation-triangle"
+      [tone]="(stats()?.failuresToday ?? 0) > 0 ? 'warning' : 'default'"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.RETRYING' | translate"
+      [value]="loading() ? '—' : (stats()?.retryingCount ?? 0)"
+      icon="pi pi-refresh"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.UNREAD' | translate"
+      [value]="loading() ? '—' : (stats()?.unreadNotifications ?? 0)"
+      icon="pi pi-envelope-open"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.AVG_DELIVERY' | translate"
+      [value]="loading() ? '—' : averageDeliveryLabel()"
+      icon="pi pi-clock"
+    />
+    <app-admin-stat-card
+      [label]="'ADMIN.COMMUNICATION.DASHBOARD.QUEUE_SIZE' | translate"
+      [value]="loading() ? '—' : (stats()?.queueSize ?? 0)"
+      icon="pi pi-list"
+    />
+  </app-admin-stat-grid>
+
+  <app-admin-stat-grid>
+    @for (provider of stats()?.providers ?? []; track provider.channel) {
+      <app-admin-stat-card
+        [label]="provider.channel"
+        [value]="provider.isEnabled ? ('ADMIN.COMMUNICATION.DASHBOARD.PROVIDER_ENABLED' | translate) : ('ADMIN.COMMUNICATION.DASHBOARD.PROVIDER_DISABLED' | translate)"
+        [hint]="provider.providerType"
+        icon="pi pi-send"
+        [tone]="provider.isEnabled ? 'success' : 'default'"
+        [compact]="true"
+      />
+    }
+  </app-admin-stat-grid>
+
+  <div class="admin-quick-links">
+    <a routerLink="/admin/communication/templates" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.TEMPLATES' | translate }}</a>
+    <a routerLink="/admin/communication/messages" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.MESSAGES' | translate }}</a>
+    <a routerLink="/admin/communication/failed-deliveries" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.FAILED_DELIVERIES' | translate }}</a>
+    <a routerLink="/admin/communication/providers" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.PROVIDERS' | translate }}</a>
+  </div>
+</section>

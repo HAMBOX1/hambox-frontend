@@ -34,6 +34,14 @@
         optionValue="value"
         [placeholder]="'ADMIN.OPERATIONS.COLS.STATUS' | translate"
       />
+      <p-select
+        [options]="queueOptions"
+        [ngModel]="queue()"
+        (ngModelChange)="queue.set($event); reload()"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'ADMIN.OPERATIONS.COLS.QUEUE' | translate"
+      />
       <input
         pInputText
         [ngModel]="search()"
@@ -67,8 +75,10 @@
             <th>{{ 'ADMIN.OPERATIONS.COLS.ATTEMPTS' | translate }}</th>
             <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
             <th>{{ 'ADMIN.OPERATIONS.COLS.PRIORITY' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.QUEUE' | translate }}</th>
             <th>{{ 'ADMIN.OPERATIONS.COLS.WORKER' | translate }}</th>
             <th>{{ 'ADMIN.OPERATIONS.COLS.CORRELATION' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.ACTIONS' | translate }}</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-job>
@@ -82,11 +92,98 @@
             <td>{{ job.attempts }}/{{ job.maxAttempts }}</td>
             <td><app-admin-status-badge [label]="job.status" [tone]="statusTone(job.status)" /></td>
             <td>{{ job.priority }}</td>
+            <td>{{ job.queue }}</td>
             <td>{{ job.workerId || '—' }}</td>
             <td class="admin-mono">{{ job.correlationId || '—' }}</td>
+            <td>
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [label]="'ADMIN.OPERATIONS.ACTIONS.DETAILS' | translate"
+                (click)="openDetails(job)"
+              ></button>
+            </td>
           </tr>
         </ng-template>
       </p-table>
     </app-admin-section-card>
   }
+
+  <p-drawer
+    [(visible)]="detailsVisible"
+    position="right"
+    [header]="'ADMIN.OPERATIONS.ACTIONS.DETAILS' | translate"
+    styleClass="admin-drawer"
+  >
+    @if (selectedJob(); as job) {
+      <dl class="admin-detail-list">
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.ID' | translate }}</dt>
+        <dd class="admin-mono">{{ job.id }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.TYPE' | translate }}</dt>
+        <dd>{{ job.jobType }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</dt>
+        <dd><app-admin-status-badge [label]="job.status" [tone]="statusTone(job.status)" /></dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.QUEUE' | translate }}</dt>
+        <dd>{{ job.queue }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.PROGRESS' | translate }}</dt>
+        <dd>{{ job.progressPercent }}%</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.ATTEMPTS' | translate }}</dt>
+        <dd>{{ job.attempts }}/{{ job.maxAttempts }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.CORRELATION' | translate }}</dt>
+        <dd class="admin-mono">{{ job.correlationId || '—' }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.WORKER' | translate }}</dt>
+        <dd>{{ job.workerId || '—' }}</dd>
+        <dt>{{ 'ADMIN.OPERATIONS.COLS.ERROR' | translate }}</dt>
+        <dd><pre class="admin-pre">{{ job.lastError || '—' }}</pre></dd>
+      </dl>
+
+      <div class="admin-page__actions">
+        <button
+          *hamboxHasPermission="permissions.Operations.Retry"
+          pButton
+          type="button"
+          size="small"
+          [label]="'ADMIN.OPERATIONS.ACTIONS.RETRY' | translate"
+          (click)="retrySelected()"
+        ></button>
+        <button
+          *hamboxHasPermission="permissions.Operations.Manage"
+          pButton
+          type="button"
+          size="small"
+          severity="secondary"
+          [label]="'ADMIN.OPERATIONS.ACTIONS.CANCEL' | translate"
+          (click)="cancelSelected()"
+        ></button>
+      </div>
+
+      <h4>{{ 'ADMIN.OPERATIONS.ACTIONS.HISTORY' | translate }}</h4>
+      @if (jobHistory().length === 0) {
+        <p>{{ 'ADMIN.OPERATIONS.EMPTY.HISTORY' | translate }}</p>
+      } @else {
+        <p-table [value]="jobHistory()">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.ATTEMPTS' | translate }}</th>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.STATUS' | translate }}</th>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.STARTED' | translate }}</th>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.DURATION' | translate }}</th>
+              <th>{{ 'ADMIN.OPERATIONS.COLS.WORKER' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-attempt>
+            <tr>
+              <td>{{ attempt.attemptNumber }}</td>
+              <td><app-admin-status-badge [label]="attempt.status" [tone]="statusTone(attempt.status)" /></td>
+              <td>{{ attempt.startedOnUtc | date: 'short' }}</td>
+              <td>{{ attempt.durationMs != null ? (attempt.durationMs / 1000 | number: '1.0-1') + 's' : '—' }}</td>
+              <td>{{ attempt.workerId || '—' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    }
+  </p-drawer>
 </section>

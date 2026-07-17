@@ -26,6 +26,7 @@ export interface Product {
   readonly status: ProductStatus;
   readonly categoryId: string;
   readonly categoryName: string;
+  readonly categoryNameAr: string;
   readonly primaryImageUrl?: string | null;
   readonly images?: readonly ProductImage[] | null;
   readonly createdOnUtc?: string;

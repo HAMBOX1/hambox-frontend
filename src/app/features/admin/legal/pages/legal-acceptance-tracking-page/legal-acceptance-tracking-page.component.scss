@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+a.admin-cell-primary {
+  text-decoration: none;
+
+  &:hover {
+    color: var(--admin-accent-green);
+  }
+}

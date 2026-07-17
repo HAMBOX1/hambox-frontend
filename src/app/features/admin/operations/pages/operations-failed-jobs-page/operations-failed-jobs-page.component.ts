@@ -61,6 +61,7 @@ export class OperationsFailedJobsPageComponent implements OnInit, OnDestroy {
   protected readonly rows = computed(() => this.jobs()?.items ?? []);
   protected readonly selectedJob = signal<OperationalJobDto | null>(null);
   protected detailsVisible = false;
+  protected readonly statusFilter = signal<'Failed' | 'DeadLetter'>('Failed');
 
   ngOnInit(): void {
     void this.reload();
@@ -73,8 +74,13 @@ export class OperationsFailedJobsPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  protected async setStatusFilter(status: 'Failed' | 'DeadLetter'): Promise<void> {
+    this.statusFilter.set(status);
+    await this.reload();
+  }
+
   protected async reload(): Promise<void> {
-    await this.facade.loadJobs({ status: 'Failed', page: 1, pageSize: 100 });
+    await this.facade.loadJobs({ status: this.statusFilter(), page: 1, pageSize: 100 });
   }
 
   protected openDetails(job: OperationalJobDto): void {

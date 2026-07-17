@@ -1,0 +1,33 @@
+.legal-acceptance-dialog__loading {
+  color: var(--color-text-muted);
+}
+
+.legal-acceptance-dialog__title {
+  margin-bottom: var(--hambox-spacing-3);
+}
+
+.legal-acceptance-dialog__body {
+  line-height: 1.7;
+  max-height: 360px;
+  overflow-y: auto;
+
+  ::ng-deep table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  ::ng-deep th,
+  ::ng-deep td {
+    border: 1px solid var(--color-border);
+    padding: var(--hambox-spacing-2);
+  }
+}
+
+.legal-acceptance-dialog__agree {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  margin-top: var(--hambox-spacing-4);
+  padding-top: var(--hambox-spacing-4);
+  border-top: 1px solid var(--color-border);
+}

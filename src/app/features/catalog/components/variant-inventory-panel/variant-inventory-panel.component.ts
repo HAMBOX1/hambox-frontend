@@ -3,16 +3,19 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TextareaModule } from 'primeng/textarea';
+import { ToastModule } from 'primeng/toast';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
@@ -26,6 +29,8 @@ import {
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { DigitalInventoryCodeDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+
+const REVEAL_AUTO_HIDE_MS = 30_000;
 
 const CODE_STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'All statuses', value: '' },
@@ -55,13 +60,17 @@ const CODE_STATUS_OPTIONS: { label: string; value: string }[] = [
     AdminLoadingSkeletonComponent,
     AdminConfirmDialogComponent,
     AdminDataTableShellComponent,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: './variant-inventory-panel.component.html',
   styleUrl: './variant-inventory-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VariantInventoryPanelComponent {
   private readonly facade = inject(ProductEditorFacade);
+  private readonly messageService = inject(MessageService);
+  private revealTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly permissions = PERMISSIONS;
   protected readonly selectedVariant = this.facade.selectedVariant;
@@ -90,7 +99,18 @@ export class VariantInventoryPanelComponent {
   protected readonly selectedCodeIds = signal<string[]>([]);
   protected readonly bulkDeleteDialogOpen = signal(false);
 
+  protected readonly revealDialogOpen = signal(false);
+  protected readonly revealTargetCode = signal<DigitalInventoryCodeDto | null>(null);
+  protected readonly revealing = signal(false);
+  protected readonly revealedCodeId = signal<string | null>(null);
+  protected readonly revealedValue = signal<string | null>(null);
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.hideRevealed());
+  }
+
   protected onBatchChange(batchId: string): void {
+    this.hideRevealed();
     this.facade.selectBatch(batchId);
   }
 
@@ -287,7 +307,63 @@ export class VariantInventoryPanelComponent {
     return this.batchesTable().find((batch) => batch.id === batchId)?.name ?? batchId;
   }
 
+  protected requestReveal(code: DigitalInventoryCodeDto): void {
+    this.revealTargetCode.set(code);
+    this.revealDialogOpen.set(true);
+  }
+
+  protected async confirmReveal(): Promise<void> {
+    const code = this.revealTargetCode();
+    if (!code) {
+      return;
+    }
+
+    this.revealing.set(true);
+    try {
+      const plaintext = await this.facade.revealCode(code.id);
+      if (plaintext) {
+        this.showRevealed(code.id, plaintext);
+      }
+    } finally {
+      this.revealing.set(false);
+      this.revealDialogOpen.set(false);
+      this.revealTargetCode.set(null);
+    }
+  }
+
+  protected async copyRevealed(): Promise<void> {
+    const value = this.revealedValue();
+    if (!value) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(value);
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Copied',
+      detail: 'Inventory code copied to clipboard.',
+    });
+  }
+
+  protected hideRevealed(): void {
+    if (this.revealTimeoutHandle !== null) {
+      clearTimeout(this.revealTimeoutHandle);
+      this.revealTimeoutHandle = null;
+    }
+
+    this.revealedCodeId.set(null);
+    this.revealedValue.set(null);
+  }
+
+  private showRevealed(codeId: string, plaintext: string): void {
+    this.hideRevealed();
+    this.revealedCodeId.set(codeId);
+    this.revealedValue.set(plaintext);
+    this.revealTimeoutHandle = setTimeout(() => this.hideRevealed(), REVEAL_AUTO_HIDE_MS);
+  }
+
   private async reloadCodes(variantId: string, pageNumber: number): Promise<void> {
+    this.hideRevealed();
     await this.facade.selectVariant(variantId, {
       status: this.statusFilter() || undefined,
       searchTerm: this.searchTerm().trim() || undefined,

@@ -100,6 +100,10 @@ export class ProductEditPageComponent implements OnInit {
     this.activeTab.set(String(value ?? 'general'));
   }
 
+  protected onCategoryCreated(): void {
+    void this.facade.loadCategories();
+  }
+
   protected onCancel(): void {
     void this.router.navigate(['/admin/products']);
   }

@@ -1,0 +1,137 @@
+<p-toast position="top-right" />
+
+<section class="admin-page suppliers-list-page">
+  <app-admin-page-header
+    [title]="'ADMIN.SUPPLIERS.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.SUPPLIERS.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Suppliers.Create"
+      pButton
+      class="admin-btn-primary"
+      routerLink="/admin/suppliers/new"
+      [label]="'ADMIN.SUPPLIERS.LIST.NEW' | translate"
+      icon="pi pi-plus"
+    ></a>
+  </app-admin-page-header>
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.SUPPLIERS.LIST.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="suppliers-list-page__filter"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      [placeholder]="'ADMIN.SUPPLIERS.LIST.FILTER_STATUS' | translate"
+    />
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table"
+      [value]="[...suppliers()]"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="totalCount() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.SUPPLIERS.LIST.COLUMNS.NAME' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.LIST.COLUMNS.CODE' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.LIST.COLUMNS.PROVIDER' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.LIST.COLUMNS.PRIORITY' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.LIST.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.LIST.COLUMNS.CREATED' | translate }}</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-supplier>
+        <tr>
+          <td>
+            <a class="admin-cell-primary" [routerLink]="['/admin/suppliers', supplier.id]">
+              {{ supplier.name }}
+            </a>
+          </td>
+          <td>{{ supplier.code }}</td>
+          <td>{{ supplier.providerType }}</td>
+          <td>{{ supplier.priority }}</td>
+          <td>
+            <app-admin-status-badge
+              [label]="supplier.isEnabled ? supplier.status : ('ADMIN.SUPPLIERS.DISABLED' | translate)"
+              [tone]="supplier.isEnabled ? statusTone(supplier.status) : 'neutral'"
+            />
+          </td>
+          <td>{{ supplier.createdOnUtc | date: 'medium' }}</td>
+          <td>
+            @let menuItems = actionMenuItems(supplier);
+            <div class="admin-actions-row">
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Suppliers.Edit"
+                icon="pi pi-pencil"
+                [label]="'ADMIN.SUPPLIERS.ACTIONS.EDIT' | translate"
+                [routerLink]="'/admin/suppliers/' + supplier.id"
+              />
+              @if (menuItems.length > 0) {
+                <app-admin-action-menu [items]="menuItems" [disabled]="actionLoading()" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <app-admin-empty-state
+              icon="pi pi-truck"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.SUPPLIERS.LIST.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.SUPPLIERS.LIST.EMPTY' | translate)
+              "
+              [primaryLabel]="'ADMIN.SUPPLIERS.LIST.NEW' | translate"
+              primaryIcon="pi pi-plus"
+              (primaryAction)="navigateToNew()"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="onDeleteDialogVisibleChange($event)"
+  [title]="'ADMIN.CONFIRM.DELETE_SUPPLIER_TITLE' | translate"
+  [message]="deleteDialogMessage()"
+  [confirmLabel]="'ADMIN.SUPPLIERS.ACTIONS.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDelete()"
+/>

@@ -1,0 +1,51 @@
+.legal-section-detail-page {
+  &__form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--admin-form-gap, 1.5rem);
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-2);
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+  }
+
+  &__optional {
+    font-weight: 400;
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--admin-form-gap, 1.5rem);
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+    font-weight: 500;
+  }
+
+  &__actions {
+    margin-top: var(--admin-section-gap, 2rem);
+    display: flex;
+    justify-content: flex-end;
+  }
+}

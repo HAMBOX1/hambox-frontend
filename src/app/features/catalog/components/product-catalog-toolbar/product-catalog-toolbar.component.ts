@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
 import {
@@ -19,7 +20,7 @@ const STATUS_OPTIONS: { label: string; value: string }[] = [
 @Component({
   selector: 'app-product-catalog-toolbar',
   standalone: true,
-  imports: [FormsModule, SelectModule, AdminToolbarComponent, AdminSearchBarComponent],
+  imports: [FormsModule, SelectModule, ButtonModule, AdminToolbarComponent, AdminSearchBarComponent],
   templateUrl: './product-catalog-toolbar.component.html',
   styleUrl: './product-catalog-toolbar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,8 +29,10 @@ export class ProductCatalogToolbarComponent {
   readonly searchTerm = input('');
   readonly statusFilter = input('');
   readonly searchPlaceholder = input('Search products…');
+  readonly hasActiveFilters = input(false);
   readonly searchChange = output<string>();
   readonly statusChange = output<ProductStatus | ''>();
+  readonly clearFilters = output<void>();
 
   protected readonly statusOptions = STATUS_OPTIONS;
 

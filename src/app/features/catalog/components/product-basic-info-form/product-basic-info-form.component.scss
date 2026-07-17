@@ -38,6 +38,23 @@
   font-weight: 600;
 }
 
+.basic-info-form__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .basic-info-form__label {
+    margin: 0;
+  }
+}
+
+.basic-info-form__optional {
+  color: var(--admin-text-tertiary, var(--admin-text-secondary));
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
 .basic-info-form__input,
 .basic-info-form__textarea {
   width: 100%;

@@ -46,7 +46,7 @@ export class AdminAuth {
    */
   async completeLoginWithToken(token: AuthTokenResponse): Promise<void> {
     this.session.setSession(AUTH_CONTEXT.Admin, token);
-    this.session.markInitialized();
+    this.session.markInitialized(AUTH_CONTEXT.Admin);
     await this.syncAccessFromProfile();
   }
 
@@ -58,7 +58,7 @@ export class AdminAuth {
       .pipe(
         tap((tokens) => {
           this.session.setSession(AUTH_CONTEXT.Admin, tokens);
-          this.session.markInitialized();
+          this.session.markInitialized(AUTH_CONTEXT.Admin);
           void this.syncAccessFromProfile();
         }),
       );

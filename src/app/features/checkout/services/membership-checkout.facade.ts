@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ApiError } from '../../../core/models/api-error.model';
+import { clearIdempotencyKey, getOrCreateIdempotencyKey } from '../../../shared/utils/idempotency-key.util';
 import { OrderApiDto } from '../../cart/models/cart-api.model';
 import { CheckoutService } from './checkout.service';
 import {
@@ -26,6 +27,8 @@ const INITIAL_BILLING: BillingDetails = {
   email: '',
   country: 'US',
 };
+
+const IDEMPOTENCY_SCOPE = 'membership-checkout';
 
 @Injectable({ providedIn: 'root' })
 export class MembershipCheckoutFacade {
@@ -65,6 +68,10 @@ export class MembershipCheckoutFacade {
   });
 
   async initialize(planId: string, action: string): Promise<void> {
+    if (this.planIdState() !== planId || this.actionState() !== action) {
+      clearIdempotencyKey(IDEMPOTENCY_SCOPE);
+    }
+
     this.planIdState.set(planId);
     this.actionState.set(action);
     this.errorState.set(null);
@@ -149,16 +156,21 @@ export class MembershipCheckoutFacade {
     this.errorState.set(null);
 
     try {
+      const idempotencyKey = getOrCreateIdempotencyKey(IDEMPOTENCY_SCOPE);
       const order = await firstValueFrom(
-        this.membershipCheckout.checkout({
-          planId,
-          action: this.actionState(),
-          email: billing.email.trim(),
-          country: billing.country,
-          paymentMethod: this.paymentMethodState(),
-          couponCode: this.discountCodeState().trim() || null,
-        }),
+        this.membershipCheckout.checkout(
+          {
+            planId,
+            action: this.actionState(),
+            email: billing.email.trim(),
+            country: billing.country,
+            paymentMethod: this.paymentMethodState(),
+            couponCode: this.discountCodeState().trim() || null,
+          },
+          idempotencyKey,
+        ),
       );
+      clearIdempotencyKey(IDEMPOTENCY_SCOPE);
       return order;
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Membership checkout failed.'));

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ACCOUNT_API, AUTH_API } from '../../../core/api/api-endpoints';
+import { ACCOUNT_API, AUTH_API, COMMUNICATION_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
 import { PagedResult } from '../../catalog/models/category.model';
 import {
@@ -14,6 +14,8 @@ import {
   OrderDetailApiDto,
   OrderSummaryApiDto,
   ProductReviewApiDto,
+  CommunicationPreferencesApiDto,
+  NotificationQuery,
   ReferralDashboardApiDto,
   ReferralHistoryApiDto,
   UpdateProfileRequest,
@@ -91,10 +93,23 @@ export class AccountApiService {
     return this.api.delete<void>(ACCOUNT_API.review(reviewId));
   }
 
-  getNotifications(pageNumber = 1, pageSize = 20): Observable<PagedResult<UserNotificationApiDto>> {
-    return this.api.get<PagedResult<UserNotificationApiDto>>(ACCOUNT_API.notifications, {
-      params: { pageNumber, pageSize },
-    });
+  getNotifications(pageNumber = 1, pageSize = 20, query: NotificationQuery = {}): Observable<PagedResult<UserNotificationApiDto>> {
+    const params: Record<string, string | number | boolean> = { pageNumber, pageSize };
+
+    if (query.includeArchived !== undefined) {
+      params['includeArchived'] = query.includeArchived;
+    }
+    if (query.isRead !== undefined) {
+      params['isRead'] = query.isRead;
+    }
+    if (query.category) {
+      params['category'] = query.category;
+    }
+    if (query.search) {
+      params['search'] = query.search;
+    }
+
+    return this.api.get<PagedResult<UserNotificationApiDto>>(ACCOUNT_API.notifications, { params });
   }
 
   getUnreadNotificationCount(): Observable<number> {
@@ -107,6 +122,22 @@ export class AccountApiService {
 
   markAllNotificationsRead(): Observable<void> {
     return this.api.post<void>(ACCOUNT_API.markAllNotificationsRead, {});
+  }
+
+  archiveNotification(id: string): Observable<void> {
+    return this.api.post<void>(ACCOUNT_API.archiveNotification(id), {});
+  }
+
+  deleteNotification(id: string): Observable<void> {
+    return this.api.delete<void>(ACCOUNT_API.deleteNotification(id));
+  }
+
+  getNotificationPreferences(): Observable<CommunicationPreferencesApiDto> {
+    return this.api.get<CommunicationPreferencesApiDto>(COMMUNICATION_API.preferences);
+  }
+
+  updateNotificationPreferences(preferences: CommunicationPreferencesApiDto): Observable<void> {
+    return this.api.put<void>(COMMUNICATION_API.preferences, preferences);
   }
 
   getReferralDashboard(): Observable<ReferralDashboardApiDto> {

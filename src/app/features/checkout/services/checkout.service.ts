@@ -12,8 +12,10 @@ import { CheckoutConfigurationDto } from '../models/checkout';
 export class CheckoutService {
   private readonly api = inject(ApiClientService);
 
-  checkout(request: CheckoutRequest): Observable<OrderApiDto> {
-    return this.api.post<OrderApiDto>(COMMERCE_API.checkout, request);
+  checkout(request: CheckoutRequest, idempotencyKey: string): Observable<OrderApiDto> {
+    return this.api.post<OrderApiDto>(COMMERCE_API.checkout, request, {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
   }
 
   getConfiguration(): Observable<CheckoutConfigurationDto> {

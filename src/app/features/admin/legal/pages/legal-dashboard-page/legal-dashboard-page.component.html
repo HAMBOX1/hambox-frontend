@@ -1,0 +1,16 @@
+<section class="admin-page legal-dashboard-page">
+  <app-admin-page-header
+    [title]="'ADMIN.LEGAL.DASHBOARD.TITLE' | translate"
+    [subtitle]="'ADMIN.LEGAL.DASHBOARD.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <a adminHeaderActions pButton class="admin-btn-primary" routerLink="/admin/legal/sections" [label]="'ADMIN.LEGAL.NAV.SECTIONS' | translate" icon="pi pi-arrow-right"></a>
+  </app-admin-page-header>
+
+  <app-admin-stat-grid>
+    <app-admin-stat-card [label]="'ADMIN.LEGAL.DASHBOARD.STATS.TOTAL' | translate" [value]="stats().total" icon="pi-file-check" />
+    <app-admin-stat-card [label]="'ADMIN.LEGAL.DASHBOARD.STATS.PUBLISHED' | translate" [value]="stats().published" icon="pi-check-circle" tone="success" />
+    <app-admin-stat-card [label]="'ADMIN.LEGAL.DASHBOARD.STATS.DRAFT' | translate" [value]="stats().draft" icon="pi-pencil" tone="info" />
+    <app-admin-stat-card [label]="'ADMIN.LEGAL.DASHBOARD.STATS.ARCHIVED' | translate" [value]="stats().archived" icon="pi-inbox" tone="warning" />
+  </app-admin-stat-grid>
+</section>

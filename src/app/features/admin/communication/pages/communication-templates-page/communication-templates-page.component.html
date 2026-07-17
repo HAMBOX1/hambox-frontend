@@ -1,0 +1,157 @@
+<p-toast position="top-right" />
+
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.COMMUNICATION.TEMPLATES.TITLE' | translate"
+    [subtitle]="'ADMIN.COMMUNICATION.TEMPLATES.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  >
+    <button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Communication.ManageTemplates"
+      pButton
+      class="admin-btn-primary"
+      type="button"
+      icon="pi pi-plus"
+      [label]="'ADMIN.COMMUNICATION.TEMPLATES.NEW' | translate"
+      (click)="openCreate()"
+    ></button>
+  </app-admin-page-header>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table class="admin-data-table" [value]="[...templates()]" [loading]="loading()" dataKey="id" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.COMMUNICATION.TEMPLATES.COLUMNS.KEY' | translate }}</th>
+          <th>{{ 'ADMIN.COMMUNICATION.TEMPLATES.COLUMNS.CHANNEL' | translate }}</th>
+          <th>{{ 'ADMIN.COMMUNICATION.TEMPLATES.COLUMNS.CATEGORY' | translate }}</th>
+          <th>{{ 'ADMIN.COMMUNICATION.TEMPLATES.COLUMNS.STATUS' | translate }}</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-template>
+        <tr>
+          <td>{{ template.key }}</td>
+          <td>{{ template.channel }}</td>
+          <td>{{ template.category }}</td>
+          <td>
+            <app-admin-status-badge
+              [label]="
+                template.hasPublishedVersion
+                  ? ('ADMIN.COMMUNICATION.TEMPLATES.PUBLISHED' | translate)
+                  : ('ADMIN.COMMUNICATION.TEMPLATES.DRAFT' | translate)
+              "
+              [tone]="template.hasPublishedVersion ? 'success' : 'neutral'"
+            />
+          </td>
+          <td>
+            <button
+              pButton
+              type="button"
+              class="p-button-text"
+              icon="pi pi-pencil"
+              [label]="'ADMIN.COMMUNICATION.TEMPLATES.EDIT' | translate"
+              (click)="openEdit(template)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">
+            <app-admin-empty-state icon="pi pi-envelope" [title]="'ADMIN.COMMUNICATION.TEMPLATES.EMPTY' | translate" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<p-dialog
+  [visible]="editDialogOpen()"
+  (visibleChange)="editDialogOpen.set($event); $event ? null : closeEdit()"
+  [modal]="true"
+  [style]="{ width: '640px' }"
+  [header]="'ADMIN.COMMUNICATION.TEMPLATES.EDIT_TITLE' | translate"
+>
+  @if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" [showRetry]="false" />
+  }
+
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.SUBJECT_EN' | translate }}</label>
+    <input pInputText [ngModel]="subjectEn()" (ngModelChange)="subjectEn.set($event)" />
+  </div>
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.SUBJECT_AR' | translate }}</label>
+    <input pInputText [ngModel]="subjectAr()" (ngModelChange)="subjectAr.set($event)" dir="rtl" />
+  </div>
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.BODY_EN' | translate }}</label>
+    <textarea pTextarea rows="4" [ngModel]="bodyEn()" (ngModelChange)="bodyEn.set($event)"></textarea>
+  </div>
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.BODY_AR' | translate }}</label>
+    <textarea pTextarea rows="4" [ngModel]="bodyAr()" (ngModelChange)="bodyAr.set($event)" dir="rtl"></textarea>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="p-button-text" [label]="'COMMON.CANCEL' | translate" (click)="closeEdit()"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-secondary"
+      [label]="'ADMIN.COMMUNICATION.TEMPLATES.SAVE_DRAFT' | translate"
+      [loading]="saving()"
+      (click)="saveDraft()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Communication.ManageTemplates"
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.COMMUNICATION.TEMPLATES.PUBLISH' | translate"
+      [loading]="saving()"
+      (click)="publishDraft()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [visible]="createDialogOpen()"
+  (visibleChange)="createDialogOpen.set($event)"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [header]="'ADMIN.COMMUNICATION.TEMPLATES.NEW' | translate"
+>
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.KEY' | translate }}</label>
+    <input pInputText [ngModel]="newKey()" (ngModelChange)="newKey.set($event)" />
+  </div>
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.CHANNEL' | translate }}</label>
+    <p-select [options]="channels" [ngModel]="newChannel()" (ngModelChange)="newChannel.set($event)" />
+  </div>
+  <div class="admin-form-field">
+    <label>{{ 'ADMIN.COMMUNICATION.TEMPLATES.FIELDS.CATEGORY' | translate }}</label>
+    <p-select [options]="categories" [ngModel]="newCategory()" (ngModelChange)="newCategory.set($event)" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="p-button-text" [label]="'COMMON.CANCEL' | translate" (click)="createDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.COMMUNICATION.TEMPLATES.CREATE' | translate"
+      [loading]="facade.templateSaving()"
+      (click)="submitCreate()"
+    ></button>
+  </ng-template>
+</p-dialog>

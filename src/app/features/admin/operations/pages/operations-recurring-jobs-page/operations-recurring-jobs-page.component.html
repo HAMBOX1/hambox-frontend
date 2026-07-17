@@ -1,0 +1,42 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.OPERATIONS.RECURRING.TITLE' | translate"
+    [subtitle]="'ADMIN.OPERATIONS.RECURRING.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="table" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  } @else if (recurringJobs().length === 0) {
+    <app-admin-section-card>
+      <p>{{ 'ADMIN.OPERATIONS.EMPTY.RECURRING' | translate }}</p>
+    </app-admin-section-card>
+  } @else {
+    <app-admin-section-card>
+      <p-table [value]="recurringJobs()">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.KEY' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.TYPE' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.QUEUE' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.PRIORITY' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.INTERVAL' | translate }}</th>
+            <th>{{ 'ADMIN.OPERATIONS.COLS.LAST_RUN' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-r>
+          <tr>
+            <td class="admin-mono">{{ r.key }}</td>
+            <td>{{ r.jobType }}</td>
+            <td>{{ r.queue }}</td>
+            <td>{{ r.priority }}</td>
+            <td>{{ r.intervalMinutes | number: '1.0-1' }} min</td>
+            <td>{{ r.lastEnqueuedOnUtc ? (r.lastEnqueuedOnUtc | date: 'short') : '—' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-section-card>
+  }
+</section>

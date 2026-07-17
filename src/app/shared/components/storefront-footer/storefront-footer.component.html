@@ -26,6 +26,15 @@
         </nav>
       </div>
 
+      <div class="footer__column">
+        <h2 class="footer__heading">Legal</h2>
+        <nav class="footer__nav" aria-label="Legal navigation">
+          @for (item of legalLinks(); track item.slug) {
+            <a class="footer__link" [routerLink]="['/legal', item.slug]">{{ legalLinkTitle(item) }}</a>
+          }
+        </nav>
+      </div>
+
       <div class="footer__column footer__contact">
         <h2 class="footer__heading">Contact</h2>
         @if (supportEmail()) {

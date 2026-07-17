@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ProductImageCacheService } from '../../../core/product/product-image-cache.service';
 import { ApiError } from '../../../core/models/api-error.model';
+import { clearIdempotencyKey, getOrCreateIdempotencyKey } from '../../../shared/utils/idempotency-key.util';
 import { CartFacade } from '../../cart/services/cart.facade';
 import { OrderApiDto } from '../../cart/models/cart-api.model';
 import { CheckoutService } from './checkout.service';
@@ -27,6 +28,8 @@ const INITIAL_BILLING: BillingDetails = {
   email: '',
   country: 'US',
 };
+
+const IDEMPOTENCY_SCOPE = 'checkout';
 
 @Injectable({
   providedIn: 'root',
@@ -201,14 +204,19 @@ export class CheckoutFacade {
     this.errorState.set(null);
 
     try {
+      const idempotencyKey = getOrCreateIdempotencyKey(IDEMPOTENCY_SCOPE);
       const order = await firstValueFrom(
-        this.checkoutService.checkout({
-          email: billing.email.trim(),
-          country: billing.country,
-          paymentMethod: this.paymentMethodState(),
-        }),
+        this.checkoutService.checkout(
+          {
+            email: billing.email.trim(),
+            country: billing.country,
+            paymentMethod: this.paymentMethodState(),
+          },
+          idempotencyKey,
+        ),
       );
 
+      clearIdempotencyKey(IDEMPOTENCY_SCOPE);
       this.lastOrderState.set(order);
       await this.cartFacade.load();
       return order;
@@ -242,6 +250,7 @@ export class CheckoutFacade {
     this.discountErrorState.set(null);
     this.errorState.set(null);
     this.lastOrderState.set(null);
+    clearIdempotencyKey(IDEMPOTENCY_SCOPE);
     this.initialize();
   }
 

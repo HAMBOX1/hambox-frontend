@@ -7,7 +7,11 @@
 >
   <div class="account-sidebar__top">
     <a class="account-sidebar__logo" routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate" (click)="closeMobile()">
-      <img [src]="logoSrc" alt="HAMBOX" />
+      @if (collapsed()) {
+        <img [src]="logoMarkSrc" alt="HAMBOX" />
+      } @else {
+        <img [src]="logoSrc" alt="HAMBOX" />
+      }
     </a>
 
     <button
