@@ -56,7 +56,7 @@
                   </div>
                 } @else {
                   <div class="option-groups-panel__chip-row">
-                    <p-chip [label]="option.label" />
+                    <span class="option-groups-panel__value-pill">{{ option.label }}</span>
                     <div class="option-groups-panel__chip-actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
                       <button type="button" class="option-groups-panel__icon-btn" (click)="moveOption(group, option, -1)" aria-label="Move up">
                         <i class="pi pi-chevron-up"></i>

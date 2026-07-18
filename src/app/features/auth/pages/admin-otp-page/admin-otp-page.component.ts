@@ -200,7 +200,7 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
 
           await this.adminAuth.syncAccessFromProfile();
 
-          await this.router.navigateByUrl('/admin/dashboard');
+          await this.router.navigateByUrl('/admin/products');
 
         },
 

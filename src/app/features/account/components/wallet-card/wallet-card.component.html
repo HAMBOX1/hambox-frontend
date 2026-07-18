@@ -1,0 +1,53 @@
+<section class="wallet-card">
+  @if (facade.loading() && !facade.wallet()) {
+    <app-loading-skeleton type="card" />
+  } @else if (facade.wallet(); as wallet) {
+    <header class="wallet-card__header">
+      <h2 class="wallet-card__title">
+        <i class="pi pi-star-fill" aria-hidden="true"></i>
+        {{ 'ACCOUNT.WALLET.TITLE' | translate }}
+      </h2>
+      <span class="wallet-card__badge">{{ 'ACCOUNT.WALLET.COMING_SOON' | translate }}</span>
+    </header>
+
+    <div class="wallet-card__points">
+      <p class="wallet-card__points-label">{{ 'ACCOUNT.WALLET.AVAILABLE_POINTS' | translate }}</p>
+      <p class="wallet-card__points-value">{{ wallet.points | number }} <span>{{ 'ACCOUNT.WALLET.POINTS_UNIT' | translate }}</span></p>
+      <p class="wallet-card__points-equiv">&asymp; {{ wallet.estimatedValueUsd | hamboxCurrency }}</p>
+    </div>
+
+    <div class="wallet-card__stats">
+      <div class="wallet-card__stat">
+        <p class="wallet-card__stat-value">{{ wallet.lifetimeEarned | number }}</p>
+        <p class="wallet-card__stat-label">{{ 'ACCOUNT.WALLET.LIFETIME_EARNED' | translate }}</p>
+      </div>
+      <div class="wallet-card__stat">
+        <p class="wallet-card__stat-value">{{ wallet.lifetimeSpent | number }}</p>
+        <p class="wallet-card__stat-label">{{ 'ACCOUNT.WALLET.LIFETIME_SPENT' | translate }}</p>
+      </div>
+      <div class="wallet-card__stat">
+        <p class="wallet-card__stat-value">{{ wallet.tier }}</p>
+        <p class="wallet-card__stat-label">{{ 'ACCOUNT.WALLET.TIER' | translate }}</p>
+      </div>
+    </div>
+
+    <button type="button" class="wallet-card__history-btn" (click)="openHistory()">
+      {{ 'ACCOUNT.WALLET.VIEW_HISTORY' | translate }}
+    </button>
+  }
+</section>
+
+<p-dialog
+  [header]="'ACCOUNT.WALLET.HISTORY_TITLE' | translate"
+  [visible]="historyOpen()"
+  (visibleChange)="historyOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '28rem' }"
+>
+  <app-empty-state
+    icon="pi pi-star"
+    [title]="'ACCOUNT.WALLET.HISTORY_TITLE' | translate"
+    [description]="'ACCOUNT.WALLET.HISTORY_EMPTY' | translate"
+  />
+</p-dialog>

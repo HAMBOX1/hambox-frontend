@@ -62,7 +62,7 @@
         (click)="requestDelete()"
       ></button>
 
-      @if (permissionServicePublic.hasPermission(permissions.Legal.Publish) && document.draftVersion) {
+      @if (permissionServicePublic.hasPermission(permissions.Legal.Publish)) {
         <button
           adminHeaderActions
           pButton
@@ -70,7 +70,7 @@
           class="admin-btn-primary"
           [label]="'ADMIN.LEGAL.ACTIONS.PUBLISH' | translate"
           icon="pi pi-send"
-          [disabled]="actionLoading() || saving()"
+          [disabled]="actionLoading() || saving() || (!document.draftVersion && !form.dirty)"
           (click)="publish()"
         ></button>
       }
@@ -241,7 +241,12 @@
                   <ng-template pTemplate="body" let-version>
                     <tr>
                       <td>{{ version.versionNumber }}</td>
-                      <td>{{ version.isPublished ? ('ADMIN.LEGAL.LIST.STATUS_PUBLISHED' | translate) : ('ADMIN.LEGAL.LIST.STATUS_DRAFT' | translate) }}</td>
+                      <td>
+                        <app-admin-status-badge
+                          [label]="(version.isPublished ? 'ADMIN.LEGAL.LIST.STATUS_PUBLISHED' : 'ADMIN.LEGAL.LIST.STATUS_DRAFT') | translate"
+                          [tone]="version.isPublished ? 'success' : 'info'"
+                        />
+                      </td>
                       <td>{{ version.publishedOnUtc ? (version.publishedOnUtc | date: 'medium') : '—' }}</td>
                       <td>
                         @if (!version.isPublished && permissionServicePublic.hasPermission(permissions.Legal.Publish)) {

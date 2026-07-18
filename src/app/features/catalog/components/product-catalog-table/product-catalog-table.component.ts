@@ -1,15 +1,23 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { MenuItem } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
+import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
+import { PermissionService } from '../../../../core/permissions/permission.service';
 import {
+  AdminActionMenuComponent,
   AdminDataTableShellComponent,
   AdminEmptyStateComponent,
+  AdminIconButtonComponent,
   AdminLoadingSkeletonComponent,
   AdminStatusBadgeComponent,
   AdminStatusTone,
 } from '../../../../shared/components/admin';
+import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { copyToClipboard, formatShortGuid } from '../../../../shared/utils/guid-display.util';
 import { Product, ProductStatus } from '../../models/product.model';
@@ -20,20 +28,30 @@ import { resolveProductImageUrl } from '../../utils/product-image.utils';
   selector: 'app-product-catalog-table',
   standalone: true,
   imports: [
+    RouterLink,
     TableModule,
     ButtonModule,
     TooltipModule,
+    TranslatePipe,
+    HasPermissionDirective,
     HamboxCurrencyPipe,
     AdminDataTableShellComponent,
     AdminStatusBadgeComponent,
     AdminEmptyStateComponent,
     AdminLoadingSkeletonComponent,
+    AdminIconButtonComponent,
+    AdminActionMenuComponent,
   ],
   templateUrl: './product-catalog-table.component.html',
   styleUrl: './product-catalog-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCatalogTableComponent {
+  private readonly permissionService = inject(PermissionService);
+  private readonly translate = inject(TranslateService);
+
+  protected readonly permissions = PERMISSIONS;
+
   readonly products = input.required<readonly Product[]>();
   readonly loading = input(false);
   readonly totalRecords = input(0);
@@ -46,6 +64,9 @@ export class ProductCatalogTableComponent {
 
   readonly pageChange = output<TableLazyLoadEvent>();
   readonly productSelect = output<string>();
+  readonly duplicateProduct = output<Product>();
+  readonly archiveProduct = output<Product>();
+  readonly deleteProduct = output<Product>();
 
   protected readonly tableSelection = computed(() => {
     const selectedId = this.selectedProductId();
@@ -108,5 +129,43 @@ export class ProductCatalogTableComponent {
         }
       }, 1500);
     }
+  }
+
+  protected productActionMenuItems(product: Product): MenuItem[] {
+    const t = (key: string) => this.translate.instant(key);
+    const items: MenuItem[] = [];
+
+    if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Create)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.DUPLICATE'),
+        icon: 'pi pi-copy',
+        command: () => this.duplicateProduct.emit(product),
+      });
+    }
+
+    if (
+      this.permissionService.hasPermission(this.permissions.Catalog.Products.Edit) &&
+      product.status !== 'Archived'
+    ) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.ARCHIVE'),
+        icon: 'pi pi-inbox',
+        command: () => this.archiveProduct.emit(product),
+      });
+    }
+
+    if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Delete)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.DELETE'),
+        icon: 'pi pi-trash',
+        command: () => this.deleteProduct.emit(product),
+      });
+    }
+
+    return items;
+  }
+
+  protected onActionsCellClick(event: Event): void {
+    event.stopPropagation();
   }
 }

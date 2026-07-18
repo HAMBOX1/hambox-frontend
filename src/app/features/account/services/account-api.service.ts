@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { ACCOUNT_API, AUTH_API, COMMUNICATION_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
@@ -22,8 +22,19 @@ import {
   UpdateReviewRequest,
   UserNotificationApiDto,
   UserProfileApiDto,
+  WalletApiDto,
   WishlistItemApiDto,
 } from '../models/account-api.model';
+
+// Mock until the rewards system ships its backend (ACCOUNT_API.wallet). Swap the
+// `of(MOCK_WALLET)` body below for `this.api.get<WalletApiDto>(ACCOUNT_API.wallet)`.
+const MOCK_WALLET: WalletApiDto = {
+  points: 12450,
+  estimatedValueUsd: 12.5,
+  lifetimeEarned: 15200,
+  lifetimeSpent: 2750,
+  tier: 'Gold',
+};
 
 @Injectable({
   providedIn: 'root',
@@ -175,5 +186,9 @@ export class AccountApiService {
 
   revealLibraryKey(libraryItemId: string): Observable<RevealCustomerLibraryKeyApiDto> {
     return this.api.get<RevealCustomerLibraryKeyApiDto>(ACCOUNT_API.revealLibraryKey(libraryItemId));
+  }
+
+  getWallet(): Observable<WalletApiDto> {
+    return of(MOCK_WALLET);
   }
 }

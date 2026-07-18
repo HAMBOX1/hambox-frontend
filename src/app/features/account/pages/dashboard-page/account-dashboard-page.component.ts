@@ -6,6 +6,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { WalletCardComponent } from '../../components/wallet-card/wallet-card.component';
 import { AccountDashboardFacade } from '../../services/account-dashboard.facade';
 import { AccountNotificationsFacade } from '../../services/account-notifications.facade';
 import { AccountWishlistFacade } from '../../services/account-wishlist.facade';
@@ -16,7 +17,7 @@ import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 @Component({
   selector: 'app-account-dashboard-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective],
+  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective, WalletCardComponent],
   templateUrl: './account-dashboard-page.component.html',
   styleUrl: './account-dashboard-page.component.scss',
 })

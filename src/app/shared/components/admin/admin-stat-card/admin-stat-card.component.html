@@ -1,4 +1,4 @@
-<article class="admin-stat-card" [class]="'admin-stat-card--' + tone()" [class.admin-stat-card--compact]="compact()">
+<ng-template #cardContent>
   <div class="admin-stat-card__top">
     <span class="admin-stat-card__label">{{ label() }}</span>
     @if (icon()) {
@@ -11,4 +11,20 @@
   @if (hint()) {
     <span class="admin-stat-card__hint">{{ hint() }}</span>
   }
-</article>
+</ng-template>
+
+@if (routerLink()) {
+  <a
+    class="admin-stat-card admin-stat-card--linkable"
+    [class]="'admin-stat-card--' + tone()"
+    [class.admin-stat-card--compact]="compact()"
+    [routerLink]="routerLink()!"
+    [queryParams]="queryParams()"
+  >
+    <ng-container *ngTemplateOutlet="cardContent" />
+  </a>
+} @else {
+  <article class="admin-stat-card" [class]="'admin-stat-card--' + tone()" [class.admin-stat-card--compact]="compact()">
+    <ng-container *ngTemplateOutlet="cardContent" />
+  </article>
+}

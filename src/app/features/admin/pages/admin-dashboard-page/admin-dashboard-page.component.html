@@ -21,6 +21,22 @@
         icon="pi pi-box"
         severity="secondary"
       ></a>
+      <a
+        *hamboxHasPermission="permissions.Catalog.Products.Create"
+        pButton
+        routerLink="/admin/products/new"
+        [label]="'ADMIN.DASHBOARD.CREATE_PRODUCT' | translate"
+        icon="pi pi-plus"
+        severity="secondary"
+      ></a>
+      <a
+        *hamboxHasPermission="permissions.Promotions.View"
+        pButton
+        routerLink="/admin/promotions"
+        [label]="'ADMIN.DASHBOARD.VIEW_PROMOTIONS' | translate"
+        icon="pi pi-tags"
+        severity="secondary"
+      ></a>
     </div>
   </app-admin-page-header>
 

@@ -4,7 +4,7 @@ html:not([data-theme]) {
   // Raw palette (future themes override these blocks only)
   --theme-background: #131314;
   --theme-surface: #1a1a1c;
-  --theme-surface-hover: rgba(255, 255, 255, 0.06);
+  --theme-surface-hover: var(--theme-elevated);
   --theme-card: #242426;
   --theme-elevated: #2a2a2b;
   --theme-sidebar: #0e0e0f;

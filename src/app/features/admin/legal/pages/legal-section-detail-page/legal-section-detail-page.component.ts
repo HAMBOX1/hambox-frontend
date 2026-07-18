@@ -1,5 +1,15 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -26,6 +36,7 @@ import {
   AdminLoadingSkeletonComponent,
   AdminPageHeaderComponent,
   AdminSectionCardComponent,
+  AdminStatusBadgeComponent,
   AdminUnsavedChangesDialogComponent,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
@@ -57,6 +68,7 @@ import { LegalManagementFacade } from '../../services/legal-management.facade';
     AdminSectionCardComponent,
     AdminDataTableShellComponent,
     AdminEmptyStateComponent,
+    AdminStatusBadgeComponent,
     AdminUnsavedChangesDialogComponent,
     AdminConfirmDialogComponent,
   ],
@@ -72,6 +84,8 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
   private readonly permissionService = inject(PermissionService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly facade = inject(LegalManagementFacade);
 
   protected readonly permissions = PERMISSIONS;
@@ -129,6 +143,13 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
   });
 
   ngOnInit(): void {
+    // p-editor (Quill) updates the form via its own internal event bus rather than an
+    // Angular-instrumented listener, so it never triggers OnPush change detection on its
+    // own — the control ends up genuinely dirty while the view (e.g. the Save/Publish
+    // buttons' [disabled] bindings) stays stale. Bridge every form event through
+    // markForCheck() so any control, including the editor, reliably repaints this view.
+    this.form.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.cdr.markForCheck());
+
     const slug = this.route.snapshot.paramMap.get('slug');
     if (!slug) {
       return;
@@ -272,6 +293,9 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
     }
 
     const success = await this.facade.restoreVersion(slug, version.id);
+    if (success) {
+      this.patchForm();
+    }
     this.messageService.add(
       success
         ? { severity: 'success', summary: this.translate.instant('ADMIN.LEGAL.MESSAGES.RESTORED'), life: 4000 }
@@ -408,6 +432,12 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
       requireAcceptance: detail?.requireAcceptance ?? false,
       versionNotes: source?.versionNotes ?? '',
     });
+
+    // p-editor (Quill) writes its initial content asynchronously and fires its own
+    // change event when it does, which marks contentEn/contentAr dirty even though the
+    // user hasn't touched anything. Resync pristine state after that settles, so the
+    // unsaved-changes guard doesn't fire on a page nobody actually edited.
+    setTimeout(() => this.form.markAsPristine());
   }
 
   private resolveUnsavedDialog(action: 'save' | 'discard' | 'cancel'): void {

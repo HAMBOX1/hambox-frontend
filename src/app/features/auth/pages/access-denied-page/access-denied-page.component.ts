@@ -17,7 +17,7 @@ import { ButtonModule } from 'primeng/button';
         }
       </p>
       <div class="access-denied__actions">
-        <a routerLink="/admin/dashboard" pButton>Go to Admin</a>
+        <a routerLink="/admin/products" pButton>Go to Admin</a>
         <a routerLink="/home" pButton severity="secondary">Go to Storefront</a>
       </div>
     </section>

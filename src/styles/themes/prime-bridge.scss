@@ -13,6 +13,10 @@ html[data-theme='hambox-light'] {
   --p-content-background: var(--surface);
   --p-content-border-color: var(--border);
   --p-content-color: var(--text-primary);
+  --p-content-hover-background: var(--color-surface-hover);
+  --p-content-hover-color: var(--text-primary);
+  --p-datatable-row-hover-background: var(--color-surface-hover);
+  --p-datatable-row-hover-color: var(--text-primary);
   --p-text-color: var(--text-primary);
   --p-text-muted-color: var(--text-muted);
   --p-inputtext-background: var(--color-input-bg);
@@ -24,4 +28,101 @@ html[data-theme='hambox-light'] {
   --p-form-field-color: var(--text-primary);
   --p-form-field-placeholder-color: var(--color-input-placeholder);
   --p-mask-background: var(--color-overlay);
+  --p-button-secondary-background: var(--color-btn-secondary-bg);
+  --p-button-secondary-hover-background: var(--color-surface-hover);
+  --p-button-secondary-active-background: var(--color-surface-hover);
+  --p-button-secondary-border-color: var(--color-btn-secondary-border);
+  --p-button-secondary-hover-border-color: var(--color-btn-secondary-border);
+  --p-button-secondary-active-border-color: var(--color-btn-secondary-border);
+  --p-button-secondary-color: var(--color-btn-secondary-text);
+  --p-button-secondary-hover-color: var(--color-btn-secondary-text);
+  --p-button-secondary-active-color: var(--color-btn-secondary-text);
+
+  // Rich text editor (p-editor / Quill). PrimeNG exposes these as design
+  // tokens; the raw Quill "snow" CSS underneath does not, see below.
+  --p-editor-toolbar-background: var(--color-card);
+  --p-editor-toolbar-border-color: var(--border);
+  --p-editor-toolbar-border-radius: var(--admin-radius-md);
+  --p-editor-toolbar-item-color: var(--text-secondary);
+  --p-editor-toolbar-item-hover-color: var(--primary);
+  --p-editor-toolbar-item-active-color: var(--primary);
+  --p-editor-overlay-background: var(--color-card);
+  --p-editor-overlay-border-color: var(--border);
+  --p-editor-overlay-border-radius: var(--admin-radius-md);
+  --p-editor-overlay-color: var(--text-primary);
+  --p-editor-overlay-shadow: var(--admin-shadow-panel);
+  --p-editor-overlay-option-color: var(--text-primary);
+  --p-editor-overlay-option-focus-background: var(--color-surface-hover);
+  --p-editor-overlay-option-focus-color: var(--primary);
+  --p-editor-overlay-option-border-radius: var(--hambox-radius-sm);
+  --p-editor-content-background: var(--color-input-bg);
+  --p-editor-content-border-color: var(--border);
+  --p-editor-content-color: var(--text-primary);
+  --p-editor-content-border-radius: var(--admin-radius-md);
+}
+
+// Quill bundles its own "snow" theme CSS (v1.3.3) alongside PrimeNG's
+// design-token layer above. A handful of its rules are plain hardcoded
+// colors with no corresponding PrimeNG token to bridge — the link color,
+// code/blockquote styling, the link-insert tooltip, and checklist markers.
+// Overridden globally here (not per-page) so every current and future
+// p-editor instance follows the active HAMBOX theme automatically. Values
+// are var()-based and already resolve correctly per theme without needing
+// the [data-theme] selector above; !important guards against Quill's
+// same-specificity base rules winning on source order.
+.p-editor {
+  .ql-snow.ql-toolbar button:disabled,
+  .ql-snow .ql-toolbar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ql-editor {
+    caret-color: var(--text-primary);
+
+    &::selection {
+      background: var(--color-primary-muted);
+      color: var(--text-primary);
+    }
+
+    a {
+      color: var(--primary) !important;
+    }
+
+    blockquote {
+      border-inline-start-color: var(--border) !important;
+    }
+
+    pre,
+    code {
+      background: var(--color-surface-hover) !important;
+      color: var(--text-primary) !important;
+    }
+
+    ul[data-checked] > li::before {
+      color: var(--text-muted) !important;
+    }
+  }
+
+  .ql-snow .ql-tooltip {
+    background: var(--color-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    box-shadow: var(--admin-shadow-panel) !important;
+
+    input[type='text'] {
+      background: var(--color-input-bg) !important;
+      border-color: var(--border) !important;
+      color: var(--text-primary) !important;
+    }
+
+    a {
+      color: var(--primary) !important;
+    }
+  }
+
+  &:focus-within .p-editor-content.ql-snow {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
 }

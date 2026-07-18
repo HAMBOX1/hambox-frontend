@@ -33,8 +33,36 @@
   margin: 0;
 }
 
-.variant-manager__generate-btn {
+.variant-manager__auto-generate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.375rem;
+}
+
+.variant-manager__auto-generate-status {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-success);
+  font-size: 0.8125rem;
+  font-weight: 600;
   white-space: nowrap;
+}
+
+.variant-manager__generate-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--variant-text-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.variant-manager__codes-dialog-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--variant-text);
 }
 
 .variant-manager__bulk-bar {
@@ -148,12 +176,15 @@
 }
 
 :host ::ng-deep {
+  .variant-manager__card-actions .p-button {
+    min-height: 2.75rem;
+  }
+
   .variant-manager__filters .p-select,
   .variant-manager__filters .p-inputtext,
   .variant-manager__bulk-controls .p-select,
   .variant-manager__bulk-controls .p-inputnumber,
-  .variant-manager__bulk-controls .p-inputnumber-input,
-  .variant-manager__generate-btn.p-button {
+  .variant-manager__bulk-controls .p-inputnumber-input {
     min-height: var(--variant-control-height);
   }
 
@@ -206,6 +237,15 @@
 
     .p-datatable-tbody > tr:hover > td {
       background: var(--variant-row-hover);
+    }
+
+    .p-datatable-tbody > tr.variant-manager__row--clickable {
+      cursor: pointer;
+    }
+
+    .p-datatable-tbody > tr.variant-manager__row--clickable:focus-visible > td {
+      outline: 2px solid var(--variant-accent);
+      outline-offset: -2px;
     }
 
     .p-datatable-tbody > tr.variant-manager__row--selected > td {
@@ -267,9 +307,83 @@
   }
 }
 
+.variant-manager__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.variant-manager__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.875rem;
+  border: 1px solid var(--variant-border);
+  border-radius: 0.75rem;
+  background: var(--variant-card);
+  cursor: pointer;
+
+  &:active {
+    background: var(--variant-row-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--variant-accent);
+    outline-offset: 2px;
+  }
+}
+
+.variant-manager__card--selected {
+  background: var(--variant-row-selected);
+  border-color: var(--variant-accent);
+}
+
+.variant-manager__card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.variant-manager__card-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.variant-manager__card-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.variant-manager__card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem 1rem;
+  color: var(--variant-text-muted);
+  font-size: 0.8125rem;
+}
+
+.variant-manager__card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 @media (max-width: 991px) {
-  .variant-manager__generate-btn {
+  .variant-manager__auto-generate {
+    align-items: stretch;
     width: 100%;
+  }
+
+  .variant-manager__auto-generate-status,
+  .variant-manager__generate-hint {
+    justify-content: center;
   }
 
   .variant-manager__bulk-controls {

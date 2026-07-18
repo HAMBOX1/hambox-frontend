@@ -129,6 +129,7 @@ export const ACCOUNT_API = {
   membershipSubscribe: '/api/v1/account/membership/subscribe',
   library: '/api/v1/account/library',
   revealLibraryKey: (id: string) => `/api/v1/account/library/${id}/reveal`,
+  wallet: '/api/v1/account/wallet',
 } as const;
 
 export const THEMES_API = {

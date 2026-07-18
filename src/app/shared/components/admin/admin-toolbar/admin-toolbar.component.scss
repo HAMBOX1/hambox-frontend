@@ -26,23 +26,25 @@
   margin-left: auto;
 }
 
+:host ::ng-deep {
+  .admin-toolbar__filters .p-select,
+  .admin-toolbar__filters .p-selectbutton {
+    min-width: 11rem;
+  }
+}
+
 @media (max-width: 767px) {
   .admin-toolbar__actions {
     width: 100%;
     margin-left: 0;
     justify-content: flex-end;
   }
-}
 
-:host ::ng-deep {
-  .admin-toolbar__filters .p-select,
-  .admin-toolbar__filters .p-selectbutton {
-    min-width: 11rem;
-  }
-
-  .admin-toolbar__filters .p-select,
-  .admin-toolbar__filters .p-dropdown,
-  .admin-toolbar__filters .p-multiselect {
-    width: 100%;
+  :host ::ng-deep {
+    .admin-toolbar__filters .p-select,
+    .admin-toolbar__filters .p-dropdown,
+    .admin-toolbar__filters .p-multiselect {
+      width: 100%;
+    }
   }
 }

@@ -36,6 +36,14 @@
       </div>
 
       <div class="detail-panel__header-actions">
+        <a
+          *hamboxHasPermission="permissions.Catalog.Products.Edit"
+          class="detail-panel__header-edit"
+          [routerLink]="['/admin/products', selected.id, 'edit']"
+        >
+          <i class="pi pi-pencil" aria-hidden="true"></i>
+          Edit
+        </a>
         <button type="button" class="detail-panel__close" aria-label="Close product details" (click)="onClose()">
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>

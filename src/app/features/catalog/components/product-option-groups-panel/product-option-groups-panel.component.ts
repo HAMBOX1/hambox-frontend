@@ -9,7 +9,6 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { ChipModule } from 'primeng/chip';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
@@ -30,7 +29,6 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
     ButtonModule,
     InputTextModule,
     CheckboxModule,
-    ChipModule,
     DragDropModule,
     HasPermissionDirective,
     AdminSectionCardComponent,

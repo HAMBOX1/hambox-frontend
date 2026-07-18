@@ -87,7 +87,7 @@ export class AdminLoginPageComponent {
                 'disabled in Settings → Authentication (typically because SMTP email ' +
                 'delivery is not configured yet). Re-enable Admin OTP as soon as email is working.',
             );
-            await this.router.navigateByUrl('/admin/dashboard');
+            await this.router.navigateByUrl('/admin/products');
             return;
           }
 

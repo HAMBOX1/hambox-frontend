@@ -9,6 +9,22 @@
   box-shadow: var(--admin-shadow-panel);
 }
 
+.admin-stat-card--linkable {
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--admin-transition, 160ms ease);
+
+  &:hover {
+    border-color: var(--admin-accent-green);
+    background: var(--admin-bg-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-accent-green);
+    outline-offset: 2px;
+  }
+}
+
 .admin-stat-card--compact {
   gap: 0.375rem;
   padding: 0.875rem 1rem;

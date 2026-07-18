@@ -2,19 +2,22 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 import { DecimalPipe } from '@angular/common';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
@@ -28,8 +31,10 @@ import {
   AdminToolbarComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
-import { ProductVariantDto } from '../../models/inventory-api.model';
+import { MobileViewportService } from '../../../../shared/services/mobile-viewport.service';
+import { CreateVariantRequest, ProductVariantDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { VariantInventoryPanelComponent } from '../variant-inventory-panel/variant-inventory-panel.component';
 
 const VARIANT_STATUS_OPTIONS = [
   { label: 'Draft', value: 'Draft' },
@@ -57,6 +62,9 @@ type VariantFilter = 'all' | 'out-of-stock' | 'draft';
     SelectModule,
     TableModule,
     TagModule,
+    TooltipModule,
+    DialogModule,
+    DrawerModule,
     DecimalPipe,
     HasPermissionDirective,
     AdminSectionCardComponent,
@@ -66,6 +74,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'draft';
     AdminEmptyStateComponent,
     AdminLoadingSkeletonComponent,
     AdminConfirmDialogComponent,
+    VariantInventoryPanelComponent,
   ],
   providers: [MessageService],
   templateUrl: './product-variant-manager.component.html',
@@ -75,7 +84,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'draft';
 export class ProductVariantManagerComponent {
   private readonly facade = inject(ProductEditorFacade);
   private readonly messageService = inject(MessageService);
-  private readonly router = inject(Router);
+  protected readonly mobileViewport = inject(MobileViewportService);
 
   protected readonly permissions = PERMISSIONS;
   protected readonly optionGroups = this.facade.optionGroups;
@@ -84,8 +93,8 @@ export class ProductVariantManagerComponent {
   protected readonly loading = this.facade.loading;
   protected readonly statusOptions = VARIANT_STATUS_OPTIONS;
   protected readonly statusFilterOptions = STATUS_FILTER_OPTIONS;
+  protected readonly variantGenerationResult = this.facade.variantGenerationResult;
 
-  protected readonly generating = signal(false);
   protected readonly saving = signal(false);
   protected readonly deleteDialogOpen = signal(false);
   protected readonly deleteTarget = signal<ProductVariantDto | null>(null);
@@ -103,10 +112,33 @@ export class ProductVariantManagerComponent {
   protected readonly bulkPrice = signal<number | null>(null);
   protected readonly bulkStatus = signal<string | null>(null);
 
-  protected readonly canGenerate = computed(() =>
-    this.optionGroups().length > 0 &&
-    this.optionGroups().every((group) => group.options.length > 0),
-  );
+  protected readonly codesDialogVisible = signal(false);
+  protected readonly selectedVariantForCodes = signal<ProductVariantDto | null>(null);
+  protected readonly creatingDefaultVariant = signal(false);
+
+  constructor() {
+    effect(() => {
+      const message = this.facade.variantSyncError();
+      if (message) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Variant sync failed',
+          detail: message,
+        });
+      }
+    });
+  }
+
+  protected readonly autoGenerationMessage = computed(() => {
+    const result = this.variantGenerationResult();
+    if (!result) {
+      return null;
+    }
+
+    return result.createdCount > 0
+      ? `${result.createdCount} variant(s) generated`
+      : 'Variants up to date';
+  });
 
   protected readonly variantsTable = computed(() => {
     const search = this.searchTerm().trim().toLowerCase();
@@ -148,33 +180,6 @@ export class ProductVariantManagerComponent {
     const visibleIds = this.variantsTable().map((variant) => variant.id);
     return visibleIds.length > 0 && visibleIds.every((id) => this.selectedVariantIds().includes(id));
   });
-
-  protected async generateVariants(): Promise<void> {
-    if (!this.canGenerate()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Option groups required',
-        detail: 'Add option groups with values before generating variants.',
-      });
-      return;
-    }
-
-    this.generating.set(true);
-    try {
-      const result = await this.facade.generateVariants();
-      if (!result) {
-        return;
-      }
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Variants generated',
-        detail: `Created ${result.createdCount}, preserved ${result.preservedCount} of ${result.totalCombinations} combinations.`,
-      });
-    } finally {
-      this.generating.set(false);
-    }
-  }
 
   protected startEdit(variant: ProductVariantDto): void {
     this.editingVariantId.set(variant.id);
@@ -236,15 +241,60 @@ export class ProductVariantManagerComponent {
     }
   }
 
-  protected viewInventory(variant: ProductVariantDto): void {
-    const productId = this.product()?.id;
-    if (!productId) {
+  protected async createDefaultVariant(): Promise<void> {
+    const product = this.product();
+    if (!product || this.creatingDefaultVariant()) {
       return;
     }
 
-    void this.router.navigate(['/admin/inventory', variant.id], {
-      queryParams: { productId },
-    });
+    this.creatingDefaultVariant.set(true);
+    try {
+      const request: CreateVariantRequest = {
+        sku: this.buildDefaultSku(product.nameEn),
+        sortOrder: 0,
+        lowStockThreshold: 5,
+        optionIds: [],
+      };
+
+      const created = await this.facade.createVariant(request);
+      if (!created) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Could not create variant',
+          detail: this.facade.error() ?? 'Please try again.',
+        });
+        return;
+      }
+
+      const variant = this.variants().find((item) => item.optionIds.length === 0);
+      if (variant) {
+        await this.manageCodes(variant);
+      }
+    } finally {
+      this.creatingDefaultVariant.set(false);
+    }
+  }
+
+  private buildDefaultSku(name: string): string {
+    const slug = name
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, '-')
+      .replace(/(^-+|-+$)/g, '');
+
+    return slug || 'DEFAULT';
+  }
+
+  protected async manageCodes(variant: ProductVariantDto): Promise<void> {
+    this.selectedVariantForCodes.set(variant);
+    this.codesDialogVisible.set(true);
+    await this.facade.selectVariant(variant.id);
+  }
+
+  protected onCodesDialogVisibleChange(visible: boolean): void {
+    this.codesDialogVisible.set(visible);
+    if (!visible) {
+      this.selectedVariantForCodes.set(null);
+    }
   }
 
   protected toggleSelectAll(checked: boolean): void {

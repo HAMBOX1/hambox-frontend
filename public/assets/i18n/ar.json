@@ -406,6 +406,18 @@
       "COMPLETED": "مكتمل",
       "EMPTY_ACTIVITY": "لا يوجد نشاط حديث بعد."
     },
+    "WALLET": {
+      "TITLE": "مكافآت HAMBOX",
+      "COMING_SOON": "نظام المكافآت قريباً",
+      "AVAILABLE_POINTS": "النقاط المتاحة",
+      "POINTS_UNIT": "نقطة",
+      "LIFETIME_EARNED": "إجمالي المكتسب",
+      "LIFETIME_SPENT": "إجمالي المُنفق",
+      "TIER": "المستوى",
+      "VIEW_HISTORY": "عرض السجل",
+      "HISTORY_TITLE": "سجل النقاط",
+      "HISTORY_EMPTY": "سيظهر سجل مكافآتك هنا بمجرد توفر نظام المكافآت."
+    },
     "ORDERS_UI": {
       "TITLE": "إدارة الطلبات",
       "SUBTITLE": "تابع مشترياتك الرقمية وتسليم المفاتيح بأمان.",
@@ -605,6 +617,18 @@
       "DELETE": {
         "TITLE": "حذف المنتج",
         "MESSAGE": "حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+      },
+      "ACTIONS": {
+        "EDIT": "تعديل",
+        "INVENTORY": "المخزون",
+        "DUPLICATE": "نسخ",
+        "ARCHIVE": "أرشفة",
+        "DELETE": "حذف"
+      },
+      "STOCK": {
+        "IN_STOCK": "{{count}} متوفر",
+        "ADD_STOCK": "انقر لإضافة مخزون",
+        "ARIA_LABEL": "عرض المخزون والمتغيرات لـ {{name}}"
       },
       "TOAST": {
         "PUBLISHED_TITLE": "تم النشر",
@@ -1189,6 +1213,8 @@
       "SUBTITLE": "مقاييس التجارة والمخزون والعضويات من بيانات الإنتاج.",
       "VIEW_ORDERS": "عرض الطلبات",
       "VIEW_INVENTORY": "عرض المخزون",
+      "CREATE_PRODUCT": "إنشاء منتج",
+      "VIEW_PROMOTIONS": "العروض",
       "STATS": {
         "REVENUE_TODAY": "إيرادات اليوم",
         "ORDERS_TODAY": "طلبات اليوم",

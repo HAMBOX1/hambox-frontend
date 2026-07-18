@@ -37,11 +37,52 @@
   min-width: 0;
 }
 
+.product-catalog-table__product-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .product-catalog-table__product-name {
   overflow: hidden;
-  max-width: 22rem;
+  max-width: 18rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.product-catalog-table__stock-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  padding: 0.125rem 0.125rem 0.125rem 0;
+  text-decoration: none;
+  border-radius: var(--admin-radius-pill);
+  cursor: pointer;
+  transition: opacity var(--admin-transition-fast);
+
+  &:hover {
+    opacity: 0.85;
+
+    .product-catalog-table__stock-icon {
+      color: var(--admin-accent-green);
+      transform: translateX(2px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-accent-green);
+    outline-offset: 2px;
+  }
+}
+
+.product-catalog-table__stock-icon {
+  font-size: 0.625rem;
+  color: var(--admin-text-muted);
+  transition:
+    color var(--admin-transition-fast),
+    transform var(--admin-transition-fast);
 }
 
 .product-catalog-table__product-desc {

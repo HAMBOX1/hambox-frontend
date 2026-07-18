@@ -202,11 +202,21 @@
 .legal-page__body {
   line-height: 1.75;
   color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  // Rich text saved from the admin editor (especially pasted content) can carry
+  // inline style="color:..." attributes that survive independently of the app
+  // theme. Force every descendant to defer to the theme first, then let the
+  // more specific rules below re-assert the intended heading/link/quote colors.
+  ::ng-deep * {
+    color: inherit !important;
+  }
 
   ::ng-deep h2,
   ::ng-deep h3 {
     scroll-margin-top: var(--hambox-spacing-6);
-    color: var(--color-text-primary);
+    color: var(--color-text-primary) !important;
     font-family: var(--sf-font-heading);
     margin: var(--sf-section-gap) 0 var(--hambox-spacing-3);
   }
@@ -222,14 +232,14 @@
   }
 
   ::ng-deep a {
-    color: var(--color-primary);
+    color: var(--color-primary) !important;
   }
 
   ::ng-deep blockquote {
     margin: 0 0 var(--hambox-spacing-4);
     padding-inline-start: var(--hambox-spacing-4);
     border-inline-start: 3px solid var(--color-primary-border);
-    color: var(--color-text-muted);
+    color: var(--color-text-muted) !important;
     font-style: italic;
   }
 
@@ -257,7 +267,10 @@
   }
 
   ::ng-deep table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
     border-collapse: collapse;
     margin: 0 0 var(--hambox-spacing-4);
   }

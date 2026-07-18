@@ -30,6 +30,7 @@ export interface Product {
   readonly primaryImageUrl?: string | null;
   readonly images?: readonly ProductImage[] | null;
   readonly createdOnUtc?: string;
+  readonly availableStock?: number;
 }
 
 export interface CreateProductRequest {

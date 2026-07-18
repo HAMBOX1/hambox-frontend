@@ -28,6 +28,7 @@
           <th>Category</th>
           <th class="product-catalog-table__price-head">Price</th>
           <th>Status</th>
+          <th style="width: 6.5rem"></th>
         </tr>
       </ng-template>
 
@@ -49,7 +50,24 @@
                 }
               </span>
               <span class="product-catalog-table__product-copy">
-                <span class="admin-cell-primary product-catalog-table__product-name">{{ product.nameEn }}</span>
+                <span class="product-catalog-table__product-name-row">
+                  <span class="admin-cell-primary product-catalog-table__product-name">{{ product.nameEn }}</span>
+                  <a
+                    class="product-catalog-table__stock-link"
+                    [routerLink]="['/admin/products', product.id, 'edit']"
+                    fragment="variants"
+                    (click)="$event.stopPropagation()"
+                    [attr.aria-label]="'ADMIN.CATALOG_PAGE.STOCK.ARIA_LABEL' | translate: { name: product.nameEn }"
+                  >
+                    <app-admin-status-badge
+                      [label]="(product.availableStock ?? 0) > 0
+                        ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
+                        : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
+                      [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
+                    />
+                    <i class="pi pi-arrow-right product-catalog-table__stock-icon" aria-hidden="true"></i>
+                  </a>
+                </span>
                 <span class="admin-cell-secondary product-catalog-table__product-desc">{{ product.descriptionEn || 'No description' }}</span>
               </span>
             </div>
@@ -88,12 +106,26 @@
               [tone]="statusTone(product.status)"
             />
           </td>
+          <td (click)="onActionsCellClick($event)">
+            <div class="admin-actions-row">
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Catalog.Products.Edit"
+                icon="pi pi-pencil"
+                [label]="'ADMIN.CATALOG_PAGE.ACTIONS.EDIT' | translate"
+                [routerLink]="'/admin/products/' + product.id + '/edit'"
+              />
+              @let menuItems = productActionMenuItems(product);
+              @if (menuItems.length > 0) {
+                <app-admin-action-menu [items]="menuItems" />
+              }
+            </div>
+          </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5">
+          <td colspan="6">
             <app-admin-empty-state
               icon="pi pi-inbox"
               [title]="searchActive() ? 'No matching products' : 'No products yet'"

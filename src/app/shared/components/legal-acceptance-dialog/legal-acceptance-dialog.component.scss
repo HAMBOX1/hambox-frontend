@@ -10,6 +10,18 @@
   line-height: 1.7;
   max-height: 360px;
   overflow-y: auto;
+  color: var(--color-text-secondary);
+
+  // Rich text saved from the admin editor (especially pasted content) can carry
+  // inline style="color:..." attributes that survive independently of the app
+  // theme — force every descendant to defer to the theme instead.
+  ::ng-deep * {
+    color: inherit !important;
+  }
+
+  ::ng-deep a {
+    color: var(--color-primary) !important;
+  }
 
   ::ng-deep table {
     width: 100%;

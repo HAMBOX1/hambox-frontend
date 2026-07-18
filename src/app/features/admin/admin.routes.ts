@@ -7,7 +7,7 @@ import { PERMISSIONS } from '../../core/permissions/permission.constants';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'products',
     pathMatch: 'full',
   },
   {

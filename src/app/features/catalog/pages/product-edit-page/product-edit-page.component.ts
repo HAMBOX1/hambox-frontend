@@ -1,16 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  effect,
   inject,
   OnInit,
-  signal,
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
-import { TabsModule } from 'primeng/tabs';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
@@ -35,7 +35,6 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
     RouterLink,
     ToastModule,
     ButtonModule,
-    TabsModule,
     HasPermissionDirective,
     AdminSectionCardComponent,
     AdminErrorAlertComponent,
@@ -58,11 +57,11 @@ export class ProductEditPageComponent implements OnInit {
   private readonly facade = inject(ProductEditorFacade);
   private readonly messageService = inject(MessageService);
 
-  private readonly generalForm = viewChild('generalForm', { read: ProductBasicInfoFormComponent });
-  private readonly pricingForm = viewChild('pricingForm', { read: ProductBasicInfoFormComponent });
+  private readonly productForm = viewChild('productForm', { read: ProductBasicInfoFormComponent });
+  private readonly variantsAnchor = viewChild<ElementRef<HTMLElement>>('variantsAnchor');
+  private hasScrolledToFragment = false;
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly activeTab = signal('general');
   protected readonly product = this.facade.product;
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;
@@ -72,6 +71,25 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly submitting = this.facade.submitting;
   protected readonly productId = this.facade.productId;
   protected readonly variants = this.facade.variants;
+
+  constructor() {
+    effect(() => {
+      if (this.hasScrolledToFragment || this.loading() || !this.product()) {
+        return;
+      }
+      if (this.route.snapshot.fragment !== 'variants') {
+        return;
+      }
+
+      const anchor = this.variantsAnchor();
+      if (!anchor) {
+        return;
+      }
+
+      this.hasScrolledToFragment = true;
+      anchor.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 
   ngOnInit(): void {
     const productId = this.route.snapshot.paramMap.get('id');
@@ -96,10 +114,6 @@ export class ProductEditPageComponent implements OnInit {
     }
   }
 
-  protected onTabChange(value: string | number | undefined): void {
-    this.activeTab.set(String(value ?? 'general'));
-  }
-
   protected onCategoryCreated(): void {
     void this.facade.loadCategories();
   }
@@ -110,22 +124,18 @@ export class ProductEditPageComponent implements OnInit {
 
   protected async onSave(navigateAway = false): Promise<void> {
     const product = this.product();
-    const general = this.generalForm();
-    const pricing = this.pricingForm();
+    const form = this.productForm();
 
-    const generalValue = general?.getGeneralValue();
-    const price = pricing?.getPriceValue() ?? general?.getPriceValue();
+    const generalValue = form?.getGeneralValue();
+    const price = form?.getPriceValue();
 
     if (!generalValue || price === null || price === undefined || !product) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Validation required',
-        detail: 'Complete all required fields in General and Pricing before saving.',
+        detail: 'Complete all required fields before saving.',
         life: 5000,
       });
-      if (this.activeTab() !== 'general' && this.activeTab() !== 'pricing') {
-        this.activeTab.set('general');
-      }
       return;
     }
 

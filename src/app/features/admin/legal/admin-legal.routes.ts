@@ -14,14 +14,6 @@ export const routes: Routes = [
     canActivate: [permissionGuard([PERMISSIONS.Legal.View])],
   },
   {
-    path: 'sections',
-    loadComponent: () =>
-      import('./pages/legal-sections-list-page/legal-sections-list-page.component').then(
-        (c) => c.LegalSectionsListPageComponent,
-      ),
-    canActivate: [permissionGuard([PERMISSIONS.Legal.View])],
-  },
-  {
     path: 'acceptance-tracking',
     loadComponent: () =>
       import('./pages/legal-acceptance-tracking-page/legal-acceptance-tracking-page.component').then(

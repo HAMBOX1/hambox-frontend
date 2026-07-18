@@ -49,61 +49,36 @@
       </div>
     </header>
 
-    <p-tabs class="admin-detail-tabs product-edit-page__tabs" [value]="activeTab()" (valueChange)="onTabChange($event)">
-      <p-tablist>
-        <p-tab value="general">General</p-tab>
-        <p-tab value="media">Media</p-tab>
-        <p-tab value="pricing">Pricing</p-tab>
-        <p-tab value="options">Option Groups</p-tab>
-        <p-tab value="variants">Variants</p-tab>
-      </p-tablist>
+    <div class="product-edit-page__setup">
+      <app-admin-section-card
+        title="General &amp; Pricing"
+        description="Names, descriptions, category, and the base price used when variants don't override it."
+      >
+        <app-product-basic-info-form
+          #productForm
+          section="full"
+          [initialSnapshot]="formSnapshot()"
+          [categories]="categories()"
+          [categoriesLoading]="categoriesLoading()"
+          [categoriesError]="error()"
+          [disabled]="submitting()"
+          (categoryCreated)="onCategoryCreated()"
+        />
+      </app-admin-section-card>
 
-      <p-tabpanels>
-        <p-tabpanel value="general">
-          <app-admin-section-card title="General" description="Names, descriptions, and category.">
-            <app-product-basic-info-form
-              #generalForm
-              section="general"
-              [initialSnapshot]="formSnapshot()"
-              [categories]="categories()"
-              [categoriesLoading]="categoriesLoading()"
-              [categoriesError]="error()"
-              [disabled]="submitting()"
-              (categoryCreated)="onCategoryCreated()"
-            />
-          </app-admin-section-card>
-        </p-tabpanel>
+      <app-admin-section-card
+        title="Media"
+        description="Upload, reorder, and set the primary storefront image."
+      >
+        <app-product-assets-upload [productId]="productId()!" />
+      </app-admin-section-card>
 
-        <p-tabpanel value="media">
-          <app-admin-section-card
-            title="Media"
-            description="Upload, reorder, and set the primary storefront image."
-          >
-            <app-product-assets-upload [productId]="productId()!" />
-          </app-admin-section-card>
-        </p-tabpanel>
+      <app-product-option-groups-panel />
 
-        <p-tabpanel value="pricing">
-          <app-admin-section-card title="Pricing" description="Base price used when variants do not override pricing.">
-            <app-product-basic-info-form
-              #pricingForm
-              section="pricing"
-              [initialSnapshot]="formSnapshot()"
-              [categories]="categories()"
-              [disabled]="submitting()"
-            />
-          </app-admin-section-card>
-        </p-tabpanel>
-
-        <p-tabpanel value="options">
-          <app-product-option-groups-panel />
-        </p-tabpanel>
-
-        <p-tabpanel value="variants">
-          <app-product-variant-manager />
-        </p-tabpanel>
-      </p-tabpanels>
-    </p-tabs>
+      <div #variantsAnchor class="product-edit-page__variants-anchor">
+        <app-product-variant-manager />
+      </div>
+    </div>
 
     <app-admin-sticky-save-bar>
       <button pButton type="button" label="Cancel" severity="secondary" [disabled]="submitting()" (click)="onCancel()"></button>

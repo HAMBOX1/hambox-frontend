@@ -49,6 +49,14 @@ export interface MembershipCardApiDto {
   readonly benefits: readonly MembershipBenefitApiDto[];
 }
 
+export interface WalletApiDto {
+  readonly points: number;
+  readonly estimatedValueUsd: number;
+  readonly lifetimeEarned: number;
+  readonly lifetimeSpent: number;
+  readonly tier: string;
+}
+
 export interface WishlistPreviewItemApiDto {
   readonly productId: string;
   readonly productNameEn: string;

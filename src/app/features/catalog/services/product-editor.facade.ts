@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 
 
-import { ApiError } from '../../../core/models/api-error.model';
+import { ApiError, parseApiError } from '../../../core/models/api-error.model';
 
 import { CategoryOption } from '../models/category.model';
 
@@ -108,6 +108,10 @@ export class ProductEditorFacade {
 
   private readonly statisticsState = signal<InventoryStatisticsDto | null>(null);
 
+  private readonly variantGenerationState = signal<GenerateProductVariantsResultDto | null>(null);
+
+  private readonly variantSyncErrorState = signal<string | null>(null);
+
   private readonly batchesState = signal<readonly InventoryBatchDto[]>([]);
 
   private readonly codesState = signal<readonly DigitalInventoryCodeDto[]>([]);
@@ -147,6 +151,10 @@ export class ProductEditorFacade {
   readonly optionGroups = this.optionGroupsState.asReadonly();
 
   readonly statistics = this.statisticsState.asReadonly();
+
+  readonly variantGenerationResult = this.variantGenerationState.asReadonly();
+
+  readonly variantSyncError = this.variantSyncErrorState.asReadonly();
 
   readonly batches = this.batchesState.asReadonly();
 
@@ -705,7 +713,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.createOptionGroup(productId, request));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -737,7 +745,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.updateOptionGroup(groupId, request));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -769,7 +777,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.deleteOptionGroup(groupId));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -801,7 +809,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.reorderOptionGroups(productId, { orderedIds }));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -833,7 +841,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.createOption(groupId, request));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -865,7 +873,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.updateOption(optionId, request));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -897,7 +905,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.deleteOption(optionId));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -929,7 +937,7 @@ export class ProductEditorFacade {
 
       await firstValueFrom(this.inventoryApi.reorderOptions(groupId, { orderedIds }));
 
-      await this.reloadInventory(productId);
+      await this.syncVariants(productId);
 
       return true;
 
@@ -972,38 +980,6 @@ export class ProductEditorFacade {
       this.errorState.set(this.toErrorMessage(error, 'Failed to create variant.'));
 
       return false;
-
-    }
-
-  }
-
-
-
-  async generateVariants(): Promise<GenerateProductVariantsResultDto | null> {
-
-    const productId = this.productId();
-
-    if (!productId) {
-
-      return null;
-
-    }
-
-
-
-    try {
-
-      const result = await firstValueFrom(this.inventoryApi.generateVariants(productId));
-
-      await this.reloadInventory(productId);
-
-      return result;
-
-    } catch (error) {
-
-      this.errorState.set(this.toErrorMessage(error, 'Failed to generate variants.'));
-
-      return null;
 
     }
 
@@ -1549,6 +1525,23 @@ export class ProductEditorFacade {
   }
 
 
+
+  /** Best-effort: regenerates variants from the current option groups, then reloads. Fails silently while option groups are mid-edit (e.g. a group with no values yet) — same pattern as publishProduct()'s legacy variant activation. */
+  private async syncVariants(productId: string): Promise<void> {
+    try {
+      const result = await firstValueFrom(this.inventoryApi.generateVariants(productId));
+      this.variantGenerationState.set(result);
+      this.variantSyncErrorState.set(null);
+    } catch (error) {
+      const apiError = parseApiError(error);
+      // 400 = option groups are incomplete (e.g. a new group with no values yet); expected, not a failure.
+      this.variantSyncErrorState.set(
+        apiError.status === 400 ? null : this.toErrorMessage(error, 'Failed to regenerate variants.'),
+      );
+    }
+
+    await this.reloadInventory(productId);
+  }
 
   private async reloadInventory(productId: string): Promise<void> {
 

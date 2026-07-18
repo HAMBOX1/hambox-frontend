@@ -66,10 +66,13 @@
 }
 
 .admin-topbar__context-label {
+  overflow: hidden;
   color: var(--admin-text-primary);
   font-size: var(--admin-type-caption);
   font-weight: 700;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .admin-topbar__context-hint {
@@ -150,5 +153,17 @@
 @media (max-width: 767px) {
   .admin-topbar__context-hint {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-topbar {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .admin-topbar__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }

@@ -406,6 +406,18 @@
       "COMPLETED": "Completed",
       "EMPTY_ACTIVITY": "No recent activity yet."
     },
+    "WALLET": {
+      "TITLE": "HAMBOX Rewards",
+      "COMING_SOON": "Rewards system coming soon",
+      "AVAILABLE_POINTS": "Available Points",
+      "POINTS_UNIT": "pts",
+      "LIFETIME_EARNED": "Lifetime Earned",
+      "LIFETIME_SPENT": "Lifetime Spent",
+      "TIER": "Tier",
+      "VIEW_HISTORY": "View History",
+      "HISTORY_TITLE": "Points History",
+      "HISTORY_EMPTY": "Your rewards history will appear here once the rewards system becomes available."
+    },
     "ORDERS_UI": {
       "TITLE": "Order Management",
       "SUBTITLE": "Track your digital acquisitions and secure key delivery.",
@@ -605,6 +617,18 @@
       "DELETE": {
         "TITLE": "Delete product",
         "MESSAGE": "Delete \"{{name}}\"? This cannot be undone."
+      },
+      "ACTIONS": {
+        "EDIT": "Edit",
+        "INVENTORY": "Inventory",
+        "DUPLICATE": "Duplicate",
+        "ARCHIVE": "Archive",
+        "DELETE": "Delete"
+      },
+      "STOCK": {
+        "IN_STOCK": "{{count}} in stock",
+        "ADD_STOCK": "Click to add stock",
+        "ARIA_LABEL": "View stock and variants for {{name}}"
       },
       "TOAST": {
         "PUBLISHED_TITLE": "Published",
@@ -1199,6 +1223,8 @@
       "SUBTITLE": "Live commerce, inventory, and membership metrics from production data.",
       "VIEW_ORDERS": "View orders",
       "VIEW_INVENTORY": "View inventory",
+      "CREATE_PRODUCT": "Create product",
+      "VIEW_PROMOTIONS": "Promotions",
       "STATS": {
         "REVENUE_TODAY": "Revenue today",
         "ORDERS_TODAY": "Orders today",

@@ -14,7 +14,7 @@ import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { ProductCatalogToolbarComponent } from '../../components/product-catalog-toolbar/product-catalog-toolbar.component';
 import { ProductCatalogTableComponent } from '../../components/product-catalog-table/product-catalog-table.component';
 import { ProductDetailPanelComponent } from '../../components/product-detail-panel/product-detail-panel.component';
-import { ProductStatus } from '../../models/product.model';
+import { Product, ProductStatus } from '../../models/product.model';
 import { ProductCatalogFacade } from '../../services/product-catalog.facade';
 import {
   AdminConfirmDialogComponent,
@@ -81,6 +81,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly deleteDialogOpen = signal(false);
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateNameSuffix = signal(' Copy');
+  protected readonly actionTarget = signal<Product | null>(null);
 
   protected readonly tableFirst = computed(
     () => (this.facade.pageNumber() - 1) * this.facade.pageSize(),
@@ -165,13 +166,18 @@ export class ProductCatalogPageComponent implements OnInit {
     }
   }
 
-  protected openDuplicateDialog(): void {
+  protected openDuplicateDialog(product: Product | null = this.selectedProduct()): void {
+    if (!product) {
+      return;
+    }
+
+    this.actionTarget.set(product);
     this.duplicateNameSuffix.set(this.translate.instant('ADMIN.CATALOG_PAGE.DUPLICATE.DEFAULT_SUFFIX'));
     this.duplicateDialogOpen.set(true);
   }
 
   protected async confirmDuplicate(): Promise<void> {
-    const product = this.selectedProduct();
+    const product = this.actionTarget();
     if (!product) {
       return;
     }
@@ -189,14 +195,15 @@ export class ProductCatalogPageComponent implements OnInit {
     }
   }
 
-  protected requestDelete(): void {
-    if (this.selectedProduct()) {
+  protected requestDelete(product: Product | null = this.selectedProduct()): void {
+    if (product) {
+      this.actionTarget.set(product);
       this.deleteDialogOpen.set(true);
     }
   }
 
   protected async confirmDelete(): Promise<void> {
-    const product = this.selectedProduct();
+    const product = this.actionTarget();
     if (!product) {
       return;
     }
@@ -214,10 +221,22 @@ export class ProductCatalogPageComponent implements OnInit {
   }
 
   protected deleteDialogMessage(): string {
-    const product = this.selectedProduct();
+    const product = this.actionTarget();
     return product
       ? this.translate.instant('ADMIN.CATALOG_PAGE.DELETE.MESSAGE', { name: product.nameEn })
       : '';
+  }
+
+  protected async onRowArchive(product: Product): Promise<void> {
+    const success = await this.facade.updateProductStatus(product, 'Archived');
+    if (success) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', { name: product.nameEn }),
+        life: 4000,
+      });
+    }
   }
 
   protected retryLoad(): void {
