@@ -93,7 +93,7 @@
   font-size: clamp(2rem, 3.4vw, 2.75rem);
   font-weight: 700;
   line-height: 1.08;
-  color: var(--theme-auth-hero-text);
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
@@ -119,10 +119,10 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem 1.125rem;
-  border: 1px solid var(--theme-auth-feature-border);
+  border: 1px solid var(--border);
   border-left: 3px solid transparent;
   border-radius: 12px;
-  background: var(--theme-auth-feature-bg);
+  background: var(--surface);
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease;
@@ -130,7 +130,7 @@
 
 .register-page__feature--active {
   border-left-color: var(--register-green);
-  background: var(--theme-auth-feature-bg);
+  background: var(--surface);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
@@ -150,14 +150,14 @@
   margin: 0 0 0.25rem;
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--theme-auth-hero-text);
+  color: var(--text-primary);
 }
 
 .register-page__feature-text {
   margin: 0;
   font-size: 0.8125rem;
   line-height: 1.55;
-  color: var(--theme-auth-hero-muted);
+  color: var(--text-secondary);
 }
 
 .register-page__gateway {
