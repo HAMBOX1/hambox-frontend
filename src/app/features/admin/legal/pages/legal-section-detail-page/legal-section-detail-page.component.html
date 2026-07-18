@@ -315,7 +315,7 @@
 >
   <label class="legal-section-detail-page__field">
     <span>{{ 'ADMIN.LEGAL.DUPLICATE.SLUG_LABEL' | translate }}</span>
-    <input pInputText type="text" [value]="duplicateSlug()" (input)="duplicateSlug.set(($any($event.target)).value)" />
+    <input pInputText type="text" [value]="duplicateSlug()" (input)="onDuplicateSlugInput($any($event.target).value)" />
   </label>
   <label class="legal-section-detail-page__field">
     <span>{{ 'ADMIN.LEGAL.DUPLICATE.TITLE_LABEL' | translate }}</span>

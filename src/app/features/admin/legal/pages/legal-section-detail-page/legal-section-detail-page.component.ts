@@ -41,7 +41,7 @@ import {
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
-import { LEGAL_SECTION_CATEGORY_SUGGESTIONS, LegalSectionVersionDto } from '../../models/legal-section.model';
+import { LEGAL_SECTION_CATEGORY_SUGGESTIONS, LegalSectionVersionDto, slugify } from '../../models/legal-section.model';
 import { LegalManagementFacade } from '../../services/legal-management.facade';
 
 @Component({
@@ -149,6 +149,13 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
     // buttons' [disabled] bindings) stays stale. Bridge every form event through
     // markForCheck() so any control, including the editor, reliably repaints this view.
     this.form.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.cdr.markForCheck());
+
+    this.form.controls.slug.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
+      const clean = slugify(value);
+      if (clean !== value) {
+        this.form.controls.slug.setValue(clean, { emitEvent: false });
+      }
+    });
 
     const slug = this.route.snapshot.paramMap.get('slug');
     if (!slug) {
@@ -338,13 +345,17 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
     if (!detail) {
       return;
     }
-    this.duplicateSlug.set(`${detail.slug}-copy`);
+    this.duplicateSlug.set(slugify(`${detail.slug}-copy`));
     this.duplicateTitle.set(`${detail.publishedVersion?.titleEn ?? detail.draftVersion?.titleEn ?? detail.slug} Copy`);
     this.duplicateDialogOpen.set(true);
   }
 
   protected closeDuplicateDialog(): void {
     this.duplicateDialogOpen.set(false);
+  }
+
+  protected onDuplicateSlugInput(value: string): void {
+    this.duplicateSlug.set(slugify(value));
   }
 
   protected async confirmDuplicate(): Promise<void> {
@@ -414,7 +425,7 @@ export class LegalSectionDetailPageComponent implements OnInit, HasUnsavedChange
     const source = detail?.draftVersion ?? detail?.publishedVersion;
 
     this.form.reset({
-      slug: detail?.slug ?? '',
+      slug: slugify(detail?.slug ?? ''),
       titleEn: source?.titleEn ?? '',
       titleAr: source?.titleAr ?? '',
       contentEn: source?.contentEn ?? '',

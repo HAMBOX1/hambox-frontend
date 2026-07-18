@@ -209,7 +209,7 @@
       type="text"
       placeholder="my-new-policy"
       [value]="createSlug()"
-      (input)="createSlug.set(($any($event.target)).value)"
+      (input)="onCreateSlugInput($any($event.target).value)"
     />
     <span class="legal-dashboard-page__field-hint">{{ 'ADMIN.LEGAL.CREATE.SLUG_HINT' | translate: { slug: createSlug() || 'my-new-policy' } }}</span>
   </label>
@@ -256,7 +256,7 @@
       class="legal-dashboard-page__field-input"
       type="text"
       [value]="duplicateSlug()"
-      (input)="duplicateSlug.set(($any($event.target)).value)"
+      (input)="onDuplicateSlugInput($any($event.target).value)"
     />
   </label>
 

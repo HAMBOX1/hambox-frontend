@@ -111,3 +111,12 @@ export interface LegalSectionQueryFilter {
 
 /** Suggested values only — Category is free text, admins can enter anything. */
 export const LEGAL_SECTION_CATEGORY_SUGGESTIONS = ['Policies', 'Legal', 'Support', 'Membership', 'Commerce', 'General'] as const;
+
+/** Backend requires slugs matching ^[a-z0-9]+(-[a-z0-9]+)*$ — normalize as the admin types instead of rejecting on save. */
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}

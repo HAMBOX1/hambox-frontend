@@ -36,6 +36,7 @@ import {
   LegalSectionListItemDto,
   LegalSectionQueryFilter,
   LegalSectionStatusFilter,
+  slugify,
 } from '../../models/legal-section.model';
 import { LegalManagementFacade } from '../../services/legal-management.facade';
 
@@ -208,6 +209,10 @@ export class LegalDashboardPageComponent implements OnInit {
     this.createDialogOpen.set(false);
   }
 
+  protected onCreateSlugInput(value: string): void {
+    this.createSlug.set(slugify(value));
+  }
+
   protected async confirmCreate(): Promise<void> {
     const slug = this.createSlug().trim().toLowerCase();
     const titleEn = this.createTitle().trim();
@@ -243,7 +248,7 @@ export class LegalDashboardPageComponent implements OnInit {
 
   protected openDuplicateDialog(section: LegalSectionListItemDto): void {
     this.duplicateTarget.set(section);
-    this.duplicateSlug.set(`${section.slug}-copy`);
+    this.duplicateSlug.set(slugify(`${section.slug}-copy`));
     this.duplicateTitle.set(`${section.titleEn} Copy`);
     this.duplicateDialogOpen.set(true);
   }
@@ -251,6 +256,10 @@ export class LegalDashboardPageComponent implements OnInit {
   protected closeDuplicateDialog(): void {
     this.duplicateDialogOpen.set(false);
     this.duplicateTarget.set(null);
+  }
+
+  protected onDuplicateSlugInput(value: string): void {
+    this.duplicateSlug.set(slugify(value));
   }
 
   protected async confirmDuplicate(): Promise<void> {
