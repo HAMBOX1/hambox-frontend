@@ -5,91 +5,34 @@
     title="Categories"
     [subtitle]="subtitle()"
     [breadcrumbs]="breadcrumbs"
+    [compactActions]="true"
   >
-    <button
+    <app-admin-icon-button
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Categories.Create"
-      pButton
-      type="button"
-      class="admin-btn-primary"
-      label="Create Category"
       icon="pi pi-plus"
-      (click)="openCreateDialog()"
-    ></button>
+      label="Create Category"
+      severity="primary"
+      (pressed)="openCreateDialog()"
+    />
   </app-admin-page-header>
 
-  <app-admin-stat-grid>
-    <app-admin-stat-card
-      [compact]="true"
-      label="Total Categories"
-      [value]="listStats().total"
-      icon="pi-tags"
-    />
-    <app-admin-stat-card
-      [compact]="true"
-      label="Active"
-      [value]="listStats().active"
-      hint="On this page"
-      icon="pi-check-circle"
-      tone="success"
-    />
-    <app-admin-stat-card
-      [compact]="true"
-      label="Inactive"
-      [value]="listStats().inactive"
-      hint="On this page"
-      icon="pi-ban"
-      tone="default"
-    />
-  </app-admin-stat-grid>
-
-  <app-admin-toolbar>
-    <app-admin-search-bar
-      adminToolbarSearch
-      [value]="searchTerm()"
-      placeholder="Search categories by name or slug..."
-      (searchChange)="onSearchChange($event)"
-    />
-    <p-select
-      adminToolbarFilters
-      [options]="statusOptions"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Filter status"
-      [ngModel]="statusFilter()"
-      (ngModelChange)="onStatusFilterChange($event)"
-    />
-    @if (hasActiveFilters()) {
-      <button
-        adminToolbarActions
-        pButton
-        type="button"
-        label="Clear filters"
-        icon="pi pi-filter-slash"
-        severity="secondary"
-        text
-        (click)="onClearFilters()"
-      ></button>
-    }
-  </app-admin-toolbar>
+  <app-admin-search-bar
+    class="category-list-page__search"
+    [value]="searchTerm()"
+    placeholder="Search the category tree..."
+    (searchChange)="onSearchChange($event)"
+  />
 
   @if (error()) {
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
-  <app-category-table
-    [categories]="items()"
-    [parentOptions]="items()"
-    [loading]="loading()"
-    [totalRecords]="totalCount()"
-    [pageSize]="pageSize()"
-    [first]="tableFirst()"
-    [searchActive]="hasActiveSearch()"
-    (pageChange)="onPageChange($event)"
+  <app-category-tree
     (createCategory)="openCreateDialog()"
     (editCategory)="openEditDialog($event)"
     (deleteCategory)="requestDelete($event)"
-    (restoreCategory)="restoreCategory($event)"
+    (addChildCategory)="openCreateDialogForParent($event)"
   />
 </section>
 
@@ -110,22 +53,26 @@
     [serverError]="createError()"
     [resetToken]="formResetToken()"
     [parentOptions]="parentOptions()"
+    [initialParentId]="createParentId()"
     (submitted)="onCreateSubmitted($event)"
     (cancelled)="onCreateCancelled()"
   />
 </p-dialog>
 
-<p-dialog
-  header="Edit Category"
+<p-drawer
   [visible]="editDialogOpen()"
-  (visibleChange)="onEditDialogVisibleChange($event)"
+  (visibleChange)="onEditDialogVisibleChange($event, editForm)"
+  header="Edit Category"
+  position="right"
   [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: 'min(32rem, 92vw)' }"
-  styleClass="admin-dialog"
+  [dismissible]="true"
+  [closeOnEscape]="true"
+  appendTo="body"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="category-list-page__edit-drawer"
 >
   <app-category-create-form
+    #editForm
     mode="edit"
     [submitting]="updating()"
     [serverError]="updateError()"
@@ -133,9 +80,9 @@
     [parentOptions]="parentOptions()"
     [initialCategory]="editingCategory()"
     (updateSubmitted)="onUpdateSubmitted($event)"
-    (cancelled)="onEditCancelled()"
+    (deleteRequested)="requestDeleteFromEditForm()"
   />
-</p-dialog>
+</p-drawer>
 
 <app-admin-confirm-dialog
   [visible]="deleteDialogOpen()"
@@ -145,4 +92,15 @@
   [loading]="deleting()"
   (visibleChange)="deleteDialogOpen.set($event)"
   (confirmed)="confirmDelete()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="discardChangesDialogOpen()"
+  title="Discard your changes?"
+  message="You have unsaved changes that will be lost if you leave now."
+  confirmLabel="Discard"
+  cancelLabel="Stay Editing"
+  [destructive]="true"
+  (visibleChange)="discardChangesDialogOpen.set($event)"
+  (confirmed)="confirmDiscardChanges()"
 />

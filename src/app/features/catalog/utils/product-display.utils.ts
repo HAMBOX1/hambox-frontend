@@ -62,3 +62,14 @@ const PRODUCT_STATUS_API: Record<ProductStatus, number> = {
 export function productStatusToApi(status: ProductStatus): number {
   return PRODUCT_STATUS_API[status];
 }
+
+/** Dash-cased technical key derived from a human-entered label, e.g. "Game Region" -> "game-region". */
+export function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}

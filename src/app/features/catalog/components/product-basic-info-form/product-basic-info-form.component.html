@@ -8,7 +8,7 @@
 
   <div class="basic-info-form__grid">
     @if (section() === 'general' || section() === 'full') {
-      <div class="basic-info-form__field">
+      <div class="basic-info-form__field basic-info-form__field--full">
         <label class="basic-info-form__label" for="product-name-en">Product Name (EN)</label>
         <input
           pInputText
@@ -20,54 +20,6 @@
           [disabled]="disabled()"
         />
         @if (fieldError('nameEn'); as error) {
-          <p class="basic-info-form__error">{{ error }}</p>
-        }
-      </div>
-
-      <div class="basic-info-form__field">
-        <label class="basic-info-form__label" for="product-name-ar">Product Name (AR) <span class="basic-info-form__optional">(optional — defaults to English)</span></label>
-        <input
-          pInputText
-          id="product-name-ar"
-          class="basic-info-form__input"
-          type="text"
-          formControlName="nameAr"
-          dir="rtl"
-          autocomplete="off"
-          [disabled]="disabled()"
-        />
-        @if (fieldError('nameAr'); as error) {
-          <p class="basic-info-form__error">{{ error }}</p>
-        }
-      </div>
-
-      <div class="basic-info-form__field basic-info-form__field--full">
-        <label class="basic-info-form__label" for="product-description-en">Description (EN)</label>
-        <textarea
-          pTextarea
-          id="product-description-en"
-          class="basic-info-form__textarea"
-          rows="4"
-          formControlName="descriptionEn"
-          [disabled]="disabled()"
-        ></textarea>
-        @if (fieldError('descriptionEn'); as error) {
-          <p class="basic-info-form__error">{{ error }}</p>
-        }
-      </div>
-
-      <div class="basic-info-form__field basic-info-form__field--full">
-        <label class="basic-info-form__label" for="product-description-ar">Description (AR) <span class="basic-info-form__optional">(optional — defaults to English)</span></label>
-        <textarea
-          pTextarea
-          id="product-description-ar"
-          class="basic-info-form__textarea"
-          rows="4"
-          formControlName="descriptionAr"
-          dir="rtl"
-          [disabled]="disabled()"
-        ></textarea>
-        @if (fieldError('descriptionAr'); as error) {
           <p class="basic-info-form__error">{{ error }}</p>
         }
       </div>
@@ -124,7 +76,94 @@
         }
       </div>
     }
+
+    @if (section() === 'general' || section() === 'full') {
+      <div class="basic-info-form__field basic-info-form__field--full">
+        <label class="basic-info-form__label" for="product-description-en">Description (Optional)</label>
+        <textarea
+          pTextarea
+          id="product-description-en"
+          class="basic-info-form__textarea"
+          rows="2"
+          formControlName="descriptionEn"
+          [disabled]="disabled()"
+        ></textarea>
+        @if (fieldError('descriptionEn'); as error) {
+          <p class="basic-info-form__error">{{ error }}</p>
+        }
+      </div>
+    }
   </div>
+
+  <ng-content></ng-content>
+
+  @if (section() === 'general' || section() === 'full') {
+    <div class="basic-info-form__arabic-section">
+      @if (!showArabic()) {
+        <button
+          pButton
+          type="button"
+          class="basic-info-form__add-arabic-btn"
+          [label]="arabicHasValue() ? 'Arabic Translation saved' : 'Add Arabic Translation'"
+          [icon]="arabicHasValue() ? 'pi pi-check-circle' : 'pi pi-plus'"
+          severity="secondary"
+          text
+          size="small"
+          (click)="revealArabic()"
+        ></button>
+      } @else {
+        <div class="basic-info-form__arabic-fields basic-info-form__field--reveal">
+          <div class="basic-info-form__arabic-header">
+            <span class="basic-info-form__label">Arabic Translation</span>
+            <button
+              pButton
+              type="button"
+              class="basic-info-form__hide-arabic-btn"
+              label="Hide"
+              icon="pi pi-times"
+              severity="secondary"
+              text
+              size="small"
+              (click)="hideArabic()"
+            ></button>
+          </div>
+
+          <div class="basic-info-form__field">
+            <label class="basic-info-form__label" for="product-name-ar">Product Name (AR)</label>
+            <input
+              pInputText
+              id="product-name-ar"
+              class="basic-info-form__input"
+              type="text"
+              formControlName="nameAr"
+              dir="rtl"
+              autocomplete="off"
+              [disabled]="disabled()"
+            />
+            @if (fieldError('nameAr'); as error) {
+              <p class="basic-info-form__error">{{ error }}</p>
+            }
+          </div>
+
+          <div class="basic-info-form__field">
+            <label class="basic-info-form__label" for="product-description-ar">Description (AR)</label>
+            <textarea
+              pTextarea
+              id="product-description-ar"
+              class="basic-info-form__textarea"
+              rows="2"
+              formControlName="descriptionAr"
+              dir="rtl"
+              [disabled]="disabled()"
+            ></textarea>
+            @if (fieldError('descriptionAr'); as error) {
+              <p class="basic-info-form__error">{{ error }}</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
 </form>
 
 <p-dialog

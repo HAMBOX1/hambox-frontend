@@ -3,7 +3,7 @@
 } @else {
   <app-admin-data-table-shell>
     <p-table
-      class="admin-data-table"
+      class="admin-data-table product-catalog-table"
       [value]="[...products()]"
       [loading]="loading()"
       [lazy]="true"
@@ -12,6 +12,8 @@
       [totalRecords]="totalRecords()"
       [first]="first()"
       [rowsPerPageOptions]="[10, 20, 50]"
+      [sortField]="sortField()"
+      [sortOrder]="sortOrder()"
       selectionMode="single"
       [selection]="tableSelection()"
       (selectionChange)="onSelectionChange($event)"
@@ -23,17 +25,29 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th>Product</th>
-          <th>ID</th>
-          <th>Category</th>
-          <th class="product-catalog-table__price-head">Price</th>
-          <th>Status</th>
-          <th style="width: 6.5rem"></th>
+          <th style="width: 3rem" (click)="$event.stopPropagation()">
+            <p-checkbox [binary]="true" [ngModel]="allPageSelected()" (onChange)="onBulkToggleAllPage()" />
+          </th>
+          <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
+          <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
+          <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
+          <th pSortableColumn="price" class="product-catalog-table__price-head">
+            Price <p-sortIcon field="price" />
+          </th>
+          <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+          <th style="width: 5.5rem"></th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-product>
         <tr [pSelectableRow]="product">
+          <td (click)="$event.stopPropagation()">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="isBulkSelected(product.id)"
+              (onChange)="onBulkCheckboxClick(product, $event.originalEvent)"
+            />
+          </td>
           <td>
             <div class="product-catalog-table__product">
               <span class="product-catalog-table__thumb">
@@ -49,75 +63,108 @@
                   <i class="pi pi-box" aria-hidden="true"></i>
                 }
               </span>
-              <span class="product-catalog-table__product-copy">
-                <span class="product-catalog-table__product-name-row">
-                  <span class="admin-cell-primary product-catalog-table__product-name">{{ product.nameEn }}</span>
-                  <a
-                    class="product-catalog-table__stock-link"
-                    [routerLink]="['/admin/products', product.id, 'edit']"
-                    fragment="variants"
-                    (click)="$event.stopPropagation()"
-                    [attr.aria-label]="'ADMIN.CATALOG_PAGE.STOCK.ARIA_LABEL' | translate: { name: product.nameEn }"
-                  >
-                    <app-admin-status-badge
-                      [label]="(product.availableStock ?? 0) > 0
-                        ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
-                        : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
-                      [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
-                    />
-                    <i class="pi pi-arrow-right product-catalog-table__stock-icon" aria-hidden="true"></i>
-                  </a>
-                </span>
-                <span class="admin-cell-secondary product-catalog-table__product-desc">{{ product.descriptionEn || 'No description' }}</span>
-              </span>
+              @if (isEditing(product.id, 'name')) {
+                <input
+                  pInputText
+                  class="product-catalog-table__edit-input"
+                  [ngModel]="editDraftText()"
+                  (ngModelChange)="editDraftText.set($event)"
+                  (click)="$event.stopPropagation()"
+                  (keydown.enter)="saveEdit(product)"
+                  (keydown.escape)="cancelEdit()"
+                  (blur)="saveEdit(product)"
+                  autofocus
+                />
+              } @else {
+                <span
+                  class="admin-cell-primary product-catalog-table__product-name"
+                  [pTooltip]="product.nameEn"
+                  tooltipPosition="top"
+                  (click)="startEdit(product, 'name', $event)"
+                >{{ product.nameEn }}</span>
+              }
             </div>
           </td>
-          <td>
-            <div class="product-catalog-table__id">
-              <code
-                class="product-catalog-table__id-text"
-                [pTooltip]="product.id"
-                tooltipPosition="top"
-              >{{ formatShortGuid(product.id) }}</code>
-              <button
-                type="button"
-                class="product-catalog-table__id-copy"
-                [attr.aria-label]="'Copy product ID'"
-                [style.opacity]="copiedId() === product.id ? 1 : null"
-                (click)="copyProductId(product.id, $event)"
-              >
-                <i [class]="copiedId() === product.id ? 'pi pi-check' : 'pi pi-copy'" aria-hidden="true"></i>
-              </button>
-            </div>
-          </td>
-          <td>
+          <td (click)="onStockClick(product, $event)">
             <app-admin-status-badge
-              [label]="product.categoryName || 'Uncategorized'"
-              tone="info"
-              [outlined]="true"
+              class="product-catalog-table__stock-badge"
+              [label]="(product.availableStock ?? 0) > 0
+                ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
+                : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
+              [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
             />
           </td>
-          <td class="product-catalog-table__price-cell">
-            <span class="admin-cell-primary">{{ product.price | hamboxCurrency }}</span>
+          <td (click)="$event.stopPropagation()">
+            @if (isEditing(product.id, 'category')) {
+              <p-select
+                class="product-catalog-table__edit-select"
+                [options]="[...categoryOptions()]"
+                optionLabel="label"
+                optionValue="id"
+                [ngModel]="editDraftText()"
+                (ngModelChange)="editDraftText.set($event)"
+                (onChange)="saveEdit(product)"
+                (onHide)="cancelEdit()"
+                appendTo="body"
+                autofocus
+              />
+            } @else {
+              <app-admin-status-badge
+                (click)="startEdit(product, 'category', $event)"
+                [label]="categoryLabel(product.categoryId, product.categoryName) || 'Uncategorized'"
+                tone="info"
+                [outlined]="true"
+              />
+            }
           </td>
-          <td>
-            <app-admin-status-badge
-              [label]="statusLabel(product.status)"
-              [tone]="statusTone(product.status)"
-            />
+          <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
+            @if (isEditing(product.id, 'price')) {
+              <p-inputNumber
+                class="product-catalog-table__edit-number"
+                [ngModel]="editDraftNumber()"
+                (ngModelChange)="editDraftNumber.set($event)"
+                (keydown.enter)="saveEdit(product)"
+                (keydown.escape)="cancelEdit()"
+                (onBlur)="saveEdit(product)"
+                mode="currency"
+                currency="USD"
+                [minFractionDigits]="2"
+                autofocus
+              />
+            } @else {
+              <span class="admin-cell-primary" (click)="startEdit(product, 'price', $event)">{{
+                product.price | hamboxCurrency
+              }}</span>
+            }
+          </td>
+          <td (click)="$event.stopPropagation()">
+            <p-select
+              class="product-catalog-table__status-select"
+              [options]="[...statusOptions]"
+              [ngModel]="product.status"
+              (ngModelChange)="onStatusEditChange(product, $event)"
+              appendTo="body"
+            >
+              <ng-template #selectedItem let-status>
+                <app-admin-status-badge [label]="statusLabel(status)" [tone]="statusTone(status)" />
+              </ng-template>
+              <ng-template let-status #item>
+                <app-admin-status-badge [label]="statusLabel(status)" [tone]="statusTone(status)" />
+              </ng-template>
+            </p-select>
           </td>
           <td (click)="onActionsCellClick($event)">
             <div class="admin-actions-row">
+              @let menuItems = productActionMenuItems(product);
+              @if (menuItems.length > 0) {
+                <app-admin-action-menu [items]="menuItems" />
+              }
               <app-admin-icon-button
                 *hamboxHasPermission="permissions.Catalog.Products.Edit"
                 icon="pi pi-pencil"
                 [label]="'ADMIN.CATALOG_PAGE.ACTIONS.EDIT' | translate"
                 [routerLink]="'/admin/products/' + product.id + '/edit'"
               />
-              @let menuItems = productActionMenuItems(product);
-              @if (menuItems.length > 0) {
-                <app-admin-action-menu [items]="menuItems" />
-              }
             </div>
           </td>
         </tr>
@@ -125,7 +172,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6">
+          <td colspan="7">
             <app-admin-empty-state
               icon="pi pi-inbox"
               [title]="searchActive() ? 'No matching products' : 'No products yet'"

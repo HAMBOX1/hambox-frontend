@@ -5,129 +5,146 @@ import { ApiError } from '../../../core/models/api-error.model';
 import {
   Category,
   CategoryOption,
+  CategoryReorderEntry,
+  CategoryTreeItem,
   CreateCategoryRequest,
-  NewParentDraft,
   UpdateCategoryRequest,
 } from '../models/category.model';
-import { CategoryApiService } from './category-api.service';
-
-const DEFAULT_PAGE_SIZE = 20;
-const SEARCH_DEBOUNCE_MS = 300;
-const PARENT_PAGE_SIZE = 100;
+import { buildTree, findAncestorIds } from '../utils/category-tree.utils';
+import { CategoryApiService, createCategoryWithHierarchy } from './category-api.service';
 
 @Injectable()
 export class CategoryListFacade {
   private readonly api = inject(CategoryApiService);
 
-  private readonly itemsState = signal<readonly Category[]>([]);
-  private readonly parentOptionsState = signal<readonly CategoryOption[]>([]);
+  private readonly flatItemsState = signal<readonly CategoryTreeItem[]>([]);
   private readonly loadingState = signal(false);
   private readonly creatingState = signal(false);
   private readonly updatingState = signal(false);
-  private readonly searchTermState = signal('');
-  private readonly statusFilterState = signal('');
   private readonly deletingState = signal(false);
+  private readonly searchTermState = signal('');
   private readonly errorState = signal<string | null>(null);
   private readonly createErrorState = signal<string | null>(null);
   private readonly updateErrorState = signal<string | null>(null);
-  private readonly totalCountState = signal(0);
-  private readonly pageNumberState = signal(1);
-  private readonly pageSizeState = signal(DEFAULT_PAGE_SIZE);
   private readonly createDialogOpenState = signal(false);
   private readonly editDialogOpenState = signal(false);
   private readonly editingCategoryState = signal<Category | null>(null);
+  private readonly createParentIdState = signal<string | null>(null);
+  private readonly manualExpandedIdsState = signal<ReadonlySet<string>>(new Set());
 
-  private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
-  private readonly hasLoadedState = signal(false);
-
-  readonly items = this.itemsState.asReadonly();
-  readonly parentOptions = this.parentOptionsState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
   readonly creating = this.creatingState.asReadonly();
   readonly updating = this.updatingState.asReadonly();
-  readonly searchTerm = this.searchTermState.asReadonly();
-  readonly statusFilter = this.statusFilterState.asReadonly();
   readonly deleting = this.deletingState.asReadonly();
+  readonly searchTerm = this.searchTermState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly createError = this.createErrorState.asReadonly();
   readonly updateError = this.updateErrorState.asReadonly();
-  readonly totalCount = this.totalCountState.asReadonly();
-  readonly pageNumber = this.pageNumberState.asReadonly();
-  readonly pageSize = this.pageSizeState.asReadonly();
   readonly createDialogOpen = this.createDialogOpenState.asReadonly();
   readonly editDialogOpen = this.editDialogOpenState.asReadonly();
   readonly editingCategory = this.editingCategoryState.asReadonly();
+  readonly createParentId = this.createParentIdState.asReadonly();
 
-  readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
-  readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
-  readonly hasActiveFilters = computed(
-    () => this.hasActiveSearch() || this.statusFilterState().trim().length > 0,
+  readonly flatItems = this.flatItemsState.asReadonly();
+  readonly tree = computed(() => buildTree(this.flatItemsState()));
+  readonly totalCount = computed(() => this.flatItemsState().length);
+  readonly parentOptions = computed<readonly CategoryOption[]>(() =>
+    this.flatItemsState().map((category) => ({ id: category.id, label: category.nameEn })),
   );
+
+  private readonly parentMap = computed(
+    () => new Map(this.flatItemsState().map((category) => [category.id, category])),
+  );
+
+  readonly isEmpty = computed(() => !this.loading() && this.flatItemsState().length === 0);
+  readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
+
+  readonly matchedIds = computed<ReadonlySet<string>>(() => {
+    const term = this.searchTermState().trim().toLowerCase();
+    if (!term) {
+      return new Set();
+    }
+
+    return new Set(
+      this.flatItemsState()
+        .filter(
+          (category) =>
+            category.nameEn.toLowerCase().includes(term) ||
+            category.nameAr.toLowerCase().includes(term) ||
+            category.slug.toLowerCase().includes(term),
+        )
+        .map((category) => category.id),
+    );
+  });
+
+  private readonly searchAncestorIds = computed<ReadonlySet<string>>(() => {
+    const map = this.parentMap();
+    const ancestors = new Set<string>();
+
+    for (const id of this.matchedIds()) {
+      for (const ancestorId of findAncestorIds(id, map)) {
+        ancestors.add(ancestorId);
+      }
+    }
+
+    return ancestors;
+  });
+
+  readonly effectiveExpandedIds = computed<ReadonlySet<string>>(() => {
+    if (!this.hasActiveSearch()) {
+      return this.manualExpandedIdsState();
+    }
+
+    return new Set([...this.manualExpandedIdsState(), ...this.searchAncestorIds()]);
+  });
+
   readonly subtitle = computed(() => {
     const count = this.totalCount();
     const noun = count === 1 ? 'category' : 'categories';
-
-    if (this.hasActiveFilters()) {
-      return `Showing ${count} matching ${noun}`;
-    }
-
-    return `Managing ${count} catalog ${noun}`;
+    return `${count} ${noun}`;
   });
 
   load(): void {
-    void this.fetchCategories(true);
-    void this.loadParentOptions();
+    void this.loadTree();
   }
 
   reload(): Promise<void> {
-    return this.fetchCategories(true);
+    return this.loadTree();
   }
 
   setSearchTerm(term: string): void {
     this.searchTermState.set(term);
-    this.pageNumberState.set(1);
-    this.scheduleReload();
   }
 
-  setStatusFilter(status: string): void {
-    this.statusFilterState.set(status);
-    this.pageNumberState.set(1);
-    void this.fetchCategories();
+  toggleExpand(id: string): void {
+    this.manualExpandedIdsState.update((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   }
 
-  clearFilters(): void {
-    if (this.searchDebounceTimer) {
-      clearTimeout(this.searchDebounceTimer);
-    }
-
-    this.searchTermState.set('');
-    this.statusFilterState.set('');
-    this.pageNumberState.set(1);
-    void this.fetchCategories();
-  }
-
-  setPage(pageNumber: number, pageSize: number): void {
-    if (
-      this.pageNumberState() === pageNumber &&
-      this.pageSizeState() === pageSize &&
-      this.hasLoadedState()
-    ) {
+  expand(id: string): void {
+    if (this.manualExpandedIdsState().has(id)) {
       return;
     }
-
-    this.pageNumberState.set(pageNumber);
-    this.pageSizeState.set(pageSize);
-    void this.fetchCategories();
+    this.manualExpandedIdsState.update((current) => new Set(current).add(id));
   }
 
-  openCreateDialog(): void {
+  openCreateDialog(parentId: string | null = null): void {
     this.createErrorState.set(null);
+    this.createParentIdState.set(parentId);
     this.createDialogOpenState.set(true);
   }
 
   closeCreateDialog(): void {
     this.createDialogOpenState.set(false);
     this.createErrorState.set(null);
+    this.createParentIdState.set(null);
   }
 
   openEditDialog(category: Category): void {
@@ -147,33 +164,10 @@ export class CategoryListFacade {
     this.createErrorState.set(null);
 
     try {
-      const parentId = await this.resolveParentId(request);
-      const rootId = await firstValueFrom(
-        this.api.createCategory({
-          nameEn: request.nameEn,
-          nameAr: request.nameAr,
-          slug: request.slug,
-          parentId,
-        }),
-      );
-
-      // ponytail: subcategories are created as separate sequential calls (same non-transactional
-      // trade-off as the inline new-parent creation below) — no batch/nested endpoint exists.
-      for (const child of request.subcategories ?? []) {
-        await firstValueFrom(
-          this.api.createCategory({
-            nameEn: child.nameEn,
-            nameAr: child.nameAr,
-            slug: child.slug,
-            parentId: rootId,
-          }),
-        );
-      }
-
+      await createCategoryWithHierarchy(this.api, request);
       this.createDialogOpenState.set(false);
-      this.pageNumberState.set(1);
-      await this.fetchCategories(true);
-      await this.loadParentOptions();
+      this.createParentIdState.set(null);
+      await this.loadTree();
       return true;
     } catch (error) {
       this.createErrorState.set(this.toErrorMessage(error, 'Failed to create category.'));
@@ -193,20 +187,10 @@ export class CategoryListFacade {
     this.updateErrorState.set(null);
 
     try {
-      const parentId = await this.resolveParentId(request);
-      await firstValueFrom(
-        this.api.updateCategory(category.id, {
-          nameEn: request.nameEn,
-          nameAr: request.nameAr,
-          slug: request.slug,
-          isActive: request.isActive,
-          parentId,
-        }),
-      );
+      await firstValueFrom(this.api.updateCategory(category.id, request));
       this.editDialogOpenState.set(false);
       this.editingCategoryState.set(null);
-      await this.fetchCategories(true);
-      await this.loadParentOptions();
+      await this.loadTree();
       return true;
     } catch (error) {
       this.updateErrorState.set(this.toErrorMessage(error, 'Failed to update category.'));
@@ -221,8 +205,7 @@ export class CategoryListFacade {
 
     try {
       await firstValueFrom(this.api.deleteCategory(categoryId));
-      await this.fetchCategories(true);
-      await this.loadParentOptions();
+      await this.loadTree();
       return true;
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Failed to delete category.'));
@@ -243,8 +226,7 @@ export class CategoryListFacade {
           parentId: category.parentId,
         }),
       );
-      await this.fetchCategories(true);
-      await this.loadParentOptions();
+      await this.loadTree();
       return true;
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Failed to reactivate category.'));
@@ -252,86 +234,43 @@ export class CategoryListFacade {
     }
   }
 
-  private async resolveParentId(request: {
-    parentId?: string | null;
-    newParent?: NewParentDraft | null;
-  }): Promise<string | null> {
-    if (!request.newParent) {
-      return request.parentId ?? null;
+  async reorderCategories(entries: readonly CategoryReorderEntry[]): Promise<boolean> {
+    if (entries.length === 0) {
+      return true;
     }
 
-    // ponytail: parent + child are created as two separate calls (no cross-entity transaction
-    // exists for this). If the child create fails after this succeeds, the new parent is left
-    // standalone rather than rolled back — acceptable since it's still a valid category on its own.
-    return firstValueFrom(
-      this.api.createCategory({
-        nameEn: request.newParent.nameEn,
-        nameAr: request.newParent.nameAr,
-        slug: request.newParent.slug,
-        parentId: null,
+    const snapshot = this.flatItemsState();
+    const patch = new Map(entries.map((entry) => [entry.id, entry]));
+
+    this.flatItemsState.set(
+      snapshot.map((item) => {
+        const entry = patch.get(item.id);
+        return entry ? { ...item, parentId: entry.parentId, sortOrder: entry.sortOrder } : item;
       }),
     );
-  }
 
-  private scheduleReload(): void {
-    if (this.searchDebounceTimer) {
-      clearTimeout(this.searchDebounceTimer);
+    try {
+      await firstValueFrom(this.api.reorderCategories(entries));
+      return true;
+    } catch (error) {
+      this.flatItemsState.set(snapshot);
+      this.errorState.set(this.toErrorMessage(error, 'Failed to reorder categories.'));
+      return false;
     }
-
-    this.searchDebounceTimer = setTimeout(() => {
-      void this.fetchCategories();
-    }, SEARCH_DEBOUNCE_MS);
   }
 
-  private async fetchCategories(force = false): Promise<void> {
+  private async loadTree(): Promise<void> {
     this.loadingState.set(true);
     this.errorState.set(null);
 
     try {
-      const status = this.statusFilterState().trim();
-      const activeOnly = status === 'active' ? true : status === 'inactive' ? false : undefined;
-
-      const result = await firstValueFrom(
-        this.api.getCategories({
-          pageNumber: this.pageNumberState(),
-          pageSize: this.pageSizeState(),
-          searchTerm: this.searchTermState(),
-          activeOnly,
-        }),
-      );
-
-      this.itemsState.set(result.items ?? []);
-      this.totalCountState.set(result.totalCount ?? 0);
-      this.pageNumberState.set(result.pageNumber ?? this.pageNumberState());
-      this.pageSizeState.set(result.pageSize ?? this.pageSizeState());
-      this.hasLoadedState.set(true);
+      const items = await firstValueFrom(this.api.getCategoryTree());
+      this.flatItemsState.set(items ?? []);
     } catch (error) {
-      this.itemsState.set([]);
-      this.totalCountState.set(0);
+      this.flatItemsState.set([]);
       this.errorState.set(this.toErrorMessage(error, 'Failed to load categories.'));
     } finally {
       this.loadingState.set(false);
-    }
-  }
-
-  private async loadParentOptions(): Promise<void> {
-    try {
-      const result = await firstValueFrom(
-        this.api.getCategories({
-          pageNumber: 1,
-          pageSize: PARENT_PAGE_SIZE,
-          activeOnly: true,
-        }),
-      );
-
-      this.parentOptionsState.set(
-        (result.items ?? []).map((category) => ({
-          id: category.id,
-          label: category.nameEn,
-        })),
-      );
-    } catch {
-      this.parentOptionsState.set([]);
     }
   }
 

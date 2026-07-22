@@ -20,6 +20,7 @@ export class AdminPageHeaderComponent {
   readonly backLink = input<string | null>(null);
   readonly backLabel = input<string>('Back');
   readonly breadcrumbs = input<AdminBreadcrumbItem[]>([]);
+  readonly compactActions = input(false);
 }
 
 export type { AdminBreadcrumbItem };

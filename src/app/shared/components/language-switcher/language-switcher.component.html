@@ -5,7 +5,7 @@
     [attr.aria-expanded]="open()"
     aria-haspopup="listbox"
     [attr.aria-label]="'COMMON.LANGUAGE_SWITCHER' | translate"
-    (click)="toggle()"
+    (click)="toggle($event)"
   >
     <span class="locale-switch__flag" aria-hidden="true">{{ current().flagEmoji }}</span>
     <span class="locale-switch__label">{{ current().nativeName }}</span>
@@ -14,7 +14,7 @@
     </svg>
   </button>
 
-  @if (open()) {
+  <p-popover #panel (onShow)="open.set(true)" (onHide)="open.set(false)">
     <ul class="locale-switch__menu" role="listbox" [attr.aria-label]="'COMMON.LANGUAGE_SWITCHER' | translate">
       @for (lang of languages; track lang.id) {
         <li role="option" [attr.aria-selected]="lang.id === current().id">
@@ -36,5 +36,5 @@
         </li>
       }
     </ul>
-  }
+  </p-popover>
 </div>

@@ -1,22 +1,12 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  OnInit,
-  signal,
-} from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 import { MessageService } from 'primeng/api';
-import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { TableLazyLoadEvent } from 'primeng/table';
 
 import { CategoryCreateFormComponent } from '../../components/category-create-form/category-create-form.component';
-import { CategoryTableComponent } from '../../components/category-table/category-table.component';
+import { CategoryTreeComponent } from '../../components/category-tree/category-tree.component';
 import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
 import { CategoryListFacade } from '../../services/category-list.facade';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
@@ -24,19 +14,11 @@ import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
   AdminConfirmDialogComponent,
   AdminErrorAlertComponent,
+  AdminIconButtonComponent,
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
-  AdminStatCardComponent,
-  AdminStatGridComponent,
-  AdminToolbarComponent,
 } from '../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
-
-const STATUS_OPTIONS: { label: string; value: string }[] = [
-  { label: 'All statuses', value: '' },
-  { label: 'Active', value: 'active' },
-  { label: 'Inactive', value: 'inactive' },
-];
 
 @Component({
   selector: 'app-category-list-page',
@@ -44,16 +26,13 @@ const STATUS_OPTIONS: { label: string; value: string }[] = [
   imports: [
     ButtonModule,
     DialogModule,
-    FormsModule,
-    SelectModule,
+    DrawerModule,
     ToastModule,
-    CategoryTableComponent,
+    CategoryTreeComponent,
     CategoryCreateFormComponent,
     HasPermissionDirective,
     AdminPageHeaderComponent,
-    AdminStatGridComponent,
-    AdminStatCardComponent,
-    AdminToolbarComponent,
+    AdminIconButtonComponent,
     AdminSearchBarComponent,
     AdminErrorAlertComponent,
     AdminConfirmDialogComponent,
@@ -69,45 +48,27 @@ export class CategoryListPageComponent implements OnInit {
 
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Categories' });
-  protected readonly statusOptions = STATUS_OPTIONS;
 
-  protected readonly items = this.facade.items;
-  protected readonly parentOptions = this.facade.parentOptions;
+  protected readonly totalCount = this.facade.totalCount;
   protected readonly loading = this.facade.loading;
   protected readonly creating = this.facade.creating;
   protected readonly updating = this.facade.updating;
   protected readonly deleting = this.facade.deleting;
   protected readonly searchTerm = this.facade.searchTerm;
-  protected readonly statusFilter = this.facade.statusFilter;
   protected readonly error = this.facade.error;
   protected readonly createError = this.facade.createError;
   protected readonly updateError = this.facade.updateError;
-  protected readonly totalCount = this.facade.totalCount;
-  protected readonly pageSize = this.facade.pageSize;
+  protected readonly parentOptions = this.facade.parentOptions;
   protected readonly createDialogOpen = this.facade.createDialogOpen;
   protected readonly editDialogOpen = this.facade.editDialogOpen;
   protected readonly editingCategory = this.facade.editingCategory;
-  protected readonly hasActiveSearch = this.facade.hasActiveSearch;
-  protected readonly hasActiveFilters = this.facade.hasActiveFilters;
+  protected readonly createParentId = this.facade.createParentId;
   protected readonly subtitle = this.facade.subtitle;
 
   protected readonly formResetToken = signal(0);
   protected readonly deleteDialogOpen = signal(false);
   protected readonly deleteTarget = signal<Category | null>(null);
-
-  protected readonly tableFirst = computed(
-    () => (this.facade.pageNumber() - 1) * this.facade.pageSize(),
-  );
-
-  protected readonly listStats = computed(() => {
-    const items = this.items();
-
-    return {
-      total: this.totalCount(),
-      active: items.filter((category) => category.isActive).length,
-      inactive: items.filter((category) => !category.isActive).length,
-    };
-  });
+  protected readonly discardChangesDialogOpen = signal(false);
 
   constructor() {
     effect(() => {
@@ -125,28 +86,16 @@ export class CategoryListPageComponent implements OnInit {
     this.facade.setSearchTerm(term);
   }
 
-  protected onStatusFilterChange(status: string): void {
-    this.facade.setStatusFilter(status);
-  }
-
-  protected onClearFilters(): void {
-    this.facade.clearFilters();
-  }
-
-  protected onPageChange(event: TableLazyLoadEvent): void {
-    const rows = event.rows ?? this.facade.pageSize();
-    const first = event.first ?? 0;
-    const pageNumber = Math.floor(first / rows) + 1;
-
-    this.facade.setPage(pageNumber, rows);
-  }
-
   protected retryLoad(): void {
     void this.facade.reload();
   }
 
   protected openCreateDialog(): void {
     this.facade.openCreateDialog();
+  }
+
+  protected openCreateDialogForParent(parentId: string): void {
+    this.facade.openCreateDialog(parentId);
   }
 
   protected openEditDialog(category: Category): void {
@@ -159,10 +108,24 @@ export class CategoryListPageComponent implements OnInit {
     }
   }
 
-  protected onEditDialogVisibleChange(visible: boolean): void {
-    if (!visible) {
-      this.facade.closeEditDialog();
+  protected onEditDialogVisibleChange(visible: boolean, form: CategoryCreateFormComponent): void {
+    if (visible) {
+      return;
     }
+
+    if (form.isDirty()) {
+      // Leave `editDialogOpen` true so the drawer's own [visible] binding snaps back
+      // open on the next check — the confirm dialog decides whether the close proceeds.
+      this.discardChangesDialogOpen.set(true);
+      return;
+    }
+
+    this.facade.closeEditDialog();
+  }
+
+  protected confirmDiscardChanges(): void {
+    this.discardChangesDialogOpen.set(false);
+    this.facade.closeEditDialog();
   }
 
   protected async onCreateSubmitted(request: CreateCategoryRequest): Promise<void> {
@@ -212,6 +175,13 @@ export class CategoryListPageComponent implements OnInit {
     this.deleteDialogOpen.set(true);
   }
 
+  protected requestDeleteFromEditForm(): void {
+    const category = this.editingCategory();
+    if (category) {
+      this.requestDelete(category);
+    }
+  }
+
   protected async confirmDelete(): Promise<void> {
     const category = this.deleteTarget();
     if (!category) {
@@ -228,17 +198,13 @@ export class CategoryListPageComponent implements OnInit {
       });
       this.deleteDialogOpen.set(false);
       this.deleteTarget.set(null);
-    }
-  }
-
-  protected async restoreCategory(category: Category): Promise<void> {
-    const success = await this.facade.restoreCategory(category);
-    if (success) {
+      this.facade.closeEditDialog();
+    } else {
       this.messageService.add({
-        severity: 'success',
-        summary: 'Category restored',
-        detail: `"${category.nameEn}" is active again.`,
-        life: 4000,
+        severity: 'error',
+        summary: 'Delete failed',
+        detail: this.facade.error() ?? 'Unable to delete category.',
+        life: 5000,
       });
     }
   }
@@ -250,9 +216,5 @@ export class CategoryListPageComponent implements OnInit {
 
   protected onCreateCancelled(): void {
     this.facade.closeCreateDialog();
-  }
-
-  protected onEditCancelled(): void {
-    this.facade.closeEditDialog();
   }
 }

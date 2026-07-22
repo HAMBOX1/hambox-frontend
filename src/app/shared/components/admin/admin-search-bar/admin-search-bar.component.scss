@@ -25,7 +25,7 @@
 }
 
 .admin-search-bar__input {
-  width: 100%;
+  flex: 1 1 0%;
   min-width: 0;
   padding: 0;
   border: 0;
@@ -34,10 +34,13 @@
   font-size: var(--admin-type-body);
   outline: 0;
   box-shadow: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin-search-bar__clear {
   display: inline-grid;
+  flex-shrink: 0;
   place-items: center;
   width: 1.75rem;
   height: 1.75rem;

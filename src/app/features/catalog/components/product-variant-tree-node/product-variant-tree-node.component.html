@@ -1,0 +1,30 @@
+<div class="variant-tree-node" [style.--depth]="depth()">
+  <button
+    type="button"
+    class="variant-tree-node__row"
+    [class.variant-tree-node__row--expanded]="callbacks().isExpanded(node().key)"
+    [attr.aria-expanded]="callbacks().isExpanded(node().key)"
+    (click)="callbacks().toggleExpand(node().key)"
+  >
+    <i
+      class="pi variant-tree-node__chevron"
+      [class.pi-chevron-right]="!callbacks().isExpanded(node().key)"
+      [class.pi-chevron-down]="callbacks().isExpanded(node().key)"
+      aria-hidden="true"
+    ></i>
+    <span class="variant-tree-node__label">{{ node().label }}</span>
+    <span class="variant-tree-node__count">{{ node().count }}</span>
+  </button>
+
+  @if (callbacks().isExpanded(node().key)) {
+    <div class="variant-tree-node__children">
+      @if (isLeafGroup()) {
+        <app-variant-leaf-list [children]="node().children" [callbacks]="callbacks()" [depth]="depth() + 1" />
+      } @else {
+        @for (child of node().children; track child.key) {
+          <app-variant-tree-node [node]="child" [depth]="depth() + 1" [callbacks]="callbacks()" />
+        }
+      }
+    </div>
+  }
+</div>

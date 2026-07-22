@@ -149,6 +149,16 @@ export interface BulkUpdateVariantsRequest {
   readonly status?: string | null;
 }
 
+export interface BulkVariantIdsRequest {
+  readonly variantIds: readonly string[];
+}
+
+export interface BulkVariantsResultDto {
+  readonly successCount: number;
+  readonly errorCount: number;
+  readonly errors: readonly string[];
+}
+
 export interface CreateVariantRequest {
   readonly sku: string;
   readonly planId?: string | null;

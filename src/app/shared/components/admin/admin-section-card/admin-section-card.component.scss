@@ -38,8 +38,45 @@
   gap: 0.625rem;
 }
 
+.admin-section-card__header--collapsible {
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--admin-accent-green);
+    outline-offset: -2px;
+  }
+}
+
+.admin-section-card__collapse-toggle {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-sm);
+  background: transparent;
+  color: var(--admin-text-secondary);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--admin-text-primary);
+    background: var(--admin-bg-elevated);
+  }
+}
+
 .admin-section-card__body--padded {
   padding: var(--admin-card-padding);
+}
+
+.admin-section-card--compact {
+  .admin-section-card__header {
+    padding: 0.875rem 1.25rem 0.75rem;
+  }
+
+  .admin-section-card__body--padded {
+    padding: 1rem 1.25rem;
+  }
 }
 
 @media (max-width: 767px) {

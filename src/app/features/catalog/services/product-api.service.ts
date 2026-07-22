@@ -7,8 +7,11 @@ import { ApiClientService } from '../../../core/api/api-client.service';
 import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import { PagedResult } from '../models/category.model';
 import {
+  BulkProductsResult,
   CreateProductRequest,
+  PriceAdjustmentMode,
   Product,
+  ProductBulkSelection,
   ProductImage,
   ProductListQuery,
   UpdateProductRequest,
@@ -86,6 +89,55 @@ export class ProductApiService {
 
   duplicateProduct(id: string, nameSuffix?: string | null): Observable<string> {
     return this.api.post<string>(CATALOG_API.productDuplicate(id), { nameSuffix: nameSuffix ?? null });
+  }
+
+  changeProductCategory(id: string, categoryId: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productCategory(id), { categoryId });
+  }
+
+  adjustProductPrice(id: string, mode: PriceAdjustmentMode, value: number): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productPrice(id), { mode, value });
+  }
+
+  bulkProducts(
+    selection: ProductBulkSelection,
+    action: string,
+    extra?: { targetCategoryId?: string; priceMode?: PriceAdjustmentMode; priceValue?: number },
+  ): Observable<BulkProductsResult> {
+    return this.api.post<BulkProductsResult>(CATALOG_API.productsBulk, {
+      ...this.selectionBody(selection),
+      action,
+      targetCategoryId: extra?.targetCategoryId ?? null,
+      priceMode: extra?.priceMode ?? null,
+      priceValue: extra?.priceValue ?? null,
+    });
+  }
+
+  bulkDeleteProducts(selection: ProductBulkSelection): Observable<BulkProductsResult> {
+    return this.api.post<BulkProductsResult>(CATALOG_API.productsBulkDelete, this.selectionBody(selection));
+  }
+
+  bulkDuplicateProducts(selection: ProductBulkSelection, nameSuffix?: string | null): Observable<BulkProductsResult> {
+    return this.api.post<BulkProductsResult>(CATALOG_API.productsBulkDuplicate, {
+      ...this.selectionBody(selection),
+      nameSuffix: nameSuffix ?? null,
+    });
+  }
+
+  exportProducts(selection: ProductBulkSelection): Observable<Blob> {
+    return this.http.post(this.resolveUrl(CATALOG_API.productsBulkExport), this.selectionBody(selection), {
+      responseType: 'blob',
+    });
+  }
+
+  private selectionBody(selection: ProductBulkSelection) {
+    return {
+      productIds: selection.productIds ?? null,
+      searchTerm: selection.searchTerm ?? null,
+      status: selection.status ?? null,
+      categoryId: selection.categoryId ?? null,
+      selectAllMatching: selection.selectAllMatching,
+    };
   }
 
   getProductImages(productId: string): Observable<readonly ProductImage[]> {

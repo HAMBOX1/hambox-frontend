@@ -1,5 +1,7 @@
 export const CATALOG_API = {
   categories: '/api/v1/categories',
+  categoriesTree: '/api/v1/categories/tree',
+  categoriesReorder: '/api/v1/categories/reorder',
   category: (id: string) => `/api/v1/categories/${id}`,
   categoryRestore: (id: string) => `/api/v1/categories/${id}/restore`,
   products: '/api/v1/products',
@@ -9,6 +11,12 @@ export const CATALOG_API = {
   productArchive: (id: string) => `/api/v1/products/${id}/archive`,
   productRestore: (id: string) => `/api/v1/products/${id}/restore`,
   productDuplicate: (id: string) => `/api/v1/products/${id}/duplicate`,
+  productCategory: (id: string) => `/api/v1/products/${id}/category`,
+  productPrice: (id: string) => `/api/v1/products/${id}/price`,
+  productsBulk: '/api/v1/products/bulk',
+  productsBulkDelete: '/api/v1/products/bulk-delete',
+  productsBulkDuplicate: '/api/v1/products/bulk-duplicate',
+  productsBulkExport: '/api/v1/products/bulk-export',
   productImages: (productId: string) => `/api/v1/products/${productId}/images`,
   productImage: (productId: string, imageId: string) => `/api/v1/products/${productId}/images/${imageId}`,
   productImagePrimary: (productId: string, imageId: string) =>
@@ -27,6 +35,12 @@ export const INVENTORY_API = {
   bulkUpdateProductVariants: (productId: string) =>
     `/api/v1/inventory/products/${productId}/variants/bulk-update`,
   activateProductVariants: (productId: string) => `/api/v1/inventory/products/${productId}/variants/activate`,
+  bulkDeleteProductVariants: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/variants/bulk-delete`,
+  bulkDuplicateProductVariants: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/variants/bulk-duplicate`,
+  bulkExportProductVariantCodes: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/variants/codes/export`,
   variant: (variantId: string) => `/api/v1/inventory/variants/${variantId}`,
   variantDuplicate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/duplicate`,
   variantActivate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/activate`,
@@ -89,6 +103,7 @@ export const AUTH_API = {
   adminLogin: '/api/auth/admin/login',
   adminVerifyOtp: '/api/auth/admin/verify-otp',
   adminResendOtp: '/api/auth/admin/resend-otp',
+  maintenanceBypass: '/api/auth/maintenance-bypass',
   sessions: '/api/auth/sessions',
   revokeAllSessions: '/api/auth/sessions/revoke-all',
   refresh: '/api/auth/refresh',

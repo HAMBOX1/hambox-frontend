@@ -5,22 +5,25 @@ import {
   inject,
   input,
   output,
+  signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
-import { AdminErrorAlertComponent } from '../../../../shared/components/admin';
+import { AdminErrorAlertComponent, AdminSectionCardComponent } from '../../../../shared/components/admin';
 import { Category, CategoryOption, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
+import { slugify } from '../../utils/product-display.utils';
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const NEW_PARENT_OPTION_VALUE = '__new_parent__';
 
 const FIELD_LABELS = {
   nameEn: 'English name',
-  nameAr: 'Arabic name',
   slug: 'Slug',
 } as const;
 
@@ -33,7 +36,9 @@ const FIELD_LABELS = {
     ButtonModule,
     SelectModule,
     CheckboxModule,
+    TooltipModule,
     AdminErrorAlertComponent,
+    AdminSectionCardComponent,
   ],
   templateUrl: './category-create-form.component.html',
   styleUrl: './category-create-form.component.scss',
@@ -48,10 +53,24 @@ export class CategoryCreateFormComponent {
   readonly resetToken = input(0);
   readonly parentOptions = input<readonly CategoryOption[]>([]);
   readonly initialCategory = input<Category | null>(null);
+  readonly initialParentId = input<string | null>(null);
 
   readonly submitted = output<CreateCategoryRequest>();
   readonly updateSubmitted = output<UpdateCategoryRequest>();
+  readonly deleteRequested = output<void>();
   readonly cancelled = output<void>();
+
+  protected readonly showArabic = signal(false);
+  protected readonly advancedCollapsed = signal(true);
+
+  private readonly arabicHasValueState = signal(false);
+  protected readonly arabicHasValue = this.arabicHasValueState.asReadonly();
+
+  private readonly dirtyState = signal(false);
+  /** True once the owner has actually edited a field (never flips on the programmatic
+   * reset used to load/open the form). Lets the host (dialog/drawer) intercept a close
+   * attempt and confirm before discarding. */
+  readonly isDirty = this.dirtyState.asReadonly();
 
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
@@ -73,24 +92,49 @@ export class CategoryCreateFormComponent {
       this.resetToken();
       const category = this.initialCategory();
       const editing = this.mode() === 'edit' && category;
-      const parentId = editing ? category.parentId : null;
+      const parentId = editing ? category.parentId : this.initialParentId();
 
-      this.form.reset({
-        nameEn: editing ? category.nameEn : '',
-        nameAr: editing ? category.nameAr : '',
-        slug: editing ? category.slug : '',
-        categoryType: parentId ? 'child' : 'root',
-        parentId,
-        isActive: editing ? category.isActive : true,
-        newParent: { nameEn: '', nameAr: '', slug: '' },
-      });
+      this.form.reset(
+        {
+          nameEn: editing ? category.nameEn : '',
+          nameAr: editing ? category.nameAr : '',
+          slug: editing ? category.slug : '',
+          categoryType: parentId ? 'child' : 'root',
+          parentId,
+          isActive: editing ? category.isActive : true,
+          newParent: { nameEn: '', nameAr: '', slug: '' },
+        },
+        { emitEvent: false },
+      );
       this.form.controls.newParent.disable({ emitEvent: false });
-      this.subcategories.clear();
+      this.subcategories.clear({ emitEvent: false });
       this.updateParentValidity();
+
+      const hasArabic = !!editing && category.nameAr.trim().length > 0 && category.nameAr !== category.nameEn;
+      this.showArabic.set(hasArabic);
+      this.arabicHasValueState.set(hasArabic);
+      this.advancedCollapsed.set(true);
 
       this.form.markAsPristine();
       this.form.markAsUntouched();
+      this.dirtyState.set(false);
     });
+
+    this.form.controls.nameAr.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
+      this.arabicHasValueState.set(!!value.trim());
+    });
+
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.dirtyState.set(true);
+    });
+  }
+
+  protected revealArabic(): void {
+    this.showArabic.set(true);
+  }
+
+  protected hideArabic(): void {
+    this.showArabic.set(false);
   }
 
   protected isChildCategory(): boolean {
@@ -128,7 +172,7 @@ export class CategoryCreateFormComponent {
       return;
     }
 
-    const generated = this.toSlug(group.controls.nameEn.value);
+    const generated = slugify(group.controls.nameEn.value);
     if (generated) {
       slugControl.setValue(generated);
     }
@@ -171,12 +215,15 @@ export class CategoryCreateFormComponent {
 
   protected parentDropdownOptions(): { label: string; value: string | null }[] {
     const editingId = this.initialCategory()?.id ?? null;
-    return [
-      { label: '+ Create new parent category', value: NEW_PARENT_OPTION_VALUE },
-      ...this.parentOptions()
-        .filter((option) => option.id !== editingId)
-        .map((option) => ({ label: option.label, value: option.id })),
-    ];
+    const options = this.parentOptions()
+      .filter((option) => option.id !== editingId)
+      .map((option) => ({ label: option.label, value: option.id as string | null }));
+
+    if (this.mode() === 'edit') {
+      return [{ label: 'No parent (root category)', value: null }, ...options];
+    }
+
+    return [{ label: '+ Create new parent category', value: NEW_PARENT_OPTION_VALUE }, ...options];
   }
 
   protected parentFieldError(): string | null {
@@ -229,7 +276,7 @@ export class CategoryCreateFormComponent {
       return;
     }
 
-    const generated = this.toSlug(this.form.controls.newParent.controls.nameEn.value);
+    const generated = slugify(this.form.controls.newParent.controls.nameEn.value);
     if (generated) {
       slugControl.setValue(generated);
     }
@@ -264,7 +311,7 @@ export class CategoryCreateFormComponent {
       return;
     }
 
-    const generated = this.toSlug(this.form.controls.nameEn.value);
+    const generated = slugify(this.form.controls.nameEn.value);
     if (generated) {
       slugControl.setValue(generated);
     }
@@ -282,9 +329,6 @@ export class CategoryCreateFormComponent {
     }
 
     const value = this.form.getRawValue();
-    const creatingNewParent = value.parentId === NEW_PARENT_OPTION_VALUE;
-    const newParent = creatingNewParent ? value.newParent : null;
-    const parentId = creatingNewParent ? null : value.parentId;
 
     if (this.mode() === 'edit') {
       this.updateSubmitted.emit({
@@ -292,15 +336,18 @@ export class CategoryCreateFormComponent {
         nameAr: value.nameAr,
         slug: value.slug,
         isActive: value.isActive,
-        parentId,
-        newParent,
+        parentId: value.parentId,
       });
       return;
     }
 
+    const creatingNewParent = value.parentId === NEW_PARENT_OPTION_VALUE;
+    const newParent = creatingNewParent ? value.newParent : null;
+    const parentId = creatingNewParent ? null : value.parentId;
+
     this.submitted.emit({
       nameEn: value.nameEn,
-      nameAr: value.nameAr,
+      nameAr: value.nameAr || value.nameEn,
       slug: value.slug,
       parentId,
       newParent,
@@ -312,13 +359,7 @@ export class CategoryCreateFormComponent {
     this.cancelled.emit();
   }
 
-  private toSlug(value: string): string {
-    return value
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
+  protected requestDelete(): void {
+    this.deleteRequested.emit();
   }
 }

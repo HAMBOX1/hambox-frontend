@@ -18,3 +18,36 @@
   gap: 0.5rem;
   margin-left: auto;
 }
+
+@media (max-width: 767px) {
+  .admin-bulk-bar {
+    padding: 0.625rem 0.75rem;
+    gap: 0.625rem;
+  }
+
+  .admin-bulk-bar__count {
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  /* Row of action buttons can outgrow the screen (Publish/Unpublish/Archive/Delete/More…) —
+     scroll it horizontally in its own compact strip instead of wrapping (grows tall) or
+     overflowing the page (breaks layout). Mirrors the stat-strip pattern already used
+     elsewhere in the admin catalog pages. */
+  .admin-bulk-bar__actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-left: 0;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    ::ng-deep .p-button {
+      flex-shrink: 0;
+    }
+  }
+}

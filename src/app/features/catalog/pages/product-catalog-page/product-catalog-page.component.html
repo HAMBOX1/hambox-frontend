@@ -3,77 +3,167 @@
 
   <app-admin-page-header
     [title]="'ADMIN.CATALOG_PAGE.TITLE' | translate"
-    [subtitle]="subtitle()"
     [breadcrumbs]="breadcrumbs"
+    [compactActions]="true"
   >
-    <a
+    <div adminHeaderMeta class="product-catalog-page__stat-strip">
+      <span class="product-catalog-page__stat">
+        <i class="pi pi-box" aria-hidden="true"></i>
+        <strong>{{ listStats().total }}</strong>
+        <span>{{ 'ADMIN.CATALOG_PAGE.STATS.TOTAL' | translate }}</span>
+      </span>
+      <span class="product-catalog-page__stat product-catalog-page__stat--success">
+        <i class="pi pi-check-circle" aria-hidden="true"></i>
+        <strong>{{ listStats().active }}</strong>
+        <span>{{ 'ADMIN.CATALOG_PAGE.STATS.PUBLISHED' | translate }}</span>
+      </span>
+      <span class="product-catalog-page__stat product-catalog-page__stat--info">
+        <i class="pi pi-file" aria-hidden="true"></i>
+        <strong>{{ listStats().draft }}</strong>
+        <span>{{ 'ADMIN.CATALOG_PAGE.STATS.DRAFTS' | translate }}</span>
+      </span>
+      <span class="product-catalog-page__stat product-catalog-page__stat--warning">
+        <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+        <strong>{{ listStats().needsAttention }}</strong>
+        <span>{{ 'ADMIN.CATALOG_PAGE.STATS.NEEDS_ATTENTION' | translate }}</span>
+      </span>
+    </div>
+
+    <app-admin-icon-button
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Inventory.View"
-      pButton
-      severity="secondary"
-      routerLink="/admin/inventory"
-      [label]="'ADMIN.CATALOG_PAGE.INVENTORY_DASHBOARD' | translate"
       icon="pi pi-chart-bar"
-    ></a>
-    <a
+      [label]="'ADMIN.CATALOG_PAGE.INVENTORY_DASHBOARD' | translate"
+      routerLink="/admin/inventory"
+    />
+    <app-admin-icon-button
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Products.Create"
-      pButton
-      class="admin-btn-primary"
-      routerLink="/admin/products/new"
-      [label]="'ADMIN.CATALOG_PAGE.CREATE_PRODUCT' | translate"
       icon="pi pi-plus"
-    ></a>
+      severity="primary"
+      [label]="'ADMIN.CATALOG_PAGE.CREATE_PRODUCT' | translate"
+      routerLink="/admin/products/new"
+    />
   </app-admin-page-header>
-
-  <app-admin-stat-grid>
-    <app-admin-stat-card [compact]="true" [label]="'ADMIN.CATALOG_PAGE.STATS.TOTAL' | translate" [value]="listStats().total" icon="pi-box" />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.CATALOG_PAGE.STATS.PUBLISHED' | translate"
-      [value]="listStats().active"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-check-circle"
-      tone="success"
-    />
-    <app-admin-stat-card [compact]="true" [label]="'ADMIN.CATALOG_PAGE.STATS.DRAFTS' | translate" [value]="listStats().draft" [hint]="'ADMIN.STATS.ON_PAGE' | translate" icon="pi-file" tone="info" />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.CATALOG_PAGE.STATS.NEEDS_ATTENTION' | translate"
-      [value]="listStats().needsAttention"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-exclamation-circle"
-      tone="warning"
-    />
-  </app-admin-stat-grid>
 
   <app-product-catalog-toolbar
     [searchTerm]="searchTerm()"
     [statusFilter]="statusFilter()"
     [hasActiveFilters]="hasActiveFilters()"
+    [viewMode]="viewMode()"
     (searchChange)="onSearchChange($event)"
     (statusChange)="onStatusFilterChange($event)"
     (clearFilters)="onClearFilters()"
+    (viewModeChange)="onViewModeChange($event)"
   />
 
   @if (error()) {
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
-  <app-product-catalog-table
-    class="product-catalog-page__table"
-    [products]="items()"
-    [loading]="loading()"
-    [totalRecords]="totalCount()"
-    [pageSize]="pageSize()"
-    [first]="tableFirst()"
-    [selectedProductId]="selectedProductId()"
-    [searchActive]="hasActiveSearch()"
-    (pageChange)="onPageChange($event)"
-    (productSelect)="onProductSelect($event)"
-    (createProduct)="navigateToCreate()"
-    (duplicateProduct)="openDuplicateDialog($event)"
-    (archiveProduct)="onRowArchive($event)"
-    (deleteProduct)="requestDelete($event)"
-  />
+  <app-admin-bulk-bar [selectedCount]="bulkSelectedCount()" (clearSelection)="clearBulkSelection()">
+    @if (canOfferSelectAllMatching()) {
+      <button
+        pButton
+        type="button"
+        [text]="true"
+        size="small"
+        [label]="'ADMIN.CATALOG_PAGE.BULK.SELECT_ALL_MATCHING' | translate: { count: totalCount() }"
+        (click)="selectAllMatchingFilter()"
+      ></button>
+    }
+    <button
+      *hamboxHasPermission="permissions.Catalog.Products.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.PUBLISH' | translate"
+      icon="pi pi-check"
+      size="small"
+      [disabled]="bulkActionLoading()"
+      (click)="bulkPublish()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Catalog.Products.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.UNPUBLISH' | translate"
+      icon="pi pi-eye-slash"
+      severity="secondary"
+      size="small"
+      [disabled]="bulkActionLoading()"
+      (click)="bulkUnpublish()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Catalog.Products.Edit"
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.ACTIONS.ARCHIVE' | translate"
+      icon="pi pi-inbox"
+      severity="secondary"
+      size="small"
+      [disabled]="bulkActionLoading()"
+      (click)="bulkArchive()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Catalog.Products.Delete"
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.ACTIONS.DELETE' | translate"
+      icon="pi pi-trash"
+      severity="danger"
+      size="small"
+      [disabled]="bulkActionLoading()"
+      (click)="requestBulkDelete()"
+    ></button>
+    <app-admin-action-menu [label]="'ADMIN.CATALOG_PAGE.BULK.MORE' | translate" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
+  </app-admin-bulk-bar>
+
+  @if (viewMode() === 'table') {
+    <app-product-catalog-table
+      class="product-catalog-page__table"
+      [products]="items()"
+      [loading]="loading()"
+      [totalRecords]="totalCount()"
+      [pageSize]="pageSize()"
+      [first]="tableFirst()"
+      [selectedProductId]="selectedProductId()"
+      [searchActive]="hasActiveSearch()"
+      [categoryOptions]="categoryOptions()"
+      [sortField]="sortField()"
+      [sortOrder]="sortOrder()"
+      [bulkSelectedIds]="bulkSelectedIds()"
+      [allPageSelected]="isAllPageSelected()"
+      (pageChange)="onPageChange($event)"
+      (productSelect)="onProductSelect($event)"
+      (createProduct)="navigateToCreate()"
+      (duplicateProduct)="openDuplicateDialog($event)"
+      (archiveProduct)="onRowArchive($event)"
+      (deleteProduct)="requestDelete($event)"
+      (manageStock)="navigateToStock($event)"
+      (fieldEdit)="onFieldEdit($event)"
+      (statusEdit)="onStatusEdit($event)"
+      (bulkToggle)="onBulkToggle($event)"
+      (bulkToggleAllPage)="onBulkToggleAllPage($event)"
+    />
+  } @else {
+    <app-product-catalog-cards
+      [products]="items()"
+      [loading]="loading()"
+      [totalRecords]="totalCount()"
+      [pageSize]="pageSize()"
+      [first]="tableFirst()"
+      [searchActive]="hasActiveSearch()"
+      [bulkSelectedIds]="bulkSelectedIds()"
+      (pageChange)="onCardsPageChange($event)"
+      (productSelect)="onProductSelect($event)"
+      (createProduct)="navigateToCreate()"
+      (duplicateProduct)="openDuplicateDialog($event)"
+      (archiveProduct)="onRowArchive($event)"
+      (deleteProduct)="requestDelete($event)"
+      (manageStock)="navigateToStock($event)"
+      (bulkToggle)="onBulkToggle($event)"
+    />
+  }
 
   <p-drawer
     [visible]="drawerVisible()"
@@ -139,3 +229,114 @@
   (visibleChange)="deleteDialogOpen.set($event)"
   (confirmed)="confirmDelete()"
 />
+
+<app-admin-confirm-dialog
+  [visible]="bulkDeleteDialogOpen()"
+  [title]="'ADMIN.CONFIRM.DELETE_PRODUCTS_TITLE' | translate"
+  [message]="'ADMIN.CONFIRM.DELETE_PRODUCTS' | translate: { count: bulkSelectedCount() }"
+  [destructive]="true"
+  [loading]="bulkActionLoading()"
+  (visibleChange)="bulkDeleteDialogOpen.set($event)"
+  (confirmed)="confirmBulkDelete()"
+/>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.DUPLICATE_TITLE' | translate"
+  [visible]="bulkDuplicateDialogOpen()"
+  (visibleChange)="bulkDuplicateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-duplicate-suffix">{{ 'ADMIN.CATALOG_PAGE.DUPLICATE.NAME_SUFFIX' | translate }}</label>
+    <input
+      pInputText
+      id="bulk-duplicate-suffix"
+      class="admin-field__input"
+      [ngModel]="bulkDuplicateSuffix()"
+      (ngModelChange)="bulkDuplicateSuffix.set($event)"
+    />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkDuplicateDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.DUPLICATE.ACTION' | translate" icon="pi pi-copy" [loading]="bulkActionLoading()" (click)="confirmBulkDuplicate()"></button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.CATEGORY_TITLE' | translate"
+  [visible]="bulkCategoryDialogOpen()"
+  (visibleChange)="bulkCategoryDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-category-select">{{ 'ADMIN.CATALOG_PAGE.BULK.NEW_CATEGORY' | translate }}</label>
+    <p-select
+      inputId="bulk-category-select"
+      [options]="[...categoryOptions()]"
+      optionLabel="label"
+      optionValue="id"
+      [ngModel]="bulkTargetCategoryId()"
+      (ngModelChange)="bulkTargetCategoryId.set($event)"
+      appendTo="body"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkCategoryDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate" icon="pi pi-check" [disabled]="!bulkTargetCategoryId()" [loading]="bulkActionLoading()" (click)="confirmBulkCategoryChange()"></button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.PRICE_TITLE' | translate"
+  [visible]="bulkPriceDialogOpen()"
+  (visibleChange)="bulkPriceDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="admin-field">
+    <div class="product-catalog-page__price-mode-options">
+      <label>
+        <p-radioButton name="bulkPriceMode" value="IncreasePercent" [ngModel]="bulkPriceMode()" (ngModelChange)="bulkPriceMode.set($event)" />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.PRICE_INCREASE' | translate }}
+      </label>
+      <label>
+        <p-radioButton name="bulkPriceMode" value="DecreasePercent" [ngModel]="bulkPriceMode()" (ngModelChange)="bulkPriceMode.set($event)" />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.PRICE_DECREASE' | translate }}
+      </label>
+      <label>
+        <p-radioButton name="bulkPriceMode" value="SetFixed" [ngModel]="bulkPriceMode()" (ngModelChange)="bulkPriceMode.set($event)" />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.PRICE_FIXED' | translate }}
+      </label>
+    </div>
+  </div>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-price-value">
+      {{ (bulkPriceMode() === 'SetFixed' ? 'ADMIN.CATALOG_PAGE.BULK.PRICE_NEW_LABEL' : 'ADMIN.CATALOG_PAGE.BULK.PRICE_PERCENT_LABEL') | translate }}
+    </label>
+    <p-inputNumber
+      inputId="bulk-price-value"
+      [ngModel]="bulkPriceValue()"
+      (ngModelChange)="bulkPriceValue.set($event)"
+      [mode]="bulkPriceMode() === 'SetFixed' ? 'currency' : 'decimal'"
+      currency="USD"
+      [min]="0"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkPriceDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate" icon="pi pi-check" [disabled]="bulkPriceValue() === null" [loading]="bulkActionLoading()" (click)="confirmBulkPriceAdjust()"></button>
+  </div>
+</p-dialog>

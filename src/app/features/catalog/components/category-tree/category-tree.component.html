@@ -1,0 +1,22 @@
+@if (loading() && tree().length === 0) {
+  <app-admin-loading-skeleton variant="table" [rows]="6" />
+} @else if (isEmpty()) {
+  <app-admin-empty-state
+    icon="pi pi-sitemap"
+    [title]="hasActiveSearch() ? 'No matching categories' : 'No categories yet'"
+    [description]="
+      hasActiveSearch()
+        ? 'Try a different search term or clear the search to see the full tree.'
+        : 'Create your first category to start organizing the catalog.'
+    "
+    [primaryLabel]="hasActiveSearch() ? null : 'Create Category'"
+    [primaryIcon]="hasActiveSearch() ? null : 'pi pi-plus'"
+    (primaryAction)="onCreateRequested()"
+  />
+} @else {
+  <div class="category-tree">
+    @for (root of tree(); track root.id) {
+      <app-category-tree-node [node]="root" [depth]="0" [callbacks]="callbacks" />
+    }
+  </div>
+}

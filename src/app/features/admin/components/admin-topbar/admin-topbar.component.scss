@@ -87,6 +87,26 @@
   gap: 0.625rem;
 }
 
+.admin-topbar__inline-switchers {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.admin-topbar__more {
+  display: none;
+}
+
+// Panel chrome (border/background/shadow/position) comes from p-popover
+// itself, which PrimeNG portals to <body> per the global `overlayAppendTo:
+// 'body'` config in app.config.ts — this only lays out its own content.
+.admin-topbar__more-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 11rem;
+}
+
 .admin-topbar__profile {
   display: flex;
   align-items: center;
@@ -154,16 +174,18 @@
   .admin-topbar__context-hint {
     display: none;
   }
+
+  .admin-topbar__inline-switchers {
+    display: none;
+  }
+
+  .admin-topbar__more {
+    display: block;
+  }
 }
 
 @media (max-width: 480px) {
-  .admin-topbar {
-    flex-wrap: wrap;
-    row-gap: 0.5rem;
-  }
-
-  .admin-topbar__actions {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+  .admin-topbar__context {
+    display: none;
   }
 }

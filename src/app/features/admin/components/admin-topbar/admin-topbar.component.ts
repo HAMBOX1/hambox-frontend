@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PopoverModule } from 'primeng/popover';
 
 import { LanguageSwitcherComponent } from '../../../../shared/components/language-switcher/language-switcher.component';
 import { CurrencySwitcherComponent } from '../../../../shared/components/currency-switcher/currency-switcher.component';
@@ -16,6 +17,7 @@ import { AdminSidebarStateService } from '../../services/admin-sidebar-state.ser
     ThemeToggleComponent,
     LanguageSwitcherComponent,
     CurrencySwitcherComponent,
+    PopoverModule,
     TranslatePipe,
   ],
   templateUrl: './admin-topbar.component.html',

@@ -1,4 +1,4 @@
-<app-admin-toolbar>
+<app-admin-toolbar [compact]="true">
   <app-admin-search-bar
     adminToolbarSearch
     [value]="searchTerm()"
@@ -14,16 +14,18 @@
     [ngModel]="statusFilter()"
     (ngModelChange)="onStatusChange($event)"
   />
+  <app-admin-icon-button
+    adminToolbarActions
+    [icon]="viewMode() === 'table' ? 'pi pi-th-large' : 'pi pi-table'"
+    [label]="viewMode() === 'table' ? 'Card view' : 'Table view'"
+    (pressed)="toggleViewMode()"
+  />
   @if (hasActiveFilters()) {
-    <button
+    <app-admin-icon-button
       adminToolbarActions
-      pButton
-      type="button"
-      label="Clear filters"
       icon="pi pi-filter-slash"
-      severity="secondary"
-      text
-      (click)="clearFilters.emit()"
-    ></button>
+      label="Clear filters"
+      (pressed)="clearFilters.emit()"
+    />
   }
 </app-admin-toolbar>

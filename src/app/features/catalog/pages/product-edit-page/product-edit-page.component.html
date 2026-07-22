@@ -18,42 +18,58 @@
         <div class="product-edit-page__title-block">
           <h1>{{ current.nameEn }}</h1>
           <p class="product-edit-page__meta">
-            {{ current.categoryName }} · {{ variants().length }} variant(s) · {{ (current.images?.length ?? 0) }} image(s)
+            {{ current.categoryName }}
+            <span aria-hidden="true">·</span>
+            <app-admin-status-badge [label]="current.status" [tone]="statusTone(current.status)" />
+            <span aria-hidden="true">·</span>
+            {{ totalVariantCount() }} variant(s) ({{ activeVariantCount() }} active)
+            <span aria-hidden="true">·</span>
+            {{ (current.images?.length ?? 0) }} image(s)
           </p>
-          <app-admin-status-badge [label]="current.status" [tone]="statusTone(current.status)" />
         </div>
 
         <div class="product-edit-page__hero-actions">
-          <button pButton type="button" label="Cancel" severity="secondary" (click)="onCancel()"></button>
-          <button
-            pButton
-            type="button"
-            label="Save"
-            icon="pi pi-save"
-            severity="secondary"
-            [loading]="submitting()"
-            (click)="onSave(false)"
-          ></button>
-          @if (current.status === 'Draft' || current.status === 'Inactive') {
+          <p-select
+            class="product-edit-page__status-select"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="current.status"
+            [disabled]="submitting()"
+            *hamboxHasPermission="permissions.Catalog.Products.Edit"
+            (ngModelChange)="onStatusChange($event)"
+          />
+
+          <div class="product-edit-page__hero-buttons">
+            <button pButton type="button" label="Cancel" severity="secondary" (click)="onCancel()"></button>
             <button
               pButton
               type="button"
-              label="Publish"
-              icon="pi pi-check"
+              label="Save"
+              severity="secondary"
+              [disabled]="!dirty()"
               [loading]="submitting()"
               *hamboxHasPermission="permissions.Catalog.Products.Edit"
-              (click)="onPublish()"
+              (click)="onSave()"
             ></button>
-          }
+            @if (current.status === 'Draft' || current.status === 'Inactive') {
+              <button
+                pButton
+                type="button"
+                label="Publish"
+                icon="pi pi-check"
+                [loading]="submitting()"
+                *hamboxHasPermission="permissions.Catalog.Products.Edit"
+                (click)="onPublish()"
+              ></button>
+            }
+          </div>
         </div>
       </div>
     </header>
 
     <div class="product-edit-page__setup">
-      <app-admin-section-card
-        title="General &amp; Pricing"
-        description="Names, descriptions, category, and the base price used when variants don't override it."
-      >
+      <app-admin-section-card title="General" [compact]="true">
         <app-product-basic-info-form
           #productForm
           section="full"
@@ -63,33 +79,33 @@
           [categoriesError]="error()"
           [disabled]="submitting()"
           (categoryCreated)="onCategoryCreated()"
-        />
+        >
+          <app-product-assets-upload [productId]="productId()!" />
+        </app-product-basic-info-form>
       </app-admin-section-card>
 
-      <app-admin-section-card
-        title="Media"
-        description="Upload, reorder, and set the primary storefront image."
-      >
-        <app-product-assets-upload [productId]="productId()!" />
-      </app-admin-section-card>
-
-      <app-product-option-groups-panel />
+      <app-product-option-groups-panel [compact]="true" />
 
       <div #variantsAnchor class="product-edit-page__variants-anchor">
-        <app-product-variant-manager />
+        <app-product-variant-manager [compact]="true" />
       </div>
     </div>
 
-    <app-admin-sticky-save-bar>
-      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="submitting()" (click)="onCancel()"></button>
-      <button
-        pButton
-        type="button"
-        label="Save Changes"
-        icon="pi pi-check"
-        [loading]="submitting()"
-        (click)="onSave()"
-      ></button>
-    </app-admin-sticky-save-bar>
+    <div
+      class="product-edit-page__float-bar"
+      [class.product-edit-page__float-bar--visible]="showFloatingSaveBar()"
+      role="status"
+      [attr.aria-hidden]="!showFloatingSaveBar()"
+    >
+      <span class="product-edit-page__float-status">
+        @if (submitting()) {
+          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i> Saving…
+        } @else if (justSaved()) {
+          <i class="pi pi-check-circle product-edit-page__float-status-icon--saved" aria-hidden="true"></i> Saved
+        } @else {
+          <i class="pi pi-circle-fill product-edit-page__float-status-icon--dirty" aria-hidden="true"></i> Unsaved changes
+        }
+      </span>
+    </div>
   }
 </section>

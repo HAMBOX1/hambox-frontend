@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { MenuItem } from 'primeng/api';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -19,18 +22,37 @@ import {
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
-import { copyToClipboard, formatShortGuid } from '../../../../shared/utils/guid-display.util';
+import { CategoryOption } from '../../models/category.model';
 import { Product, ProductStatus } from '../../models/product.model';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
+
+type EditableField = 'name' | 'category' | 'price';
+
+const STATUS_EDIT_OPTIONS: readonly ProductStatus[] = ['Draft', 'Active', 'Inactive', 'Archived'];
+
+export interface ProductFieldEdit {
+  readonly product: Product;
+  readonly nameEn?: string;
+  readonly categoryId?: string;
+  readonly price?: number;
+}
+
+export interface ProductStatusEdit {
+  readonly product: Product;
+  readonly status: ProductStatus;
+}
 
 @Component({
   selector: 'app-product-catalog-table',
   standalone: true,
   imports: [
-    RouterLink,
+    FormsModule,
     TableModule,
-    ButtonModule,
+    CheckboxModule,
+    InputNumberModule,
+    InputTextModule,
+    SelectModule,
     TooltipModule,
     TranslatePipe,
     HasPermissionDirective,
@@ -59,14 +81,24 @@ export class ProductCatalogTableComponent {
   readonly first = input(0);
   readonly selectedProductId = input<string | null>(null);
   readonly searchActive = input(false);
+  readonly categoryOptions = input<readonly CategoryOption[]>([]);
+  readonly sortField = input<string | undefined>(undefined);
+  readonly sortOrder = input(0);
+  readonly bulkSelectedIds = input<ReadonlySet<string>>(new Set());
+  readonly allPageSelected = input(false);
 
   readonly createProduct = output<void>();
 
   readonly pageChange = output<TableLazyLoadEvent>();
   readonly productSelect = output<string>();
+  readonly bulkToggle = output<{ productId: string; shiftKey: boolean }>();
+  readonly bulkToggleAllPage = output<boolean>();
+  readonly manageStock = output<Product>();
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
+  readonly fieldEdit = output<ProductFieldEdit>();
+  readonly statusEdit = output<ProductStatusEdit>();
 
   protected readonly tableSelection = computed(() => {
     const selectedId = this.selectedProductId();
@@ -78,10 +110,13 @@ export class ProductCatalogTableComponent {
   });
 
   protected readonly statusLabel = productStatusLabel;
-  protected readonly formatShortGuid = formatShortGuid;
   protected readonly resolveImageUrl = resolveProductImageUrl;
-  protected readonly copiedId = signal<string | null>(null);
   protected readonly failedImageIds = signal<ReadonlySet<string>>(new Set());
+  protected readonly statusOptions = STATUS_EDIT_OPTIONS;
+
+  protected readonly editingCell = signal<{ productId: string; field: EditableField } | null>(null);
+  protected readonly editDraftText = signal('');
+  protected readonly editDraftNumber = signal<number | null>(null);
 
   protected statusTone(status: ProductStatus): AdminStatusTone {
     switch (status) {
@@ -110,6 +145,19 @@ export class ProductCatalogTableComponent {
     this.productSelect.emit(product.id);
   }
 
+  protected isBulkSelected(productId: string): boolean {
+    return this.bulkSelectedIds().has(productId);
+  }
+
+  protected onBulkCheckboxClick(product: Product, event: Event | undefined): void {
+    const shiftKey = event instanceof MouseEvent && event.shiftKey;
+    this.bulkToggle.emit({ productId: product.id, shiftKey });
+  }
+
+  protected onBulkToggleAllPage(): void {
+    this.bulkToggleAllPage.emit(!this.allPageSelected());
+  }
+
   protected isImageFailed(productId: string): boolean {
     return this.failedImageIds().has(productId);
   }
@@ -118,16 +166,71 @@ export class ProductCatalogTableComponent {
     this.failedImageIds.update((ids) => new Set(ids).add(productId));
   }
 
-  protected async copyProductId(id: string, event: Event): Promise<void> {
+  protected categoryLabel(categoryId: string, fallback: string): string {
+    return this.categoryOptions().find((option) => option.id === categoryId)?.label ?? fallback;
+  }
+
+  protected onStockClick(product: Product, event: Event): void {
     event.stopPropagation();
-    const copied = await copyToClipboard(id);
-    if (copied) {
-      this.copiedId.set(id);
-      window.setTimeout(() => {
-        if (this.copiedId() === id) {
-          this.copiedId.set(null);
-        }
-      }, 1500);
+    this.manageStock.emit(product);
+  }
+
+  protected isEditing(productId: string, field: EditableField): boolean {
+    const cell = this.editingCell();
+    return !!cell && cell.productId === productId && cell.field === field;
+  }
+
+  protected startEdit(product: Product, field: EditableField, event: Event): void {
+    event.stopPropagation();
+
+    if (field === 'name') {
+      this.editDraftText.set(product.nameEn);
+    } else if (field === 'category') {
+      this.editDraftText.set(product.categoryId);
+    } else {
+      this.editDraftNumber.set(product.price);
+    }
+
+    this.editingCell.set({ productId: product.id, field });
+  }
+
+  protected cancelEdit(): void {
+    this.editingCell.set(null);
+  }
+
+  protected saveEdit(product: Product): void {
+    const cell = this.editingCell();
+    if (!cell || cell.productId !== product.id) {
+      return;
+    }
+
+    this.editingCell.set(null);
+
+    if (cell.field === 'name') {
+      const value = this.editDraftText().trim();
+      if (value && value !== product.nameEn) {
+        this.fieldEdit.emit({ product, nameEn: value });
+      }
+      return;
+    }
+
+    if (cell.field === 'category') {
+      const value = this.editDraftText();
+      if (value && value !== product.categoryId) {
+        this.fieldEdit.emit({ product, categoryId: value });
+      }
+      return;
+    }
+
+    const value = this.editDraftNumber();
+    if (value !== null && value !== product.price) {
+      this.fieldEdit.emit({ product, price: value });
+    }
+  }
+
+  protected onStatusEditChange(product: Product, status: ProductStatus): void {
+    if (status !== product.status) {
+      this.statusEdit.emit({ product, status });
     }
   }
 

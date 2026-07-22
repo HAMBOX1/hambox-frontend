@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
 import {
+  AdminIconButtonComponent,
   AdminSearchBarComponent,
   AdminToolbarComponent,
 } from '../../../../shared/components/admin';
 import { ProductStatus } from '../../models/product.model';
+import { AdminProductsViewMode } from '../../services/admin-products-view-mode.service';
 
 const STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'All statuses', value: '' },
@@ -20,7 +21,13 @@ const STATUS_OPTIONS: { label: string; value: string }[] = [
 @Component({
   selector: 'app-product-catalog-toolbar',
   standalone: true,
-  imports: [FormsModule, SelectModule, ButtonModule, AdminToolbarComponent, AdminSearchBarComponent],
+  imports: [
+    FormsModule,
+    SelectModule,
+    AdminToolbarComponent,
+    AdminSearchBarComponent,
+    AdminIconButtonComponent,
+  ],
   templateUrl: './product-catalog-toolbar.component.html',
   styleUrl: './product-catalog-toolbar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,9 +37,11 @@ export class ProductCatalogToolbarComponent {
   readonly statusFilter = input('');
   readonly searchPlaceholder = input('Search products…');
   readonly hasActiveFilters = input(false);
+  readonly viewMode = input<AdminProductsViewMode>('table');
   readonly searchChange = output<string>();
   readonly statusChange = output<ProductStatus | ''>();
   readonly clearFilters = output<void>();
+  readonly viewModeChange = output<AdminProductsViewMode>();
 
   protected readonly statusOptions = STATUS_OPTIONS;
 
@@ -42,5 +51,9 @@ export class ProductCatalogToolbarComponent {
 
   protected onStatusChange(value: string): void {
     this.statusChange.emit(value as ProductStatus | '');
+  }
+
+  protected toggleViewMode(): void {
+    this.viewModeChange.emit(this.viewMode() === 'table' ? 'cards' : 'table');
   }
 }

@@ -1,89 +1,18 @@
 @if (inventoryLoading()) {
   <app-admin-loading-skeleton variant="table" />
 } @else if (selectedVariant(); as variant) {
+  <div class="variant-inventory-panel__stats">
+    <span class="variant-inventory-panel__stat variant-inventory-panel__stat--available">
+      Available <strong>{{ variant.availableStock }}</strong>
+    </span>
+    <span class="variant-inventory-panel__stat">Reserved <strong>{{ variant.reservedStock }}</strong></span>
+    <span class="variant-inventory-panel__stat">Sold <strong>{{ variant.soldStock }}</strong></span>
+  </div>
+
   <app-admin-section-card
-    title="Batch management"
-    description="Create batches, import codes, and track stock by supplier."
+    title="Import Codes"
+    description="Paste or upload digital codes for this variant."
   >
-    <div class="variant-inventory-panel__toolbar">
-      <button
-        pButton
-        type="button"
-        label="Export CSV"
-        icon="pi pi-download"
-        severity="secondary"
-        [loading]="actionLoading()"
-        (click)="exportCodes()"
-      ></button>
-    </div>
-
-    <div class="variant-inventory-panel__batch-form" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
-      <input
-        pInputText
-        placeholder="Batch name"
-        [ngModel]="newBatchName()"
-        (ngModelChange)="newBatchName.set($event)"
-      />
-      <button
-        pButton
-        type="button"
-        label="Create Batch"
-        icon="pi pi-folder-plus"
-        [loading]="creatingBatch()"
-        (click)="createBatch()"
-      ></button>
-    </div>
-
-    @if (batchesTable().length) {
-      <app-admin-data-table-shell>
-        <p-table class="admin-data-table variant-inventory-panel__table" [value]="batchesTable()" responsiveLayout="scroll">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>Batch</th>
-              <th>Supplier</th>
-              <th>Imported</th>
-              <th>Available</th>
-              <th>Reserved</th>
-              <th>Sold</th>
-              <th>Expired</th>
-              <th>Created</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-batch>
-            <tr [class.variant-inventory-panel__batch-row--active]="selectedBatchId() === batch.id">
-              <td>{{ batch.name }}</td>
-              <td>{{ batch.supplierId ?? '—' }}</td>
-              <td>{{ batch.totalCodes }}</td>
-              <td>{{ batch.availableCodes }}</td>
-              <td>{{ batch.reservedCodes }}</td>
-              <td>{{ batch.soldCodes }}</td>
-              <td>{{ batch.expiredCodes }}</td>
-              <td>{{ batch.importDate | date: 'mediumDate' }}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </app-admin-data-table-shell>
-
-      <div class="variant-inventory-panel__batch-select">
-        <label for="batch-select">Import target batch</label>
-        <p-select
-          inputId="batch-select"
-          [options]="batchOptions()"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="selectedBatchId()"
-          (ngModelChange)="onBatchChange($event)"
-          placeholder="Select batch"
-        />
-      </div>
-    } @else {
-      <app-admin-empty-state
-        icon="pi pi-folder"
-        title="No batches yet"
-        [description]="'Create a batch for ' + variant.sku + ' before importing codes.'"
-      />
-    }
-
     <div class="variant-inventory-panel__import" *hamboxHasPermission="permissions.Catalog.Inventory.Import">
       <div class="variant-inventory-panel__upload-row">
         <label class="variant-inventory-panel__file-btn">
@@ -96,7 +25,7 @@
         </label>
       </div>
 
-      <label for="bulk-codes">Bulk import (one code per line)</label>
+      <label for="bulk-codes">Paste codes (one per line)</label>
       <textarea
         id="bulk-codes"
         pTextarea
@@ -104,21 +33,82 @@
         placeholder="XXXX-XXXX-XXXX"
         [ngModel]="bulkCodes()"
         (ngModelChange)="bulkCodes.set($event)"
-        [disabled]="!selectedBatchId()"
       ></textarea>
+
+      <button
+        type="button"
+        class="variant-inventory-panel__advanced-toggle"
+        [attr.aria-expanded]="advancedOpen()"
+        (click)="toggleAdvanced()"
+      >
+        <i class="pi" [class.pi-chevron-down]="!advancedOpen()" [class.pi-chevron-up]="advancedOpen()"></i>
+        Advanced
+      </button>
+
+      @if (advancedOpen()) {
+        <div class="variant-inventory-panel__advanced" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
+          <div class="variant-inventory-panel__advanced-field">
+            <label for="import-supplier">Supplier (optional)</label>
+            <p-select
+              inputId="import-supplier"
+              [options]="supplierOptions()"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="supplierId()"
+              (ngModelChange)="supplierId.set($event)"
+              placeholder="No supplier"
+              [showClear]="true"
+            />
+          </div>
+
+          <div class="variant-inventory-panel__advanced-checkbox">
+            <p-checkbox
+              [binary]="true"
+              inputId="group-into-batch"
+              [ngModel]="groupIntoBatch()"
+              (ngModelChange)="groupIntoBatch.set($event)"
+            />
+            <label for="group-into-batch">Group import into batch</label>
+          </div>
+
+          <div class="variant-inventory-panel__advanced-field">
+            <label for="import-batch-name">Batch name</label>
+            <input
+              pInputText
+              id="import-batch-name"
+              placeholder="e.g. Supplier A — March"
+              [ngModel]="batchName()"
+              (ngModelChange)="batchName.set($event)"
+              [disabled]="!groupIntoBatch()"
+            />
+          </div>
+
+          <div class="variant-inventory-panel__advanced-field">
+            <label for="import-notes">Notes (optional)</label>
+            <textarea
+              id="import-notes"
+              pTextarea
+              rows="2"
+              [ngModel]="importNotes()"
+              (ngModelChange)="importNotes.set($event)"
+            ></textarea>
+          </div>
+        </div>
+      }
+
       <button
         pButton
         type="button"
-        label="Import Codes"
+        label="Import"
         icon="pi pi-upload"
         [loading]="importing()"
-        [disabled]="!selectedBatchId()"
+        [disabled]="!canImport()"
         (click)="importCodes()"
       ></button>
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Digital codes" description="Search, filter, and manage imported codes.">
+  <app-admin-section-card title="Digital Codes" description="Search, filter, and manage imported codes.">
     <div class="variant-inventory-panel__toolbar">
       <input
         pInputText
@@ -136,6 +126,15 @@
         (ngModelChange)="statusFilter.set($event)"
       />
       <button pButton type="button" label="Apply Filters" severity="secondary" (click)="applyFilters()"></button>
+      <button
+        pButton
+        type="button"
+        label="Export CSV"
+        icon="pi pi-download"
+        severity="secondary"
+        [loading]="actionLoading()"
+        (click)="exportCodes()"
+      ></button>
     </div>
 
     @if (selectedCodeIds().length) {
@@ -231,7 +230,7 @@
                   ></button>
                 }
               </td>
-              <td>{{ batchName(code.batchId) }}</td>
+              <td>{{ batchLabel(code.batchId) }}</td>
               <td><app-admin-status-badge [label]="code.status" /></td>
               <td>{{ code.reservedOnUtc ? (code.reservedOnUtc | date: 'short') : '—' }}</td>
               <td>—</td>
@@ -289,6 +288,54 @@
         icon="pi pi-key"
         title="No codes imported"
         description="Paste codes above or adjust your search filters."
+      />
+    }
+  </app-admin-section-card>
+
+  <app-admin-section-card
+    title="Import History"
+    description="Recent import activity for this variant."
+    [collapsible]="true"
+    [collapsed]="historyCollapsed()"
+    (collapsedChange)="onHistoryCollapsedChange($event)"
+  >
+    @if (auditLogsLoading()) {
+      <app-admin-loading-skeleton variant="table" />
+    } @else if (auditLogs().length) {
+      <ul class="variant-inventory-panel__history-list">
+        @for (entry of auditLogs(); track entry.id) {
+          <li class="variant-inventory-panel__history-item">
+            <button
+              type="button"
+              class="variant-inventory-panel__history-summary"
+              [attr.aria-expanded]="expandedHistoryId() === entry.id"
+              (click)="toggleHistoryEntry(entry.id)"
+            >
+              <span class="variant-inventory-panel__history-action">{{ historyLabel(entry) }}</span>
+              <span class="variant-inventory-panel__history-time">{{ historyRelativeLabel(entry.occurredOnUtc) }}</span>
+            </button>
+            @if (expandedHistoryId() === entry.id) {
+              <div class="variant-inventory-panel__history-meta">
+                @if (entry.details) {
+                  <span>{{ entry.details }}</span>
+                }
+                @if (entry.batchId) {
+                  <span>Batch: {{ batchLabel(entry.batchId) }}</span>
+                  @if (batchSupplierName(entry.batchId); as supplier) {
+                    <span>Supplier: {{ supplier }}</span>
+                  }
+                }
+                <span>{{ entry.occurredOnUtc | date: 'medium' }}</span>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <app-admin-empty-state
+        icon="pi pi-history"
+        title="No activity yet"
+        description="Imports and code changes for this variant will show up here."
       />
     }
   </app-admin-section-card>

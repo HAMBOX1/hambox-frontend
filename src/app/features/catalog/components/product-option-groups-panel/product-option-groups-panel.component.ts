@@ -4,22 +4,24 @@ import {
   Component,
   computed,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
   AdminEmptyStateComponent,
+  AdminIconButtonComponent,
   AdminLoadingSkeletonComponent,
   AdminSectionCardComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { slugify } from '../../utils/product-display.utils';
 
 @Component({
   selector: 'app-product-option-groups-panel',
@@ -28,12 +30,12 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
     FormsModule,
     ButtonModule,
     InputTextModule,
-    CheckboxModule,
     DragDropModule,
     HasPermissionDirective,
     AdminSectionCardComponent,
     AdminEmptyStateComponent,
     AdminLoadingSkeletonComponent,
+    AdminIconButtonComponent,
   ],
   templateUrl: './product-option-groups-panel.component.html',
   styleUrl: './product-option-groups-panel.component.scss',
@@ -42,11 +44,12 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
 export class ProductOptionGroupsPanelComponent {
   private readonly facade = inject(ProductEditorFacade);
 
+  readonly compact = input(false);
+
   protected readonly permissions = PERMISSIONS;
   protected readonly optionGroups = this.facade.optionGroups;
   protected readonly loading = this.facade.loading;
 
-  protected readonly newGroupKey = signal('');
   protected readonly newGroupLabel = signal('');
   protected readonly pendingOptionByGroup = signal<Record<string, string>>({});
   protected readonly editingGroupId = signal<string | null>(null);
@@ -144,8 +147,8 @@ export class ProductOptionGroupsPanelComponent {
   }
 
   protected async createOptionGroup(): Promise<void> {
-    const key = this.newGroupKey().trim();
     const label = this.newGroupLabel().trim();
+    const key = slugify(label);
     if (!key || !label) {
       return;
     }
@@ -158,7 +161,6 @@ export class ProductOptionGroupsPanelComponent {
         sortOrder: this.optionGroups().length,
         isRequired: true,
       });
-      this.newGroupKey.set('');
       this.newGroupLabel.set('');
     } finally {
       this.creatingGroup.set(false);
@@ -171,7 +173,7 @@ export class ProductOptionGroupsPanelComponent {
       return;
     }
 
-    const value = label.toLowerCase().replace(/\s+/g, '-');
+    const value = slugify(label);
     const group = this.optionGroups().find((item) => item.id === groupId);
     await this.facade.createOption(groupId, {
       value,

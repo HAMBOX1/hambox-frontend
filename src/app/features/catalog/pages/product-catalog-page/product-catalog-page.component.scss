@@ -7,6 +7,88 @@
   width: 100%;
 }
 
+.product-catalog-page__price-mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-field-gap, 0.75rem);
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.product-catalog-page__stat-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.product-catalog-page__stat {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.4375rem;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.9375rem;
+    color: var(--admin-text-muted);
+  }
+
+  strong {
+    color: var(--admin-text-primary);
+    font-size: 0.9375rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .product-catalog-page__stat-strip {
+    gap: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-catalog-page__stat-strip {
+    gap: 0.625rem;
+  }
+
+  .product-catalog-page__stat {
+    font-size: 0.75rem;
+
+    i {
+      font-size: 0.8125rem;
+    }
+
+    strong {
+      font-size: 0.8125rem;
+    }
+  }
+}
+
+.product-catalog-page__stat--success i {
+  color: var(--admin-accent-green);
+}
+
+.product-catalog-page__stat--info i {
+  color: var(--admin-accent-blue);
+}
+
+.product-catalog-page__stat--warning i {
+  color: var(--admin-accent-amber);
+}
+
 // The drawer's own width/max-height/mobile overrides live in the global
 // styles.scss instead of here — it renders with appendTo="body" (to escape
 // a sitewide `.admin-page` enter-animation transform that otherwise breaks

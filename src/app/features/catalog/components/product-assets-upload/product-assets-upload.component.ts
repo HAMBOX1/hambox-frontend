@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { firstValueFrom } from 'rxjs';
 
 import { ProductAssetFile, ProductDraftAssetMetadata, ProductImage } from '../../models/product.model';
@@ -24,7 +25,7 @@ import {
 @Component({
   selector: 'app-product-assets-upload',
   standalone: true,
-  imports: [ButtonModule, DragDropModule],
+  imports: [ButtonModule, DragDropModule, DialogModule],
   templateUrl: './product-assets-upload.component.html',
   styleUrl: './product-assets-upload.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,10 +37,13 @@ export class ProductAssetsUploadComponent implements OnDestroy {
 
   readonly assetsChanged = output<readonly ProductDraftAssetMetadata[]>();
 
+  protected readonly maxCount = PRODUCT_IMAGE_MAX_COUNT;
+
   protected readonly assets = signal<readonly ProductAssetFile[]>([]);
   protected readonly isDragOver = signal(false);
   protected readonly uploading = signal(false);
   protected readonly validationError = signal<string | null>(null);
+  protected readonly previewAsset = signal<ProductAssetFile | null>(null);
 
   private readonly previewUrls = new Set<string>();
 
@@ -118,6 +122,20 @@ export class ProductAssetsUploadComponent implements OnDestroy {
 
   protected onBrowseClick(fileInput: HTMLInputElement): void {
     fileInput.click();
+  }
+
+  protected openPreview(asset: ProductAssetFile): void {
+    this.previewAsset.set(asset);
+  }
+
+  protected closePreview(): void {
+    this.previewAsset.set(null);
+  }
+
+  protected onPreviewVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.closePreview();
+    }
   }
 
   protected onFileSelected(event: Event): void {

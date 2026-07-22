@@ -1,16 +1,22 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  DestroyRef,
   ElementRef,
   effect,
+  HostListener,
   inject,
   OnInit,
+  signal,
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
+import { SelectModule } from 'primeng/select';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
@@ -18,7 +24,6 @@ import {
   AdminLoadingSkeletonComponent,
   AdminSectionCardComponent,
   AdminStatusBadgeComponent,
-  AdminStickySaveBarComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductAssetsUploadComponent } from '../../components/product-assets-upload/product-assets-upload.component';
@@ -28,18 +33,26 @@ import { ProductVariantManagerComponent } from '../../components/product-variant
 import { ProductStatus, UpdateProductRequest } from '../../models/product.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
+const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
+  { label: 'Draft', value: 'Draft' },
+  { label: 'Active', value: 'Active' },
+  { label: 'Inactive', value: 'Inactive' },
+  { label: 'Archived', value: 'Archived' },
+];
+
 @Component({
   selector: 'app-product-edit-page',
   standalone: true,
   imports: [
     RouterLink,
+    FormsModule,
     ToastModule,
     ButtonModule,
+    SelectModule,
     HasPermissionDirective,
     AdminSectionCardComponent,
     AdminErrorAlertComponent,
     AdminLoadingSkeletonComponent,
-    AdminStickySaveBarComponent,
     AdminStatusBadgeComponent,
     ProductBasicInfoFormComponent,
     ProductAssetsUploadComponent,
@@ -62,6 +75,7 @@ export class ProductEditPageComponent implements OnInit {
   private hasScrolledToFragment = false;
 
   protected readonly permissions = PERMISSIONS;
+  protected readonly statusOptions = STATUS_OPTIONS;
   protected readonly product = this.facade.product;
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;
@@ -71,8 +85,26 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly submitting = this.facade.submitting;
   protected readonly productId = this.facade.productId;
   protected readonly variants = this.facade.variants;
+  protected readonly totalVariantCount = this.facade.totalVariantCount;
+  protected readonly activeVariantCount = this.facade.activeVariantCount;
+
+  /** True once the owner has actually typed/changed something in the General form since the last save. Drives the floating save bar. */
+  protected readonly dirty = computed(() => this.productForm()?.dirty() ?? false);
+  private readonly justSavedState = signal(false);
+  /** Brief "Saved" flash after a successful save, so the bar doesn't just vanish the instant dirty flips back to false. */
+  protected readonly justSaved = this.justSavedState.asReadonly();
+  protected readonly showFloatingSaveBar = computed(
+    () => this.dirty() || this.submitting() || this.justSaved(),
+  );
+
+  private justSavedTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      if (this.justSavedTimeout !== null) {
+        clearTimeout(this.justSavedTimeout);
+      }
+    });
     effect(() => {
       if (this.hasScrolledToFragment || this.loading() || !this.product()) {
         return;
@@ -122,6 +154,16 @@ export class ProductEditPageComponent implements OnInit {
     void this.router.navigate(['/admin/products']);
   }
 
+  @HostListener('document:keydown', ['$event'])
+  protected onKeydown(event: KeyboardEvent): void {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+      event.preventDefault();
+      if (this.dirty() && !this.submitting()) {
+        void this.onSave();
+      }
+    }
+  }
+
   protected async onSave(navigateAway = false): Promise<void> {
     const product = this.product();
     const form = this.productForm();
@@ -153,6 +195,7 @@ export class ProductEditPageComponent implements OnInit {
         detail: `"${updateRequest.nameEn}" was updated successfully.`,
         life: 4000,
       });
+      this.flashSaved();
       if (navigateAway) {
         void this.router.navigate(['/admin/products']);
       }
@@ -163,6 +206,34 @@ export class ProductEditPageComponent implements OnInit {
       severity: 'error',
       summary: 'Save failed',
       detail: this.facade.submitError() ?? 'Unable to update product.',
+      life: 5000,
+    });
+  }
+
+  private flashSaved(): void {
+    if (this.justSavedTimeout !== null) {
+      clearTimeout(this.justSavedTimeout);
+    }
+    this.justSavedState.set(true);
+    this.justSavedTimeout = setTimeout(() => this.justSavedState.set(false), 2000);
+  }
+
+  protected async onStatusChange(status: ProductStatus): Promise<void> {
+    const updated = await this.facade.updateStatus(status);
+    if (updated) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Status updated',
+        detail: `Product status changed to ${status}.`,
+        life: 4000,
+      });
+      return;
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Status update failed',
+      detail: this.facade.submitError() ?? 'Unable to update product status.',
       life: 5000,
     });
   }

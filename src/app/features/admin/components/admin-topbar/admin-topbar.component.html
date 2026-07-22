@@ -32,8 +32,30 @@
   </div>
 
   <div class="admin-topbar__actions" [attr.aria-label]="'ADMIN.UTILITIES' | translate">
-    <app-language-switcher />
-    <app-currency-switcher />
+    <div class="admin-topbar__inline-switchers">
+      <app-language-switcher />
+      <app-currency-switcher />
+    </div>
+
+    <div class="admin-topbar__more">
+      <button
+        type="button"
+        class="admin-topbar__icon-btn admin-topbar__more-btn"
+        [attr.aria-label]="'ADMIN.TOPBAR.MORE' | translate"
+        aria-haspopup="true"
+        (click)="morePanel.toggle($event)"
+      >
+        <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
+      </button>
+
+      <p-popover #morePanel>
+        <div class="admin-topbar__more-panel" role="menu">
+          <app-language-switcher />
+          <app-currency-switcher />
+        </div>
+      </p-popover>
+    </div>
+
     <app-theme-toggle [compact]="true" />
 
     <a

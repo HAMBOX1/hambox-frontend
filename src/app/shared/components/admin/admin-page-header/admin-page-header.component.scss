@@ -74,4 +74,24 @@
   .admin-page-header__actions {
     justify-content: flex-start;
   }
+
+  /* Compact mode: title and actions stay on one row instead of stacking. */
+  .admin-page-header__row--compact {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .admin-page-header__row--compact .admin-page-header__main {
+    min-width: 0;
+  }
+
+  .admin-page-header__row--compact .admin-page-header__title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .admin-page-header__row--compact .admin-page-header__actions {
+    justify-content: flex-end;
+  }
 }

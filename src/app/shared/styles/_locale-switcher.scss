@@ -73,32 +73,16 @@
   transform: rotate(180deg);
 }
 
+// The dropdown itself has no position/overlay chrome here — it renders inside
+// a p-popover, which PrimeNG portals to <body> (see providePrimeNG's global
+// `overlayAppendTo: 'body'` in app.config.ts). That's what keeps it from ever
+// being clipped by a scrolling/transformed ancestor; this list only styles
+// its own content.
 .locale-switch__menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  inset-inline-end: 0;
-  z-index: 130;
   min-width: 13.5rem;
   margin: 0;
-  padding: 6px;
+  padding: 0;
   list-style: none;
-  border: 1px solid var(--color-nav-border, var(--color-border));
-  border-radius: var(--sf-radius-lg);
-  background: var(--color-dropdown-bg, var(--color-elevated));
-  box-shadow: var(--color-dropdown-shadow, var(--color-shadow-lg));
-  animation: locale-switch-fade-in 0.16s ease;
-}
-
-@keyframes locale-switch-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .locale-switch__option {

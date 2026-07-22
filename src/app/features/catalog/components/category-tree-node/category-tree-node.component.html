@@ -1,0 +1,84 @@
+<div
+  class="category-tree-node"
+  [class.category-tree-node--root]="depth() === 0"
+  [class.category-tree-node--last]="isLast()"
+  [style.--category-tree-depth]="depth()"
+>
+  <div
+    class="category-tree-node__row"
+    [class.category-tree-node__row--parent]="hasChildren()"
+    [class.category-tree-node__row--match]="callbacks().isMatched(node().id)"
+    [class.category-tree-node__row--inactive]="!node().isActive"
+    [class.category-tree-node__row--dragging]="callbacks().isDragged(node().id)"
+    [class.category-tree-node__row--drop-before]="callbacks().dropZoneFor(node().id) === 'before'"
+    [class.category-tree-node__row--drop-after]="callbacks().dropZoneFor(node().id) === 'after'"
+    [class.category-tree-node__row--drop-inside]="callbacks().dropZoneFor(node().id) === 'inside'"
+    [class.category-tree-node__row--mobile]="callbacks().isMobile()"
+    [attr.data-category-row-id]="node().id"
+    cdkDrag
+    [cdkDragData]="node().id"
+    cdkDragBoundary=".category-tree"
+    (cdkDragMoved)="onDragMoved($event)"
+    (cdkDragEnded)="onDragEnded($event)"
+    (click)="onRowActivate($event)"
+  >
+    <div class="category-tree-node__primary">
+      <button
+        type="button"
+        class="category-tree-node__disclosure"
+        [class.category-tree-node__disclosure--hidden]="!hasChildren()"
+        [attr.aria-label]="isExpanded() ? 'Collapse' : 'Expand'"
+        (click)="toggle(); $event.stopPropagation()"
+      >
+        <i class="pi" [class.pi-chevron-right]="!isExpanded()" [class.pi-chevron-down]="isExpanded()" aria-hidden="true"></i>
+      </button>
+
+      <i
+        class="pi category-tree-node__icon"
+        [class.pi-folder-open]="hasChildren()"
+        [class.pi-folder]="!hasChildren()"
+        aria-hidden="true"
+      ></i>
+
+      <span class="category-tree-node__name">
+        @for (segment of nameSegments(); track $index) {
+          @if (segment.matched) {
+            <mark>{{ segment.text }}</mark>
+          } @else {
+            {{ segment.text }}
+          }
+        }
+      </span>
+    </div>
+
+    <div class="category-tree-node__meta">
+      @if (!node().isActive) {
+        <span class="category-tree-node__inactive-badge">Inactive</span>
+      }
+      @if (node().childrenCount > 0) {
+        <span class="category-tree-node__count category-tree-node__count--children" title="{{ node().childrenCount }} child categories">
+          {{ node().childrenCount }}
+        </span>
+      }
+      @if (node().productCount > 0) {
+        <span class="category-tree-node__count category-tree-node__count--products" title="{{ node().productCount }} products">
+          ({{ node().productCount }})
+        </span>
+      }
+    </div>
+
+    <div class="category-tree-node__actions" (click)="$event.stopPropagation()">
+      <app-admin-action-menu [items]="menuItems()" label="Category actions" />
+    </div>
+
+    <i class="pi pi-bars category-tree-node__drag-handle" cdkDragHandle aria-hidden="true"></i>
+  </div>
+
+  @if (isExpanded() && hasChildren()) {
+    <div class="category-tree-node__children">
+      @for (child of node().children; track child.id; let last = $last) {
+        <app-category-tree-node [node]="child" [depth]="depth() + 1" [isLast]="last" [callbacks]="callbacks()" />
+      }
+    </div>
+  }
+</div>

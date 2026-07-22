@@ -589,7 +589,8 @@
     },
     "TOPBAR": {
       "WORKSPACE": "Admin workspace",
-      "WORKSPACE_HINT": "Manage catalog, access, and commerce"
+      "WORKSPACE_HINT": "Manage catalog, access, and commerce",
+      "MORE": "More options"
     },
     "SIDEBAR": {
       "NAV_ARIA": "Admin navigation",
@@ -624,6 +625,27 @@
         "DUPLICATE": "Duplicate",
         "ARCHIVE": "Archive",
         "DELETE": "Delete"
+      },
+      "BULK": {
+        "PUBLISH": "Publish",
+        "UNPUBLISH": "Unpublish",
+        "MORE": "More",
+        "SELECT_ALL_MATCHING": "Select all {{count}} matching your filter",
+        "CHANGE_CATEGORY": "Change category",
+        "ADJUST_PRICE": "Adjust price",
+        "EXPORT": "Export",
+        "MANAGE_INVENTORY": "Manage inventory",
+        "DELETE_TITLE": "Delete selected products",
+        "DUPLICATE_TITLE": "Duplicate selected products",
+        "CATEGORY_TITLE": "Change category",
+        "NEW_CATEGORY": "New category",
+        "PRICE_TITLE": "Adjust price",
+        "PRICE_INCREASE": "Increase by %",
+        "PRICE_DECREASE": "Decrease by %",
+        "PRICE_FIXED": "Set fixed value",
+        "PRICE_PERCENT_LABEL": "Percent",
+        "PRICE_NEW_LABEL": "New price",
+        "APPLY": "Apply"
       },
       "STOCK": {
         "IN_STOCK": "{{count}} in stock",
@@ -728,7 +750,11 @@
       "DELETE_SUPPLIER_TITLE": "Delete supplier?",
       "DELETE_SUPPLIER": "Delete \"{{name}}\"? This cannot be undone.",
       "DELETE_MAPPING_TITLE": "Delete mapping?",
-      "DELETE_MAPPING": "Delete this product mapping? This cannot be undone."
+      "DELETE_MAPPING": "Delete this product mapping? This cannot be undone.",
+      "DELETE_PRODUCTS_TITLE": "Delete selected products?",
+      "DELETE_PRODUCTS": "Delete {{count}} selected product(s)? This cannot be undone.",
+      "DELETE_VARIANTS_TITLE": "Delete selected variants?",
+      "DELETE_VARIANTS": "Delete {{count}} selected variant(s)? This cannot be undone."
     },
     "BULK": {
       "SELECTED": "{{count}} selected",

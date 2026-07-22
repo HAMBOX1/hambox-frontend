@@ -3,7 +3,8 @@
 } @else {
   <app-admin-section-card
     title="Variants"
-    description="Summary of purchasable combinations. Manage stock and codes from Inventory."
+    description="Browse by option group. Select a variant to manage stock and codes."
+    [compact]="compact()"
   >
     <div class="variant-manager">
       <app-admin-toolbar>
@@ -68,285 +69,95 @@
         </div>
       </app-admin-toolbar>
 
-      @if (selectedVariantIds().length > 0) {
-        <div class="variant-manager__bulk-bar admin-glass-card" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
-          <span class="variant-manager__bulk-count">{{ selectedVariantIds().length }} selected</span>
-          <div class="variant-manager__bulk-controls">
-            <p-inputNumber
-              class="variant-manager__bulk-input"
-              [ngModel]="bulkPrice()"
-              (ngModelChange)="bulkPrice.set($event)"
-              mode="decimal"
-              [minFractionDigits]="2"
-              placeholder="Bulk price"
+      <app-admin-bulk-bar [selectedCount]="bulkSelectedCount()" (clearSelection)="clearBulkSelection()">
+        <button
+          *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+          pButton
+          type="button"
+          label="Activate"
+          icon="pi pi-check"
+          size="small"
+          [disabled]="bulkActionLoading()"
+          (click)="bulkActivate()"
+        ></button>
+        <button
+          *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+          pButton
+          type="button"
+          label="Deactivate"
+          icon="pi pi-eye-slash"
+          severity="secondary"
+          size="small"
+          [disabled]="bulkActionLoading()"
+          (click)="bulkDeactivate()"
+        ></button>
+        <button
+          *hamboxHasPermission="permissions.Catalog.Inventory.Export"
+          pButton
+          type="button"
+          label="Export codes"
+          icon="pi pi-download"
+          severity="secondary"
+          size="small"
+          [disabled]="bulkActionLoading()"
+          (click)="bulkExportCodes()"
+        ></button>
+        <button
+          *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+          pButton
+          type="button"
+          label="Delete"
+          icon="pi pi-trash"
+          severity="danger"
+          size="small"
+          [disabled]="bulkActionLoading()"
+          (click)="requestBulkDelete()"
+        ></button>
+        <app-admin-action-menu label="More" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
+      </app-admin-bulk-bar>
+
+      @if (variantTree().length) {
+        <div class="variant-manager__tree-toolbar">
+          <label class="variant-manager__select-all">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="allVisibleSelected()"
+              (ngModelChange)="toggleSelectAll($event)"
             />
-            <p-select
-              class="variant-manager__bulk-input"
-              [options]="statusOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Bulk status"
-              [ngModel]="bulkStatus()"
-              (ngModelChange)="bulkStatus.set($event)"
-            />
-            <button
-              pButton
-              type="button"
-              class="admin-btn-secondary"
-              label="Apply"
-              size="small"
-              [loading]="saving()"
-              (click)="applyBulkUpdates()"
-            ></button>
-          </div>
+            {{ selectAllLabel() }}
+          </label>
         </div>
-      }
 
-      @if (mobileViewport.isMobile()) {
-        @if (variantsTable().length) {
-          <div class="variant-manager__cards">
-            @for (variant of variantsTable(); track variant.id) {
-              <div
-                class="variant-manager__card"
-                [class.variant-manager__card--selected]="isVariantSelected(variant.id)"
-                tabindex="0"
-                [attr.aria-label]="'Open codes for ' + variant.sku"
-                (click)="manageCodes(variant)"
-                (keydown.enter)="manageCodes(variant)"
-              >
-                <div class="variant-manager__card-top">
-                  <span class="variant-manager__card-check" (click)="$event.stopPropagation()">
-                    <p-checkbox
-                      [binary]="true"
-                      [ngModel]="isVariantSelected(variant.id)"
-                      (ngModelChange)="toggleVariantSelection(variant.id, $event)"
-                    />
-                  </span>
-                  <div class="variant-manager__card-heading">
-                    <span class="variant-manager__combination">{{ variant.optionsLabel }}</span>
-                    <span class="variant-manager__sku">{{ variant.sku }}</span>
-                  </div>
-                  <p-tag [value]="variant.status" [severity]="statusSeverity(variant)" />
-                </div>
-
-                <div class="variant-manager__card-stats">
-                  <span class="variant-manager__price">{{ variant.displayPrice | number: '1.2-2' }}</span>
-                  <span>Available {{ variant.availableStock }}</span>
-                  <span>Reserved {{ variant.reservedStock }}</span>
-                  <span>Sold {{ variant.soldStock }}</span>
-                </div>
-
-                <div class="variant-manager__card-actions" (click)="$event.stopPropagation()">
-                  <button
-                    pButton
-                    type="button"
-                    label="Manage Codes"
-                    icon="pi pi-key"
-                    size="small"
-                    severity="secondary"
-                    (click)="manageCodes(variant)"
-                  ></button>
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-pencil"
-                    size="small"
-                    severity="secondary"
-                    *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
-                    (click)="startEdit(variant)"
-                    aria-label="Edit variant"
-                  ></button>
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-trash"
-                    size="small"
-                    severity="danger"
-                    *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
-                    (click)="requestDelete(variant)"
-                    aria-label="Delete variant"
-                  ></button>
-                </div>
-              </div>
+        <div class="variant-manager__tree" role="tree">
+          @if (rootIsLeafGroup()) {
+            <app-variant-leaf-list [children]="variantTree()" [callbacks]="treeCallbacks" />
+          } @else {
+            @for (node of variantTree(); track node.key) {
+              <app-variant-tree-node [node]="node" [depth]="0" [callbacks]="treeCallbacks" />
             }
-          </div>
-        } @else if (optionGroups().length === 0) {
-          <app-admin-empty-state
-            icon="pi pi-box"
-            title="Simple product — no options needed?"
-            description="Skip option groups and create a single variant to start pasting stock codes."
-            primaryLabel="Create Variant"
-            primaryIcon="pi pi-plus"
-            (primaryAction)="createDefaultVariant()"
-          />
-        } @else {
-          <app-admin-empty-state
-            icon="pi pi-table"
-            title="No variants yet"
-            description="Add option values above — variants are generated automatically."
-          />
-        }
+          }
+        </div>
+      } @else if (optionGroups().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-box"
+          title="Simple product — no options needed?"
+          description="Skip option groups and create a single variant to start pasting stock codes."
+          primaryLabel="Create Variant"
+          primaryIcon="pi pi-plus"
+          (primaryAction)="createDefaultVariant()"
+        />
+      } @else if (variants().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-table"
+          title="No variants yet"
+          description="Add option values above — variants are generated automatically."
+        />
       } @else {
-        <app-admin-data-table-shell class="variant-manager__table-shell">
-          <p-table
-            class="admin-data-table variant-manager__table"
-            [value]="variantsTable()"
-            [rowHover]="true"
-            dataKey="id"
-            scrollable
-            scrollHeight="flex"
-            responsiveLayout="scroll"
-          >
-            <ng-template pTemplate="header">
-              <tr>
-                <th class="variant-manager__checkbox-col">
-                  <p-checkbox
-                    [binary]="true"
-                    [ngModel]="allVisibleSelected()"
-                    (ngModelChange)="toggleSelectAll($event)"
-                  />
-                </th>
-                <th>Combination</th>
-                <th>SKU</th>
-                <th>Price</th>
-                <th>Available</th>
-                <th>Reserved</th>
-                <th>Sold</th>
-                <th>Status</th>
-                <th class="variant-manager__actions-col">Actions</th>
-              </tr>
-            </ng-template>
-
-            <ng-template pTemplate="body" let-variant let-rowIndex="rowIndex">
-              @if (editingVariantId() === variant.id) {
-                <tr class="variant-manager__edit-row">
-                  <td></td>
-                  <td>{{ variant.optionsLabel }}</td>
-                  <td>
-                    <input pInputText [ngModel]="editSku()" (ngModelChange)="editSku.set($event)" />
-                  </td>
-                  <td>
-                    <p-inputNumber
-                      [ngModel]="editPriceOverride()"
-                      (ngModelChange)="editPriceOverride.set($event)"
-                      mode="decimal"
-                      [minFractionDigits]="2"
-                      placeholder="Base price"
-                    />
-                  </td>
-                  <td>{{ variant.availableStock }}</td>
-                  <td>{{ variant.reservedStock }}</td>
-                  <td>{{ variant.soldStock }}</td>
-                  <td>
-                    <p-select
-                      [options]="statusOptions"
-                      optionLabel="label"
-                      optionValue="value"
-                      [ngModel]="editStatus()"
-                      (ngModelChange)="editStatus.set($event)"
-                    />
-                  </td>
-                  <td>
-                    <div class="variant-manager__actions">
-                      <button pButton type="button" icon="pi pi-check" size="small" [loading]="saving()" (click)="saveEdit(variant)"></button>
-                      <button pButton type="button" icon="pi pi-times" size="small" severity="secondary" (click)="cancelEdit()"></button>
-                    </div>
-                  </td>
-                </tr>
-              } @else {
-                <tr
-                  class="variant-manager__row--clickable"
-                  tabindex="0"
-                  [class.variant-manager__row--zebra]="rowIndex % 2 === 1"
-                  [class.variant-manager__row--selected]="isVariantSelected(variant.id)"
-                  [class.variant-manager__row--out-of-stock]="variant.isOutOfStock"
-                  [attr.aria-label]="'Open codes for ' + variant.sku"
-                  (click)="manageCodes(variant)"
-                  (keydown.enter)="manageCodes(variant)"
-                >
-                  <td class="variant-manager__checkbox-col" (click)="$event.stopPropagation()">
-                    <p-checkbox
-                      [binary]="true"
-                      [ngModel]="isVariantSelected(variant.id)"
-                      (ngModelChange)="toggleVariantSelection(variant.id, $event)"
-                    />
-                  </td>
-                  <td>
-                    <span class="variant-manager__combination">{{ variant.optionsLabel }}</span>
-                  </td>
-                  <td>
-                    <span class="variant-manager__sku">{{ variant.sku }}</span>
-                  </td>
-                  <td>
-                    <span class="variant-manager__price">{{ variant.displayPrice | number: '1.2-2' }}</span>
-                  </td>
-                  <td>{{ variant.availableStock }}</td>
-                  <td>{{ variant.reservedStock }}</td>
-                  <td>{{ variant.soldStock }}</td>
-                  <td>
-                    <p-tag [value]="variant.status" [severity]="statusSeverity(variant)" />
-                  </td>
-                  <td>
-                    <div class="variant-manager__actions" (click)="$event.stopPropagation()">
-                      <button
-                        pButton
-                        type="button"
-                        label="Manage Codes"
-                        icon="pi pi-key"
-                        size="small"
-                        severity="secondary"
-                        (click)="manageCodes(variant)"
-                      ></button>
-                      <button
-                        pButton
-                        type="button"
-                        icon="pi pi-pencil"
-                        size="small"
-                        severity="secondary"
-                        *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
-                        (click)="startEdit(variant)"
-                        aria-label="Edit variant"
-                      ></button>
-                      <button
-                        pButton
-                        type="button"
-                        icon="pi pi-trash"
-                        size="small"
-                        severity="danger"
-                        *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
-                        (click)="requestDelete(variant)"
-                        aria-label="Delete variant"
-                      ></button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </ng-template>
-
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="9">
-                  @if (optionGroups().length === 0) {
-                    <app-admin-empty-state
-                      icon="pi pi-box"
-                      title="Simple product — no options needed?"
-                      description="Skip option groups and create a single variant to start pasting stock codes."
-                      primaryLabel="Create Variant"
-                      primaryIcon="pi pi-plus"
-                      (primaryAction)="createDefaultVariant()"
-                    />
-                  } @else {
-                    <app-admin-empty-state
-                      icon="pi pi-table"
-                      title="No variants yet"
-                      description="Add option values above — variants are generated automatically."
-                    />
-                  }
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </app-admin-data-table-shell>
+        <app-admin-empty-state
+          icon="pi pi-search"
+          title="No matching variants"
+          description="Try a different search term or clear the filters."
+        />
       }
     </div>
   </app-admin-section-card>
@@ -364,9 +175,29 @@
       styleClass="variant-manager__codes-drawer"
     >
       <ng-template #header>
-        <span class="variant-manager__codes-dialog-title">
-          Manage Codes — {{ selectedVariantForCodes()?.sku }}
-        </span>
+        <div class="variant-manager__codes-dialog-header">
+          <span class="variant-manager__codes-dialog-title">
+            @if (codesBreadcrumb()) {
+              {{ codesBreadcrumb() }} ·
+            }
+            {{ selectedVariantForCodes()?.sku }}
+          </span>
+          <div class="variant-manager__codes-dialog-actions">
+            <app-admin-icon-button
+              icon="pi pi-pencil"
+              label="Edit variant"
+              *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+              (pressed)="openEditDialog(selectedVariantForCodes()!)"
+            />
+            <app-admin-icon-button
+              icon="pi pi-trash"
+              label="Delete variant"
+              severity="danger"
+              *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+              (pressed)="requestDelete(selectedVariantForCodes()!)"
+            />
+          </div>
+        </div>
       </ng-template>
       @if (selectedVariantForCodes()) {
         <app-variant-inventory-panel />
@@ -376,7 +207,6 @@
     <p-dialog
       [visible]="codesDialogVisible()"
       (visibleChange)="onCodesDialogVisibleChange($event)"
-      [header]="'Manage Codes — ' + (selectedVariantForCodes()?.sku ?? '')"
       [modal]="true"
       [draggable]="false"
       [resizable]="false"
@@ -384,11 +214,102 @@
       [contentStyle]="{ 'max-height': '75vh', overflow: 'auto' }"
       styleClass="admin-dialog variant-manager__codes-dialog"
     >
+      <ng-template #header>
+        <div class="variant-manager__codes-dialog-header">
+          <span class="variant-manager__codes-dialog-title">
+            @if (codesBreadcrumb()) {
+              {{ codesBreadcrumb() }} ·
+            }
+            {{ selectedVariantForCodes()?.sku }}
+          </span>
+          <div class="variant-manager__codes-dialog-actions">
+            <app-admin-icon-button
+              icon="pi pi-pencil"
+              label="Edit variant"
+              *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+              (pressed)="openEditDialog(selectedVariantForCodes()!)"
+            />
+            <app-admin-icon-button
+              icon="pi pi-trash"
+              label="Delete variant"
+              severity="danger"
+              *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+              (pressed)="requestDelete(selectedVariantForCodes()!)"
+            />
+          </div>
+        </div>
+      </ng-template>
       @if (selectedVariantForCodes()) {
         <app-variant-inventory-panel />
       }
     </p-dialog>
   }
+
+  <p-dialog
+    [visible]="editDialogVisible()"
+    (visibleChange)="onEditDialogVisibleChange($event)"
+    header="Edit variant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    @if (editTarget(); as variant) {
+      <div class="variant-manager__edit-form">
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-sku">SKU</label>
+          <input id="variant-edit-sku" pInputText [ngModel]="editSku()" (ngModelChange)="editSku.set($event)" />
+        </div>
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-price">Price override</label>
+          <p-inputNumber
+            inputId="variant-edit-price"
+            [ngModel]="editPriceOverride()"
+            (ngModelChange)="editPriceOverride.set($event)"
+            mode="decimal"
+            [minFractionDigits]="2"
+            placeholder="Uses base price"
+          />
+        </div>
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-compare">Compare-at price</label>
+          <p-inputNumber
+            inputId="variant-edit-compare"
+            [ngModel]="editComparePrice()"
+            (ngModelChange)="editComparePrice.set($event)"
+            mode="decimal"
+            [minFractionDigits]="2"
+            placeholder="Optional"
+          />
+        </div>
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-low-stock">Low stock threshold</label>
+          <p-inputNumber
+            inputId="variant-edit-low-stock"
+            [ngModel]="editLowStockThreshold()"
+            (ngModelChange)="editLowStockThreshold.set($event)"
+            [min]="0"
+          />
+        </div>
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-status">Status</label>
+          <p-select
+            inputId="variant-edit-status"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="editStatus()"
+            (ngModelChange)="editStatus.set($event)"
+          />
+        </div>
+        <div class="variant-manager__edit-actions">
+          <button pButton type="button" label="Cancel" severity="secondary" [disabled]="saving()" (click)="cancelEdit()"></button>
+          <button pButton type="button" label="Save" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
+        </div>
+      </div>
+    }
+  </p-dialog>
 
   <app-admin-confirm-dialog
     [visible]="deleteDialogOpen()"
@@ -399,4 +320,55 @@
     (visibleChange)="deleteDialogOpen.set($event)"
     (confirmed)="confirmDelete()"
   />
+
+  <app-admin-confirm-dialog
+    [visible]="bulkDeleteDialogOpen()"
+    title="Delete selected variants"
+    [message]="'Delete ' + bulkSelectedCount() + ' variant(s)? This cannot be undone.'"
+    [destructive]="true"
+    [loading]="bulkActionLoading()"
+    (visibleChange)="bulkDeleteDialogOpen.set($event)"
+    (confirmed)="confirmBulkDelete()"
+  />
+
+  <p-dialog
+    [visible]="bulkPriceStatusDialogOpen()"
+    (visibleChange)="bulkPriceStatusDialogOpen.set($event)"
+    header="Change price / status"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: 'min(24rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <div class="variant-manager__edit-form">
+      <div class="variant-manager__edit-field">
+        <label for="variant-bulk-price">Price override</label>
+        <p-inputNumber
+          inputId="variant-bulk-price"
+          [ngModel]="bulkPrice()"
+          (ngModelChange)="bulkPrice.set($event)"
+          mode="decimal"
+          [minFractionDigits]="2"
+          placeholder="Leave blank to keep current"
+        />
+      </div>
+      <div class="variant-manager__edit-field">
+        <label for="variant-bulk-status">Status</label>
+        <p-select
+          inputId="variant-bulk-status"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Leave blank to keep current"
+          [ngModel]="bulkStatus()"
+          (ngModelChange)="bulkStatus.set($event)"
+        />
+      </div>
+      <div class="variant-manager__edit-actions">
+        <button pButton type="button" label="Cancel" severity="secondary" [disabled]="bulkActionLoading()" (click)="bulkPriceStatusDialogOpen.set(false)"></button>
+        <button pButton type="button" label="Apply" icon="pi pi-check" [loading]="bulkActionLoading()" (click)="confirmBulkPriceStatus()"></button>
+      </div>
+    </div>
+  </p-dialog>
 }

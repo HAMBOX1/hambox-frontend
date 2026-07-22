@@ -17,7 +17,7 @@ export class AdminActionMenuComponent {
 
   private readonly menu = viewChild<Menu>('menu');
 
-  protected toggle(event: Event): void {
+  toggle(event: Event): void {
     this.menu()?.toggle(event);
   }
 }

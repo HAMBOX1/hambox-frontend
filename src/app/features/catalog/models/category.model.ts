@@ -7,6 +7,22 @@ export interface Category {
   readonly parentId: string | null;
 }
 
+export interface CategoryTreeItem extends Category {
+  readonly sortOrder: number;
+  readonly childrenCount: number;
+  readonly productCount: number;
+}
+
+export interface CategoryTreeNode extends CategoryTreeItem {
+  readonly children: readonly CategoryTreeNode[];
+}
+
+export interface CategoryReorderEntry {
+  readonly id: string;
+  readonly parentId: string | null;
+  readonly sortOrder: number;
+}
+
 export interface NewParentDraft {
   readonly nameEn: string;
   readonly nameAr: string;
@@ -28,7 +44,6 @@ export interface UpdateCategoryRequest {
   readonly slug: string;
   readonly isActive: boolean;
   readonly parentId?: string | null;
-  readonly newParent?: NewParentDraft | null;
 }
 
 export interface CategoryListQuery {

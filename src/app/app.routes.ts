@@ -6,6 +6,7 @@ import { adminOtpGuard } from './core/guards/admin-otp.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { customerGuard } from './core/guards/customer.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { maintenanceGuard } from './core/guards/maintenance.guard';
 
 export const routes: Routes = [
   {
@@ -68,8 +69,15 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'coming-soon',
+    loadComponent: () =>
+      import('./features/auth/pages/coming-soon-page/coming-soon-page.component').then(
+        (c) => c.ComingSoonPageComponent,
+      ),
+  },
+  {
     path: '',
-    canActivate: [customerGuard],
+    canActivate: [maintenanceGuard, customerGuard],
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(c => c.MainLayoutComponent),
     children: [
       {

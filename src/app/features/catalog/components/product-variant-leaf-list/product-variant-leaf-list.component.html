@@ -1,0 +1,38 @@
+<cdk-virtual-scroll-viewport
+  [itemSize]="itemSize()"
+  [style.height.px]="viewportHeight()"
+  [style.--depth]="depth()"
+  class="variant-leaf-list"
+>
+  <div *cdkVirtualFor="let node of children(); trackBy: trackByKey" class="variant-leaf-list__slot">
+    <div
+      class="variant-manager__row"
+      [class.variant-manager__row--selected]="callbacks().isSelected(node.variant!.id)"
+      [class.variant-manager__row--active]="callbacks().isActive(node.variant!.id)"
+      [class.variant-manager__row--highlighted]="callbacks().isHighlighted(node.variant!.id)"
+      tabindex="0"
+      [attr.aria-label]="'Open codes for ' + node.label"
+      (click)="!callbacks().bulkSelectionActive() && callbacks().openVariant(node.variant!)"
+      (keydown.enter)="!callbacks().bulkSelectionActive() && callbacks().openVariant(node.variant!)"
+    >
+      <span class="variant-manager__row-check" (click)="$event.stopPropagation()">
+        <p-checkbox
+          [binary]="true"
+          [ngModel]="callbacks().isSelected(node.variant!.id)"
+          (onChange)="callbacks().toggleSelect(node.variant!.id, $event.checked, isShiftClick($event.originalEvent))"
+        />
+      </span>
+
+      <div class="variant-manager__row-body">
+        <div class="variant-manager__row-top">
+          <span class="variant-manager__row-name">{{ node.label }}</span>
+          <p-tag [value]="node.variant!.status" [severity]="callbacks().statusSeverity(node.variant!)" />
+        </div>
+        <div class="variant-manager__row-stats">
+          <span class="variant-manager__row-price">{{ callbacks().displayPrice(node.variant!) | hamboxCurrency }}</span>
+          <span class="variant-manager__row-available">Available {{ node.variant!.availableStock }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</cdk-virtual-scroll-viewport>

@@ -39,6 +39,10 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 import { localeInterceptor } from './core/interceptors/locale.interceptor';
 
+import { maintenanceBypassInterceptor } from './core/interceptors/maintenance-bypass.interceptor';
+
+import { MaintenanceService } from './core/maintenance/maintenance.service';
+
 import { provideHamboxI18n } from './core/i18n/i18n.providers';
 
 import { CurrencyService } from './core/currency/currency.service';
@@ -65,7 +69,13 @@ export const appConfig: ApplicationConfig = {
 
     provideHttpClient(
 
-      withInterceptors([localeInterceptor, errorInterceptor, authInterceptor, cartInterceptor]),
+      withInterceptors([
+        localeInterceptor,
+        errorInterceptor,
+        authInterceptor,
+        cartInterceptor,
+        maintenanceBypassInterceptor,
+      ]),
 
     ),
 
@@ -108,15 +118,17 @@ export const appConfig: ApplicationConfig = {
 
       const translation = inject(TranslationService);
       const currency = inject(CurrencyService);
+      const maintenance = inject(MaintenanceService);
 
 
 
       theme.init();
       void themeEngine.init();
 
-
+      const maintenanceReady = maintenance.init();
 
       return translation.init().then(async () => {
+        await maintenanceReady;
         await currency.init();
 
         await auth.restoreSession();

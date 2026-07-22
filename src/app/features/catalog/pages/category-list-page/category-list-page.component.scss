@@ -1,3 +1,22 @@
 :host {
   display: block;
 }
+
+// AdminSearchBarComponent's own :host sets `flex: 1 1 20rem` for its usual
+// row-flex toolbar habitat — inside our column-flex .admin-page, that flex-basis
+// resolves against the cross axis and is read as a 320px *height* instead of a
+// width, blowing a huge gap under the search bar. Override it for this context.
+.category-list-page .category-list-page__search {
+  display: block;
+  flex: none;
+  margin-block: 1rem;
+}
+
+// The drawer's own scroll region is handed off to the form component (see
+// category-create-form's flex-column layout) so the Cancel/Save/Delete footer
+// can stay pinned instead of scrolling away with a long Advanced section.
+::ng-deep .category-list-page__edit-drawer .p-drawer-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

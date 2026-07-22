@@ -3,7 +3,7 @@
     <app-admin-breadcrumb class="admin-page-header__breadcrumb" [items]="breadcrumbs()" />
   }
 
-  <div class="admin-page-header__row">
+  <div class="admin-page-header__row" [class.admin-page-header__row--compact]="compactActions()">
     <div class="admin-page-header__main">
       @if (backLink()) {
         <a class="admin-page-header__back" [routerLink]="backLink()!">
@@ -24,4 +24,6 @@
       <ng-content select="[adminHeaderActions]" />
     </div>
   </div>
+
+  <ng-content select="[adminHeaderMeta]" />
 </header>

@@ -4,7 +4,18 @@ export type { PagedResult };
 
 export type ProductStatus = 'Draft' | 'Active' | 'Inactive' | 'Archived';
 
-export type ProductSortBy = 'Newest' | 'PriceAsc' | 'PriceDesc';
+export type ProductSortBy =
+  | 'Newest'
+  | 'PriceAsc'
+  | 'PriceDesc'
+  | 'NameAsc'
+  | 'NameDesc'
+  | 'CategoryAsc'
+  | 'CategoryDesc'
+  | 'StatusAsc'
+  | 'StatusDesc'
+  | 'StockAsc'
+  | 'StockDesc';
 
 export interface ProductImage {
   readonly id: string;
@@ -118,6 +129,24 @@ export interface ProductListQuery {
   readonly status?: ProductStatus;
   readonly categoryId?: string;
   readonly sortBy?: ProductSortBy;
+}
+
+/** Either an explicit set of product ids, or (when `selectAllMatching` is true) the current list
+ * filter, resolved server-side — lets "select all matching filter" scale past the loaded page. */
+export interface ProductBulkSelection {
+  readonly productIds?: readonly string[];
+  readonly searchTerm?: string;
+  readonly status?: ProductStatus;
+  readonly categoryId?: string;
+  readonly selectAllMatching: boolean;
+}
+
+export type PriceAdjustmentMode = 'IncreasePercent' | 'DecreasePercent' | 'SetFixed';
+
+export interface BulkProductsResult {
+  readonly successCount: number;
+  readonly errorCount: number;
+  readonly errors: readonly string[];
 }
 
 export interface ProductInventoryPlaceholders {

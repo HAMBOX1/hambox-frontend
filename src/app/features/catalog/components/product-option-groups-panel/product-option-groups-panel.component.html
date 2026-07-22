@@ -4,6 +4,7 @@
   <app-admin-section-card
     title="Option Groups"
     description="Define purchasable dimensions such as platform, region, and edition."
+    [compact]="compact()"
   >
     @if (sortedGroups().length) {
       <div
@@ -12,7 +13,7 @@
         (cdkDropListDropped)="onGroupDrop($event)"
       >
         @for (group of sortedGroups(); track group.id) {
-          <article class="option-groups-panel__group-card" cdkDrag>
+          <article class="option-groups-panel__group" cdkDrag>
             <header class="option-groups-panel__group-header">
               <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle aria-label="Reorder group">
                 <i class="pi pi-bars"></i>
@@ -21,43 +22,48 @@
                 @if (editingGroupId() === group.id) {
                   <input
                     pInputText
+                    class="option-groups-panel__title-input"
                     [ngModel]="editingGroupLabel()"
                     (ngModelChange)="editingGroupLabel.set($event)"
                     (keyup.enter)="saveEditGroup(group)"
                   />
                 } @else {
-                  <h3>{{ group.displayName }}</h3>
-                  <span class="option-groups-panel__group-key">{{ group.key }}</span>
+                  <span>{{ group.displayName }}</span>
                 }
               </div>
               <div class="option-groups-panel__group-actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
                 @if (editingGroupId() === group.id) {
-                  <button pButton type="button" icon="pi pi-check" size="small" [loading]="saving()" (click)="saveEditGroup(group)"></button>
-                  <button pButton type="button" icon="pi pi-times" size="small" severity="secondary" (click)="cancelEditGroup()"></button>
+                  <app-admin-icon-button icon="pi pi-check" label="Save" [loading]="saving()" (pressed)="saveEditGroup(group)" />
+                  <app-admin-icon-button icon="pi pi-times" label="Cancel" (pressed)="cancelEditGroup()" />
                 } @else {
-                  <button pButton type="button" icon="pi pi-pencil" size="small" severity="secondary" (click)="startEditGroup(group)"></button>
-                  <button pButton type="button" icon="pi pi-trash" size="small" severity="danger" [loading]="saving()" (click)="deleteGroup(group.id)"></button>
+                  <app-admin-icon-button icon="pi pi-pencil" label="Edit group" (pressed)="startEditGroup(group)" />
+                  <app-admin-icon-button icon="pi pi-trash" label="Delete group" severity="danger" [loading]="saving()" (pressed)="deleteGroup(group.id)" />
                 }
               </div>
             </header>
 
-            <div class="option-groups-panel__chips">
+            <ul class="option-groups-panel__option-list">
               @for (option of sortedOptions(group); track option.id) {
-                @if (editingOptionId() === option.id) {
-                  <div class="option-groups-panel__chip-edit">
+                <li class="option-groups-panel__option-row">
+                  @if (editingOptionId() === option.id) {
                     <input
                       pInputText
+                      class="option-groups-panel__option-input"
                       [ngModel]="editingOptionLabel()"
                       (ngModelChange)="editingOptionLabel.set($event)"
                       (keyup.enter)="saveEditOption(option)"
                     />
-                    <button pButton type="button" icon="pi pi-check" size="small" (click)="saveEditOption(option)"></button>
-                    <button pButton type="button" icon="pi pi-times" size="small" severity="secondary" (click)="cancelEditOption()"></button>
-                  </div>
-                } @else {
-                  <div class="option-groups-panel__chip-row">
-                    <span class="option-groups-panel__value-pill">{{ option.label }}</span>
-                    <div class="option-groups-panel__chip-actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
+                    <div class="option-groups-panel__option-actions">
+                      <button type="button" class="option-groups-panel__icon-btn" (click)="saveEditOption(option)" aria-label="Save option">
+                        <i class="pi pi-check"></i>
+                      </button>
+                      <button type="button" class="option-groups-panel__icon-btn" (click)="cancelEditOption()" aria-label="Cancel">
+                        <i class="pi pi-times"></i>
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="option-groups-panel__option-label">{{ option.label }}</span>
+                    <div class="option-groups-panel__option-actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
                       <button type="button" class="option-groups-panel__icon-btn" (click)="moveOption(group, option, -1)" aria-label="Move up">
                         <i class="pi pi-chevron-up"></i>
                       </button>
@@ -71,20 +77,20 @@
                         <i class="pi pi-trash"></i>
                       </button>
                     </div>
-                  </div>
-                }
+                  }
+                </li>
               }
-            </div>
+            </ul>
 
             <div class="option-groups-panel__inline-form" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
               <input
                 pInputText
-                placeholder="Add option"
+                placeholder="Option name…"
                 [ngModel]="pendingOption(group.id)"
                 (ngModelChange)="setPendingOption(group.id, $event)"
                 (keyup.enter)="addOptionToGroup(group.id)"
               />
-              <button pButton type="button" label="Add Option" icon="pi pi-plus" severity="secondary" (click)="addOptionToGroup(group.id)"></button>
+              <button pButton type="button" label="Add" icon="pi pi-plus" severity="secondary" (click)="addOptionToGroup(group.id)"></button>
             </div>
           </article>
         }
@@ -97,10 +103,16 @@
       />
     }
 
-    <div class="option-groups-panel__inline-form" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
-      <input pInputText placeholder="Key (platform)" [ngModel]="newGroupKey()" (ngModelChange)="newGroupKey.set($event)" />
-      <input pInputText placeholder="Display name (Platform)" [ngModel]="newGroupLabel()" (ngModelChange)="newGroupLabel.set($event)" />
-      <button pButton type="button" label="Add Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
+    <div class="option-groups-panel__new-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
+      <div class="option-groups-panel__inline-form">
+        <input
+          pInputText
+          placeholder="Display name (e.g. Platform)"
+          [ngModel]="newGroupLabel()"
+          (ngModelChange)="newGroupLabel.set($event)"
+        />
+        <button pButton type="button" label="Add Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
+      </div>
     </div>
   </app-admin-section-card>
 }

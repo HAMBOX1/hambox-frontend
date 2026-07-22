@@ -8,6 +8,8 @@ import { ApiError, parseApiError } from '../../../core/models/api-error.model';
 
 import { CategoryOption } from '../models/category.model';
 
+import { isVariantLive } from '../utils/variant-status.utils';
+
 import {
 
   Product,
@@ -38,11 +40,15 @@ import {
 
   GenerateProductVariantsResultDto,
 
+  InventoryAuditLogDto,
+
   BulkUpdateVariantsRequest,
 
   InventoryBatchDto,
 
   InventoryStatisticsDto,
+
+  InventorySupplierDto,
 
   ProductOptionGroupDto,
 
@@ -126,6 +132,16 @@ export class ProductEditorFacade {
 
   private readonly codesHasMoreState = signal(false);
 
+  private readonly auditLogsState = signal<readonly InventoryAuditLogDto[]>([]);
+
+  private readonly auditLogsLoadingState = signal(false);
+
+  private readonly suppliersState = signal<readonly InventorySupplierDto[]>([]);
+
+  private readonly suppliersLoadingState = signal(false);
+
+  private suppliersLoaded = false;
+
   private readonly loadingState = signal(false);
 
   private readonly inventoryLoadingState = signal(false);
@@ -147,6 +163,12 @@ export class ProductEditorFacade {
   readonly categories = this.categoriesState.asReadonly();
 
   readonly variants = this.variantsState.asReadonly();
+
+  /** Canonical "variant count" — every non-deleted variant, any status. The single source of truth for the Edit Product header. */
+  readonly totalVariantCount = computed(() => this.variantsState().length);
+
+  /** Active + visible subset, i.e. sellable on the storefront right now — shown alongside the total so the two never look like a disagreement. */
+  readonly activeVariantCount = computed(() => this.variantsState().filter(isVariantLive).length);
 
   readonly optionGroups = this.optionGroupsState.asReadonly();
 
@@ -181,6 +203,14 @@ export class ProductEditorFacade {
   readonly codesPageSize = this.codesPageSizeState.asReadonly();
 
   readonly codesHasMore = this.codesHasMoreState.asReadonly();
+
+  readonly auditLogs = this.auditLogsState.asReadonly();
+
+  readonly auditLogsLoading = this.auditLogsLoadingState.asReadonly();
+
+  readonly suppliers = this.suppliersState.asReadonly();
+
+  readonly suppliersLoading = this.suppliersLoadingState.asReadonly();
 
 
 
@@ -334,6 +364,8 @@ export class ProductEditorFacade {
 
     this.selectedVariantIdState.set(variantId);
 
+    this.auditLogsState.set([]);
+
     this.inventoryLoadingState.set(true);
 
 
@@ -428,6 +460,37 @@ export class ProductEditorFacade {
 
     this.selectedBatchIdState.set(batchId);
 
+  }
+
+  /** Lazy — only fetched when the owner opens the History panel for the selected variant, not on every variant switch. */
+  async loadAuditLogs(variantId: string): Promise<void> {
+    this.auditLogsLoadingState.set(true);
+    try {
+      const logs = await firstValueFrom(this.inventoryApi.getAuditLogs(variantId));
+      this.auditLogsState.set(logs);
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to load history.'));
+    } finally {
+      this.auditLogsLoadingState.set(false);
+    }
+  }
+
+  /** Lazy and fetched once — only needed by the Advanced import panel / history detail, which most admins never open. */
+  async loadSuppliers(): Promise<void> {
+    if (this.suppliersLoaded) {
+      return;
+    }
+
+    this.suppliersLoadingState.set(true);
+    try {
+      const suppliers = await firstValueFrom(this.inventoryApi.getSuppliers(1, 200));
+      this.suppliersState.set(suppliers);
+      this.suppliersLoaded = true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to load suppliers.'));
+    } finally {
+      this.suppliersLoadingState.set(false);
+    }
   }
 
 
@@ -1018,6 +1081,52 @@ export class ProductEditorFacade {
   }
 
 
+
+  async bulkDeleteVariants(variantIds: readonly string[]): Promise<number> {
+    const productId = this.productId();
+    if (!productId || variantIds.length === 0) {
+      return 0;
+    }
+
+    try {
+      const result = await firstValueFrom(this.inventoryApi.bulkDeleteVariants(productId, { variantIds }));
+      await this.reloadInventory(productId);
+      return result.successCount;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to delete variants.'));
+      return 0;
+    }
+  }
+
+  async bulkDuplicateVariants(variantIds: readonly string[]): Promise<number> {
+    const productId = this.productId();
+    if (!productId || variantIds.length === 0) {
+      return 0;
+    }
+
+    try {
+      const result = await firstValueFrom(this.inventoryApi.bulkDuplicateVariants(productId, { variantIds }));
+      await this.reloadInventory(productId);
+      return result.successCount;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to duplicate variants.'));
+      return 0;
+    }
+  }
+
+  async exportVariantsCodes(variantIds: readonly string[], status?: string): Promise<Blob | null> {
+    const productId = this.productId();
+    if (!productId || variantIds.length === 0) {
+      return null;
+    }
+
+    try {
+      return await firstValueFrom(this.inventoryApi.exportVariantsCodes(productId, variantIds, status));
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to export codes.'));
+      return null;
+    }
+  }
 
   async updateVariant(variantId: string, request: UpdateVariantRequest): Promise<boolean> {
 

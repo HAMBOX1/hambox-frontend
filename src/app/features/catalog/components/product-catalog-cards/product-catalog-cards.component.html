@@ -1,0 +1,95 @@
+@if (loading() && products().length === 0) {
+  <app-admin-loading-skeleton variant="table" [rows]="4" />
+} @else if (products().length === 0) {
+  <app-admin-empty-state
+    icon="pi pi-inbox"
+    [title]="searchActive() ? 'No matching products' : 'No products yet'"
+    [description]="
+      searchActive()
+        ? 'Try a different search term or clear the filter to see all products.'
+        : 'Create a product to start building your enterprise catalog.'
+    "
+    [primaryLabel]="searchActive() ? null : 'Create Product'"
+    [primaryIcon]="searchActive() ? null : 'pi pi-plus'"
+    (primaryAction)="createProduct.emit()"
+  />
+} @else {
+  <div class="product-catalog-cards">
+    @for (product of products(); track product.id) {
+      <div
+        class="product-catalog-cards__card"
+        tabindex="0"
+        [attr.aria-label]="'Open ' + product.nameEn"
+        (click)="onCardClick(product)"
+        (keydown.enter)="onCardClick(product)"
+      >
+        <div class="product-catalog-cards__top">
+          <p-checkbox
+            class="product-catalog-cards__select"
+            [binary]="true"
+            [ngModel]="isBulkSelected(product.id)"
+            (onChange)="onBulkCheckboxClick(product, $event.originalEvent)"
+            (click)="$event.stopPropagation()"
+          />
+          <span class="product-catalog-cards__thumb">
+            @if (product.primaryImageUrl && !isImageFailed(product.id)) {
+              <img
+                class="product-catalog-cards__thumb-img"
+                [src]="resolveImageUrl(product.primaryImageUrl)"
+                [alt]="product.nameEn"
+                loading="lazy"
+                (error)="onImageError(product.id)"
+              />
+            } @else {
+              <i class="pi pi-box" aria-hidden="true"></i>
+            }
+          </span>
+          <div class="product-catalog-cards__heading">
+            <span class="product-catalog-cards__name">{{ product.nameEn }}</span>
+            <span class="product-catalog-cards__price">{{ product.price | hamboxCurrency }}</span>
+          </div>
+          <app-admin-status-badge [label]="statusLabel(product.status)" [tone]="statusTone(product.status)" />
+        </div>
+
+        <div class="product-catalog-cards__meta">
+          <app-admin-status-badge
+            class="product-catalog-cards__stock-badge"
+            (click)="onStockClick(product, $event)"
+            [label]="(product.availableStock ?? 0) > 0
+              ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
+              : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
+            [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
+          />
+          <app-admin-status-badge
+            [label]="product.categoryName || 'Uncategorized'"
+            tone="info"
+            [outlined]="true"
+          />
+        </div>
+
+        <div class="product-catalog-cards__actions" (click)="$event.stopPropagation()">
+          @let menuItems = productActionMenuItems(product);
+          @if (menuItems.length > 0) {
+            <app-admin-action-menu [items]="menuItems" />
+          }
+          <app-admin-icon-button
+            *hamboxHasPermission="permissions.Catalog.Products.Edit"
+            icon="pi pi-pencil"
+            [label]="'ADMIN.CATALOG_PAGE.ACTIONS.EDIT' | translate"
+            [routerLink]="'/admin/products/' + product.id + '/edit'"
+          />
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (totalRecords() > pageSize()) {
+    <p-paginator
+      [first]="first()"
+      [rows]="pageSize()"
+      [totalRecords]="totalRecords()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      (onPageChange)="onPaginatorChange($event)"
+    />
+  }
+}

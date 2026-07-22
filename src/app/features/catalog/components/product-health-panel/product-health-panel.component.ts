@@ -5,6 +5,7 @@ import {
   AdminStatusBadgeComponent,
 } from '../../../../shared/components/admin';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { isVariantLive } from '../../utils/variant-status.utils';
 
 interface HealthCheck {
   readonly id: string;
@@ -52,7 +53,7 @@ export class ProductHealthPanelComponent {
     const hasPricing = product.price > 0;
     const hasVariants = variants.length > 0;
     const requiresVariants = optionGroups.length > 0;
-    const activeVisibleVariants = variants.filter((v) => v.status === 'Active' && v.isVisible);
+    const activeVisibleVariants = variants.filter(isVariantLive);
     const variantCoverageOk = !requiresVariants || activeVisibleVariants.length > 0;
 
     const availableStock = stats?.available ?? 0;

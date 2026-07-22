@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -9,6 +9,8 @@ import {
   BulkCodeActionResultDto,
   BulkCodeIdsRequest,
   BulkUpdateVariantsRequest,
+  BulkVariantIdsRequest,
+  BulkVariantsResultDto,
   CreateBatchRequest,
   CreateOptionGroupRequest,
   CreateOptionRequest,
@@ -95,6 +97,29 @@ export class InventoryApiService {
 
   activateProductVariants(productId: string): Observable<number> {
     return this.api.post<number>(INVENTORY_API.activateProductVariants(productId), {});
+  }
+
+  bulkDeleteVariants(productId: string, request: BulkVariantIdsRequest): Observable<BulkVariantsResultDto> {
+    return this.api.post<BulkVariantsResultDto>(INVENTORY_API.bulkDeleteProductVariants(productId), request);
+  }
+
+  bulkDuplicateVariants(productId: string, request: BulkVariantIdsRequest): Observable<BulkVariantsResultDto> {
+    return this.api.post<BulkVariantsResultDto>(INVENTORY_API.bulkDuplicateProductVariants(productId), request);
+  }
+
+  exportVariantsCodes(productId: string, variantIds: readonly string[], status?: string): Observable<Blob> {
+    let params = new HttpParams();
+    for (const variantId of variantIds) {
+      params = params.append('variantIds', variantId);
+    }
+    if (status) {
+      params = params.set('status', status);
+    }
+
+    return this.http.get(this.resolveUrl(INVENTORY_API.bulkExportProductVariantCodes(productId)), {
+      params,
+      responseType: 'blob',
+    });
   }
 
   getOptionGroups(productId: string): Observable<readonly ProductOptionGroupDto[]> {

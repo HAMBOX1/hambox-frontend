@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -27,7 +28,7 @@ import {
   AdminStatusBadgeComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
-import { DigitalInventoryCodeDto } from '../../models/inventory-api.model';
+import { DigitalInventoryCodeDto, InventoryAuditLogDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
 const REVEAL_AUTO_HIDE_MS = 30_000;
@@ -40,6 +41,30 @@ const CODE_STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'Expired', value: 'Expired' },
   { label: 'Disabled', value: 'Disabled' },
 ];
+
+/** Friendly fallback labels for audit actions that don't carry their own `details` text. */
+const HISTORY_ACTION_LABELS: Record<string, string> = {
+  VariantCreated: 'Variant created',
+  VariantUpdated: 'Variant updated',
+  VariantDeleted: 'Variant deleted',
+  CodeAdded: 'Code added',
+  CodeImported: 'Codes imported',
+  CodeExported: 'Codes exported',
+  CodeReserved: 'Code reserved',
+  CodeReleased: 'Code released',
+  CodeSold: 'Code sold',
+  BatchCreated: 'Batch created',
+  BatchImported: 'Codes imported',
+  SupplierAdded: 'Supplier added',
+  InventoryAdjusted: 'Inventory adjusted',
+  OptionGroupCreated: 'Option group created',
+  OptionCreated: 'Option created',
+  PlanCreated: 'Plan created',
+  CodeRevealed: 'Code revealed',
+};
+
+/** Actions whose `details` string is "Imported N codes (X duplicates, Y invalid)" — the parenthetical is only shown once the history row is expanded. */
+const IMPORT_ACTIONS = new Set(['CodeImported', 'BatchImported']);
 
 @Component({
   selector: 'app-variant-inventory-panel',
@@ -74,27 +99,42 @@ export class VariantInventoryPanelComponent {
 
   protected readonly permissions = PERMISSIONS;
   protected readonly selectedVariant = this.facade.selectedVariant;
-  protected readonly selectedBatchId = this.facade.selectedBatchId;
   protected readonly batchesTable = computed(() => [...this.facade.batches()]);
-  protected readonly batchOptions = computed(() =>
-    this.batchesTable().map((batch) => ({
-      label: `${batch.name} (${batch.availableCodes} available)`,
-      value: batch.id,
-    })),
-  );
   protected readonly codesTable = computed(() => [...this.facade.codes()]);
   protected readonly inventoryLoading = this.facade.inventoryLoading;
   protected readonly statusOptions = CODE_STATUS_OPTIONS;
   protected readonly codesPage = this.facade.codesPage;
   protected readonly codesPageSize = this.facade.codesPageSize;
   protected readonly codesHasMore = this.facade.codesHasMore;
+  protected readonly auditLogs = this.facade.auditLogs;
+  protected readonly auditLogsLoading = this.facade.auditLogsLoading;
+  protected readonly supplierOptions = computed(() =>
+    this.facade.suppliers().map((supplier) => ({ label: supplier.companyName, value: supplier.id })),
+  );
 
-  protected readonly newBatchName = signal('');
+  /** Collapsed by default — advanced/occasional-use, per "hide advanced functionality until requested". */
+  protected readonly historyCollapsed = signal(true);
+  protected readonly expandedHistoryId = signal<string | null>(null);
+
+  /** Advanced import options — the common workflow (paste/upload → Import) never touches these. */
+  protected readonly advancedOpen = signal(false);
+  protected readonly supplierId = signal<string | null>(null);
+  protected readonly groupIntoBatch = signal(false);
+  protected readonly batchName = signal('');
+  protected readonly importNotes = signal('');
+
+  /** True once codes are typed/pasted/uploaded and (if grouping is on) a batch name is set — gates the Import button. */
+  protected readonly canImport = computed(() => {
+    if (!this.bulkCodes().trim()) {
+      return false;
+    }
+    return !this.groupIntoBatch() || this.batchName().trim().length > 0;
+  });
+
   protected readonly bulkCodes = signal('');
   protected readonly searchTerm = signal('');
   protected readonly statusFilter = signal('');
   protected readonly importing = signal(false);
-  protected readonly creatingBatch = signal(false);
   protected readonly actionLoading = signal(false);
   protected readonly selectedCodeIds = signal<string[]>([]);
   protected readonly bulkDeleteDialogOpen = signal(false);
@@ -107,11 +147,39 @@ export class VariantInventoryPanelComponent {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.hideRevealed());
+
+    let lastVariantId: string | null = null;
+    effect(() => {
+      const variantId = this.selectedVariant()?.id ?? null;
+      if (variantId !== lastVariantId) {
+        lastVariantId = variantId;
+        this.historyCollapsed.set(true);
+        this.advancedOpen.set(false);
+        this.expandedHistoryId.set(null);
+      }
+    });
   }
 
-  protected onBatchChange(batchId: string): void {
-    this.hideRevealed();
-    this.facade.selectBatch(batchId);
+  protected toggleAdvanced(): void {
+    const next = !this.advancedOpen();
+    this.advancedOpen.set(next);
+    if (next) {
+      void this.facade.loadSuppliers();
+    }
+  }
+
+  protected toggleHistoryEntry(entryId: string): void {
+    this.expandedHistoryId.update((current) => (current === entryId ? null : entryId));
+  }
+
+  protected onHistoryCollapsedChange(collapsed: boolean): void {
+    this.historyCollapsed.set(collapsed);
+
+    const variantId = this.selectedVariant()?.id;
+    if (!collapsed && variantId) {
+      void this.facade.loadAuditLogs(variantId);
+      void this.facade.loadSuppliers();
+    }
   }
 
   protected async applyFilters(): Promise<void> {
@@ -152,44 +220,46 @@ export class VariantInventoryPanelComponent {
     this.selectedCodeIds.set(checked ? this.codesTable().map((code) => code.id) : []);
   }
 
-  protected async createBatch(): Promise<void> {
-    const variant = this.selectedVariant();
-    const name = this.newBatchName().trim();
-    if (!variant || !name) {
-      return;
-    }
-
-    this.creatingBatch.set(true);
-    try {
-      await this.facade.createBatch({
-        name,
-        currency: 'USD',
-        purchaseCost: 0,
-      });
-      this.newBatchName.set('');
-    } finally {
-      this.creatingBatch.set(false);
-    }
-  }
-
   protected async importCodes(): Promise<void> {
     const variant = this.selectedVariant();
-    const batchId = this.selectedBatchId();
     const raw = this.bulkCodes().trim();
-    if (!variant || !batchId || !raw) {
+    const grouping = this.groupIntoBatch();
+    const name = grouping ? this.batchName().trim() : '';
+    if (!variant || !raw || (grouping && !name)) {
       return;
     }
 
     const codes = raw.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+
     this.importing.set(true);
     try {
-      const ok = await this.facade.importCodes(codes, batchId);
+      // Import always needs a batch behind the scenes (backend contract) — the admin only ever
+      // sees this when they opt into "Group import into batch" under Advanced.
+      const created = await this.facade.createBatch({
+        name: grouping ? name : this.buildInternalBatchName(),
+        supplierId: this.supplierId(),
+        currency: 'USD',
+        purchaseCost: 0,
+        notes: this.importNotes().trim() || null,
+      });
+      if (!created) {
+        return;
+      }
+
+      const ok = await this.facade.importCodes(codes);
       if (ok) {
         this.bulkCodes.set('');
+        if (grouping) {
+          this.batchName.set('');
+        }
       }
     } finally {
       this.importing.set(false);
     }
+  }
+
+  private buildInternalBatchName(): string {
+    return `Import ${new Date().toISOString()}`;
   }
 
   protected onFileSelected(event: Event, kind: 'txt' | 'csv'): void {
@@ -303,8 +373,37 @@ export class VariantInventoryPanelComponent {
     }
   }
 
-  protected batchName(batchId: string): string {
+  protected batchLabel(batchId: string): string {
     return this.batchesTable().find((batch) => batch.id === batchId)?.name ?? batchId;
+  }
+
+  protected batchSupplierName(batchId: string): string | null {
+    const batch = this.batchesTable().find((item) => item.id === batchId);
+    if (!batch?.supplierId) {
+      return null;
+    }
+    return this.facade.suppliers().find((supplier) => supplier.id === batch.supplierId)?.companyName ?? null;
+  }
+
+  protected historyLabel(entry: InventoryAuditLogDto): string {
+    if (entry.details) {
+      return IMPORT_ACTIONS.has(entry.action) ? entry.details.split(' (')[0] : entry.details;
+    }
+    return HISTORY_ACTION_LABELS[entry.action] ?? entry.action;
+  }
+
+  protected historyRelativeLabel(occurredOnUtc: string): string {
+    const date = new Date(occurredOnUtc);
+    const now = new Date();
+    if (date.toDateString() === now.toDateString()) {
+      return 'Today';
+    }
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    }
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
 
   protected requestReveal(code: DigitalInventoryCodeDto): void {

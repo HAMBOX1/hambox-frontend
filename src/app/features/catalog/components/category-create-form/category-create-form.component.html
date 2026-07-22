@@ -1,169 +1,143 @@
 <form class="category-create-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-  @if (serverError()) {
-    <app-admin-error-alert [message]="serverError()!" [showRetry]="false" />
-  }
-
-  <div class="admin-field">
-    <label class="admin-field__label" for="category-name-en">English name</label>
-    <input
-      pInputText
-      id="category-name-en"
-      class="admin-field__input"
-      type="text"
-      formControlName="nameEn"
-      autocomplete="off"
-      (blur)="onNameEnBlur()"
-    />
-    @if (fieldError('nameEn'); as error) {
-      <p class="category-create-form__error">{{ error }}</p>
+  <div class="category-create-form__fields">
+    @if (serverError()) {
+      <app-admin-error-alert [message]="serverError()!" [showRetry]="false" />
     }
-  </div>
 
-  <div class="admin-field">
-    <label class="admin-field__label" for="category-name-ar">Arabic name <span class="admin-field__optional">(optional — defaults to English)</span></label>
-    <input
-      pInputText
-      id="category-name-ar"
-      class="admin-field__input"
-      type="text"
-      formControlName="nameAr"
-      dir="rtl"
-      autocomplete="off"
-    />
-    @if (fieldError('nameAr'); as error) {
-      <p class="category-create-form__error">{{ error }}</p>
-    }
-  </div>
-
-  <div class="admin-field">
-    <label class="admin-field__label" for="category-slug">Slug</label>
-    <input
-      pInputText
-      id="category-slug"
-      class="admin-field__input"
-      type="text"
-      formControlName="slug"
-      autocomplete="off"
-      placeholder="gift-cards"
-    />
-    @if (fieldError('slug'); as error) {
-      <p class="category-create-form__error">{{ error }}</p>
-    }
-    <p class="admin-field__hint">Lowercase URL segment used in storefront routes.</p>
-  </div>
-
-  <div class="admin-field">
-    <span class="admin-field__label">Category type</span>
-    <div class="category-create-form__type-toggle">
-      <label class="category-create-form__type-option">
-        <input type="radio" formControlName="categoryType" value="root" (change)="onCategoryTypeChange()" />
-        Root Category
-      </label>
-      <label class="category-create-form__type-option">
-        <input type="radio" formControlName="categoryType" value="child" (change)="onCategoryTypeChange()" />
-        Child Category
-      </label>
-    </div>
-  </div>
-
-  @if (isChildCategory()) {
     <div class="admin-field">
-      <label class="admin-field__label" for="category-parent">Parent category</label>
-      <p-select
-        inputId="category-parent"
-        formControlName="parentId"
-        [options]="parentDropdownOptions()"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Select parent category"
-        (onChange)="onParentChange()"
+      <label class="admin-field__label" for="category-name-en">Category name</label>
+      <input
+        pInputText
+        id="category-name-en"
+        class="admin-field__input"
+        type="text"
+        formControlName="nameEn"
+        autocomplete="off"
+        (blur)="onNameEnBlur()"
       />
-      @if (parentFieldError(); as error) {
+      @if (fieldError('nameEn'); as error) {
         <p class="category-create-form__error">{{ error }}</p>
       }
-      <p class="admin-field__hint">Pick an existing category, or create a new parent inline.</p>
     </div>
-  }
 
-  @if (isChildCategory() && isCreatingNewParent()) {
-    <div class="category-create-form__new-parent" [formGroup]="form.controls.newParent">
-      <p class="category-create-form__new-parent-title">New parent category</p>
-
+    @if (mode() === 'create') {
       <div class="admin-field">
-        <label class="admin-field__label" for="new-parent-name-en">English name</label>
-        <input
-          pInputText
-          id="new-parent-name-en"
-          class="admin-field__input"
-          type="text"
-          formControlName="nameEn"
-          autocomplete="off"
-          (blur)="onNewParentNameEnBlur()"
+        <span class="admin-field__label">Category type</span>
+        <div class="category-create-form__type-toggle">
+          <label class="category-create-form__type-option">
+            <input type="radio" formControlName="categoryType" value="root" (change)="onCategoryTypeChange()" />
+            Root Category
+          </label>
+          <label class="category-create-form__type-option">
+            <input type="radio" formControlName="categoryType" value="child" (change)="onCategoryTypeChange()" />
+            Child Category
+          </label>
+        </div>
+      </div>
+    }
+
+    @if (mode() === 'edit' || isChildCategory()) {
+      <div class="admin-field">
+        <label class="admin-field__label" for="category-parent">Parent category <span class="admin-field__optional">(optional)</span></label>
+        <p-select
+          inputId="category-parent"
+          formControlName="parentId"
+          [options]="parentDropdownOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="No parent (root category)"
+          (onChange)="onParentChange()"
         />
-        @if (newParentFieldError('nameEn'); as error) {
+        @if (parentFieldError(); as error) {
           <p class="category-create-form__error">{{ error }}</p>
         }
       </div>
+    }
 
-      <div class="admin-field">
-        <label class="admin-field__label" for="new-parent-name-ar">Arabic name <span class="admin-field__optional">(optional)</span></label>
-        <input
-          pInputText
-          id="new-parent-name-ar"
-          class="admin-field__input"
-          type="text"
-          formControlName="nameAr"
-          dir="rtl"
-          autocomplete="off"
-        />
+    @if (mode() === 'create' && isChildCategory() && isCreatingNewParent()) {
+      <div class="category-create-form__new-parent" [formGroup]="form.controls.newParent">
+        <p class="category-create-form__new-parent-title">New parent category</p>
+
+        <div class="admin-field">
+          <label class="admin-field__label" for="new-parent-name-en">English name</label>
+          <input
+            pInputText
+            id="new-parent-name-en"
+            class="admin-field__input"
+            type="text"
+            formControlName="nameEn"
+            autocomplete="off"
+            (blur)="onNewParentNameEnBlur()"
+          />
+          @if (newParentFieldError('nameEn'); as error) {
+            <p class="category-create-form__error">{{ error }}</p>
+          }
+        </div>
+
+        <div class="admin-field">
+          <label class="admin-field__label" for="new-parent-name-ar">Arabic name <span class="admin-field__optional">(optional)</span></label>
+          <input
+            pInputText
+            id="new-parent-name-ar"
+            class="admin-field__input"
+            type="text"
+            formControlName="nameAr"
+            dir="rtl"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="admin-field">
+          <label class="admin-field__label" for="new-parent-slug">Slug</label>
+          <input
+            pInputText
+            id="new-parent-slug"
+            class="admin-field__input"
+            type="text"
+            formControlName="slug"
+            autocomplete="off"
+            placeholder="gift-cards"
+          />
+          @if (newParentFieldError('slug'); as error) {
+            <p class="category-create-form__error">{{ error }}</p>
+          }
+        </div>
       </div>
+    }
 
-      <div class="admin-field">
-        <label class="admin-field__label" for="new-parent-slug">Slug</label>
-        <input
-          pInputText
-          id="new-parent-slug"
-          class="admin-field__input"
-          type="text"
-          formControlName="slug"
-          autocomplete="off"
-          placeholder="gift-cards"
-        />
-        @if (newParentFieldError('slug'); as error) {
-          <p class="category-create-form__error">{{ error }}</p>
-        }
-      </div>
-    </div>
-  }
-
-  @if (mode() === 'create' && !isChildCategory()) {
-    <div class="category-create-form__subcategories">
-      <span class="admin-field__label">Subcategories <span class="admin-field__optional">(optional)</span></span>
-      <p class="admin-field__hint">Create child categories together with this root category.</p>
-
-      @for (group of subcategories.controls; track $index; let i = $index) {
-        <div class="category-create-form__subcategory-row" [formGroup]="group">
-          <div class="admin-field">
-            <label class="admin-field__label" [for]="'subcategory-name-en-' + i">English name</label>
-            <input
-              pInputText
-              [id]="'subcategory-name-en-' + i"
-              class="admin-field__input"
-              type="text"
-              formControlName="nameEn"
-              autocomplete="off"
-              (blur)="onSubcategoryNameEnBlur(i)"
-            />
-            @if (subcategoryFieldError(i, 'nameEn'); as error) {
-              <p class="category-create-form__error">{{ error }}</p>
-            }
+    <div class="category-create-form__arabic-section">
+      @if (!showArabic()) {
+        <button
+          pButton
+          type="button"
+          [label]="arabicHasValue() ? 'Arabic Translation saved' : 'Add Arabic Translation'"
+          [icon]="arabicHasValue() ? 'pi pi-check-circle' : 'pi pi-plus'"
+          severity="secondary"
+          text
+          size="small"
+          (click)="revealArabic()"
+        ></button>
+      } @else {
+        <div class="category-create-form__arabic-fields">
+          <div class="category-create-form__arabic-header">
+            <span class="admin-field__label">Arabic translation</span>
+            <button
+              pButton
+              type="button"
+              label="Hide"
+              icon="pi pi-times"
+              severity="secondary"
+              text
+              size="small"
+              (click)="hideArabic()"
+            ></button>
           </div>
 
           <div class="admin-field">
-            <label class="admin-field__label" [for]="'subcategory-name-ar-' + i">Arabic name <span class="admin-field__optional">(optional)</span></label>
+            <label class="admin-field__label" for="category-name-ar">Arabic name</label>
             <input
               pInputText
-              [id]="'subcategory-name-ar-' + i"
+              id="category-name-ar"
               class="admin-field__input"
               type="text"
               formControlName="nameAr"
@@ -171,75 +145,163 @@
               autocomplete="off"
             />
           </div>
-
-          <div class="admin-field">
-            <label class="admin-field__label" [for]="'subcategory-slug-' + i">Slug</label>
-            <input
-              pInputText
-              [id]="'subcategory-slug-' + i"
-              class="admin-field__input"
-              type="text"
-              formControlName="slug"
-              autocomplete="off"
-              placeholder="windows"
-            />
-            @if (subcategoryFieldError(i, 'slug'); as error) {
-              <p class="category-create-form__error">{{ error }}</p>
-            }
-          </div>
-
-          <button
-            pButton
-            type="button"
-            class="category-create-form__subcategory-remove"
-            icon="pi pi-trash"
-            label="Remove"
-            severity="danger"
-            text
-            (click)="removeSubcategory(i)"
-          ></button>
         </div>
       }
+    </div>
 
+    @if (mode() === 'create' && !isChildCategory()) {
+      <div class="category-create-form__subcategories">
+        <span class="admin-field__label">Subcategories <span class="admin-field__optional">(optional)</span></span>
+        <p class="admin-field__hint">Create child categories together with this root category.</p>
+
+        @for (group of subcategories.controls; track $index; let i = $index) {
+          <div class="category-create-form__subcategory-row" [formGroup]="group">
+            <div class="admin-field">
+              <label class="admin-field__label" [for]="'subcategory-name-en-' + i">English name</label>
+              <input
+                pInputText
+                [id]="'subcategory-name-en-' + i"
+                class="admin-field__input"
+                type="text"
+                formControlName="nameEn"
+                autocomplete="off"
+                (blur)="onSubcategoryNameEnBlur(i)"
+              />
+              @if (subcategoryFieldError(i, 'nameEn'); as error) {
+                <p class="category-create-form__error">{{ error }}</p>
+              }
+            </div>
+
+            <div class="admin-field">
+              <label class="admin-field__label" [for]="'subcategory-name-ar-' + i">Arabic name <span class="admin-field__optional">(optional)</span></label>
+              <input
+                pInputText
+                [id]="'subcategory-name-ar-' + i"
+                class="admin-field__input"
+                type="text"
+                formControlName="nameAr"
+                dir="rtl"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="admin-field">
+              <label class="admin-field__label" [for]="'subcategory-slug-' + i">Slug</label>
+              <input
+                pInputText
+                [id]="'subcategory-slug-' + i"
+                class="admin-field__input"
+                type="text"
+                formControlName="slug"
+                autocomplete="off"
+                placeholder="windows"
+              />
+              @if (subcategoryFieldError(i, 'slug'); as error) {
+                <p class="category-create-form__error">{{ error }}</p>
+              }
+            </div>
+
+            <button
+              pButton
+              type="button"
+              class="category-create-form__subcategory-remove"
+              icon="pi pi-trash"
+              label="Remove"
+              severity="danger"
+              text
+              (click)="removeSubcategory(i)"
+            ></button>
+          </div>
+        }
+
+        <button
+          pButton
+          type="button"
+          class="admin-btn-secondary"
+          icon="pi pi-plus"
+          [label]="subcategories.length ? 'Add another' : 'Add Subcategory'"
+          severity="secondary"
+          text
+          (click)="addSubcategory()"
+        ></button>
+      </div>
+    }
+
+    <app-admin-section-card title="Advanced" [collapsible]="true" [(collapsed)]="advancedCollapsed">
+      <div class="admin-field">
+        <label class="admin-field__label" for="category-slug">Slug</label>
+        <input
+          pInputText
+          id="category-slug"
+          class="admin-field__input"
+          type="text"
+          formControlName="slug"
+          autocomplete="off"
+          placeholder="gift-cards"
+        />
+        @if (fieldError('slug'); as error) {
+          <p class="category-create-form__error">{{ error }}</p>
+        }
+        <p class="admin-field__hint">Lowercase URL segment used in storefront routes. Auto-generated from the name.</p>
+      </div>
+    </app-admin-section-card>
+  </div>
+
+  @if (mode() === 'edit') {
+    <div class="category-create-form__actions category-create-form__actions--edit">
+      <div class="category-create-form__actions-start">
+        <div class="admin-field admin-field--checkbox category-create-form__visibility">
+          <p-checkbox formControlName="isActive" inputId="category-active" [binary]="true" />
+          <label for="category-active">Visible on storefront</label>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          class="category-create-form__delete"
+          icon="pi pi-trash"
+          severity="danger"
+          text
+          [disabled]="submitting()"
+          aria-label="Delete Category"
+          pTooltip="Delete Category"
+          tooltipPosition="top"
+          (click)="requestDelete()"
+        ></button>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        class="admin-btn-primary"
+        label="Save"
+        icon="pi pi-check"
+        severity="success"
+        [loading]="submitting()"
+        [disabled]="submitting()"
+      ></button>
+    </div>
+  } @else {
+    <div class="category-create-form__actions">
       <button
         pButton
         type="button"
         class="admin-btn-secondary"
-        icon="pi pi-plus"
-        [label]="subcategories.length ? 'Add another' : 'Add Subcategory'"
+        label="Cancel"
         severity="secondary"
-        text
-        (click)="addSubcategory()"
+        [disabled]="submitting()"
+        (click)="cancel()"
+      ></button>
+
+      <button
+        pButton
+        type="submit"
+        class="admin-btn-primary"
+        [label]="submitLabel()"
+        icon="pi pi-plus"
+        [loading]="submitting()"
+        [disabled]="submitting()"
       ></button>
     </div>
   }
-
-  @if (mode() === 'edit') {
-    <div class="admin-field admin-field--checkbox">
-      <p-checkbox formControlName="isActive" inputId="category-active" [binary]="true" />
-      <label for="category-active">Active</label>
-    </div>
-  }
-
-  <div class="category-create-form__actions">
-    <button
-      pButton
-      type="button"
-      class="admin-btn-secondary"
-      label="Cancel"
-      severity="secondary"
-      [disabled]="submitting()"
-      (click)="cancel()"
-    ></button>
-
-    <button
-      pButton
-      type="submit"
-      class="admin-btn-primary"
-      [label]="submitLabel()"
-      [icon]="mode() === 'edit' ? 'pi pi-check' : 'pi pi-plus'"
-      [loading]="submitting()"
-      [disabled]="submitting()"
-    ></button>
-  </div>
 </form>

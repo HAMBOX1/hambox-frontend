@@ -589,7 +589,8 @@
     },
     "TOPBAR": {
       "WORKSPACE": "مساحة الإدارة",
-      "WORKSPACE_HINT": "إدارة الكتالوج والوصول والتجارة"
+      "WORKSPACE_HINT": "إدارة الكتالوج والوصول والتجارة",
+      "MORE": "خيارات إضافية"
     },
     "SIDEBAR": {
       "NAV_ARIA": "تنقل الإدارة",
@@ -624,6 +625,27 @@
         "DUPLICATE": "نسخ",
         "ARCHIVE": "أرشفة",
         "DELETE": "حذف"
+      },
+      "BULK": {
+        "PUBLISH": "نشر",
+        "UNPUBLISH": "إلغاء النشر",
+        "MORE": "المزيد",
+        "SELECT_ALL_MATCHING": "تحديد كل {{count}} المطابقة للفلتر",
+        "CHANGE_CATEGORY": "تغيير الفئة",
+        "ADJUST_PRICE": "تعديل السعر",
+        "EXPORT": "تصدير",
+        "MANAGE_INVENTORY": "إدارة المخزون",
+        "DELETE_TITLE": "حذف المنتجات المحددة",
+        "DUPLICATE_TITLE": "نسخ المنتجات المحددة",
+        "CATEGORY_TITLE": "تغيير الفئة",
+        "NEW_CATEGORY": "الفئة الجديدة",
+        "PRICE_TITLE": "تعديل السعر",
+        "PRICE_INCREASE": "زيادة بنسبة %",
+        "PRICE_DECREASE": "خفض بنسبة %",
+        "PRICE_FIXED": "تحديد قيمة ثابتة",
+        "PRICE_PERCENT_LABEL": "النسبة المئوية",
+        "PRICE_NEW_LABEL": "السعر الجديد",
+        "APPLY": "تطبيق"
       },
       "STOCK": {
         "IN_STOCK": "{{count}} متوفر",
@@ -719,7 +741,11 @@
       "DELETE_SUPPLIER_TITLE": "حذف المورد؟",
       "DELETE_SUPPLIER": "حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
       "DELETE_MAPPING_TITLE": "حذف الربط؟",
-      "DELETE_MAPPING": "حذف ربط المنتج هذا؟ لا يمكن التراجع عن هذا الإجراء."
+      "DELETE_MAPPING": "حذف ربط المنتج هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+      "DELETE_PRODUCTS_TITLE": "حذف المنتجات المحددة؟",
+      "DELETE_PRODUCTS": "حذف {{count}} منتج/منتجات محددة؟ لا يمكن التراجع عن هذا الإجراء.",
+      "DELETE_VARIANTS_TITLE": "حذف المتغيرات المحددة؟",
+      "DELETE_VARIANTS": "حذف {{count}} متغير/متغيرات محددة؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "BULK": {
       "SELECTED": "{{count}} محدد",

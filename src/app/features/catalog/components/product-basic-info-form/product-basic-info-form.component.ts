@@ -8,8 +8,9 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { firstValueFrom, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -21,7 +22,7 @@ import { ApiError } from '../../../../core/models/api-error.model';
 import { CategoryCreateFormComponent } from '../category-create-form/category-create-form.component';
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
 import { CreateProductRequest, ProductDraftFormSnapshot } from '../../models/product.model';
-import { CategoryApiService } from '../../services/category-api.service';
+import { CategoryApiService, createCategoryWithHierarchy } from '../../services/category-api.service';
 
 const FIELD_LABELS = {
   nameEn: 'Product name (EN)',
@@ -89,11 +90,22 @@ export class ProductBasicInfoFormComponent {
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
     nameAr: ['', [Validators.maxLength(200)]],
-    descriptionEn: ['', [Validators.required, Validators.maxLength(2000)]],
+    descriptionEn: ['', [Validators.maxLength(2000)]],
     descriptionAr: ['', [Validators.maxLength(2000)]],
     price: [0, [Validators.required, Validators.min(0)]],
     categoryId: ['', [Validators.required]],
   });
+
+  /** Always collapsed initially; the owner opts in via revealArabic() regardless of existing Arabic content. */
+  protected readonly showArabic = signal(false);
+
+  private readonly arabicHasValueState = signal(false);
+  /** Drives the "Arabic Translation saved" vs "Add Arabic Translation" label on the collapsed toggle. */
+  protected readonly arabicHasValue = this.arabicHasValueState.asReadonly();
+
+  private readonly dirtyState = signal(false);
+  /** True once the owner has actually edited a field (never flips on the programmatic patch used to load/reset the form). Drives the page's floating save bar. */
+  readonly dirty = this.dirtyState.asReadonly();
 
   constructor() {
     effect(() => {
@@ -101,8 +113,24 @@ export class ProductBasicInfoFormComponent {
       if (snapshot) {
         this.form.patchValue(snapshot, { emitEvent: false });
         this.form.markAsPristine();
+        this.dirtyState.set(false);
+        const hasArabic = !!(snapshot.nameAr?.trim() || snapshot.descriptionAr?.trim());
+        this.arabicHasValueState.set(hasArabic);
       }
     });
+
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
+      this.dirtyState.set(true);
+      this.arabicHasValueState.set(!!(value.nameAr?.trim() || value.descriptionAr?.trim()));
+    });
+  }
+
+  protected revealArabic(): void {
+    this.showArabic.set(true);
+  }
+
+  protected hideArabic(): void {
+    this.showArabic.set(false);
   }
 
   validate(): boolean {
@@ -173,6 +201,9 @@ export class ProductBasicInfoFormComponent {
   applyDraftSnapshot(snapshot: ProductDraftFormSnapshot): void {
     this.form.patchValue(snapshot, { emitEvent: false });
     this.form.markAsPristine();
+    this.dirtyState.set(false);
+    const hasArabic = !!(snapshot.nameAr?.trim() || snapshot.descriptionAr?.trim());
+    this.arabicHasValueState.set(hasArabic);
   }
 
   get valueChanges$(): Observable<typeof this.form.value> {
@@ -224,7 +255,7 @@ export class ProductBasicInfoFormComponent {
     this.categoryCreateErrorState.set(null);
 
     try {
-      const id = await firstValueFrom(this.categoryApi.createCategory(request));
+      const id = await createCategoryWithHierarchy(this.categoryApi, request);
       this.newlyCreatedCategoryState.set({ id, label: request.nameEn });
       this.form.controls.categoryId.setValue(id);
       this.categoryDialogOpenState.set(false);

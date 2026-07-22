@@ -1,6 +1,19 @@
-<section class="admin-section-card admin-glass-card">
+<section
+  class="admin-section-card admin-glass-card"
+  [class.admin-section-card--compact]="compact()"
+>
   @if (title()) {
-    <header class="admin-section-card__header" [class.admin-section-card__header--plain]="noDivider()">
+    <header
+      class="admin-section-card__header"
+      [class.admin-section-card__header--plain]="noDivider()"
+      [class.admin-section-card__header--collapsible]="collapsible()"
+      [attr.role]="collapsible() ? 'button' : null"
+      [attr.tabindex]="collapsible() ? 0 : null"
+      [attr.aria-expanded]="collapsible() ? !collapsed() : null"
+      (click)="toggle()"
+      (keydown.enter)="toggle()"
+      (keydown.space)="$event.preventDefault(); toggle()"
+    >
       <div>
         <h2 class="admin-section-card__title">{{ title() }}</h2>
         @if (description()) {
@@ -9,11 +22,23 @@
       </div>
       <div class="admin-section-card__header-actions">
         <ng-content select="[adminSectionActions]" />
+        @if (collapsible()) {
+          <button
+            type="button"
+            class="admin-section-card__collapse-toggle"
+            [attr.aria-label]="collapsed() ? 'Expand section' : 'Collapse section'"
+            (click)="$event.stopPropagation(); toggle()"
+          >
+            <i class="pi" [class.pi-chevron-down]="collapsed()" [class.pi-chevron-up]="!collapsed()"></i>
+          </button>
+        }
       </div>
     </header>
   }
 
-  <div class="admin-section-card__body" [class.admin-section-card__body--padded]="padded()">
-    <ng-content />
-  </div>
+  @if (!collapsible() || !collapsed()) {
+    <div class="admin-section-card__body" [class.admin-section-card__body--padded]="padded()">
+      <ng-content />
+    </div>
+  }
 </section>

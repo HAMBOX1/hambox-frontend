@@ -1,39 +1,79 @@
-<section class="assets-upload">
-  <div
-    class="assets-upload__dropzone"
-    [class.assets-upload__dropzone--active]="isDragOver()"
-    [class.assets-upload__dropzone--disabled]="uploading()"
-    (dragover)="onDragOver($event)"
-    (dragleave)="onDragLeave($event)"
-    (drop)="onDrop($event)"
-  >
-    <input
-      #fileInput
-      class="assets-upload__file-input"
-      type="file"
-      accept="image/jpeg,image/png,image/webp,image/gif"
-      multiple
-      [disabled]="uploading()"
-      (change)="onFileSelected($event)"
-    />
+<section
+  class="assets-upload"
+  [class.assets-upload--drag-over]="isDragOver()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <input
+    #fileInput
+    class="assets-upload__file-input"
+    type="file"
+    accept="image/jpeg,image/png,image/webp,image/gif"
+    multiple
+    [disabled]="uploading()"
+    (change)="onFileSelected($event)"
+  />
 
-    <i class="pi pi-cloud-upload assets-upload__icon" aria-hidden="true"></i>
-    <h3 class="assets-upload__title">Drag & drop product images here</h3>
-    <p class="assets-upload__copy">
-      PNG, JPG, WEBP, or GIF up to 5 MB each. Maximum {{ 10 }} images per product.
-    </p>
+  <div class="assets-upload__row">
+    <span class="assets-upload__label">Images <span class="assets-upload__count">{{ assets().length }}/{{ maxCount }}</span></span>
 
-    <button
-      pButton
-      type="button"
-      class="assets-upload__browse-btn"
-      label="Browse Files"
-      icon="pi pi-folder-open"
-      severity="secondary"
-      [outlined]="true"
-      [disabled]="uploading()"
-      (click)="onBrowseClick(fileInput)"
-    ></button>
+    <div
+      class="assets-upload__strip"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      aria-label="Product image previews"
+      (cdkDropListDropped)="onAssetDrop($event)"
+    >
+      <button
+        type="button"
+        class="assets-upload__add"
+        [class.assets-upload__add--empty]="assets().length === 0"
+        [disabled]="uploading() || assets().length >= maxCount"
+        [attr.aria-label]="assets().length === 0 ? 'Add image' : 'Add another image'"
+        (click)="onBrowseClick(fileInput)"
+      >
+        <i class="pi pi-plus" aria-hidden="true"></i>
+        @if (assets().length === 0) {
+          <span>Add Image</span>
+        }
+      </button>
+
+      @for (asset of assets(); track asset.id) {
+        <article class="assets-upload__card" cdkDrag>
+          <button
+            type="button"
+            class="assets-upload__thumb-btn"
+            [attr.aria-label]="'Preview ' + asset.name"
+            (click)="openPreview(asset)"
+          >
+            @if (asset.previewUrl) {
+              <img class="assets-upload__image" [src]="asset.previewUrl" [alt]="asset.name" />
+            } @else {
+              <div class="assets-upload__placeholder" aria-hidden="true">
+                <i class="pi pi-image"></i>
+              </div>
+            }
+          </button>
+
+          @if (asset.isPrimary) {
+            <span class="assets-upload__primary-badge" title="Primary image">
+              <i class="pi pi-star-fill" aria-hidden="true"></i>
+            </span>
+          }
+
+          <button
+            type="button"
+            class="assets-upload__remove"
+            aria-label="Remove image"
+            [disabled]="uploading()"
+            (click)="removeAsset(asset.id)"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </article>
+      }
+    </div>
   </div>
 
   @if (validationError()) {
@@ -44,57 +84,63 @@
     <p class="assets-upload__status">Uploading images...</p>
   }
 
-  @if (assets().length > 0) {
-    <div
-      class="assets-upload__previews"
-      cdkDropList
-      cdkDropListOrientation="mixed"
-      aria-label="Product image previews"
-      (cdkDropListDropped)="onAssetDrop($event)"
-    >
-      @for (asset of assets(); track asset.id) {
-        <article class="assets-upload__card" cdkDrag>
-          @if (asset.previewUrl) {
-            <img class="assets-upload__image" [src]="asset.previewUrl" [alt]="asset.name" />
-          } @else {
-            <div class="assets-upload__placeholder" aria-hidden="true">
-              <i class="pi pi-image"></i>
-              <span>{{ asset.name }}</span>
-            </div>
-          }
-
-          @if (asset.isPrimary) {
-            <span class="assets-upload__primary-badge">Primary</span>
-          }
-
-          <div class="assets-upload__meta">
-            <span class="assets-upload__name">{{ asset.name }}</span>
-            <span class="assets-upload__size">{{ formatFileSize(asset.size) }}</span>
-          </div>
-
-          <div class="assets-upload__actions">
-            @if (!asset.isPrimary) {
-              <button
-                type="button"
-                class="assets-upload__action"
-                [disabled]="uploading()"
-                (click)="setPrimary(asset.id)"
-              >
-                Set primary
-              </button>
-            }
-            <button
-              type="button"
-              class="assets-upload__remove"
-              aria-label="Remove image"
-              [disabled]="uploading()"
-              (click)="removeAsset(asset.id)"
-            >
-              <i class="pi pi-times" aria-hidden="true"></i>
-            </button>
-          </div>
-        </article>
-      }
-    </div>
+  @if (isDragOver()) {
+    <div class="assets-upload__drag-overlay">Drop images to upload</div>
   }
 </section>
+
+<p-dialog
+  [visible]="!!previewAsset()"
+  (visibleChange)="onPreviewVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: 'min(40rem, 92vw)' }"
+  styleClass="admin-dialog assets-upload__preview-dialog"
+>
+  <ng-template #header>
+    @if (previewAsset(); as asset) {
+      <div class="assets-upload__preview-header">
+        <span>{{ asset.name }}</span>
+        <span class="assets-upload__preview-meta">{{ formatFileSize(asset.size) }}</span>
+      </div>
+    }
+  </ng-template>
+  @if (previewAsset(); as asset) {
+    <div class="assets-upload__preview-body">
+      @if (asset.previewUrl) {
+        <img class="assets-upload__preview-image" [src]="asset.previewUrl" [alt]="asset.name" />
+      } @else {
+        <div class="assets-upload__placeholder assets-upload__placeholder--large" aria-hidden="true">
+          <i class="pi pi-image"></i>
+        </div>
+      }
+      <div class="assets-upload__preview-actions">
+        @if (!asset.isPrimary) {
+          <button
+            pButton
+            type="button"
+            label="Set primary"
+            icon="pi pi-star"
+            severity="secondary"
+            size="small"
+            [disabled]="uploading()"
+            (click)="setPrimary(asset.id); closePreview()"
+          ></button>
+        }
+        <button
+          pButton
+          type="button"
+          label="Remove"
+          icon="pi pi-trash"
+          severity="danger"
+          size="small"
+          [outlined]="true"
+          [disabled]="uploading()"
+          (click)="removeAsset(asset.id); closePreview()"
+        ></button>
+      </div>
+    </div>
+  }
+</p-dialog>
