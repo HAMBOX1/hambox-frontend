@@ -18,12 +18,11 @@
 
   @if (callbacks().isExpanded(node().key)) {
     <div class="variant-tree-node__children">
-      @if (isLeafGroup()) {
-        <app-variant-leaf-list [children]="node().children" [callbacks]="callbacks()" [depth]="depth() + 1" />
-      } @else {
-        @for (child of node().children; track child.key) {
-          <app-variant-tree-node [node]="child" [depth]="depth() + 1" [callbacks]="callbacks()" />
-        }
+      @if (childGroups().leaves.length) {
+        <app-variant-leaf-list [children]="childGroups().leaves" [callbacks]="callbacks()" [depth]="depth() + 1" />
+      }
+      @for (child of childGroups().branches; track child.key) {
+        <app-variant-tree-node [node]="child" [depth]="depth() + 1" [callbacks]="callbacks()" />
       }
     </div>
   }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import {
-  isLeafGroup as isLeafGroupNodes,
+  partitionTreeNodes,
   VariantTreeCallbacks,
   VariantTreeNode,
 } from '../../utils/variant-tree.utils';
@@ -23,5 +23,5 @@ export class ProductVariantTreeNodeComponent {
   readonly depth = input(0);
   readonly callbacks = input.required<VariantTreeCallbacks>();
 
-  protected readonly isLeafGroup = computed(() => isLeafGroupNodes(this.node().children));
+  protected readonly childGroups = computed(() => partitionTreeNodes(this.node().children));
 }

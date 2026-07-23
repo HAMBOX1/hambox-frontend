@@ -132,12 +132,11 @@
           @if (unassignedVariants().length) {
             <app-variant-leaf-list [children]="unassignedVariants()" [callbacks]="treeCallbacks" />
           }
-          @if (rootIsLeafGroup()) {
-            <app-variant-leaf-list [children]="variantTree()" [callbacks]="treeCallbacks" />
-          } @else {
-            @for (node of variantTree(); track node.key) {
-              <app-variant-tree-node [node]="node" [depth]="0" [callbacks]="treeCallbacks" />
-            }
+          @if (rootTree().leaves.length) {
+            <app-variant-leaf-list [children]="rootTree().leaves" [callbacks]="treeCallbacks" />
+          }
+          @for (node of rootTree().branches; track node.key) {
+            <app-variant-tree-node [node]="node" [depth]="0" [callbacks]="treeCallbacks" />
           }
         </div>
       } @else if (!product()) {

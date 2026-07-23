@@ -39,7 +39,7 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
 import {
   breadcrumbForVariant,
   buildVariantTree,
-  isLeafGroup,
+  partitionTreeNodes,
   unassignedVariantLeaves,
   VariantTreeCallbacks,
   VariantTreeNode,
@@ -187,8 +187,8 @@ export class ProductVariantManagerComponent {
     unassignedVariantLeaves(this.optionGroups(), this.variantsTable()),
   );
 
-  /** True when the product has a single option group, so the tree root is itself a flat list of variant leaves rather than branches — that list still needs virtualizing directly, without a branch node to own it. */
-  protected readonly rootIsLeafGroup = computed(() => isLeafGroup(this.variantTree()));
+  /** Root-level siblings split into plain variant leaves vs. further sub-groups — see `partitionTreeNodes`. */
+  protected readonly rootTree = computed(() => partitionTreeNodes(this.variantTree()));
 
   /** "Select all (N)" when unfiltered, "Select all (N of TOTAL)" when a search/status/quick filter narrows the table — so it never reads as a second, conflicting total next to the header. */
   protected readonly selectAllLabel = computed(() => {

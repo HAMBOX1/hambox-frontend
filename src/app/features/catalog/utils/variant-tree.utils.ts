@@ -130,9 +130,22 @@ function buildLevel(
   return nodes;
 }
 
-/** True when every node in this array is a variant leaf rather than a further sub-group — the point at which a list should render as virtualized leaf cards instead of recursing into more branches. */
-export function isLeafGroup(nodes: readonly VariantTreeNode[]): boolean {
-  return nodes.length > 0 && nodes[0].variant !== null;
+/**
+ * Splits a set of sibling nodes into variant leaves vs. further sub-groups. Siblings aren't
+ * guaranteed to be homogeneous — e.g. under "Platform", Xbox can have a nested "Account Type"
+ * group (making it a branch) while PSN/Steam/PC don't (making them leaves) — so each kind needs
+ * its own renderer rather than picking one rendering strategy for the whole level.
+ */
+export function partitionTreeNodes(nodes: readonly VariantTreeNode[]): {
+  readonly leaves: readonly VariantTreeNode[];
+  readonly branches: readonly VariantTreeNode[];
+} {
+  const leaves: VariantTreeNode[] = [];
+  const branches: VariantTreeNode[] = [];
+  for (const node of nodes) {
+    (node.variant !== null ? leaves : branches).push(node);
+  }
+  return { leaves, branches };
 }
 
 /** Walks the same root-then-child-edges path as buildVariantTree for a single variant, root-first. */
