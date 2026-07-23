@@ -13,9 +13,9 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
 
 /**
- * One Question card for the mobile editor. Stays in a single scrollable view (no separate
- * screens): tapping an Answer expands a tinted, indented panel in place, recursing into this same
- * component for its follow-up Question(s) — an accordion, not a drill-down navigator. Row actions
+ * One Option Group card for the mobile editor. Stays in a single scrollable view (no separate
+ * screens): tapping an Option expands a tinted, indented panel in place, recursing into this same
+ * component for its follow-up option group(s) — an accordion, not a drill-down navigator. Row actions
  * (Edit/Delete/Move) sit behind one overflow menu per row so full-size touch targets never wrap.
  */
 @Component({
@@ -39,7 +39,7 @@ export class ProductOptionMobileGroupCardComponent {
 
   readonly group = input.required<ProductOptionGroupDto>();
   readonly allGroups = input.required<readonly ProductOptionGroupDto[]>();
-  /** Only true for root Questions, where sibling Questions can be reordered (matches desktop). */
+  /** Only true for root option groups, where sibling option groups can be reordered (matches desktop). */
   readonly canReorderGroup = input(false);
 
   readonly moveGroup = output<-1 | 1>();
@@ -92,7 +92,7 @@ export class ProductOptionMobileGroupCardComponent {
 
   protected groupMenuItems(): MenuItem[] {
     const items: MenuItem[] = [
-      { label: 'Edit question', icon: 'pi pi-pencil', command: () => this.startEditGroup() },
+      { label: 'Edit option group', icon: 'pi pi-pencil', command: () => this.startEditGroup() },
     ];
     if (this.canReorderGroup()) {
       items.push(
@@ -100,16 +100,16 @@ export class ProductOptionMobileGroupCardComponent {
         { label: 'Move down', icon: 'pi pi-arrow-down', command: () => this.moveGroup.emit(1) },
       );
     }
-    items.push({ label: 'Delete question', icon: 'pi pi-trash', command: () => this.deleteGroup() });
+    items.push({ label: 'Delete option group', icon: 'pi pi-trash', command: () => this.deleteGroup() });
     return items;
   }
 
   protected optionMenuItems(option: ProductOptionDto): MenuItem[] {
     return [
-      { label: 'Edit answer', icon: 'pi pi-pencil', command: () => this.startEditOption(option) },
+      { label: 'Edit option', icon: 'pi pi-pencil', command: () => this.startEditOption(option) },
       { label: 'Move up', icon: 'pi pi-arrow-up', command: () => this.moveOption(option, -1) },
       { label: 'Move down', icon: 'pi pi-arrow-down', command: () => this.moveOption(option, 1) },
-      { label: 'Delete answer', icon: 'pi pi-trash', command: () => this.deleteOption(option.id) },
+      { label: 'Delete option', icon: 'pi pi-trash', command: () => this.deleteOption(option.id) },
     ];
   }
 

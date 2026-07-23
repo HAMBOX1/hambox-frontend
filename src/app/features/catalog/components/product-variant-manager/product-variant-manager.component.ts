@@ -40,6 +40,7 @@ import {
   breadcrumbForVariant,
   buildVariantTree,
   isLeafGroup,
+  unassignedVariantLeaves,
   VariantTreeCallbacks,
   VariantTreeNode,
 } from '../../utils/variant-tree.utils';
@@ -179,6 +180,11 @@ export class ProductVariantManagerComponent {
 
   protected readonly variantTree = computed<readonly VariantTreeNode[]>(() =>
     buildVariantTree(this.optionGroups(), this.variantsTable()),
+  );
+
+  /** Leaves for variants with no option value in any root group (see `unassignedVariantLeaves` doc) — rendered as their own flat section so they're never dropped by the branch tree. */
+  protected readonly unassignedVariants = computed<readonly VariantTreeNode[]>(() =>
+    unassignedVariantLeaves(this.optionGroups(), this.variantsTable()),
   );
 
   /** True when the product has a single option group, so the tree root is itself a flat list of variant leaves rather than branches — that list still needs virtualizing directly, without a branch node to own it. */

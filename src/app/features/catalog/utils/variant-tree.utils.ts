@@ -70,6 +70,31 @@ export function buildVariantTree(
   return buildLevel(rootGroupsWithOptions(groups), variants, '', childGroups);
 }
 
+/**
+ * Variants that don't carry an option value for any root group — e.g. a variant created before
+ * its product had option groups at all. `buildVariantTree` walks group->option edges only, so
+ * these would otherwise never appear under any branch and silently vanish from the manager.
+ * Returned as ready-made leaf nodes for `app-variant-leaf-list` to render alongside the tree.
+ */
+export function unassignedVariantLeaves(
+  groups: readonly ProductOptionGroupDto[],
+  variants: readonly ProductVariantDto[],
+): readonly VariantTreeNode[] {
+  const rootOptionIds = new Set(
+    rootGroupsWithOptions(groups).flatMap((group) => group.options.map((option) => option.id)),
+  );
+
+  return variants
+    .filter((variant) => !variant.optionIds.some((id) => rootOptionIds.has(id)))
+    .map((variant) => ({
+      key: variant.id,
+      label: variant.sku,
+      count: 1,
+      children: [],
+      variant,
+    }));
+}
+
 function buildLevel(
   remainingGroups: readonly ProductOptionGroupDto[],
   variants: readonly ProductVariantDto[],

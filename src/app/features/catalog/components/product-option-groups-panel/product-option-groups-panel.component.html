@@ -2,8 +2,8 @@
   <app-admin-loading-skeleton variant="table" />
 } @else {
   <app-admin-section-card
-    title="Questions"
-    description="Define the questions customers answer when choosing this product, like Platform, Region, or Edition."
+    title="Option Groups"
+    description="Define the options customers choose from when configuring this product, like Platform, Region, or Edition."
     [compact]="compact()"
   >
     @if (viewport.isMobile()) {
@@ -17,7 +17,7 @@
         >
           @for (group of sortedRootGroups(); track group.id) {
             <div class="option-groups-panel__group" cdkDrag>
-              <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle aria-label="Reorder question">
+              <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle aria-label="Reorder option group">
                 <i class="pi pi-bars"></i>
               </button>
               <app-option-group-node [group]="group" [allGroups]="optionGroups()" />
@@ -27,8 +27,8 @@
       } @else {
         <app-admin-empty-state
           icon="pi pi-question-circle"
-          title="No questions yet"
-          description="Create questions (like Platform or Region) before adding variants."
+          title="No option groups yet"
+          description="Create option groups (like Platform or Region) before adding variants."
         />
       }
 
@@ -37,11 +37,11 @@
           <div class="option-groups-panel__inline-form">
             <input
               pInputText
-              placeholder="Question (e.g. Platform)"
+              placeholder="Option group name (e.g. Platform)"
               [ngModel]="newGroupLabel()"
               (ngModelChange)="newGroupLabel.set($event)"
             />
-            <button pButton type="button" label="Add Question" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
+            <button pButton type="button" label="Add Option Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
           </div>
         } @else {
           <p class="option-groups-panel__hint">Enter a product name and category above to begin.</p>

@@ -12,14 +12,14 @@
 } @else {
   <app-admin-empty-state
     icon="pi pi-question-circle"
-    title="No questions yet"
-    description="Create questions (like Platform or Region) before adding variants."
+    title="No option groups yet"
+    description="Create option groups (like Platform or Region) before adding variants."
   />
 }
 
 <div class="mobile-nav__add-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
   @if (productId()) {
-    <span class="mobile-nav__add-group-label">New Question</span>
+    <span class="mobile-nav__add-group-label">New Option Group</span>
     <input
       pInputText
       placeholder="e.g. Platform"
@@ -27,7 +27,7 @@
       (ngModelChange)="newGroupLabel.set($event)"
       (keyup.enter)="addGroup()"
     />
-    <button pButton type="button" label="Add Question" icon="pi pi-plus" [loading]="creatingGroup()" (click)="addGroup()"></button>
+    <button pButton type="button" label="Add Option Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="addGroup()"></button>
   } @else {
     <p class="mobile-nav__hint">Enter a product name and category above to begin.</p>
   }

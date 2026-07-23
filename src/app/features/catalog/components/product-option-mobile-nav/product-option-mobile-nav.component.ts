@@ -12,10 +12,10 @@ import { slugify } from '../../utils/product-display.utils';
 import { ProductOptionMobileGroupCardComponent } from '../product-option-mobile-group-card/product-option-mobile-group-card.component';
 
 /**
- * Mobile editor for Questions/Answers — a single scrollable view, not a separate desktop tree
+ * Mobile editor for Option Groups/Options — a single scrollable view, not a separate desktop tree
  * copy. `ProductOptionGroupsPanelComponent` renders this instead of the desktop tree below 768px;
- * the desktop tree itself is untouched at any viewport width. Root Questions render as cards here;
- * follow-up Questions expand in place inside `ProductOptionMobileGroupCardComponent` (an accordion)
+ * the desktop tree itself is untouched at any viewport width. Root option groups render as cards here;
+ * follow-up option groups expand in place inside `ProductOptionMobileGroupCardComponent` (an accordion)
  * rather than navigating to another screen.
  */
 @Component({

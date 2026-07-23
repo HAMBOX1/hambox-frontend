@@ -19,11 +19,9 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
 
 /**
- * Recursive node: renders one Question (option group) as a card, its Answers (options) as rows, and —
- * for any answer that owns nested follow-up questions (e.g. Xbox -> Account Type) — recurses into
- * `app-option-group-node` again inside a tinted, indented panel. Terminology in the template is
- * Question/Answer/Follow-up Question throughout; "group"/"option" only remain as internal identifiers
- * since they mirror the underlying data model.
+ * Recursive node: renders one Option Group as a card, its Options as rows, and — for any option
+ * that owns nested follow-up option groups (e.g. Xbox -> Account Type) — recurses into
+ * `app-option-group-node` again inside a tinted, indented panel.
  */
 @Component({
   selector: 'app-option-group-node',

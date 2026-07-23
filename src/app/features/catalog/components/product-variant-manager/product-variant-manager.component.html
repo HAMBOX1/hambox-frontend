@@ -116,7 +116,7 @@
         <app-admin-action-menu label="More" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
       </app-admin-bulk-bar>
 
-      @if (variantTree().length) {
+      @if (variantTree().length || unassignedVariants().length) {
         <div class="variant-manager__tree-toolbar">
           <label class="variant-manager__select-all">
             <p-checkbox
@@ -129,6 +129,9 @@
         </div>
 
         <div class="variant-manager__tree" role="tree">
+          @if (unassignedVariants().length) {
+            <app-variant-leaf-list [children]="unassignedVariants()" [callbacks]="treeCallbacks" />
+          }
           @if (rootIsLeafGroup()) {
             <app-variant-leaf-list [children]="variantTree()" [callbacks]="treeCallbacks" />
           } @else {
