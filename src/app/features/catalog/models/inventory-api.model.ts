@@ -9,6 +9,7 @@ export interface ProductOptionDto {
 export interface ProductOptionGroupDto {
   readonly id: string;
   readonly productId: string;
+  readonly parentOptionId: string | null;
   readonly key: string;
   readonly displayName: string;
   readonly sortOrder: number;
@@ -92,6 +93,7 @@ export interface InventoryAuditLogDto {
   readonly variantId: string | null;
   readonly batchId: string | null;
   readonly codeId: string | null;
+  readonly performedByUserId: string | null;
   readonly details: string | null;
   readonly occurredOnUtc: string;
 }
@@ -175,6 +177,7 @@ export interface CreateOptionGroupRequest {
   readonly displayName: string;
   readonly sortOrder: number;
   readonly isRequired: boolean;
+  readonly parentOptionId?: string | null;
 }
 
 export interface CreateOptionRequest {
@@ -208,10 +211,19 @@ export interface ImportCodesRequest {
   readonly codes: readonly string[];
 }
 
+export interface ImportCodeDuplicateDto {
+  readonly code: string;
+  readonly productName: string;
+  readonly variantName: string;
+  readonly batchName: string | null;
+}
+
 export interface ImportCodesResultDto {
-  readonly imported: number;
-  readonly duplicates: number;
-  readonly invalid: number;
+  readonly totalSubmitted: number;
+  readonly importedCount: number;
+  readonly duplicateCount: number;
+  readonly invalidCount: number;
+  readonly duplicates: readonly ImportCodeDuplicateDto[];
 }
 
 export interface UpdateVariantRequest {

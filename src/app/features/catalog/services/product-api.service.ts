@@ -12,6 +12,8 @@ import {
   PriceAdjustmentMode,
   Product,
   ProductBulkSelection,
+  ProductFacetGroup,
+  ProductFacetQuery,
   ProductImage,
   ProductListQuery,
   UpdateProductRequest,
@@ -49,7 +51,41 @@ export class ProductApiService {
       params['sortBy'] = query.sortBy;
     }
 
+    const attributes = this.serializeAttributes(query.attributes);
+    if (attributes) {
+      params['attributes'] = attributes;
+    }
+
     return this.api.get<PagedResult<Product>>(CATALOG_API.products, { params });
+  }
+
+  getProductFacets(query: ProductFacetQuery): Observable<readonly ProductFacetGroup[]> {
+    const params: Record<string, string> = {};
+
+    const searchTerm = query.searchTerm?.trim();
+    if (searchTerm) {
+      params['searchTerm'] = searchTerm;
+    }
+
+    if (query.categoryId) {
+      params['categoryId'] = query.categoryId;
+    }
+
+    const attributes = this.serializeAttributes(query.attributes);
+    if (attributes) {
+      params['attributes'] = attributes;
+    }
+
+    return this.api.get<readonly ProductFacetGroup[]>(CATALOG_API.productFacets, { params });
+  }
+
+  private serializeAttributes(attributes: Readonly<Record<string, readonly string[]>> | undefined): string | null {
+    if (!attributes) {
+      return null;
+    }
+
+    const entries = Object.entries(attributes).filter(([, values]) => values.length > 0);
+    return entries.length ? JSON.stringify(Object.fromEntries(entries)) : null;
   }
 
   getProductById(id: string): Observable<Product> {

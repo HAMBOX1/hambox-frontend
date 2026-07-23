@@ -137,6 +137,12 @@
             }
           }
         </div>
+      } @else if (!product()) {
+        <app-admin-empty-state
+          icon="pi pi-box"
+          title="No variants yet"
+          description="Create option groups to generate variants. Inventory becomes available after the product has been created."
+        />
       } @else if (optionGroups().length === 0) {
         <app-admin-empty-state
           icon="pi pi-box"
@@ -150,7 +156,7 @@
         <app-admin-empty-state
           icon="pi pi-table"
           title="No variants yet"
-          description="Add option values above — variants are generated automatically."
+          description="Create option groups to generate variants."
         />
       } @else {
         <app-admin-empty-state
@@ -210,6 +216,7 @@
       [modal]="true"
       [draggable]="false"
       [resizable]="false"
+      appendTo="body"
       [style]="{ width: 'min(64rem, 92vw)' }"
       [contentStyle]="{ 'max-height': '75vh', overflow: 'auto' }"
       styleClass="admin-dialog variant-manager__codes-dialog"

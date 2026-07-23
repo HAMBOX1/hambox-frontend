@@ -30,9 +30,25 @@ export const routes: Routes = [
     path: 'products/new',
     canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.Create])],
     loadComponent: () =>
-      import('../catalog/pages/product-create-page/product-create-page.component').then(
-        (c) => c.ProductCreatePageComponent,
+      import('../catalog/pages/product-edit-page/product-edit-page.component').then(
+        (c) => c.ProductEditPageComponent,
       ),
+  },
+  {
+    path: 'products/export',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.Export])],
+    loadComponent: () =>
+      import('../catalog/import-export/pages/catalog-export-page/catalog-export-page.component').then(
+        (c) => c.CatalogExportPageComponent,
+      ),
+  },
+  {
+    path: 'products/import',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.Import])],
+    loadComponent: () =>
+      import(
+        '../catalog/import-export/pages/catalog-import-wizard-page/catalog-import-wizard-page.component'
+      ).then((c) => c.CatalogImportWizardPageComponent),
   },
   {
     path: 'products/:id/edit',

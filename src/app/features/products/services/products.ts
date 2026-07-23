@@ -4,7 +4,12 @@ import { firstValueFrom } from 'rxjs';
 import { CategoryApiService } from '../../catalog/services/category-api.service';
 import { ProductApiService } from '../../catalog/services/product-api.service';
 import { Category } from '../../catalog/models/category.model';
-import { Product, ProductListQuery, ProductSortBy } from '../../catalog/models/product.model';
+import {
+  Product,
+  ProductFacetGroup,
+  ProductListQuery,
+  ProductSortBy,
+} from '../../catalog/models/product.model';
 import { PagedResult } from '../../catalog/models/category.model';
 import { StoreCategoryPill } from '../models/product';
 import { TranslationService } from '../../../core/i18n/translation.service';
@@ -18,6 +23,13 @@ export interface StorefrontProductQuery {
   readonly searchTerm?: string;
   readonly categoryId?: string;
   readonly sortBy?: ProductSortBy;
+  readonly attributes?: Readonly<Record<string, readonly string[]>>;
+}
+
+export interface StorefrontFacetQuery {
+  readonly searchTerm?: string;
+  readonly categoryId?: string;
+  readonly attributes?: Readonly<Record<string, readonly string[]>>;
 }
 
 @Injectable({
@@ -36,9 +48,14 @@ export class Products {
       status: 'Active',
       categoryId: query.categoryId,
       sortBy: query.sortBy,
+      attributes: query.attributes,
     };
 
     return firstValueFrom(this.productApi.getProducts(request));
+  }
+
+  getFacets(query: StorefrontFacetQuery): Promise<readonly ProductFacetGroup[]> {
+    return firstValueFrom(this.productApi.getProductFacets(query));
   }
 
   getProductById(id: string): Promise<Product> {

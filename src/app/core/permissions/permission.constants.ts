@@ -15,6 +15,8 @@ export const PERMISSIONS = {
       Create: 'Catalog.Products.Create',
       Edit: 'Catalog.Products.Edit',
       Delete: 'Catalog.Products.Delete',
+      Import: 'Catalog.Products.Import',
+      Export: 'Catalog.Products.Export',
     },
     Inventory: {
       View: 'Catalog.Inventory.View',
@@ -182,6 +184,8 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Catalog.Products.Create,
   PERMISSIONS.Catalog.Products.Edit,
   PERMISSIONS.Catalog.Products.Delete,
+  PERMISSIONS.Catalog.Products.Import,
+  PERMISSIONS.Catalog.Products.Export,
   PERMISSIONS.Catalog.Inventory.View,
   PERMISSIONS.Catalog.Inventory.Create,
   PERMISSIONS.Catalog.Inventory.Edit,

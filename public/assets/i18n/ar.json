@@ -602,6 +602,8 @@
     "CATALOG_PAGE": {
       "TITLE": "المنتجات",
       "INVENTORY_DASHBOARD": "لوحة المخزون",
+      "IMPORT": "استيراد",
+      "EXPORT": "تصدير",
       "CREATE_PRODUCT": "إنشاء منتج",
       "STATS": {
         "TOTAL": "إجمالي المنتجات",
@@ -757,6 +759,8 @@
     },
     "NAV": {
       "DASHBOARD": "لوحة التحكم",
+      "PRODUCTS_IMPORT": "استيراد المنتجات",
+      "PRODUCTS_EXPORT": "تصدير المنتجات",
       "INVENTORY": "المخزون",
       "CATEGORIES": "الفئات",
       "ROLES": "الأدوار",

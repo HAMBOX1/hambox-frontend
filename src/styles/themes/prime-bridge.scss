@@ -126,3 +126,16 @@ html[data-theme='hambox-light'] {
     box-shadow: 0 0 0 3px var(--color-focus-ring);
   }
 }
+
+// PrimeNG's Toast has no responsive width by default — it only adapts via an explicit
+// [breakpoints] input, which nothing in this codebase passes. Its fixed right-anchored
+// position plus fixed width pushes the message partly off-screen on narrow viewports.
+// Constrained globally here so every current and future p-toast instance (~30 pages,
+// admin and storefront alike) is readable on mobile without touching each one.
+@media (max-width: 767px) {
+  .p-toast {
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+  }
+}

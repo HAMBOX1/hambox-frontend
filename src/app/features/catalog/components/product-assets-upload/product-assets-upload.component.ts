@@ -6,14 +6,13 @@ import {
   inject,
   input,
   OnDestroy,
-  output,
   signal,
 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { firstValueFrom } from 'rxjs';
 
-import { ProductAssetFile, ProductDraftAssetMetadata, ProductImage } from '../../models/product.model';
+import { ProductAssetFile, ProductImage } from '../../models/product.model';
 import { ProductApiService } from '../../services/product-api.service';
 import {
   isAllowedProductImage,
@@ -34,8 +33,6 @@ export class ProductAssetsUploadComponent implements OnDestroy {
   private readonly productApi = inject(ProductApiService);
 
   readonly productId = input<string | null>(null);
-
-  readonly assetsChanged = output<readonly ProductDraftAssetMetadata[]>();
 
   protected readonly maxCount = PRODUCT_IMAGE_MAX_COUNT;
 
@@ -93,30 +90,6 @@ export class ProductAssetsUploadComponent implements OnDestroy {
           isPrimary: image.isPrimary,
           contentType: image.contentType,
         })),
-    );
-
-    this.emitAssetsChanged();
-  }
-
-  getAssetMetadata(): readonly ProductDraftAssetMetadata[] {
-    return this.assets().map((asset) => ({
-      name: asset.name,
-      size: asset.size,
-    }));
-  }
-
-  applyAssetMetadata(metadata: readonly ProductDraftAssetMetadata[]): void {
-    this.revokeAllPreviews();
-    this.assets.set([]);
-    this.validationError.set(null);
-    this.emitAssetsChanged();
-
-    if (!metadata.length) {
-      return;
-    }
-
-    this.validationError.set(
-      'Draft image files cannot be restored after reload. Re-select images to upload them.',
     );
   }
 
@@ -183,7 +156,6 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     }
 
     this.assets.update((current) => current.filter((entry) => entry.id !== assetId));
-    this.emitAssetsChanged();
   }
 
   protected async setPrimary(assetId: string): Promise<void> {
@@ -235,8 +207,6 @@ export class ProductAssetsUploadComponent implements OnDestroy {
       }
       return;
     }
-
-    this.emitAssetsChanged();
   }
 
   protected formatFileSize(bytes: number): string {
@@ -320,16 +290,11 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     });
 
     this.assets.update((current) => [...current, ...nextAssets]);
-    this.emitAssetsChanged();
   }
 
   private async refreshPersistedImages(productId: string): Promise<void> {
     const images = await firstValueFrom(this.productApi.getProductImages(productId));
     this.loadPersistedImages(images);
-  }
-
-  private emitAssetsChanged(): void {
-    this.assetsChanged.emit(this.getAssetMetadata());
   }
 
   private revokeAllPreviews(): void {

@@ -35,6 +35,10 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
 import { ProductVariantDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
+function escapeCsvField(value: string): string {
+  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+}
+
 @Component({
   selector: 'app-variant-codes-page',
   standalone: true,
@@ -203,16 +207,19 @@ export class VariantCodesPageComponent implements OnInit {
   }
 
   protected exportCodes(): void {
-    const lines = this.codesTable().map((code) => code.digitalCode);
-    if (!lines.length) {
+    const sku = this.variant()?.sku ?? '';
+    const rows = this.codesTable().map((code) => [sku, code.digitalCode]);
+    if (!rows.length) {
       return;
     }
 
-    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    // Header must match CatalogImportParser's Codes column names so this file re-imports as-is.
+    const csv = ['VariantSku,Code', ...rows.map((row) => row.map(escapeCsvField).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `codes-${this.variant()?.sku ?? 'export'}.csv`;
+    anchor.download = `codes-${sku || 'export'}.csv`;
     anchor.click();
     URL.revokeObjectURL(url);
   }

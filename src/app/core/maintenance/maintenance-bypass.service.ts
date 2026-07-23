@@ -31,10 +31,10 @@ export class MaintenanceBypassService {
     return this.hasValidToken() ? this.storedState()!.token : null;
   }
 
-  async verify(email: string, password: string): Promise<boolean> {
+  async verify(password: string): Promise<boolean> {
     try {
       const response = await firstValueFrom(
-        this.api.post<MaintenanceBypassResponse>(AUTH_API.maintenanceBypass, { email, password }),
+        this.api.post<MaintenanceBypassResponse>(AUTH_API.maintenanceBypass, { password }),
       );
       const stored: StoredBypass = { token: response.token, expiresOnUtc: response.expiresOnUtc };
       this.storedState.set(stored);

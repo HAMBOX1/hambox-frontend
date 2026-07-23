@@ -1,0 +1,321 @@
+// Question card — deliberately heavier than an answer row (thicker border, elevated surface,
+// bigger radius) so it reads as a distinct container, never confusable with an answer.
+.question-card {
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--admin-border-color);
+  border-radius: var(--admin-radius-lg, 0.875rem);
+  background: var(--admin-surface-elevated);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+  box-sizing: border-box;
+}
+
+.question-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2rem;
+}
+
+.question-card__collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.question-card__collapse-btn:hover {
+  background: var(--admin-surface-muted);
+  color: var(--admin-text-primary);
+}
+
+// Question badge — a colored icon chip so a Question is recognizable at a glance, distinct from
+// an Answer's plain bullet icon.
+.question-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+}
+
+.question-card__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.question-card__title-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--admin-text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.question-card__count {
+  flex: 0 0 auto;
+  padding: 0.0625rem 0.5rem;
+  border-radius: 9999px;
+  background: var(--admin-surface-muted);
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.question-card__title-input {
+  width: 100%;
+}
+
+.question-card__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.125rem;
+}
+
+.question-card__required-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-inline-start: 2.375rem;
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.question-card__body {
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--admin-border-subtle);
+}
+
+// Answers — lightweight rows, no card chrome of their own, so they never compete visually with
+// the Question card that contains them.
+.answer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.answer-item.cdk-drag-preview {
+  border-radius: 0.5rem;
+  background: var(--admin-surface-elevated);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+}
+
+.answer-item.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding: 0 0.25rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease;
+}
+
+.answer-row:hover {
+  background: var(--admin-surface-muted);
+}
+
+.answer-row__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: grab;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.answer-row__drag-handle:hover {
+  opacity: 1;
+}
+
+.answer-row__drag-handle:disabled {
+  cursor: not-allowed;
+  opacity: 0.25;
+}
+
+// Small bullet icon — the Answer's visual signature, deliberately quiet next to the Question badge.
+.answer-row__bullet {
+  flex: 0 0 auto;
+  font-size: 0.375rem;
+  color: var(--admin-text-muted);
+}
+
+.answer-row__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--admin-text-primary);
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.answer-row__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.answer-row__followup-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--admin-accent-blue-soft);
+  color: var(--admin-accent-blue);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.answer-row__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.answer-row__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.875rem;
+  height: 1.875rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.answer-row__icon-btn:hover {
+  background: var(--admin-surface-elevated);
+  color: var(--admin-text-primary);
+}
+
+// Follow-up panel — tinted + indented so a nested Question -> Answer chain reads as a subtree at
+// a glance, never mistaken for a sibling of the answer it hangs off.
+.followup-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-inline-start: 1.75rem;
+  margin-block: 0.375rem;
+  padding: 0.625rem;
+  border-inline-start: 2px solid var(--admin-accent-blue);
+  border-radius: 0.625rem;
+  background: var(--admin-accent-blue-soft);
+}
+
+.answer-item__add-followup {
+  margin-inline-start: 1.75rem;
+}
+
+.answer-item__add-followup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.answer-item__add-followup-btn:hover {
+  background: var(--admin-surface-muted);
+  color: var(--admin-accent-blue);
+}
+
+.followup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  border: 1px dashed var(--admin-accent-blue);
+  border-radius: 0.625rem;
+  background: var(--admin-surface-elevated);
+}
+
+.followup-form__label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--admin-accent-blue);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.followup-form__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+// New Answer — a bordered mini-form, visually unmistakable from the "Add Follow-up Question"
+// text link above so the two operations never look like the same action (per redesign spec).
+.new-answer-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: 0.625rem;
+  background: var(--admin-surface-muted);
+}
+
+.new-answer-box__label {
+  color: var(--admin-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.new-answer-box button {
+  align-self: flex-start;
+}

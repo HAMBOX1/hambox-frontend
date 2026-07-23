@@ -5,7 +5,6 @@ import {
   UiAuthCardComponent,
   UiButtonComponent,
   UiFieldComponent,
-  UiInputComponent,
   UiPasswordInputComponent,
 } from '../../../../shared/components/ui';
 
@@ -20,7 +19,6 @@ import { getControlErrorMessage } from '../../utils/auth-form.utils';
     ReactiveFormsModule,
     UiAuthCardComponent,
     UiFieldComponent,
-    UiInputComponent,
     UiPasswordInputComponent,
     UiButtonComponent,
   ],
@@ -40,7 +38,6 @@ export class ComingSoonPageComponent {
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
 
@@ -52,7 +49,6 @@ export class ComingSoonPageComponent {
 
   protected fieldError(controlName: string): string | null {
     return getControlErrorMessage(controlName, this.form, {
-      email: 'Email',
       password: 'Password',
     });
   }
@@ -66,10 +62,10 @@ export class ComingSoonPageComponent {
     }
 
     this.isSubmitting.set(true);
-    const { email, password } = this.form.getRawValue();
+    const { password } = this.form.getRawValue();
 
     try {
-      const ok = await this.bypass.verify(email, password);
+      const ok = await this.bypass.verify(password);
       if (ok) {
         await this.router.navigateByUrl('/home');
         return;

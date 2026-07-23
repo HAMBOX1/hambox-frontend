@@ -1,0 +1,19 @@
+<ol class="admin-stepper" role="list">
+  @for (step of steps(); track step.label; let index = $index; let last = $last) {
+    <li class="admin-stepper__item" [class.admin-stepper__item--last]="last">
+      <div class="admin-stepper__marker" [attr.data-state]="stateOf(index)">
+        @if (stateOf(index) === 'done') {
+          <i class="pi pi-check"></i>
+        } @else if (step.icon) {
+          <i class="pi" [class]="step.icon"></i>
+        } @else {
+          {{ index + 1 }}
+        }
+      </div>
+      <span class="admin-stepper__label" [attr.data-state]="stateOf(index)">{{ step.label }}</span>
+      @if (!last) {
+        <div class="admin-stepper__connector" [attr.data-state]="stateOf(index)"></div>
+      }
+    </li>
+  }
+</ol>

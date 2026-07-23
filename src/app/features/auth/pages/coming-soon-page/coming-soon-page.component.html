@@ -17,12 +17,8 @@
     }
 
     <form class="coming-soon-page__form" [formGroup]="form" (ngSubmit)="submit()">
-      <ui-field label="Email" [required]="true" [error]="fieldError('email')">
-        <ui-input formControlName="email" type="email" placeholder="you@company.com" autocomplete="username" />
-      </ui-field>
-
       <ui-field label="Password" [required]="true" [error]="fieldError('password')">
-        <ui-password-input formControlName="password" placeholder="Enter your password" />
+        <ui-password-input formControlName="password" placeholder="Enter access password" autocomplete="off" />
       </ui-field>
 
       <ui-button

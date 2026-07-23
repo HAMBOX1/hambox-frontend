@@ -38,6 +38,20 @@
     />
     <app-admin-icon-button
       adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Products.Import"
+      icon="pi pi-upload"
+      [label]="'ADMIN.CATALOG_PAGE.IMPORT' | translate"
+      routerLink="/admin/products/import"
+    />
+    <app-admin-icon-button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Products.Export"
+      icon="pi pi-download"
+      [label]="'ADMIN.CATALOG_PAGE.EXPORT' | translate"
+      routerLink="/admin/products/export"
+    />
+    <app-admin-icon-button
+      adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Products.Create"
       icon="pi pi-plus"
       severity="primary"
@@ -133,6 +147,7 @@
       [sortOrder]="sortOrder()"
       [bulkSelectedIds]="bulkSelectedIds()"
       [allPageSelected]="isAllPageSelected()"
+      [actionLoading]="actionLoading()"
       (pageChange)="onPageChange($event)"
       (productSelect)="onProductSelect($event)"
       (createProduct)="navigateToCreate()"
@@ -142,6 +157,7 @@
       (manageStock)="navigateToStock($event)"
       (fieldEdit)="onFieldEdit($event)"
       (statusEdit)="onStatusEdit($event)"
+      (categoryCreated)="onCategoryCreated()"
       (bulkToggle)="onBulkToggle($event)"
       (bulkToggleAllPage)="onBulkToggleAllPage($event)"
     />

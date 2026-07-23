@@ -49,6 +49,7 @@ export function toUpdateProductRequest(product: Product, status: ProductStatus):
     price: product.price,
     categoryId: product.categoryId,
     status,
+    additionalCategoryIds: product.additionalCategoryIds ?? [],
   };
 }
 

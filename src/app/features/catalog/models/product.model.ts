@@ -38,6 +38,7 @@ export interface Product {
   readonly categoryId: string;
   readonly categoryName: string;
   readonly categoryNameAr: string;
+  readonly additionalCategoryIds?: readonly string[];
   readonly primaryImageUrl?: string | null;
   readonly images?: readonly ProductImage[] | null;
   readonly createdOnUtc?: string;
@@ -51,6 +52,7 @@ export interface CreateProductRequest {
   readonly descriptionEn: string;
   readonly price: number;
   readonly categoryId: string;
+  readonly additionalCategoryIds?: readonly string[];
 }
 
 export interface UpdateProductRequest {
@@ -61,6 +63,7 @@ export interface UpdateProductRequest {
   readonly price: number;
   readonly categoryId: string;
   readonly status: ProductStatus;
+  readonly additionalCategoryIds?: readonly string[];
 }
 
 export interface ProductAssetFile {
@@ -74,11 +77,6 @@ export interface ProductAssetFile {
   readonly contentType?: string;
 }
 
-export interface ProductDraftAssetMetadata {
-  readonly name: string;
-  readonly size: number;
-}
-
 export interface ProductDraftFormSnapshot {
   readonly nameEn: string;
   readonly nameAr: string;
@@ -86,41 +84,8 @@ export interface ProductDraftFormSnapshot {
   readonly descriptionAr: string;
   readonly price: number;
   readonly categoryId: string;
+  readonly additionalCategoryIds: readonly string[];
 }
-
-export interface ProductDraftData extends ProductDraftFormSnapshot {
-  readonly version: 1;
-  readonly savedAt: string;
-  readonly activeStep: ProductCreateStepId;
-  readonly assets: readonly ProductDraftAssetMetadata[];
-}
-
-export type ProductCreateStepId =
-  | 'overview'
-  | 'basic-information'
-  | 'variants'
-  | 'fulfillment'
-  | 'pricing'
-  | 'inventory'
-  | 'seo'
-  | 'visibility';
-
-export interface ProductCreateStep {
-  readonly id: ProductCreateStepId;
-  readonly label: string;
-  readonly enabled: boolean;
-}
-
-export const PRODUCT_CREATE_STEPS: readonly ProductCreateStep[] = [
-  { id: 'overview', label: 'Overview', enabled: true },
-  { id: 'basic-information', label: 'Basic Information', enabled: true },
-  { id: 'variants', label: 'Variants', enabled: false },
-  { id: 'fulfillment', label: 'Fulfillment', enabled: false },
-  { id: 'pricing', label: 'Pricing', enabled: false },
-  { id: 'inventory', label: 'Inventory', enabled: false },
-  { id: 'seo', label: 'SEO', enabled: false },
-  { id: 'visibility', label: 'Visibility', enabled: false },
-] as const;
 
 export interface ProductListQuery {
   readonly pageNumber: number;
@@ -129,6 +94,26 @@ export interface ProductListQuery {
   readonly status?: ProductStatus;
   readonly categoryId?: string;
   readonly sortBy?: ProductSortBy;
+  readonly attributes?: Readonly<Record<string, readonly string[]>>;
+}
+
+export interface ProductFacetQuery {
+  readonly searchTerm?: string;
+  readonly categoryId?: string;
+  readonly attributes?: Readonly<Record<string, readonly string[]>>;
+}
+
+/** One global option-group facet (e.g. Platform), deduplicated across every product. */
+export interface ProductFacetGroup {
+  readonly key: string;
+  readonly displayName: string;
+  readonly options: readonly ProductFacetOption[];
+}
+
+export interface ProductFacetOption {
+  readonly value: string;
+  readonly label: string;
+  readonly count: number;
 }
 
 /** Either an explicit set of product ids, or (when `selectAllMatching` is true) the current list

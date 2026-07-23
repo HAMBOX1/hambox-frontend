@@ -5,6 +5,7 @@ export const CATALOG_API = {
   category: (id: string) => `/api/v1/categories/${id}`,
   categoryRestore: (id: string) => `/api/v1/categories/${id}/restore`,
   products: '/api/v1/products',
+  productFacets: '/api/v1/products/facets',
   product: (id: string) => `/api/v1/products/${id}`,
   productPublish: (id: string) => `/api/v1/products/${id}/publish`,
   productDeactivate: (id: string) => `/api/v1/products/${id}/deactivate`,
@@ -25,6 +26,16 @@ export const CATALOG_API = {
   storefrontContent: '/api/v1/storefront/content',
   storefrontProductConfiguration: (productId: string) =>
     `/api/v1/storefront/products/${productId}/configuration`,
+} as const;
+
+export const CATALOG_IMPORT_EXPORT_API = {
+  export: '/api/v1/catalog/export',
+  importTemplate: (entityType: string) => `/api/v1/catalog/import/templates/${entityType}`,
+  importUpload: '/api/v1/catalog/import/upload',
+  importValidate: (uploadId: string) => `/api/v1/catalog/import/${uploadId}/validate`,
+  importExecute: (uploadId: string) => `/api/v1/catalog/import/${uploadId}/execute`,
+  job: (jobId: string) => `/api/v1/catalog/import-export/jobs/${jobId}`,
+  jobDownload: (jobId: string) => `/api/v1/catalog/import-export/jobs/${jobId}/download`,
 } as const;
 
 export const INVENTORY_API = {

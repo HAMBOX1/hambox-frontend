@@ -1,0 +1,26 @@
+<div
+  class="admin-file-dropzone"
+  [class.admin-file-dropzone--dragover]="isDragOver()"
+  [class.admin-file-dropzone--disabled]="disabled()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+  (click)="onBrowseClick(fileInput)"
+  (keydown.enter)="onBrowseClick(fileInput)"
+  role="button"
+  tabindex="0"
+>
+  <i class="pi pi-cloud-upload admin-file-dropzone__icon"></i>
+  <p class="admin-file-dropzone__title">Drag &amp; drop a file here, or click to browse</p>
+  @if (hint()) {
+    <p class="admin-file-dropzone__hint">{{ hint() }}</p>
+  }
+  <input
+    #fileInput
+    type="file"
+    class="admin-file-dropzone__input"
+    [accept]="accept()"
+    [disabled]="disabled()"
+    (change)="onFileInput($event)"
+  />
+</div>

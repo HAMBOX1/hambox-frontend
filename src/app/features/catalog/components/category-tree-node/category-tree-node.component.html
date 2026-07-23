@@ -22,6 +22,10 @@
     (cdkDragEnded)="onDragEnded($event)"
     (click)="onRowActivate($event)"
   >
+    <div class="category-tree-node__actions" (click)="$event.stopPropagation()">
+      <app-admin-action-menu [items]="menuItems()" label="Category actions" />
+    </div>
+
     <div class="category-tree-node__primary">
       <button
         type="button"
@@ -65,10 +69,6 @@
           ({{ node().productCount }})
         </span>
       }
-    </div>
-
-    <div class="category-tree-node__actions" (click)="$event.stopPropagation()">
-      <app-admin-action-menu [items]="menuItems()" label="Category actions" />
     </div>
 
     <i class="pi pi-bars category-tree-node__drag-handle" cdkDragHandle aria-hidden="true"></i>

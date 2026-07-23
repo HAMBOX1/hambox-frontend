@@ -9,6 +9,13 @@
   >
     <app-admin-icon-button
       adminHeaderActions
+      icon="pi pi-download"
+      label="Export Categories"
+      severity="secondary"
+      (pressed)="exportCategories()"
+    />
+    <app-admin-icon-button
+      adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Categories.Create"
       icon="pi pi-plus"
       label="Create Category"
@@ -77,7 +84,7 @@
     [submitting]="updating()"
     [serverError]="updateError()"
     [resetToken]="formResetToken()"
-    [parentOptions]="parentOptions()"
+    [parentOptions]="editableParentOptions()"
     [initialCategory]="editingCategory()"
     (updateSubmitted)="onUpdateSubmitted($event)"
     (deleteRequested)="requestDeleteFromEditForm()"

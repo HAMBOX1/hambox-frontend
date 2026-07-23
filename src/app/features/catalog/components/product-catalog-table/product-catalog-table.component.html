@@ -94,28 +94,40 @@
               [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
             />
           </td>
-          <td (click)="$event.stopPropagation()">
-            @if (isEditing(product.id, 'category')) {
-              <p-select
-                class="product-catalog-table__edit-select"
-                [options]="[...categoryOptions()]"
-                optionLabel="label"
-                optionValue="id"
-                [ngModel]="editDraftText()"
-                (ngModelChange)="editDraftText.set($event)"
-                (onChange)="saveEdit(product)"
-                (onHide)="cancelEdit()"
-                appendTo="body"
-                autofocus
-              />
-            } @else {
-              <app-admin-status-badge
-                (click)="startEdit(product, 'category', $event)"
-                [label]="categoryLabel(product.categoryId, product.categoryName) || 'Uncategorized'"
-                tone="info"
-                [outlined]="true"
-              />
-            }
+          <td
+            class="product-catalog-table__category-cell"
+            [class.product-catalog-table__category-cell--active]="isCategoryPopoverOpenFor(product.id)"
+            (click)="openCategoryPopover(product, $event)"
+          >
+            @let categoryLabels = productCategoryLabels(product);
+            <div class="product-catalog-table__category-chips">
+              @if (categoryLabels.length === 0) {
+                <span class="product-catalog-table__category-empty">Uncategorized</span>
+              } @else {
+                <span class="product-catalog-table__category-chip">{{ categoryLabels[0] }}</span>
+                @if (categoryLabels.length > 1) {
+                  <span class="product-catalog-table__category-chip product-catalog-table__category-chip--wide-only">{{
+                    categoryLabels[1]
+                  }}</span>
+                }
+                @if (categoryLabels.length > 2) {
+                  <span
+                    class="product-catalog-table__category-overflow product-catalog-table__category-overflow--wide"
+                    [pTooltip]="categoryLabels.join(', ')"
+                    tooltipPosition="top"
+                    >+{{ categoryLabels.length - 2 }}</span
+                  >
+                }
+                @if (categoryLabels.length > 1) {
+                  <span
+                    class="product-catalog-table__category-overflow product-catalog-table__category-overflow--narrow"
+                    [pTooltip]="categoryLabels.join(', ')"
+                    tooltipPosition="top"
+                    >+{{ categoryLabels.length - 1 }}</span
+                  >
+                }
+              }
+            </div>
           </td>
           <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
             @if (isEditing(product.id, 'price')) {
@@ -190,4 +202,84 @@
       </ng-template>
     </p-table>
   </app-admin-data-table-shell>
+
+  <p-popover #categoryPopover appendTo="body" styleClass="product-catalog-table__category-popover">
+    <div class="product-catalog-table__category-popover-content" (click)="$event.stopPropagation()">
+      <h4 class="product-catalog-table__category-popover-title">Categories</h4>
+
+      <app-admin-search-bar
+        [value]="categorySearchTerm()"
+        placeholder="Search..."
+        ariaLabel="Search categories"
+        (searchChange)="categorySearchTerm.set($event)"
+      />
+
+      <ul class="product-catalog-table__category-list" role="listbox" aria-label="Categories">
+        @for (option of filteredCategoryPopoverOptions(); track option.id) {
+          <li class="product-catalog-table__category-list-item">
+            <p-checkbox
+              [binary]="true"
+              [inputId]="'category-check-' + option.id"
+              [ngModel]="isCategoryDraftChecked(option.id)"
+              (ngModelChange)="toggleCategoryDraft(option.id, $event)"
+            />
+            <label class="product-catalog-table__category-list-label" [for]="'category-check-' + option.id">{{
+              option.label
+            }}</label>
+          </li>
+        } @empty {
+          <li class="product-catalog-table__category-list-empty">No categories match your search.</li>
+        }
+      </ul>
+
+      @if (categorySaveError(); as error) {
+        <p class="product-catalog-table__category-error">{{ error }}</p>
+      }
+
+      <button
+        pButton
+        type="button"
+        label="Create Category"
+        icon="pi pi-plus"
+        severity="secondary"
+        text
+        size="small"
+        class="product-catalog-table__category-create-btn"
+        (click)="openCategoryCreateDialog()"
+      ></button>
+
+      <div class="product-catalog-table__category-popover-actions">
+        <button pButton type="button" label="Cancel" severity="secondary" text (click)="cancelCategoryPopover()"></button>
+        <button
+          pButton
+          type="button"
+          label="Save"
+          icon="pi pi-check"
+          [disabled]="actionLoading()"
+          [loading]="actionLoading()"
+          (click)="saveCategoryPopover()"
+        ></button>
+      </div>
+    </div>
+  </p-popover>
+
+  <p-dialog
+    header="Create Category"
+    [visible]="categoryDialogOpen()"
+    (visibleChange)="onCategoryCreateDialogVisibleChange($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: 'min(32rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <app-category-create-form
+      mode="create"
+      [submitting]="categoryCreating()"
+      [serverError]="categoryCreateError()"
+      [resetToken]="categoryFormResetToken()"
+      (submitted)="onCategorySubmitted($event)"
+      (cancelled)="closeCategoryCreateDialog()"
+    />
+  </p-dialog>
 }

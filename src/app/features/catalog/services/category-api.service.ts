@@ -101,13 +101,18 @@ export async function createCategoryWithHierarchy(
     }),
   );
 
+  // A root category's extra rows are its own children (nest under rootId). A
+  // child category has no "root" to nest under, so its extra rows are instead
+  // created as siblings under that same fixed parent.
+  const extrasParentId = parentId ?? rootId;
+
   for (const child of request.subcategories ?? []) {
     await firstValueFrom(
       api.createCategory({
         nameEn: child.nameEn,
         nameAr: child.nameAr,
         slug: child.slug,
-        parentId: rootId,
+        parentId: extrasParentId,
       }),
     );
   }

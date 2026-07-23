@@ -130,6 +130,12 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
   maintenance: [
     { key: 'enabled', label: 'Maintenance Mode', type: 'checkbox' },
     { key: 'message', label: 'Maintenance Message', type: 'textarea' },
+    {
+      key: 'bypassPassword',
+      label: 'Bypass Password',
+      type: 'text',
+      hint: 'Owner-only password to unlock the Coming Soon page. Leave blank to keep the stored password.',
+    },
   ],
   localization: [
     { key: 'defaultLanguage', label: 'Default Language', type: 'text' },

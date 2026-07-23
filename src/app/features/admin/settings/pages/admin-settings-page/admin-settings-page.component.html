@@ -142,6 +142,10 @@
                 @if (field.key === 'password' && readField('hasStoredPassword')) {
                   <small class="settings-form__hint">A password is already stored.</small>
                 }
+
+                @if (field.key === 'bypassPassword' && readField('hasStoredBypassPassword')) {
+                  <small class="settings-form__hint">A bypass password is already stored.</small>
+                }
               </div>
             }
           </div>

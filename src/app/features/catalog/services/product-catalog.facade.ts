@@ -147,13 +147,26 @@ export class ProductCatalogFacade {
     }
 
     this.categoryOptionsLoaded = true;
+    await this.fetchCategoryOptions();
+  }
 
+  /** Force-refetches categories — used after creating one inline (e.g. from the category popover). */
+  async refreshCategoryOptions(): Promise<void> {
+    this.categoryOptionsLoaded = true;
+    await this.fetchCategoryOptions();
+  }
+
+  private async fetchCategoryOptions(): Promise<void> {
     try {
       const result = await firstValueFrom(
         this.categoryApi.getCategories({ pageNumber: 1, pageSize: 100, activeOnly: true }),
       );
       this.categoryOptionsState.set(
-        (result.items ?? []).map((category) => ({ id: category.id, label: category.nameEn })),
+        (result.items ?? []).map((category) => ({
+          id: category.id,
+          label: category.nameEn,
+          parentId: category.parentId,
+        })),
       );
     } catch {
       this.categoryOptionsLoaded = false;
@@ -162,7 +175,7 @@ export class ProductCatalogFacade {
 
   async updateProductInline(
     product: Product,
-    patch: Partial<Pick<UpdateProductRequest, 'nameEn' | 'categoryId' | 'price'>>,
+    patch: Partial<Pick<UpdateProductRequest, 'nameEn' | 'categoryId' | 'additionalCategoryIds' | 'price'>>,
   ): Promise<boolean> {
     this.actionLoadingState.set(true);
     this.errorState.set(null);

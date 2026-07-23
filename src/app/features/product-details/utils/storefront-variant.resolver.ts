@@ -40,6 +40,23 @@ export function isOptionCompatible(
   });
 }
 
+/**
+ * Which option groups should render as pickable chip rows right now: root groups are always
+ * visible; a nested child group (e.g. Xbox -> Account Type) only becomes visible once its parent
+ * option is selected, so a shopper never sees PSN's Account Type row while Xbox is selected.
+ */
+export function visibleOptionGroups(
+  optionGroups: readonly ProductOptionGroupDto[],
+  selectedByGroup: Readonly<Record<string, string>>,
+): readonly ProductOptionGroupDto[] {
+  const selectedOptionIds = new Set(Object.values(selectedByGroup).filter(Boolean));
+  return optionGroups.filter(
+    (group) =>
+      group.options.length > 0 &&
+      (group.parentOptionId === null || selectedOptionIds.has(group.parentOptionId)),
+  );
+}
+
 export function getAvailableOptionsForGroup(
   configuration: StorefrontProductConfigurationDto,
   groupId: string,
@@ -65,7 +82,7 @@ export function resolveVariant(
     return unresolved(configuration);
   }
 
-  const selectableGroups = configuration.optionGroups.filter((group) => group.options.length > 0);
+  const selectableGroups = visibleOptionGroups(configuration.optionGroups, selectedByGroup);
 
   // Products with variants but no selectable options (single implicit SKU).
   if (selectableGroups.length === 0) {

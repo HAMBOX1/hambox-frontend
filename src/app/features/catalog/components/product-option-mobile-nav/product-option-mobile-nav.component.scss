@@ -1,0 +1,33 @@
+.mobile-nav__groups {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav__add-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.875rem;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--admin-surface-muted);
+}
+
+.mobile-nav__add-group-label {
+  color: var(--admin-text-muted);
+  font-size: var(--admin-type-label);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mobile-nav__add-group button {
+  align-self: flex-start;
+}
+
+.mobile-nav__hint {
+  margin: 0;
+  color: var(--admin-text-muted);
+  font-size: var(--admin-type-caption);
+}

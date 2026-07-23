@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
-import { ProductSortBy } from '../../catalog/models/product.model';
+import { ProductFacetGroup, ProductSortBy } from '../../catalog/models/product.model';
 import { ApiError } from '../../../core/models/api-error.model';
 import { StoreCategoryPill, StoreProduct, StoreSortOption } from '../models/product';
 import { STOREFRONT_SORT_OPTIONS } from '../services/storefront-products-data';
@@ -8,11 +8,10 @@ import { StorefrontProductEnrichmentService } from '../services/storefront-produ
 import { mapProductToStoreProduct } from '../utils/storefront-product.mapper';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import {
-  buildDynamicFilterGroups,
   countActiveAttributeFilters,
+  DynamicFilterGroup,
   lowestPurchasablePrice,
   matchesEnhancedSearch,
-  productMatchesAttributeFilters,
   productPassesStockFilter,
 } from '../utils/storefront-filter.util';
 import {
@@ -24,6 +23,32 @@ import {
   resolveDirectCartVariantId,
 } from '../utils/storefront-add-to-cart.util';
 import { Products } from './products';
+
+function mapFacetGroups(groups: readonly ProductFacetGroup[]): readonly DynamicFilterGroup[] {
+  return groups.map((group) => ({
+    id: group.key,
+    label: group.displayName,
+    options: group.options.map((option) => ({
+      id: option.value,
+      label: option.label,
+      count: option.count,
+    })),
+  }));
+}
+
+function attributesEqual(
+  left: Readonly<Record<string, readonly string[]>>,
+  right: Readonly<Record<string, readonly string[]>>,
+): boolean {
+  const canonicalize = (attributes: Readonly<Record<string, readonly string[]>>) =>
+    Object.entries(attributes)
+      .filter(([, values]) => values.length > 0)
+      .map(([key, values]) => `${key}:${[...values].sort().join(',')}`)
+      .sort()
+      .join('|');
+
+  return canonicalize(left) === canonicalize(right);
+}
 
 const DEFAULT_PAGE_SIZE = 12;
 const DEFAULT_SECTION = 'games';
@@ -71,6 +96,7 @@ export class ProductsFacade {
   private readonly pageSizeState = signal(DEFAULT_PAGE_SIZE);
   private readonly totalCountState = signal(0);
   private readonly clientFiltersState = signal<StorefrontClientFilters>(EMPTY_CLIENT_FILTERS);
+  private readonly facetGroupsState = signal<readonly DynamicFilterGroup[]>([]);
 
   readonly items = this.itemsState.asReadonly();
   readonly categories = this.categoriesState.asReadonly();
@@ -114,9 +140,7 @@ export class ProductsFacade {
     });
   });
 
-  readonly dynamicFilterGroups = computed(() =>
-    buildDynamicFilterGroups(this.enrichedItems(), this.enrichment.configurations()),
-  );
+  readonly dynamicFilterGroups = this.facetGroupsState.asReadonly();
 
   readonly displayItems = computed(() => {
     const filtered = this.applyClientFilters(this.enrichedItems());
@@ -190,19 +214,21 @@ export class ProductsFacade {
     this.categoryIdState.set(categoryId);
     this.sectionState.set(section);
     this.pageNumberState.set(1);
-    await Promise.all([this.loadCategories(), this.fetchProducts(true)]);
+    await Promise.all([this.loadCategories(), this.fetchProducts(true), this.fetchFacets()]);
   }
 
   setSearchTerm(term: string): void {
     this.searchTermState.set(term);
     this.pageNumberState.set(1);
     void this.fetchProducts(true);
+    void this.fetchFacets();
   }
 
   setCategory(categoryId: string): void {
     this.categoryIdState.set(categoryId);
     this.pageNumberState.set(1);
     void this.fetchProducts(true);
+    void this.fetchFacets();
   }
 
   setSection(section: string): void {
@@ -218,11 +244,18 @@ export class ProductsFacade {
   }
 
   setClientFilters(filters: StorefrontClientFilters): void {
+    const attributesChanged = !attributesEqual(this.clientFiltersState().attributes, filters.attributes);
     this.clientFiltersState.set(filters);
+
+    if (attributesChanged) {
+      this.pageNumberState.set(1);
+      void this.fetchProducts(true);
+      void this.fetchFacets();
+    }
   }
 
   resetClientFilters(): void {
-    this.clientFiltersState.set(EMPTY_CLIENT_FILTERS);
+    this.setClientFilters(EMPTY_CLIENT_FILTERS);
   }
 
   removeAppliedFilter(chipId: string): void {
@@ -235,20 +268,20 @@ export class ProductsFacade {
 
     switch (chip.type) {
       case 'price-min':
-        this.clientFiltersState.set({ ...current, minPrice: null });
+        this.setClientFilters({ ...current, minPrice: null });
         break;
       case 'price-max':
-        this.clientFiltersState.set({ ...current, maxPrice: null });
+        this.setClientFilters({ ...current, maxPrice: null });
         break;
       case 'stock':
-        this.clientFiltersState.set({ ...current, inStockOnly: false });
+        this.setClientFilters({ ...current, inStockOnly: false });
         break;
       case 'attribute':
         if (!chip.groupId || !chip.optionId) {
           return;
         }
 
-        this.clientFiltersState.set({
+        this.setClientFilters({
           ...current,
           attributes: {
             ...current.attributes,
@@ -309,6 +342,7 @@ export class ProductsFacade {
         searchTerm: this.searchTermState(),
         categoryId: this.categoryIdState() === 'all' ? undefined : this.categoryIdState(),
         sortBy: this.mapSortToApi(this.sortState()),
+        attributes: this.clientFiltersState().attributes,
       });
 
       const baseIndex = append ? this.itemsState().length : 0;
@@ -338,6 +372,20 @@ export class ProductsFacade {
     }
   }
 
+  private async fetchFacets(): Promise<void> {
+    try {
+      const groups = await this.productsService.getFacets({
+        searchTerm: this.searchTermState(),
+        categoryId: this.categoryIdState() === 'all' ? undefined : this.categoryIdState(),
+        attributes: this.clientFiltersState().attributes,
+      });
+
+      this.facetGroupsState.set(mapFacetGroups(groups));
+    } catch {
+      this.facetGroupsState.set([]);
+    }
+  }
+
   private applyClientFilters(products: readonly StoreProduct[]): readonly StoreProduct[] {
     const filters = this.clientFiltersState();
     const section = this.sectionState();
@@ -364,10 +412,6 @@ export class ProductsFacade {
       }
 
       if (!productPassesStockFilter(configuration, !product.outOfStock, filters.inStockOnly)) {
-        return false;
-      }
-
-      if (!productMatchesAttributeFilters(configuration, filters.attributes)) {
         return false;
       }
 

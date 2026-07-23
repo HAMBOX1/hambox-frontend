@@ -12,6 +12,8 @@ import { isVariantLive } from '../utils/variant-status.utils';
 
 import {
 
+  CreateProductRequest,
+
   Product,
 
   ProductDraftFormSnapshot,
@@ -39,6 +41,8 @@ import {
   DigitalInventoryCodeDto,
 
   GenerateProductVariantsResultDto,
+
+  ImportCodesResultDto,
 
   InventoryAuditLogDto,
 
@@ -142,6 +146,8 @@ export class ProductEditorFacade {
 
   private suppliersLoaded = false;
 
+  private draftCreationInFlight: Promise<string | null> | null = null;
+
   private readonly loadingState = signal(false);
 
   private readonly inventoryLoadingState = signal(false);
@@ -242,6 +248,8 @@ export class ProductEditorFacade {
 
       categoryId: product.categoryId,
 
+      additionalCategoryIds: product.additionalCategoryIds ?? [],
+
     };
 
   });
@@ -267,6 +275,55 @@ export class ProductEditorFacade {
   });
 
 
+
+  /**
+   * Silently creates the Draft product behind a brand-new "Create Product" page the moment the
+   * admin has entered enough to save (name + category — the backend's minimum valid product).
+   * Idempotent and dedupes concurrent callers so rapid typing can't create two products.
+   */
+  async createDraft(input: { nameEn: string; nameAr: string; categoryId: string }): Promise<string | null> {
+    const existingId = this.productId();
+    if (existingId) {
+      return existingId;
+    }
+
+    if (this.draftCreationInFlight) {
+      return this.draftCreationInFlight;
+    }
+
+    const request: CreateProductRequest = {
+      nameEn: input.nameEn,
+      nameAr: input.nameAr,
+      descriptionEn: '',
+      descriptionAr: '',
+      price: 0,
+      categoryId: input.categoryId,
+    };
+
+    this.draftCreationInFlight = (async () => {
+      try {
+        const id = await firstValueFrom(this.productApi.createProduct(request));
+        const product = await firstValueFrom(this.productApi.getProductById(id));
+
+        this.productState.set({ ...product, images: [] });
+        this.imagesState.set([]);
+        this.variantsState.set([]);
+        this.optionGroupsState.set([]);
+        this.statisticsState.set(null);
+
+        return id;
+      } catch (error) {
+        this.errorState.set(this.toErrorMessage(error, 'Failed to create product.'));
+        return null;
+      }
+    })();
+
+    try {
+      return await this.draftCreationInFlight;
+    } finally {
+      this.draftCreationInFlight = null;
+    }
+  }
 
   async load(productId: string): Promise<void> {
 
@@ -1350,7 +1407,7 @@ export class ProductEditorFacade {
 
 
 
-  async importCodes(codes: readonly string[], batchId?: string): Promise<boolean> {
+  async importCodes(codes: readonly string[], batchId?: string): Promise<ImportCodesResultDto | null> {
 
     const variant = this.selectedVariant();
 
@@ -1364,7 +1421,7 @@ export class ProductEditorFacade {
 
     if (!variant || !batch || !productId || codes.length === 0) {
 
-      return false;
+      return null;
 
     }
 
@@ -1372,19 +1429,19 @@ export class ProductEditorFacade {
 
     try {
 
-      await firstValueFrom(this.inventoryApi.importCodes(variant.id, batch.id, { codes }));
+      const result = await firstValueFrom(this.inventoryApi.importCodes(variant.id, batch.id, { codes }));
 
       await this.reloadInventory(productId);
 
       await this.selectVariant(variant.id);
 
-      return true;
+      return result;
 
     } catch (error) {
 
       this.errorState.set(this.toErrorMessage(error, 'Failed to import codes.'));
 
-      return false;
+      return null;
 
     }
 
@@ -1705,6 +1762,8 @@ export class ProductEditorFacade {
           id: category.id,
 
           label: category.nameEn,
+
+          parentId: category.parentId,
 
         })),
 

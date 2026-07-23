@@ -1,4 +1,4 @@
-import { ProductOptionGroupDto, ProductVariantDto } from '../models/inventory-api.model';
+import { ProductOptionDto, ProductOptionGroupDto, ProductVariantDto } from '../models/inventory-api.model';
 
 export interface VariantTreeNode {
   readonly key: string;
@@ -29,45 +29,76 @@ function sortBySortOrder<T extends { sortOrder: number }>(items: readonly T[]): 
   return [...items].sort((left, right) => left.sortOrder - right.sortOrder);
 }
 
-/** Groups variants into a tree keyed by option group depth (e.g. Platform -> Region -> Edition), skipping branches with no matching variants. */
+/** Root-level groups (no parent option), sorted and stripped of not-yet-configured empty groups. */
+function rootGroupsWithOptions(groups: readonly ProductOptionGroupDto[]): ProductOptionGroupDto[] {
+  return sortBySortOrder(groups).filter((group) => group.parentOptionId === null && group.options.length > 0);
+}
+
+/** Maps an option id to the (non-empty) child option groups nested under it, sorted by sortOrder. */
+function childGroupsByParentOptionId(
+  groups: readonly ProductOptionGroupDto[],
+): ReadonlyMap<string, ProductOptionGroupDto[]> {
+  const map = new Map<string, ProductOptionGroupDto[]>();
+  for (const group of groups) {
+    if (group.parentOptionId === null || group.options.length === 0) {
+      continue;
+    }
+    const siblings = map.get(group.parentOptionId) ?? [];
+    siblings.push(group);
+    map.set(group.parentOptionId, siblings);
+  }
+  for (const siblings of map.values()) {
+    siblings.sort((left, right) => left.sortOrder - right.sortOrder);
+  }
+  return map;
+}
+
+/**
+ * Groups variants into a tree following the option groups' real parent/child edges (Platform -> Xbox ->
+ * Account Type -> ...), skipping branches with no matching variants. Multiple independent root groups
+ * (e.g. legacy flat products with Platform + Region) still cross-multiply as sequential tree levels,
+ * matching the old flat behavior. An option's own child groups (if any) are descended into *before*
+ * continuing to the remaining sibling root groups — mirroring the backend's `ExpandGroups`/`ExpandOption`
+ * — so e.g. Steam's Account Type branch still nests under Steam even when a later "Edition" root group
+ * also applies to every leaf; sibling branches (Xbox's Account Type vs. PSN's Account Type) never mix.
+ */
 export function buildVariantTree(
   groups: readonly ProductOptionGroupDto[],
   variants: readonly ProductVariantDto[],
 ): readonly VariantTreeNode[] {
-  return buildLevel(groupsWithOptions(groups), variants, 0, '');
-}
-
-/** An option group with no options yet (e.g. mid-setup) can never appear in any variant's optionIds, so it must not count as a tree depth level — otherwise it pushes "last level" past the real terminal options and the true leaves get misclassified as empty branches. */
-function groupsWithOptions(groups: readonly ProductOptionGroupDto[]): ProductOptionGroupDto[] {
-  return sortBySortOrder(groups).filter((group) => group.options.length > 0);
+  const childGroups = childGroupsByParentOptionId(groups);
+  return buildLevel(rootGroupsWithOptions(groups), variants, '', childGroups);
 }
 
 function buildLevel(
-  groups: readonly ProductOptionGroupDto[],
+  remainingGroups: readonly ProductOptionGroupDto[],
   variants: readonly ProductVariantDto[],
-  depth: number,
   keyPrefix: string,
+  childGroups: ReadonlyMap<string, ProductOptionGroupDto[]>,
 ): VariantTreeNode[] {
-  if (depth >= groups.length) {
+  if (remainingGroups.length === 0) {
     return [];
   }
 
-  const isLastLevel = depth === groups.length - 1;
+  const [group, ...restGroups] = remainingGroups;
   const nodes: VariantTreeNode[] = [];
 
-  for (const option of sortBySortOrder(groups[depth].options)) {
+  for (const option of sortBySortOrder(group.options)) {
     const matching = variants.filter((variant) => variant.optionIds.includes(option.id));
     if (!matching.length) {
       continue;
     }
 
     const key = `${keyPrefix}${option.id}`;
+    const nextGroups = [...(childGroups.get(option.id) ?? []), ...restGroups];
+    const isLeaf = nextGroups.length === 0;
+
     nodes.push({
       key,
       label: option.label,
       count: matching.length,
-      variant: isLastLevel ? matching[0] : null,
-      children: isLastLevel ? [] : buildLevel(groups, matching, depth + 1, `${key}/`),
+      variant: isLeaf ? matching[0] : null,
+      children: isLeaf ? [] : buildLevel(nextGroups, matching, `${key}/`, childGroups),
     });
   }
 
@@ -79,21 +110,41 @@ export function isLeafGroup(nodes: readonly VariantTreeNode[]): boolean {
   return nodes.length > 0 && nodes[0].variant !== null;
 }
 
+/** Walks the same root-then-child-edges path as buildVariantTree for a single variant, root-first. */
+function pathSegmentsForVariant(
+  groups: readonly ProductOptionGroupDto[],
+  variant: ProductVariantDto,
+): readonly ProductOptionDto[] {
+  const childGroups = childGroupsByParentOptionId(groups);
+  const segments: ProductOptionDto[] = [];
+  let currentGroups = rootGroupsWithOptions(groups);
+
+  while (currentGroups.length > 0) {
+    const [group, ...restGroups] = currentGroups;
+    const option = sortBySortOrder(group.options).find((candidate) => variant.optionIds.includes(candidate.id));
+    if (!option) {
+      break;
+    }
+
+    segments.push(option);
+    currentGroups = [...(childGroups.get(option.id) ?? []), ...restGroups];
+  }
+
+  return segments;
+}
+
 /** Ancestor node keys (root-first) for a variant, so the tree can auto-expand the path to it. */
 export function pathToVariant(
   groups: readonly ProductOptionGroupDto[],
   variant: ProductVariantDto,
 ): readonly string[] {
-  const segments: string[] = [];
   const keys: string[] = [];
+  let prefix = '';
 
-  for (const group of groupsWithOptions(groups)) {
-    const optionId = group.options.find((option) => variant.optionIds.includes(option.id))?.id;
-    if (!optionId) {
-      break;
-    }
-    segments.push(optionId);
-    keys.push(segments.join('/'));
+  for (const option of pathSegmentsForVariant(groups, variant)) {
+    prefix += option.id;
+    keys.push(prefix);
+    prefix += '/';
   }
 
   return keys;
@@ -104,8 +155,7 @@ export function breadcrumbForVariant(
   groups: readonly ProductOptionGroupDto[],
   variant: ProductVariantDto,
 ): string {
-  return groupsWithOptions(groups)
-    .map((group) => group.options.find((option) => variant.optionIds.includes(option.id))?.label)
-    .filter((label): label is string => !!label)
+  return pathSegmentsForVariant(groups, variant)
+    .map((option) => option.label)
     .join(' / ');
 }

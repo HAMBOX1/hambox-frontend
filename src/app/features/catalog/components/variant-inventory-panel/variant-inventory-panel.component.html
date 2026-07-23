@@ -29,7 +29,9 @@
       <textarea
         id="bulk-codes"
         pTextarea
+        class="variant-inventory-panel__codes-textarea"
         rows="6"
+        wrap="off"
         placeholder="XXXX-XXXX-XXXX"
         [ngModel]="bulkCodes()"
         (ngModelChange)="bulkCodes.set($event)"
@@ -196,7 +198,7 @@
               </td>
               <td>
                 @if (revealedCodeId() === code.id) {
-                  <code class="variant-inventory-panel__code variant-inventory-panel__code--revealed">{{ revealedValue() }}</code>
+                  <code class="variant-inventory-panel__code variant-inventory-panel__code--revealed" title="{{ revealedValue() }}">{{ revealedValue() }}</code>
                   <button
                     pButton
                     type="button"
@@ -216,7 +218,7 @@
                     (click)="hideRevealed()"
                   ></button>
                 } @else {
-                  <code class="variant-inventory-panel__code">{{ code.digitalCode }}</code>
+                  <code class="variant-inventory-panel__code" title="{{ code.digitalCode }}">{{ code.digitalCode }}</code>
                   <button
                     pButton
                     type="button"
@@ -325,6 +327,9 @@
                     <span>Supplier: {{ supplier }}</span>
                   }
                 }
+                @if (entry.performedByUserId) {
+                  <span>Admin: {{ entry.performedByUserId | slice: 0 : 8 }}</span>
+                }
                 <span>{{ entry.occurredOnUtc | date: 'medium' }}</span>
               </div>
             }
@@ -360,5 +365,108 @@
   (visibleChange)="revealDialogOpen.set($event); revealTargetCode.set(null)"
   (confirmed)="confirmReveal()"
 />
+
+<p-dialog
+  [visible]="importResultDialogOpen()"
+  (visibleChange)="importResultDialogOpen.set($event)"
+  header="Import completed"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(34rem, 92vw)' }"
+  [contentStyle]="{ 'max-height': '70vh', overflow: 'auto' }"
+  styleClass="admin-dialog variant-inventory-panel__import-result-dialog"
+>
+  @if (importResult(); as result) {
+    <div class="variant-inventory-panel__import-summary">
+      <i class="pi pi-check-circle variant-inventory-panel__import-summary-icon" aria-hidden="true"></i>
+      <div>
+        <p class="variant-inventory-panel__import-summary-headline">{{ importSummaryLine(result) }}</p>
+        <p class="variant-inventory-panel__import-summary-sub">{{ result.totalSubmitted }} codes processed</p>
+      </div>
+    </div>
+
+    <div class="variant-inventory-panel__import-stats">
+      <div class="variant-inventory-panel__import-stat variant-inventory-panel__import-stat--success">
+        <i class="pi pi-check" aria-hidden="true"></i>
+        <span>{{ result.importedCount }} new code(s) imported</span>
+      </div>
+      @if (result.duplicateCount > 0) {
+        <div class="variant-inventory-panel__import-stat variant-inventory-panel__import-stat--warn">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          <span>{{ result.duplicateCount }} duplicate code(s) skipped</span>
+        </div>
+      }
+      @if (result.invalidCount > 0) {
+        <div class="variant-inventory-panel__import-stat variant-inventory-panel__import-stat--muted">
+          <i class="pi pi-ban" aria-hidden="true"></i>
+          <span>{{ result.invalidCount }} blank line(s) skipped</span>
+        </div>
+      }
+    </div>
+
+    @if (result.duplicateCount > 0) {
+      <div class="variant-inventory-panel__import-duplicates">
+        <button
+          type="button"
+          class="variant-inventory-panel__import-duplicates-toggle"
+          [attr.aria-expanded]="duplicatesExpanded()"
+          (click)="toggleDuplicatesExpanded()"
+        >
+          <i class="pi" [class.pi-chevron-down]="!duplicatesExpanded()" [class.pi-chevron-up]="duplicatesExpanded()"></i>
+          Duplicate Codes ({{ result.duplicateCount }})
+        </button>
+
+        @if (duplicatesExpanded()) {
+          <ul class="variant-inventory-panel__import-duplicates-list">
+            @for (dup of result.duplicates; track $index) {
+              <li class="variant-inventory-panel__import-duplicate">
+                <code class="variant-inventory-panel__code" title="{{ dup.code }}">{{ dup.code }}</code>
+                <span class="variant-inventory-panel__import-duplicate-reason">Already exists</span>
+                <span class="variant-inventory-panel__import-duplicate-meta">
+                  Product: <strong>{{ dup.productName }}</strong>
+                </span>
+                <span class="variant-inventory-panel__import-duplicate-meta">
+                  Variant: <strong>{{ dup.variantName }}</strong>
+                </span>
+                @if (dup.batchName) {
+                  <span class="variant-inventory-panel__import-duplicate-meta">
+                    Batch: <strong>{{ dup.batchName }}</strong>
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+
+          <div class="variant-inventory-panel__import-duplicates-actions">
+            <button
+              pButton
+              type="button"
+              label="Copy duplicate list"
+              icon="pi pi-copy"
+              severity="secondary"
+              size="small"
+              (click)="copyDuplicates()"
+            ></button>
+            <button
+              pButton
+              type="button"
+              label="Export .txt"
+              icon="pi pi-download"
+              severity="secondary"
+              size="small"
+              (click)="exportDuplicates()"
+            ></button>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="variant-inventory-panel__import-result-footer">
+      <button pButton type="button" label="Done" (click)="closeImportResultDialog()"></button>
+    </div>
+  }
+</p-dialog>
 
 <p-toast />

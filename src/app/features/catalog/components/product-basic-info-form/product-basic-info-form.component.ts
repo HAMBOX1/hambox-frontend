@@ -9,13 +9,13 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { TextareaModule } from 'primeng/textarea';
 
 import { ApiError } from '../../../../core/models/api-error.model';
@@ -38,10 +38,11 @@ const FIELD_LABELS = {
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     InputTextModule,
     TextareaModule,
     InputNumberModule,
-    SelectModule,
+    MultiSelectModule,
     ButtonModule,
     DialogModule,
     CategoryCreateFormComponent,
@@ -87,6 +88,34 @@ export class ProductBasicInfoFormComponent {
     return [...base, created];
   });
 
+  private readonly selectedCategoryIdState = signal('');
+  private readonly additionalCategoryIdsState = signal<readonly string[]>([]);
+
+  /** All currently-selected category ids (primary first), for the multi-select's checkbox state. */
+  protected readonly allSelectedCategoryIds = computed(() => {
+    const primary = this.selectedCategoryIdState();
+    const additional = this.additionalCategoryIdsState();
+    return primary ? [primary, ...additional] : [...additional];
+  });
+
+  /** Selected categories rendered as chips — the primary one is starred, the rest are plain. */
+  protected readonly selectedCategoryChips = computed(() => {
+    const primary = this.selectedCategoryIdState();
+    const additional = this.additionalCategoryIdsState();
+    const labelById = new Map(this.categoryOptions().map((option) => [option.id, option.label]));
+    const chips: { id: string; label: string; isPrimary: boolean }[] = [];
+
+    if (primary) {
+      chips.push({ id: primary, label: labelById.get(primary) ?? 'Unknown category', isPrimary: true });
+    }
+
+    for (const id of additional) {
+      chips.push({ id, label: labelById.get(id) ?? 'Unknown category', isPrimary: false });
+    }
+
+    return chips;
+  });
+
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
     nameAr: ['', [Validators.maxLength(200)]],
@@ -94,6 +123,7 @@ export class ProductBasicInfoFormComponent {
     descriptionAr: ['', [Validators.maxLength(2000)]],
     price: [0, [Validators.required, Validators.min(0)]],
     categoryId: ['', [Validators.required]],
+    additionalCategoryIds: this.fb.nonNullable.control<readonly string[]>([]),
   });
 
   /** Always collapsed initially; the owner opts in via revealArabic() regardless of existing Arabic content. */
@@ -114,6 +144,8 @@ export class ProductBasicInfoFormComponent {
         this.form.patchValue(snapshot, { emitEvent: false });
         this.form.markAsPristine();
         this.dirtyState.set(false);
+        this.selectedCategoryIdState.set(snapshot.categoryId);
+        this.additionalCategoryIdsState.set(snapshot.additionalCategoryIds);
         const hasArabic = !!(snapshot.nameAr?.trim() || snapshot.descriptionAr?.trim());
         this.arabicHasValueState.set(hasArabic);
       }
@@ -122,6 +154,8 @@ export class ProductBasicInfoFormComponent {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
       this.dirtyState.set(true);
       this.arabicHasValueState.set(!!(value.nameAr?.trim() || value.descriptionAr?.trim()));
+      this.selectedCategoryIdState.set(value.categoryId ?? '');
+      this.additionalCategoryIdsState.set(value.additionalCategoryIds ?? []);
     });
   }
 
@@ -161,6 +195,7 @@ export class ProductBasicInfoFormComponent {
       descriptionEn: value.descriptionEn.trim(),
       descriptionAr: value.descriptionAr.trim(),
       categoryId: value.categoryId,
+      additionalCategoryIds: value.additionalCategoryIds,
     };
   }
 
@@ -182,6 +217,7 @@ export class ProductBasicInfoFormComponent {
       descriptionAr: value.descriptionAr.trim(),
       price: value.price,
       categoryId: value.categoryId,
+      additionalCategoryIds: value.additionalCategoryIds,
     };
   }
 
@@ -195,6 +231,7 @@ export class ProductBasicInfoFormComponent {
       descriptionAr: value.descriptionAr,
       price: value.price,
       categoryId: value.categoryId,
+      additionalCategoryIds: value.additionalCategoryIds,
     };
   }
 
@@ -202,8 +239,53 @@ export class ProductBasicInfoFormComponent {
     this.form.patchValue(snapshot, { emitEvent: false });
     this.form.markAsPristine();
     this.dirtyState.set(false);
+    this.selectedCategoryIdState.set(snapshot.categoryId);
+    this.additionalCategoryIdsState.set(snapshot.additionalCategoryIds);
     const hasArabic = !!(snapshot.nameAr?.trim() || snapshot.descriptionAr?.trim());
     this.arabicHasValueState.set(hasArabic);
+  }
+
+  /** Fired by the merged Category multi-select whenever the checked set changes. */
+  protected onCategorySelectionChange(selectedIds: string[]): void {
+    const currentPrimary = this.form.controls.categoryId.value;
+    const primary = currentPrimary && selectedIds.includes(currentPrimary) ? currentPrimary : (selectedIds[0] ?? '');
+    const additional = selectedIds.filter((id) => id !== primary);
+
+    this.form.controls.categoryId.setValue(primary);
+    this.form.controls.categoryId.markAsTouched();
+    this.form.controls.additionalCategoryIds.setValue(additional);
+  }
+
+  /** Stars a chip as the Primary Category; the previous primary (if any) drops back to additional. */
+  protected setPrimaryCategory(categoryId: string): void {
+    const currentPrimary = this.form.controls.categoryId.value;
+    if (currentPrimary === categoryId) {
+      return;
+    }
+
+    const currentAdditional = this.form.controls.additionalCategoryIds.value;
+    const nextAdditional = [currentPrimary, ...currentAdditional].filter(
+      (id): id is string => !!id && id !== categoryId,
+    );
+
+    this.form.controls.categoryId.setValue(categoryId);
+    this.form.controls.additionalCategoryIds.setValue(nextAdditional);
+  }
+
+  /** Removes a chip entirely; if it was the primary, the next remaining category is promoted. */
+  protected removeCategoryChip(categoryId: string): void {
+    const currentPrimary = this.form.controls.categoryId.value;
+    const currentAdditional = this.form.controls.additionalCategoryIds.value;
+
+    if (categoryId === currentPrimary) {
+      const [nextPrimary, ...rest] = currentAdditional;
+      this.form.controls.categoryId.setValue(nextPrimary ?? '');
+      this.form.controls.additionalCategoryIds.setValue(rest);
+    } else {
+      this.form.controls.additionalCategoryIds.setValue(currentAdditional.filter((id) => id !== categoryId));
+    }
+
+    this.form.controls.categoryId.markAsTouched();
   }
 
   get valueChanges$(): Observable<typeof this.form.value> {
@@ -256,8 +338,16 @@ export class ProductBasicInfoFormComponent {
 
     try {
       const id = await createCategoryWithHierarchy(this.categoryApi, request);
-      this.newlyCreatedCategoryState.set({ id, label: request.nameEn });
-      this.form.controls.categoryId.setValue(id);
+      this.newlyCreatedCategoryState.set({ id, label: request.nameEn, parentId: request.parentId ?? null });
+
+      const currentPrimary = this.form.controls.categoryId.value;
+      if (!currentPrimary) {
+        this.form.controls.categoryId.setValue(id);
+      } else {
+        this.form.controls.additionalCategoryIds.setValue([...this.form.controls.additionalCategoryIds.value, id]);
+      }
+      this.form.controls.categoryId.markAsTouched();
+
       this.categoryDialogOpenState.set(false);
       this.categoryCreated.emit();
     } catch (error) {

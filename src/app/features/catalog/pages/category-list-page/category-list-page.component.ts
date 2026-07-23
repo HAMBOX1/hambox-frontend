@@ -9,6 +9,7 @@ import { CategoryCreateFormComponent } from '../../components/category-create-fo
 import { CategoryTreeComponent } from '../../components/category-tree/category-tree.component';
 import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
 import { CategoryListFacade } from '../../services/category-list.facade';
+import { exportCategoriesToCsv } from '../../utils/category-export.util';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
@@ -58,7 +59,9 @@ export class CategoryListPageComponent implements OnInit {
   protected readonly error = this.facade.error;
   protected readonly createError = this.facade.createError;
   protected readonly updateError = this.facade.updateError;
+  protected readonly flatItems = this.facade.flatItems;
   protected readonly parentOptions = this.facade.parentOptions;
+  protected readonly editableParentOptions = this.facade.editableParentOptions;
   protected readonly createDialogOpen = this.facade.createDialogOpen;
   protected readonly editDialogOpen = this.facade.editDialogOpen;
   protected readonly editingCategory = this.facade.editingCategory;
@@ -88,6 +91,10 @@ export class CategoryListPageComponent implements OnInit {
 
   protected retryLoad(): void {
     void this.facade.reload();
+  }
+
+  protected exportCategories(): void {
+    exportCategoriesToCsv(this.flatItems());
   }
 
   protected openCreateDialog(): void {
@@ -211,7 +218,9 @@ export class CategoryListPageComponent implements OnInit {
 
   protected deleteDialogMessage(): string {
     const category = this.deleteTarget();
-    return category ? `Delete "${category.nameEn}"? Products will remain but lose this category link.` : '';
+    return category
+      ? `Delete "${category.nameEn}"? Categories with products or subcategories can't be deleted — reassign or remove those first.`
+      : '';
   }
 
   protected onCreateCancelled(): void {

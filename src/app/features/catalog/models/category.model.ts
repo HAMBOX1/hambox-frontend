@@ -66,4 +66,5 @@ export interface PagedResult<T> {
 export interface CategoryOption {
   readonly id: string;
   readonly label: string;
+  readonly parentId: string | null;
 }

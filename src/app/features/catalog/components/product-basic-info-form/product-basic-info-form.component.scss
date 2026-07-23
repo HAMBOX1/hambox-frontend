@@ -117,6 +117,68 @@
   font-size: 0.75rem;
 }
 
+.basic-info-form__hint {
+  margin: 0;
+  color: var(--admin-text-tertiary, var(--admin-text-secondary));
+  font-size: 0.75rem;
+}
+
+.basic-info-form__category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.basic-info-form__category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.375rem 0.25rem 0.5rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-pill);
+  background: var(--admin-bg-input);
+  font-size: 0.8125rem;
+
+  &--primary {
+    border-color: color-mix(in srgb, var(--admin-accent-amber) 45%, var(--admin-border-default));
+    background: color-mix(in srgb, var(--admin-accent-amber) 15%, transparent);
+  }
+}
+
+.basic-info-form__category-chip-star,
+.basic-info-form__category-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--admin-text-secondary);
+  cursor: pointer;
+  line-height: 1;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  .pi {
+    font-size: 0.75rem;
+  }
+}
+
+.basic-info-form__category-chip-star .pi-star-fill {
+  color: var(--admin-accent-amber);
+}
+
+.basic-info-form__category-chip-remove:hover:not(:disabled) {
+  color: var(--admin-accent-red);
+}
+
+.basic-info-form__category-chip-label {
+  color: var(--admin-text-primary);
+}
+
 :host ::ng-deep {
   .basic-info-form__input.p-inputtext,
   .basic-info-form__textarea.p-textarea {
@@ -129,7 +191,8 @@
   }
 
   .basic-info-form__number .p-inputnumber-input,
-  .basic-info-form__select .p-select {
+  .basic-info-form__select .p-select,
+  .basic-info-form__select .p-multiselect {
     width: 100%;
     padding: 0.625rem 0.875rem;
     border: 1px solid var(--admin-border-default);
@@ -139,7 +202,8 @@
     font-family: var(--admin-font-body);
   }
 
-  .basic-info-form__select .p-select-label {
+  .basic-info-form__select .p-select-label,
+  .basic-info-form__select .p-multiselect-label {
     color: var(--admin-text-primary);
   }
 }

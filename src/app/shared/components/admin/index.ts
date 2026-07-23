@@ -39,3 +39,8 @@ export { AdminConfirmDialogComponent } from './admin-confirm-dialog/admin-confir
 export { AdminUnsavedChangesDialogComponent } from './admin-unsaved-changes-dialog/admin-unsaved-changes-dialog.component';
 export { adminBreadcrumbs, ADMIN_ROOT_BREADCRUMB } from './admin-breadcrumb.helpers';
 
+export { AdminStepperComponent } from './admin-stepper/admin-stepper.component';
+export type { AdminStepperStep } from './admin-stepper/admin-stepper.component';
+export { AdminProgressBarComponent } from './admin-progress-bar/admin-progress-bar.component';
+export { AdminFileDropzoneComponent } from './admin-file-dropzone/admin-file-dropzone.component';
+

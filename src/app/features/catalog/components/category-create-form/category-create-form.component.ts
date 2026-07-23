@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   input,
@@ -72,6 +73,17 @@ export class CategoryCreateFormComponent {
    * attempt and confirm before discarding. */
   readonly isDirty = this.dirtyState.asReadonly();
 
+  /** Guards the populate-on-open effect below against re-running mid-session. Angular
+   * re-invokes a component's effects on every view refresh that touches this component
+   * (e.g. the CD pass triggered by the user picking a value in the parent-category
+   * p-select), not only when a tracked signal's value actually changes — so without
+   * this guard, `resetToken`/`initialCategory` reading the *same* values on a spurious
+   * extra run still re-executes `form.reset(...)`, silently discarding whatever the
+   * owner just picked (most visibly: selecting "No parent" always snapped back to the
+   * category's original parent). NaN as the sentinel guarantees the first real run
+   * (resetToken starts at a number) always populates the form. */
+  private appliedResetToken = Number.NaN;
+
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
     nameAr: ['', [Validators.maxLength(200)]],
@@ -89,9 +101,16 @@ export class CategoryCreateFormComponent {
 
   constructor() {
     effect(() => {
-      this.resetToken();
+      const token = this.resetToken();
       const category = this.initialCategory();
-      const editing = this.mode() === 'edit' && category;
+      const mode = this.mode();
+
+      if (token === this.appliedResetToken) {
+        return;
+      }
+      this.appliedResetToken = token;
+
+      const editing = mode === 'edit' && category;
       const parentId = editing ? category.parentId : this.initialParentId();
 
       this.form.reset(
@@ -146,8 +165,6 @@ export class CategoryCreateFormComponent {
       this.form.controls.parentId.setValue(null);
       this.form.controls.newParent.disable({ emitEvent: false });
       this.form.controls.newParent.reset({ nameEn: '', nameAr: '', slug: '' }, { emitEvent: false });
-    } else {
-      this.subcategories.clear();
     }
     this.updateParentValidity();
   }
@@ -208,12 +225,28 @@ export class CategoryCreateFormComponent {
     });
   }
 
+  /** Parent is required only when creating via the "Child Category" radio — in edit
+   * mode "No parent" is always a legal target (moving a category back to root), so
+   * requiring it there would permanently lock out that move for the rest of the
+   * session (the radio that drove the old requirement doesn't exist in edit mode). */
   private updateParentValidity(): void {
-    this.form.controls.parentId.setValidators(this.isChildCategory() ? [Validators.required] : []);
+    const requireParent = this.mode() === 'create' && this.isChildCategory();
+    this.form.controls.parentId.setValidators(requireParent ? [Validators.required] : []);
     this.form.controls.parentId.updateValueAndValidity({ emitEvent: false });
   }
 
-  protected parentDropdownOptions(): { label: string; value: string | null }[] {
+  /** A `computed()`, not a plain method: it must return a referentially stable array
+   * across change-detection cycles that don't actually change its inputs. PrimeNG's
+   * p-select re-renders its option list whenever the `[options]` array reference
+   * changes, and Angular's default `@for` (object identity, no `track` key on these
+   * POJOs) tears down and rebuilds the option `<li>` elements when that happens. A
+   * plain method called from the template (`parentDropdownOptions()`) returns a brand
+   * new array on *every* tick — including the tick that happens mid-click/mid-keypress
+   * while the dropdown is open — so the option the user is clicking/pressing Enter on
+   * can already be a detached, dead DOM node by the time the event fires. Net effect:
+   * selecting an option (most visibly "No parent (root category)") silently no-ops
+   * and the field snaps back to its previous value. Memoizing this closes that gap. */
+  protected readonly parentDropdownOptions = computed<{ label: string; value: string | null }[]>(() => {
     const editingId = this.initialCategory()?.id ?? null;
     const options = this.parentOptions()
       .filter((option) => option.id !== editingId)
@@ -224,7 +257,7 @@ export class CategoryCreateFormComponent {
     }
 
     return [{ label: '+ Create new parent category', value: NEW_PARENT_OPTION_VALUE }, ...options];
-  }
+  });
 
   protected parentFieldError(): string | null {
     const control = this.form.controls.parentId;
@@ -351,7 +384,10 @@ export class CategoryCreateFormComponent {
       slug: value.slug,
       parentId,
       newParent,
-      subcategories: value.categoryType === 'root' ? value.subcategories : null,
+      // For a root category these become its children; for a child category
+      // there's no "root" to nest under, so createCategoryWithHierarchy parents
+      // them as siblings under the same parentId instead — see there.
+      subcategories: value.subcategories,
     });
   }
 

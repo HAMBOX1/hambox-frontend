@@ -251,6 +251,10 @@ export class ProductCatalogPageComponent implements OnInit {
     void this.router.navigate(['/admin/products', product.id, 'edit'], { fragment: 'variants' });
   }
 
+  protected onCategoryCreated(): void {
+    void this.facade.refreshCategoryOptions();
+  }
+
   protected async onFieldEdit(edit: ProductFieldEdit): Promise<void> {
     const { product, ...patch } = edit;
     const success = await this.facade.updateProductInline(product, patch);
@@ -260,6 +264,13 @@ export class ProductCatalogPageComponent implements OnInit {
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
         detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', { name: product.nameEn }),
         life: 3000,
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update failed',
+        detail: this.facade.error() ?? 'Failed to update product.',
+        life: 5000,
       });
     }
   }

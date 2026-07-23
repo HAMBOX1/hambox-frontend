@@ -2,117 +2,51 @@
   <app-admin-loading-skeleton variant="table" />
 } @else {
   <app-admin-section-card
-    title="Option Groups"
-    description="Define purchasable dimensions such as platform, region, and edition."
+    title="Questions"
+    description="Define the questions customers answer when choosing this product, like Platform, Region, or Edition."
     [compact]="compact()"
   >
-    @if (sortedGroups().length) {
-      <div
-        class="option-groups-panel__groups"
-        cdkDropList
-        (cdkDropListDropped)="onGroupDrop($event)"
-      >
-        @for (group of sortedGroups(); track group.id) {
-          <article class="option-groups-panel__group" cdkDrag>
-            <header class="option-groups-panel__group-header">
-              <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle aria-label="Reorder group">
+    @if (viewport.isMobile()) {
+      <app-option-mobile-nav [allGroups]="optionGroups()" />
+    } @else {
+      @if (sortedRootGroups().length) {
+        <div
+          class="option-groups-panel__groups"
+          cdkDropList
+          (cdkDropListDropped)="onGroupDrop($event)"
+        >
+          @for (group of sortedRootGroups(); track group.id) {
+            <div class="option-groups-panel__group" cdkDrag>
+              <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle aria-label="Reorder question">
                 <i class="pi pi-bars"></i>
               </button>
-              <div class="option-groups-panel__group-title">
-                @if (editingGroupId() === group.id) {
-                  <input
-                    pInputText
-                    class="option-groups-panel__title-input"
-                    [ngModel]="editingGroupLabel()"
-                    (ngModelChange)="editingGroupLabel.set($event)"
-                    (keyup.enter)="saveEditGroup(group)"
-                  />
-                } @else {
-                  <span>{{ group.displayName }}</span>
-                }
-              </div>
-              <div class="option-groups-panel__group-actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
-                @if (editingGroupId() === group.id) {
-                  <app-admin-icon-button icon="pi pi-check" label="Save" [loading]="saving()" (pressed)="saveEditGroup(group)" />
-                  <app-admin-icon-button icon="pi pi-times" label="Cancel" (pressed)="cancelEditGroup()" />
-                } @else {
-                  <app-admin-icon-button icon="pi pi-pencil" label="Edit group" (pressed)="startEditGroup(group)" />
-                  <app-admin-icon-button icon="pi pi-trash" label="Delete group" severity="danger" [loading]="saving()" (pressed)="deleteGroup(group.id)" />
-                }
-              </div>
-            </header>
-
-            <ul class="option-groups-panel__option-list">
-              @for (option of sortedOptions(group); track option.id) {
-                <li class="option-groups-panel__option-row">
-                  @if (editingOptionId() === option.id) {
-                    <input
-                      pInputText
-                      class="option-groups-panel__option-input"
-                      [ngModel]="editingOptionLabel()"
-                      (ngModelChange)="editingOptionLabel.set($event)"
-                      (keyup.enter)="saveEditOption(option)"
-                    />
-                    <div class="option-groups-panel__option-actions">
-                      <button type="button" class="option-groups-panel__icon-btn" (click)="saveEditOption(option)" aria-label="Save option">
-                        <i class="pi pi-check"></i>
-                      </button>
-                      <button type="button" class="option-groups-panel__icon-btn" (click)="cancelEditOption()" aria-label="Cancel">
-                        <i class="pi pi-times"></i>
-                      </button>
-                    </div>
-                  } @else {
-                    <span class="option-groups-panel__option-label">{{ option.label }}</span>
-                    <div class="option-groups-panel__option-actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
-                      <button type="button" class="option-groups-panel__icon-btn" (click)="moveOption(group, option, -1)" aria-label="Move up">
-                        <i class="pi pi-chevron-up"></i>
-                      </button>
-                      <button type="button" class="option-groups-panel__icon-btn" (click)="moveOption(group, option, 1)" aria-label="Move down">
-                        <i class="pi pi-chevron-down"></i>
-                      </button>
-                      <button type="button" class="option-groups-panel__icon-btn" (click)="startEditOption(option)" aria-label="Edit option">
-                        <i class="pi pi-pencil"></i>
-                      </button>
-                      <button type="button" class="option-groups-panel__icon-btn" (click)="deleteOption(option.id)" aria-label="Delete option">
-                        <i class="pi pi-trash"></i>
-                      </button>
-                    </div>
-                  }
-                </li>
-              }
-            </ul>
-
-            <div class="option-groups-panel__inline-form" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
-              <input
-                pInputText
-                placeholder="Option name…"
-                [ngModel]="pendingOption(group.id)"
-                (ngModelChange)="setPendingOption(group.id, $event)"
-                (keyup.enter)="addOptionToGroup(group.id)"
-              />
-              <button pButton type="button" label="Add" icon="pi pi-plus" severity="secondary" (click)="addOptionToGroup(group.id)"></button>
+              <app-option-group-node [group]="group" [allGroups]="optionGroups()" />
             </div>
-          </article>
+          }
+        </div>
+      } @else {
+        <app-admin-empty-state
+          icon="pi pi-question-circle"
+          title="No questions yet"
+          description="Create questions (like Platform or Region) before adding variants."
+        />
+      }
+
+      <div class="option-groups-panel__new-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
+        @if (productId()) {
+          <div class="option-groups-panel__inline-form">
+            <input
+              pInputText
+              placeholder="Question (e.g. Platform)"
+              [ngModel]="newGroupLabel()"
+              (ngModelChange)="newGroupLabel.set($event)"
+            />
+            <button pButton type="button" label="Add Question" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
+          </div>
+        } @else {
+          <p class="option-groups-panel__hint">Enter a product name and category above to begin.</p>
         }
       </div>
-    } @else {
-      <app-admin-empty-state
-        icon="pi pi-sliders-h"
-        title="No option groups"
-        description="Create option groups before adding variants."
-      />
     }
-
-    <div class="option-groups-panel__new-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
-      <div class="option-groups-panel__inline-form">
-        <input
-          pInputText
-          placeholder="Display name (e.g. Platform)"
-          [ngModel]="newGroupLabel()"
-          (ngModelChange)="newGroupLabel.set($event)"
-        />
-        <button pButton type="button" label="Add Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
-      </div>
-    </div>
   </app-admin-section-card>
 }

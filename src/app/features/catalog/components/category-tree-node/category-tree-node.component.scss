@@ -14,6 +14,12 @@
   flex-direction: column;
 }
 
+// Leading actions column width (trigger button + row gap) — the action menu now
+// sits before the disclosure/name block instead of after it, so every depth-based
+// offset below (row indentation, connector lines) has to start past this fixed
+// column rather than from the row's own inline-start edge.
+$action-column: 2.25rem;
+
 // Connector guide line, VS Code/GitHub/Windows-Explorer style. Each non-root node
 // draws its OWN vertical segment (from its top to its own row's center, or all
 // the way through if it isn't the last sibling) plus a short horizontal elbow
@@ -22,7 +28,7 @@
 .category-tree-node:not(.category-tree-node--root)::before {
   content: '';
   position: absolute;
-  inset-inline-start: calc(0.75rem + (var(--category-tree-depth, 1) - 1) * 1.25rem + 0.5rem);
+  inset-inline-start: calc(#{$action-column} + 0.75rem + (var(--category-tree-depth, 1) - 1) * 1.25rem + 0.5rem);
   inset-block-start: 0;
   width: 1px;
   height: 100%;
@@ -36,7 +42,7 @@
 .category-tree-node:not(.category-tree-node--root) > .category-tree-node__row::before {
   content: '';
   position: absolute;
-  inset-inline-start: calc(0.75rem + (var(--category-tree-depth, 1) - 1) * 1.25rem + 0.5rem);
+  inset-inline-start: calc(#{$action-column} + 0.75rem + (var(--category-tree-depth, 1) - 1) * 1.25rem + 0.5rem);
   inset-block-start: 1.25rem;
   width: 0.5rem;
   height: 1px;
@@ -50,7 +56,6 @@
   gap: 0.5rem;
   min-height: 2.25rem;
   padding-inline: 0.75rem;
-  padding-inline-start: calc(0.75rem + var(--category-tree-depth, 0) * 1.25rem);
   border-radius: var(--admin-radius-sm, 8px);
   color: var(--admin-text-primary);
   cursor: grab;
@@ -115,6 +120,7 @@
   gap: 0.5rem;
   flex: 1;
   min-width: 0;
+  margin-inline-start: calc(var(--category-tree-depth, 0) * 1.25rem);
 }
 
 .category-tree-node__meta {
@@ -161,7 +167,7 @@
   }
 }
 
-// Compact numeric counts, right-aligned before the actions column — no more
+// Compact numeric counts, right-aligned before the drag handle — no more
 // "N products"/"N children" copy, just the number (parens distinguish products
 // from the plain children count).
 .category-tree-node__count {
@@ -199,8 +205,6 @@
 .category-tree-node__actions {
   display: flex;
   flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.12s ease;
 
   // The shared trigger is sized/bordered for toolbar use; shrink it to a plain
   // icon button here so it doesn't overflow a 2.25rem-tall tree row.
@@ -217,11 +221,6 @@
   }
 }
 
-.category-tree-node__row:hover .category-tree-node__actions,
-.category-tree-node__row:focus-within .category-tree-node__actions {
-  opacity: 1;
-}
-
 .category-tree-node__drag-handle {
   flex-shrink: 0;
   color: var(--admin-text-muted);
@@ -236,8 +235,9 @@
 }
 
 // Mobile: no hover, no drag handle — the row itself is the tap target (opens the
-// same action menu as desktop's "⋮" trigger, see onRowActivate()). Name + chevron
-// stay on their own line; counts wrap to a second line indented to match.
+// same action menu as desktop's leading "⋮" trigger, see onRowActivate()). The
+// action button stays leading alongside the name (truncates with ellipsis same
+// as desktop); counts wrap to their own line, indented to align under the name.
 .category-tree-node__row--mobile {
   flex-wrap: wrap;
   row-gap: 0.125rem;
@@ -247,21 +247,9 @@
     display: none;
   }
 
-  .category-tree-node__actions {
-    opacity: 1;
-    margin-inline-start: auto;
-  }
-
-  .category-tree-node__primary {
-    flex-basis: 100%;
-  }
-
-  .category-tree-node__name {
-    white-space: normal;
-  }
-
   .category-tree-node__meta {
-    padding-inline-start: 2rem;
+    flex-basis: 100%;
+    padding-inline-start: calc(#{$action-column} + 2rem);
   }
 }
 

@@ -1,0 +1,23 @@
+<div class="admin-progress-bar">
+  @if (label()) {
+    <div class="admin-progress-bar__header">
+      <span class="admin-progress-bar__label">{{ label() }}</span>
+      @if (!indeterminate()) {
+        <span class="admin-progress-bar__percent">{{ clampedPercent() }}%</span>
+      }
+    </div>
+  }
+  <div
+    class="admin-progress-bar__track"
+    role="progressbar"
+    [attr.aria-valuenow]="indeterminate() ? null : clampedPercent()"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
+    <div
+      class="admin-progress-bar__fill"
+      [class.admin-progress-bar__fill--indeterminate]="indeterminate()"
+      [style.width.%]="indeterminate() ? 100 : clampedPercent()"
+    ></div>
+  </div>
+</div>

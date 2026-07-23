@@ -6,53 +6,64 @@
   } @else if (error()) {
     <app-admin-error-alert [message]="error()!" />
     <button pButton type="button" label="Back to products" class="product-edit-page__back" (click)="onCancel()"></button>
-  } @else if (product(); as current) {
+  } @else {
     <header class="product-edit-page__hero">
       <nav class="product-edit-page__breadcrumb" aria-label="Breadcrumb">
         <a routerLink="/admin/products">Products</a>
         <span aria-hidden="true">/</span>
-        <span>Edit Product</span>
+        <span>{{ product() ? 'Edit Product' : 'Create Product' }}</span>
       </nav>
 
       <div class="product-edit-page__hero-row">
         <div class="product-edit-page__title-block">
-          <h1>{{ current.nameEn }}</h1>
-          <p class="product-edit-page__meta">
-            {{ current.categoryName }}
-            <span aria-hidden="true">·</span>
-            <app-admin-status-badge [label]="current.status" [tone]="statusTone(current.status)" />
-            <span aria-hidden="true">·</span>
-            {{ totalVariantCount() }} variant(s) ({{ activeVariantCount() }} active)
-            <span aria-hidden="true">·</span>
-            {{ (current.images?.length ?? 0) }} image(s)
-          </p>
+          @if (product(); as current) {
+            <h1>{{ current.nameEn }}</h1>
+            <p class="product-edit-page__meta">
+              {{ current.categoryName }}
+              <span aria-hidden="true">·</span>
+              <app-admin-status-badge [label]="current.status" [tone]="statusTone(current.status)" />
+              <span aria-hidden="true">·</span>
+              {{ totalVariantCount() }} variant(s) ({{ activeVariantCount() }} active)
+              <span aria-hidden="true">·</span>
+              {{ (current.images?.length ?? 0) }} image(s)
+            </p>
+          } @else {
+            <h1>New Product</h1>
+            <p class="product-edit-page__meta">
+              Enter a name and category below — HAMBOX saves it as a draft automatically.
+            </p>
+          }
         </div>
 
         <div class="product-edit-page__hero-actions">
-          <p-select
-            class="product-edit-page__status-select"
-            [options]="statusOptions"
-            optionLabel="label"
-            optionValue="value"
-            [ngModel]="current.status"
-            [disabled]="submitting()"
-            *hamboxHasPermission="permissions.Catalog.Products.Edit"
-            (ngModelChange)="onStatusChange($event)"
-          />
+          @if (product(); as current) {
+            <p-select
+              class="product-edit-page__status-select"
+              [options]="statusOptions"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="current.status"
+              [disabled]="submitting()"
+              *hamboxHasPermission="permissions.Catalog.Products.Edit"
+              (ngModelChange)="onStatusChange($event)"
+            />
+          }
 
           <div class="product-edit-page__hero-buttons">
             <button pButton type="button" label="Cancel" severity="secondary" (click)="onCancel()"></button>
-            <button
-              pButton
-              type="button"
-              label="Save"
-              severity="secondary"
-              [disabled]="!dirty()"
-              [loading]="submitting()"
-              *hamboxHasPermission="permissions.Catalog.Products.Edit"
-              (click)="onSave()"
-            ></button>
-            @if (current.status === 'Draft' || current.status === 'Inactive') {
+            @if (product()) {
+              <button
+                pButton
+                type="button"
+                label="Save"
+                severity="secondary"
+                [disabled]="!dirty()"
+                [loading]="submitting()"
+                *hamboxHasPermission="permissions.Catalog.Products.Edit"
+                (click)="onSave()"
+              ></button>
+            }
+            @if (product()?.status === 'Draft' || product()?.status === 'Inactive') {
               <button
                 pButton
                 type="button"
@@ -80,7 +91,7 @@
           [disabled]="submitting()"
           (categoryCreated)="onCategoryCreated()"
         >
-          <app-product-assets-upload [productId]="productId()!" />
+          <app-product-assets-upload [productId]="productId()" />
         </app-product-basic-info-form>
       </app-admin-section-card>
 

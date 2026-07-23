@@ -1,0 +1,34 @@
+@if (rootGroups().length) {
+  <div class="mobile-nav__groups">
+    @for (group of rootGroups(); track group.id; let count = $count) {
+      <app-option-mobile-group-card
+        [group]="group"
+        [allGroups]="allGroups()"
+        [canReorderGroup]="count > 1"
+        (moveGroup)="moveGroup(group, $event)"
+      />
+    }
+  </div>
+} @else {
+  <app-admin-empty-state
+    icon="pi pi-question-circle"
+    title="No questions yet"
+    description="Create questions (like Platform or Region) before adding variants."
+  />
+}
+
+<div class="mobile-nav__add-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
+  @if (productId()) {
+    <span class="mobile-nav__add-group-label">New Question</span>
+    <input
+      pInputText
+      placeholder="e.g. Platform"
+      [ngModel]="newGroupLabel()"
+      (ngModelChange)="newGroupLabel.set($event)"
+      (keyup.enter)="addGroup()"
+    />
+    <button pButton type="button" label="Add Question" icon="pi pi-plus" [loading]="creatingGroup()" (click)="addGroup()"></button>
+  } @else {
+    <p class="mobile-nav__hint">Enter a product name and category above to begin.</p>
+  }
+</div>

@@ -83,16 +83,14 @@
               <app-loading-skeleton type="detail" [count]="2" />
             } @else if (variantConfigError()) {
               <p class="pdp__config-error" role="alert">{{ variantConfigError() }}</p>
-            } @else if (hasVariants() && configuration(); as config) {
-              @for (group of config.optionGroups; track group.id) {
-                @if (group.options.length > 0) {
-                  <app-variant-option-group
-                    [groupLabel]="group.displayName"
-                    [options]="variantFacade.optionsForGroup(group)"
-                    [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
-                    (optionSelected)="onOptionChange(group.id, $event)"
-                  />
-                }
+            } @else if (hasVariants() && configuration()) {
+              @for (group of variantFacade.visibleGroups(); track group.id) {
+                <app-variant-option-group
+                  [groupLabel]="group.displayName"
+                  [options]="variantFacade.optionsForGroup(group)"
+                  [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
+                  (optionSelected)="onOptionChange(group.id, $event)"
+                />
               }
             } @else if (variantFacade.hasOptionGroups()) {
               <p class="pdp__config-hint">Variants for this product are being configured. Check back soon.</p>

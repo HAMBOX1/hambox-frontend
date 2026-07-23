@@ -602,6 +602,8 @@
     "CATALOG_PAGE": {
       "TITLE": "Products",
       "INVENTORY_DASHBOARD": "Inventory Dashboard",
+      "IMPORT": "Import",
+      "EXPORT": "Export",
       "CREATE_PRODUCT": "Create Product",
       "STATS": {
         "TOTAL": "Total Products",
@@ -767,6 +769,8 @@
     "NAV": {
       "DASHBOARD": "Dashboard",
       "PRODUCTS": "Products",
+      "PRODUCTS_IMPORT": "Import Products",
+      "PRODUCTS_EXPORT": "Export Products",
       "INVENTORY": "Inventory",
       "CATEGORIES": "Categories",
       "ROLES": "Roles",

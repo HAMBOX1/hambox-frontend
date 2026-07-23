@@ -26,6 +26,8 @@ import {
 
   ResolvedStorefrontVariant,
 
+  visibleOptionGroups,
+
 } from '../utils/storefront-variant.resolver';
 
 
@@ -68,6 +70,15 @@ export class StorefrontVariantFacade {
     () =>
       this.configurationState()?.optionGroups.some((group) => group.options.length > 0) ?? false,
   );
+
+  /** Root groups plus any nested child group whose parent option is currently selected — see `visibleOptionGroups`. */
+  readonly visibleGroups = computed(() => {
+    const configuration = this.configurationState();
+    if (!configuration) {
+      return [];
+    }
+    return visibleOptionGroups(configuration.optionGroups, this.selectedByGroupState());
+  });
 
 
 

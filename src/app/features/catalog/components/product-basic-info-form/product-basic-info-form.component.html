@@ -24,7 +24,7 @@
         }
       </div>
 
-      <div class="basic-info-form__field">
+      <div class="basic-info-form__field basic-info-form__field--full">
         <div class="basic-info-form__label-row">
           <label class="basic-info-form__label" for="product-category">Category</label>
           <button
@@ -39,19 +39,59 @@
             (click)="openCategoryDialog()"
           ></button>
         </div>
-        <p-select
+        <p-multiSelect
           inputId="product-category"
           class="basic-info-form__select"
-          formControlName="categoryId"
+          [ngModel]="allSelectedCategoryIds()"
+          [ngModelOptions]="{ standalone: true }"
+          (onChange)="onCategorySelectionChange($event.value)"
           [options]="[...categoryOptions()]"
           optionLabel="label"
           optionValue="id"
-          placeholder="Select a category"
+          display="comma"
+          filter="true"
+          filterPlaceHolder="Search categories..."
+          placeholder="Select one or more categories"
           [loading]="categoriesLoading()"
           [disabled]="disabled() || categoriesLoading()"
         />
+        <p class="basic-info-form__hint">Star the category that should be the primary one.</p>
         @if (fieldError('categoryId'); as error) {
           <p class="basic-info-form__error">{{ error }}</p>
+        }
+
+        @if (selectedCategoryChips().length > 0) {
+          <div class="basic-info-form__category-chips">
+            @for (chip of selectedCategoryChips(); track chip.id) {
+              <span
+                class="basic-info-form__category-chip"
+                [class.basic-info-form__category-chip--primary]="chip.isPrimary"
+              >
+                <button
+                  type="button"
+                  class="basic-info-form__category-chip-star"
+                  [attr.aria-pressed]="chip.isPrimary"
+                  [attr.aria-label]="
+                    chip.isPrimary ? chip.label + ' is the primary category' : 'Set ' + chip.label + ' as primary'
+                  "
+                  [disabled]="disabled() || chip.isPrimary"
+                  (click)="setPrimaryCategory(chip.id)"
+                >
+                  <i class="pi" [class.pi-star-fill]="chip.isPrimary" [class.pi-star]="!chip.isPrimary"></i>
+                </button>
+                <span class="basic-info-form__category-chip-label">{{ chip.label }}</span>
+                <button
+                  type="button"
+                  class="basic-info-form__category-chip-remove"
+                  [disabled]="disabled()"
+                  [attr.aria-label]="'Remove ' + chip.label"
+                  (click)="removeCategoryChip(chip.id)"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              </span>
+            }
+          </div>
         }
       </div>
     }

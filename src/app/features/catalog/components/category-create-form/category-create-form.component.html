@@ -149,10 +149,15 @@
       }
     </div>
 
-    @if (mode() === 'create' && !isChildCategory()) {
+    @if (mode() === 'create') {
       <div class="category-create-form__subcategories">
-        <span class="admin-field__label">Subcategories <span class="admin-field__optional">(optional)</span></span>
-        <p class="admin-field__hint">Create child categories together with this root category.</p>
+        @if (isChildCategory()) {
+          <span class="admin-field__label">Additional categories <span class="admin-field__optional">(optional)</span></span>
+          <p class="admin-field__hint">Create more categories under the same parent.</p>
+        } @else {
+          <span class="admin-field__label">Subcategories <span class="admin-field__optional">(optional)</span></span>
+          <p class="admin-field__hint">Create child categories together with this root category.</p>
+        }
 
         @for (group of subcategories.controls; track $index; let i = $index) {
           <div class="category-create-form__subcategory-row" [formGroup]="group">
@@ -219,7 +224,7 @@
           type="button"
           class="admin-btn-secondary"
           icon="pi pi-plus"
-          [label]="subcategories.length ? 'Add another' : 'Add Subcategory'"
+          [label]="subcategories.length ? 'Add another' : (isChildCategory() ? 'Add Category' : 'Add Subcategory')"
           severity="secondary"
           text
           (click)="addSubcategory()"

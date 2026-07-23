@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -28,7 +29,11 @@ import {
   AdminStatusBadgeComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
-import { DigitalInventoryCodeDto, InventoryAuditLogDto } from '../../models/inventory-api.model';
+import {
+  DigitalInventoryCodeDto,
+  ImportCodesResultDto,
+  InventoryAuditLogDto,
+} from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
 const REVEAL_AUTO_HIDE_MS = 30_000;
@@ -71,9 +76,11 @@ const IMPORT_ACTIONS = new Set(['CodeImported', 'BatchImported']);
   standalone: true,
   imports: [
     DatePipe,
+    SlicePipe,
     FormsModule,
     ButtonModule,
     CheckboxModule,
+    DialogModule,
     InputTextModule,
     SelectModule,
     TextareaModule,
@@ -136,6 +143,11 @@ export class VariantInventoryPanelComponent {
   protected readonly statusFilter = signal('');
   protected readonly importing = signal(false);
   protected readonly actionLoading = signal(false);
+
+  /** Rich post-import summary (goal: never just a toast) — set once an import call returns, cleared on close. */
+  protected readonly importResult = signal<ImportCodesResultDto | null>(null);
+  protected readonly importResultDialogOpen = signal(false);
+  protected readonly duplicatesExpanded = signal(false);
   protected readonly selectedCodeIds = signal<string[]>([]);
   protected readonly bulkDeleteDialogOpen = signal(false);
 
@@ -246,16 +258,72 @@ export class VariantInventoryPanelComponent {
         return;
       }
 
-      const ok = await this.facade.importCodes(codes);
-      if (ok) {
+      const result = await this.facade.importCodes(codes);
+      if (result) {
         this.bulkCodes.set('');
         if (grouping) {
           this.batchName.set('');
         }
+        this.duplicatesExpanded.set(false);
+        this.importResult.set(result);
+        this.importResultDialogOpen.set(true);
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Import failed',
+          detail: this.facade.error() ?? 'Unable to import codes.',
+        });
       }
     } finally {
       this.importing.set(false);
     }
+  }
+
+  /** "120 codes imported successfully." or "120 imported • 8 skipped because they already exist." */
+  protected importSummaryLine(result: ImportCodesResultDto): string {
+    if (result.duplicateCount === 0) {
+      return `${result.importedCount} codes imported successfully.`;
+    }
+    return `${result.importedCount} imported • ${result.duplicateCount} skipped because they already exist.`;
+  }
+
+  protected closeImportResultDialog(): void {
+    this.importResultDialogOpen.set(false);
+    this.importResult.set(null);
+  }
+
+  protected toggleDuplicatesExpanded(): void {
+    this.duplicatesExpanded.update((current) => !current);
+  }
+
+  protected async copyDuplicates(): Promise<void> {
+    const result = this.importResult();
+    if (!result?.duplicates.length) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(result.duplicates.map((d) => d.code).join('\n'));
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Copied',
+      detail: `${result.duplicates.length} duplicate code(s) copied to clipboard.`,
+    });
+  }
+
+  protected exportDuplicates(): void {
+    const result = this.importResult();
+    if (!result?.duplicates.length) {
+      return;
+    }
+
+    const text = result.duplicates.map((d) => d.code).join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `duplicate-codes-${Date.now()}.txt`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   private buildInternalBatchName(): string {

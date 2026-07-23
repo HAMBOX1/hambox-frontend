@@ -35,15 +35,30 @@ export class CategoryTreeNodeComponent {
 
     return [
       {
-        label: 'Add child category',
-        icon: 'pi pi-plus',
-        command: () => callbacks.addChild(node.id),
-      },
-      {
         label: 'Edit category',
         icon: 'pi pi-pencil',
         command: () => callbacks.editCategory(node),
       },
+      {
+        label: 'Duplicate category',
+        icon: 'pi pi-copy',
+        disabled: true,
+        tooltip: 'Coming soon',
+      },
+      {
+        // Parent reassignment already lives front-and-center in the edit form
+        // (see CategoryCreateFormComponent) — "Move" just opens the same dialog
+        // rather than a second, separate parent-picker UI.
+        label: 'Move category',
+        icon: 'pi pi-arrows-alt',
+        command: () => callbacks.editCategory(node),
+      },
+      {
+        label: 'Add child category',
+        icon: 'pi pi-plus',
+        command: () => callbacks.addChild(node.id),
+      },
+      { separator: true },
       {
         label: 'Delete category',
         icon: 'pi pi-trash',

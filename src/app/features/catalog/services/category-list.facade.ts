@@ -10,7 +10,7 @@ import {
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from '../models/category.model';
-import { buildTree, findAncestorIds } from '../utils/category-tree.utils';
+import { buildTree, findAncestorIds, isDescendantOf } from '../utils/category-tree.utils';
 import { CategoryApiService, createCategoryWithHierarchy } from './category-api.service';
 
 @Injectable()
@@ -49,12 +49,32 @@ export class CategoryListFacade {
   readonly tree = computed(() => buildTree(this.flatItemsState()));
   readonly totalCount = computed(() => this.flatItemsState().length);
   readonly parentOptions = computed<readonly CategoryOption[]>(() =>
-    this.flatItemsState().map((category) => ({ id: category.id, label: category.nameEn })),
+    this.flatItemsState().map((category) => ({
+      id: category.id,
+      label: category.nameEn,
+      parentId: category.parentId,
+    })),
   );
 
   private readonly parentMap = computed(
     () => new Map(this.flatItemsState().map((category) => [category.id, category])),
   );
+
+  /** Parent options for the edit form: excludes the category being edited and every
+   * one of its descendants, since assigning either as its own parent would create a
+   * cycle. The backend rejects this too (`CategoryParentValidator`), but filtering it
+   * out of the dropdown means the admin can't pick an option that's guaranteed to fail. */
+  readonly editableParentOptions = computed<readonly CategoryOption[]>(() => {
+    const editing = this.editingCategoryState();
+    if (!editing) {
+      return this.parentOptions();
+    }
+
+    const map = this.parentMap();
+    return this.flatItemsState()
+      .filter((category) => category.id !== editing.id && !isDescendantOf(category.id, editing.id, map))
+      .map((category) => ({ id: category.id, label: category.nameEn, parentId: category.parentId }));
+  });
 
   readonly isEmpty = computed(() => !this.loading() && this.flatItemsState().length === 0);
   readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
