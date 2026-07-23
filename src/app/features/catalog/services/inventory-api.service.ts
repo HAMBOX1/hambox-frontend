@@ -134,8 +134,8 @@ export class InventoryApiService {
     return this.api.put<void>(INVENTORY_API.optionGroup(groupId), request);
   }
 
-  deleteOptionGroup(groupId: string): Observable<void> {
-    return this.api.delete<void>(INVENTORY_API.optionGroup(groupId));
+  deleteOptionGroup(groupId: string, force = false): Observable<void> {
+    return this.api.delete<void>(INVENTORY_API.optionGroup(groupId), { params: { force } });
   }
 
   reorderOptionGroups(productId: string, request: ReorderIdsRequest): Observable<void> {

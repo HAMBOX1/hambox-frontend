@@ -6,7 +6,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
-import { AdminActionMenuComponent } from '../../../../shared/components/admin';
+import { AdminActionMenuComponent, AdminConfirmDialogComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
@@ -28,6 +28,7 @@ import { slugify } from '../../utils/product-display.utils';
     InputTextModule,
     HasPermissionDirective,
     AdminActionMenuComponent,
+    AdminConfirmDialogComponent,
     ProductOptionMobileGroupCardComponent,
   ],
   templateUrl: './product-option-mobile-group-card.component.html',
@@ -63,6 +64,7 @@ export class ProductOptionMobileGroupCardComponent {
   protected readonly newFollowupLabel = signal('');
   protected readonly newFollowupRequired = signal(true);
   protected readonly creatingFollowup = signal(false);
+  protected readonly deleteDialogOpen = signal(false);
 
   protected sortedOptions(): readonly ProductOptionDto[] {
     return [...this.group().options].sort((left, right) => left.sortOrder - right.sortOrder);
@@ -100,7 +102,7 @@ export class ProductOptionMobileGroupCardComponent {
         { label: 'Move down', icon: 'pi pi-arrow-down', command: () => this.moveGroup.emit(1) },
       );
     }
-    items.push({ label: 'Delete option group', icon: 'pi pi-trash', command: () => this.deleteGroup() });
+    items.push({ label: 'Delete option group', icon: 'pi pi-trash', command: () => this.requestDeleteGroup() });
     return items;
   }
 
@@ -143,10 +145,15 @@ export class ProductOptionMobileGroupCardComponent {
     }
   }
 
-  protected async deleteGroup(): Promise<void> {
+  protected requestDeleteGroup(): void {
+    this.deleteDialogOpen.set(true);
+  }
+
+  protected async confirmDeleteGroup(): Promise<void> {
     this.savingGroup.set(true);
     try {
-      await this.facade.deleteOptionGroup(this.group().id);
+      await this.facade.deleteOptionGroup(this.group().id, true);
+      this.deleteDialogOpen.set(false);
     } finally {
       this.savingGroup.set(false);
     }

@@ -35,10 +35,20 @@
         <app-admin-icon-button icon="pi pi-times" label="Cancel" (pressed)="cancelEditGroup()" />
       } @else {
         <app-admin-icon-button icon="pi pi-pencil" label="Edit option group" (pressed)="startEditGroup()" />
-        <app-admin-icon-button icon="pi pi-trash" label="Delete option group" severity="danger" [loading]="saving()" (pressed)="deleteGroup()" />
+        <app-admin-icon-button icon="pi pi-trash" label="Delete option group" severity="danger" [loading]="saving()" (pressed)="requestDeleteGroup()" />
       }
     </div>
   </header>
+
+  <app-admin-confirm-dialog
+    [visible]="deleteDialogOpen()"
+    title="Delete option group"
+    message="Delete '{{ group().displayName }}' and all its options? Any variants using these options will also be removed, along with their inventory codes. This cannot be undone."
+    [destructive]="true"
+    [loading]="saving()"
+    (visibleChange)="deleteDialogOpen.set($event)"
+    (confirmed)="confirmDeleteGroup()"
+  />
 
   @if (editingGroup() && group().parentOptionId !== null) {
     <label class="question-card__required-toggle">

@@ -12,7 +12,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
-import { AdminIconButtonComponent } from '../../../../shared/components/admin';
+import { AdminConfirmDialogComponent, AdminIconButtonComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
@@ -34,6 +34,7 @@ import { slugify } from '../../utils/product-display.utils';
     DragDropModule,
     HasPermissionDirective,
     AdminIconButtonComponent,
+    AdminConfirmDialogComponent,
     ProductOptionGroupNodeComponent,
   ],
   templateUrl: './product-option-group-node.component.html',
@@ -62,6 +63,7 @@ export class ProductOptionGroupNodeComponent {
   protected readonly creatingChildGroup = signal(false);
   protected readonly collapsed = signal(false);
   protected readonly collapsedFollowUps = signal<ReadonlySet<string>>(new Set());
+  protected readonly deleteDialogOpen = signal(false);
 
   protected toggleCollapse(): void {
     this.collapsed.update((value) => !value);
@@ -123,10 +125,15 @@ export class ProductOptionGroupNodeComponent {
     }
   }
 
-  protected async deleteGroup(): Promise<void> {
+  protected requestDeleteGroup(): void {
+    this.deleteDialogOpen.set(true);
+  }
+
+  protected async confirmDeleteGroup(): Promise<void> {
     this.saving.set(true);
     try {
-      await this.facade.deleteOptionGroup(this.group().id);
+      await this.facade.deleteOptionGroup(this.group().id, true);
+      this.deleteDialogOpen.set(false);
     } finally {
       this.saving.set(false);
     }

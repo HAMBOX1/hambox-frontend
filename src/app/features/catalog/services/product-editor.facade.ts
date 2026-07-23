@@ -881,7 +881,7 @@ export class ProductEditorFacade {
 
 
 
-  async deleteOptionGroup(groupId: string): Promise<boolean> {
+  async deleteOptionGroup(groupId: string, force = false): Promise<boolean> {
 
     const productId = this.productId();
 
@@ -895,7 +895,7 @@ export class ProductEditorFacade {
 
     try {
 
-      await firstValueFrom(this.inventoryApi.deleteOptionGroup(groupId));
+      await firstValueFrom(this.inventoryApi.deleteOptionGroup(groupId, force));
 
       await this.syncVariants(productId);
 

@@ -33,6 +33,16 @@
     }
   </header>
 
+  <app-admin-confirm-dialog
+    [visible]="deleteDialogOpen()"
+    title="Delete option group"
+    message="Delete '{{ group().displayName }}' and all its options? Any variants using these options will also be removed, along with their inventory codes. This cannot be undone."
+    [destructive]="true"
+    [loading]="savingGroup()"
+    (visibleChange)="deleteDialogOpen.set($event)"
+    (confirmed)="confirmDeleteGroup()"
+  />
+
   @if (editingGroup() && group().parentOptionId !== null) {
     <label class="mobile-question-card__required-toggle">
       <p-checkbox [binary]="true" [ngModel]="editingGroupRequired()" (ngModelChange)="editingGroupRequired.set($event)" />
