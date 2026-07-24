@@ -13,7 +13,19 @@
     </label>
     <label>
       <span>{{ 'ADMIN.THEMES.ASSIGNMENTS.TARGET' | translate }}</span>
-      <input pInputText [ngModel]="targetKey()" (ngModelChange)="targetKey.set($event)" name="targetKey" required />
+      @if (isMembershipAssignment()) {
+        <p-select
+          [options]="membershipOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="targetKey()"
+          (ngModelChange)="targetKey.set($event)"
+          name="targetKey"
+          [placeholder]="'ADMIN.THEMES.ASSIGNMENTS.SELECT_MEMBERSHIP' | translate"
+        />
+      } @else {
+        <input pInputText [ngModel]="targetKey()" (ngModelChange)="targetKey.set($event)" name="targetKey" required />
+      }
     </label>
     <label>
       <span>{{ 'ADMIN.THEMES.ASSIGNMENTS.PRIORITY' | translate }}</span>

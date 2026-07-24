@@ -65,6 +65,14 @@
             tone="info"
             [outlined]="true"
           />
+          <button
+            type="button"
+            class="product-catalog-cards__collections-btn"
+            (click)="openCollectionSheet(product, $event)"
+          >
+            <i class="pi pi-folder" aria-hidden="true"></i>
+            {{ collectionCount(product) }} Collections
+          </button>
         </div>
 
         <div class="product-catalog-cards__actions" (click)="$event.stopPropagation()">
@@ -93,3 +101,40 @@
     />
   }
 }
+
+<app-hambox-bottom-sheet
+  [open]="collectionSheetOpen()"
+  title="Assign Collections"
+  [heightVh]="70"
+  (closed)="closeCollectionSheet()"
+>
+  <app-admin-search-bar
+    [value]="collectionSheetSearchTerm()"
+    placeholder="Search..."
+    ariaLabel="Search collections"
+    (searchChange)="collectionSheetSearchTerm.set($event)"
+  />
+
+  <ul class="product-catalog-cards__collection-list" role="listbox" aria-label="Collections">
+    @for (option of filteredCollectionSheetOptions(); track option.id) {
+      <li class="product-catalog-cards__collection-list-item">
+        <p-checkbox
+          [binary]="true"
+          [inputId]="'mobile-collection-check-' + option.id"
+          [ngModel]="isCollectionDraftChecked(option.id)"
+          (ngModelChange)="toggleCollectionDraft(option.id, $event)"
+        />
+        <label class="product-catalog-cards__collection-list-label" [for]="'mobile-collection-check-' + option.id">{{
+          option.label
+        }}</label>
+      </li>
+    } @empty {
+      <li class="product-catalog-cards__collection-list-empty">No collections match your search.</li>
+    }
+  </ul>
+
+  <div sheetFooter class="product-catalog-cards__collection-sheet-actions">
+    <button pButton type="button" label="Cancel" severity="secondary" text (click)="closeCollectionSheet()"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="saveCollectionSheet()"></button>
+  </div>
+</app-hambox-bottom-sheet>

@@ -112,6 +112,10 @@ type ExportScopeMode = 'entire' | 'filtered' | 'selected';
             <p-checkbox [binary]="true" inputId="opt-suppliers" [ngModel]="options().includeSuppliers" (ngModelChange)="patchOption('includeSuppliers', $event)" label="Suppliers" />
             <p class="export-page__checkbox-hint">Supplier product mappings, buying prices, and priority — internal cost data.</p>
           </div>
+          <div class="export-page__checkbox-item">
+            <p-checkbox [binary]="true" inputId="opt-collections" [ngModel]="options().includeCollections" (ngModelChange)="patchOption('includeCollections', $event)" label="Collections" />
+            <p class="export-page__checkbox-hint">Internal, owner-only collection tree and each product's collection assignments. Never customer-facing.</p>
+          </div>
         </div>
       </app-admin-section-card>
 

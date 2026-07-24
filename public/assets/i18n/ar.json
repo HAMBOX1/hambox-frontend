@@ -624,6 +624,7 @@
       "ACTIONS": {
         "EDIT": "تعديل",
         "INVENTORY": "المخزون",
+        "PREVIEW": "معاينة",
         "DUPLICATE": "نسخ",
         "ARCHIVE": "أرشفة",
         "DELETE": "حذف"
@@ -635,6 +636,18 @@
         "SELECT_ALL_MATCHING": "تحديد كل {{count}} المطابقة للفلتر",
         "CHANGE_CATEGORY": "تغيير الفئة",
         "ADJUST_PRICE": "تعديل السعر",
+        "ASSIGN_COLLECTION": "تعيين مجموعة",
+        "REMOVE_COLLECTION": "إزالة من المجموعة",
+        "CREATE_COLLECTION_FROM_SELECTION": "إنشاء مجموعة من التحديد",
+        "ASSIGN_COLLECTION_TITLE": "تعيين مجموعة",
+        "REMOVE_COLLECTION_TITLE": "إزالة من المجموعة",
+        "CREATE_COLLECTION_TITLE": "إنشاء مجموعة من التحديد",
+        "COLLECTION_LABEL": "المجموعة",
+        "NEW_COLLECTION_NAME": "اسم المجموعة",
+        "NEW_COLLECTION_HINT": "سيتم إضافة {{count}} منتج (منتجات) محدد إلى هذه المجموعة الجديدة.",
+        "ASSIGN": "تعيين",
+        "REMOVE": "إزالة",
+        "CREATE_AND_ASSIGN": "إنشاء وتعيين",
         "EXPORT": "تصدير",
         "MANAGE_INVENTORY": "إدارة المخزون",
         "DELETE_TITLE": "حذف المنتجات المحددة",
@@ -662,7 +675,9 @@
         "DUPLICATED_TITLE": "تم نسخ المنتج",
         "DUPLICATED_DETAIL": "تم إنشاء نسخة من المنتج.",
         "DELETED_TITLE": "تم حذف المنتج",
-        "DELETED_DETAIL": "تمت إزالة \"{{name}}\"."
+        "DELETED_DETAIL": "تمت إزالة \"{{name}}\".",
+        "PREVIEW_BLOCKED_TITLE": "المعاينة غير متاحة",
+        "PREVIEW_BLOCKED_DETAIL": "يجب أن يكون المنتج نشطاً لمعاينته في المتجر."
       }
     },
     "INVENTORY_PANEL": {
@@ -763,6 +778,7 @@
       "PRODUCTS_EXPORT": "تصدير المنتجات",
       "INVENTORY": "المخزون",
       "CATEGORIES": "الفئات",
+      "COLLECTIONS": "المجموعات",
       "ROLES": "الأدوار",
       "PROMOTIONS": "العروض",
       "MEMBERSHIPS": "العضويات",
@@ -1520,6 +1536,12 @@
         "EMPTY": "لا توجد سمات بعد. أنشئ أول سمة للمتجر.",
         "EMPTY_SEARCH": "لا توجد سمات مطابقة للفلاتر."
       },
+      "GALLERY": {
+        "VIEW_GRID": "عرض شبكي",
+        "VIEW_LIST": "عرض قائمة",
+        "VERSION": "الإصدار",
+        "UPDATED": "آخر تحديث"
+      },
       "STATS": {
         "TOTAL": "إجمالي السمات",
         "PUBLISHED": "منشورة",
@@ -1530,6 +1552,15 @@
         "TITLE": "نسخ السمة",
         "NAME_LABEL": "اسم السمة الجديدة",
         "SLUG_LABEL": "المعرف الجديد"
+      },
+      "CREATE": {
+        "TITLE": "إنشاء سمة",
+        "SUBTITLE": "ابدأ من نموذج جاهز أو من لوحة فارغة، ثم اختر اسمًا.",
+        "CHOOSE_STARTING_POINT": "اختر نقطة انطلاق",
+        "DETAILS": "اسم السمة",
+        "CHANGE": "تغيير",
+        "CREATE": "إنشاء",
+        "FAILED": "تعذر إنشاء السمة"
       },
       "EDIT": {
         "BACK": "العودة إلى السمات",
@@ -1568,7 +1599,48 @@
         "CTA": "تسوق الآن",
         "CARD_TITLE": "بطاقة سطح",
         "CARD_ELEVATED": "بطاقة مرتفعة",
-        "CARD_TEXT": "نص تجريبي على الأسطح الملوّنة."
+        "CARD_TEXT": "نص تجريبي على الأسطح الملوّنة.",
+        "PAGES": {
+          "HOME": "الرئيسية",
+          "PRODUCTS": "المنتجات",
+          "PRODUCT_DETAILS": "تفاصيل المنتج",
+          "CART": "السلة والدفع",
+          "LOGIN": "تسجيل الدخول"
+        },
+        "NAV_SHOP": "تسوق",
+        "NAV_DEALS": "العروض",
+        "NAV_SUPPORT": "الدعم",
+        "PDP_TITLE": "سماعة ألعاب لاسلكية",
+        "PDP_DESCRIPTION": "عاين كيف يبدو وصف المنتج مع الأسطح وزر الشراء.",
+        "PDP_BUY": "أضف إلى السلة",
+        "SUBTOTAL": "الإجمالي الفرعي",
+        "CHECKOUT": "الدفع",
+        "LOGIN_TITLE": "مرحبًا بعودتك",
+        "EMAIL": "البريد الإلكتروني",
+        "PASSWORD": "كلمة المرور",
+        "LOGIN_CTA": "تسجيل الدخول",
+        "FOOTER": "© متجرك — تذييل تجريبي"
+      },
+      "EDITOR": {
+        "ADVANCED": "متقدم",
+        "BRAND_HINT": "تتحكم هذه الألوان في الأزرار والروابط واللمسات المميزة في المتجر بالكامل.",
+        "FONT_FAMILY": "عائلة الخط",
+        "TYPE_HEADING_PREVIEW": "معاينة العنوان",
+        "TYPE_BODY_PREVIEW": "نص تجريبي يوضح شكل النص الأساسي في متجرك.",
+        "TYPE_BUTTON_PREVIEW": "معاينة الزر",
+        "BUTTON_PRIMARY": "الزر الأساسي",
+        "BUTTON_SECONDARY": "الزر الثانوي",
+        "BUTTON_OUTLINE": "زر محاط بحد",
+        "BUTTON_GHOST": "زر شفاف",
+        "BUTTON_DISABLED": "زر معطّل",
+        "INPUT_PREVIEW": "معاينة الحقل",
+        "ANIMATION_SPEED": "سرعة الحركة",
+        "SHADOW_NONE": "بلا",
+        "SHADOW_SOFT": "خفيف",
+        "SHADOW_ELEVATED": "مرتفع",
+        "PRIMARY_RAMP": "تدرّج الألوان الفاتحة والغامقة المولّد تلقائيًا",
+        "UNDO": "تراجع",
+        "REDO": "إعادة"
       },
       "SCHEDULE": {
         "TITLE": "الجداول",
@@ -1585,6 +1657,7 @@
         "TITLE": "التعيينات",
         "TYPE": "نوع التعيين",
         "TARGET": "المفتاح المستهدف",
+        "SELECT_MEMBERSHIP": "اختر خطة عضوية",
         "PRIORITY": "الأولوية",
         "ADD": "إضافة تعيين",
         "EMPTY": "لا توجد تعيينات لهذه السمة.",
@@ -1600,10 +1673,13 @@
       },
       "COMPARE": {
         "TITLE": "مقارنة السمات",
+        "MODE_THEMES": "مقارنة السمات",
+        "MODE_VERSIONS": "مقارنة الإصدارات",
         "LEFT": "السمة اليسرى",
         "RIGHT": "السمة اليمنى",
         "RUN": "قارن",
         "EMPTY": "اختر سمتين لمقارنة اختلافات الرموز.",
+        "NO_DIFFERENCES": "لا توجد اختلافات في الرموز بين هذين الإصدارين.",
         "TOKEN": "الرمز",
         "LEFT_VALUE": "القيمة اليسرى",
         "RIGHT_VALUE": "القيمة اليمنى"

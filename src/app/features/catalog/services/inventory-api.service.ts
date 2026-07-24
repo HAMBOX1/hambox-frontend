@@ -252,10 +252,14 @@ export class InventoryApiService {
     return this.api.post<void>(INVENTORY_API.releaseReservation(codeId), {});
   }
 
-  getStorefrontConfiguration(productId: string): Observable<StorefrontProductConfigurationDto> {
-    return this.api.get<StorefrontProductConfigurationDto>(
-      CATALOG_API.storefrontProductConfiguration(productId),
-    );
+  getStorefrontConfiguration(
+    productId: string,
+    preview = false,
+  ): Observable<StorefrontProductConfigurationDto> {
+    const path = preview
+      ? CATALOG_API.storefrontProductConfigurationPreview(productId)
+      : CATALOG_API.storefrontProductConfiguration(productId);
+    return this.api.get<StorefrontProductConfigurationDto>(path);
   }
 
   private resolveUrl(path: string): string {

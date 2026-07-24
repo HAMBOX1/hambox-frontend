@@ -39,6 +39,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
   { label: 'Full catalog package (.hambox)', value: 'FullPackage' },
   { label: 'Products', value: 'Products' },
   { label: 'Categories', value: 'Categories' },
+  { label: 'Collections', value: 'Collections' },
   { label: 'Inventory (variants)', value: 'Inventory' },
   { label: 'Digital codes', value: 'Codes' },
 ];
@@ -65,7 +66,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
     <p-toast />
     <app-admin-page-header
       title="Import Catalog"
-      subtitle="Upload a .hambox package or a Products/Categories/Inventory/Codes template. Nothing is written until you review and confirm."
+      subtitle="Upload a .hambox package or a Products/Categories/Collections/Inventory/Codes template. Nothing is written until you review and confirm."
       [breadcrumbs]="breadcrumbs"
     />
 

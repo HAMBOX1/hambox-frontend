@@ -1,0 +1,106 @@
+<p-toast position="top-right" />
+
+<section class="admin-page create-theme-page">
+  <app-admin-page-header
+    [title]="'ADMIN.THEMES.CREATE.TITLE' | translate"
+    [subtitle]="'ADMIN.THEMES.CREATE.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    <a
+      adminHeaderActions
+      pButton
+      class="p-button-text"
+      routerLink="/admin/themes"
+      [label]="'ADMIN.THEMES.EDIT.BACK' | translate"
+      icon="pi pi-arrow-left"
+    ></a>
+  </app-admin-page-header>
+
+  <app-admin-stepper [steps]="steps" [activeIndex]="activeIndex()" />
+
+  @if (activeIndex() === 0) {
+    <app-admin-section-card [title]="'ADMIN.THEMES.CREATE.CHOOSE_STARTING_POINT' | translate">
+      <div class="create-theme-page__grid">
+        @for (point of blankStartingPoints; track point.key) {
+          <button type="button" class="starting-point-card" (click)="selectStartingPoint(point)">
+            <span class="starting-point-card__swatch" [style.background-color]="point.previewBackground">
+              <span class="starting-point-card__dot" [style.background-color]="point.previewPrimary"></span>
+            </span>
+            <span class="starting-point-card__name">{{ point.name }}</span>
+            <span class="starting-point-card__desc">{{ point.description }}</span>
+          </button>
+        }
+
+        @if (templatesLoading()) {
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="starting-point-card starting-point-card--skeleton"></div>
+          }
+        } @else {
+          @for (template of templates(); track template.id) {
+            <button
+              type="button"
+              class="starting-point-card"
+              (click)="
+                selectStartingPoint({
+                  key: template.id,
+                  templateId: template.id,
+                  name: template.name,
+                  description: template.description || '',
+                  baseMode: template.baseMode === 'Light' ? 'Light' : 'Dark',
+                  previewPrimary: template.tokens['primary'] || '#888888',
+                  previewBackground: template.tokens['background'] || '#111111'
+                })
+              "
+            >
+              <span class="starting-point-card__swatch" [style.background-color]="template.tokens['background'] || '#111'">
+                <span class="starting-point-card__dot" [style.background-color]="template.tokens['primary'] || '#888'"></span>
+                <span class="starting-point-card__dot starting-point-card__dot--sm" [style.background-color]="template.tokens['secondary'] || '#888'"></span>
+              </span>
+              <span class="starting-point-card__name">{{ template.name }}</span>
+              <span class="starting-point-card__desc">{{ template.description }}</span>
+            </button>
+          }
+        }
+      </div>
+    </app-admin-section-card>
+  } @else {
+    <app-admin-section-card [title]="'ADMIN.THEMES.CREATE.DETAILS' | translate">
+      <div class="create-theme-page__selected">
+        <span class="starting-point-card__swatch" [style.background-color]="selected()?.previewBackground">
+          <span class="starting-point-card__dot" [style.background-color]="selected()?.previewPrimary"></span>
+        </span>
+        <div>
+          <strong>{{ selected()?.name }}</strong>
+          <p>{{ selected()?.description }}</p>
+        </div>
+        <button pButton type="button" class="p-button-text p-button-sm" (click)="backToStartingPoint()">
+          {{ 'ADMIN.THEMES.CREATE.CHANGE' | translate }}
+        </button>
+      </div>
+
+      <label class="create-theme-page__field">
+        <span>{{ 'ADMIN.THEMES.EDIT.NAME' | translate }}</span>
+        <input pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" />
+      </label>
+
+      <label class="create-theme-page__field">
+        <span>{{ 'ADMIN.THEMES.EDIT.DESCRIPTION' | translate }}</span>
+        <textarea pTextarea rows="3" [ngModel]="description()" (ngModelChange)="description.set($event)"></textarea>
+      </label>
+
+      <div class="create-theme-page__actions">
+        <button pButton type="button" class="p-button-text" (click)="backToStartingPoint()" [label]="'ADMIN.THEMES.ACTIONS.CANCEL' | translate"></button>
+        <button
+          pButton
+          type="button"
+          class="admin-btn-primary"
+          [label]="'ADMIN.THEMES.CREATE.CREATE' | translate"
+          icon="pi pi-check"
+          [loading]="saving()"
+          [disabled]="!name().trim()"
+          (click)="create()"
+        ></button>
+      </div>
+    </app-admin-section-card>
+  }
+</section>

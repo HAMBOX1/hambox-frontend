@@ -79,6 +79,7 @@ export class ProductEditPageComponent implements OnInit {
   private readonly productForm = viewChild('productForm', { read: ProductBasicInfoFormComponent });
   private readonly assetsUpload = viewChild(ProductAssetsUploadComponent);
   private readonly variantsAnchor = viewChild<ElementRef<HTMLElement>>('variantsAnchor');
+  private readonly imagesAnchor = viewChild<ElementRef<HTMLElement>>('imagesAnchor');
   private hasScrolledToFragment = false;
   private readonly draftCreatingState = signal(false);
 
@@ -89,6 +90,8 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly error = this.facade.error;
   protected readonly categories = this.facade.categories;
   protected readonly categoriesLoading = this.facade.categoriesLoading;
+  protected readonly collections = this.facade.collections;
+  protected readonly collectionsLoading = this.facade.collectionsLoading;
   protected readonly formSnapshot = this.facade.formSnapshot;
   protected readonly submitting = this.facade.submitting;
   protected readonly productId = this.facade.productId;
@@ -96,8 +99,10 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly totalVariantCount = this.facade.totalVariantCount;
   protected readonly activeVariantCount = this.facade.activeVariantCount;
 
-  /** True once the owner has actually typed/changed something in the General form since the last save. Drives the floating save bar. */
-  protected readonly dirty = computed(() => this.productForm()?.dirty() ?? false);
+  /** True once the owner has changed the General form or staged an image change since the last save. Drives the floating save bar. */
+  protected readonly dirty = computed(
+    () => (this.productForm()?.dirty() ?? false) || (this.assetsUpload()?.dirty() ?? false),
+  );
   private readonly justSavedState = signal(false);
   /** Brief "Saved" flash after a successful save, so the bar doesn't just vanish the instant dirty flips back to false. */
   protected readonly justSaved = this.justSavedState.asReadonly();
@@ -119,17 +124,29 @@ export class ProductEditPageComponent implements OnInit {
       if (this.hasScrolledToFragment || this.loading() || !this.product()) {
         return;
       }
-      if (this.route.snapshot.fragment !== 'variants') {
+      const fragment = this.route.snapshot.fragment;
+      if (fragment === 'variants') {
+        const anchor = this.variantsAnchor();
+        if (!anchor) {
+          return;
+        }
+
+        this.hasScrolledToFragment = true;
+        anchor.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
 
-      const anchor = this.variantsAnchor();
-      if (!anchor) {
-        return;
-      }
+      if (fragment === 'images') {
+        const anchor = this.imagesAnchor();
+        const upload = this.assetsUpload();
+        if (!anchor || !upload) {
+          return;
+        }
 
-      this.hasScrolledToFragment = true;
-      anchor.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.hasScrolledToFragment = true;
+        anchor.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        upload.openFilePicker();
+      }
     });
   }
 
@@ -143,6 +160,7 @@ export class ProductEditPageComponent implements OnInit {
     // No :id — this is the "Create Product" route. Nothing to load yet; the draft product
     // is created silently in the background once the admin enters a name and category.
     void this.facade.loadCategories();
+    void this.facade.loadCollections();
   }
 
   /** Watches the General form and auto-creates the backend Draft product the moment it becomes
@@ -182,7 +200,6 @@ export class ProductEditPageComponent implements OnInit {
         return;
       }
 
-      await this.assetsUpload()?.uploadPendingFiles(id);
       this.location.replaceState(`/admin/products/${id}/edit`);
     } finally {
       this.draftCreatingState.set(false);
@@ -204,6 +221,10 @@ export class ProductEditPageComponent implements OnInit {
 
   protected onCategoryCreated(): void {
     void this.facade.loadCategories();
+  }
+
+  protected onCollectionCreated(): void {
+    void this.facade.loadCollections();
   }
 
   protected onCancel(): void {
@@ -245,6 +266,11 @@ export class ProductEditPageComponent implements OnInit {
 
     const saved = await this.facade.updateProduct(updateRequest);
     if (saved) {
+      const assetsUpload = this.assetsUpload();
+      if (assetsUpload?.dirty()) {
+        await assetsUpload.commitChanges(product.id);
+      }
+
       this.messageService.add({
         severity: 'success',
         summary: 'Product saved',
@@ -292,6 +318,15 @@ export class ProductEditPageComponent implements OnInit {
       detail: this.facade.submitError() ?? 'Unable to update product status.',
       life: 5000,
     });
+  }
+
+  protected onPreview(): void {
+    const id = this.productId();
+    if (!id) {
+      return;
+    }
+
+    window.open(`/products/${id}?preview=1`, '_blank', 'noopener');
   }
 
   protected async onPublish(): Promise<void> {

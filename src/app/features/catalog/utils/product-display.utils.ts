@@ -50,6 +50,7 @@ export function toUpdateProductRequest(product: Product, status: ProductStatus):
     categoryId: product.categoryId,
     status,
     additionalCategoryIds: product.additionalCategoryIds ?? [],
+    collectionIds: product.collectionIds ?? [],
   };
 }
 

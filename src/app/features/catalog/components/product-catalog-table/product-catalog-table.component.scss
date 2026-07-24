@@ -46,6 +46,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: text;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .product-catalog-table__stock-badge {
@@ -118,6 +122,13 @@
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// Collections reuse the category chip/popover styling exactly, just with a distinct accent
+// so the two organization axes (customer-facing Category vs internal-only Collection) stay
+// visually distinguishable at a glance in the table.
+.product-catalog-table__category-chip--collection {
+  --category-chip-accent: var(--admin-accent-green, var(--color-success));
 }
 
 .product-catalog-table__category-overflow {

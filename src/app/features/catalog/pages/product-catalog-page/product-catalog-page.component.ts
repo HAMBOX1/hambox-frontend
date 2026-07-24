@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -98,6 +98,7 @@ export class ProductCatalogPageComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly viewModeService = inject(AdminProductsViewModeService);
   private readonly permissionService = inject(PermissionService);
 
@@ -120,6 +121,8 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly statusError = this.facade.statusError;
 
   protected readonly categoryOptions = this.facade.categoryOptions;
+  protected readonly collectionOptions = this.facade.collectionOptions;
+  protected readonly collectionFilter = this.facade.collectionFilter;
   protected readonly viewMode = this.viewModeService.mode;
 
   protected readonly deleteDialogOpen = signal(false);
@@ -140,10 +143,15 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkDuplicateDialogOpen = signal(false);
   protected readonly bulkCategoryDialogOpen = signal(false);
   protected readonly bulkPriceDialogOpen = signal(false);
+  protected readonly bulkAssignCollectionDialogOpen = signal(false);
+  protected readonly bulkRemoveCollectionDialogOpen = signal(false);
+  protected readonly bulkCreateCollectionDialogOpen = signal(false);
   protected readonly bulkDuplicateSuffix = signal(' Copy');
   protected readonly bulkTargetCategoryId = signal<string | null>(null);
   protected readonly bulkPriceMode = signal<PriceAdjustmentMode>('IncreasePercent');
   protected readonly bulkPriceValue = signal<number | null>(null);
+  protected readonly bulkTargetCollectionId = signal<string | null>(null);
+  protected readonly bulkNewCollectionName = signal('');
 
   protected readonly bulkMoreMenuItems = computed<MenuItem[]>(() => {
     const t = (key: string) => this.translate.instant(key);
@@ -165,6 +173,25 @@ export class ProductCatalogPageComponent implements OnInit {
         label: t('ADMIN.CATALOG_PAGE.BULK.ADJUST_PRICE'),
         icon: 'pi pi-dollar',
         command: () => this.bulkPriceDialogOpen.set(true),
+      });
+    }
+    if (this.permissionService.hasPermission(this.permissions.Catalog.Collections.Edit)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.ASSIGN_COLLECTION'),
+        icon: 'pi pi-folder',
+        command: () => this.bulkAssignCollectionDialogOpen.set(true),
+      });
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.REMOVE_COLLECTION'),
+        icon: 'pi pi-folder-open',
+        command: () => this.bulkRemoveCollectionDialogOpen.set(true),
+      });
+    }
+    if (this.permissionService.hasPermission(this.permissions.Catalog.Collections.Create)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.CREATE_COLLECTION_FROM_SELECTION'),
+        icon: 'pi pi-plus-circle',
+        command: () => this.bulkCreateCollectionDialogOpen.set(true),
       });
     }
     items.push({ label: t('ADMIN.CATALOG_PAGE.BULK.EXPORT'), icon: 'pi pi-download', command: () => void this.bulkExport() });
@@ -206,8 +233,14 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly drawerVisible = computed(() => this.selectedProductId() !== null);
 
   ngOnInit(): void {
-    void this.facade.reload();
+    const collectionIdFromRoute = this.route.snapshot.queryParamMap.get('collectionId');
+    if (collectionIdFromRoute) {
+      this.facade.setCollectionFilter(collectionIdFromRoute);
+    } else {
+      void this.facade.reload();
+    }
     void this.facade.loadCategoryOptions();
+    void this.facade.loadCollectionOptions();
   }
 
   protected onSearchChange(term: string): void {
@@ -216,6 +249,10 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onStatusFilterChange(status: ProductStatus | ''): void {
     this.facade.setStatusFilter(status);
+  }
+
+  protected onCollectionFilterChange(collectionId: string | null): void {
+    this.facade.setCollectionFilter(collectionId);
   }
 
   protected onClearFilters(): void {
@@ -253,6 +290,14 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onCategoryCreated(): void {
     void this.facade.refreshCategoryOptions();
+  }
+
+  protected onCollectionCreated(): void {
+    void this.facade.refreshCollectionOptions();
+  }
+
+  protected async onCollectionsEdit(event: { product: Product; collectionIds: readonly string[] }): Promise<void> {
+    await this.onFieldEdit({ product: event.product, collectionIds: event.collectionIds });
   }
 
   protected async onFieldEdit(edit: ProductFieldEdit): Promise<void> {
@@ -325,6 +370,20 @@ export class ProductCatalogPageComponent implements OnInit {
         life: 4000,
       });
     }
+  }
+
+  protected onPreviewProduct(product: Product): void {
+    if (product.status !== 'Active') {
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.PREVIEW_BLOCKED_TITLE'),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.PREVIEW_BLOCKED_DETAIL'),
+        life: 4000,
+      });
+      return;
+    }
+
+    window.open(`/products/${product.id}`, '_blank', 'noopener');
   }
 
   protected openDuplicateDialog(product: Product | null = this.selectedProduct()): void {
@@ -489,6 +548,37 @@ export class ProductCatalogPageComponent implements OnInit {
 
     await this.runBulkAction(() => this.facade.bulkChangeCategory(categoryId), 'Category updated');
     this.bulkCategoryDialogOpen.set(false);
+  }
+
+  protected async confirmBulkAssignCollection(): Promise<void> {
+    const collectionId = this.bulkTargetCollectionId();
+    if (!collectionId) {
+      return;
+    }
+
+    await this.runBulkAction(() => this.facade.bulkAssignCollection(collectionId), 'Collection assigned');
+    this.bulkAssignCollectionDialogOpen.set(false);
+  }
+
+  protected async confirmBulkRemoveCollection(): Promise<void> {
+    const collectionId = this.bulkTargetCollectionId();
+    if (!collectionId) {
+      return;
+    }
+
+    await this.runBulkAction(() => this.facade.bulkRemoveCollection(collectionId), 'Collection removed');
+    this.bulkRemoveCollectionDialogOpen.set(false);
+  }
+
+  protected async confirmBulkCreateCollection(): Promise<void> {
+    const name = this.bulkNewCollectionName().trim();
+    if (!name) {
+      return;
+    }
+
+    await this.runBulkAction(() => this.facade.createCollectionFromSelectionAndAssign(name), 'Collection created');
+    this.bulkCreateCollectionDialogOpen.set(false);
+    this.bulkNewCollectionName.set('');
   }
 
   protected async confirmBulkPriceAdjust(): Promise<void> {

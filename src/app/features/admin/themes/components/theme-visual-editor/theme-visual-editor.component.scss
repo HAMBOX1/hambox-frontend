@@ -1,0 +1,210 @@
+.tve {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.tve__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.tve__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  border: none;
+  border-radius: var(--admin-radius-md, 10px);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  i {
+    font-size: 0.95rem;
+    width: 1.1rem;
+    text-align: center;
+  }
+
+  &:hover {
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+    color: var(--color-text-primary);
+  }
+
+  &--active {
+    background: var(--ui-primary);
+    color: var(--ui-primary-contrast, #fff);
+  }
+}
+
+.tve__panel {
+  min-width: 0;
+}
+
+.tve__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.tve__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+
+  input[type='range'] {
+    accent-color: var(--ui-primary);
+  }
+}
+
+.tve__ramp-label {
+  margin-top: 1.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.tve__ramp {
+  display: flex;
+  border-radius: var(--admin-radius-md, 10px);
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.tve__ramp-swatch {
+  flex: 1;
+  min-height: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.tve__type-preview {
+  padding: 1.5rem;
+  border-radius: var(--admin-radius-md, 10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0 0 1rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+.tve__type-btn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--ui-primary);
+  color: var(--ui-primary-contrast, #fff);
+  font-weight: 600;
+  cursor: default;
+}
+
+.tve__button-preview,
+.tve__input-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1.25rem;
+  border-radius: var(--admin-radius-md, 10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  margin-top: 0.5rem;
+}
+
+.tve__btn {
+  padding: 0.6rem 1.1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: default;
+  border: 1px solid transparent;
+  color: #fff;
+
+  &--outline,
+  &--ghost {
+    background: transparent;
+    border: 1px solid currentColor;
+  }
+
+  &--ghost {
+    border-color: transparent;
+  }
+
+  &--disabled {
+    background: var(--color-surface-hover, #e5e7eb);
+    color: var(--color-text-disabled, #9ca3af);
+    border: none;
+  }
+}
+
+.tve__input-preview input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.tve__shadow-presets {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tve__shadow-preset {
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--admin-radius-md, 10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--ui-primary);
+  }
+}
+
+.tve__shadow-preview {
+  width: 100%;
+  height: 80px;
+  border-radius: var(--admin-radius-md, 10px);
+  background: var(--color-surface);
+}
+
+@media (max-width: 900px) {
+  .tve {
+    grid-template-columns: 1fr;
+  }
+
+  .tve__nav {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}

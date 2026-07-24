@@ -624,6 +624,7 @@
       "ACTIONS": {
         "EDIT": "Edit",
         "INVENTORY": "Inventory",
+        "PREVIEW": "Preview",
         "DUPLICATE": "Duplicate",
         "ARCHIVE": "Archive",
         "DELETE": "Delete"
@@ -635,6 +636,18 @@
         "SELECT_ALL_MATCHING": "Select all {{count}} matching your filter",
         "CHANGE_CATEGORY": "Change category",
         "ADJUST_PRICE": "Adjust price",
+        "ASSIGN_COLLECTION": "Assign Collection",
+        "REMOVE_COLLECTION": "Remove Collection",
+        "CREATE_COLLECTION_FROM_SELECTION": "Create Collection From Selection",
+        "ASSIGN_COLLECTION_TITLE": "Assign Collection",
+        "REMOVE_COLLECTION_TITLE": "Remove Collection",
+        "CREATE_COLLECTION_TITLE": "Create Collection From Selection",
+        "COLLECTION_LABEL": "Collection",
+        "NEW_COLLECTION_NAME": "Collection name",
+        "NEW_COLLECTION_HINT": "The {{count}} selected product(s) will be added to this new collection.",
+        "ASSIGN": "Assign",
+        "REMOVE": "Remove",
+        "CREATE_AND_ASSIGN": "Create & Assign",
         "EXPORT": "Export",
         "MANAGE_INVENTORY": "Manage inventory",
         "DELETE_TITLE": "Delete selected products",
@@ -662,7 +675,9 @@
         "DUPLICATED_TITLE": "Product duplicated",
         "DUPLICATED_DETAIL": "A copy of the product was created.",
         "DELETED_TITLE": "Product deleted",
-        "DELETED_DETAIL": "\"{{name}}\" was removed."
+        "DELETED_DETAIL": "\"{{name}}\" was removed.",
+        "PREVIEW_BLOCKED_TITLE": "Preview unavailable",
+        "PREVIEW_BLOCKED_DETAIL": "The product must be Active to preview it on the storefront."
       }
     },
     "INVENTORY_PANEL": {
@@ -773,6 +788,7 @@
       "PRODUCTS_EXPORT": "Export Products",
       "INVENTORY": "Inventory",
       "CATEGORIES": "Categories",
+      "COLLECTIONS": "Collections",
       "ROLES": "Roles",
       "PROMOTIONS": "Promotions",
       "MEMBERSHIPS": "Memberships",
@@ -1629,6 +1645,12 @@
         "EMPTY": "No themes yet. Create your first storefront theme.",
         "EMPTY_SEARCH": "No themes match your filters."
       },
+      "GALLERY": {
+        "VIEW_GRID": "Grid view",
+        "VIEW_LIST": "List view",
+        "VERSION": "Version",
+        "UPDATED": "Updated"
+      },
       "STATS": {
         "TOTAL": "Total themes",
         "PUBLISHED": "Published",
@@ -1639,6 +1661,15 @@
         "TITLE": "Duplicate theme",
         "NAME_LABEL": "New theme name",
         "SLUG_LABEL": "New slug"
+      },
+      "CREATE": {
+        "TITLE": "Create theme",
+        "SUBTITLE": "Start from a curated preset or a blank canvas, then name it.",
+        "CHOOSE_STARTING_POINT": "Choose a starting point",
+        "DETAILS": "Name your theme",
+        "CHANGE": "Change",
+        "CREATE": "Create",
+        "FAILED": "Failed to create theme"
       },
       "EDIT": {
         "BACK": "Back to themes",
@@ -1677,7 +1708,48 @@
         "CTA": "Shop now",
         "CARD_TITLE": "Surface card",
         "CARD_ELEVATED": "Elevated card",
-        "CARD_TEXT": "Sample body text on themed surfaces."
+        "CARD_TEXT": "Sample body text on themed surfaces.",
+        "PAGES": {
+          "HOME": "Home",
+          "PRODUCTS": "Products",
+          "PRODUCT_DETAILS": "Product details",
+          "CART": "Cart & checkout",
+          "LOGIN": "Login"
+        },
+        "NAV_SHOP": "Shop",
+        "NAV_DEALS": "Deals",
+        "NAV_SUPPORT": "Support",
+        "PDP_TITLE": "Wireless Gaming Headset",
+        "PDP_DESCRIPTION": "Preview how product descriptions read against your surfaces and buy button.",
+        "PDP_BUY": "Add to cart",
+        "SUBTOTAL": "Subtotal",
+        "CHECKOUT": "Checkout",
+        "LOGIN_TITLE": "Welcome back",
+        "EMAIL": "Email",
+        "PASSWORD": "Password",
+        "LOGIN_CTA": "Sign in",
+        "FOOTER": "© Your storefront — preview footer"
+      },
+      "EDITOR": {
+        "ADVANCED": "Advanced",
+        "BRAND_HINT": "These colors drive buttons, links, and accents across the whole storefront.",
+        "FONT_FAMILY": "Font family",
+        "TYPE_HEADING_PREVIEW": "Heading preview",
+        "TYPE_BODY_PREVIEW": "Paragraph preview text shows how body copy will read in your storefront.",
+        "TYPE_BUTTON_PREVIEW": "Button preview",
+        "BUTTON_PRIMARY": "Primary button",
+        "BUTTON_SECONDARY": "Secondary button",
+        "BUTTON_OUTLINE": "Outline button",
+        "BUTTON_GHOST": "Ghost button",
+        "BUTTON_DISABLED": "Disabled button",
+        "INPUT_PREVIEW": "Input preview",
+        "ANIMATION_SPEED": "Animation speed",
+        "SHADOW_NONE": "None",
+        "SHADOW_SOFT": "Soft",
+        "SHADOW_ELEVATED": "Elevated",
+        "PRIMARY_RAMP": "Auto-generated tint & shade ramp",
+        "UNDO": "Undo",
+        "REDO": "Redo"
       },
       "SCHEDULE": {
         "TITLE": "Schedules",
@@ -1694,6 +1766,7 @@
         "TITLE": "Assignments",
         "TYPE": "Assignment type",
         "TARGET": "Target key",
+        "SELECT_MEMBERSHIP": "Select a membership plan",
         "PRIORITY": "Priority",
         "ADD": "Add assignment",
         "EMPTY": "No assignments configured for this theme.",
@@ -1709,10 +1782,13 @@
       },
       "COMPARE": {
         "TITLE": "Compare themes",
+        "MODE_THEMES": "Compare themes",
+        "MODE_VERSIONS": "Compare versions",
         "LEFT": "Left theme",
         "RIGHT": "Right theme",
         "RUN": "Compare",
         "EMPTY": "Select two themes to compare token differences.",
+        "NO_DIFFERENCES": "These versions have no token differences.",
         "TOKEN": "Token",
         "LEFT_VALUE": "Left value",
         "RIGHT_VALUE": "Right value"

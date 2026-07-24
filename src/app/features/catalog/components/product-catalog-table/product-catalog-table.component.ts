@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -28,9 +29,12 @@ import {
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { CategoryCreateFormComponent } from '../category-create-form/category-create-form.component';
+import { CollectionCreateFormComponent } from '../collection-create-form/collection-create-form.component';
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
+import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { Product, ProductStatus } from '../../models/product.model';
 import { CategoryApiService, createCategoryWithHierarchy } from '../../services/category-api.service';
+import { CollectionApiService } from '../../services/collection-api.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
@@ -43,6 +47,7 @@ export interface ProductFieldEdit {
   readonly nameEn?: string;
   readonly categoryId?: string;
   readonly additionalCategoryIds?: readonly string[];
+  readonly collectionIds?: readonly string[];
   readonly price?: number;
 }
 
@@ -76,6 +81,7 @@ export interface ProductStatusEdit {
     AdminActionMenuComponent,
     AdminSearchBarComponent,
     CategoryCreateFormComponent,
+    CollectionCreateFormComponent,
   ],
   templateUrl: './product-catalog-table.component.html',
   styleUrl: './product-catalog-table.component.scss',
@@ -85,6 +91,7 @@ export class ProductCatalogTableComponent {
   private readonly permissionService = inject(PermissionService);
   private readonly translate = inject(TranslateService);
   private readonly categoryApi = inject(CategoryApiService);
+  private readonly collectionApi = inject(CollectionApiService);
 
   protected readonly permissions = PERMISSIONS;
 
@@ -96,6 +103,7 @@ export class ProductCatalogTableComponent {
   readonly selectedProductId = input<string | null>(null);
   readonly searchActive = input(false);
   readonly categoryOptions = input<readonly CategoryOption[]>([]);
+  readonly collectionOptions = input<readonly CollectionOption[]>([]);
   readonly sortField = input<string | undefined>(undefined);
   readonly sortOrder = input(0);
   readonly bulkSelectedIds = input<ReadonlySet<string>>(new Set());
@@ -111,6 +119,7 @@ export class ProductCatalogTableComponent {
   readonly bulkToggle = output<{ productId: string; shiftKey: boolean }>();
   readonly bulkToggleAllPage = output<boolean>();
   readonly manageStock = output<Product>();
+  readonly previewProduct = output<Product>();
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
@@ -118,6 +127,8 @@ export class ProductCatalogTableComponent {
   readonly statusEdit = output<ProductStatusEdit>();
   /** Emitted after a category is created inline from the popover, so the parent facade can refresh its category list. */
   readonly categoryCreated = output<void>();
+  /** Emitted after a collection is created inline from the popover, so the parent facade can refresh its collection list. */
+  readonly collectionCreated = output<void>();
 
   protected readonly tableSelection = computed(() => {
     const selectedId = this.selectedProductId();
@@ -202,6 +213,14 @@ export class ProductCatalogTableComponent {
     );
   }
 
+  protected collectionLabel(collectionId: string): string {
+    return this.collectionOptions().find((option) => option.id === collectionId)?.label ?? collectionId;
+  }
+
+  protected productCollectionLabels(product: Product): string[] {
+    return (product.collectionIds ?? []).map((id) => this.collectionLabel(id));
+  }
+
   protected onStockClick(product: Product, event: Event): void {
     event.stopPropagation();
     this.manageStock.emit(product);
@@ -230,6 +249,25 @@ export class ProductCatalogTableComponent {
 
   protected cancelEdit(): void {
     this.editingCell.set(null);
+  }
+
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** Mobile fallback for dblclick — touch-and-hold enters edit mode. */
+  protected onNameTouchStart(product: Product, event: Event): void {
+    this.clearLongPressTimer();
+    this.longPressTimer = setTimeout(() => this.startEdit(product, 'name', event), 500);
+  }
+
+  protected onNameTouchEnd(): void {
+    this.clearLongPressTimer();
+  }
+
+  private clearLongPressTimer(): void {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
   }
 
   protected saveEdit(product: Product): void {
@@ -262,7 +300,13 @@ export class ProductCatalogTableComponent {
 
   protected productActionMenuItems(product: Product): MenuItem[] {
     const t = (key: string) => this.translate.instant(key);
-    const items: MenuItem[] = [];
+    const items: MenuItem[] = [
+      {
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.PREVIEW'),
+        icon: 'pi pi-external-link',
+        command: () => this.previewProduct.emit(product),
+      },
+    ];
 
     if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Create)) {
       items.push({
@@ -451,5 +495,137 @@ export class ProductCatalogTableComponent {
     }
 
     return fallback;
+  }
+
+  // --- Collections popover (chips + searchable checklist) ---
+  // Mirrors the category popover above exactly, minus the "primary category" concept —
+  // collections are flat tags, so there's no star button and an empty selection is valid.
+
+  private readonly collectionPopoverProductState = signal<Product | null>(null);
+  private readonly collectionDraftIdsState = signal<readonly string[]>([]);
+  protected readonly collectionSearchTerm = signal('');
+  protected readonly collectionSaveError = signal<string | null>(null);
+
+  private readonly newlyCreatedCollectionState = signal<CollectionOption | null>(null);
+  protected readonly collectionDialogOpen = signal(false);
+  protected readonly collectionCreating = signal(false);
+  protected readonly collectionCreateError = signal<string | null>(null);
+  protected readonly collectionFormResetToken = signal(0);
+
+  private readonly collectionPopover = viewChild<Popover>('collectionPopover');
+
+  protected readonly collectionPopoverOptions = computed(() => {
+    const base = this.collectionOptions();
+    const created = this.newlyCreatedCollectionState();
+
+    if (!created || base.some((option) => option.id === created.id)) {
+      return base;
+    }
+
+    return [...base, created];
+  });
+
+  protected readonly filteredCollectionPopoverOptions = computed(() => {
+    const term = this.collectionSearchTerm().trim().toLowerCase();
+    const options = this.collectionPopoverOptions();
+
+    if (!term) {
+      return options;
+    }
+
+    return options.filter((option) => option.label.toLowerCase().includes(term));
+  });
+
+  protected isCollectionPopoverOpenFor(productId: string): boolean {
+    return this.collectionPopoverProductState()?.id === productId;
+  }
+
+  protected isCollectionDraftChecked(collectionId: string): boolean {
+    return this.collectionDraftIdsState().includes(collectionId);
+  }
+
+  protected openCollectionPopover(product: Product, event: Event): void {
+    event.stopPropagation();
+
+    if (this.actionLoading()) {
+      return;
+    }
+
+    const popover = this.collectionPopover();
+    if (!popover) {
+      return;
+    }
+
+    const alreadyOpenForThisRow = this.collectionPopoverProductState()?.id === product.id;
+    this.collectionPopoverProductState.set(product);
+    this.collectionDraftIdsState.set(product.collectionIds ?? []);
+    this.collectionSearchTerm.set('');
+    this.collectionSaveError.set(null);
+
+    if (alreadyOpenForThisRow) {
+      popover.toggle(event);
+    } else {
+      popover.show(event, event.currentTarget);
+    }
+  }
+
+  protected toggleCollectionDraft(collectionId: string, checked: boolean): void {
+    this.collectionDraftIdsState.update((ids) =>
+      checked ? [...ids, collectionId] : ids.filter((id) => id !== collectionId),
+    );
+  }
+
+  protected cancelCollectionPopover(): void {
+    this.collectionSaveError.set(null);
+    this.collectionPopover()?.hide();
+  }
+
+  protected saveCollectionPopover(): void {
+    if (this.actionLoading()) {
+      return;
+    }
+
+    const product = this.collectionPopoverProductState();
+    if (!product) {
+      return;
+    }
+
+    this.collectionSaveError.set(null);
+    this.fieldEdit.emit({ product, collectionIds: this.collectionDraftIdsState() });
+    this.collectionPopover()?.hide();
+  }
+
+  protected openCollectionCreateDialog(): void {
+    this.collectionCreateError.set(null);
+    this.collectionFormResetToken.update((value) => value + 1);
+    this.collectionDialogOpen.set(true);
+  }
+
+  protected closeCollectionCreateDialog(): void {
+    this.collectionDialogOpen.set(false);
+    this.collectionCreateError.set(null);
+  }
+
+  protected onCollectionCreateDialogVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.closeCollectionCreateDialog();
+    }
+  }
+
+  protected async onCollectionSubmitted(request: CreateCollectionRequest): Promise<void> {
+    this.collectionCreating.set(true);
+    this.collectionCreateError.set(null);
+
+    try {
+      const id = await firstValueFrom(this.collectionApi.createCollection(request));
+      this.newlyCreatedCollectionState.set({ id, label: request.name, parentId: request.parentId ?? null });
+      this.collectionDraftIdsState.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
+      this.collectionDialogOpen.set(false);
+      this.collectionCreated.emit();
+    } catch (error) {
+      this.collectionCreateError.set(this.toErrorMessage(error, 'Failed to create collection.'));
+    } finally {
+      this.collectionCreating.set(false);
+    }
   }
 }

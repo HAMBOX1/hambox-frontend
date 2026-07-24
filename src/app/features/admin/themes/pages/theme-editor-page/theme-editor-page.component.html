@@ -14,6 +14,26 @@
       [label]="'ADMIN.THEMES.EDIT.BACK' | translate"
       icon="pi pi-arrow-left"
     ></a>
+    <button
+      adminHeaderActions
+      pButton
+      type="button"
+      class="p-button-text"
+      icon="pi pi-undo"
+      [disabled]="!canUndo()"
+      [pTooltip]="'ADMIN.THEMES.EDITOR.UNDO' | translate"
+      (click)="undo()"
+    ></button>
+    <button
+      adminHeaderActions
+      pButton
+      type="button"
+      class="p-button-text"
+      icon="pi pi-refresh"
+      [disabled]="!canRedo()"
+      [pTooltip]="'ADMIN.THEMES.EDITOR.REDO' | translate"
+      (click)="redo()"
+    ></button>
     @if (!isCreateMode()) {
       <button
         adminHeaderActions
@@ -27,6 +47,20 @@
       ></button>
     }
   </app-admin-page-header>
+
+  @if (serverWarnings().length || liveWarnings().length) {
+    <div class="theme-editor-page__warnings">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <ul>
+        @for (warning of liveWarnings(); track warning) {
+          <li>{{ warning }}</li>
+        }
+        @for (warning of serverWarnings(); track warning) {
+          <li>{{ warning }}</li>
+        }
+      </ul>
+    </div>
+  }
 
   @if (detailError()) {
     <app-admin-error-alert [message]="detailError()!" />
@@ -70,7 +104,7 @@
           </div>
         </app-admin-section-card>
 
-        <app-theme-token-editor [tokens]="tokens()" (tokensChange)="onTokensChange($event)" [disabled]="detailSaving()" />
+        <app-theme-visual-editor [tokens]="tokens()" (tokensChange)="onTokensChange($event)" [disabled]="detailSaving()" />
       </div>
 
       <aside class="theme-editor-page__preview">

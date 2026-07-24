@@ -21,6 +21,8 @@ import { VariantOptionGroupComponent } from '../../components/variant-option-gro
 import { ApiError } from '../../../../core/models/api-error.model';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
+import { AUTH_CONTEXT } from '../../../../core/auth/auth-context';
+import { AdminAuth } from '../../../auth/services/admin-auth';
 import { AccountWishlistFacade } from '../../../account/services/account-wishlist.facade';
 
 @Component({
@@ -46,6 +48,7 @@ export class ProductDetailsPageComponent {
   protected readonly variantFacade = inject(StorefrontVariantFacade);
   private readonly cartFacade = inject(CartFacade);
   private readonly authSession = inject(AuthSessionService);
+  private readonly adminAuth = inject(AdminAuth);
   private readonly wishlistFacade = inject(AccountWishlistFacade);
 
   protected readonly navLinks = STOREFRONT_PRODUCTS_NAV_LINKS;
@@ -56,6 +59,7 @@ export class ProductDetailsPageComponent {
   protected readonly cartActionError = signal<string | null>(null);
   protected readonly wishlistActionMessage = signal<string | null>(null);
   protected readonly isAuthenticated = this.authSession.isAuthenticated;
+  protected readonly isPreview = signal(false);
 
   protected readonly configuration = this.variantFacade.configuration;
   protected readonly resolvedVariant = this.variantFacade.resolved;
@@ -145,6 +149,10 @@ export class ProductDetailsPageComponent {
   });
 
   protected readonly canPurchase = computed(() => {
+    if (this.isPreview()) {
+      return false;
+    }
+
     if (!this.hasVariants()) {
       return true;
     }
@@ -156,6 +164,7 @@ export class ProductDetailsPageComponent {
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const productId = params.get('id');
+      this.isPreview.set(this.route.snapshot.queryParamMap.get('preview') === '1');
       void this.loadProduct(productId);
     });
   }
@@ -191,7 +200,7 @@ export class ProductDetailsPageComponent {
 
   protected async addToWishlist(): Promise<void> {
     const current = this.product();
-    if (!current) {
+    if (!current || this.isPreview()) {
       return;
     }
 
@@ -250,10 +259,21 @@ export class ProductDetailsPageComponent {
     this.error.set(null);
     this.variantFacade.reset();
 
+    const preview = this.isPreview();
+    if (preview) {
+      // This storefront route never runs the admin route guard, so the admin session (needed to
+      // authorize the permission-gated preview/configuration call) is never hydrated from storage
+      // in this tab unless we do it explicitly here.
+      if (!this.authSession.initialized(AUTH_CONTEXT.Admin)) {
+        await this.adminAuth.restoreSession();
+        this.authSession.markInitialized(AUTH_CONTEXT.Admin);
+      }
+    }
+
     try {
       const [details] = await Promise.all([
-        this.productDetailsService.getById(productId),
-        this.variantFacade.load(productId),
+        this.productDetailsService.getById(productId, preview),
+        this.variantFacade.load(productId, preview),
         this.cartFacade.load(),
       ]);
       this.product.set(details);

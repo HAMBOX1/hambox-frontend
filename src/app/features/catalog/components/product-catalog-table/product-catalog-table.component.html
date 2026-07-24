@@ -31,6 +31,7 @@
           <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
           <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
           <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
+          <th>Collections</th>
           <th pSortableColumn="price" class="product-catalog-table__price-head">
             Price <p-sortIcon field="price" />
           </th>
@@ -80,7 +81,12 @@
                   class="admin-cell-primary product-catalog-table__product-name"
                   [pTooltip]="product.nameEn"
                   tooltipPosition="top"
-                  (click)="startEdit(product, 'name', $event)"
+                  (click)="$event.stopPropagation()"
+                  (dblclick)="startEdit(product, 'name', $event)"
+                  (touchstart)="onNameTouchStart(product, $event)"
+                  (touchend)="onNameTouchEnd()"
+                  (touchmove)="onNameTouchEnd()"
+                  (touchcancel)="onNameTouchEnd()"
                 >{{ product.nameEn }}</span>
               }
             </div>
@@ -124,6 +130,44 @@
                     [pTooltip]="categoryLabels.join(', ')"
                     tooltipPosition="top"
                     >+{{ categoryLabels.length - 1 }}</span
+                  >
+                }
+              }
+            </div>
+          </td>
+          <td
+            class="product-catalog-table__category-cell product-catalog-table__collection-cell"
+            [class.product-catalog-table__category-cell--active]="isCollectionPopoverOpenFor(product.id)"
+            (click)="openCollectionPopover(product, $event)"
+          >
+            @let collectionLabels = productCollectionLabels(product);
+            <div class="product-catalog-table__category-chips">
+              @if (collectionLabels.length === 0) {
+                <span class="product-catalog-table__category-empty">None</span>
+              } @else {
+                <span class="product-catalog-table__category-chip product-catalog-table__category-chip--collection">{{
+                  collectionLabels[0]
+                }}</span>
+                @if (collectionLabels.length > 1) {
+                  <span
+                    class="product-catalog-table__category-chip product-catalog-table__category-chip--collection product-catalog-table__category-chip--wide-only"
+                    >{{ collectionLabels[1] }}</span
+                  >
+                }
+                @if (collectionLabels.length > 2) {
+                  <span
+                    class="product-catalog-table__category-overflow product-catalog-table__category-overflow--wide"
+                    [pTooltip]="collectionLabels.join(', ')"
+                    tooltipPosition="top"
+                    >+{{ collectionLabels.length - 2 }}</span
+                  >
+                }
+                @if (collectionLabels.length > 1) {
+                  <span
+                    class="product-catalog-table__category-overflow product-catalog-table__category-overflow--narrow"
+                    [pTooltip]="collectionLabels.join(', ')"
+                    tooltipPosition="top"
+                    >+{{ collectionLabels.length - 1 }}</span
                   >
                 }
               }
@@ -184,7 +228,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <app-admin-empty-state
               icon="pi pi-inbox"
               [title]="searchActive() ? 'No matching products' : 'No products yet'"
@@ -280,6 +324,86 @@
       [resetToken]="categoryFormResetToken()"
       (submitted)="onCategorySubmitted($event)"
       (cancelled)="closeCategoryCreateDialog()"
+    />
+  </p-dialog>
+
+  <p-popover #collectionPopover appendTo="body" styleClass="product-catalog-table__category-popover">
+    <div class="product-catalog-table__category-popover-content" (click)="$event.stopPropagation()">
+      <h4 class="product-catalog-table__category-popover-title">Collections</h4>
+
+      <app-admin-search-bar
+        [value]="collectionSearchTerm()"
+        placeholder="Search..."
+        ariaLabel="Search collections"
+        (searchChange)="collectionSearchTerm.set($event)"
+      />
+
+      <ul class="product-catalog-table__category-list" role="listbox" aria-label="Collections">
+        @for (option of filteredCollectionPopoverOptions(); track option.id) {
+          <li class="product-catalog-table__category-list-item">
+            <p-checkbox
+              [binary]="true"
+              [inputId]="'collection-check-' + option.id"
+              [ngModel]="isCollectionDraftChecked(option.id)"
+              (ngModelChange)="toggleCollectionDraft(option.id, $event)"
+            />
+            <label class="product-catalog-table__category-list-label" [for]="'collection-check-' + option.id">{{
+              option.label
+            }}</label>
+          </li>
+        } @empty {
+          <li class="product-catalog-table__category-list-empty">No collections match your search.</li>
+        }
+      </ul>
+
+      @if (collectionSaveError(); as error) {
+        <p class="product-catalog-table__category-error">{{ error }}</p>
+      }
+
+      <button
+        pButton
+        type="button"
+        label="+ New Collection"
+        icon="pi pi-plus"
+        severity="secondary"
+        text
+        size="small"
+        class="product-catalog-table__category-create-btn"
+        (click)="openCollectionCreateDialog()"
+      ></button>
+
+      <div class="product-catalog-table__category-popover-actions">
+        <button pButton type="button" label="Cancel" severity="secondary" text (click)="cancelCollectionPopover()"></button>
+        <button
+          pButton
+          type="button"
+          label="Save"
+          icon="pi pi-check"
+          [disabled]="actionLoading()"
+          [loading]="actionLoading()"
+          (click)="saveCollectionPopover()"
+        ></button>
+      </div>
+    </div>
+  </p-popover>
+
+  <p-dialog
+    header="Create Collection"
+    [visible]="collectionDialogOpen()"
+    (visibleChange)="onCollectionCreateDialogVisibleChange($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <app-collection-create-form
+      mode="create"
+      [submitting]="collectionCreating()"
+      [serverError]="collectionCreateError()"
+      [resetToken]="collectionFormResetToken()"
+      (submitted)="onCollectionSubmitted($event)"
+      (cancelled)="closeCollectionCreateDialog()"
     />
   </p-dialog>
 }

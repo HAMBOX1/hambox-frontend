@@ -15,8 +15,8 @@ export const routes: Routes = [
   {
     path: 'new',
     loadComponent: () =>
-      import('./pages/theme-editor-page/theme-editor-page.component').then(
-        (c) => c.ThemeEditorPageComponent,
+      import('./pages/create-theme-page/create-theme-page.component').then(
+        (c) => c.CreateThemePageComponent,
       ),
     canActivate: [permissionGuard([PERMISSIONS.Themes.Create])],
   },

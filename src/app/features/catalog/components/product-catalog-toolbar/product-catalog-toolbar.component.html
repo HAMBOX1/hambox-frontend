@@ -14,6 +14,16 @@
     [ngModel]="statusFilter()"
     (ngModelChange)="onStatusChange($event)"
   />
+  <p-select
+    adminToolbarFilters
+    [options]="[...collectionOptions()]"
+    optionLabel="label"
+    optionValue="id"
+    placeholder="Filter collection"
+    [showClear]="true"
+    [ngModel]="collectionFilter()"
+    (ngModelChange)="onCollectionChange($event)"
+  />
   <app-admin-icon-button
     adminToolbarActions
     [icon]="viewMode() === 'table' ? 'pi pi-th-large' : 'pi pi-table'"

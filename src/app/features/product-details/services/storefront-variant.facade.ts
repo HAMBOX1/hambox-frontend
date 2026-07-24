@@ -116,7 +116,7 @@ export class StorefrontVariantFacade {
 
 
 
-  async load(productId: string): Promise<void> {
+  async load(productId: string, preview = false): Promise<void> {
 
     this.loadingState.set(true);
 
@@ -126,7 +126,7 @@ export class StorefrontVariantFacade {
 
     try {
 
-      const configuration = await firstValueFrom(this.api.getStorefrontConfiguration(productId));
+      const configuration = await firstValueFrom(this.api.getStorefrontConfiguration(productId, preview));
 
       this.configurationState.set(configuration);
 

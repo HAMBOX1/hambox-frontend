@@ -61,12 +61,104 @@
       (ngModelChange)="onStatusChange($event)"
       [placeholder]="'ADMIN.THEMES.LIST.FILTER_STATUS' | translate"
     />
+
+    <div adminToolbarActions class="themes-list-page__view-toggle">
+      <button
+        type="button"
+        class="themes-list-page__view-btn"
+        [class.themes-list-page__view-btn--active]="viewMode() === 'grid'"
+        [title]="'ADMIN.THEMES.GALLERY.VIEW_GRID' | translate"
+        (click)="setViewMode('grid')"
+      >
+        <i class="pi pi-th-large" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
+        class="themes-list-page__view-btn"
+        [class.themes-list-page__view-btn--active]="viewMode() === 'list'"
+        [title]="'ADMIN.THEMES.GALLERY.VIEW_LIST' | translate"
+        (click)="setViewMode('list')"
+      >
+        <i class="pi pi-list" aria-hidden="true"></i>
+      </button>
+    </div>
   </app-admin-toolbar>
 
   @if (error()) {
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
+  @if (loading() && !themes().length) {
+    <app-admin-loading-skeleton [rows]="4" />
+  } @else if (viewMode() === 'grid') {
+    @if (!themes().length) {
+      <app-admin-empty-state
+        icon="pi pi-palette"
+        [title]="
+          hasActiveFilters() ? ('ADMIN.THEMES.LIST.EMPTY_SEARCH' | translate) : ('ADMIN.THEMES.LIST.EMPTY' | translate)
+        "
+      />
+    } @else {
+      <div class="themes-list-page__grid">
+        @for (theme of themes(); track theme.id) {
+          <article class="theme-card">
+            <a class="theme-card__thumb" [routerLink]="['/admin/themes', theme.id]" [style.background-color]="theme.previewBackground || 'var(--color-surface)'">
+              <span class="theme-card__thumb-topbar" [style.background-color]="theme.previewPrimary || 'var(--ui-primary)'"></span>
+              <span class="theme-card__thumb-block" [style.background-color]="theme.previewCard || 'rgba(255,255,255,0.08)'"></span>
+              <span class="theme-card__thumb-block theme-card__thumb-block--sm" [style.background-color]="theme.previewCard || 'rgba(255,255,255,0.08)'"></span>
+              <span class="theme-card__mode-pill">{{ theme.baseMode }}</span>
+            </a>
+
+            <div class="theme-card__body">
+              <div class="theme-card__title-row">
+                <h4>{{ theme.name }}</h4>
+                <app-admin-status-badge [label]="theme.status" [tone]="statusTone(theme.status)" />
+              </div>
+              <div class="theme-card__meta">
+                <span>{{ 'ADMIN.THEMES.GALLERY.VERSION' | translate }} {{ theme.versionCount }}</span>
+                @if (theme.isDefault) {
+                  <span class="theme-card__default-badge">{{ 'ADMIN.THEMES.LIST.DEFAULT' | translate }}</span>
+                }
+              </div>
+              @if (theme.assignmentSummary) {
+                <div class="theme-card__assignment"><i class="pi pi-tag" aria-hidden="true"></i>{{ theme.assignmentSummary }}</div>
+              }
+              <div class="theme-card__updated">
+                {{ 'ADMIN.THEMES.GALLERY.UPDATED' | translate }} {{ theme.createdOnUtc | date: 'mediumDate' }}
+              </div>
+            </div>
+
+            <div class="theme-card__actions">
+              <app-admin-icon-button
+                icon="pi pi-eye"
+                [label]="'ADMIN.THEMES.ACTIONS.PREVIEW' | translate"
+                [routerLink]="'/admin/themes/' + theme.id"
+              />
+              <app-admin-icon-button
+                icon="pi pi-copy"
+                [label]="'ADMIN.THEMES.ACTIONS.DUPLICATE' | translate"
+                *hamboxHasPermission="permissions.Themes.Create"
+                (pressed)="openDuplicateDialog(theme)"
+              />
+              <app-admin-icon-button
+                icon="pi pi-pencil"
+                [label]="'ADMIN.THEMES.ACTIONS.EDIT' | translate"
+                [routerLink]="'/admin/themes/' + theme.id + '/edit'"
+              />
+              <app-admin-icon-button
+                icon="pi pi-send"
+                [label]="'ADMIN.THEMES.ACTIONS.PUBLISH' | translate"
+                *hamboxHasPermission="permissions.Themes.Publish"
+                [disabled]="actionLoading() || theme.status === 'Published'"
+                (pressed)="publishTheme(theme)"
+              />
+              <app-admin-action-menu [items]="themeActionMenuItems(theme)" />
+            </div>
+          </article>
+        }
+      </div>
+    }
+  } @else {
   <app-admin-data-table-shell>
     <p-table
       [value]="[...themes()]"
@@ -132,6 +224,7 @@
       </ng-template>
     </p-table>
   </app-admin-data-table-shell>
+  }
 </section>
 
 <p-dialog

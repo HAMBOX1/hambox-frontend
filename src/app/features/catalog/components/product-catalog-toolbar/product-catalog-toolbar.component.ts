@@ -7,6 +7,7 @@ import {
   AdminSearchBarComponent,
   AdminToolbarComponent,
 } from '../../../../shared/components/admin';
+import { CollectionOption } from '../../models/collection.model';
 import { ProductStatus } from '../../models/product.model';
 import { AdminProductsViewMode } from '../../services/admin-products-view-mode.service';
 
@@ -35,11 +36,14 @@ const STATUS_OPTIONS: { label: string; value: string }[] = [
 export class ProductCatalogToolbarComponent {
   readonly searchTerm = input('');
   readonly statusFilter = input('');
+  readonly collectionFilter = input<string | null>(null);
+  readonly collectionOptions = input<readonly CollectionOption[]>([]);
   readonly searchPlaceholder = input('Search products…');
   readonly hasActiveFilters = input(false);
   readonly viewMode = input<AdminProductsViewMode>('table');
   readonly searchChange = output<string>();
   readonly statusChange = output<ProductStatus | ''>();
+  readonly collectionChange = output<string | null>();
   readonly clearFilters = output<void>();
   readonly viewModeChange = output<AdminProductsViewMode>();
 
@@ -51,6 +55,10 @@ export class ProductCatalogToolbarComponent {
 
   protected onStatusChange(value: string): void {
     this.statusChange.emit(value as ProductStatus | '');
+  }
+
+  protected onCollectionChange(value: string | null): void {
+    this.collectionChange.emit(value);
   }
 
   protected toggleViewMode(): void {

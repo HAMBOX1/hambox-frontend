@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.collection-list-page .collection-list-page__search {
+  display: block;
+  flex: none;
+  margin-block: 1rem;
+}
+
+::ng-deep .collection-list-page__edit-drawer .p-drawer-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

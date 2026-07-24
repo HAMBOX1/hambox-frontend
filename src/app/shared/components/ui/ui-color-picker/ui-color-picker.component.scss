@@ -1,0 +1,111 @@
+@use '../../../../../styles/enterprise-admin-mixins' as enterprise;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.ui-color-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2);
+}
+
+.ui-color-picker__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+}
+
+.ui-color-picker__text {
+  @include enterprise.ui-control-base;
+  flex: 1;
+  font-family: var(--hambox-font-mono, monospace);
+}
+
+.ui-color-picker__eyedropper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ui-control-height);
+  height: var(--ui-control-height);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-surface);
+  color: var(--ui-text-primary);
+  cursor: pointer;
+  transition: border-color var(--ui-transition);
+
+  &:hover {
+    border-color: var(--ui-primary);
+  }
+}
+
+.ui-color-picker__alpha-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+}
+
+.ui-color-picker__alpha {
+  flex: 1;
+  accent-color: var(--ui-primary);
+}
+
+.ui-color-picker__alpha-value {
+  min-width: 2.5rem;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
+}
+
+.ui-color-picker__formats {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-bg-surface);
+  width: fit-content;
+}
+
+.ui-color-picker__format {
+  padding: 4px 10px;
+  border: none;
+  border-radius: calc(var(--ui-radius-md) - 2px);
+  background: transparent;
+  color: var(--ui-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-color var(--ui-transition), color var(--ui-transition);
+
+  &:hover {
+    color: var(--ui-text-primary);
+  }
+
+  &--active {
+    background: var(--ui-primary);
+    color: var(--ui-primary-contrast, #fff);
+  }
+}
+
+.ui-color-picker__recent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ui-color-picker__swatch {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm, 6px);
+  cursor: pointer;
+  padding: 0;
+  transition: transform var(--ui-transition);
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}

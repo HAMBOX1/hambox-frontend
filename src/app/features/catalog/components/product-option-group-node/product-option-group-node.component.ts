@@ -12,8 +12,10 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
+import { PermissionService } from '../../../../core/permissions/permission.service';
 import { AdminConfirmDialogComponent, AdminIconButtonComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { LongPressDirective } from '../../../../shared/directives/long-press.directive';
 import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
@@ -33,6 +35,7 @@ import { slugify } from '../../utils/product-display.utils';
     InputTextModule,
     DragDropModule,
     HasPermissionDirective,
+    LongPressDirective,
     AdminIconButtonComponent,
     AdminConfirmDialogComponent,
     ProductOptionGroupNodeComponent,
@@ -43,6 +46,7 @@ import { slugify } from '../../utils/product-display.utils';
 })
 export class ProductOptionGroupNodeComponent {
   private readonly facade = inject(ProductEditorFacade);
+  private readonly permissionService = inject(PermissionService);
 
   readonly group = input.required<ProductOptionGroupDto>();
   readonly allGroups = input.required<readonly ProductOptionGroupDto[]>();
@@ -64,6 +68,25 @@ export class ProductOptionGroupNodeComponent {
   protected readonly collapsed = signal(false);
   protected readonly collapsedFollowUps = signal<ReadonlySet<string>>(new Set());
   protected readonly deleteDialogOpen = signal(false);
+
+  private canEdit(): boolean {
+    return (
+      this.permissionService.isOwner() ||
+      this.permissionService.hasPermission(this.permissions.Catalog.Inventory.Edit)
+    );
+  }
+
+  protected onGroupLongPress(): void {
+    if (this.canEdit() && !this.editingGroup()) {
+      this.startEditGroup();
+    }
+  }
+
+  protected onOptionLongPress(option: ProductOptionDto): void {
+    if (this.canEdit() && this.editingOptionId() !== option.id) {
+      this.startEditOption(option);
+    }
+  }
 
   protected toggleCollapse(): void {
     this.collapsed.update((value) => !value);

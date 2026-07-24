@@ -15,6 +15,20 @@
   padding: 80px var(--sf-container-px) var(--sf-section-gap);
 }
 
+.pdp__preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px var(--sf-container-px);
+  background: var(--color-info-muted);
+  color: var(--color-info);
+  font-family: var(--sf-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
 .pdp__breadcrumb {
   display: flex;
   flex-wrap: wrap;

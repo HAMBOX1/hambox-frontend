@@ -144,6 +144,13 @@
     border-color: color-mix(in srgb, var(--admin-accent-amber) 45%, var(--admin-border-default));
     background: color-mix(in srgb, var(--admin-accent-amber) 15%, transparent);
   }
+
+  // Collections reuse this same chip shape with a distinct accent, so the two organization
+  // axes (customer-facing Category vs internal-only Collection) stay visually distinguishable.
+  &--collection {
+    border-color: color-mix(in srgb, var(--admin-accent-green, var(--color-success)) 35%, var(--admin-border-default));
+    background: color-mix(in srgb, var(--admin-accent-green, var(--color-success)) 12%, transparent);
+  }
 }
 
 .basic-info-form__category-chip-star,

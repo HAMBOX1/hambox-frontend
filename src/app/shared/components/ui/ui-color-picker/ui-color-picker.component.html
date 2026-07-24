@@ -1,0 +1,71 @@
+<div class="ui-color-picker">
+  <div class="ui-color-picker__row">
+    <p-colorPicker
+      [ngModel]="hex()"
+      (ngModelChange)="onPickerValueChange($event)"
+      format="hex"
+      appendTo="body"
+      [id]="resolvedId"
+    />
+
+    <input
+      class="ui-color-picker__text"
+      type="text"
+      [value]="textValue()"
+      [attr.aria-label]="label() || 'Color value'"
+      (change)="onTextInput($event)"
+      (blur)="onTextBlur()"
+    />
+
+    @if (supportsEyeDropper) {
+      <button
+        type="button"
+        class="ui-color-picker__eyedropper"
+        title="Pick color from screen"
+        (click)="pickWithEyeDropper()"
+      >
+        <i class="pi pi-eye-dropper" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  <div class="ui-color-picker__alpha-row">
+    <input
+      type="range"
+      class="ui-color-picker__alpha"
+      min="0"
+      max="100"
+      [value]="alpha()"
+      aria-label="Opacity"
+      (input)="onAlphaInput($event)"
+    />
+    <span class="ui-color-picker__alpha-value">{{ alpha() }}%</span>
+  </div>
+
+  <div class="ui-color-picker__formats" role="group" aria-label="Color format">
+    @for (f of formats; track f) {
+      <button
+        type="button"
+        class="ui-color-picker__format"
+        [class.ui-color-picker__format--active]="format() === f"
+        (click)="setFormat(f)"
+      >
+        {{ f.toUpperCase() }}
+      </button>
+    }
+  </div>
+
+  @if (recentColors().length) {
+    <div class="ui-color-picker__recent">
+      @for (color of recentColors(); track color) {
+        <button
+          type="button"
+          class="ui-color-picker__swatch"
+          [style.background-color]="color"
+          [title]="color"
+          (click)="applyRecent(color)"
+        ></button>
+      }
+    </div>
+  }
+</div>

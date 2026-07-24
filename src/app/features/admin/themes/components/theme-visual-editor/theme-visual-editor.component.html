@@ -1,0 +1,215 @@
+<div class="tve">
+  <nav class="tve__nav">
+    @for (item of sectionNav; track item.id) {
+      <button
+        type="button"
+        class="tve__nav-item"
+        [class.tve__nav-item--active]="activeSection() === item.id"
+        (click)="selectSection(item.id)"
+      >
+        <i [class]="item.icon" aria-hidden="true"></i>
+        <span>{{ item.labelKey | translate }}</span>
+      </button>
+    }
+  </nav>
+
+  <div class="tve__panel">
+    @switch (activeSection()) {
+      @case ('brand') {
+        <app-admin-section-card
+          [title]="'ADMIN.THEMES.TOKENS.SECTIONS.BRAND' | translate"
+          [description]="'ADMIN.THEMES.EDITOR.BRAND_HINT' | translate"
+        >
+          <div class="tve__grid">
+            @for (key of brandTokens; track key) {
+              <label class="tve__field">
+                <span>{{ tokenLabel(key) | translate }}</span>
+                <ui-color-picker [ngModel]="tokenValue(key)" (ngModelChange)="setToken(key, $event)" />
+              </label>
+            }
+          </div>
+
+          <div class="tve__ramp-label">{{ 'ADMIN.THEMES.EDITOR.PRIMARY_RAMP' | translate }}</div>
+          <div class="tve__ramp">
+            @for (swatch of primaryRamp(); track swatch.step) {
+              <div class="tve__ramp-swatch" [style.background-color]="swatch.color">
+                <span>{{ swatch.step }}</span>
+              </div>
+            }
+          </div>
+        </app-admin-section-card>
+      }
+
+      @case ('typography') {
+        <app-admin-section-card [title]="'ADMIN.THEMES.TOKENS.SECTIONS.TYPOGRAPHY' | translate">
+          <label class="tve__field">
+            <span>{{ 'ADMIN.THEMES.EDITOR.FONT_FAMILY' | translate }}</span>
+            <p-select
+              [options]="fontOptions"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="selectedFont()"
+              (ngModelChange)="onFontChange($event)"
+            />
+          </label>
+
+          <div class="tve__type-preview" [style.font-family]="tokenValue('typography')">
+            <h2>{{ 'ADMIN.THEMES.EDITOR.TYPE_HEADING_PREVIEW' | translate }}</h2>
+            <p>{{ 'ADMIN.THEMES.EDITOR.TYPE_BODY_PREVIEW' | translate }}</p>
+            <button type="button" class="tve__type-btn">{{ 'ADMIN.THEMES.EDITOR.TYPE_BUTTON_PREVIEW' | translate }}</button>
+          </div>
+        </app-admin-section-card>
+      }
+
+      @case ('surfaces') {
+        <app-admin-section-card [title]="'ADMIN.THEMES.TOKENS.SECTIONS.SURFACES' | translate">
+          <div class="tve__grid">
+            @for (key of surfaceTokens; track key) {
+              <label class="tve__field">
+                <span>{{ tokenLabel(key) | translate }}</span>
+                <ui-color-picker [ngModel]="tokenValue(key)" (ngModelChange)="setToken(key, $event)" />
+              </label>
+            }
+          </div>
+        </app-admin-section-card>
+      }
+
+      @case ('layout') {
+        <app-admin-section-card [title]="'ADMIN.THEMES.TOKENS.SECTIONS.LAYOUT' | translate">
+          <div class="tve__grid">
+            @for (key of layoutTokens; track key) {
+              <label class="tve__field">
+                <span>{{ tokenLabel(key) | translate }}</span>
+                <ui-color-picker [ngModel]="tokenValue(key)" (ngModelChange)="setToken(key, $event)" />
+              </label>
+            }
+          </div>
+        </app-admin-section-card>
+      }
+
+      @case ('buttons') {
+        <app-admin-section-card [title]="'ADMIN.THEMES.TOKENS.SECTIONS.BUTTONS' | translate">
+          <label class="tve__field">
+            <span>{{ 'ADMIN.THEMES.TOKENS.LABELS.buttonRadius' | translate }} — {{ radiusPixels('buttonRadius') }}px</span>
+            <input
+              type="range"
+              min="0"
+              max="24"
+              [value]="radiusPixels('buttonRadius')"
+              (input)="setRadiusPixels('buttonRadius', $event)"
+            />
+          </label>
+          <label class="tve__field">
+            <span>{{ 'ADMIN.THEMES.TOKENS.LABELS.inputRadius' | translate }} — {{ radiusPixels('inputRadius') }}px</span>
+            <input
+              type="range"
+              min="0"
+              max="24"
+              [value]="radiusPixels('inputRadius')"
+              (input)="setRadiusPixels('inputRadius', $event)"
+            />
+          </label>
+
+          <div class="tve__button-preview">
+            <button
+              type="button"
+              class="tve__btn tve__btn--primary"
+              [style.background-color]="tokenValue('primary')"
+              [style.border-radius]="tokenValue('buttonRadius')"
+            >
+              {{ 'ADMIN.THEMES.EDITOR.BUTTON_PRIMARY' | translate }}
+            </button>
+            <button
+              type="button"
+              class="tve__btn tve__btn--secondary"
+              [style.background-color]="tokenValue('secondary')"
+              [style.border-radius]="tokenValue('buttonRadius')"
+            >
+              {{ 'ADMIN.THEMES.EDITOR.BUTTON_SECONDARY' | translate }}
+            </button>
+            <button
+              type="button"
+              class="tve__btn tve__btn--outline"
+              [style.border-color]="tokenValue('primary')"
+              [style.color]="tokenValue('primary')"
+              [style.border-radius]="tokenValue('buttonRadius')"
+            >
+              {{ 'ADMIN.THEMES.EDITOR.BUTTON_OUTLINE' | translate }}
+            </button>
+            <button
+              type="button"
+              class="tve__btn tve__btn--ghost"
+              [style.color]="tokenValue('primary')"
+              [style.border-radius]="tokenValue('buttonRadius')"
+            >
+              {{ 'ADMIN.THEMES.EDITOR.BUTTON_GHOST' | translate }}
+            </button>
+            <button type="button" class="tve__btn tve__btn--disabled" disabled [style.border-radius]="tokenValue('buttonRadius')">
+              {{ 'ADMIN.THEMES.EDITOR.BUTTON_DISABLED' | translate }}
+            </button>
+          </div>
+
+          <div class="tve__input-preview">
+            <input
+              type="text"
+              [placeholder]="'ADMIN.THEMES.EDITOR.INPUT_PREVIEW' | translate"
+              [style.border-radius]="tokenValue('inputRadius')"
+              [style.border-color]="tokenValue('border')"
+            />
+          </div>
+        </app-admin-section-card>
+      }
+
+      @case ('effects') {
+        <app-admin-section-card [title]="'ADMIN.THEMES.TOKENS.SECTIONS.EFFECTS' | translate">
+          <label class="tve__field">
+            <span>{{ 'ADMIN.THEMES.TOKENS.LABELS.borderRadius' | translate }} — {{ radiusPixels('borderRadius') }}px</span>
+            <input
+              type="range"
+              min="0"
+              max="32"
+              [value]="radiusPixels('borderRadius')"
+              (input)="setRadiusPixels('borderRadius', $event)"
+            />
+          </label>
+
+          <label class="tve__field">
+            <span>{{ 'ADMIN.THEMES.EDITOR.ANIMATION_SPEED' | translate }} — {{ animationSpeed() }}</span>
+            <input
+              type="range"
+              min="0"
+              max="500"
+              step="10"
+              [value]="parsePixels(animationSpeed())"
+              (input)="setAnimationSpeed($event)"
+            />
+          </label>
+
+          <div class="tve__field">
+            <span>{{ 'ADMIN.THEMES.TOKENS.LABELS.shadow' | translate }}</span>
+            <div class="tve__shadow-presets">
+              <button type="button" class="tve__shadow-preset" (click)="setToken('shadow', 'none')">
+                {{ 'ADMIN.THEMES.EDITOR.SHADOW_NONE' | translate }}
+              </button>
+              <button type="button" class="tve__shadow-preset" (click)="setToken('shadow', '0 4px 12px rgba(0, 0, 0, 0.12)')">
+                {{ 'ADMIN.THEMES.EDITOR.SHADOW_SOFT' | translate }}
+              </button>
+              <button type="button" class="tve__shadow-preset" (click)="setToken('shadow', '0 12px 32px rgba(0, 0, 0, 0.35)')">
+                {{ 'ADMIN.THEMES.EDITOR.SHADOW_ELEVATED' | translate }}
+              </button>
+            </div>
+            <div class="tve__shadow-preview" [style.box-shadow]="shadow()"></div>
+          </div>
+        </app-admin-section-card>
+      }
+
+      @case ('advanced') {
+        <app-theme-token-editor
+          [tokens]="tokens()"
+          [disabled]="disabled()"
+          (tokensChange)="onAdvancedTokensChange($event)"
+        />
+      }
+    }
+  </div>
+</div>

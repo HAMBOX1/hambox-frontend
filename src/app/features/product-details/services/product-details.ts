@@ -12,10 +12,10 @@ export class ProductDetails {
   private readonly products = inject(Products);
   private readonly translation = inject(TranslationService);
 
-  async getById(id: string): Promise<ProductDetailsItem> {
+  async getById(id: string, preview = false): Promise<ProductDetailsItem> {
     const product = await this.products.getProductById(id);
 
-    if (product.status !== 'Active') {
+    if (!preview && product.status !== 'Active') {
       throw new Error('Product is not available on the storefront.');
     }
 

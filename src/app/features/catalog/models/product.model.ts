@@ -39,6 +39,7 @@ export interface Product {
   readonly categoryName: string;
   readonly categoryNameAr: string;
   readonly additionalCategoryIds?: readonly string[];
+  readonly collectionIds?: readonly string[];
   readonly primaryImageUrl?: string | null;
   readonly images?: readonly ProductImage[] | null;
   readonly createdOnUtc?: string;
@@ -53,6 +54,7 @@ export interface CreateProductRequest {
   readonly price: number;
   readonly categoryId: string;
   readonly additionalCategoryIds?: readonly string[];
+  readonly collectionIds?: readonly string[];
 }
 
 export interface UpdateProductRequest {
@@ -64,6 +66,7 @@ export interface UpdateProductRequest {
   readonly categoryId: string;
   readonly status: ProductStatus;
   readonly additionalCategoryIds?: readonly string[];
+  readonly collectionIds?: readonly string[];
 }
 
 export interface ProductAssetFile {
@@ -85,6 +88,7 @@ export interface ProductDraftFormSnapshot {
   readonly price: number;
   readonly categoryId: string;
   readonly additionalCategoryIds: readonly string[];
+  readonly collectionIds: readonly string[];
 }
 
 export interface ProductListQuery {
@@ -95,6 +99,7 @@ export interface ProductListQuery {
   readonly categoryId?: string;
   readonly sortBy?: ProductSortBy;
   readonly attributes?: Readonly<Record<string, readonly string[]>>;
+  readonly collectionId?: string;
 }
 
 export interface ProductFacetQuery {
@@ -125,6 +130,16 @@ export interface ProductBulkSelection {
   readonly categoryId?: string;
   readonly selectAllMatching: boolean;
 }
+
+/** Discriminator for `ProductApiService.bulkProducts` — see backend `BulkProductsRequest` doc comment. */
+export type BulkProductAction =
+  | 'publish'
+  | 'unpublish'
+  | 'archive'
+  | 'change-category'
+  | 'adjust-price'
+  | 'assign-collection'
+  | 'remove-collection';
 
 export type PriceAdjustmentMode = 'IncreasePercent' | 'DecreasePercent' | 'SetFixed';
 

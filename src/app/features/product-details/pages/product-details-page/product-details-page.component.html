@@ -1,6 +1,13 @@
 <div class="pdp">
   <app-storefront-nav [links]="navLinks" />
 
+  @if (isPreview()) {
+    <div class="pdp__preview-banner" role="status">
+      <i class="pi pi-eye" aria-hidden="true"></i>
+      Preview mode — this is how the product will look once published. Purchasing is disabled.
+    </div>
+  }
+
   <main class="pdp__main">
     @if (loading()) {
       <app-loading-skeleton type="detail" [count]="1" />
@@ -103,7 +110,7 @@
               Add to Cart
             </button>
             <button type="button" class="pdp__cta pdp__cta--buy" [disabled]="!canPurchase()" (click)="buyNow()">Buy Now</button>
-            <button type="button" class="pdp__cta pdp__cta--wishlist" (click)="addToWishlist()">
+            <button type="button" class="pdp__cta pdp__cta--wishlist" [disabled]="isPreview()" (click)="addToWishlist()">
               <i class="pi pi-heart" aria-hidden="true"></i>
               Save to Vault
             </button>

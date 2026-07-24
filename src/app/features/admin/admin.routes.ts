@@ -101,6 +101,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'collections',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Collections.View])],
+    loadComponent: () =>
+      import('../catalog/pages/collection-list-page/collection-list-page.component').then(
+        (c) => c.CollectionListPageComponent,
+      ),
+  },
+  {
     path: 'roles',
     loadChildren: () =>
       import('./roles/admin-roles.routes').then((m) => m.routes),

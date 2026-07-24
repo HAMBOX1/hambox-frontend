@@ -2,11 +2,14 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
+  ElementRef,
   inject,
   input,
   OnDestroy,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -32,6 +35,8 @@ import {
 export class ProductAssetsUploadComponent implements OnDestroy {
   private readonly productApi = inject(ProductApiService);
 
+  private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+
   readonly productId = input<string | null>(null);
 
   protected readonly maxCount = PRODUCT_IMAGE_MAX_COUNT;
@@ -43,11 +48,37 @@ export class ProductAssetsUploadComponent implements OnDestroy {
   protected readonly previewAsset = signal<ProductAssetFile | null>(null);
 
   private readonly previewUrls = new Set<string>();
+  private readonly deletedImageIds = signal<ReadonlySet<string>>(new Set());
+  private originalOrder: readonly string[] = [];
+  private originalPrimaryId: string | null = null;
+
+  /** True while there are local image changes (added/removed/reordered/re-primaried) not yet
+   * pushed to the backend — driven into `onSave` alongside the General form, same as `dirty`
+   * on `ProductBasicInfoFormComponent`. */
+  readonly dirty = computed(() => {
+    const assets = this.assets();
+    if (assets.some((asset) => !asset.persisted)) {
+      return true;
+    }
+    if (this.deletedImageIds().size > 0) {
+      return true;
+    }
+
+    const currentOrder = assets.map((asset) => asset.id);
+    if (currentOrder.length !== this.originalOrder.length || currentOrder.some((id, i) => id !== this.originalOrder[i])) {
+      return true;
+    }
+
+    const currentPrimaryId = assets.find((asset) => asset.isPrimary)?.id ?? null;
+    return currentPrimaryId !== this.originalPrimaryId;
+  });
 
   constructor() {
     effect(() => {
       const productId = this.productId();
-      if (!productId) {
+      // Skip when there are unsaved local staged images — e.g. the productId flips from null to
+      // a freshly auto-created draft id while the admin still has un-uploaded files pending.
+      if (!productId || this.dirty()) {
         return;
       }
 
@@ -59,38 +90,30 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     this.revokeAllPreviews();
   }
 
-  getPendingFiles(): readonly File[] {
-    return this.assets()
-      .filter((asset) => !asset.persisted && asset.file)
-      .map((asset) => asset.file as File);
-  }
-
-  async uploadPendingFiles(targetProductId: string): Promise<void> {
-    const pending = this.getPendingFiles();
-
-    for (const file of pending) {
-      await firstValueFrom(this.productApi.uploadProductImage(targetProductId, file));
-    }
-
-    await this.refreshPersistedImages(targetProductId);
+  openFilePicker(): void {
+    this.fileInput()?.nativeElement.click();
   }
 
   loadPersistedImages(images: readonly ProductImage[]): void {
     this.revokeAllPreviews();
 
+    const sorted = [...images].sort((left, right) => left.displayOrder - right.displayOrder);
+
     this.assets.set(
-      [...images]
-        .sort((left, right) => left.displayOrder - right.displayOrder)
-        .map((image) => ({
-          id: image.id,
-          name: image.fileName,
-          size: image.fileSizeBytes,
-          previewUrl: resolveProductImageUrl(image.url),
-          persisted: true,
-          isPrimary: image.isPrimary,
-          contentType: image.contentType,
-        })),
+      sorted.map((image) => ({
+        id: image.id,
+        name: image.fileName,
+        size: image.fileSizeBytes,
+        previewUrl: resolveProductImageUrl(image.url),
+        persisted: true,
+        isPrimary: image.isPrimary,
+        contentType: image.contentType,
+      })),
     );
+
+    this.deletedImageIds.set(new Set());
+    this.originalOrder = sorted.map((image) => image.id);
+    this.originalPrimaryId = sorted.find((image) => image.isPrimary)?.id ?? null;
   }
 
   protected onBrowseClick(fileInput: HTMLInputElement): void {
@@ -113,7 +136,7 @@ export class ProductAssetsUploadComponent implements OnDestroy {
 
   protected onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    void this.addFiles(input.files);
+    this.addFiles(input.files);
     input.value = '';
   }
 
@@ -130,60 +153,44 @@ export class ProductAssetsUploadComponent implements OnDestroy {
   protected onDrop(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver.set(false);
-    void this.addFiles(event.dataTransfer?.files ?? null);
+    this.addFiles(event.dataTransfer?.files ?? null);
   }
 
-  protected async removeAsset(assetId: string): Promise<void> {
+  /** Local only — nothing hits the backend until `commitChanges` runs from Save. */
+  protected removeAsset(assetId: string): void {
     const asset = this.assets().find((entry) => entry.id === assetId);
-    const productId = this.productId();
-
-    if (asset?.persisted && productId) {
-      this.uploading.set(true);
-      try {
-        await firstValueFrom(this.productApi.deleteProductImage(productId, assetId));
-        await this.refreshPersistedImages(productId);
-      } catch {
-        this.validationError.set('Unable to delete image.');
-      } finally {
-        this.uploading.set(false);
-      }
+    if (!asset) {
       return;
     }
 
-    if (asset?.previewUrl && !asset.persisted) {
+    if (asset.persisted) {
+      this.deletedImageIds.update((ids) => new Set(ids).add(assetId));
+    } else if (asset.previewUrl) {
       URL.revokeObjectURL(asset.previewUrl);
       this.previewUrls.delete(asset.previewUrl);
     }
 
-    this.assets.update((current) => current.filter((entry) => entry.id !== assetId));
+    this.assets.update((current) => {
+      const next = current.filter((entry) => entry.id !== assetId);
+      if (asset.isPrimary && next.length > 0 && !next.some((entry) => entry.isPrimary)) {
+        next[0] = { ...next[0], isPrimary: true };
+      }
+      return next;
+    });
   }
 
-  protected async setPrimary(assetId: string): Promise<void> {
-    const productId = this.productId();
-    const asset = this.assets().find((entry) => entry.id === assetId);
-
-    if (!productId || !asset?.persisted) {
-      this.assets.update((current) =>
-        current.map((entry) => ({
-          ...entry,
-          isPrimary: entry.id === assetId,
-        })),
-      );
-      return;
-    }
-
-    this.uploading.set(true);
-    try {
-      await firstValueFrom(this.productApi.setPrimaryProductImage(productId, assetId));
-      await this.refreshPersistedImages(productId);
-    } catch {
-      this.validationError.set('Unable to set primary image.');
-    } finally {
-      this.uploading.set(false);
-    }
+  /** Local only — see `removeAsset`. */
+  protected setPrimary(assetId: string): void {
+    this.assets.update((current) =>
+      current.map((entry) => ({
+        ...entry,
+        isPrimary: entry.id === assetId,
+      })),
+    );
   }
 
-  protected async onAssetDrop(event: CdkDragDrop<readonly ProductAssetFile[]>): Promise<void> {
+  /** Local only — see `removeAsset`. */
+  protected onAssetDrop(event: CdkDragDrop<readonly ProductAssetFile[]>): void {
     if (event.previousIndex === event.currentIndex) {
       return;
     }
@@ -191,21 +198,48 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     const nextAssets = [...this.assets()];
     moveItemInArray(nextAssets, event.previousIndex, event.currentIndex);
     this.assets.set(nextAssets);
+  }
 
-    const productId = this.productId();
-    const persistedIds = nextAssets.filter((asset) => asset.persisted).map((asset) => asset.id);
-
-    if (productId && persistedIds.length === nextAssets.length && persistedIds.length > 0) {
-      this.uploading.set(true);
-      try {
-        await firstValueFrom(this.productApi.reorderProductImages(productId, persistedIds));
-        await this.refreshPersistedImages(productId);
-      } catch {
-        this.validationError.set('Unable to reorder images.');
-      } finally {
-        this.uploading.set(false);
-      }
+  /** Pushes all staged image changes (adds/deletes/reorder/primary) to the backend. Called from
+   * the page's Save action — never on its own, so images never persist ahead of the rest of the form. */
+  async commitChanges(targetProductId: string): Promise<void> {
+    if (!this.dirty()) {
       return;
+    }
+
+    this.uploading.set(true);
+    try {
+      for (const imageId of this.deletedImageIds()) {
+        await firstValueFrom(this.productApi.deleteProductImage(targetProductId, imageId));
+      }
+
+      const orderedIds: string[] = [];
+      let primaryId: string | null = null;
+
+      for (const asset of this.assets()) {
+        let resolvedId = asset.id;
+        if (!asset.persisted && asset.file) {
+          const uploaded = await firstValueFrom(this.productApi.uploadProductImage(targetProductId, asset.file));
+          resolvedId = uploaded.id;
+        }
+        orderedIds.push(resolvedId);
+        if (asset.isPrimary) {
+          primaryId = resolvedId;
+        }
+      }
+
+      if (orderedIds.length > 0) {
+        await firstValueFrom(this.productApi.reorderProductImages(targetProductId, orderedIds));
+      }
+      if (primaryId) {
+        await firstValueFrom(this.productApi.setPrimaryProductImage(targetProductId, primaryId));
+      }
+
+      await this.refreshPersistedImages(targetProductId);
+    } catch {
+      this.validationError.set('Unable to save image changes.');
+    } finally {
+      this.uploading.set(false);
     }
   }
 
@@ -221,7 +255,7 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  private async addFiles(fileList: FileList | null): Promise<void> {
+  private addFiles(fileList: FileList | null): void {
     if (!fileList?.length) {
       return;
     }
@@ -256,23 +290,6 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     }
 
     this.validationError.set(null);
-    const productId = this.productId();
-
-    if (productId) {
-      this.uploading.set(true);
-      try {
-        for (const file of validFiles) {
-          await firstValueFrom(this.productApi.uploadProductImage(productId, file));
-        }
-
-        await this.refreshPersistedImages(productId);
-      } catch {
-        this.validationError.set('Unable to upload one or more images.');
-      } finally {
-        this.uploading.set(false);
-      }
-      return;
-    }
 
     const nextAssets = validFiles.map((file) => {
       const previewUrl = URL.createObjectURL(file);

@@ -20,6 +20,7 @@ import {
   ThemeListResult,
   ThemePreviewSessionDto,
   ThemeStatisticsDto,
+  ThemeTemplateDto,
   UpdateThemeRequest,
 } from '../models/theme-api.model';
 
@@ -59,6 +60,10 @@ export class ThemeManagementFacade {
 
   private readonly actionLoadingState = signal(false);
 
+  private readonly templatesState = signal<readonly ThemeTemplateDto[]>([]);
+  private readonly templatesLoadingState = signal(false);
+  private readonly templatesErrorState = signal<string | null>(null);
+
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly themes = this.themesState.asReadonly();
@@ -88,6 +93,10 @@ export class ThemeManagementFacade {
   readonly compareError = this.compareErrorState.asReadonly();
 
   readonly actionLoading = this.actionLoadingState.asReadonly();
+
+  readonly templates = this.templatesState.asReadonly();
+  readonly templatesLoading = this.templatesLoadingState.asReadonly();
+  readonly templatesError = this.templatesErrorState.asReadonly();
 
   readonly hasActiveFilters = computed(
     () => this.searchTermState().trim().length > 0 || this.statusFilterState() !== 'all',
@@ -123,6 +132,23 @@ export class ThemeManagementFacade {
 
   loadStatistics(): void {
     void this.fetchStatistics();
+  }
+
+  async loadTemplates(): Promise<void> {
+    this.templatesLoadingState.set(true);
+    this.templatesErrorState.set(null);
+
+    try {
+      const templates = await firstValueFrom(
+        this.api.get<ThemeTemplateDto[]>(THEMES_API.templates),
+      );
+      this.templatesState.set(templates ?? []);
+    } catch (error) {
+      this.templatesState.set([]);
+      this.templatesErrorState.set(this.toErrorMessage(error, 'Failed to load templates.'));
+    } finally {
+      this.templatesLoadingState.set(false);
+    }
   }
 
   setSearchTerm(term: string): void {

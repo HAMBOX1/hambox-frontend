@@ -17,6 +17,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ThemeEngineService } from '../../../../../core/theme/theme-engine.service';
 import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
@@ -28,11 +29,14 @@ import {
   AdminStickySaveBarComponent,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
+import { contrastRatio } from '../../../../../shared/utils/color.util';
 import { ThemePreviewPanelComponent } from '../../components/theme-preview-panel/theme-preview-panel.component';
-import { ThemeTokenEditorComponent } from '../../components/theme-token-editor/theme-token-editor.component';
+import { ThemeVisualEditorComponent } from '../../components/theme-visual-editor/theme-visual-editor.component';
 import {
   CreateThemeRequest,
   THEME_BASE_MODE_OPTIONS,
+  ThemeDetailDto,
+  latestThemeVersion,
   tokensFromDetail,
   UpdateThemeRequest,
 } from '../../models/theme-api.model';
@@ -50,12 +54,13 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
     SelectModule,
     TextareaModule,
     ToastModule,
+    TooltipModule,
     AdminPageHeaderComponent,
     AdminErrorAlertComponent,
     AdminSectionCardComponent,
     AdminLoadingSkeletonComponent,
     AdminStickySaveBarComponent,
-    ThemeTokenEditorComponent,
+    ThemeVisualEditorComponent,
     ThemePreviewPanelComponent,
   ],
   providers: [ThemeManagementFacade, MessageService],
@@ -84,9 +89,37 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
   protected readonly notes = signal('');
   protected readonly tokens = signal<Record<string, string>>({});
 
+  private tokenHistory: Record<string, string>[] = [];
+  private historyIndex = -1;
+  protected readonly canUndo = signal(false);
+  protected readonly canRedo = signal(false);
+
   protected readonly detailLoading = this.facade.detailLoading;
   protected readonly detailSaving = this.facade.detailSaving;
   protected readonly detailError = this.facade.detailError;
+
+  protected readonly serverWarnings = computed(
+    () => latestThemeVersion(this.facade.detail())?.validationWarnings ?? [],
+  );
+
+  protected readonly liveWarnings = computed(() => {
+    const tokens = this.tokens();
+    const warnings: string[] = [];
+
+    const primaryOnBackground = contrastRatio(tokens['primary'], tokens['background']);
+    if (primaryOnBackground !== null && primaryOnBackground < 4.5) {
+      warnings.push(
+        `Primary vs background contrast is ${primaryOnBackground.toFixed(2)}:1 — WCAG AA needs 4.5:1.`,
+      );
+    }
+
+    const cardOnBackground = contrastRatio(tokens['card'], tokens['background']);
+    if (cardOnBackground !== null && cardOnBackground < 1.2) {
+      warnings.push('Card background barely differs from the page background — content may be hard to distinguish.');
+    }
+
+    return warnings;
+  });
 
   protected readonly breadcrumbs = computed(() =>
     adminBreadcrumbs(
@@ -104,18 +137,23 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
     ),
   );
 
+  private lastLoadedDetail: ThemeDetailDto | null = null;
+
   constructor() {
     effect(() => {
       const detail = this.facade.detail();
-      if (!detail || this.isCreateMode()) {
+      if (!detail || this.isCreateMode() || detail === this.lastLoadedDetail) {
         return;
       }
+      this.lastLoadedDetail = detail;
 
       this.name.set(detail.name);
       this.slug.set(detail.slug);
       this.description.set(detail.description ?? '');
       this.baseMode.set(detail.baseMode);
-      this.tokens.set(tokensFromDetail(detail));
+      const loadedTokens = tokensFromDetail(detail);
+      this.tokens.set(loadedTokens);
+      this.resetHistory(loadedTokens);
       this.applyLivePreview();
     });
 
@@ -134,14 +172,16 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.tokens.set({
+    const defaultTokens = {
       primary: '#50ed95',
       background: '#131314',
       surface: '#1a1a1c',
       card: '#2a2a2b',
       border: 'rgba(255, 255, 255, 0.1)',
       typography: "'Inter', system-ui, sans-serif",
-    });
+    };
+    this.tokens.set(defaultTokens);
+    this.resetHistory(defaultTokens);
     this.applyLivePreview();
   }
 
@@ -156,9 +196,55 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
 
   protected onTokensChange(next: Record<string, string>): void {
     this.tokens.set(next);
+    this.tokenHistory = [...this.tokenHistory.slice(0, this.historyIndex + 1), next];
+    this.historyIndex = this.tokenHistory.length - 1;
+    this.updateHistoryFlags();
   }
 
+  protected undo(): void {
+    if (this.historyIndex <= 0) {
+      return;
+    }
+    this.historyIndex--;
+    this.tokens.set(this.tokenHistory[this.historyIndex]);
+    this.updateHistoryFlags();
+  }
+
+  protected redo(): void {
+    if (this.historyIndex >= this.tokenHistory.length - 1) {
+      return;
+    }
+    this.historyIndex++;
+    this.tokens.set(this.tokenHistory[this.historyIndex]);
+    this.updateHistoryFlags();
+  }
+
+  private resetHistory(snapshot: Record<string, string>): void {
+    this.tokenHistory = [snapshot];
+    this.historyIndex = 0;
+    this.updateHistoryFlags();
+  }
+
+  private updateHistoryFlags(): void {
+    this.canUndo.set(this.historyIndex > 0);
+    this.canRedo.set(this.historyIndex < this.tokenHistory.length - 1);
+  }
+
+  private saveInFlight = false;
+
   protected async save(): Promise<void> {
+    if (this.saveInFlight) {
+      return;
+    }
+    this.saveInFlight = true;
+    try {
+      await this.performSave();
+    } finally {
+      this.saveInFlight = false;
+    }
+  }
+
+  private async performSave(): Promise<void> {
     if (this.isCreateMode()) {
       const request: CreateThemeRequest = {
         name: this.name().trim(),

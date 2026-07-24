@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,6 +26,8 @@ import {
   AdminDataTableShellComponent,
   AdminEmptyStateComponent,
   AdminErrorAlertComponent,
+  AdminIconButtonComponent,
+  AdminLoadingSkeletonComponent,
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
   AdminStatCardComponent,
@@ -42,6 +45,7 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
   selector: 'app-themes-list-page',
   standalone: true,
   imports: [
+    DatePipe,
     FormsModule,
     RouterLink,
     TranslatePipe,
@@ -63,6 +67,8 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
     AdminActionMenuComponent,
     AdminConfirmDialogComponent,
     AdminStatusBadgeComponent,
+    AdminIconButtonComponent,
+    AdminLoadingSkeletonComponent,
   ],
   providers: [ThemeManagementFacade, MessageService],
   templateUrl: './themes-list-page.component.html',
@@ -91,6 +97,8 @@ export class ThemesListPageComponent implements OnInit {
   protected readonly actionLoading = this.facade.actionLoading;
   protected readonly listStats = this.facade.listStats;
 
+  protected readonly viewMode = signal<'grid' | 'list'>('grid');
+
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateTarget = signal<ThemeListItemDto | null>(null);
   protected readonly duplicateName = signal('');
@@ -105,6 +113,10 @@ export class ThemesListPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadThemes();
+  }
+
+  protected setViewMode(mode: 'grid' | 'list'): void {
+    this.viewMode.set(mode);
   }
 
   protected onSearchChange(term: string): void {

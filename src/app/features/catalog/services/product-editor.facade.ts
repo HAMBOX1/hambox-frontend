@@ -8,6 +8,8 @@ import { ApiError, parseApiError } from '../../../core/models/api-error.model';
 
 import { CategoryOption } from '../models/category.model';
 
+import { CollectionOption } from '../models/collection.model';
+
 import { isVariantLive } from '../utils/variant-status.utils';
 
 import {
@@ -68,6 +70,8 @@ import {
 
 import { CategoryApiService } from './category-api.service';
 
+import { CollectionApiService } from './collection-api.service';
+
 import { InventoryApiService } from './inventory-api.service';
 
 import { ProductApiService } from './product-api.service';
@@ -75,6 +79,8 @@ import { ProductApiService } from './product-api.service';
 
 
 const CATEGORY_PAGE_SIZE = 100;
+
+const COLLECTION_PAGE_SIZE = 200;
 
 const DEFAULT_CODE_PAGE_SIZE = 25;
 
@@ -102,6 +108,8 @@ export class ProductEditorFacade {
 
   private readonly categoryApi = inject(CategoryApiService);
 
+  private readonly collectionApi = inject(CollectionApiService);
+
   private readonly inventoryApi = inject(InventoryApiService);
 
 
@@ -111,6 +119,8 @@ export class ProductEditorFacade {
   private readonly imagesState = signal<readonly ProductImage[]>([]);
 
   private readonly categoriesState = signal<readonly CategoryOption[]>([]);
+
+  private readonly collectionsState = signal<readonly CollectionOption[]>([]);
 
   private readonly variantsState = signal<readonly ProductVariantDto[]>([]);
 
@@ -154,6 +164,8 @@ export class ProductEditorFacade {
 
   private readonly categoriesLoadingState = signal(false);
 
+  private readonly collectionsLoadingState = signal(false);
+
   private readonly errorState = signal<string | null>(null);
 
   private readonly submittingState = signal(false);
@@ -167,6 +179,10 @@ export class ProductEditorFacade {
   readonly images = this.imagesState.asReadonly();
 
   readonly categories = this.categoriesState.asReadonly();
+
+  readonly collections = this.collectionsState.asReadonly();
+
+  readonly collectionsLoading = this.collectionsLoadingState.asReadonly();
 
   readonly variants = this.variantsState.asReadonly();
 
@@ -249,6 +265,8 @@ export class ProductEditorFacade {
       categoryId: product.categoryId,
 
       additionalCategoryIds: product.additionalCategoryIds ?? [],
+
+      collectionIds: product.collectionIds ?? [],
 
     };
 
@@ -350,6 +368,8 @@ export class ProductEditorFacade {
       ]);
 
       await this.loadCategories();
+
+      await this.loadCollections();
 
 
 
@@ -1779,6 +1799,28 @@ export class ProductEditorFacade {
 
     }
 
+  }
+
+  async loadCollections(): Promise<void> {
+    this.collectionsLoadingState.set(true);
+
+    try {
+      const result = await firstValueFrom(
+        this.collectionApi.getCollections({ pageNumber: 1, pageSize: COLLECTION_PAGE_SIZE }),
+      );
+
+      this.collectionsState.set(
+        (result.items ?? []).map((collection) => ({
+          id: collection.id,
+          label: collection.name,
+          parentId: collection.parentId,
+        })),
+      );
+    } catch {
+      this.collectionsState.set([]);
+    } finally {
+      this.collectionsLoadingState.set(false);
+    }
   }
 
 

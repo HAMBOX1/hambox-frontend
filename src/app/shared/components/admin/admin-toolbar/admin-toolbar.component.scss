@@ -48,36 +48,41 @@
     }
   }
 
-  /* Compact mode: search, status, and view-toggle icons all stay on one row. */
+  /* Compact mode: row 1 is search + view-toggle icons, row 2 is the filter dropdowns. */
   .admin-toolbar--compact {
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'search actions'
+      'filters filters';
     gap: 0.5rem;
     padding: 0.625rem 0.75rem;
   }
 
   .admin-toolbar--compact .admin-toolbar__search {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .admin-toolbar--compact .admin-toolbar__filters {
-    flex: 0 0 auto;
-    flex-wrap: nowrap;
+    grid-area: search;
     min-width: 0;
   }
 
   .admin-toolbar--compact .admin-toolbar__actions {
-    flex: 0 0 auto;
+    grid-area: actions;
     width: auto;
     margin-left: 0;
     gap: 0.375rem;
+  }
+
+  .admin-toolbar--compact .admin-toolbar__filters {
+    grid-area: filters;
+    flex-wrap: nowrap;
+    min-width: 0;
   }
 
   :host ::ng-deep {
     .admin-toolbar--compact .admin-toolbar__filters .p-select,
     .admin-toolbar--compact .admin-toolbar__filters .p-dropdown,
     .admin-toolbar--compact .admin-toolbar__filters .p-multiselect {
-      width: 5.5rem;
+      flex: 1 1 0;
+      width: auto;
       min-width: 0;
     }
   }

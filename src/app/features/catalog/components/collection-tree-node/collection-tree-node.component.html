@@ -1,0 +1,83 @@
+<div
+  class="collection-tree-node"
+  [class.collection-tree-node--root]="depth() === 0"
+  [class.collection-tree-node--last]="isLast()"
+  [style.--collection-tree-depth]="depth()"
+>
+  <div
+    class="collection-tree-node__row"
+    [class.collection-tree-node__row--parent]="hasChildren()"
+    [class.collection-tree-node__row--match]="callbacks().isMatched(node().id)"
+    [class.collection-tree-node__row--dragging]="callbacks().isDragged(node().id)"
+    [class.collection-tree-node__row--drop-before]="callbacks().dropZoneFor(node().id) === 'before'"
+    [class.collection-tree-node__row--drop-after]="callbacks().dropZoneFor(node().id) === 'after'"
+    [class.collection-tree-node__row--drop-inside]="callbacks().dropZoneFor(node().id) === 'inside'"
+    [class.collection-tree-node__row--mobile]="callbacks().isMobile()"
+    [attr.data-collection-row-id]="node().id"
+    cdkDrag
+    [cdkDragData]="node().id"
+    cdkDragBoundary=".collection-tree"
+    (cdkDragMoved)="onDragMoved($event)"
+    (cdkDragEnded)="onDragEnded($event)"
+    (click)="onRowActivate($event)"
+  >
+    <div class="collection-tree-node__actions" (click)="$event.stopPropagation()">
+      <app-admin-action-menu [items]="menuItems()" label="Collection actions" />
+    </div>
+
+    <div class="collection-tree-node__primary">
+      <button
+        type="button"
+        class="collection-tree-node__disclosure"
+        [class.collection-tree-node__disclosure--hidden]="!hasChildren()"
+        [attr.aria-label]="isExpanded() ? 'Collapse' : 'Expand'"
+        (click)="toggle(); $event.stopPropagation()"
+      >
+        <i class="pi" [class.pi-chevron-right]="!isExpanded()" [class.pi-chevron-down]="isExpanded()" aria-hidden="true"></i>
+      </button>
+
+      <i
+        class="pi collection-tree-node__icon"
+        [class]="node().icon || (hasChildren() ? 'pi-folder-open' : 'pi-folder')"
+        [style.color]="iconColor()"
+        aria-hidden="true"
+      ></i>
+
+      <span class="collection-tree-node__name">
+        @for (segment of nameSegments(); track $index) {
+          @if (segment.matched) {
+            <mark>{{ segment.text }}</mark>
+          } @else {
+            {{ segment.text }}
+          }
+        }
+      </span>
+    </div>
+
+    <div class="collection-tree-node__meta">
+      @if (node().isSystem) {
+        <span class="collection-tree-node__system-badge">System</span>
+      }
+      @if (node().childrenCount > 0) {
+        <span class="collection-tree-node__count collection-tree-node__count--children" title="{{ node().childrenCount }} child collections">
+          {{ node().childrenCount }}
+        </span>
+      }
+      @if (node().productCount > 0) {
+        <span class="collection-tree-node__count collection-tree-node__count--products" title="{{ node().productCount }} products">
+          ({{ node().productCount }})
+        </span>
+      }
+    </div>
+
+    <i class="pi pi-bars collection-tree-node__drag-handle" cdkDragHandle aria-hidden="true"></i>
+  </div>
+
+  @if (isExpanded() && hasChildren()) {
+    <div class="collection-tree-node__children">
+      @for (child of node().children; track child.id; let last = $last) {
+        <app-collection-tree-node [node]="child" [depth]="depth() + 1" [isLast]="last" [callbacks]="callbacks()" />
+      }
+    </div>
+  }
+</div>

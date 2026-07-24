@@ -16,6 +16,18 @@ export interface ThemeListItemDto {
   readonly versionCount: number;
   readonly publishedOnUtc: string | null;
   readonly createdOnUtc: string;
+  readonly previewPrimary: string | null;
+  readonly previewBackground: string | null;
+  readonly previewCard: string | null;
+  readonly assignmentSummary: string | null;
+}
+
+export interface ThemeTemplateDto {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly baseMode: string;
+  readonly tokens: Readonly<Record<string, string>>;
 }
 
 export interface ThemeVersionDto {

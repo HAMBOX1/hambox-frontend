@@ -1,0 +1,94 @@
+<p-toast position="top-right" />
+
+<section class="admin-page collection-list-page">
+  <app-admin-page-header
+    title="Collections"
+    [subtitle]="subtitle()"
+    [breadcrumbs]="breadcrumbs"
+    [compactActions]="true"
+  >
+    <app-admin-icon-button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Collections.Create"
+      icon="pi pi-plus"
+      label="Create Collection"
+      severity="primary"
+      (pressed)="openCreateDialog()"
+    />
+  </app-admin-page-header>
+
+  <app-admin-search-bar
+    class="collection-list-page__search"
+    [value]="searchTerm()"
+    placeholder="Search collections..."
+    (searchChange)="onSearchChange($event)"
+  />
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-collection-tree
+    (createCollection)="openCreateDialog()"
+    (editCollection)="openEditDialog($event)"
+    (deleteCollection)="requestDelete($event)"
+    (addChildCollection)="openCreateDialogForParent($event)"
+    (viewProducts)="viewProducts($event)"
+  />
+</section>
+
+<p-dialog
+  header="Create Collection"
+  [visible]="createDialogOpen()"
+  (visibleChange)="onCreateDialogVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+  ariaLabelledBy="create-collection-dialog-title"
+>
+  <app-collection-create-form
+    mode="create"
+    [submitting]="creating()"
+    [serverError]="createError()"
+    [resetToken]="formResetToken()"
+    [parentOptions]="parentOptions()"
+    [initialParentId]="createParentId()"
+    (submitted)="onCreateSubmitted($event)"
+    (cancelled)="onCreateCancelled()"
+  />
+</p-dialog>
+
+<p-drawer
+  [visible]="editDialogOpen()"
+  (visibleChange)="onEditDialogVisibleChange($event)"
+  header="Edit Collection"
+  position="right"
+  [modal]="true"
+  [dismissible]="true"
+  [closeOnEscape]="true"
+  appendTo="body"
+  [style]="{ width: 'min(26rem, 92vw)' }"
+  styleClass="collection-list-page__edit-drawer"
+>
+  <app-collection-create-form
+    mode="edit"
+    [submitting]="updating()"
+    [serverError]="updateError()"
+    [resetToken]="formResetToken()"
+    [parentOptions]="editableParentOptions()"
+    [initialCollection]="editingCollection()"
+    (updateSubmitted)="onUpdateSubmitted($event)"
+  />
+</p-drawer>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  title="Delete collection"
+  [message]="deleteDialogMessage()"
+  [destructive]="true"
+  [loading]="deleting()"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  (confirmed)="confirmDelete()"
+/>

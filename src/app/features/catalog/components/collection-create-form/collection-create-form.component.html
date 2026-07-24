@@ -1,0 +1,112 @@
+<form class="collection-create-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="collection-create-form__fields">
+    @if (serverError()) {
+      <app-admin-error-alert [message]="serverError()!" [showRetry]="false" />
+    }
+
+    <div class="admin-field">
+      <label class="admin-field__label" for="collection-name">Name</label>
+      <input
+        pInputText
+        id="collection-name"
+        class="admin-field__input"
+        type="text"
+        formControlName="name"
+        autocomplete="off"
+        placeholder="e.g. Supplier Bamboo"
+      />
+      @if (fieldError('name'); as error) {
+        <p class="collection-create-form__error">{{ error }}</p>
+      }
+    </div>
+
+    <div class="admin-field">
+      <label class="admin-field__label" for="collection-description"
+        >Description <span class="admin-field__optional">(optional)</span></label
+      >
+      <textarea
+        pTextarea
+        id="collection-description"
+        class="admin-field__input"
+        formControlName="description"
+        rows="2"
+        autocomplete="off"
+      ></textarea>
+    </div>
+
+    <div class="admin-field">
+      <label class="admin-field__label" for="collection-parent"
+        >Parent collection <span class="admin-field__optional">(optional)</span></label
+      >
+      <p-select
+        inputId="collection-parent"
+        formControlName="parentId"
+        [options]="parentDropdownOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="No parent (top-level)"
+      />
+    </div>
+
+    <div class="admin-field">
+      <span class="admin-field__label">Color <span class="admin-field__optional">(optional)</span></span>
+      <div class="collection-create-form__swatches">
+        @for (preset of colorPresets; track preset.key) {
+          <button
+            type="button"
+            class="collection-create-form__swatch"
+            [class.collection-create-form__swatch--selected]="isColorSelected(preset.key)"
+            [style.--swatch-color]="'var(--color-' + preset.key + ')'"
+            [attr.aria-label]="preset.label"
+            [attr.aria-pressed]="isColorSelected(preset.key)"
+            (click)="selectColor(preset.key)"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <div class="admin-field">
+      <span class="admin-field__label">Icon <span class="admin-field__optional">(optional)</span></span>
+      <div class="collection-create-form__icons">
+        @for (icon of iconPresets; track icon) {
+          <button
+            type="button"
+            class="collection-create-form__icon-btn"
+            [class.collection-create-form__icon-btn--selected]="isIconSelected(icon)"
+            [attr.aria-pressed]="isIconSelected(icon)"
+            (click)="selectIcon(icon)"
+          >
+            <i [class]="icon" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="admin-field">
+      <label class="admin-field__label" for="collection-sort-order">Sort order</label>
+      <p-inputNumber inputId="collection-sort-order" formControlName="sortOrder" [min]="0" [showButtons]="true" />
+    </div>
+  </div>
+
+  <div class="collection-create-form__actions">
+    <button
+      pButton
+      type="button"
+      class="admin-btn-secondary"
+      label="Cancel"
+      severity="secondary"
+      [disabled]="submitting()"
+      (click)="cancel()"
+    ></button>
+
+    <button
+      pButton
+      type="submit"
+      class="admin-btn-primary"
+      [label]="submitLabel()"
+      icon="pi pi-check"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+    ></button>
+  </div>
+</form>

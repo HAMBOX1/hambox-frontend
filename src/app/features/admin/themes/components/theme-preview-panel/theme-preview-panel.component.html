@@ -1,27 +1,148 @@
 <app-admin-section-card [title]="'ADMIN.THEMES.PREVIEW.TITLE' | translate">
   <p class="theme-preview-panel__hint">{{ 'ADMIN.THEMES.PREVIEW.HINT' | translate }}</p>
 
-  <div class="theme-preview-panel__canvas">
-    <header class="theme-preview-panel__nav">
-      <span>{{ themeName() || ('ADMIN.THEMES.PREVIEW.SAMPLE_STORE' | translate) }}</span>
-      <span class="theme-preview-panel__mode">{{ baseMode() }}</span>
-    </header>
-
-    <div class="theme-preview-panel__hero">
-      <h3>{{ 'ADMIN.THEMES.PREVIEW.HERO_TITLE' | translate }}</h3>
-      <p>{{ 'ADMIN.THEMES.PREVIEW.HERO_TEXT' | translate }}</p>
-      <button pButton type="button" class="theme-preview-panel__cta" [label]="'ADMIN.THEMES.PREVIEW.CTA' | translate"></button>
+  <div class="theme-preview-panel__toolbar">
+    <div class="theme-preview-panel__pages">
+      @for (page of pages; track page.id) {
+        <button
+          type="button"
+          class="theme-preview-panel__tab"
+          [class.theme-preview-panel__tab--active]="activePage() === page.id"
+          (click)="selectPage(page.id)"
+        >
+          {{ page.labelKey | translate }}
+        </button>
+      }
     </div>
 
-    <div class="theme-preview-panel__cards">
-      <article class="theme-preview-panel__card">
-        <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_TITLE' | translate }}</h4>
-        <p>{{ 'ADMIN.THEMES.PREVIEW.CARD_TEXT' | translate }}</p>
-      </article>
-      <article class="theme-preview-panel__card theme-preview-panel__card--elevated">
-        <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_ELEVATED' | translate }}</h4>
-        <p>{{ 'ADMIN.THEMES.PREVIEW.CARD_TEXT' | translate }}</p>
-      </article>
+    <div class="theme-preview-panel__viewports">
+      @for (viewport of viewports; track viewport.id) {
+        <button
+          type="button"
+          class="theme-preview-panel__viewport-btn"
+          [class.theme-preview-panel__viewport-btn--active]="viewportSize() === viewport.id"
+          [title]="viewport.id"
+          (click)="selectViewport(viewport.id)"
+        >
+          <i [class]="viewport.icon" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div
+    class="theme-preview-panel__viewport theme-preview-panel__viewport--{{ viewportSize() }}"
+  >
+    <div class="theme-preview-panel__canvas">
+      <header class="theme-preview-panel__nav">
+        <span class="theme-preview-panel__brand">{{ themeName() || ('ADMIN.THEMES.PREVIEW.SAMPLE_STORE' | translate) }}</span>
+        <nav class="theme-preview-panel__nav-links">
+          <span>{{ 'ADMIN.THEMES.PREVIEW.NAV_SHOP' | translate }}</span>
+          <span>{{ 'ADMIN.THEMES.PREVIEW.NAV_DEALS' | translate }}</span>
+          <span>{{ 'ADMIN.THEMES.PREVIEW.NAV_SUPPORT' | translate }}</span>
+        </nav>
+        <div class="theme-preview-panel__nav-icons">
+          <i class="pi pi-search"></i>
+          <i class="pi pi-heart"></i>
+          <i class="pi pi-shopping-cart"></i>
+          <i class="pi pi-user"></i>
+        </div>
+      </header>
+
+      <div class="theme-preview-panel__content">
+        @switch (activePage()) {
+          @case ('home') {
+            <div class="theme-preview-panel__hero">
+              <h3>{{ 'ADMIN.THEMES.PREVIEW.HERO_TITLE' | translate }}</h3>
+              <p>{{ 'ADMIN.THEMES.PREVIEW.HERO_TEXT' | translate }}</p>
+              <button pButton type="button" class="theme-preview-panel__cta" [label]="'ADMIN.THEMES.PREVIEW.CTA' | translate"></button>
+            </div>
+            <div class="theme-preview-panel__cards">
+              <article class="theme-preview-panel__product">
+                <div class="theme-preview-panel__product-badge">-20%</div>
+                <div class="theme-preview-panel__product-image"></div>
+                <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_TITLE' | translate }}</h4>
+                <div class="theme-preview-panel__price-row">
+                  <span class="theme-preview-panel__price">$39.99</span>
+                  <span class="theme-preview-panel__price-old">$49.99</span>
+                </div>
+              </article>
+              <article class="theme-preview-panel__product theme-preview-panel__product--elevated">
+                <div class="theme-preview-panel__product-image"></div>
+                <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_ELEVATED' | translate }}</h4>
+                <div class="theme-preview-panel__price-row">
+                  <span class="theme-preview-panel__price">$24.99</span>
+                </div>
+              </article>
+            </div>
+          }
+          @case ('products') {
+            <div class="theme-preview-panel__grid">
+              @for (i of [1, 2, 3, 4]; track i) {
+                <article class="theme-preview-panel__product">
+                  <div class="theme-preview-panel__product-image"></div>
+                  <h4>{{ 'ADMIN.THEMES.PREVIEW.CARD_TITLE' | translate }} {{ i }}</h4>
+                  <div class="theme-preview-panel__price-row">
+                    <span class="theme-preview-panel__price">${{ 19.99 * i | number: '1.2-2' }}</span>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+          @case ('product-details') {
+            <div class="theme-preview-panel__pdp">
+              <div class="theme-preview-panel__pdp-gallery"></div>
+              <div class="theme-preview-panel__pdp-info">
+                <h3>{{ 'ADMIN.THEMES.PREVIEW.PDP_TITLE' | translate }}</h3>
+                <div class="theme-preview-panel__price-row">
+                  <span class="theme-preview-panel__price">$59.99</span>
+                  <span class="theme-preview-panel__price-old">$79.99</span>
+                </div>
+                <p>{{ 'ADMIN.THEMES.PREVIEW.PDP_DESCRIPTION' | translate }}</p>
+                <button pButton type="button" class="theme-preview-panel__cta" [label]="'ADMIN.THEMES.PREVIEW.PDP_BUY' | translate"></button>
+              </div>
+            </div>
+          }
+          @case ('cart') {
+            <div class="theme-preview-panel__cart">
+              <div class="theme-preview-panel__cart-items">
+                @for (i of [1, 2]; track i) {
+                  <div class="theme-preview-panel__cart-item">
+                    <div class="theme-preview-panel__cart-thumb"></div>
+                    <span>{{ 'ADMIN.THEMES.PREVIEW.CARD_TITLE' | translate }} {{ i }}</span>
+                    <span class="theme-preview-panel__price">$29.99</span>
+                  </div>
+                }
+              </div>
+              <div class="theme-preview-panel__cart-summary">
+                <div class="theme-preview-panel__summary-row">
+                  <span>{{ 'ADMIN.THEMES.PREVIEW.SUBTOTAL' | translate }}</span>
+                  <span>$59.98</span>
+                </div>
+                <button pButton type="button" class="theme-preview-panel__cta" [label]="'ADMIN.THEMES.PREVIEW.CHECKOUT' | translate"></button>
+              </div>
+            </div>
+          }
+          @case ('login') {
+            <div class="theme-preview-panel__login">
+              <h3>{{ 'ADMIN.THEMES.PREVIEW.LOGIN_TITLE' | translate }}</h3>
+              <label class="theme-preview-panel__form-field">
+                <span>{{ 'ADMIN.THEMES.PREVIEW.EMAIL' | translate }}</span>
+                <input type="text" disabled placeholder="you@example.com" />
+              </label>
+              <label class="theme-preview-panel__form-field">
+                <span>{{ 'ADMIN.THEMES.PREVIEW.PASSWORD' | translate }}</span>
+                <input type="text" disabled placeholder="••••••••" />
+              </label>
+              <button pButton type="button" class="theme-preview-panel__cta" [label]="'ADMIN.THEMES.PREVIEW.LOGIN_CTA' | translate"></button>
+            </div>
+          }
+        }
+      </div>
+
+      <footer class="theme-preview-panel__footer">
+        {{ 'ADMIN.THEMES.PREVIEW.FOOTER' | translate }}
+      </footer>
     </div>
   </div>
 </app-admin-section-card>

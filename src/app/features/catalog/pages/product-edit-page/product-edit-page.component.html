@@ -55,6 +55,18 @@
               <button
                 pButton
                 type="button"
+                label="Preview"
+                icon="pi pi-eye"
+                severity="secondary"
+                [outlined]="true"
+                *hamboxHasPermission="permissions.Catalog.Products.View"
+                (click)="onPreview()"
+              ></button>
+            }
+            @if (product()) {
+              <button
+                pButton
+                type="button"
                 label="Save"
                 severity="secondary"
                 [disabled]="!dirty()"
@@ -88,10 +100,15 @@
           [categories]="categories()"
           [categoriesLoading]="categoriesLoading()"
           [categoriesError]="error()"
+          [collections]="collections()"
+          [collectionsLoading]="collectionsLoading()"
           [disabled]="submitting()"
           (categoryCreated)="onCategoryCreated()"
+          (collectionCreated)="onCollectionCreated()"
         >
-          <app-product-assets-upload [productId]="productId()" />
+          <div #imagesAnchor>
+            <app-product-assets-upload [productId]="productId()" />
+          </div>
         </app-product-basic-info-form>
       </app-admin-section-card>
 

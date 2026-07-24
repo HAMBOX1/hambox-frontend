@@ -10,6 +10,12 @@ export const PERMISSIONS = {
       Edit: 'Catalog.Categories.Edit',
       Delete: 'Catalog.Categories.Delete',
     },
+    Collections: {
+      View: 'Catalog.Collections.View',
+      Create: 'Catalog.Collections.Create',
+      Edit: 'Catalog.Collections.Edit',
+      Delete: 'Catalog.Collections.Delete',
+    },
     Products: {
       View: 'Catalog.Products.View',
       Create: 'Catalog.Products.Create',

@@ -1,7 +1,7 @@
 import { ProductStatus } from '../../models/product.model';
 
 export type CatalogPackageFormat = 'Hambox' | 'Xlsx' | 'Csv';
-export type CatalogImportEntityType = 'FullPackage' | 'Products' | 'Categories' | 'Inventory' | 'Codes';
+export type CatalogImportEntityType = 'FullPackage' | 'Products' | 'Categories' | 'Inventory' | 'Codes' | 'Collections';
 export type CatalogDuplicateStrategy = 'Skip' | 'Update' | 'Merge' | 'Rename';
 export type CatalogImportRowStatus = 'New' | 'Updated' | 'Duplicate' | 'Invalid';
 export type CatalogPackageDirection = 'Export' | 'Import';
@@ -15,6 +15,7 @@ export interface CatalogPackageOptions {
   readonly includeImages: boolean;
   readonly includeLocalization: boolean;
   readonly includeSuppliers: boolean;
+  readonly includeCollections: boolean;
 }
 
 export function defaultCatalogPackageOptions(): CatalogPackageOptions {
@@ -26,6 +27,7 @@ export function defaultCatalogPackageOptions(): CatalogPackageOptions {
     includeImages: true,
     includeLocalization: true,
     includeSuppliers: false,
+    includeCollections: true,
   };
 }
 

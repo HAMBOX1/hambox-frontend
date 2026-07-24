@@ -3,6 +3,7 @@ import { firstValueFrom, Observable } from 'rxjs';
 
 import { ApiError } from '../../../core/models/api-error.model';
 import { CategoryOption } from '../models/category.model';
+import { CollectionOption } from '../models/collection.model';
 import {
   BulkProductsResult,
   PriceAdjustmentMode,
@@ -14,6 +15,7 @@ import {
 } from '../models/product.model';
 import { toUpdateProductRequest } from '../utils/product-display.utils';
 import { CategoryApiService } from './category-api.service';
+import { CollectionApiService } from './collection-api.service';
 import { ProductApiService } from './product-api.service';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -23,6 +25,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 export class ProductCatalogFacade {
   private readonly api = inject(ProductApiService);
   private readonly categoryApi = inject(CategoryApiService);
+  private readonly collectionApi = inject(CollectionApiService);
 
   private readonly itemsState = signal<readonly Product[]>([]);
   private readonly loadingState = signal(false);
@@ -39,6 +42,9 @@ export class ProductCatalogFacade {
   private readonly statusErrorState = signal<string | null>(null);
   private readonly categoryOptionsState = signal<readonly CategoryOption[]>([]);
   private categoryOptionsLoaded = false;
+  private readonly collectionOptionsState = signal<readonly CollectionOption[]>([]);
+  private collectionOptionsLoaded = false;
+  private readonly collectionFilterState = signal<string | null>(null);
 
   // Bulk multi-select — a Set for O(1) toggle/lookup regardless of catalog size (see the variant
   // manager's array+`.includes()` pattern for the O(n²) shape this avoids). Never cleared by
@@ -58,6 +64,8 @@ export class ProductCatalogFacade {
   readonly statusFilter = this.statusFilterState.asReadonly();
   readonly sortBy = this.sortByState.asReadonly();
   readonly categoryOptions = this.categoryOptionsState.asReadonly();
+  readonly collectionOptions = this.collectionOptionsState.asReadonly();
+  readonly collectionFilter = this.collectionFilterState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly totalCount = this.totalCountState.asReadonly();
   readonly pageNumber = this.pageNumberState.asReadonly();
@@ -69,7 +77,7 @@ export class ProductCatalogFacade {
 
   readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
   readonly hasActiveFilters = computed(
-    () => this.hasActiveSearch() || this.statusFilterState().trim().length > 0,
+    () => this.hasActiveSearch() || this.statusFilterState().trim().length > 0 || this.collectionFilterState() !== null,
   );
   readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
 
@@ -120,6 +128,14 @@ export class ProductCatalogFacade {
     void this.fetchProducts();
   }
 
+  /** Also settable directly from a Collections-page "View products" navigation
+   * (see `CollectionListPageComponent.viewProducts`), which lands here via a query param. */
+  setCollectionFilter(collectionId: string | null): void {
+    this.collectionFilterState.set(collectionId);
+    this.pageNumberState.set(1);
+    void this.fetchProducts();
+  }
+
   clearFilters(): void {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
@@ -127,6 +143,7 @@ export class ProductCatalogFacade {
 
     this.searchTermState.set('');
     this.statusFilterState.set('');
+    this.collectionFilterState.set(null);
     this.pageNumberState.set(1);
     void this.fetchProducts();
   }
@@ -173,9 +190,43 @@ export class ProductCatalogFacade {
     }
   }
 
+  async loadCollectionOptions(): Promise<void> {
+    if (this.collectionOptionsLoaded) {
+      return;
+    }
+
+    this.collectionOptionsLoaded = true;
+    await this.fetchCollectionOptions();
+  }
+
+  /** Force-refetches collections — used after creating one inline (e.g. from the collections popover). */
+  async refreshCollectionOptions(): Promise<void> {
+    this.collectionOptionsLoaded = true;
+    await this.fetchCollectionOptions();
+  }
+
+  private async fetchCollectionOptions(): Promise<void> {
+    try {
+      const result = await firstValueFrom(
+        this.collectionApi.getCollections({ pageNumber: 1, pageSize: 200 }),
+      );
+      this.collectionOptionsState.set(
+        (result.items ?? []).map((collection) => ({
+          id: collection.id,
+          label: collection.name,
+          parentId: collection.parentId,
+        })),
+      );
+    } catch {
+      this.collectionOptionsLoaded = false;
+    }
+  }
+
   async updateProductInline(
     product: Product,
-    patch: Partial<Pick<UpdateProductRequest, 'nameEn' | 'categoryId' | 'additionalCategoryIds' | 'price'>>,
+    patch: Partial<
+      Pick<UpdateProductRequest, 'nameEn' | 'categoryId' | 'additionalCategoryIds' | 'collectionIds' | 'price'>
+    >,
   ): Promise<boolean> {
     this.actionLoadingState.set(true);
     this.errorState.set(null);
@@ -366,6 +417,31 @@ export class ProductCatalogFacade {
     );
   }
 
+  async bulkAssignCollection(targetCollectionId: string): Promise<BulkProductsResult | null> {
+    return this.runBulkAction(() =>
+      this.api.bulkProducts(this.currentBulkSelection(), 'assign-collection', { targetCollectionId }),
+    );
+  }
+
+  async bulkRemoveCollection(targetCollectionId: string): Promise<BulkProductsResult | null> {
+    return this.runBulkAction(() =>
+      this.api.bulkProducts(this.currentBulkSelection(), 'remove-collection', { targetCollectionId }),
+    );
+  }
+
+  /** "Create Collection From Selection" — a frontend-only orchestration (no dedicated backend
+   * endpoint): create the collection, then bulk-assign the current selection to it. */
+  async createCollectionFromSelectionAndAssign(name: string): Promise<BulkProductsResult | null> {
+    try {
+      const collectionId = await firstValueFrom(this.collectionApi.createCollection({ name }));
+      await this.refreshCollectionOptions();
+      return await this.bulkAssignCollection(collectionId);
+    } catch (error) {
+      this.bulkErrorState.set(this.toErrorMessage(error, 'Failed to create collection.'));
+      return null;
+    }
+  }
+
   async bulkDelete(): Promise<BulkProductsResult | null> {
     return this.runBulkAction(() => this.api.bulkDeleteProducts(this.currentBulkSelection()));
   }
@@ -441,6 +517,7 @@ export class ProductCatalogFacade {
     try {
       const status = this.statusFilterState().trim();
       const sortBy = this.sortByState();
+      const collectionId = this.collectionFilterState();
       const result = await firstValueFrom(
         this.api.getProducts({
           pageNumber: this.pageNumberState(),
@@ -448,6 +525,7 @@ export class ProductCatalogFacade {
           searchTerm: this.searchTermState(),
           ...(status ? { status: status as ProductStatus } : {}),
           ...(sortBy ? { sortBy } : {}),
+          ...(collectionId ? { collectionId } : {}),
         }),
       );
 

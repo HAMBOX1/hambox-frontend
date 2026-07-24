@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -20,9 +20,12 @@ import { TextareaModule } from 'primeng/textarea';
 
 import { ApiError } from '../../../../core/models/api-error.model';
 import { CategoryCreateFormComponent } from '../category-create-form/category-create-form.component';
+import { CollectionCreateFormComponent } from '../collection-create-form/collection-create-form.component';
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
+import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { CreateProductRequest, ProductDraftFormSnapshot } from '../../models/product.model';
 import { CategoryApiService, createCategoryWithHierarchy } from '../../services/category-api.service';
+import { CollectionApiService } from '../../services/collection-api.service';
 
 const FIELD_LABELS = {
   nameEn: 'Product name (EN)',
@@ -46,6 +49,7 @@ const FIELD_LABELS = {
     ButtonModule,
     DialogModule,
     CategoryCreateFormComponent,
+    CollectionCreateFormComponent,
   ],
   templateUrl: './product-basic-info-form.component.html',
   styleUrl: './product-basic-info-form.component.scss',
@@ -54,16 +58,21 @@ const FIELD_LABELS = {
 export class ProductBasicInfoFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly categoryApi = inject(CategoryApiService);
+  private readonly collectionApi = inject(CollectionApiService);
 
   readonly categories = input<readonly CategoryOption[]>([]);
   readonly categoriesLoading = input(false);
   readonly categoriesError = input<string | null>(null);
+  readonly collections = input<readonly CollectionOption[]>([]);
+  readonly collectionsLoading = input(false);
   readonly disabled = input(false);
   readonly initialSnapshot = input<ProductDraftFormSnapshot | null>(null);
   readonly section = input<'general' | 'pricing' | 'full'>('full');
 
   /** Emitted after a category is created inline, so the parent facade can refresh its category list. */
   readonly categoryCreated = output<void>();
+  /** Emitted after a collection is created inline, so the parent facade can refresh its collection list. */
+  readonly collectionCreated = output<void>();
 
   private readonly newlyCreatedCategoryState = signal<CategoryOption | null>(null);
   private readonly categoryDialogOpenState = signal(false);
@@ -75,6 +84,17 @@ export class ProductBasicInfoFormComponent {
   protected readonly categoryCreating = this.categoryCreatingState.asReadonly();
   protected readonly categoryCreateError = this.categoryCreateErrorState.asReadonly();
   protected readonly categoryFormResetToken = this.categoryFormResetTokenState.asReadonly();
+
+  private readonly newlyCreatedCollectionState = signal<CollectionOption | null>(null);
+  private readonly collectionDialogOpenState = signal(false);
+  private readonly collectionCreatingState = signal(false);
+  private readonly collectionCreateErrorState = signal<string | null>(null);
+  private readonly collectionFormResetTokenState = signal(0);
+
+  protected readonly collectionDialogOpen = this.collectionDialogOpenState.asReadonly();
+  protected readonly collectionCreating = this.collectionCreatingState.asReadonly();
+  protected readonly collectionCreateError = this.collectionCreateErrorState.asReadonly();
+  protected readonly collectionFormResetToken = this.collectionFormResetTokenState.asReadonly();
 
   /** categories() plus an optimistic entry for a just-created category, selectable before the parent's refetch lands. */
   protected readonly categoryOptions = computed(() => {
@@ -116,6 +136,26 @@ export class ProductBasicInfoFormComponent {
     return chips;
   });
 
+  /** collections() plus an optimistic entry for a just-created collection, selectable before the parent's refetch lands. */
+  protected readonly collectionOptionsMerged = computed(() => {
+    const base = this.collections();
+    const created = this.newlyCreatedCollectionState();
+
+    if (!created || base.some((option) => option.id === created.id)) {
+      return base;
+    }
+
+    return [...base, created];
+  });
+
+  private readonly selectedCollectionIdsState = signal<readonly string[]>([]);
+
+  /** Selected collections rendered as chips — flat tags, no primary concept unlike categories. */
+  protected readonly selectedCollectionChips = computed(() => {
+    const labelById = new Map(this.collectionOptionsMerged().map((option) => [option.id, option.label]));
+    return this.selectedCollectionIdsState().map((id) => ({ id, label: labelById.get(id) ?? 'Unknown collection' }));
+  });
+
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
     nameAr: ['', [Validators.maxLength(200)]],
@@ -124,6 +164,7 @@ export class ProductBasicInfoFormComponent {
     price: [0, [Validators.required, Validators.min(0)]],
     categoryId: ['', [Validators.required]],
     additionalCategoryIds: this.fb.nonNullable.control<readonly string[]>([]),
+    collectionIds: this.fb.nonNullable.control<readonly string[]>([]),
   });
 
   /** Always collapsed initially; the owner opts in via revealArabic() regardless of existing Arabic content. */
@@ -146,6 +187,7 @@ export class ProductBasicInfoFormComponent {
         this.dirtyState.set(false);
         this.selectedCategoryIdState.set(snapshot.categoryId);
         this.additionalCategoryIdsState.set(snapshot.additionalCategoryIds);
+        this.selectedCollectionIdsState.set(snapshot.collectionIds);
         const hasArabic = !!(snapshot.nameAr?.trim() || snapshot.descriptionAr?.trim());
         this.arabicHasValueState.set(hasArabic);
       }
@@ -156,6 +198,7 @@ export class ProductBasicInfoFormComponent {
       this.arabicHasValueState.set(!!(value.nameAr?.trim() || value.descriptionAr?.trim()));
       this.selectedCategoryIdState.set(value.categoryId ?? '');
       this.additionalCategoryIdsState.set(value.additionalCategoryIds ?? []);
+      this.selectedCollectionIdsState.set(value.collectionIds ?? []);
     });
   }
 
@@ -196,6 +239,7 @@ export class ProductBasicInfoFormComponent {
       descriptionAr: value.descriptionAr.trim(),
       categoryId: value.categoryId,
       additionalCategoryIds: value.additionalCategoryIds,
+      collectionIds: value.collectionIds,
     };
   }
 
@@ -218,6 +262,7 @@ export class ProductBasicInfoFormComponent {
       price: value.price,
       categoryId: value.categoryId,
       additionalCategoryIds: value.additionalCategoryIds,
+      collectionIds: value.collectionIds,
     };
   }
 
@@ -232,6 +277,7 @@ export class ProductBasicInfoFormComponent {
       price: value.price,
       categoryId: value.categoryId,
       additionalCategoryIds: value.additionalCategoryIds,
+      collectionIds: value.collectionIds,
     };
   }
 
@@ -241,8 +287,21 @@ export class ProductBasicInfoFormComponent {
     this.dirtyState.set(false);
     this.selectedCategoryIdState.set(snapshot.categoryId);
     this.additionalCategoryIdsState.set(snapshot.additionalCategoryIds);
+    this.selectedCollectionIdsState.set(snapshot.collectionIds);
     const hasArabic = !!(snapshot.nameAr?.trim() || snapshot.descriptionAr?.trim());
     this.arabicHasValueState.set(hasArabic);
+  }
+
+  /** Fired by the Collections multi-select whenever the checked set changes — flat tags, no primary concept. */
+  protected onCollectionSelectionChange(selectedIds: string[]): void {
+    this.form.controls.collectionIds.setValue(selectedIds);
+  }
+
+  /** Removes a chip entirely. */
+  protected removeCollectionChip(collectionId: string): void {
+    this.form.controls.collectionIds.setValue(
+      this.form.controls.collectionIds.value.filter((id) => id !== collectionId),
+    );
   }
 
   /** Fired by the merged Category multi-select whenever the checked set changes. */
@@ -354,6 +413,40 @@ export class ProductBasicInfoFormComponent {
       this.categoryCreateErrorState.set(this.toErrorMessage(error, 'Failed to create category.'));
     } finally {
       this.categoryCreatingState.set(false);
+    }
+  }
+
+  protected openCollectionDialog(): void {
+    this.collectionCreateErrorState.set(null);
+    this.collectionFormResetTokenState.update((value) => value + 1);
+    this.collectionDialogOpenState.set(true);
+  }
+
+  protected closeCollectionDialog(): void {
+    this.collectionDialogOpenState.set(false);
+    this.collectionCreateErrorState.set(null);
+  }
+
+  protected onCollectionDialogVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.closeCollectionDialog();
+    }
+  }
+
+  protected async onCollectionSubmitted(request: CreateCollectionRequest): Promise<void> {
+    this.collectionCreatingState.set(true);
+    this.collectionCreateErrorState.set(null);
+
+    try {
+      const id = await firstValueFrom(this.collectionApi.createCollection(request));
+      this.newlyCreatedCollectionState.set({ id, label: request.name, parentId: request.parentId ?? null });
+      this.form.controls.collectionIds.setValue([...this.form.controls.collectionIds.value, id]);
+      this.collectionDialogOpenState.set(false);
+      this.collectionCreated.emit();
+    } catch (error) {
+      this.collectionCreateErrorState.set(this.toErrorMessage(error, 'Failed to create collection.'));
+    } finally {
+      this.collectionCreatingState.set(false);
     }
   }
 

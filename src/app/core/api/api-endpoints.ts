@@ -4,6 +4,11 @@ export const CATALOG_API = {
   categoriesReorder: '/api/v1/categories/reorder',
   category: (id: string) => `/api/v1/categories/${id}`,
   categoryRestore: (id: string) => `/api/v1/categories/${id}/restore`,
+  collections: '/api/v1/collections',
+  collectionsTree: '/api/v1/collections/tree',
+  collectionsReorder: '/api/v1/collections/reorder',
+  collection: (id: string) => `/api/v1/collections/${id}`,
+  collectionRestore: (id: string) => `/api/v1/collections/${id}/restore`,
   products: '/api/v1/products',
   productFacets: '/api/v1/products/facets',
   product: (id: string) => `/api/v1/products/${id}`,
@@ -26,6 +31,8 @@ export const CATALOG_API = {
   storefrontContent: '/api/v1/storefront/content',
   storefrontProductConfiguration: (productId: string) =>
     `/api/v1/storefront/products/${productId}/configuration`,
+  storefrontProductConfigurationPreview: (productId: string) =>
+    `/api/v1/storefront/products/${productId}/configuration/preview`,
 } as const;
 
 export const CATALOG_IMPORT_EXPORT_API = {
@@ -163,6 +170,7 @@ export const THEMES_API = {
   preview: (token: string) => `/api/v1/themes/preview/${token}`,
   themes: '/api/v1/themes',
   statistics: '/api/v1/themes/statistics',
+  templates: '/api/v1/themes/templates',
   theme: (themeId: string) => `/api/v1/themes/${themeId}`,
   duplicate: (themeId: string) => `/api/v1/themes/${themeId}/duplicate`,
   publish: (themeId: string) => `/api/v1/themes/${themeId}/publish`,

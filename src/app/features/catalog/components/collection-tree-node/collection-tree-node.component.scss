@@ -1,0 +1,240 @@
+:host {
+  display: block;
+}
+
+.collection-tree-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-tree-node__children {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+// Mirrors category-tree-node.component.scss's connector-guide layout exactly.
+$action-column: 2.25rem;
+
+.collection-tree-node:not(.collection-tree-node--root)::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(#{$action-column} + 0.75rem + (var(--collection-tree-depth, 1) - 1) * 1.25rem + 0.5rem);
+  inset-block-start: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--admin-border-subtle);
+}
+
+.collection-tree-node--last:not(.collection-tree-node--root)::before {
+  height: 1.25rem;
+}
+
+.collection-tree-node:not(.collection-tree-node--root) > .collection-tree-node__row::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(#{$action-column} + 0.75rem + (var(--collection-tree-depth, 1) - 1) * 1.25rem + 0.5rem);
+  inset-block-start: 1.25rem;
+  width: 0.5rem;
+  height: 1px;
+  background: var(--admin-border-subtle);
+}
+
+.collection-tree-node__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  padding-inline: 0.75rem;
+  border-radius: var(--admin-radius-sm, 8px);
+  color: var(--admin-text-primary);
+  cursor: grab;
+  transition: background-color 0.12s ease;
+
+  &:hover,
+  &:focus-within {
+    background: var(--color-surface-hover);
+  }
+
+  &--parent {
+    background: color-mix(in srgb, var(--admin-bg-elevated) 55%, transparent);
+
+    .collection-tree-node__name {
+      font-weight: 700;
+      font-size: 0.9375rem;
+    }
+  }
+
+  &--match {
+    background: color-mix(in srgb, var(--admin-accent-amber, orange) 16%, transparent);
+  }
+
+  &--dragging {
+    opacity: 0.4;
+  }
+
+  &--drop-inside {
+    outline: 2px solid var(--admin-accent-green);
+    outline-offset: -2px;
+    background: color-mix(in srgb, var(--admin-accent-green) 12%, transparent);
+  }
+
+  &--drop-before::before,
+  &--drop-after::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.75rem;
+    height: 2px;
+    background: var(--admin-accent-green);
+    border-radius: 1px;
+  }
+
+  &--drop-before::before {
+    inset-block-start: 0;
+  }
+
+  &--drop-after::after {
+    inset-block-end: 0;
+  }
+}
+
+.collection-tree-node__primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  margin-inline-start: calc(var(--collection-tree-depth, 0) * 1.25rem);
+}
+
+.collection-tree-node__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.collection-tree-node__disclosure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &--hidden {
+    visibility: hidden;
+  }
+}
+
+.collection-tree-node__icon {
+  flex-shrink: 0;
+}
+
+.collection-tree-node__name {
+  flex: 1;
+  overflow: hidden;
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  mark {
+    background: color-mix(in srgb, var(--admin-accent-amber, orange) 40%, transparent);
+    color: inherit;
+    border-radius: 2px;
+  }
+}
+
+.collection-tree-node__count {
+  flex-shrink: 0;
+  min-width: 1.25rem;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+
+  &--children {
+    background: var(--admin-bg-elevated);
+    color: var(--admin-text-muted);
+  }
+
+  &--products {
+    color: var(--admin-text-secondary);
+    font-weight: 600;
+  }
+}
+
+.collection-tree-node__system-badge {
+  flex-shrink: 0;
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 9999px;
+  background: var(--color-info-muted, var(--admin-bg-elevated));
+  color: var(--color-info, var(--admin-text-muted));
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.collection-tree-node__actions {
+  display: flex;
+  flex-shrink: 0;
+
+  ::ng-deep .admin-action-menu__trigger {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    background: transparent;
+
+    &:hover:not(:disabled) {
+      background: var(--color-surface-hover);
+      transform: none;
+    }
+  }
+}
+
+.collection-tree-node__drag-handle {
+  flex-shrink: 0;
+  color: var(--admin-text-muted);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.collection-tree-node__row:hover .collection-tree-node__drag-handle,
+.collection-tree-node__row:focus-within .collection-tree-node__drag-handle {
+  opacity: 1;
+}
+
+.collection-tree-node__row--mobile {
+  flex-wrap: wrap;
+  row-gap: 0.125rem;
+  cursor: pointer;
+
+  .collection-tree-node__drag-handle {
+    display: none;
+  }
+
+  .collection-tree-node__meta {
+    flex-basis: 100%;
+    padding-inline-start: calc(#{$action-column} + 2rem);
+  }
+}
+
+.cdk-drag-preview {
+  box-shadow: var(--admin-shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.24));
+  border-radius: var(--admin-radius-sm, 8px);
+  background: var(--admin-bg-elevated);
+  // Without this, the floating preview clone sits exactly under the pointer and
+  // wins document.elementFromPoint() lookups during drag, so drop-target
+  // resolution (collection-tree.component.ts) always misses the real row beneath it.
+  pointer-events: none;
+}

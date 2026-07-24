@@ -6,8 +6,10 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
+import { PermissionService } from '../../../../core/permissions/permission.service';
 import { AdminActionMenuComponent, AdminConfirmDialogComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { LongPressDirective } from '../../../../shared/directives/long-press.directive';
 import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
@@ -27,6 +29,7 @@ import { slugify } from '../../utils/product-display.utils';
     CheckboxModule,
     InputTextModule,
     HasPermissionDirective,
+    LongPressDirective,
     AdminActionMenuComponent,
     AdminConfirmDialogComponent,
     ProductOptionMobileGroupCardComponent,
@@ -37,6 +40,8 @@ import { slugify } from '../../utils/product-display.utils';
 })
 export class ProductOptionMobileGroupCardComponent {
   private readonly facade = inject(ProductEditorFacade);
+  private readonly permissionService = inject(PermissionService);
+  private suppressToggleClick = false;
 
   readonly group = input.required<ProductOptionGroupDto>();
   readonly allGroups = input.required<readonly ProductOptionGroupDto[]>();
@@ -81,6 +86,11 @@ export class ProductOptionMobileGroupCardComponent {
   }
 
   protected toggleExpanded(optionId: string): void {
+    if (this.suppressToggleClick) {
+      this.suppressToggleClick = false;
+      return;
+    }
+
     this.expandedOptionIds.update((current) => {
       const next = new Set(current);
       if (next.has(optionId)) {
@@ -90,6 +100,26 @@ export class ProductOptionMobileGroupCardComponent {
       }
       return next;
     });
+  }
+
+  private canEdit(): boolean {
+    return (
+      this.permissionService.isOwner() ||
+      this.permissionService.hasPermission(this.permissions.Catalog.Inventory.Edit)
+    );
+  }
+
+  protected onGroupLongPress(): void {
+    if (this.canEdit() && !this.editingGroup()) {
+      this.startEditGroup();
+    }
+  }
+
+  protected onOptionLongPress(option: ProductOptionDto): void {
+    if (this.canEdit() && this.editingOptionId() !== option.id) {
+      this.suppressToggleClick = true;
+      this.startEditOption(option);
+    }
   }
 
   protected groupMenuItems(): MenuItem[] {

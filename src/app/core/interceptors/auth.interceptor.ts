@@ -34,8 +34,15 @@ function resolveUrl(baseUrl: string, path: string): string {
   return `${base}${normalizedPath}`;
 }
 
-function resolveAuthContext(routerUrl: string): AuthContextType {
-  return routerUrl.startsWith('/admin') ? AUTH_CONTEXT.Admin : AUTH_CONTEXT.Customer;
+function resolveAuthContext(routerUrl: string, requestUrl: string): AuthContextType {
+  // The product-editor "Preview" button opens a storefront route (/products/:id?preview=1) in a
+  // new tab, but the underlying configuration/preview endpoint is Admin-permission-gated — so that
+  // one call needs the Admin token even though every other call on that page uses Customer context.
+  if (routerUrl.startsWith('/admin') || requestUrl.includes('/configuration/preview')) {
+    return AUTH_CONTEXT.Admin;
+  }
+
+  return AUTH_CONTEXT.Customer;
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -46,7 +53,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const rawHttp = new HttpClient(httpBackend);
 
-  const context = resolveAuthContext(router.url);
+  const context = resolveAuthContext(router.url, req.url);
   const skipAuth = req.context.get(SKIP_AUTH_INTERCEPTOR) || isAuthEndpoint(req.url);
   const accessToken = session.getAccessToken(context);
 

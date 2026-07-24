@@ -10,15 +10,29 @@
     <header class="detail-panel__header">
       <div class="detail-panel__identity">
         @if (selected.primaryImageUrl) {
-          <img
-            class="detail-panel__thumb"
-            [src]="resolveImageUrl(selected.primaryImageUrl)"
-            [alt]="selected.nameEn"
-          />
+          <a
+            class="detail-panel__thumb-link"
+            [routerLink]="['/admin/products', selected.id, 'edit']"
+            fragment="images"
+            aria-label="Edit product images"
+          >
+            <img
+              class="detail-panel__thumb"
+              [src]="resolveImageUrl(selected.primaryImageUrl)"
+              [alt]="selected.nameEn"
+            />
+          </a>
         } @else {
-          <span class="detail-panel__thumb detail-panel__thumb--placeholder" aria-hidden="true">
-            <i class="pi pi-box"></i>
-          </span>
+          <a
+            class="detail-panel__thumb-link"
+            [routerLink]="['/admin/products', selected.id, 'edit']"
+            fragment="images"
+            aria-label="Add product images"
+          >
+            <span class="detail-panel__thumb detail-panel__thumb--placeholder" aria-hidden="true">
+              <i class="pi pi-box"></i>
+            </span>
+          </a>
         }
 
         <div class="detail-panel__identity-copy">

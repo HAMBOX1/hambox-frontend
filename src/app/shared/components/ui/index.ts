@@ -4,3 +4,4 @@ export { UiPasswordInputComponent } from './ui-password-input/ui-password-input.
 export { UiButtonComponent } from './ui-button/ui-button.component';
 export type { UiButtonVariant, UiButtonSize } from './ui-button/ui-button.component';
 export { UiAuthCardComponent } from './ui-auth-card/ui-auth-card.component';
+export { UiColorPickerComponent } from './ui-color-picker/ui-color-picker.component';

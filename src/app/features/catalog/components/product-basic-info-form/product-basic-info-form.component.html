@@ -94,6 +94,61 @@
           </div>
         }
       </div>
+
+      <div class="basic-info-form__field basic-info-form__field--full">
+        <div class="basic-info-form__label-row">
+          <label class="basic-info-form__label" for="product-collections"
+            >Collections <span class="admin-field__optional">(optional, internal-only)</span></label
+          >
+          <button
+            pButton
+            type="button"
+            label="+ New Collection"
+            icon="pi pi-plus"
+            severity="secondary"
+            text
+            size="small"
+            [disabled]="disabled()"
+            (click)="openCollectionDialog()"
+          ></button>
+        </div>
+        <p-multiSelect
+          inputId="product-collections"
+          class="basic-info-form__select"
+          [ngModel]="form.controls.collectionIds.value"
+          [ngModelOptions]="{ standalone: true }"
+          (onChange)="onCollectionSelectionChange($event.value)"
+          [options]="[...collectionOptionsMerged()]"
+          optionLabel="label"
+          optionValue="id"
+          display="comma"
+          filter="true"
+          filterPlaceHolder="Search collections..."
+          placeholder="Assign one or more collections"
+          [loading]="collectionsLoading()"
+          [disabled]="disabled() || collectionsLoading()"
+        />
+        <p class="basic-info-form__hint">Internal organization only — never shown on the storefront.</p>
+
+        @if (selectedCollectionChips().length > 0) {
+          <div class="basic-info-form__category-chips">
+            @for (chip of selectedCollectionChips(); track chip.id) {
+              <span class="basic-info-form__category-chip basic-info-form__category-chip--collection">
+                <span class="basic-info-form__category-chip-label">{{ chip.label }}</span>
+                <button
+                  type="button"
+                  class="basic-info-form__category-chip-remove"
+                  [disabled]="disabled()"
+                  [attr.aria-label]="'Remove ' + chip.label"
+                  (click)="removeCollectionChip(chip.id)"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              </span>
+            }
+          </div>
+        }
+      </div>
     }
 
     @if (section() === 'pricing' || section() === 'full') {
@@ -223,5 +278,25 @@
     [resetToken]="categoryFormResetToken()"
     (submitted)="onCategorySubmitted($event)"
     (cancelled)="closeCategoryDialog()"
+  />
+</p-dialog>
+
+<p-dialog
+  header="Create Collection"
+  [visible]="collectionDialogOpen()"
+  (visibleChange)="onCollectionDialogVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <app-collection-create-form
+    mode="create"
+    [submitting]="collectionCreating()"
+    [serverError]="collectionCreateError()"
+    [resetToken]="collectionFormResetToken()"
+    (submitted)="onCollectionSubmitted($event)"
+    (cancelled)="closeCollectionDialog()"
   />
 </p-dialog>

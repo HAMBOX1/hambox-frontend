@@ -7,6 +7,7 @@ import { ApiClientService } from '../../../core/api/api-client.service';
 import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import { PagedResult } from '../models/category.model';
 import {
+  BulkProductAction,
   BulkProductsResult,
   CreateProductRequest,
   PriceAdjustmentMode,
@@ -54,6 +55,10 @@ export class ProductApiService {
     const attributes = this.serializeAttributes(query.attributes);
     if (attributes) {
       params['attributes'] = attributes;
+    }
+
+    if (query.collectionId) {
+      params['collectionId'] = query.collectionId;
     }
 
     return this.api.get<PagedResult<Product>>(CATALOG_API.products, { params });
@@ -137,8 +142,13 @@ export class ProductApiService {
 
   bulkProducts(
     selection: ProductBulkSelection,
-    action: string,
-    extra?: { targetCategoryId?: string; priceMode?: PriceAdjustmentMode; priceValue?: number },
+    action: BulkProductAction,
+    extra?: {
+      targetCategoryId?: string;
+      priceMode?: PriceAdjustmentMode;
+      priceValue?: number;
+      targetCollectionId?: string;
+    },
   ): Observable<BulkProductsResult> {
     return this.api.post<BulkProductsResult>(CATALOG_API.productsBulk, {
       ...this.selectionBody(selection),
@@ -146,6 +156,7 @@ export class ProductApiService {
       targetCategoryId: extra?.targetCategoryId ?? null,
       priceMode: extra?.priceMode ?? null,
       priceValue: extra?.priceValue ?? null,
+      targetCollectionId: extra?.targetCollectionId ?? null,
     });
   }
 
