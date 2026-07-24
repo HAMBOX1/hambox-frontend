@@ -1,0 +1,79 @@
+.instructions-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--hambox-spacing-6) var(--hambox-spacing-4);
+
+  @media print {
+    max-width: none;
+    padding: 0;
+  }
+}
+
+.instructions-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  margin-bottom: var(--hambox-spacing-4);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+.instructions-page__state {
+  padding: var(--hambox-spacing-8) 0;
+  text-align: center;
+  color: var(--color-text-secondary);
+
+  &--empty {
+    i {
+      font-size: 2rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--hambox-spacing-3);
+    }
+  }
+}
+
+.instructions-page__header {
+  margin-bottom: var(--hambox-spacing-6);
+
+  h1 {
+    margin-bottom: var(--hambox-spacing-2);
+  }
+}
+
+.instructions-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hambox-spacing-4);
+  color: var(--color-text-secondary);
+  font-size: var(--hambox-font-size-sm);
+}
+
+.instructions-page__support {
+  margin-top: var(--hambox-spacing-8);
+  padding-top: var(--hambox-spacing-6);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+
+  @media print {
+    display: none;
+  }
+}
+
+.instructions-page__support-link {
+  display: inline-block;
+  margin-top: var(--hambox-spacing-2);
+  padding: var(--hambox-spacing-2) var(--hambox-spacing-5);
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
+  border-radius: var(--hambox-radius-md);
+  text-decoration: none;
+  font-weight: 600;
+}

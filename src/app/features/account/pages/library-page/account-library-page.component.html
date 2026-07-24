@@ -158,6 +158,9 @@
           {{ copyFeedbackId() === item.id ? ('ACCOUNT.LIBRARY_UI.COPIED' | translate) : ('ACCOUNT.LIBRARY_UI.COPY_CODE' | translate) }}
         </button>
         <button type="button" (click)="toggleInstructions(item.id)">{{ 'ACCOUNT.LIBRARY_UI.HOW_TO_REDEEM' | translate }}</button>
+        @if (item.hasInstructions) {
+          <a [routerLink]="['/account/library', item.orderItemId, 'instructions']">{{ 'ACCOUNT.LIBRARY_UI.INSTRUCTIONS' | translate }}</a>
+        }
         <a [routerLink]="['/account/orders', item.orderId]">{{ 'ACCOUNT.LIBRARY_UI.VIEW_DETAILS' | translate }}</a>
         @if (item.invoiceUrl) {
           <a [href]="item.invoiceUrl" target="_blank" rel="noopener">{{ 'ACCOUNT.LIBRARY_UI.DOWNLOAD_INVOICE' | translate }}</a>

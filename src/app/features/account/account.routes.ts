@@ -26,6 +26,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'library/:orderItemId/instructions',
+        loadComponent: () =>
+          import('./pages/library-instructions-page/account-library-instructions-page.component').then(
+            (c) => c.AccountLibraryInstructionsPageComponent,
+          ),
+      },
+      {
         path: 'wishlist',
         loadComponent: () =>
           import('./pages/wishlist-page/account-wishlist-page.component').then(

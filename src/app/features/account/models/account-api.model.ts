@@ -140,10 +140,18 @@ export interface CustomerLibraryItemApiDto {
   readonly invoiceUrl: string | null;
   readonly supportUrl: string | null;
   readonly isRecentPurchase: boolean;
+  readonly hasInstructions: boolean;
 }
 
 export interface RevealCustomerLibraryKeyApiDto {
   readonly licenseKey: string;
+}
+
+export interface LibraryItemInstructionsApiDto {
+  readonly title: string;
+  readonly contentHtml: string;
+  readonly version: number;
+  readonly updatedOnUtc: string | null;
 }
 
 export interface CustomerLibraryQuery {

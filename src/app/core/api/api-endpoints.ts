@@ -28,6 +28,10 @@ export const CATALOG_API = {
   productImagePrimary: (productId: string, imageId: string) =>
     `/api/v1/products/${productId}/images/${imageId}/primary`,
   productImagesReorder: (productId: string) => `/api/v1/products/${productId}/images/reorder`,
+  productInstructions: (productId: string) => `/api/v1/products/${productId}/instructions`,
+  productInstructionsPublish: (productId: string) => `/api/v1/products/${productId}/instructions/publish`,
+  productInstructionsUnpublish: (productId: string) => `/api/v1/products/${productId}/instructions/unpublish`,
+  productInstructionsImages: (productId: string) => `/api/v1/products/${productId}/instructions/images`,
   storefrontContent: '/api/v1/storefront/content',
   storefrontProductConfiguration: (productId: string) =>
     `/api/v1/storefront/products/${productId}/configuration`,
@@ -162,6 +166,7 @@ export const ACCOUNT_API = {
   membershipSubscribe: '/api/v1/account/membership/subscribe',
   library: '/api/v1/account/library',
   revealLibraryKey: (id: string) => `/api/v1/account/library/${id}/reveal`,
+  libraryItemInstructions: (orderItemId: string) => `/api/v1/account/library/${orderItemId}/instructions`,
   wallet: '/api/v1/account/wallet',
 } as const;
 

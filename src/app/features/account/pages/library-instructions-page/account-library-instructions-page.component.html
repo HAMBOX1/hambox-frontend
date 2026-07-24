@@ -1,0 +1,47 @@
+<section class="instructions-page" hamboxTranslateRefresh>
+  <a routerLink="/account/library" class="instructions-page__back">
+    <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    {{ 'ACCOUNT.INSTRUCTIONS_PAGE.BACK_TO_LIBRARY' | translate }}
+  </a>
+
+  @if (loading()) {
+    <p class="instructions-page__state">{{ 'ACCOUNT.INSTRUCTIONS_PAGE.LOADING' | translate }}</p>
+  } @else if (forbidden()) {
+    <div class="instructions-page__state instructions-page__state--empty">
+      <i class="pi pi-lock" aria-hidden="true"></i>
+      <h2>{{ 'ACCOUNT.INSTRUCTIONS_PAGE.FORBIDDEN_TITLE' | translate }}</h2>
+      <p>{{ 'ACCOUNT.INSTRUCTIONS_PAGE.FORBIDDEN_BODY' | translate }}</p>
+    </div>
+  } @else if (error()) {
+    <div class="instructions-page__state instructions-page__state--empty">
+      <h2>{{ 'ACCOUNT.INSTRUCTIONS_PAGE.ERROR_TITLE' | translate }}</h2>
+      <p>{{ error() }}</p>
+      <button type="button" (click)="retry()">{{ 'ACCOUNT.INSTRUCTIONS_PAGE.RETRY' | translate }}</button>
+    </div>
+  } @else if (instructions(); as current) {
+    <header class="instructions-page__header">
+      <h1>{{ current.title }}</h1>
+      <div class="instructions-page__meta">
+        <span>
+          <strong>{{ 'ACCOUNT.INSTRUCTIONS_PAGE.ESTIMATED_TIME' | translate }}:</strong>
+          {{ 'ACCOUNT.INSTRUCTIONS_PAGE.ESTIMATED_TIME_VALUE' | translate: { minutes: estimatedMinutes() } }}
+        </span>
+        @if (current.updatedOnUtc) {
+          <span>
+            <strong>{{ 'ACCOUNT.INSTRUCTIONS_PAGE.LAST_UPDATED' | translate }}:</strong>
+            {{ current.updatedOnUtc | hamboxDate: 'longDate' }}
+          </span>
+        }
+      </div>
+    </header>
+
+    <app-rich-content-viewer [html]="current.contentHtml" />
+
+    <footer class="instructions-page__support">
+      <h2>{{ 'ACCOUNT.INSTRUCTIONS_PAGE.NEED_HELP' | translate }}</h2>
+      <a routerLink="/support-chat" class="instructions-page__support-link">
+        {{ 'ACCOUNT.INSTRUCTIONS_PAGE.OPEN_SUPPORT_TICKET' | translate }}
+      </a>
+    </footer>
+  }
+</section>

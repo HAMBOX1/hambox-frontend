@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.rcv__progress {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 3px;
+  background: var(--color-primary);
+  transition: width 0.1s linear;
+
+  @media print {
+    display: none;
+  }
+}
+
+.rcv__layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--hambox-spacing-8);
+  align-items: start;
+
+  &--no-toc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.rcv__toc {
+  position: sticky;
+  top: var(--hambox-spacing-4);
+  max-height: calc(100vh - var(--hambox-spacing-8));
+  overflow-y: auto;
+  padding: var(--hambox-spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--hambox-radius-md);
+  background: var(--color-card);
+
+  @media print {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    position: static;
+    max-height: none;
+  }
+
+  ul {
+    list-style: none;
+    margin: var(--hambox-spacing-2) 0 0;
+    padding: 0;
+  }
+
+  li {
+    margin-inline-start: var(--rcv-toc-indent, 0px);
+  }
+
+  a {
+    display: block;
+    padding: var(--hambox-spacing-1) 0;
+    color: var(--color-text-secondary);
+    font-size: var(--hambox-font-size-sm);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}
+
+.rcv__toc-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.rcv__lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-overlay);
+  cursor: zoom-out;
+
+  img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: var(--hambox-radius-md);
+  }
+}
+
+.rcv__lightbox-close {
+  position: absolute;
+  top: var(--hambox-spacing-4);
+  inset-inline-end: var(--hambox-spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: var(--hambox-radius-full);
+  background: var(--color-card);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+@media print {
+  .rcv__lightbox {
+    display: none;
+  }
+}

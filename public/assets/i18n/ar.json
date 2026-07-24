@@ -320,6 +320,7 @@
       "COPIED": "تم النسخ",
       "COPY_CODE": "نسخ الكود",
       "HOW_TO_REDEEM": "طريقة التفعيل",
+      "INSTRUCTIONS": "التعليمات",
       "VIEW_DETAILS": "عرض التفاصيل",
       "DOWNLOAD_INVOICE": "تحميل الفاتورة",
       "SUPPORT": "الدعم",
@@ -331,6 +332,19 @@
       "REVEAL_REQUIRED_BODY": "أظهر كود التفعيل قبل النسخ.",
       "COPIED_TITLE": "تم نسخ كود التفعيل",
       "COPIED_BODY": "الصقه في شاشة الاسترداد على منصتك."
+    },
+    "INSTRUCTIONS_PAGE": {
+      "ESTIMATED_TIME": "الوقت التقديري",
+      "ESTIMATED_TIME_VALUE": "{{minutes}} دقيقة قراءة",
+      "LAST_UPDATED": "آخر تحديث",
+      "NEED_HELP": "تحتاج مساعدة؟",
+      "OPEN_SUPPORT_TICKET": "فتح تذكرة دعم",
+      "BACK_TO_LIBRARY": "العودة إلى المكتبة",
+      "LOADING": "جارٍ تحميل التعليمات…",
+      "FORBIDDEN_TITLE": "غير متاح",
+      "FORBIDDEN_BODY": "هذه التعليمات غير متاحة لهذا العنصر — قد لا تكون منشورة بعد، أو أن هذا الشراء غير مؤهل.",
+      "ERROR_TITLE": "حدث خطأ ما",
+      "RETRY": "إعادة المحاولة"
     },
     "NOTIFICATIONS_UI": {
       "TITLE": "الإشعارات",

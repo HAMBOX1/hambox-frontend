@@ -32,6 +32,7 @@ import {
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductAssetsUploadComponent } from '../../components/product-assets-upload/product-assets-upload.component';
 import { ProductBasicInfoFormComponent } from '../../components/product-basic-info-form/product-basic-info-form.component';
+import { ProductInstructionsPanelComponent } from '../../components/product-instructions-panel/product-instructions-panel.component';
 import { ProductOptionGroupsPanelComponent } from '../../components/product-option-groups-panel/product-option-groups-panel.component';
 import { ProductVariantManagerComponent } from '../../components/product-variant-manager/product-variant-manager.component';
 import { ProductStatus, UpdateProductRequest } from '../../models/product.model';
@@ -62,6 +63,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
     ProductAssetsUploadComponent,
     ProductOptionGroupsPanelComponent,
     ProductVariantManagerComponent,
+    ProductInstructionsPanelComponent,
   ],
   providers: [ProductEditorFacade, MessageService],
   templateUrl: './product-edit-page.component.html',

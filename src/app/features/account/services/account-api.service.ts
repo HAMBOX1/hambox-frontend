@@ -10,6 +10,7 @@ import {
   CreateReviewRequest,
   CustomerLibraryItemApiDto,
   CustomerLibraryQuery,
+  LibraryItemInstructionsApiDto,
   RevealCustomerLibraryKeyApiDto,
   OrderDetailApiDto,
   OrderSummaryApiDto,
@@ -186,6 +187,10 @@ export class AccountApiService {
 
   revealLibraryKey(libraryItemId: string): Observable<RevealCustomerLibraryKeyApiDto> {
     return this.api.get<RevealCustomerLibraryKeyApiDto>(ACCOUNT_API.revealLibraryKey(libraryItemId));
+  }
+
+  getLibraryItemInstructions(orderItemId: string): Observable<LibraryItemInstructionsApiDto> {
+    return this.api.get<LibraryItemInstructionsApiDto>(ACCOUNT_API.libraryItemInstructions(orderItemId));
   }
 
   getWallet(): Observable<WalletApiDto> {

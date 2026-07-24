@@ -178,3 +178,198 @@ body.hambox-mobile-shell {
     max-width: 100vw !important;
   }
 }
+
+/* ---------------------------------------------------------
+   Product Instructions rich-text editor (Quill) — global because Quill
+   renders its toolbar/editor DOM imperatively, outside Angular's view
+   encapsulation, and the emoji popup is appended directly to <body>.
+--------------------------------------------------------- */
+.ql-toolbar .pi {
+  font-size: 16px;
+  line-height: 1;
+}
+
+// PrimeNG's p-editor always renders its own hardcoded default toolbar markup
+// (a plain, iconless `div[data-pc-section="toolbar"].p-editor-toolbar` with
+// header/font/color/background/align controls) *in addition to* the real
+// toolbar Quill builds from our custom `[modules]` config, because passing a
+// custom `modules.toolbar` object — rather than projecting a `<p-header>` —
+// doesn't replace PrimeNG's default, it just gives Quill a second container to
+// build. The default one never gets Quill's icon/click-handler wiring, so it
+// sits there empty and broken, stacked above the working toolbar. It only
+// ever lacks the `ql-toolbar` class Quill adds to whichever container it
+// actually uses, so that's what distinguishes "the dead default" from "the
+// real thing" (which keeps `p-editor-toolbar` when no custom toolbar config
+// is given, e.g. Legal Center's plain `<p-editor>` instances).
+.p-editor-toolbar:not(.ql-toolbar) {
+  display: none;
+}
+
+// The real Quill-built toolbar wraps onto multiple rows once all our custom
+// buttons (callouts, divider, emoji, etc.) don't fit one line — most of the
+// time on mobile. Quill's own `.ql-formats` groups are plain inline-block
+// with no vertical margin, so wrapped rows touch with zero gap.
+.ql-toolbar.ql-snow {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--hambox-spacing-2);
+}
+
+// Because this toolbar never carries PrimeNG's own `.p-editor-toolbar` class
+// (only the dead default div does — see above), none of PrimeNG's own
+// `.p-editor-toolbar` background/border design-token rules ever reach it, so
+// it fell back to a transparent box showing whatever was behind it — wrong in
+// light mode where the card behind it is light but the toolbar looked dark.
+// Mirrored here from the same `--p-editor-toolbar-*` tokens PrimeNG exposes.
+.p-editor .ql-toolbar.ql-snow {
+  background: var(--p-editor-toolbar-background);
+  border-color: var(--p-editor-toolbar-border-color);
+  border-start-start-radius: var(--p-editor-toolbar-border-radius);
+  border-start-end-radius: var(--p-editor-toolbar-border-radius);
+}
+
+.hbx-emoji-picker {
+  position: absolute;
+  z-index: 1100;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--hambox-spacing-1);
+  padding: var(--hambox-spacing-2);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--hambox-radius-md);
+  box-shadow: var(--color-shadow-lg);
+}
+
+.hbx-emoji-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.1rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--hambox-radius-sm);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-surface);
+  }
+}
+
+/* ---------------------------------------------------------
+   Rich content viewer — the instructions HTML is bound via [innerHTML],
+   so these nodes never receive Angular's `_ngcontent` attribute and the
+   component's own scoped styles can't reach them; kept global instead.
+--------------------------------------------------------- */
+.rcv__content {
+  min-width: 0;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--hambox-radius-md);
+  }
+
+  iframe {
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    border: none;
+    border-radius: var(--hambox-radius-md);
+  }
+
+  hr {
+    margin: var(--hambox-spacing-6) 0;
+    border: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  blockquote {
+    margin: 0 0 var(--hambox-spacing-4);
+    padding-inline-start: var(--hambox-spacing-4);
+    border-inline-start: 3px solid var(--color-border);
+    color: var(--color-text-secondary);
+  }
+
+  pre {
+    margin: 0 0 var(--hambox-spacing-4);
+    padding: var(--hambox-spacing-4);
+    overflow-x: auto;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--hambox-radius-md);
+    font-family: monospace;
+  }
+
+  code {
+    font-family: monospace;
+  }
+
+  p code,
+  li code {
+    padding: 0.1em 0.35em;
+    background: var(--color-surface);
+    border-radius: var(--hambox-radius-sm);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 var(--hambox-spacing-4);
+  }
+
+  th,
+  td {
+    padding: var(--hambox-spacing-2) var(--hambox-spacing-3);
+    border: 1px solid var(--color-border);
+    text-align: start;
+  }
+
+  .rcv-copy-button {
+    position: absolute;
+    top: var(--hambox-spacing-2);
+    inset-inline-end: var(--hambox-spacing-2);
+    padding: 2px var(--hambox-spacing-2);
+    font-size: var(--hambox-font-size-xs);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--hambox-radius-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+@media print {
+  .rcv-copy-button {
+    display: none;
+  }
+}
+
+.hbx-callout {
+  margin: 0 0 var(--hambox-spacing-4);
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-4);
+  border-inline-start: 4px solid var(--color-info);
+  border-radius: var(--hambox-radius-sm);
+  background: var(--color-info-muted);
+
+  &[data-callout-type='warning'] {
+    border-inline-start-color: var(--color-warning);
+    background: var(--color-warning-muted);
+  }
+
+  &[data-callout-type='tip'] {
+    border-inline-start-color: var(--color-success);
+    background: var(--color-success-muted);
+  }
+
+  &[data-callout-type='note'] {
+    border-inline-start-color: var(--color-text-muted);
+    background: var(--color-surface);
+  }
+}

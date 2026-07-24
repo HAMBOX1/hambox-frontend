@@ -25,6 +25,7 @@
     "apexcharts": "^5.15.0",
     "dayjs": "^1.11.21",
     "file-saver": "^2.0.5",
+    "highlight.js": "^11.11.1",
     "jwt-decode": "^4.0.0",
     "ng-apexcharts": "^2.4.0",
     "primeflex": "^4.0.0",

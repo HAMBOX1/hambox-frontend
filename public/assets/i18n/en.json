@@ -320,6 +320,7 @@
       "COPIED": "Copied",
       "COPY_CODE": "Copy Code",
       "HOW_TO_REDEEM": "How to Redeem",
+      "INSTRUCTIONS": "Instructions",
       "VIEW_DETAILS": "View Details",
       "DOWNLOAD_INVOICE": "Download Invoice",
       "SUPPORT": "Support",
@@ -331,6 +332,19 @@
       "REVEAL_REQUIRED_BODY": "Reveal the activation code before copying.",
       "COPIED_TITLE": "Activation code copied",
       "COPIED_BODY": "Paste it in your platform redeem screen."
+    },
+    "INSTRUCTIONS_PAGE": {
+      "ESTIMATED_TIME": "Estimated time",
+      "ESTIMATED_TIME_VALUE": "{{minutes}} min read",
+      "LAST_UPDATED": "Last updated",
+      "NEED_HELP": "Need help?",
+      "OPEN_SUPPORT_TICKET": "Open Support Ticket",
+      "BACK_TO_LIBRARY": "Back to Library",
+      "LOADING": "Loading instructions…",
+      "FORBIDDEN_TITLE": "Not available",
+      "FORBIDDEN_BODY": "These instructions aren't available for this item — it may not be published yet, or this purchase isn't eligible.",
+      "ERROR_TITLE": "Something went wrong",
+      "RETRY": "Try again"
     },
     "NOTIFICATIONS_UI": {
       "TITLE": "Notifications",

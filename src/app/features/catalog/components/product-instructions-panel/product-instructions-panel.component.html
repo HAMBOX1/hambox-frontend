@@ -1,0 +1,99 @@
+<p-toast position="top-right" />
+
+<app-admin-section-card title="Instructions" description="Private setup/usage documentation, shown to customers only after purchase." [compact]="true">
+  @if (!productId()) {
+    <p class="product-instructions-panel__hint">Save the product first to start writing instructions.</p>
+  } @else {
+    <div class="product-instructions-panel__toolbar">
+      <input
+        pInputText
+        class="product-instructions-panel__title"
+        placeholder="Title (e.g. How to Activate Your Product)"
+        [ngModel]="titleState()"
+        (ngModelChange)="onTitleChange($event)"
+      />
+
+      <div class="product-instructions-panel__meta">
+        @if (instructions(); as current) {
+          <app-admin-status-badge
+            [label]="current.isPublished ? 'Published' : 'Draft'"
+            [tone]="current.isPublished ? 'success' : 'neutral'"
+          />
+          <span class="product-instructions-panel__version">v{{ current.version }}</span>
+          @if (current.updatedOnUtc) {
+            <span class="product-instructions-panel__updated">Updated {{ current.updatedOnUtc | hamboxDate: 'medium' }}</span>
+          }
+        }
+
+        @if (saving()) {
+          <span class="product-instructions-panel__status"><i class="pi pi-spin pi-spinner"></i> Saving…</span>
+        } @else if (dirty()) {
+          <span class="product-instructions-panel__status product-instructions-panel__status--dirty">
+            <i class="pi pi-circle-fill"></i> Unsaved changes
+          </span>
+        } @else {
+          <span class="product-instructions-panel__status product-instructions-panel__status--saved">
+            <i class="pi pi-check-circle"></i> Saved
+          </span>
+        }
+      </div>
+    </div>
+
+    <p-editor
+      [ngModel]="contentState()"
+      (ngModelChange)="onContentChange($event)"
+      [modules]="editorModules"
+      [style]="{ height: '420px' }"
+    />
+
+    <div class="product-instructions-panel__actions">
+      <button pButton type="button" label="Preview" icon="pi pi-eye" severity="secondary" [outlined]="true" (click)="previewOpen.set(true)"></button>
+
+      @if (instructions()?.isPublished) {
+        <button
+          pButton
+          type="button"
+          label="Unpublish"
+          icon="pi pi-eye-slash"
+          severity="secondary"
+          *hamboxHasPermission="permissions.Catalog.Products.Edit"
+          [loading]="publishing()"
+          (click)="unpublishConfirmOpen.set(true)"
+        ></button>
+      } @else {
+        <button
+          pButton
+          type="button"
+          label="Publish"
+          icon="pi pi-check"
+          *hamboxHasPermission="permissions.Catalog.Products.Edit"
+          [loading]="publishing()"
+          [disabled]="!titleState().trim()"
+          (click)="publishConfirmOpen.set(true)"
+        ></button>
+      }
+    </div>
+  }
+</app-admin-section-card>
+
+<p-dialog header="Preview" [(visible)]="previewOpen" [modal]="true" [style]="{ width: '860px', maxWidth: '95vw' }">
+  <h2 class="product-instructions-panel__preview-title">{{ titleState() || 'Untitled' }}</h2>
+  <app-rich-content-viewer [html]="contentState()" [showToc]="false" />
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [(visible)]="publishConfirmOpen"
+  title="Publish instructions?"
+  message="Customers who purchased this product will immediately be able to view these instructions."
+  confirmLabel="Publish"
+  (confirmed)="onPublish()"
+/>
+
+<app-admin-confirm-dialog
+  [(visible)]="unpublishConfirmOpen"
+  title="Unpublish instructions?"
+  message="Customers will lose access to these instructions until you publish again."
+  confirmLabel="Unpublish"
+  [destructive]="true"
+  (confirmed)="onUnpublish()"
+/>
