@@ -1,11 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { MenuItem } from 'primeng/api';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
+import { ApiError } from '../../../../core/models/api-error.model';
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { PermissionService } from '../../../../core/permissions/permission.service';
 import {
@@ -20,8 +23,10 @@ import {
 import { HamboxBottomSheetComponent } from '../../../../shared/components/hambox-bottom-sheet/hambox-bottom-sheet.component';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
-import { CollectionOption } from '../../models/collection.model';
+import { CollectionCreateFormComponent } from '../collection-create-form/collection-create-form.component';
+import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { Product, ProductStatus } from '../../models/product.model';
+import { CollectionApiService } from '../../services/collection-api.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
@@ -33,6 +38,7 @@ import { resolveProductImageUrl } from '../../utils/product-image.utils';
     PaginatorModule,
     ButtonModule,
     CheckboxModule,
+    DialogModule,
     TranslatePipe,
     HasPermissionDirective,
     HamboxCurrencyPipe,
@@ -43,6 +49,7 @@ import { resolveProductImageUrl } from '../../utils/product-image.utils';
     AdminActionMenuComponent,
     AdminSearchBarComponent,
     HamboxBottomSheetComponent,
+    CollectionCreateFormComponent,
   ],
   templateUrl: './product-catalog-cards.component.html',
   styleUrl: './product-catalog-cards.component.scss',
@@ -51,6 +58,7 @@ import { resolveProductImageUrl } from '../../utils/product-image.utils';
 export class ProductCatalogCardsComponent {
   private readonly permissionService = inject(PermissionService);
   private readonly translate = inject(TranslateService);
+  private readonly collectionApi = inject(CollectionApiService);
 
   protected readonly permissions = PERMISSIONS;
 
@@ -75,6 +83,8 @@ export class ProductCatalogCardsComponent {
   /** Emitted when the collections bottom sheet is saved — the page maps this into the same
    * partial-update path as the desktop table's collection popover. */
   readonly collectionsEdit = output<{ product: Product; collectionIds: readonly string[] }>();
+  /** Emitted after a collection is created inline from the sheet, so the parent facade can refresh its collection list. */
+  readonly collectionCreated = output<void>();
 
   protected readonly statusLabel = productStatusLabel;
   protected readonly resolveImageUrl = resolveProductImageUrl;
@@ -130,8 +140,6 @@ export class ProductCatalogCardsComponent {
   }
 
   // --- Collections bottom sheet (mobile equivalent of the desktop table's popover) ---
-  // No inline "create collection" here — matches the existing pattern of this mobile card
-  // view already having no inline "create category" either; use the Collections page for that.
 
   private readonly collectionSheetProductState = signal<Product | null>(null);
   private readonly collectionDraftIdsState = signal<readonly string[]>([]);
@@ -139,9 +147,26 @@ export class ProductCatalogCardsComponent {
 
   protected readonly collectionSheetOpen = signal(false);
 
+  private readonly newlyCreatedCollectionState = signal<CollectionOption | null>(null);
+  protected readonly collectionDialogOpen = signal(false);
+  protected readonly collectionCreating = signal(false);
+  protected readonly collectionCreateError = signal<string | null>(null);
+  protected readonly collectionFormResetToken = signal(0);
+
+  protected readonly collectionSheetOptions = computed(() => {
+    const base = this.collectionOptions();
+    const created = this.newlyCreatedCollectionState();
+
+    if (!created || base.some((option) => option.id === created.id)) {
+      return base;
+    }
+
+    return [...base, created];
+  });
+
   protected readonly filteredCollectionSheetOptions = computed(() => {
     const term = this.collectionSheetSearchTerm().trim().toLowerCase();
-    const options = this.collectionOptions();
+    const options = this.collectionSheetOptions();
 
     if (!term) {
       return options;
@@ -181,6 +206,52 @@ export class ProductCatalogCardsComponent {
 
     this.collectionsEdit.emit({ product, collectionIds: this.collectionDraftIdsState() });
     this.closeCollectionSheet();
+  }
+
+  protected openCollectionCreateDialog(): void {
+    this.collectionCreateError.set(null);
+    this.collectionFormResetToken.update((value) => value + 1);
+    this.collectionDialogOpen.set(true);
+  }
+
+  protected closeCollectionCreateDialog(): void {
+    this.collectionDialogOpen.set(false);
+    this.collectionCreateError.set(null);
+  }
+
+  protected onCollectionCreateDialogVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.closeCollectionCreateDialog();
+    }
+  }
+
+  protected async onCollectionSubmitted(request: CreateCollectionRequest): Promise<void> {
+    this.collectionCreating.set(true);
+    this.collectionCreateError.set(null);
+
+    try {
+      const id = await firstValueFrom(this.collectionApi.createCollection(request));
+      this.newlyCreatedCollectionState.set({ id, label: request.name, parentId: request.parentId ?? null });
+      this.collectionDraftIdsState.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
+      this.collectionDialogOpen.set(false);
+      this.collectionCreated.emit();
+    } catch (error) {
+      this.collectionCreateError.set(this.toErrorMessage(error, 'Failed to create collection.'));
+    } finally {
+      this.collectionCreating.set(false);
+    }
+  }
+
+  private toErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof ApiError) {
+      if (error.status === 401 || error.status === 403) {
+        return 'You do not have permission to manage collections. Sign in with an admin account (admin@hambox.local in development).';
+      }
+
+      return error.message;
+    }
+
+    return fallback;
   }
 
   protected productActionMenuItems(product: Product): MenuItem[] {

@@ -133,8 +133,44 @@
     }
   </ul>
 
+  @if (collectionCreateError(); as error) {
+    <p class="product-catalog-cards__collection-error">{{ error }}</p>
+  }
+
+  <button
+    pButton
+    type="button"
+    label="+ New Collection"
+    icon="pi pi-plus"
+    severity="secondary"
+    text
+    size="small"
+    class="product-catalog-cards__collection-create-btn"
+    (click)="openCollectionCreateDialog()"
+  ></button>
+
   <div sheetFooter class="product-catalog-cards__collection-sheet-actions">
     <button pButton type="button" label="Cancel" severity="secondary" text (click)="closeCollectionSheet()"></button>
     <button pButton type="button" label="Save" icon="pi pi-check" (click)="saveCollectionSheet()"></button>
   </div>
 </app-hambox-bottom-sheet>
+
+<p-dialog
+  header="Create Collection"
+  [visible]="collectionDialogOpen()"
+  (visibleChange)="onCollectionCreateDialogVisibleChange($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <app-collection-create-form
+    mode="create"
+    [submitting]="collectionCreating()"
+    [serverError]="collectionCreateError()"
+    [resetToken]="collectionFormResetToken()"
+    (submitted)="onCollectionSubmitted($event)"
+    (cancelled)="closeCollectionCreateDialog()"
+  />
+</p-dialog>
