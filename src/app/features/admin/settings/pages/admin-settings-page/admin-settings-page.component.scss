@@ -11,14 +11,67 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  /* AdminSearchBarComponent's :host sets `flex: 1 1 20rem` for its usual placement inside a horizontal
+     AdminToolbar row, where flex-grow applies along the row axis. Here it sits in a *column* flex
+     container instead, so that same flex-grow stretches it vertically (with 20rem/320px as the basis) —
+     override to a fixed-height item so it doesn't consume the sidebar's height. */
+  > app-admin-search-bar {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .settings-nav__list {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 1rem;
   max-height: calc(100vh - 12rem);
   overflow: auto;
+}
+
+.settings-nav__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.settings-nav__section-label {
+  padding: 0 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.settings-nav__section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.settings-nav__section-toggle .settings-nav__section-label {
+  padding-inline-end: 0.5rem;
+}
+
+.settings-nav__section-toggle i {
+  font-size: 0.7rem;
+  opacity: 0.55;
+  padding-inline-end: 0.85rem;
+}
+
+.settings-nav__empty {
+  padding: 0.5rem 0.85rem;
+  opacity: 0.7;
+  font-size: 0.85rem;
 }
 
 .settings-nav__item {
@@ -46,11 +99,6 @@
   font-weight: 600;
 }
 
-.settings-nav__group {
-  font-size: 0.75rem;
-  opacity: 0.7;
-}
-
 .settings-form {
   display: grid;
   gap: 1rem;
@@ -63,14 +111,58 @@
 
 .settings-form__hint {
   opacity: 0.75;
+  font-size: 0.82rem;
 }
 
-.settings-form__color {
-  width: 3rem;
-  height: 2.25rem;
-  padding: 0;
-  border: 0;
+.settings-form__label {
+  font-weight: 600;
+}
+
+.settings-form__field--wide {
+  grid-column: 1 / -1;
+}
+
+.settings-form__advanced {
+  margin-top: 1.25rem;
+}
+
+.rate-table {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rate-table__row {
+  display: grid;
+  grid-template-columns: minmax(0, 5rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.rate-table__code {
+  font-weight: 600;
+}
+
+.rate-table__row--add {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.rate-table__remove,
+.rate-table__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: 0.6rem;
   background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.rate-table__remove {
+  padding: 0.5rem;
+  color: var(--p-red-500, #ef4444);
 }
 
 .settings-form__smtp-test {
@@ -84,6 +176,12 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.75rem;
   align-items: center;
+}
+
+.settings-form__smtp-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .branding-preview {

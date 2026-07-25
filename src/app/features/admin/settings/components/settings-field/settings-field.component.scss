@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.settings-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.settings-field__label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.settings-field__required {
+  color: var(--p-red-500, #ef4444);
+  margin-inline-start: 0.15rem;
+}
+
+.settings-field__info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.settings-field__info:hover,
+.settings-field__info:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.settings-field__info:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary-color, #6366f1);
+}
+
+.settings-field__helper {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+.settings-field__control {
+  display: block;
+  width: 100%;
+
+  /* `.w-full` (used throughout this component's template) is a PrimeFlex utility class, but PrimeFlex
+     is a declared dependency that's never actually imported into any stylesheet in this project — the
+     class exists on these elements but matches no CSS rule, so every control was rendering at its
+     native intrinsic width instead of filling the field. Setting width directly here, scoped to this
+     component, rather than depending on that dead class. */
+  > input,
+  > textarea,
+  > ui-color-picker {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* p-select/p-multiselect/p-autocomplete/p-inputnumber are PrimeNG components whose host element is
+     itself the flex container laying out their internal label + icon (e.g. .p-select-label +
+     .p-select-dropdown) via `display: inline-flex`. Only widen them — forcing `display: block` here
+     (as applied above for plain elements) would override that inline-flex and make the icon wrap onto
+     its own line instead of sitting beside the label. */
+  > p-select,
+  > p-multiselect,
+  > p-autocomplete,
+  > p-inputnumber {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+.settings-field__radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.settings-field__radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.settings-field__slider-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 8rem;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-field__slider {
+  width: 100%;
+}
+
+.settings-field--invalid .settings-field__control ::ng-deep .p-inputtext,
+.settings-field--invalid .settings-field__control ::ng-deep textarea {
+  border-color: var(--p-red-500, #ef4444);
+}
+
+.settings-field__error {
+  color: var(--p-red-500, #ef4444);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 560px) {
+  .settings-field__slider-row {
+    grid-template-columns: 1fr;
+  }
+}

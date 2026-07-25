@@ -1,0 +1,182 @@
+<div class="settings-field" [class.settings-field--invalid]="error()">
+  <div class="settings-field__label-row">
+    <label [for]="fieldId">
+      {{ field().labelKey | translate }}
+      @if (field().validators?.required) {
+        <span class="settings-field__required" aria-hidden="true">*</span>
+      }
+    </label>
+
+    @if (field().tooltipKey) {
+      <button
+        type="button"
+        class="settings-field__info"
+        [pTooltip]="tooltipText()"
+        tooltipPosition="top"
+        [attr.aria-label]="tooltipText()"
+      >
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  @if (field().helperKey) {
+    <p class="settings-field__helper">{{ field().helperKey | translate }}</p>
+  }
+
+  <div class="settings-field__control">
+    @switch (field().control) {
+      @case ('toggle') {
+        <p-toggleswitch
+          [inputId]="fieldId"
+          [ngModel]="!!value()"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+
+      @case ('color') {
+        <ui-color-picker
+          [ngModel]="value() ?? '#000000'"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+
+      @case ('select') {
+        <p-select
+          [inputId]="fieldId"
+          class="w-full"
+          [options]="options()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="value()"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+
+      @case ('radio') {
+        <div class="settings-field__radio-group" role="radiogroup" [attr.aria-label]="field().labelKey | translate">
+          @for (option of options(); track option.value) {
+            <label class="settings-field__radio">
+              <p-radioButton
+                [name]="fieldId"
+                [value]="option.value"
+                [ngModel]="value()"
+                [disabled]="disabled()"
+                (ngModelChange)="emit($event)"
+              />
+              {{ option.label }}
+            </label>
+          }
+        </div>
+      }
+
+      @case ('multiselect') {
+        <p-multiSelect
+          [inputId]="fieldId"
+          class="w-full"
+          [options]="options()"
+          optionLabel="label"
+          optionValue="value"
+          display="chip"
+          [maxSelectedLabels]="options().length + 1"
+          [ngModel]="multiselectValue()"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+
+      @case ('autocomplete') {
+        <p-autoComplete
+          [inputId]="fieldId"
+          class="w-full"
+          [ngModel]="value()"
+          [disabled]="disabled()"
+          [suggestions]="timezoneSuggestions()"
+          (completeMethod)="filterTimezones($event)"
+          (ngModelChange)="emit($event)"
+          [dropdown]="true"
+        />
+      }
+
+      @case ('slider') {
+        <div class="settings-field__slider-row">
+          <p-slider
+            class="settings-field__slider"
+            [ngModel]="scaledValue()"
+            [min]="field().min ?? 0"
+            [max]="field().max ?? 100"
+            [step]="field().step ?? 1"
+            [disabled]="disabled()"
+            (ngModelChange)="emitScaled($event)"
+          />
+          <p-inputNumber
+            [inputId]="fieldId"
+            [ngModel]="scaledValue()"
+            [min]="field().min"
+            [max]="field().max"
+            [step]="field().step ?? 1"
+            [suffix]="field().unit ? ' ' + field().unit : ''"
+            [disabled]="disabled()"
+            (ngModelChange)="emitScaled($event)"
+          />
+        </div>
+      }
+
+      @case ('stepper') {
+        <p-inputNumber
+          [inputId]="fieldId"
+          [ngModel]="value()"
+          [min]="field().min"
+          [max]="field().max"
+          [step]="1"
+          [showButtons]="true"
+          [suffix]="field().unit ? ' ' + field().unit : ''"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+
+      @case ('number') {
+        <p-inputNumber
+          [inputId]="fieldId"
+          [ngModel]="value()"
+          [min]="field().min"
+          [max]="field().max"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+
+      @case ('textarea') {
+        <textarea
+          pTextarea
+          [id]="fieldId"
+          class="w-full"
+          [rows]="field().rows || 4"
+          [ngModel]="value() ?? ''"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        ></textarea>
+      }
+
+      @default {
+        <input
+          pInputText
+          class="w-full"
+          [id]="fieldId"
+          [type]="field().control === 'email' ? 'email' : field().control === 'url' ? 'url' : 'text'"
+          [ngModel]="value() ?? ''"
+          [disabled]="disabled()"
+          (ngModelChange)="emit($event)"
+        />
+      }
+    }
+  </div>
+
+  @if (error()) {
+    <small class="settings-field__error">{{ error()! | translate: errorParams() }}</small>
+  }
+</div>

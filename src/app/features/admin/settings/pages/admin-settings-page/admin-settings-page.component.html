@@ -1,8 +1,8 @@
 <p-toast />
 
 <app-admin-page-header
-  title="Platform Settings"
-  subtitle="Configure HAMBOX platform behavior, branding, security, and operations."
+  [title]="'ADMIN.SETTINGS.TITLE' | translate"
+  [subtitle]="'ADMIN.SETTINGS.SUBTITLE' | translate"
   [breadcrumbs]="breadcrumbs"
 />
 
@@ -13,31 +13,46 @@
 } @else {
   <div class="settings-layout">
     <aside class="settings-nav">
-      <div class="settings-nav__search">
-        <span class="p-input-icon-left w-full">
-          <i class="pi pi-search" aria-hidden="true"></i>
-          <input
-            pInputText
-            class="w-full"
-            type="search"
-            placeholder="Search categories..."
-            [ngModel]="searchTerm()"
-            (ngModelChange)="searchTerm.set($event)"
-          />
-        </span>
-      </div>
+      <app-admin-search-bar
+        [value]="searchTerm()"
+        [placeholder]="'ADMIN.SETTINGS.SEARCH_PLACEHOLDER' | translate"
+        [ariaLabel]="'ADMIN.SETTINGS.SEARCH_PLACEHOLDER' | translate"
+        (searchChange)="searchTerm.set($event)"
+      />
 
       <nav class="settings-nav__list" aria-label="Settings categories">
-        @for (category of filteredCategories(); track category.key) {
-          <button
-            type="button"
-            class="settings-nav__item"
-            [class.settings-nav__item--active]="category.key === activeCategoryKey()"
-            (click)="selectCategory(category)"
-          >
-            <span class="settings-nav__label">{{ category.label }}</span>
-            <span class="settings-nav__group">{{ category.group }}</span>
-          </button>
+        @for (section of navSections(); track section.label) {
+          <div class="settings-nav__section">
+            @if (section.label === advancedSectionLabel) {
+              <button
+                type="button"
+                class="settings-nav__section-toggle"
+                (click)="advancedNavExpanded.set(!advancedNavExpanded())"
+              >
+                <span class="settings-nav__section-label">{{ section.label | translate }}</span>
+                <i class="pi" [class.pi-chevron-down]="!showAdvancedNav()" [class.pi-chevron-up]="showAdvancedNav()" aria-hidden="true"></i>
+              </button>
+            } @else {
+              <span class="settings-nav__section-label">{{ section.label | translate }}</span>
+            }
+
+            @if (section.label !== advancedSectionLabel || showAdvancedNav()) {
+              @for (category of section.items; track category.key) {
+                <button
+                  type="button"
+                  class="settings-nav__item"
+                  [class.settings-nav__item--active]="category.key === activeCategoryKey()"
+                  (click)="selectCategory(category)"
+                >
+                  <span class="settings-nav__label">{{ categoryLabelKey(category) | translate }}</span>
+                </button>
+              }
+            }
+          </div>
+        }
+
+        @if (!navSections().length) {
+          <p class="settings-nav__empty">{{ 'ADMIN.SETTINGS.NAV.NO_MATCHES' | translate }}</p>
         }
       </nav>
     </aside>
@@ -51,139 +66,188 @@
             (payloadChange)="replaceDraft($event)"
           />
         } @else {
-        <app-admin-section-card
-          [title]="category.label"
-          [description]="category.hasPersistedOverride ? 'Custom configuration saved' : 'Using platform defaults'"
-        >
-          @if (activeCategoryKey() === 'branding') {
-            <div class="branding-preview" aria-label="Branding preview">
-              <div
-                class="branding-preview__bar"
-                [style.background]="brandingPreview().primary"
-              ></div>
-              <div class="branding-preview__body">
-                @if (brandingPreview().logoUrl) {
-                  <img [src]="brandingPreview().logoUrl" alt="" class="branding-preview__logo" />
-                }
-                <h3 [style.color]="brandingPreview().secondary">{{ brandingPreview().title }}</h3>
-                <span
-                  class="branding-preview__chip"
-                  [style.background]="brandingPreview().accent"
-                >
-                  Accent
-                </span>
-              </div>
-            </div>
-          }
-
-          <div class="settings-form">
-            @for (field of activeFields(); track field.key) {
-              <div class="settings-form__field">
-                <label [for]="field.key">{{ field.label }}</label>
-
-                @switch (field.type) {
-                  @case ('checkbox') {
-                    <p-checkbox
-                      [inputId]="field.key"
-                      [binary]="true"
-                      [ngModel]="readBoolean(field.key)"
-                      [disabled]="!canEdit()"
-                      (ngModelChange)="setField(field.key, $event)"
-                    />
+          <app-admin-section-card
+            [title]="categoryLabelKey(category) | translate"
+            [description]="
+              (category.hasPersistedOverride
+                ? 'ADMIN.SETTINGS.CUSTOM_CONFIGURED'
+                : 'ADMIN.SETTINGS.USING_DEFAULTS'
+              ) | translate
+            "
+          >
+            @if (activeCategoryKey() === 'branding') {
+              <div class="branding-preview" aria-label="Branding preview">
+                <div class="branding-preview__bar" [style.background]="brandingPreview().primary"></div>
+                <div class="branding-preview__body">
+                  @if (brandingPreview().logoUrl) {
+                    <img [src]="brandingPreview().logoUrl" alt="" class="branding-preview__logo" />
                   }
-                  @case ('number') {
-                    <p-inputNumber
-                      [inputId]="field.key"
-                      [ngModel]="readNumber(field.key)"
-                      [disabled]="!canEdit()"
-                      [min]="field.min"
-                      [max]="field.max"
-                      (ngModelChange)="setField(field.key, $event)"
-                    />
-                  }
-                  @case ('textarea') {
-                    <textarea
-                      pTextarea
-                      [id]="field.key"
-                      rows="4"
-                      class="w-full"
-                      [ngModel]="readText(field.key)"
-                      [disabled]="!canEdit()"
-                      (ngModelChange)="setField(field.key, $event)"
-                    ></textarea>
-                  }
-                  @case ('color') {
-                    <input
-                      [id]="field.key"
-                      type="color"
-                      class="settings-form__color"
-                      [ngModel]="readText(field.key)"
-                      [disabled]="!canEdit()"
-                      (ngModelChange)="setField(field.key, $event)"
-                    />
-                  }
-                  @default {
-                    <input
-                      pInputText
-                      class="w-full"
-                      [id]="field.key"
-                      [type]="field.type === 'email' ? 'email' : 'text'"
-                      [ngModel]="readText(field.key)"
-                      [disabled]="!canEdit()"
-                      (ngModelChange)="setField(field.key, $event)"
-                    />
-                  }
-                }
-
-                @if (field.hint) {
-                  <small class="settings-form__hint">{{ field.hint }}</small>
-                }
-
-                @if (field.key === 'password' && readField('hasStoredPassword')) {
-                  <small class="settings-form__hint">A password is already stored.</small>
-                }
-
-                @if (field.key === 'bypassPassword' && readField('hasStoredBypassPassword')) {
-                  <small class="settings-form__hint">A bypass password is already stored.</small>
-                }
+                  <h3 [style.color]="brandingPreview().secondary">{{ brandingPreview().title }}</h3>
+                  <span class="branding-preview__chip" [style.background]="brandingPreview().accent">
+                    {{ 'ADMIN.SETTINGS.BRANDING.ACCENT_PREVIEW' | translate }}
+                  </span>
+                </div>
               </div>
             }
-          </div>
 
-          @if (activeCategoryKey() === 'email' && canEdit()) {
-            <div class="settings-form__smtp-test">
-              <label for="testEmail">Test Email Recipient</label>
-              <div class="settings-form__smtp-row">
-                <input
-                  pInputText
-                  id="testEmail"
-                  type="email"
-                  class="w-full"
-                  [ngModel]="testEmail()"
-                  (ngModelChange)="testEmail.set($event)"
-                  placeholder="admin@example.com"
+            <div class="settings-form">
+              @for (field of primaryFields(); track field.key) {
+                <app-settings-field
+                  [field]="field"
+                  [value]="readField(field.key)"
+                  [disabled]="!canEdit()"
+                  [error]="errorKeyFor(field.key)"
+                  [errorParams]="errorParamsFor(field)"
+                  [resolvedOptions]="resolvedOptionsFor(field)"
+                  (valueChange)="setField(field, $event)"
                 />
-                <p-button
-                  label="Test SMTP"
-                  icon="pi pi-send"
-                  [loading]="facade.saving()"
-                  (onClick)="sendTestEmail()"
-                />
-              </div>
+
+                @if (field.key === 'password' && readField('hasStoredPassword')) {
+                  <small class="settings-form__hint">{{ 'ADMIN.SETTINGS.EMAIL.PASSWORD_STORED' | translate }}</small>
+                }
+                @if (field.key === 'bypassPassword' && readField('hasStoredBypassPassword')) {
+                  <small class="settings-form__hint">{{ 'ADMIN.SETTINGS.MAINTENANCE.BYPASS_STORED' | translate }}</small>
+                }
+              }
+
+              @if (isIntegrationsCategory()) {
+                <div class="settings-form__field">
+                  <span class="settings-form__label">{{ 'ADMIN.SETTINGS.INTEGRATIONS.WEBHOOK_SECRET' | translate }}</span>
+                  <app-admin-status-badge
+                    [label]="
+                      (readField('stripeWebhookSecretConfigured')
+                        ? 'ADMIN.SETTINGS.STATUS.CONFIGURED'
+                        : 'ADMIN.SETTINGS.STATUS.NOT_CONFIGURED'
+                      ) | translate
+                    "
+                    [tone]="readField('stripeWebhookSecretConfigured') ? 'success' : 'neutral'"
+                  />
+                </div>
+              }
+
+              @if (isCurrencyCategory()) {
+                <div class="settings-form__field settings-form__field--wide">
+                  <span class="settings-form__label">{{ 'ADMIN.SETTINGS.CURRENCY.STATIC_RATES' | translate }}</span>
+                  <p class="settings-form__hint">{{ 'ADMIN.SETTINGS.CURRENCY.STATIC_RATES_HELP' | translate }}</p>
+
+                  <div class="rate-table">
+                    @for (entry of rateEntries(); track entry[0]) {
+                      <div class="rate-table__row">
+                        <span class="rate-table__code">{{ entry[0] }}</span>
+                        <p-inputNumber
+                          [ngModel]="entry[1]"
+                          [minFractionDigits]="2"
+                          [maxFractionDigits]="6"
+                          [disabled]="!canEdit()"
+                          (ngModelChange)="setRate(entry[0], $event)"
+                        />
+                        @if (canEdit()) {
+                          <button
+                            type="button"
+                            class="rate-table__remove"
+                            [attr.aria-label]="'ADMIN.SETTINGS.CURRENCY.REMOVE_RATE' | translate"
+                            (click)="removeRate(entry[0])"
+                          >
+                            <i class="pi pi-trash" aria-hidden="true"></i>
+                          </button>
+                        }
+                      </div>
+                    }
+
+                    @if (canEdit() && availableRateCurrencies().length) {
+                      <div class="rate-table__row rate-table__row--add">
+                        <p-select
+                          [options]="availableRateCurrencies()"
+                          optionLabel="label"
+                          optionValue="value"
+                          [ngModel]="newRateCurrency()"
+                          (ngModelChange)="newRateCurrency.set($event)"
+                          [placeholder]="'ADMIN.SETTINGS.CURRENCY.SELECT_CURRENCY' | translate"
+                        />
+                        <p-inputNumber
+                          [ngModel]="newRateValue()"
+                          [minFractionDigits]="2"
+                          [maxFractionDigits]="6"
+                          (ngModelChange)="newRateValue.set($event)"
+                        />
+                        <button
+                          type="button"
+                          class="rate-table__add"
+                          [disabled]="!newRateCurrency() || newRateValue() === null"
+                          (click)="addRate()"
+                        >
+                          <i class="pi pi-plus" aria-hidden="true"></i>
+                          {{ 'ADMIN.SETTINGS.CURRENCY.ADD_RATE' | translate }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
             </div>
-          }
-        </app-admin-section-card>
+
+            @if (advancedFields().length) {
+              <app-admin-section-card
+                class="settings-form__advanced"
+                [title]="'ADMIN.SETTINGS.NAV.ADVANCED' | translate"
+                [collapsible]="true"
+                [(collapsed)]="advancedFieldsCollapsed"
+                [noDivider]="true"
+                [compact]="true"
+              >
+                <div class="settings-form">
+                  @for (field of advancedFields(); track field.key) {
+                    <app-settings-field
+                      [field]="field"
+                      [value]="readField(field.key)"
+                      [disabled]="!canEdit()"
+                      [error]="errorKeyFor(field.key)"
+                      [errorParams]="errorParamsFor(field)"
+                      [resolvedOptions]="resolvedOptionsFor(field)"
+                      (valueChange)="setField(field, $event)"
+                    />
+                  }
+                </div>
+              </app-admin-section-card>
+            }
+
+            @if (activeCategoryKey() === 'email' && canEdit()) {
+              <div class="settings-form__smtp-test">
+                <label for="testEmail">{{ 'ADMIN.SETTINGS.EMAIL.TEST_RECIPIENT' | translate }}</label>
+                <div class="settings-form__smtp-row">
+                  <input
+                    pInputText
+                    id="testEmail"
+                    type="email"
+                    class="settings-form__smtp-input"
+                    [ngModel]="testEmail()"
+                    (ngModelChange)="testEmail.set($event)"
+                    placeholder="admin@example.com"
+                  />
+                  <p-button
+                    [label]="'ADMIN.SETTINGS.EMAIL.TEST_SMTP' | translate"
+                    icon="pi pi-send"
+                    [loading]="facade.saving()"
+                    (onClick)="sendTestEmail()"
+                  />
+                </div>
+              </div>
+            }
+          </app-admin-section-card>
         }
 
         @if (facade.audit().length) {
-          <app-admin-section-card title="Recent Changes" description="Configuration audit trail">
+          <app-admin-section-card
+            [title]="'ADMIN.SETTINGS.AUDIT.TITLE' | translate"
+            [description]="'ADMIN.SETTINGS.AUDIT.DESCRIPTION' | translate"
+          >
             <ul class="settings-audit">
               @for (entry of facade.audit(); track entry.id) {
                 <li>
                   <strong>{{ entry.categoryKey }}</strong>
                   — {{ entry.action }}
                   @if (entry.actorDisplayName) {
-                    <span>by {{ entry.actorDisplayName }}</span>
+                    <span>{{ 'ADMIN.SETTINGS.AUDIT.BY' | translate: { name: entry.actorDisplayName } }}</span>
                   }
                   <time>{{ entry.occurredOnUtc | date: 'medium' }}</time>
                 </li>
@@ -195,20 +259,24 @@
     </section>
   </div>
 
-  <app-admin-sticky-save-bar [dirty]="dirty()" [visible]="canEdit()">
+  <app-admin-sticky-save-bar
+    [dirty]="dirty()"
+    [visible]="canEdit()"
+    [hint]="hasValidationErrors() ? ('ADMIN.SETTINGS.VALIDATION.BLOCKED' | translate) : ''"
+  >
   @if (canEdit()) {
     <p-button
-      label="Restore Defaults"
+      [label]="'ADMIN.SETTINGS.RESTORE_DEFAULTS' | translate"
       severity="secondary"
       [text]="true"
       [disabled]="facade.saving()"
       (onClick)="requestRestore()"
     />
     <p-button
-      label="Save Changes"
+      [label]="'ADMIN.SETTINGS.SAVE_CHANGES' | translate"
       icon="pi pi-check"
       [loading]="facade.saving()"
-      [disabled]="!dirty()"
+      [disabled]="!dirty() || hasValidationErrors()"
       (onClick)="saveActive()"
     />
   }
@@ -232,4 +300,15 @@
   [loading]="facade.saving()"
   (visibleChange)="restoreDialogOpen.set($event)"
   (confirmed)="confirmRestore()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="dangerousConfirmOpen()"
+  [title]="'ADMIN.SETTINGS.DANGER.TITLE' | translate"
+  [message]="'ADMIN.SETTINGS.DANGER.MESSAGE' | translate"
+  [confirmLabel]="'ADMIN.CONFIRM.CONFIRM'"
+  [cancelLabel]="'ADMIN.CONFIRM.CANCEL'"
+  [destructive]="true"
+  (visibleChange)="onDangerousDialogVisibleChange($event)"
+  (confirmed)="confirmDangerousChange()"
 />

@@ -1,138 +1,188 @@
 <div class="storefront-editor">
-  <app-admin-section-card title="Hero Section" description="Primary home page hero">
-      <div class="storefront-editor__preview" [style.--preview-badge]="text('hero', 'badgeColor')">
-        <div class="storefront-editor__preview-badge">{{ text('hero', 'badgeText') || 'Badge' }}</div>
-        <strong>{{ text('hero', 'title') || 'Hero title' }}</strong>
-        <p>{{ text('hero', 'subtitle') || 'Hero subtitle' }}</p>
-      </div>
-      <div class="storefront-editor__grid">
-        <label>Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'title')" (ngModelChange)="setSectionField('hero', 'title', $event)" /></label>
-        <label>Subtitle<textarea pTextarea rows="3" class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'subtitle')" (ngModelChange)="setSectionField('hero', 'subtitle', $event)"></textarea></label>
-        <label>Primary Button Text<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'primaryButtonText')" (ngModelChange)="setSectionField('hero', 'primaryButtonText', $event)" /></label>
-        <label>Primary Button URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'primaryButtonUrl')" (ngModelChange)="setSectionField('hero', 'primaryButtonUrl', $event)" /></label>
-        <label>Secondary Button Text<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'secondaryButtonText')" (ngModelChange)="setSectionField('hero', 'secondaryButtonText', $event)" /></label>
-        <label>Secondary Button URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'secondaryButtonUrl')" (ngModelChange)="setSectionField('hero', 'secondaryButtonUrl', $event)" /></label>
-        <label>Background Image URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'backgroundImageUrl')" (ngModelChange)="setSectionField('hero', 'backgroundImageUrl', $event)" /></label>
-        <label>Overlay Image URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'overlayImageUrl')" (ngModelChange)="setSectionField('hero', 'overlayImageUrl', $event)" /></label>
-        <label>Overlay Opacity<p-inputNumber [disabled]="disabled()" [min]="0" [max]="1" [step]="0.05" [ngModel]="num('hero', 'overlayOpacity')" (ngModelChange)="setSectionField('hero', 'overlayOpacity', $event)" /></label>
-        <label>Badge Text<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('hero', 'badgeText')" (ngModelChange)="setSectionField('hero', 'badgeText', $event)" /></label>
-        <label>Badge Color<input type="color" [disabled]="disabled()" [ngModel]="text('hero', 'badgeColor')" (ngModelChange)="setSectionField('hero', 'badgeColor', $event)" /></label>
-        <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('hero', 'visible')" (ngModelChange)="setSectionField('hero', 'visible', $event)" /> Visible</label>
-      </div>
-    </app-admin-section-card>
-
-  <app-admin-section-card title="Announcement Bar" description="Top promotional strip">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.HERO.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.HERO.DESCRIPTION_CARD' | translate"
+  >
+    <div class="storefront-editor__preview" [style.--preview-badge]="previewText('hero', 'badgeColor')">
+      <div class="storefront-editor__preview-badge">{{ previewText('hero', 'badgeText') || 'Badge' }}</div>
+      <strong>{{ previewText('hero', 'title') || 'Hero title' }}</strong>
+      <p>{{ previewText('hero', 'subtitle') || 'Hero subtitle' }}</p>
+    </div>
     <div class="storefront-editor__grid">
-      <label>Text<textarea pTextarea rows="2" class="w-full" [disabled]="disabled()" [ngModel]="text('announcementBar', 'text')" (ngModelChange)="setSectionField('announcementBar', 'text', $event)"></textarea></label>
-      <label>Link<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('announcementBar', 'link')" (ngModelChange)="setSectionField('announcementBar', 'link', $event)" /></label>
-      <label>Button Text<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('announcementBar', 'buttonText')" (ngModelChange)="setSectionField('announcementBar', 'buttonText', $event)" /></label>
-      <label>Background Color<input type="color" [disabled]="disabled()" [ngModel]="text('announcementBar', 'backgroundColor')" (ngModelChange)="setSectionField('announcementBar', 'backgroundColor', $event)" /></label>
-      <label>Text Color<input type="color" [disabled]="disabled()" [ngModel]="text('announcementBar', 'textColor')" (ngModelChange)="setSectionField('announcementBar', 'textColor', $event)" /></label>
-      <label>Display Position<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('announcementBar', 'displayPosition')" (ngModelChange)="setSectionField('announcementBar', 'displayPosition', $event)" /></label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('announcementBar', 'visible')" (ngModelChange)="setSectionField('announcementBar', 'visible', $event)" /> Visible</label>
+      @for (field of heroFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('hero')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('hero', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Promotional Banner" description="Sale / campaign banner">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.ANNOUNCEMENT.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.ANNOUNCEMENT.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('promotionalBanner', 'title')" (ngModelChange)="setSectionField('promotionalBanner', 'title', $event)" /></label>
-      <label>Subtitle<textarea pTextarea rows="2" class="w-full" [disabled]="disabled()" [ngModel]="text('promotionalBanner', 'subtitle')" (ngModelChange)="setSectionField('promotionalBanner', 'subtitle', $event)"></textarea></label>
-      <label>Image URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('promotionalBanner', 'imageUrl')" (ngModelChange)="setSectionField('promotionalBanner', 'imageUrl', $event)" /></label>
-      <label>Button Text<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('promotionalBanner', 'buttonText')" (ngModelChange)="setSectionField('promotionalBanner', 'buttonText', $event)" /></label>
-      <label>Button URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('promotionalBanner', 'buttonUrl')" (ngModelChange)="setSectionField('promotionalBanner', 'buttonUrl', $event)" /></label>
-      <label>Countdown (seconds)<p-inputNumber [disabled]="disabled()" [min]="0" [ngModel]="num('promotionalBanner', 'countdownSeconds')" (ngModelChange)="setSectionField('promotionalBanner', 'countdownSeconds', $event)" /></label>
-      <label>Background Color<input type="color" [disabled]="disabled()" [ngModel]="text('promotionalBanner', 'backgroundColor')" (ngModelChange)="setSectionField('promotionalBanner', 'backgroundColor', $event)" /></label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('promotionalBanner', 'visible')" (ngModelChange)="setSectionField('promotionalBanner', 'visible', $event)" /> Visible</label>
+      @for (field of announcementBarFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('announcementBar')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('announcementBar', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Flash Deals" description="Limited-time product section">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.PROMO_BANNER.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.PROMO_BANNER.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Section Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('flashDeals', 'sectionTitle')" (ngModelChange)="setSectionField('flashDeals', 'sectionTitle', $event)" /></label>
-      <label>Section Subtitle<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('flashDeals', 'sectionSubtitle')" (ngModelChange)="setSectionField('flashDeals', 'sectionSubtitle', $event)" /></label>
-      <label>Maximum Products<p-inputNumber [disabled]="disabled()" [min]="1" [max]="24" [ngModel]="num('flashDeals', 'maximumProducts')" (ngModelChange)="setSectionField('flashDeals', 'maximumProducts', $event)" /></label>
-      <label>Sort Method<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('flashDeals', 'sortMethod')" (ngModelChange)="setSectionField('flashDeals', 'sortMethod', $event)" /></label>
-      <label>Countdown (seconds)<p-inputNumber [disabled]="disabled()" [min]="0" [ngModel]="num('flashDeals', 'countdownSeconds')" (ngModelChange)="setSectionField('flashDeals', 'countdownSeconds', $event)" /></label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('flashDeals', 'countdownEnabled')" (ngModelChange)="setSectionField('flashDeals', 'countdownEnabled', $event)" /> Countdown Enabled</label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('flashDeals', 'visible')" (ngModelChange)="setSectionField('flashDeals', 'visible', $event)" /> Visible</label>
+      @for (field of promotionalBannerFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('promotionalBanner')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('promotionalBanner', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Featured Collections" description="Trending / collections block">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.FLASH_DEALS.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.FLASH_DEALS.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('featuredCollections', 'title')" (ngModelChange)="setSectionField('featuredCollections', 'title', $event)" /></label>
-      <label>Subtitle<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('featuredCollections', 'subtitle')" (ngModelChange)="setSectionField('featuredCollections', 'subtitle', $event)" /></label>
-      <label>Maximum Items<p-inputNumber [disabled]="disabled()" [min]="1" [max]="24" [ngModel]="num('featuredCollections', 'maximumItems')" (ngModelChange)="setSectionField('featuredCollections', 'maximumItems', $event)" /></label>
-      <label>Display Style<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('featuredCollections', 'displayStyle')" (ngModelChange)="setSectionField('featuredCollections', 'displayStyle', $event)" /></label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('featuredCollections', 'visible')" (ngModelChange)="setSectionField('featuredCollections', 'visible', $event)" /> Visible</label>
+      @for (field of flashDealsFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('flashDeals')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('flashDeals', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Popular Categories" description="Category grid on home">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.FEATURED_COLLECTIONS.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.FEATURED_COLLECTIONS.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Section Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('popularCategories', 'sectionTitle')" (ngModelChange)="setSectionField('popularCategories', 'sectionTitle', $event)" /></label>
-      <label>Maximum Categories<p-inputNumber [disabled]="disabled()" [min]="1" [max]="24" [ngModel]="num('popularCategories', 'maximumCategories')" (ngModelChange)="setSectionField('popularCategories', 'maximumCategories', $event)" /></label>
-      <label>Sort Order<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('popularCategories', 'sortOrder')" (ngModelChange)="setSectionField('popularCategories', 'sortOrder', $event)" /></label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('popularCategories', 'visible')" (ngModelChange)="setSectionField('popularCategories', 'visible', $event)" /> Visible</label>
+      @for (field of featuredCollectionsFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('featuredCollections')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('featuredCollections', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Featured Product" description="Highlighted product selection">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.POPULAR_CATEGORIES.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.POPULAR_CATEGORIES.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Product ID<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('featuredProduct', 'productId')" (ngModelChange)="setSectionField('featuredProduct', 'productId', $event || null)" /></label>
-      <label>Badge<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('featuredProduct', 'badge')" (ngModelChange)="setSectionField('featuredProduct', 'badge', $event)" /></label>
-      <label>Call To Action<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('featuredProduct', 'callToAction')" (ngModelChange)="setSectionField('featuredProduct', 'callToAction', $event)" /></label>
-      <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="bool('featuredProduct', 'visible')" (ngModelChange)="setSectionField('featuredProduct', 'visible', $event)" /> Visible</label>
+      @for (field of popularCategoriesFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('popularCategories')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('popularCategories', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Trust Bar" description="Unlimited trust items">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.FEATURED_PRODUCT.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.FEATURED_PRODUCT.DESCRIPTION_CARD' | translate"
+  >
+    <div class="storefront-editor__grid">
+      @for (field of featuredProductFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('featuredProduct')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('featuredProduct', field.key, $event)"
+        />
+      }
+    </div>
+  </app-admin-section-card>
+
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.TRUST_BAR.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.TRUST_BAR.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__trust-list">
       @for (item of trustItems(); track $index; let i = $index) {
         <div class="storefront-editor__trust-item">
           <div class="storefront-editor__grid">
-            <label>Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="trustText(item, 'title')" (ngModelChange)="setTrustField(i, 'title', $event)" /></label>
-            <label>Description<textarea pTextarea rows="2" class="w-full" [disabled]="disabled()" [ngModel]="trustText(item, 'description')" (ngModelChange)="setTrustField(i, 'description', $event)"></textarea></label>
-            <label>Icon URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="trustText(item, 'iconUrl')" (ngModelChange)="setTrustField(i, 'iconUrl', $event)" /></label>
-            <label>Sort Order<p-inputNumber [disabled]="disabled()" [ngModel]="trustNum(item, 'sortOrder')" (ngModelChange)="setTrustField(i, 'sortOrder', $event)" /></label>
-            <label class="storefront-editor__check"><p-checkbox [binary]="true" [disabled]="disabled()" [ngModel]="trustBool(item, 'visible')" (ngModelChange)="setTrustField(i, 'visible', $event)" /> Visible</label>
+            @for (field of trustItemFields; track field.key) {
+              <app-settings-field
+                [field]="field"
+                [value]="item[field.key]"
+                [disabled]="disabled()"
+                (valueChange)="setTrustField(i, field.key, $event)"
+              />
+            }
           </div>
           @if (!disabled()) {
-            <p-button label="Remove" severity="danger" [text]="true" (onClick)="removeTrustItem(i)" />
+            <p-button
+              [label]="'ADMIN.SETTINGS.STOREFRONT.TRUST_BAR.REMOVE' | translate"
+              severity="danger"
+              [text]="true"
+              (onClick)="removeTrustItem(i)"
+            />
           }
         </div>
       }
     </div>
     @if (!disabled()) {
-      <p-button label="Add Trust Item" icon="pi pi-plus" [outlined]="true" (onClick)="addTrustItem()" />
+      <p-button
+        [label]="'ADMIN.SETTINGS.STOREFRONT.TRUST_BAR.ADD' | translate"
+        icon="pi pi-plus"
+        [outlined]="true"
+        (onClick)="addTrustItem()"
+      />
     }
   </app-admin-section-card>
 
-  <app-admin-section-card title="Footer" description="Contact and social links">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.FOOTER.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.FOOTER.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Company Name<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'companyName')" (ngModelChange)="setSectionField('footer', 'companyName', $event)" /></label>
-      <label>Copyright<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'copyright')" (ngModelChange)="setSectionField('footer', 'copyright', $event)" /></label>
-      <label>Support Email<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'supportEmail')" (ngModelChange)="setSectionField('footer', 'supportEmail', $event)" /></label>
-      <label>Support Phone<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'supportPhone')" (ngModelChange)="setSectionField('footer', 'supportPhone', $event)" /></label>
-      <label>Address<textarea pTextarea rows="2" class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'address')" (ngModelChange)="setSectionField('footer', 'address', $event)"></textarea></label>
-      <label>Working Hours<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'workingHours')" (ngModelChange)="setSectionField('footer', 'workingHours', $event)" /></label>
-      <label>Facebook<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'facebookUrl')" (ngModelChange)="setSectionField('footer', 'facebookUrl', $event || null)" /></label>
-      <label>Instagram<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'instagramUrl')" (ngModelChange)="setSectionField('footer', 'instagramUrl', $event || null)" /></label>
-      <label>X<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'xUrl')" (ngModelChange)="setSectionField('footer', 'xUrl', $event || null)" /></label>
-      <label>Discord<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'discordUrl')" (ngModelChange)="setSectionField('footer', 'discordUrl', $event || null)" /></label>
-      <label>Telegram<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'telegramUrl')" (ngModelChange)="setSectionField('footer', 'telegramUrl', $event || null)" /></label>
-      <label>YouTube<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'youTubeUrl')" (ngModelChange)="setSectionField('footer', 'youTubeUrl', $event || null)" /></label>
-      <label>TikTok<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('footer', 'tikTokUrl')" (ngModelChange)="setSectionField('footer', 'tikTokUrl', $event || null)" /></label>
+      @for (field of footerFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('footer')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('footer', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="SEO Defaults" description="Home page meta defaults">
+  <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.SEO.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.SEO.DESCRIPTION_CARD' | translate"
+  >
     <div class="storefront-editor__grid">
-      <label>Meta Title<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('seo', 'defaultMetaTitle')" (ngModelChange)="setSectionField('seo', 'defaultMetaTitle', $event)" /></label>
-      <label>Meta Description<textarea pTextarea rows="3" class="w-full" [disabled]="disabled()" [ngModel]="text('seo', 'defaultMetaDescription')" (ngModelChange)="setSectionField('seo', 'defaultMetaDescription', $event)"></textarea></label>
-      <label>Open Graph Image<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('seo', 'openGraphImageUrl')" (ngModelChange)="setSectionField('seo', 'openGraphImageUrl', $event || null)" /></label>
-      <label>Twitter Card<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('seo', 'twitterCard')" (ngModelChange)="setSectionField('seo', 'twitterCard', $event)" /></label>
-      <label>Canonical URL<input pInputText class="w-full" [disabled]="disabled()" [ngModel]="text('seo', 'canonicalUrl')" (ngModelChange)="setSectionField('seo', 'canonicalUrl', $event)" /></label>
+      @for (field of seoFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('seo')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('seo', field.key, $event)"
+        />
+      }
     </div>
   </app-admin-section-card>
 </div>
