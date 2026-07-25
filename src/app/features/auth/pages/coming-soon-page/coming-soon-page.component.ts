@@ -37,6 +37,15 @@ export class ComingSoonPageComponent {
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
+  // Mirrors the storefront footer's default social links (see storefront category
+  // Platform Settings). Hardcoded rather than fetched so this page still renders
+  // during the backend outages maintenance mode is meant to cover.
+  protected readonly socialLinks = [
+    { label: 'WhatsApp', url: 'https://wa.me/201555413000', icon: 'assets/images/footer/whatsapp.svg' },
+    { label: 'Telegram', url: 'https://t.me/hambox', icon: 'assets/images/footer/telegram.svg' },
+    { label: 'Facebook', url: 'https://facebook.com/hamboxstore', icon: 'assets/images/footer/facebook.svg' },
+  ] as const;
+
   protected readonly form = this.fb.nonNullable.group({
     password: ['', [Validators.required]],
   });

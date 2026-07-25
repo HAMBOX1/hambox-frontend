@@ -26,3 +26,38 @@
   display: grid;
   gap: var(--ui-space-4);
 }
+
+.coming-soon-page__social {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: var(--ui-space-4);
+}
+
+.coming-soon-page__social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--color-shadow-xs);
+  text-decoration: none;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    border-color: var(--color-primary-border);
+    background: var(--color-primary-muted);
+    box-shadow: var(--color-shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  img {
+    display: block;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+}

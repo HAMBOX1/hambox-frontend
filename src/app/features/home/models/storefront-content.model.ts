@@ -91,6 +91,7 @@ export interface StorefrontFooterContent {
   readonly telegramUrl: string | null;
   readonly youTubeUrl: string | null;
   readonly tikTokUrl: string | null;
+  readonly whatsAppUrl: string | null;
 }
 
 export interface StorefrontSeoContent {

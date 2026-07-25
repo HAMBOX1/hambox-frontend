@@ -6,6 +6,7 @@ import { TranslationService } from '../../../core/i18n/translation.service';
 import { StorefrontFooterContent } from '../../../features/home/models/storefront-content.model';
 import { PublicLegalSectionSummaryDto } from '../../../features/legal/models/legal-section.model';
 import { LegalService } from '../../../features/legal/services/legal.service';
+import { StorefrontFooterContentService } from './storefront-footer-content.service';
 
 @Component({
   selector: 'app-storefront-footer',
@@ -18,8 +19,13 @@ import { LegalService } from '../../../features/legal/services/legal.service';
 export class StorefrontFooterComponent {
   private readonly legal = inject(LegalService);
   private readonly translation = inject(TranslationService);
+  private readonly footerContent = inject(StorefrontFooterContentService);
 
   readonly footer = input<StorefrontFooterContent | null>(null);
+
+  // Falls back to a self-fetched copy when the host page doesn't pass `[footer]` explicitly
+  // (only the home page does today) — see storefront-footer-content.service.ts.
+  private readonly resolvedFooter = computed(() => this.footer() ?? this.footerContent.footer());
 
   protected readonly legalLinks = computed(() =>
     [...this.legal.documents()].filter((d) => d.showInFooter).sort((a, b) => a.sortOrder - b.sortOrder),
@@ -27,6 +33,7 @@ export class StorefrontFooterComponent {
 
   constructor() {
     void this.legal.loadDocuments();
+    this.footerContent.load();
   }
 
   protected legalLinkTitle(item: PublicLegalSectionSummaryDto): string {
@@ -36,18 +43,19 @@ export class StorefrontFooterComponent {
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
   protected readonly facebookIcon = 'assets/images/footer/facebook.svg';
   protected readonly telegramIcon = 'assets/images/footer/telegram.svg';
+  protected readonly whatsAppIcon = 'assets/images/footer/whatsapp.svg';
 
-  protected readonly companyName = computed(() => this.footer()?.companyName || 'HAMBOX');
+  protected readonly companyName = computed(() => this.resolvedFooter()?.companyName || 'HAMBOX');
   protected readonly copyright = computed(
-    () => this.footer()?.copyright || `© ${new Date().getFullYear()} HAMBOX. All rights reserved.`,
+    () => this.resolvedFooter()?.copyright || `© ${new Date().getFullYear()} HAMBOX. All rights reserved.`,
   );
-  protected readonly supportEmail = computed(() => this.footer()?.supportEmail || '');
-  protected readonly supportPhone = computed(() => this.footer()?.supportPhone || '');
-  protected readonly address = computed(() => this.footer()?.address || '');
-  protected readonly workingHours = computed(() => this.footer()?.workingHours || '');
+  protected readonly supportEmail = computed(() => this.resolvedFooter()?.supportEmail || '');
+  protected readonly supportPhone = computed(() => this.resolvedFooter()?.supportPhone || '');
+  protected readonly address = computed(() => this.resolvedFooter()?.address || '');
+  protected readonly workingHours = computed(() => this.resolvedFooter()?.workingHours || '');
 
   protected readonly socialLinks = computed(() => {
-    const f = this.footer();
+    const f = this.resolvedFooter();
     if (!f) {
       return [];
     }
@@ -60,6 +68,7 @@ export class StorefrontFooterComponent {
       { label: 'Telegram', url: f.telegramUrl, icon: this.telegramIcon },
       { label: 'YouTube', url: f.youTubeUrl, icon: null },
       { label: 'TikTok', url: f.tikTokUrl, icon: null },
+      { label: 'WhatsApp', url: f.whatsAppUrl, icon: this.whatsAppIcon },
     ].filter((link) => !!link.url);
   });
 

@@ -30,4 +30,18 @@
       />
     </form>
   }
+
+  <div class="coming-soon-page__social">
+    @for (link of socialLinks; track link.label) {
+      <a
+        class="coming-soon-page__social-btn"
+        [href]="link.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="link.label"
+      >
+        <img [src]="link.icon" alt="" aria-hidden="true" />
+      </a>
+    }
+  </div>
 </ui-auth-card>
