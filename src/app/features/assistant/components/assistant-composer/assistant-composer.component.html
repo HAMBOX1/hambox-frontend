@@ -1,0 +1,44 @@
+<div class="quick-row">
+  @for (q of quickSuggestions; track q.flow) {
+    <button type="button" class="quick-chip" (click)="onQuickChip(q.flow)">
+      {{ q.label | translate }}
+    </button>
+  }
+</div>
+
+<div class="composer">
+  <div class="composer-box">
+    <textarea
+      #composerInput
+      rows="1"
+      [value]="inputValue()"
+      (input)="onInputChange($any($event.target).value)"
+      (keydown)="onInputKeydown($event)"
+      [attr.placeholder]="'ASSISTANT.PLACEHOLDER' | translate"
+      [attr.aria-label]="'ASSISTANT.PLACEHOLDER' | translate"
+      maxlength="500"
+    ></textarea>
+    <div class="composer-tools">
+      <button
+        type="button"
+        class="send-btn"
+        [class.ready]="inputValue().trim().length > 0"
+        [disabled]="inputValue().trim().length === 0"
+        [attr.aria-label]="'ASSISTANT.SEND' | translate"
+        (click)="handleSend()"
+      >
+        <i class="pi pi-send"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="composer-foot">
+    <span
+      class="char-count"
+      [class.show]="inputValue().length > 400"
+      [class.warn]="inputValue().length > 480"
+    >
+      {{ inputValue().length }} / 500
+    </span>
+  </div>
+</div>

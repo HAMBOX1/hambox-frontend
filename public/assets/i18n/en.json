@@ -1434,7 +1434,10 @@
         "REMOVE_RATE": "Remove rate"
       },
       "OPTIONS": {
-        "LANGUAGE": { "EN": "English", "AR": "Arabic" },
+        "LANGUAGE": {
+          "EN": "English",
+          "AR": "Arabic"
+        },
         "CURRENCY": {
           "USD": "USD — US Dollar",
           "EUR": "EUR — Euro",
@@ -1461,13 +1464,19 @@
           "NEWEST": "Newest first",
           "ENDING_SOON": "Ending soonest"
         },
-        "DISPLAY_STYLE": { "GRID": "Grid", "CAROUSEL": "Carousel" },
+        "DISPLAY_STYLE": {
+          "GRID": "Grid",
+          "CAROUSEL": "Carousel"
+        },
         "CATEGORY_SORT": {
           "NAME_ASC": "Name (A–Z)",
           "NAME_DESC": "Name (Z–A)",
           "MOST_POPULAR": "Most popular"
         },
-        "ANNOUNCEMENT_POSITION": { "TOP": "Top of page", "BOTTOM": "Bottom of page" },
+        "ANNOUNCEMENT_POSITION": {
+          "TOP": "Top of page",
+          "BOTTOM": "Bottom of page"
+        },
         "TWITTER_CARD": {
           "SUMMARY": "Summary",
           "SUMMARY_LARGE_IMAGE": "Summary with large image"
@@ -1478,7 +1487,9 @@
           "INDEX_NOFOLLOW": "Index, but ignore links",
           "NOINDEX_NOFOLLOW": "Don't index or follow"
         },
-        "PAYMENT_METHOD": { "CARD": "Card" },
+        "PAYMENT_METHOD": {
+          "CARD": "Card"
+        },
         "CONTENT_TYPE": {
           "JPEG": "JPEG image",
           "PNG": "PNG image",
@@ -1490,261 +1501,925 @@
       },
       "FIELDS": {
         "GENERAL": {
-          "STORE_NAME": { "LABEL": "Store Name", "HELP": "The name shown in the browser tab, emails, and receipts.", "TOOLTIP": "Appears across the storefront, admin, and outgoing emails. Applies immediately, no restart needed." },
-          "STORE_DESCRIPTION": { "LABEL": "Store Description", "HELP": "A short summary used for search engines and social sharing.", "TOOLTIP": "Shown in search results and link previews. Doesn't affect any on-page content." },
-          "CONTACT_EMAIL": { "LABEL": "Contact Email", "HELP": "The main email address customers can reach you at.", "TOOLTIP": "Shown on public pages such as the footer and contact page. Not used for sending mail — see Email settings for that." },
-          "SUPPORT_EMAIL": { "LABEL": "Support Email", "HELP": "The email address used for customer support requests.", "TOOLTIP": "Shown wherever the storefront links to support. Separate from Contact Email so you can route them differently." },
-          "PHONE": { "LABEL": "Phone", "HELP": "A public phone number, if you have one.", "TOOLTIP": "Optional. Shown on the storefront if provided." },
-          "ADDRESS": { "LABEL": "Address", "HELP": "Your business address, if you display one publicly.", "TOOLTIP": "Optional. Shown on the storefront and in legal pages." },
-          "TIMEZONE": { "LABEL": "Timezone", "HELP": "Used for scheduling and displaying dates in the admin.", "TOOLTIP": "Affects report dates, scheduled promotions, and audit timestamps shown to admins. Doesn't change stored data, only how times are displayed." },
-          "DEFAULT_LANGUAGE": { "LABEL": "Default Language", "HELP": "The language shown to new visitors before they pick one.", "TOOLTIP": "Applies to first-time visitors only — returning customers keep their own language preference. Takes effect immediately." },
-          "DEFAULT_CURRENCY": { "LABEL": "Default Currency", "HELP": "The currency used for displaying prices to new visitors.", "TOOLTIP": "Prices are always stored in USD internally — this only changes what's displayed. Takes effect immediately, no restart needed." },
-          "STORE_STATUS": { "LABEL": "Store Status", "HELP": "Controls whether the storefront is open for browsing and purchases.", "TOOLTIP": "Affects every customer immediately. \"Temporarily Closed\" is different from Maintenance Mode — it's a lighter, storefront-only state." }
+          "STORE_NAME": {
+            "LABEL": "Store Name",
+            "HELP": "The name shown in the browser tab, emails, and receipts.",
+            "TOOLTIP": "Appears across the storefront, admin, and outgoing emails. Applies immediately, no restart needed."
+          },
+          "STORE_DESCRIPTION": {
+            "LABEL": "Store Description",
+            "HELP": "A short summary used for search engines and social sharing.",
+            "TOOLTIP": "Shown in search results and link previews. Doesn't affect any on-page content."
+          },
+          "CONTACT_EMAIL": {
+            "LABEL": "Contact Email",
+            "HELP": "The main email address customers can reach you at.",
+            "TOOLTIP": "Shown on public pages such as the footer and contact page. Not used for sending mail — see Email settings for that."
+          },
+          "SUPPORT_EMAIL": {
+            "LABEL": "Support Email",
+            "HELP": "The email address used for customer support requests.",
+            "TOOLTIP": "Shown wherever the storefront links to support. Separate from Contact Email so you can route them differently."
+          },
+          "PHONE": {
+            "LABEL": "Phone",
+            "HELP": "A public phone number, if you have one.",
+            "TOOLTIP": "Optional. Shown on the storefront if provided."
+          },
+          "ADDRESS": {
+            "LABEL": "Address",
+            "HELP": "Your business address, if you display one publicly.",
+            "TOOLTIP": "Optional. Shown on the storefront and in legal pages."
+          },
+          "TIMEZONE": {
+            "LABEL": "Timezone",
+            "HELP": "Used for scheduling and displaying dates in the admin.",
+            "TOOLTIP": "Affects report dates, scheduled promotions, and audit timestamps shown to admins. Doesn't change stored data, only how times are displayed."
+          },
+          "DEFAULT_LANGUAGE": {
+            "LABEL": "Default Language",
+            "HELP": "The language shown to new visitors before they pick one.",
+            "TOOLTIP": "Applies to first-time visitors only — returning customers keep their own language preference. Takes effect immediately."
+          },
+          "DEFAULT_CURRENCY": {
+            "LABEL": "Default Currency",
+            "HELP": "The currency used for displaying prices to new visitors.",
+            "TOOLTIP": "Prices are always stored in USD internally — this only changes what's displayed. Takes effect immediately, no restart needed."
+          },
+          "STORE_STATUS": {
+            "LABEL": "Store Status",
+            "HELP": "Controls whether the storefront is open for browsing and purchases.",
+            "TOOLTIP": "Affects every customer immediately. \"Temporarily Closed\" is different from Maintenance Mode — it's a lighter, storefront-only state."
+          }
         },
         "BRANDING": {
-          "LOGO_URL": { "LABEL": "Logo URL", "HELP": "The main logo shown in the storefront header.", "TOOLTIP": "Applies immediately across the storefront. Use a transparent PNG or SVG for best results." },
-          "FAVICON_URL": { "LABEL": "Favicon URL", "HELP": "The small icon shown in browser tabs.", "TOOLTIP": "Some browsers cache favicons — customers may need to hard-refresh to see a change." },
-          "ADMIN_LOGO_URL": { "LABEL": "Admin Logo URL", "HELP": "The logo shown inside the admin dashboard, separate from the storefront.", "TOOLTIP": "Only visible to staff signed into the admin — customers never see this one." },
-          "PRIMARY_COLOR": { "LABEL": "Primary Color", "HELP": "Your main brand color, used for buttons and highlights.", "TOOLTIP": "Applies across the storefront immediately. Aim for enough contrast against white and dark backgrounds." },
-          "SECONDARY_COLOR": { "LABEL": "Secondary Color", "HELP": "A supporting color used alongside the primary color.", "TOOLTIP": "Used for secondary UI elements and text accents." },
-          "ACCENT_COLOR": { "LABEL": "Accent Color", "HELP": "A highlight color for badges, tags, and small details.", "TOOLTIP": "Used sparingly for emphasis — badges, notification dots, small callouts." },
-          "FOOTER_LOGO_URL": { "LABEL": "Footer Logo URL", "HELP": "An optional alternate logo shown in the storefront footer.", "TOOLTIP": "Leave blank to reuse the main logo in the footer." },
-          "BROWSER_TITLE": { "LABEL": "Browser Title", "HELP": "The default page title shown in browser tabs.", "TOOLTIP": "Individual pages (products, categories) may override this with their own title." }
+          "LOGO_URL": {
+            "LABEL": "Logo URL",
+            "HELP": "The main logo shown in the storefront header.",
+            "TOOLTIP": "Applies immediately across the storefront. Use a transparent PNG or SVG for best results."
+          },
+          "FAVICON_URL": {
+            "LABEL": "Favicon URL",
+            "HELP": "The small icon shown in browser tabs.",
+            "TOOLTIP": "Some browsers cache favicons — customers may need to hard-refresh to see a change."
+          },
+          "ADMIN_LOGO_URL": {
+            "LABEL": "Admin Logo URL",
+            "HELP": "The logo shown inside the admin dashboard, separate from the storefront.",
+            "TOOLTIP": "Only visible to staff signed into the admin — customers never see this one."
+          },
+          "PRIMARY_COLOR": {
+            "LABEL": "Primary Color",
+            "HELP": "Your main brand color, used for buttons and highlights.",
+            "TOOLTIP": "Applies across the storefront immediately. Aim for enough contrast against white and dark backgrounds."
+          },
+          "SECONDARY_COLOR": {
+            "LABEL": "Secondary Color",
+            "HELP": "A supporting color used alongside the primary color.",
+            "TOOLTIP": "Used for secondary UI elements and text accents."
+          },
+          "ACCENT_COLOR": {
+            "LABEL": "Accent Color",
+            "HELP": "A highlight color for badges, tags, and small details.",
+            "TOOLTIP": "Used sparingly for emphasis — badges, notification dots, small callouts."
+          },
+          "FOOTER_LOGO_URL": {
+            "LABEL": "Footer Logo URL",
+            "HELP": "An optional alternate logo shown in the storefront footer.",
+            "TOOLTIP": "Leave blank to reuse the main logo in the footer."
+          },
+          "BROWSER_TITLE": {
+            "LABEL": "Browser Title",
+            "HELP": "The default page title shown in browser tabs.",
+            "TOOLTIP": "Individual pages (products, categories) may override this with their own title."
+          }
         },
         "LOCALIZATION": {
-          "DEFAULT_LANGUAGE": { "LABEL": "Default Language", "HELP": "The language new visitors see by default.", "TOOLTIP": "Same setting as in General — shown here for convenience alongside other localization options." },
-          "SUPPORTED_LANGUAGES": { "LABEL": "Supported Languages", "HELP": "Languages customers can switch the storefront to.", "TOOLTIP": "HAMBOX currently ships English and Arabic translations — removing a language here hides its switcher option immediately." },
-          "RTL_ENABLED": { "LABEL": "RTL Layout Enabled", "HELP": "Enables right-to-left layout when Arabic is selected.", "TOOLTIP": "Only affects the Arabic locale. Turning this off shows Arabic text in a left-to-right layout, which is unusual — leave it on unless you have a specific reason." }
+          "DEFAULT_LANGUAGE": {
+            "LABEL": "Default Language",
+            "HELP": "The language new visitors see by default.",
+            "TOOLTIP": "Same setting as in General — shown here for convenience alongside other localization options."
+          },
+          "SUPPORTED_LANGUAGES": {
+            "LABEL": "Supported Languages",
+            "HELP": "Languages customers can switch the storefront to.",
+            "TOOLTIP": "HAMBOX currently ships English and Arabic translations — removing a language here hides its switcher option immediately."
+          },
+          "RTL_ENABLED": {
+            "LABEL": "RTL Layout Enabled",
+            "HELP": "Enables right-to-left layout when Arabic is selected.",
+            "TOOLTIP": "Only affects the Arabic locale. Turning this off shows Arabic text in a left-to-right layout, which is unusual — leave it on unless you have a specific reason."
+          }
         },
         "CURRENCY": {
-          "BASE_CURRENCY": { "LABEL": "Base Currency", "HELP": "The currency all prices are ultimately calculated from.", "TOOLTIP": "All prices are stored in USD internally regardless of this setting — this only affects the reference currency for rate calculations." },
-          "SUPPORTED_CURRENCIES": { "LABEL": "Supported Currencies", "HELP": "Currencies customers can view prices in.", "TOOLTIP": "Removing a currency here hides it from the customer currency switcher immediately." },
-          "EXCHANGE_RATE_REFRESH_MINUTES": { "LABEL": "Exchange Rate Refresh", "HELP": "How often live exchange rates are refreshed.", "TOOLTIP": "Only applies when the provider below is set to the live exchange rate API." },
-          "PROVIDER": { "LABEL": "Rate Provider", "HELP": "Choose whether exchange rates are fixed values you set, or fetched live.", "TOOLTIP": "Static rates are predictable and never fail; the live API updates automatically but depends on an external service being reachable." },
-          "EXTERNAL_API_URL": { "LABEL": "External API URL", "HELP": "The exchange rate API endpoint, only used when Provider is set to live rates.", "TOOLTIP": "Advanced — only needed if you're using a custom or self-hosted exchange rate provider." }
+          "BASE_CURRENCY": {
+            "LABEL": "Base Currency",
+            "HELP": "The currency all prices are ultimately calculated from.",
+            "TOOLTIP": "All prices are stored in USD internally regardless of this setting — this only affects the reference currency for rate calculations."
+          },
+          "SUPPORTED_CURRENCIES": {
+            "LABEL": "Supported Currencies",
+            "HELP": "Currencies customers can view prices in.",
+            "TOOLTIP": "Removing a currency here hides it from the customer currency switcher immediately."
+          },
+          "EXCHANGE_RATE_REFRESH_MINUTES": {
+            "LABEL": "Exchange Rate Refresh",
+            "HELP": "How often live exchange rates are refreshed.",
+            "TOOLTIP": "Only applies when the provider below is set to the live exchange rate API."
+          },
+          "PROVIDER": {
+            "LABEL": "Rate Provider",
+            "HELP": "Choose whether exchange rates are fixed values you set, or fetched live.",
+            "TOOLTIP": "Static rates are predictable and never fail; the live API updates automatically but depends on an external service being reachable."
+          },
+          "EXTERNAL_API_URL": {
+            "LABEL": "External API URL",
+            "HELP": "The exchange rate API endpoint, only used when Provider is set to live rates.",
+            "TOOLTIP": "Advanced — only needed if you're using a custom or self-hosted exchange rate provider."
+          }
         },
         "THEME": {
-          "DEFAULT_THEME_ID": { "LABEL": "Default Theme", "HELP": "The theme shown to customers who haven't chosen one.", "TOOLTIP": "Manage the actual look of each theme under Themes in the admin sidebar — this only picks which one is the default." },
-          "ALLOW_CUSTOMER_THEME_SWITCH": { "LABEL": "Allow Customer Theme Switching", "HELP": "Lets customers pick their own light/dark preference.", "TOOLTIP": "When off, every customer sees the default theme regardless of their device preference." },
-          "SYNC_WITH_SYSTEM_PREFERENCE": { "LABEL": "Sync With System Preference", "HELP": "Automatically matches the customer's device light/dark mode.", "TOOLTIP": "Only applies when customer theme switching is allowed above." }
+          "DEFAULT_THEME_ID": {
+            "LABEL": "Default Theme",
+            "HELP": "The theme shown to customers who haven't chosen one.",
+            "TOOLTIP": "Manage the actual look of each theme under Themes in the admin sidebar — this only picks which one is the default."
+          },
+          "ALLOW_CUSTOMER_THEME_SWITCH": {
+            "LABEL": "Allow Customer Theme Switching",
+            "HELP": "Lets customers pick their own light/dark preference.",
+            "TOOLTIP": "When off, every customer sees the default theme regardless of their device preference."
+          },
+          "SYNC_WITH_SYSTEM_PREFERENCE": {
+            "LABEL": "Sync With System Preference",
+            "HELP": "Automatically matches the customer's device light/dark mode.",
+            "TOOLTIP": "Only applies when customer theme switching is allowed above."
+          }
         },
         "EMAIL": {
-          "ENABLED": { "LABEL": "Email Sending Enabled", "HELP": "Turns outgoing email on or off platform-wide.", "TOOLTIP": "When off, no order confirmations, password resets, or notifications are sent to anyone. Takes effect immediately." },
-          "SENDER_NAME": { "LABEL": "Sender Name", "HELP": "The name customers see as the sender of your emails.", "TOOLTIP": "Shown in the recipient's inbox alongside the sender email address." },
-          "SENDER_EMAIL": { "LABEL": "Sender Email", "HELP": "The address your emails are sent from.", "TOOLTIP": "Should match or be authorized by the SMTP account below, or emails may be marked as spam." },
-          "SMTP_HOST": { "LABEL": "SMTP Host", "HELP": "The mail server address used to send email.", "TOOLTIP": "Provided by your email provider (e.g. smtp.gmail.com, smtp.sendgrid.net)." },
-          "SMTP_PORT": { "LABEL": "SMTP Port", "HELP": "The port your mail server listens on.", "TOOLTIP": "Common values are 587 (TLS) or 465 (SSL) — check with your email provider if unsure." },
-          "USERNAME": { "LABEL": "SMTP Username", "HELP": "The username used to authenticate with your mail server.", "TOOLTIP": "Usually your full email address or an API key, depending on your provider." },
-          "PASSWORD": { "LABEL": "SMTP Password", "HELP": "The password or API key used to authenticate with your mail server.", "TOOLTIP": "Stored encrypted — never shown again once saved. Leave blank to keep the currently stored password." },
-          "USE_SSL": { "LABEL": "Use SSL/TLS", "HELP": "Encrypts the connection to your mail server.", "TOOLTIP": "Almost always should stay on — only disable if your provider explicitly requires an unencrypted connection." },
-          "APPLICATION_BASE_URL": { "LABEL": "Application Base URL", "HELP": "The base URL used to build links inside emails.", "TOOLTIP": "Used to construct verification and password reset links — should match your live storefront domain." },
-          "VERIFICATION_PATH": { "LABEL": "Verification Path", "HELP": "The storefront path appended to build email verification links.", "TOOLTIP": "Advanced — only change if your storefront's verification page has moved." },
-          "RESET_PASSWORD_PATH": { "LABEL": "Reset Password Path", "HELP": "The storefront path appended to build password reset links.", "TOOLTIP": "Advanced — only change if your storefront's reset-password page has moved." }
+          "ENABLED": {
+            "LABEL": "Email Sending Enabled",
+            "HELP": "Turns outgoing email on or off platform-wide.",
+            "TOOLTIP": "When off, no order confirmations, password resets, or notifications are sent to anyone. Takes effect immediately."
+          },
+          "SENDER_NAME": {
+            "LABEL": "Sender Name",
+            "HELP": "The name customers see as the sender of your emails.",
+            "TOOLTIP": "Shown in the recipient's inbox alongside the sender email address."
+          },
+          "SENDER_EMAIL": {
+            "LABEL": "Sender Email",
+            "HELP": "The address your emails are sent from.",
+            "TOOLTIP": "Should match or be authorized by the SMTP account below, or emails may be marked as spam."
+          },
+          "SMTP_HOST": {
+            "LABEL": "SMTP Host",
+            "HELP": "The mail server address used to send email.",
+            "TOOLTIP": "Provided by your email provider (e.g. smtp.gmail.com, smtp.sendgrid.net)."
+          },
+          "SMTP_PORT": {
+            "LABEL": "SMTP Port",
+            "HELP": "The port your mail server listens on.",
+            "TOOLTIP": "Common values are 587 (TLS) or 465 (SSL) — check with your email provider if unsure."
+          },
+          "USERNAME": {
+            "LABEL": "SMTP Username",
+            "HELP": "The username used to authenticate with your mail server.",
+            "TOOLTIP": "Usually your full email address or an API key, depending on your provider."
+          },
+          "PASSWORD": {
+            "LABEL": "SMTP Password",
+            "HELP": "The password or API key used to authenticate with your mail server.",
+            "TOOLTIP": "Stored encrypted — never shown again once saved. Leave blank to keep the currently stored password."
+          },
+          "USE_SSL": {
+            "LABEL": "Use SSL/TLS",
+            "HELP": "Encrypts the connection to your mail server.",
+            "TOOLTIP": "Almost always should stay on — only disable if your provider explicitly requires an unencrypted connection."
+          },
+          "APPLICATION_BASE_URL": {
+            "LABEL": "Application Base URL",
+            "HELP": "The base URL used to build links inside emails.",
+            "TOOLTIP": "Used to construct verification and password reset links — should match your live storefront domain."
+          },
+          "VERIFICATION_PATH": {
+            "LABEL": "Verification Path",
+            "HELP": "The storefront path appended to build email verification links.",
+            "TOOLTIP": "Advanced — only change if your storefront's verification page has moved."
+          },
+          "RESET_PASSWORD_PATH": {
+            "LABEL": "Reset Password Path",
+            "HELP": "The storefront path appended to build password reset links.",
+            "TOOLTIP": "Advanced — only change if your storefront's reset-password page has moved."
+          }
         },
         "AUTHENTICATION": {
-          "MINIMUM_PASSWORD_LENGTH": { "LABEL": "Minimum Password Length", "HELP": "The shortest password allowed for new accounts.", "TOOLTIP": "Applies to new passwords going forward — existing shorter passwords still work until changed." },
-          "REQUIRE_NUMBERS": { "LABEL": "Require Numbers", "HELP": "Passwords must contain at least one number.", "TOOLTIP": "Applies to new and changed passwords only." },
-          "REQUIRE_SYMBOLS": { "LABEL": "Require Symbols", "HELP": "Passwords must contain at least one special character.", "TOOLTIP": "Applies to new and changed passwords only." },
-          "REQUIRE_UPPERCASE": { "LABEL": "Require Uppercase", "HELP": "Passwords must contain at least one uppercase letter.", "TOOLTIP": "Applies to new and changed passwords only." },
-          "SESSION_TIMEOUT_MINUTES": { "LABEL": "Session Timeout", "HELP": "How long a customer stays signed in before needing to log in again.", "TOOLTIP": "Shorter timeouts are more secure on shared devices; longer timeouts are more convenient. Applies to new sessions." },
-          "REMEMBER_ME_DURATION_DAYS": { "LABEL": "Remember Me Duration", "HELP": "How long a \"Remember Me\" login stays valid.", "TOOLTIP": "Only applies when a customer checks \"Remember Me\" at login." },
-          "ADMIN_OTP_ENABLED": { "LABEL": "Admin OTP Enabled", "HELP": "Requires a one-time code for admin logins.", "TOOLTIP": "Adds a verification step after admin password login. Strongly recommended to keep on for security." }
+          "MINIMUM_PASSWORD_LENGTH": {
+            "LABEL": "Minimum Password Length",
+            "HELP": "The shortest password allowed for new accounts.",
+            "TOOLTIP": "Applies to new passwords going forward — existing shorter passwords still work until changed."
+          },
+          "REQUIRE_NUMBERS": {
+            "LABEL": "Require Numbers",
+            "HELP": "Passwords must contain at least one number.",
+            "TOOLTIP": "Applies to new and changed passwords only."
+          },
+          "REQUIRE_SYMBOLS": {
+            "LABEL": "Require Symbols",
+            "HELP": "Passwords must contain at least one special character.",
+            "TOOLTIP": "Applies to new and changed passwords only."
+          },
+          "REQUIRE_UPPERCASE": {
+            "LABEL": "Require Uppercase",
+            "HELP": "Passwords must contain at least one uppercase letter.",
+            "TOOLTIP": "Applies to new and changed passwords only."
+          },
+          "SESSION_TIMEOUT_MINUTES": {
+            "LABEL": "Session Timeout",
+            "HELP": "How long a customer stays signed in before needing to log in again.",
+            "TOOLTIP": "Shorter timeouts are more secure on shared devices; longer timeouts are more convenient. Applies to new sessions."
+          },
+          "REMEMBER_ME_DURATION_DAYS": {
+            "LABEL": "Remember Me Duration",
+            "HELP": "How long a \"Remember Me\" login stays valid.",
+            "TOOLTIP": "Only applies when a customer checks \"Remember Me\" at login."
+          },
+          "ADMIN_OTP_ENABLED": {
+            "LABEL": "Admin OTP Enabled",
+            "HELP": "Requires a one-time code for admin logins.",
+            "TOOLTIP": "Adds a verification step after admin password login. Strongly recommended to keep on for security."
+          }
         },
         "SECURITY": {
-          "MAX_FAILED_ACCESS_ATTEMPTS": { "LABEL": "Max Failed Login Attempts", "HELP": "How many failed logins trigger a temporary lockout.", "TOOLTIP": "Protects against password guessing. Applies to all accounts." },
-          "LOCKOUT_DURATION_MINUTES": { "LABEL": "Lockout Duration", "HELP": "How long an account stays locked after too many failed attempts.", "TOOLTIP": "Applies once the failed-attempt limit above is reached." },
-          "REQUIRE_EMAIL_VERIFICATION": { "LABEL": "Require Email Verification", "HELP": "New accounts must verify their email before signing in.", "TOOLTIP": "Reduces fake accounts. Applies to new registrations going forward." },
-          "ENFORCE_HTTPS": { "LABEL": "Enforce HTTPS", "HELP": "Requires a secure connection for all traffic.", "TOOLTIP": "Turning this off is a security risk — customer data, including passwords, could be sent unencrypted. Only disable for local testing." }
+          "MAX_FAILED_ACCESS_ATTEMPTS": {
+            "LABEL": "Max Failed Login Attempts",
+            "HELP": "How many failed logins trigger a temporary lockout.",
+            "TOOLTIP": "Protects against password guessing. Applies to all accounts."
+          },
+          "LOCKOUT_DURATION_MINUTES": {
+            "LABEL": "Lockout Duration",
+            "HELP": "How long an account stays locked after too many failed attempts.",
+            "TOOLTIP": "Applies once the failed-attempt limit above is reached."
+          },
+          "REQUIRE_EMAIL_VERIFICATION": {
+            "LABEL": "Require Email Verification",
+            "HELP": "New accounts must verify their email before signing in.",
+            "TOOLTIP": "Reduces fake accounts. Applies to new registrations going forward."
+          },
+          "ENFORCE_HTTPS": {
+            "LABEL": "Enforce HTTPS",
+            "HELP": "Requires a secure connection for all traffic.",
+            "TOOLTIP": "Turning this off is a security risk — customer data, including passwords, could be sent unencrypted. Only disable for local testing."
+          }
         },
         "OTP": {
-          "CODE_LENGTH": { "LABEL": "Code Length", "HELP": "How many digits the one-time verification code has.", "TOOLTIP": "Longer codes are more secure but slightly less convenient to type." },
-          "EXPIRATION_MINUTES": { "LABEL": "Code Expiration", "HELP": "How long a one-time code stays valid.", "TOOLTIP": "Codes expire automatically after this window — the admin will need to request a new one." },
-          "MAX_ATTEMPTS": { "LABEL": "Max Attempts", "HELP": "How many incorrect code entries are allowed before lockout.", "TOOLTIP": "Protects against code guessing." },
-          "RESEND_COOLDOWN_SECONDS": { "LABEL": "Resend Cooldown", "HELP": "How long an admin must wait before requesting a new code.", "TOOLTIP": "Prevents spamming the code delivery method (email/SMS)." },
-          "LOCKOUT_MINUTES": { "LABEL": "Lockout Duration", "HELP": "How long access is locked after too many failed code attempts.", "TOOLTIP": "Applies once the max attempts above is reached." }
+          "CODE_LENGTH": {
+            "LABEL": "Code Length",
+            "HELP": "How many digits the one-time verification code has.",
+            "TOOLTIP": "Longer codes are more secure but slightly less convenient to type."
+          },
+          "EXPIRATION_MINUTES": {
+            "LABEL": "Code Expiration",
+            "HELP": "How long a one-time code stays valid.",
+            "TOOLTIP": "Codes expire automatically after this window — the admin will need to request a new one."
+          },
+          "MAX_ATTEMPTS": {
+            "LABEL": "Max Attempts",
+            "HELP": "How many incorrect code entries are allowed before lockout.",
+            "TOOLTIP": "Protects against code guessing."
+          },
+          "RESEND_COOLDOWN_SECONDS": {
+            "LABEL": "Resend Cooldown",
+            "HELP": "How long an admin must wait before requesting a new code.",
+            "TOOLTIP": "Prevents spamming the code delivery method (email/SMS)."
+          },
+          "LOCKOUT_MINUTES": {
+            "LABEL": "Lockout Duration",
+            "HELP": "How long access is locked after too many failed code attempts.",
+            "TOOLTIP": "Applies once the max attempts above is reached."
+          }
         },
         "TOTP": {
-          "ENABLED": { "LABEL": "TOTP Enabled", "HELP": "Enables authenticator-app based two-factor login.", "TOOLTIP": "An alternative to email/SMS one-time codes, using apps like Google Authenticator." },
-          "ARCHITECTURE_READY": { "LABEL": "Architecture Ready", "HELP": "Internal readiness flag for the TOTP feature.", "TOOLTIP": "Reflects backend readiness — leave as the platform default unless instructed otherwise." },
-          "ISSUER": { "LABEL": "Issuer Name", "HELP": "The name shown inside authenticator apps.", "TOOLTIP": "Helps admins recognize this account in their authenticator app's list." },
-          "DIGITS": { "LABEL": "Digits", "HELP": "How many digits the authenticator app code has.", "TOOLTIP": "Standard authenticator apps expect 6 digits — only change if you know your app supports otherwise." },
-          "PERIOD_SECONDS": { "LABEL": "Code Refresh Period", "HELP": "How often the authenticator app code changes.", "TOOLTIP": "Standard is 30 seconds — most authenticator apps assume this value." }
+          "ENABLED": {
+            "LABEL": "TOTP Enabled",
+            "HELP": "Enables authenticator-app based two-factor login.",
+            "TOOLTIP": "An alternative to email/SMS one-time codes, using apps like Google Authenticator."
+          },
+          "ARCHITECTURE_READY": {
+            "LABEL": "Architecture Ready",
+            "HELP": "Internal readiness flag for the TOTP feature.",
+            "TOOLTIP": "Reflects backend readiness — leave as the platform default unless instructed otherwise."
+          },
+          "ISSUER": {
+            "LABEL": "Issuer Name",
+            "HELP": "The name shown inside authenticator apps.",
+            "TOOLTIP": "Helps admins recognize this account in their authenticator app's list."
+          },
+          "DIGITS": {
+            "LABEL": "Digits",
+            "HELP": "How many digits the authenticator app code has.",
+            "TOOLTIP": "Standard authenticator apps expect 6 digits — only change if you know your app supports otherwise."
+          },
+          "PERIOD_SECONDS": {
+            "LABEL": "Code Refresh Period",
+            "HELP": "How often the authenticator app code changes.",
+            "TOOLTIP": "Standard is 30 seconds — most authenticator apps assume this value."
+          }
         },
         "COMMERCE": {
-          "TAX_RATE_PERCENT": { "LABEL": "Tax Rate", "HELP": "The default tax rate applied at checkout.", "TOOLTIP": "Applies platform-wide unless overridden elsewhere. Takes effect on new orders immediately." },
-          "SHIPPING_ENABLED_FUTURE": { "LABEL": "Shipping (Reserved)", "HELP": "Reserved for a future physical-shipping feature — has no effect yet.", "TOOLTIP": "HAMBOX currently sells digital goods only; this toggle isn't wired to any behavior yet." },
-          "RESERVATION_TIMEOUT_MINUTES": { "LABEL": "Order Reservation Timeout", "HELP": "How long items stay reserved for a customer during checkout.", "TOOLTIP": "After this window, unpurchased reserved inventory is released back to stock." },
-          "ORDER_EXPIRATION_HOURS": { "LABEL": "Order Expiration", "HELP": "How long an unpaid order stays open before expiring.", "TOOLTIP": "Expired orders are cancelled automatically by the background worker." },
-          "REFUND_WINDOW_DAYS": { "LABEL": "Refund Window", "HELP": "How many days after purchase a refund can be requested.", "TOOLTIP": "Set to 0 to disable refund requests entirely." },
-          "INVOICE_PREFIX": { "LABEL": "Invoice Prefix", "HELP": "Text shown before the invoice number, e.g. \"INV-\".", "TOOLTIP": "Applies to new invoices going forward — existing invoice numbers don't change." }
+          "TAX_RATE_PERCENT": {
+            "LABEL": "Tax Rate",
+            "HELP": "The default tax rate applied at checkout.",
+            "TOOLTIP": "Applies platform-wide unless overridden elsewhere. Takes effect on new orders immediately."
+          },
+          "SHIPPING_ENABLED_FUTURE": {
+            "LABEL": "Shipping (Reserved)",
+            "HELP": "Reserved for a future physical-shipping feature — has no effect yet.",
+            "TOOLTIP": "HAMBOX currently sells digital goods only; this toggle isn't wired to any behavior yet."
+          },
+          "RESERVATION_TIMEOUT_MINUTES": {
+            "LABEL": "Order Reservation Timeout",
+            "HELP": "How long items stay reserved for a customer during checkout.",
+            "TOOLTIP": "After this window, unpurchased reserved inventory is released back to stock."
+          },
+          "ORDER_EXPIRATION_HOURS": {
+            "LABEL": "Order Expiration",
+            "HELP": "How long an unpaid order stays open before expiring.",
+            "TOOLTIP": "Expired orders are cancelled automatically by the background worker."
+          },
+          "REFUND_WINDOW_DAYS": {
+            "LABEL": "Refund Window",
+            "HELP": "How many days after purchase a refund can be requested.",
+            "TOOLTIP": "Set to 0 to disable refund requests entirely."
+          },
+          "INVOICE_PREFIX": {
+            "LABEL": "Invoice Prefix",
+            "HELP": "Text shown before the invoice number, e.g. \"INV-\".",
+            "TOOLTIP": "Applies to new invoices going forward — existing invoice numbers don't change."
+          }
         },
         "CHECKOUT": {
-          "GUEST_CHECKOUT_ALLOWED": { "LABEL": "Allow Guest Checkout", "HELP": "Lets customers buy without creating an account.", "TOOLTIP": "Turning this off requires every customer to register before purchasing — this can reduce conversions." },
-          "REQUIRE_PHONE_NUMBER": { "LABEL": "Require Phone Number", "HELP": "Makes phone number mandatory at checkout.", "TOOLTIP": "Applies to all checkouts going forward." },
-          "DEFAULT_PAYMENT_METHOD": { "LABEL": "Default Payment Method", "HELP": "The payment method pre-selected at checkout.", "TOOLTIP": "Customers can still choose a different available method if more than one is enabled." },
-          "CART_ABANDONMENT_MINUTES": { "LABEL": "Cart Abandonment Window", "HELP": "How long an inactive cart is considered abandoned.", "TOOLTIP": "Used for abandoned-cart reporting and reminder logic." }
+          "GUEST_CHECKOUT_ALLOWED": {
+            "LABEL": "Allow Guest Checkout",
+            "HELP": "Lets customers buy without creating an account.",
+            "TOOLTIP": "Turning this off requires every customer to register before purchasing — this can reduce conversions."
+          },
+          "REQUIRE_PHONE_NUMBER": {
+            "LABEL": "Require Phone Number",
+            "HELP": "Makes phone number mandatory at checkout.",
+            "TOOLTIP": "Applies to all checkouts going forward."
+          },
+          "DEFAULT_PAYMENT_METHOD": {
+            "LABEL": "Default Payment Method",
+            "HELP": "The payment method pre-selected at checkout.",
+            "TOOLTIP": "Customers can still choose a different available method if more than one is enabled."
+          },
+          "CART_ABANDONMENT_MINUTES": {
+            "LABEL": "Cart Abandonment Window",
+            "HELP": "How long an inactive cart is considered abandoned.",
+            "TOOLTIP": "Used for abandoned-cart reporting and reminder logic."
+          }
         },
         "PROMOTIONS": {
-          "DEFAULT_MAX_DISCOUNT_PERCENT": { "LABEL": "Default Max Discount", "HELP": "The largest discount percentage a new coupon can offer by default.", "TOOLTIP": "A safety ceiling — individual coupons can still be created with a lower discount, and admins with permission can override this per-coupon." },
-          "STACK_COUPONS_ALLOWED": { "LABEL": "Allow Stacking Coupons", "HELP": "Lets customers apply more than one coupon to an order.", "TOOLTIP": "Applies to new orders immediately." },
-          "DEFAULT_COUPON_USAGE_LIMIT": { "LABEL": "Default Usage Limit", "HELP": "How many times a new coupon can be used by default, across all customers.", "TOOLTIP": "Applies only when a new coupon doesn't specify its own limit." },
-          "DEFAULT_PER_USER_LIMIT": { "LABEL": "Default Per-Customer Limit", "HELP": "How many times a single customer can use a new coupon by default.", "TOOLTIP": "Applies only when a new coupon doesn't specify its own limit." }
+          "DEFAULT_MAX_DISCOUNT_PERCENT": {
+            "LABEL": "Default Max Discount",
+            "HELP": "The largest discount percentage a new coupon can offer by default.",
+            "TOOLTIP": "A safety ceiling — individual coupons can still be created with a lower discount, and admins with permission can override this per-coupon."
+          },
+          "STACK_COUPONS_ALLOWED": {
+            "LABEL": "Allow Stacking Coupons",
+            "HELP": "Lets customers apply more than one coupon to an order.",
+            "TOOLTIP": "Applies to new orders immediately."
+          },
+          "DEFAULT_COUPON_USAGE_LIMIT": {
+            "LABEL": "Default Usage Limit",
+            "HELP": "How many times a new coupon can be used by default, across all customers.",
+            "TOOLTIP": "Applies only when a new coupon doesn't specify its own limit."
+          },
+          "DEFAULT_PER_USER_LIMIT": {
+            "LABEL": "Default Per-Customer Limit",
+            "HELP": "How many times a single customer can use a new coupon by default.",
+            "TOOLTIP": "Applies only when a new coupon doesn't specify its own limit."
+          }
         },
         "MEMBERSHIPS": {
-          "ENABLED": { "LABEL": "Memberships Enabled", "HELP": "Turns the membership program on or off platform-wide.", "TOOLTIP": "When off, customers can't subscribe to or view membership plans." },
-          "DEFAULT_TRIAL_DAYS": { "LABEL": "Default Trial Days", "HELP": "How many free trial days new membership plans get by default.", "TOOLTIP": "Set to 0 for no trial. Individual plans can still override this." },
-          "AUTO_RENEW_DEFAULT": { "LABEL": "Auto-Renew By Default", "HELP": "Whether new memberships renew automatically unless the customer opts out.", "TOOLTIP": "Applies to new memberships going forward." }
+          "ENABLED": {
+            "LABEL": "Memberships Enabled",
+            "HELP": "Turns the membership program on or off platform-wide.",
+            "TOOLTIP": "When off, customers can't subscribe to or view membership plans."
+          },
+          "DEFAULT_TRIAL_DAYS": {
+            "LABEL": "Default Trial Days",
+            "HELP": "How many free trial days new membership plans get by default.",
+            "TOOLTIP": "Set to 0 for no trial. Individual plans can still override this."
+          },
+          "AUTO_RENEW_DEFAULT": {
+            "LABEL": "Auto-Renew By Default",
+            "HELP": "Whether new memberships renew automatically unless the customer opts out.",
+            "TOOLTIP": "Applies to new memberships going forward."
+          }
         },
         "REFERRAL": {
-          "ENABLED": { "LABEL": "Referral Program Enabled", "HELP": "Turns the customer referral program on or off.", "TOOLTIP": "When off, referral links and rewards stop working immediately for new referrals." },
-          "REFERRER_REWARD_PERCENT": { "LABEL": "Referrer Reward", "HELP": "The reward percentage given to the customer who refers someone.", "TOOLTIP": "Applies to new referrals going forward." },
-          "REFEREE_DISCOUNT_PERCENT": { "LABEL": "Referee Discount", "HELP": "The discount percentage given to the newly referred customer.", "TOOLTIP": "Applies to new referrals going forward." },
-          "REWARD_EXPIRY_DAYS": { "LABEL": "Reward Expiry", "HELP": "How many days a referral reward stays valid before expiring.", "TOOLTIP": "Applies to new rewards going forward." }
+          "ENABLED": {
+            "LABEL": "Referral Program Enabled",
+            "HELP": "Turns the customer referral program on or off.",
+            "TOOLTIP": "When off, referral links and rewards stop working immediately for new referrals."
+          },
+          "REFERRER_REWARD_PERCENT": {
+            "LABEL": "Referrer Reward",
+            "HELP": "The reward percentage given to the customer who refers someone.",
+            "TOOLTIP": "Applies to new referrals going forward."
+          },
+          "REFEREE_DISCOUNT_PERCENT": {
+            "LABEL": "Referee Discount",
+            "HELP": "The discount percentage given to the newly referred customer.",
+            "TOOLTIP": "Applies to new referrals going forward."
+          },
+          "REWARD_EXPIRY_DAYS": {
+            "LABEL": "Reward Expiry",
+            "HELP": "How many days a referral reward stays valid before expiring.",
+            "TOOLTIP": "Applies to new rewards going forward."
+          }
         },
         "INVENTORY": {
-          "LOW_STOCK_THRESHOLD": { "LABEL": "Low Stock Threshold", "HELP": "The stock level that triggers a low-stock warning.", "TOOLTIP": "Used for admin alerts and dashboard indicators — doesn't block sales by itself." },
-          "RESERVATION_TIMEOUT_MINUTES": { "LABEL": "Reservation Timeout", "HELP": "How long stock stays reserved for a customer during checkout.", "TOOLTIP": "Same concept as the Commerce reservation timeout, applied at the inventory level." },
-          "AUTOMATIC_RELEASE_ENABLED": { "LABEL": "Automatic Release", "HELP": "Automatically returns reserved stock to inventory if a purchase isn't completed.", "TOOLTIP": "Recommended to keep on — otherwise abandoned checkouts can hold stock indefinitely." },
-          "CODE_REVEAL_POLICY": { "LABEL": "Code Reveal Policy", "HELP": "Choose how stock is deducted and codes are shown after purchase.", "TOOLTIP": "\"Manual\" requires an admin to release codes by hand — use it if you need a review step before delivery." }
+          "LOW_STOCK_THRESHOLD": {
+            "LABEL": "Low Stock Threshold",
+            "HELP": "The stock level that triggers a low-stock warning.",
+            "TOOLTIP": "Used for admin alerts and dashboard indicators — doesn't block sales by itself."
+          },
+          "RESERVATION_TIMEOUT_MINUTES": {
+            "LABEL": "Reservation Timeout",
+            "HELP": "How long stock stays reserved for a customer during checkout.",
+            "TOOLTIP": "Same concept as the Commerce reservation timeout, applied at the inventory level."
+          },
+          "AUTOMATIC_RELEASE_ENABLED": {
+            "LABEL": "Automatic Release",
+            "HELP": "Automatically returns reserved stock to inventory if a purchase isn't completed.",
+            "TOOLTIP": "Recommended to keep on — otherwise abandoned checkouts can hold stock indefinitely."
+          },
+          "CODE_REVEAL_POLICY": {
+            "LABEL": "Code Reveal Policy",
+            "HELP": "Choose how stock is deducted and codes are shown after purchase.",
+            "TOOLTIP": "\"Manual\" requires an admin to release codes by hand — use it if you need a review step before delivery."
+          }
         },
         "QUEUE": {
-          "WORKER_INTERVAL_SECONDS": { "LABEL": "Worker Interval", "HELP": "How often the background job worker checks for new work.", "TOOLTIP": "Technical setting — lower values process jobs faster but increase database load." },
-          "BATCH_SIZE": { "LABEL": "Batch Size", "HELP": "How many jobs the worker processes per run.", "TOOLTIP": "Technical setting — larger batches process faster but use more memory per run." },
-          "MAX_CONCURRENCY": { "LABEL": "Max Concurrency", "HELP": "How many jobs can run at the same time.", "TOOLTIP": "Technical setting — higher concurrency processes the queue faster but uses more server resources." },
-          "VISIBILITY_TIMEOUT_SECONDS": { "LABEL": "Visibility Timeout", "HELP": "How long a job is hidden from other workers while being processed.", "TOOLTIP": "Technical setting — should be longer than the slowest job normally takes to complete." }
+          "WORKER_INTERVAL_SECONDS": {
+            "LABEL": "Worker Interval",
+            "HELP": "How often the background job worker checks for new work.",
+            "TOOLTIP": "Technical setting — lower values process jobs faster but increase database load."
+          },
+          "BATCH_SIZE": {
+            "LABEL": "Batch Size",
+            "HELP": "How many jobs the worker processes per run.",
+            "TOOLTIP": "Technical setting — larger batches process faster but use more memory per run."
+          },
+          "MAX_CONCURRENCY": {
+            "LABEL": "Max Concurrency",
+            "HELP": "How many jobs can run at the same time.",
+            "TOOLTIP": "Technical setting — higher concurrency processes the queue faster but uses more server resources."
+          },
+          "VISIBILITY_TIMEOUT_SECONDS": {
+            "LABEL": "Visibility Timeout",
+            "HELP": "How long a job is hidden from other workers while being processed.",
+            "TOOLTIP": "Technical setting — should be longer than the slowest job normally takes to complete."
+          }
         },
         "RETRY_POLICIES": {
-          "RETRY_COUNT": { "LABEL": "Retry Count", "HELP": "How many times a failed background job is retried.", "TOOLTIP": "Applies to background jobs like email delivery and order fulfillment." },
-          "RETRY_DELAY_SECONDS": { "LABEL": "Retry Delay", "HELP": "How long to wait before the first retry.", "TOOLTIP": "When exponential backoff is on, each retry waits longer than the last, starting from this value." },
-          "TIMEOUT_SECONDS": { "LABEL": "Job Timeout", "HELP": "How long a job can run before it's considered failed.", "TOOLTIP": "Technical setting — should be longer than the slowest job normally takes." },
-          "DEAD_LETTER_THRESHOLD": { "LABEL": "Dead Letter Threshold", "HELP": "How many failed attempts before a job is moved aside for manual review.", "TOOLTIP": "Jobs that exceed this are no longer retried automatically and need admin attention." },
-          "USE_EXPONENTIAL_BACKOFF": { "LABEL": "Use Exponential Backoff", "HELP": "Gradually increases the wait time between retries instead of using a fixed delay.", "TOOLTIP": "Recommended — reduces load on failing services instead of retrying rapidly." }
+          "RETRY_COUNT": {
+            "LABEL": "Retry Count",
+            "HELP": "How many times a failed background job is retried.",
+            "TOOLTIP": "Applies to background jobs like email delivery and order fulfillment."
+          },
+          "RETRY_DELAY_SECONDS": {
+            "LABEL": "Retry Delay",
+            "HELP": "How long to wait before the first retry.",
+            "TOOLTIP": "When exponential backoff is on, each retry waits longer than the last, starting from this value."
+          },
+          "TIMEOUT_SECONDS": {
+            "LABEL": "Job Timeout",
+            "HELP": "How long a job can run before it's considered failed.",
+            "TOOLTIP": "Technical setting — should be longer than the slowest job normally takes."
+          },
+          "DEAD_LETTER_THRESHOLD": {
+            "LABEL": "Dead Letter Threshold",
+            "HELP": "How many failed attempts before a job is moved aside for manual review.",
+            "TOOLTIP": "Jobs that exceed this are no longer retried automatically and need admin attention."
+          },
+          "USE_EXPONENTIAL_BACKOFF": {
+            "LABEL": "Use Exponential Backoff",
+            "HELP": "Gradually increases the wait time between retries instead of using a fixed delay.",
+            "TOOLTIP": "Recommended — reduces load on failing services instead of retrying rapidly."
+          }
         },
         "NOTIFICATIONS": {
-          "EMAIL_ENABLED": { "LABEL": "Email Notifications", "HELP": "Turns email notifications on or off.", "TOOLTIP": "Also requires Email sending to be enabled under Email settings." },
-          "SMS_ENABLED_FUTURE": { "LABEL": "SMS Notifications (Reserved)", "HELP": "Reserved for a future SMS notification feature — has no effect yet.", "TOOLTIP": "Not yet wired to any SMS provider." },
-          "PUSH_ENABLED_FUTURE": { "LABEL": "Push Notifications (Reserved)", "HELP": "Reserved for a future push notification feature — has no effect yet.", "TOOLTIP": "Not yet wired to any push provider." },
-          "ADMIN_ALERTS_ENABLED": { "LABEL": "Admin Alerts", "HELP": "Sends alerts to admins for important platform events.", "TOOLTIP": "Covers general operational alerts, separate from the specific alert types below." },
-          "LOW_STOCK_ALERTS_ENABLED": { "LABEL": "Low Stock Alerts", "HELP": "Notifies admins when inventory drops below the low-stock threshold.", "TOOLTIP": "Uses the threshold configured under Inventory settings." },
-          "WORKER_ALERTS_ENABLED": { "LABEL": "Background Worker Alerts", "HELP": "Notifies admins when background jobs fail repeatedly.", "TOOLTIP": "Related to the retry and dead-letter settings above." }
+          "EMAIL_ENABLED": {
+            "LABEL": "Email Notifications",
+            "HELP": "Turns email notifications on or off.",
+            "TOOLTIP": "Also requires Email sending to be enabled under Email settings."
+          },
+          "SMS_ENABLED_FUTURE": {
+            "LABEL": "SMS Notifications (Reserved)",
+            "HELP": "Reserved for a future SMS notification feature — has no effect yet.",
+            "TOOLTIP": "Not yet wired to any SMS provider."
+          },
+          "PUSH_ENABLED_FUTURE": {
+            "LABEL": "Push Notifications (Reserved)",
+            "HELP": "Reserved for a future push notification feature — has no effect yet.",
+            "TOOLTIP": "Not yet wired to any push provider."
+          },
+          "ADMIN_ALERTS_ENABLED": {
+            "LABEL": "Admin Alerts",
+            "HELP": "Sends alerts to admins for important platform events.",
+            "TOOLTIP": "Covers general operational alerts, separate from the specific alert types below."
+          },
+          "LOW_STOCK_ALERTS_ENABLED": {
+            "LABEL": "Low Stock Alerts",
+            "HELP": "Notifies admins when inventory drops below the low-stock threshold.",
+            "TOOLTIP": "Uses the threshold configured under Inventory settings."
+          },
+          "WORKER_ALERTS_ENABLED": {
+            "LABEL": "Background Worker Alerts",
+            "HELP": "Notifies admins when background jobs fail repeatedly.",
+            "TOOLTIP": "Related to the retry and dead-letter settings above."
+          }
         },
         "MEDIA": {
-          "MAX_UPLOAD_SIZE_BYTES": { "LABEL": "Max Upload Size", "HELP": "The largest file size allowed for uploads.", "TOOLTIP": "Applies to product images, branding assets, and other admin uploads." },
-          "IMAGE_COMPRESSION_ENABLED": { "LABEL": "Image Compression", "HELP": "Automatically compresses uploaded images to save space.", "TOOLTIP": "Recommended on — reduces storage use and improves page load times with minimal visible quality loss." },
-          "ALLOWED_CONTENT_TYPES": { "LABEL": "Allowed File Types", "HELP": "File types accepted for uploads.", "TOOLTIP": "Uploads outside this list are rejected immediately, before being stored." },
-          "THUMBNAIL_SMALL_PX": { "LABEL": "Small Thumbnail Size", "HELP": "The pixel size generated for small thumbnails.", "TOOLTIP": "Used in compact listings like search results and cart items." },
-          "THUMBNAIL_MEDIUM_PX": { "LABEL": "Medium Thumbnail Size", "HELP": "The pixel size generated for medium thumbnails.", "TOOLTIP": "Used in product grids and category listings." },
-          "THUMBNAIL_LARGE_PX": { "LABEL": "Large Thumbnail Size", "HELP": "The pixel size generated for large thumbnails.", "TOOLTIP": "Used on product detail pages." }
+          "MAX_UPLOAD_SIZE_BYTES": {
+            "LABEL": "Max Upload Size",
+            "HELP": "The largest file size allowed for uploads.",
+            "TOOLTIP": "Applies to product images, branding assets, and other admin uploads."
+          },
+          "IMAGE_COMPRESSION_ENABLED": {
+            "LABEL": "Image Compression",
+            "HELP": "Automatically compresses uploaded images to save space.",
+            "TOOLTIP": "Recommended on — reduces storage use and improves page load times with minimal visible quality loss."
+          },
+          "ALLOWED_CONTENT_TYPES": {
+            "LABEL": "Allowed File Types",
+            "HELP": "File types accepted for uploads.",
+            "TOOLTIP": "Uploads outside this list are rejected immediately, before being stored."
+          },
+          "THUMBNAIL_SMALL_PX": {
+            "LABEL": "Small Thumbnail Size",
+            "HELP": "The pixel size generated for small thumbnails.",
+            "TOOLTIP": "Used in compact listings like search results and cart items."
+          },
+          "THUMBNAIL_MEDIUM_PX": {
+            "LABEL": "Medium Thumbnail Size",
+            "HELP": "The pixel size generated for medium thumbnails.",
+            "TOOLTIP": "Used in product grids and category listings."
+          },
+          "THUMBNAIL_LARGE_PX": {
+            "LABEL": "Large Thumbnail Size",
+            "HELP": "The pixel size generated for large thumbnails.",
+            "TOOLTIP": "Used on product detail pages."
+          }
         },
         "SEO": {
-          "META_TITLE": { "LABEL": "Default Meta Title", "HELP": "The fallback page title used for search engines.", "TOOLTIP": "Individual pages can override this with their own title." },
-          "META_DESCRIPTION": { "LABEL": "Default Meta Description", "HELP": "The fallback description shown in search results.", "TOOLTIP": "Individual pages can override this with their own description." },
-          "OPEN_GRAPH_IMAGE_URL": { "LABEL": "Default Social Share Image", "HELP": "The fallback image shown when pages are shared on social media.", "TOOLTIP": "Individual pages can override this with their own image." },
-          "TWITTER_CARD_TYPE": { "LABEL": "Twitter/X Card Type", "HELP": "Controls how links preview when shared on X (Twitter).", "TOOLTIP": "\"Summary with large image\" shows a bigger preview image and is usually the better choice for a storefront." },
-          "ROBOTS_DIRECTIVE": { "LABEL": "Search Engine Indexing", "HELP": "Controls whether search engines index and follow links on your site.", "TOOLTIP": "\"Don't index\" hides your site from search results entirely — only use this intentionally, e.g. on a staging environment." },
-          "CANONICAL_BASE_URL": { "LABEL": "Canonical Base URL", "HELP": "Your storefront's official domain, used to avoid duplicate-content issues.", "TOOLTIP": "Should exactly match your live production domain, including https://." }
+          "META_TITLE": {
+            "LABEL": "Default Meta Title",
+            "HELP": "The fallback page title used for search engines.",
+            "TOOLTIP": "Individual pages can override this with their own title."
+          },
+          "META_DESCRIPTION": {
+            "LABEL": "Default Meta Description",
+            "HELP": "The fallback description shown in search results.",
+            "TOOLTIP": "Individual pages can override this with their own description."
+          },
+          "OPEN_GRAPH_IMAGE_URL": {
+            "LABEL": "Default Social Share Image",
+            "HELP": "The fallback image shown when pages are shared on social media.",
+            "TOOLTIP": "Individual pages can override this with their own image."
+          },
+          "TWITTER_CARD_TYPE": {
+            "LABEL": "Twitter/X Card Type",
+            "HELP": "Controls how links preview when shared on X (Twitter).",
+            "TOOLTIP": "\"Summary with large image\" shows a bigger preview image and is usually the better choice for a storefront."
+          },
+          "ROBOTS_DIRECTIVE": {
+            "LABEL": "Search Engine Indexing",
+            "HELP": "Controls whether search engines index and follow links on your site.",
+            "TOOLTIP": "\"Don't index\" hides your site from search results entirely — only use this intentionally, e.g. on a staging environment."
+          },
+          "CANONICAL_BASE_URL": {
+            "LABEL": "Canonical Base URL",
+            "HELP": "Your storefront's official domain, used to avoid duplicate-content issues.",
+            "TOOLTIP": "Should exactly match your live production domain, including https://."
+          }
         },
         "ANALYTICS": {
-          "GOOGLE_ANALYTICS_ID": { "LABEL": "Google Analytics ID", "HELP": "Connects your store to Google Analytics.", "TOOLTIP": "Leave blank to disable Google Analytics tracking." },
-          "GOOGLE_TAG_MANAGER_ID": { "LABEL": "Google Tag Manager ID", "HELP": "Connects your store to Google Tag Manager.", "TOOLTIP": "Leave blank to disable Google Tag Manager." },
-          "META_PIXEL_ID": { "LABEL": "Meta Pixel ID", "HELP": "Connects your store to Meta (Facebook/Instagram) Pixel.", "TOOLTIP": "Leave blank to disable Meta Pixel tracking." },
-          "ENABLE_TRACKING": { "LABEL": "Enable Tracking", "HELP": "Master switch for all analytics tracking scripts above.", "TOOLTIP": "When off, none of the tracking IDs above are loaded, regardless of whether they're filled in." }
+          "GOOGLE_ANALYTICS_ID": {
+            "LABEL": "Google Analytics ID",
+            "HELP": "Connects your store to Google Analytics.",
+            "TOOLTIP": "Leave blank to disable Google Analytics tracking."
+          },
+          "GOOGLE_TAG_MANAGER_ID": {
+            "LABEL": "Google Tag Manager ID",
+            "HELP": "Connects your store to Google Tag Manager.",
+            "TOOLTIP": "Leave blank to disable Google Tag Manager."
+          },
+          "META_PIXEL_ID": {
+            "LABEL": "Meta Pixel ID",
+            "HELP": "Connects your store to Meta (Facebook/Instagram) Pixel.",
+            "TOOLTIP": "Leave blank to disable Meta Pixel tracking."
+          },
+          "ENABLE_TRACKING": {
+            "LABEL": "Enable Tracking",
+            "HELP": "Master switch for all analytics tracking scripts above.",
+            "TOOLTIP": "When off, none of the tracking IDs above are loaded, regardless of whether they're filled in."
+          }
         },
         "INTEGRATIONS": {
-          "STRIPE_PUBLISHABLE_KEY": { "LABEL": "Stripe Publishable Key", "HELP": "Your Stripe public API key, safe to expose in the browser.", "TOOLTIP": "The matching secret key is configured on the server and never shown here." },
-          "PAYPAL_CLIENT_ID": { "LABEL": "PayPal Client ID", "HELP": "Your PayPal application client ID.", "TOOLTIP": "Found in your PayPal developer dashboard." },
-          "WEBHOOKS_ENABLED": { "LABEL": "Webhooks Enabled", "HELP": "Allows payment providers to notify your store of events like successful payments.", "TOOLTIP": "Recommended on for Stripe/PayPal integrations to stay in sync automatically." }
+          "STRIPE_PUBLISHABLE_KEY": {
+            "LABEL": "Stripe Publishable Key",
+            "HELP": "Your Stripe public API key, safe to expose in the browser.",
+            "TOOLTIP": "The matching secret key is configured on the server and never shown here."
+          },
+          "PAYPAL_CLIENT_ID": {
+            "LABEL": "PayPal Client ID",
+            "HELP": "Your PayPal application client ID.",
+            "TOOLTIP": "Found in your PayPal developer dashboard."
+          },
+          "WEBHOOKS_ENABLED": {
+            "LABEL": "Webhooks Enabled",
+            "HELP": "Allows payment providers to notify your store of events like successful payments.",
+            "TOOLTIP": "Recommended on for Stripe/PayPal integrations to stay in sync automatically."
+          }
         },
         "MAINTENANCE": {
-          "ENABLED": { "LABEL": "Maintenance Mode", "HELP": "Temporarily disables customer access while administrators continue working.", "TOOLTIP": "Customers see a \"coming soon\" style page immediately. Admins can still access the dashboard. No restart required." },
-          "MESSAGE": { "LABEL": "Maintenance Message", "HELP": "The message shown to customers while maintenance mode is on.", "TOOLTIP": "Shown on the maintenance page immediately when maintenance mode is active." },
-          "ALLOWED_ROLE_NAMES": { "LABEL": "Roles Allowed During Maintenance", "HELP": "Admin roles that can still browse the storefront while maintenance mode is on.", "TOOLTIP": "Lets your team preview the live site while customers see the maintenance page." },
-          "BYPASS_PASSWORD": { "LABEL": "Bypass Password", "HELP": "An optional password that lets anyone with it view the site during maintenance.", "TOOLTIP": "Owner-only password to unlock the maintenance page. Leave blank to keep the currently stored password." }
+          "ENABLED": {
+            "LABEL": "Maintenance Mode",
+            "HELP": "Temporarily disables customer access while administrators continue working.",
+            "TOOLTIP": "Customers see a \"coming soon\" style page immediately. Admins can still access the dashboard. No restart required."
+          },
+          "MESSAGE": {
+            "LABEL": "Maintenance Message",
+            "HELP": "The message shown to customers while maintenance mode is on.",
+            "TOOLTIP": "Shown on the maintenance page immediately when maintenance mode is active."
+          },
+          "ALLOWED_ROLE_NAMES": {
+            "LABEL": "Roles Allowed During Maintenance",
+            "HELP": "Admin roles that can still browse the storefront while maintenance mode is on.",
+            "TOOLTIP": "Lets your team preview the live site while customers see the maintenance page."
+          },
+          "BYPASS_PASSWORD": {
+            "LABEL": "Bypass Password",
+            "HELP": "An optional password that lets anyone with it view the site during maintenance.",
+            "TOOLTIP": "Owner-only password to unlock the maintenance page. Leave blank to keep the currently stored password."
+          }
         },
         "LEGAL": {
-          "TERMS_HTML": { "LABEL": "Terms of Service", "HELP": "The full text of your terms of service page.", "TOOLTIP": "Supports HTML formatting. Applies immediately to the public terms page." },
-          "PRIVACY_HTML": { "LABEL": "Privacy Policy", "HELP": "The full text of your privacy policy page.", "TOOLTIP": "Supports HTML formatting. Applies immediately to the public privacy page." },
-          "REFUND_POLICY_HTML": { "LABEL": "Refund Policy", "HELP": "The full text of your refund policy page.", "TOOLTIP": "Supports HTML formatting. Applies immediately to the public refund policy page." },
-          "SUPPORT_POLICY_HTML": { "LABEL": "Support Policy", "HELP": "The full text of your support policy page.", "TOOLTIP": "Supports HTML formatting. Applies immediately to the public support policy page." }
+          "TERMS_HTML": {
+            "LABEL": "Terms of Service",
+            "HELP": "The full text of your terms of service page.",
+            "TOOLTIP": "Supports HTML formatting. Applies immediately to the public terms page."
+          },
+          "PRIVACY_HTML": {
+            "LABEL": "Privacy Policy",
+            "HELP": "The full text of your privacy policy page.",
+            "TOOLTIP": "Supports HTML formatting. Applies immediately to the public privacy page."
+          },
+          "REFUND_POLICY_HTML": {
+            "LABEL": "Refund Policy",
+            "HELP": "The full text of your refund policy page.",
+            "TOOLTIP": "Supports HTML formatting. Applies immediately to the public refund policy page."
+          },
+          "SUPPORT_POLICY_HTML": {
+            "LABEL": "Support Policy",
+            "HELP": "The full text of your support policy page.",
+            "TOOLTIP": "Supports HTML formatting. Applies immediately to the public support policy page."
+          }
         }
       },
       "STOREFRONT": {
         "HERO": {
           "TITLE_CARD": "Hero Section",
           "DESCRIPTION_CARD": "The large banner at the top of your home page.",
-          "TITLE": { "LABEL": "Title", "HELP": "The main headline shown in the hero banner.", "TOOLTIP": "The largest, most prominent text on your home page." },
-          "SUBTITLE": { "LABEL": "Subtitle", "HELP": "Supporting text shown below the title.", "TOOLTIP": "Keep it short — one or two sentences works best." },
-          "PRIMARY_BUTTON_TEXT": { "LABEL": "Primary Button Text", "HELP": "The label on the main call-to-action button." },
-          "PRIMARY_BUTTON_URL": { "LABEL": "Primary Button URL", "HELP": "Where the main button links to." },
-          "SECONDARY_BUTTON_TEXT": { "LABEL": "Secondary Button Text", "HELP": "The label on the second, less prominent button." },
-          "SECONDARY_BUTTON_URL": { "LABEL": "Secondary Button URL", "HELP": "Where the secondary button links to." },
-          "BACKGROUND_IMAGE_URL": { "LABEL": "Background Image URL", "HELP": "The main hero background image." },
-          "OVERLAY_IMAGE_URL": { "LABEL": "Overlay Image URL", "HELP": "An optional image layered on top of the background." },
-          "OVERLAY_OPACITY": { "LABEL": "Overlay Opacity", "HELP": "How transparent the overlay image is, from 0 (invisible) to 1 (solid).", "TOOLTIP": "Higher values make text easier to read over busy background images." },
-          "BADGE_TEXT": { "LABEL": "Badge Text", "HELP": "A small label shown above the hero title, e.g. \"NEW SEASON LIVE\"." },
-          "BADGE_COLOR": { "LABEL": "Badge Color", "HELP": "The color of the badge text." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides this section on the home page immediately." }
+          "TITLE": {
+            "LABEL": "Title",
+            "HELP": "The main headline shown in the hero banner.",
+            "TOOLTIP": "The largest, most prominent text on your home page."
+          },
+          "SUBTITLE": {
+            "LABEL": "Subtitle",
+            "HELP": "Supporting text shown below the title.",
+            "TOOLTIP": "Keep it short — one or two sentences works best."
+          },
+          "PRIMARY_BUTTON_TEXT": {
+            "LABEL": "Primary Button Text",
+            "HELP": "The label on the main call-to-action button."
+          },
+          "PRIMARY_BUTTON_URL": {
+            "LABEL": "Primary Button URL",
+            "HELP": "Where the main button links to."
+          },
+          "SECONDARY_BUTTON_TEXT": {
+            "LABEL": "Secondary Button Text",
+            "HELP": "The label on the second, less prominent button."
+          },
+          "SECONDARY_BUTTON_URL": {
+            "LABEL": "Secondary Button URL",
+            "HELP": "Where the secondary button links to."
+          },
+          "BACKGROUND_IMAGE_URL": {
+            "LABEL": "Background Image URL",
+            "HELP": "The main hero background image."
+          },
+          "OVERLAY_IMAGE_URL": {
+            "LABEL": "Overlay Image URL",
+            "HELP": "An optional image layered on top of the background."
+          },
+          "OVERLAY_OPACITY": {
+            "LABEL": "Overlay Opacity",
+            "HELP": "How transparent the overlay image is, from 0 (invisible) to 1 (solid).",
+            "TOOLTIP": "Higher values make text easier to read over busy background images."
+          },
+          "BADGE_TEXT": {
+            "LABEL": "Badge Text",
+            "HELP": "A small label shown above the hero title, e.g. \"NEW SEASON LIVE\"."
+          },
+          "BADGE_COLOR": {
+            "LABEL": "Badge Color",
+            "HELP": "The color of the badge text."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides this section on the home page immediately."
+          }
         },
         "ANNOUNCEMENT": {
           "TITLE_CARD": "Announcement Bar",
           "DESCRIPTION_CARD": "A thin promotional strip shown at the top or bottom of the page.",
-          "TEXT": { "LABEL": "Text", "HELP": "The message shown in the announcement bar." },
-          "LINK": { "LABEL": "Link", "HELP": "Where the announcement bar links to when clicked." },
-          "BUTTON_TEXT": { "LABEL": "Button Text", "HELP": "An optional button label inside the bar." },
-          "BACKGROUND_COLOR": { "LABEL": "Background Color", "HELP": "The announcement bar's background color." },
-          "TEXT_COLOR": { "LABEL": "Text Color", "HELP": "The announcement bar's text color." },
-          "DISPLAY_POSITION": { "LABEL": "Display Position", "HELP": "Where the bar appears on the page." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides the announcement bar immediately." }
+          "TEXT": {
+            "LABEL": "Text",
+            "HELP": "The message shown in the announcement bar."
+          },
+          "LINK": {
+            "LABEL": "Link",
+            "HELP": "Where the announcement bar links to when clicked."
+          },
+          "BUTTON_TEXT": {
+            "LABEL": "Button Text",
+            "HELP": "An optional button label inside the bar."
+          },
+          "BACKGROUND_COLOR": {
+            "LABEL": "Background Color",
+            "HELP": "The announcement bar's background color."
+          },
+          "TEXT_COLOR": {
+            "LABEL": "Text Color",
+            "HELP": "The announcement bar's text color."
+          },
+          "DISPLAY_POSITION": {
+            "LABEL": "Display Position",
+            "HELP": "Where the bar appears on the page."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides the announcement bar immediately."
+          }
         },
         "PROMO_BANNER": {
           "TITLE_CARD": "Promotional Banner",
           "DESCRIPTION_CARD": "A sale or campaign banner on the home page.",
-          "TITLE": { "LABEL": "Title", "HELP": "The banner's headline." },
-          "SUBTITLE": { "LABEL": "Subtitle", "HELP": "Supporting text below the banner title." },
-          "IMAGE_URL": { "LABEL": "Image URL", "HELP": "The banner's background image." },
-          "BUTTON_TEXT": { "LABEL": "Button Text", "HELP": "The label on the banner's button." },
-          "BUTTON_URL": { "LABEL": "Button URL", "HELP": "Where the banner button links to." },
-          "COUNTDOWN_SECONDS": { "LABEL": "Countdown Duration", "HELP": "How long the countdown timer runs for, in seconds." },
-          "COUNTDOWN_ENDS_AT_UTC": { "LABEL": "Countdown End Time (UTC)", "HELP": "An optional fixed end date/time in ISO format, e.g. 2026-08-01T00:00:00Z. Leave blank to use the duration above instead.", "TOOLTIP": "When set, this takes priority over the countdown duration — the timer counts down to this exact moment." },
-          "BACKGROUND_COLOR": { "LABEL": "Background Color", "HELP": "The banner's background color." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides the promotional banner immediately." }
+          "TITLE": {
+            "LABEL": "Title",
+            "HELP": "The banner's headline."
+          },
+          "SUBTITLE": {
+            "LABEL": "Subtitle",
+            "HELP": "Supporting text below the banner title."
+          },
+          "IMAGE_URL": {
+            "LABEL": "Image URL",
+            "HELP": "The banner's background image."
+          },
+          "BUTTON_TEXT": {
+            "LABEL": "Button Text",
+            "HELP": "The label on the banner's button."
+          },
+          "BUTTON_URL": {
+            "LABEL": "Button URL",
+            "HELP": "Where the banner button links to."
+          },
+          "COUNTDOWN_SECONDS": {
+            "LABEL": "Countdown Duration",
+            "HELP": "How long the countdown timer runs for, in seconds."
+          },
+          "COUNTDOWN_ENDS_AT_UTC": {
+            "LABEL": "Countdown End Time (UTC)",
+            "HELP": "An optional fixed end date/time in ISO format, e.g. 2026-08-01T00:00:00Z. Leave blank to use the duration above instead.",
+            "TOOLTIP": "When set, this takes priority over the countdown duration — the timer counts down to this exact moment."
+          },
+          "BACKGROUND_COLOR": {
+            "LABEL": "Background Color",
+            "HELP": "The banner's background color."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides the promotional banner immediately."
+          }
         },
         "FLASH_DEALS": {
           "TITLE_CARD": "Flash Deals",
           "DESCRIPTION_CARD": "A limited-time product section on the home page.",
-          "SECTION_TITLE": { "LABEL": "Section Title", "HELP": "The heading shown above the flash deals." },
-          "SECTION_SUBTITLE": { "LABEL": "Section Subtitle", "HELP": "Supporting text below the section title." },
-          "MAXIMUM_PRODUCTS": { "LABEL": "Maximum Products", "HELP": "How many products to show in this section." },
-          "SORT_METHOD": { "LABEL": "Sort Method", "HELP": "How products in this section are ordered." },
-          "COUNTDOWN_SECONDS": { "LABEL": "Countdown Duration", "HELP": "How long the countdown timer runs for, in seconds." },
-          "COUNTDOWN_DATE_UTC": { "LABEL": "Countdown End Date (UTC)", "HELP": "An optional fixed end date/time in ISO format, e.g. 2026-08-01T00:00:00Z. Leave blank to use the duration above instead.", "TOOLTIP": "When set, this takes priority over the countdown duration — the timer counts down to this exact moment." },
-          "COUNTDOWN_ENABLED": { "LABEL": "Countdown Enabled", "HELP": "Shows a countdown timer on this section." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides the flash deals section immediately." }
+          "SECTION_TITLE": {
+            "LABEL": "Section Title",
+            "HELP": "The heading shown above the flash deals."
+          },
+          "SECTION_SUBTITLE": {
+            "LABEL": "Section Subtitle",
+            "HELP": "Supporting text below the section title."
+          },
+          "MAXIMUM_PRODUCTS": {
+            "LABEL": "Maximum Products",
+            "HELP": "How many products to show in this section."
+          },
+          "SORT_METHOD": {
+            "LABEL": "Sort Method",
+            "HELP": "How products in this section are ordered."
+          },
+          "COUNTDOWN_SECONDS": {
+            "LABEL": "Countdown Duration",
+            "HELP": "How long the countdown timer runs for, in seconds."
+          },
+          "COUNTDOWN_DATE_UTC": {
+            "LABEL": "Countdown End Date (UTC)",
+            "HELP": "An optional fixed end date/time in ISO format, e.g. 2026-08-01T00:00:00Z. Leave blank to use the duration above instead.",
+            "TOOLTIP": "When set, this takes priority over the countdown duration — the timer counts down to this exact moment."
+          },
+          "COUNTDOWN_ENABLED": {
+            "LABEL": "Countdown Enabled",
+            "HELP": "Shows a countdown timer on this section."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides the flash deals section immediately."
+          }
         },
         "FEATURED_COLLECTIONS": {
           "TITLE_CARD": "Featured Collections",
           "DESCRIPTION_CARD": "A trending or curated collections block.",
-          "TITLE": { "LABEL": "Title", "HELP": "The heading shown above featured collections." },
-          "SUBTITLE": { "LABEL": "Subtitle", "HELP": "Supporting text below the title." },
-          "MAXIMUM_ITEMS": { "LABEL": "Maximum Items", "HELP": "How many collections to show." },
-          "DISPLAY_STYLE": { "LABEL": "Display Style", "HELP": "How the collections are laid out." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides this section immediately." }
+          "TITLE": {
+            "LABEL": "Title",
+            "HELP": "The heading shown above featured collections."
+          },
+          "SUBTITLE": {
+            "LABEL": "Subtitle",
+            "HELP": "Supporting text below the title."
+          },
+          "MAXIMUM_ITEMS": {
+            "LABEL": "Maximum Items",
+            "HELP": "How many collections to show."
+          },
+          "DISPLAY_STYLE": {
+            "LABEL": "Display Style",
+            "HELP": "How the collections are laid out."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides this section immediately."
+          }
         },
         "POPULAR_CATEGORIES": {
           "TITLE_CARD": "Popular Categories",
           "DESCRIPTION_CARD": "A category grid shown on the home page.",
-          "SECTION_TITLE": { "LABEL": "Section Title", "HELP": "The heading shown above popular categories." },
-          "MAXIMUM_CATEGORIES": { "LABEL": "Maximum Categories", "HELP": "How many categories to show." },
-          "SORT_ORDER": { "LABEL": "Sort Order", "HELP": "How categories in this section are ordered." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides this section immediately." }
+          "SECTION_TITLE": {
+            "LABEL": "Section Title",
+            "HELP": "The heading shown above popular categories."
+          },
+          "MAXIMUM_CATEGORIES": {
+            "LABEL": "Maximum Categories",
+            "HELP": "How many categories to show."
+          },
+          "SORT_ORDER": {
+            "LABEL": "Sort Order",
+            "HELP": "How categories in this section are ordered."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides this section immediately."
+          }
         },
         "FEATURED_PRODUCT": {
           "TITLE_CARD": "Featured Product",
           "DESCRIPTION_CARD": "A single highlighted product spotlight.",
-          "PRODUCT_ID": { "LABEL": "Product ID", "HELP": "The internal ID of the product to feature. Leave blank to hide this section." },
-          "BADGE": { "LABEL": "Badge", "HELP": "A small label shown on the featured product, e.g. \"EDITOR'S CHOICE\"." },
-          "CALL_TO_ACTION": { "LABEL": "Call To Action", "HELP": "The button label for this section." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides this section immediately." }
+          "PRODUCT_ID": {
+            "LABEL": "Product ID",
+            "HELP": "The internal ID of the product to feature. Leave blank to hide this section."
+          },
+          "BADGE": {
+            "LABEL": "Badge",
+            "HELP": "A small label shown on the featured product, e.g. \"EDITOR'S CHOICE\"."
+          },
+          "CALL_TO_ACTION": {
+            "LABEL": "Call To Action",
+            "HELP": "The button label for this section."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides this section immediately."
+          }
         },
         "TRUST_BAR": {
           "TITLE_CARD": "Trust Bar",
@@ -1753,38 +2428,110 @@
           "REMOVE": "Remove"
         },
         "TRUST_ITEM": {
-          "TITLE": { "LABEL": "Title", "HELP": "The short headline for this trust item." },
-          "DESCRIPTION": { "LABEL": "Description", "HELP": "A brief explanation shown under the title." },
-          "ICON_URL": { "LABEL": "Icon URL", "HELP": "The icon shown next to this trust item." },
-          "SORT_ORDER": { "LABEL": "Sort Order", "HELP": "Controls the order items appear in, lowest first." },
-          "VISIBLE": { "LABEL": "Visible", "HELP": "Shows or hides this individual item immediately." }
+          "TITLE": {
+            "LABEL": "Title",
+            "HELP": "The short headline for this trust item."
+          },
+          "DESCRIPTION": {
+            "LABEL": "Description",
+            "HELP": "A brief explanation shown under the title."
+          },
+          "ICON_URL": {
+            "LABEL": "Icon URL",
+            "HELP": "The icon shown next to this trust item."
+          },
+          "SORT_ORDER": {
+            "LABEL": "Sort Order",
+            "HELP": "Controls the order items appear in, lowest first."
+          },
+          "VISIBLE": {
+            "LABEL": "Visible",
+            "HELP": "Shows or hides this individual item immediately."
+          }
         },
         "FOOTER": {
           "TITLE_CARD": "Footer",
           "DESCRIPTION_CARD": "Contact details and social links shown in the site footer.",
-          "COMPANY_NAME": { "LABEL": "Company Name", "HELP": "Your legal or trading name, shown in the footer." },
-          "COPYRIGHT": { "LABEL": "Copyright Text", "HELP": "The copyright line shown in the footer." },
-          "SUPPORT_EMAIL": { "LABEL": "Support Email", "HELP": "The support email shown in the footer." },
-          "SUPPORT_PHONE": { "LABEL": "Support Phone", "HELP": "The support phone number shown in the footer." },
-          "ADDRESS": { "LABEL": "Address", "HELP": "Your business address, if shown in the footer." },
-          "WORKING_HOURS": { "LABEL": "Working Hours", "HELP": "Support availability shown in the footer, e.g. \"24/7 digital support\"." },
-          "FACEBOOK_URL": { "LABEL": "Facebook", "HELP": "Link to your Facebook page. Leave blank to hide the icon." },
-          "INSTAGRAM_URL": { "LABEL": "Instagram", "HELP": "Link to your Instagram page. Leave blank to hide the icon." },
-          "X_URL": { "LABEL": "X (Twitter)", "HELP": "Link to your X page. Leave blank to hide the icon." },
-          "DISCORD_URL": { "LABEL": "Discord", "HELP": "Link to your Discord server. Leave blank to hide the icon." },
-          "TELEGRAM_URL": { "LABEL": "Telegram", "HELP": "Link to your Telegram channel. Leave blank to hide the icon." },
-          "YOUTUBE_URL": { "LABEL": "YouTube", "HELP": "Link to your YouTube channel. Leave blank to hide the icon." },
-          "TIKTOK_URL": { "LABEL": "TikTok", "HELP": "Link to your TikTok page. Leave blank to hide the icon." },
-          "WHATSAPP_URL": { "LABEL": "WhatsApp", "HELP": "wa.me link for WhatsApp chat. Leave blank to hide the icon." }
+          "COMPANY_NAME": {
+            "LABEL": "Company Name",
+            "HELP": "Your legal or trading name, shown in the footer."
+          },
+          "COPYRIGHT": {
+            "LABEL": "Copyright Text",
+            "HELP": "The copyright line shown in the footer."
+          },
+          "SUPPORT_EMAIL": {
+            "LABEL": "Support Email",
+            "HELP": "The support email shown in the footer."
+          },
+          "SUPPORT_PHONE": {
+            "LABEL": "Support Phone",
+            "HELP": "The support phone number shown in the footer."
+          },
+          "ADDRESS": {
+            "LABEL": "Address",
+            "HELP": "Your business address, if shown in the footer."
+          },
+          "WORKING_HOURS": {
+            "LABEL": "Working Hours",
+            "HELP": "Support availability shown in the footer, e.g. \"24/7 digital support\"."
+          },
+          "FACEBOOK_URL": {
+            "LABEL": "Facebook",
+            "HELP": "Link to your Facebook page. Leave blank to hide the icon."
+          },
+          "INSTAGRAM_URL": {
+            "LABEL": "Instagram",
+            "HELP": "Link to your Instagram page. Leave blank to hide the icon."
+          },
+          "X_URL": {
+            "LABEL": "X (Twitter)",
+            "HELP": "Link to your X page. Leave blank to hide the icon."
+          },
+          "DISCORD_URL": {
+            "LABEL": "Discord",
+            "HELP": "Link to your Discord server. Leave blank to hide the icon."
+          },
+          "TELEGRAM_URL": {
+            "LABEL": "Telegram",
+            "HELP": "Link to your Telegram channel. Leave blank to hide the icon."
+          },
+          "YOUTUBE_URL": {
+            "LABEL": "YouTube",
+            "HELP": "Link to your YouTube channel. Leave blank to hide the icon."
+          },
+          "TIKTOK_URL": {
+            "LABEL": "TikTok",
+            "HELP": "Link to your TikTok page. Leave blank to hide the icon."
+          },
+          "WHATSAPP_URL": {
+            "LABEL": "WhatsApp",
+            "HELP": "wa.me link for WhatsApp chat. Leave blank to hide the icon."
+          }
         },
         "SEO": {
           "TITLE_CARD": "SEO Defaults",
           "DESCRIPTION_CARD": "Search engine and social sharing defaults for the home page.",
-          "DEFAULT_META_TITLE": { "LABEL": "Meta Title", "HELP": "The home page title used by search engines." },
-          "DEFAULT_META_DESCRIPTION": { "LABEL": "Meta Description", "HELP": "The home page description shown in search results." },
-          "OPEN_GRAPH_IMAGE_URL": { "LABEL": "Open Graph Image", "HELP": "The image shown when the home page is shared on social media." },
-          "TWITTER_CARD": { "LABEL": "Twitter Card", "HELP": "Controls how the home page link previews on X (Twitter)." },
-          "CANONICAL_URL": { "LABEL": "Canonical URL", "HELP": "The home page's official URL, used to avoid duplicate-content issues." }
+          "DEFAULT_META_TITLE": {
+            "LABEL": "Meta Title",
+            "HELP": "The home page title used by search engines."
+          },
+          "DEFAULT_META_DESCRIPTION": {
+            "LABEL": "Meta Description",
+            "HELP": "The home page description shown in search results."
+          },
+          "OPEN_GRAPH_IMAGE_URL": {
+            "LABEL": "Open Graph Image",
+            "HELP": "The image shown when the home page is shared on social media."
+          },
+          "TWITTER_CARD": {
+            "LABEL": "Twitter Card",
+            "HELP": "Controls how the home page link previews on X (Twitter)."
+          },
+          "CANONICAL_URL": {
+            "LABEL": "Canonical URL",
+            "HELP": "The home page's official URL, used to avoid duplicate-content issues."
+          }
         }
       }
     },
@@ -2747,5 +3494,74 @@
         "IP_BLOCKED": "IP address blocked."
       }
     }
+  },
+  "ASSISTANT": {
+    "FAB_TOOLTIP": "Ask HAMBOX AI",
+    "TITLE": "HAMBOX AI Assistant",
+    "SUBTITLE": "Powered by AI",
+    "NEW_CONVERSATION": "New conversation",
+    "HISTORY": "Conversation history",
+    "COLLAPSE": "Collapse",
+    "CLOSE": "Close assistant",
+    "CONTEXT_VIEWING": "Currently viewing",
+    "DISMISS": "Dismiss",
+    "GREETING": "Hi {{name}} 👋",
+    "GREETING_SUBTITLE": "How can I help you today?",
+    "KBD_HINT": "⌘K to open · Enter to send · Shift+Enter for a new line",
+    "PLACEHOLDER": "Ask anything…",
+    "SEND": "Send message",
+    "COPY": "Copy",
+    "REGENERATE": "Regenerate",
+    "GOOD_RESPONSE": "Good response",
+    "BAD_RESPONSE": "Bad response",
+    "ERROR_TITLE": "Something went wrong generating a response",
+    "ERROR_BODY": "The assistant had trouble reaching HAMBOX servers. You can try again or let us know.",
+    "RETRY": "Retry",
+    "REPORT_ISSUE": "Report issue",
+    "QUICK_ADD": "Quick Add",
+    "VIEW_DETAILS": "View Details",
+    "OPEN_ORDER": "Open Order",
+    "VIEW_INSTRUCTIONS": "View Instructions",
+    "REVEAL_KEY": "Reveal",
+    "HIDE_KEY": "Hide",
+    "COPY_KEY": "Copy key",
+    "ACTIVATED": "Activated",
+    "NOT_ACTIVATED": "Not Activated",
+    "LICENSE_KEY_LABEL": "License key",
+    "PURCHASED_ON": "Purchased {{date}}",
+    "IN_STOCK": "In Stock",
+    "HISTORY_TITLE": "History",
+    "HISTORY_SEARCH_PLACEHOLDER": "Search conversations…",
+    "HISTORY_BACK": "Back to chat",
+    "HISTORY_EMPTY_TITLE": "No conversations found",
+    "HISTORY_EMPTY_TEXT": "Try a different search, or start something new.",
+    "PIN": "Pin",
+    "RENAME": "Rename",
+    "DELETE": "Delete",
+    "SUGGESTION_FIND": "Find a product",
+    "SUGGESTION_TRACK": "Track my order",
+    "SUGGESTION_COMPARE": "Compare memberships",
+    "SUGGESTION_ACTIVATE": "Activation help",
+    "SUGGESTION_REFUND": "Refund policy",
+    "SUGGESTION_SUPPORT": "Contact support",
+    "QUICK_EXPLAIN": "Explain this product",
+    "QUICK_COMPARE_PLANS": "Compare plans",
+    "QUICK_WHERE_ORDER": "Where is my order?",
+    "QUICK_HOW_ACTIVATE": "How do I activate this?",
+    "TOAST_COPIED": "Copied to clipboard",
+    "TOAST_KEY_COPIED": "License key copied",
+    "TOAST_NEW_CONVERSATION": "New conversation started",
+    "TOAST_PINNED": "Conversation pinned",
+    "TOAST_DELETED": "Conversation deleted",
+    "TOAST_ADDED_TO_CART": "Added to cart",
+    "TOAST_OPENING_PRODUCT": "Opening product page…",
+    "TOAST_OPENING_ORDER": "Opening your order…",
+    "TOAST_OPENING_LIBRARY": "Opening your Library…",
+    "TOAST_OPENING_MEMBERSHIP": "Opening membership plans…",
+    "TOAST_OPENING_CHECKOUT": "Resuming checkout…",
+    "TOAST_DOWNLOADING_LICENSE": "Downloading license file…",
+    "TOAST_OPENING_INSTRUCTIONS": "Opening activation guide…",
+    "TOAST_CONNECTING_SUPPORT": "Connecting you to support…",
+    "TOAST_ISSUE_REPORTED": "Issue reported — thank you"
   }
 }

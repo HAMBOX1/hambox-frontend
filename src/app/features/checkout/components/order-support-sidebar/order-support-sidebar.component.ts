@@ -1,12 +1,18 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+
+import { AssistantFacade } from '../../../assistant/services/assistant.facade';
 
 @Component({
   selector: 'app-order-support-sidebar',
   standalone: true,
-  imports: [RouterLink],
   templateUrl: './order-support-sidebar.component.html',
   styleUrl: './order-support-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderSupportSidebarComponent {}
+export class OrderSupportSidebarComponent {
+  private readonly assistant = inject(AssistantFacade);
+
+  protected openAssistant(): void {
+    this.assistant.open();
+  }
+}

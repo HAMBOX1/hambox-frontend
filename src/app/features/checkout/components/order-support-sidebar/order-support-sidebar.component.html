@@ -1,42 +1,69 @@
 <aside class="support-sidebar" aria-label="Support and security">
   <section class="support-sidebar__card">
     <h2 class="support-sidebar__title">Need Assistance?</h2>
-    <a routerLink="/support-chat" class="support-sidebar__link">
+    <button type="button" (click)="openAssistant()" class="support-sidebar__link">
       <div class="support-sidebar__link-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M10 2a6 6 0 00-6 6v2H3v6h4v-4h6v4h4v-6h-1V8a6 6 0 00-6-6z" stroke="currentColor" stroke-width="1.2" />
+          <path
+            d="M10 2a6 6 0 00-6 6v2H3v6h4v-4h6v4h4v-6h-1V8a6 6 0 00-6-6z"
+            stroke="currentColor"
+            stroke-width="1.2"
+          />
         </svg>
       </div>
       <div class="support-sidebar__link-body">
         <span class="support-sidebar__link-title">Instant Support</span>
         <span class="support-sidebar__link-sub">Priority Queue</span>
       </div>
-      <svg class="support-sidebar__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <svg
+        class="support-sidebar__chevron"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
         <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
       </svg>
-    </a>
-    <a routerLink="/support-chat" class="support-sidebar__link">
+    </button>
+    <button type="button" (click)="openAssistant()" class="support-sidebar__link">
       <div class="support-sidebar__link-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.2" />
-          <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          <path
+            d="M10 6v4M10 14h.01"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
         </svg>
       </div>
       <div class="support-sidebar__link-body">
         <span class="support-sidebar__link-title">Help Center</span>
         <span class="support-sidebar__link-sub">Browse FAQs</span>
       </div>
-      <svg class="support-sidebar__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <svg
+        class="support-sidebar__chevron"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
         <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
       </svg>
-    </a>
+    </button>
   </section>
 
   <section class="support-sidebar__card">
     <h2 class="support-sidebar__title">Security Check</h2>
     <div class="support-sidebar__security">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 2l7 3v5c0 5-3.5 8.5-7 9.5C8.5 18.5 5 15 5 10V5l7-3z" stroke="currentColor" stroke-width="1.5" />
+        <path
+          d="M12 2l7 3v5c0 5-3.5 8.5-7 9.5C8.5 18.5 5 15 5 10V5l7-3z"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
         <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
       </svg>
       <div>

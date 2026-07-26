@@ -1,0 +1,161 @@
+<div class="fab-wrap" [class.hidden]="facade.isOpen()">
+  <div class="fab-tooltip">{{ 'ASSISTANT.FAB_TOOLTIP' | translate }}</div>
+  <button
+    type="button"
+    class="fab"
+    [class.pulse]="facade.hasNewSuggestion()"
+    [attr.aria-label]="'ASSISTANT.FAB_TOOLTIP' | translate"
+    aria-haspopup="dialog"
+    (click)="onFabClick()"
+  >
+    <i class="pi pi-comments"></i>
+    <span class="fab-sparkle"><i class="pi pi-sparkles"></i></span>
+    @if (facade.hasNewSuggestion()) {
+      <span class="fab-badge">1</span>
+    }
+    <span class="fab-online" aria-hidden="true"></span>
+  </button>
+</div>
+
+<section
+  class="panel"
+  [class.show]="facade.isOpen()"
+  [class.collapsed]="facade.isCollapsed()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="assistantPanelTitle"
+  [attr.aria-hidden]="!facade.isOpen()"
+>
+  <header class="panel-header" (click)="onHeaderClick()">
+    <div class="ai-avatar"><i class="pi pi-sparkles"></i></div>
+    <div class="panel-titles">
+      <h2 id="assistantPanelTitle">
+        {{ 'ASSISTANT.TITLE' | translate }}<span class="status-dot" aria-hidden="true"></span>
+      </h2>
+      <p>{{ 'ASSISTANT.SUBTITLE' | translate }}</p>
+    </div>
+    <div class="panel-actions">
+      <button
+        type="button"
+        class="icon-btn"
+        [attr.aria-label]="'ASSISTANT.NEW_CONVERSATION' | translate"
+        (click)="onNewClick($event)"
+      >
+        <i class="pi pi-plus"></i>
+      </button>
+      <button
+        type="button"
+        class="icon-btn"
+        [attr.aria-label]="'ASSISTANT.HISTORY' | translate"
+        (click)="onHistoryClick($event)"
+      >
+        <i class="pi pi-history"></i>
+      </button>
+      <button
+        type="button"
+        class="icon-btn"
+        [attr.aria-label]="'ASSISTANT.COLLAPSE' | translate"
+        (click)="onCollapseClick($event)"
+      >
+        <i class="pi pi-minus"></i>
+      </button>
+      <button
+        type="button"
+        class="icon-btn"
+        [attr.aria-label]="'ASSISTANT.CLOSE' | translate"
+        (click)="onCloseClick($event)"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </header>
+
+  @if (facade.showContextBanner()) {
+    <div class="context-banner">
+      <i class="pi pi-map-marker"></i>
+      <div class="ctx-txt">
+        {{ 'ASSISTANT.CONTEXT_VIEWING' | translate }}
+        <strong>{{ facade.contextProductName() }}</strong>
+      </div>
+      <button
+        type="button"
+        [attr.aria-label]="'ASSISTANT.DISMISS' | translate"
+        (click)="facade.dismissContext()"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  }
+
+  <div class="panel-body" #panelBody>
+    @if (
+      facade.messages().length === 0 &&
+      !facade.streamingMessage() &&
+      !facade.isThinking() &&
+      !facade.historyLoading()
+    ) {
+      <div class="welcome">
+        <div class="welcome-orb"><i class="pi pi-sparkles"></i></div>
+        <h3>{{ 'ASSISTANT.GREETING' | translate: { name: facade.greetingName() } }}</h3>
+        <p>{{ 'ASSISTANT.GREETING_SUBTITLE' | translate }}</p>
+        <div class="chip-grid">
+          @for (s of suggestions; track s.flow) {
+            <button type="button" class="chip" (click)="onChipClick(s.flow)">
+              <i class="pi" [attr.class]="'pi pi-' + s.icon"></i>{{ s.label | translate }}
+            </button>
+          }
+        </div>
+        <div class="kbd-hint">{{ 'ASSISTANT.KBD_HINT' | translate }}</div>
+      </div>
+    } @else if (facade.historyLoading()) {
+      <div class="skel-row">
+        <div class="skel-avatar"></div>
+        <div class="skel-lines">
+          <div class="skel-bubble" style="width: 70%"></div>
+          <div class="skel-bubble" style="width: 40%"></div>
+        </div>
+      </div>
+    } @else {
+      @for (m of facade.messages(); track m.id) {
+        <app-assistant-message
+          [message]="m"
+          [userInitial]="facade.userInitial()"
+          (cardAction)="onComposerAction($event)"
+          (regenerate)="onRegenerate($event)"
+          (retryMessage)="onRetry($event)"
+          (reportIssue)="onReportIssue()"
+          (like)="onLike($event)"
+          (dislike)="onDislike($event)"
+          (copied)="onCopied($event)"
+        />
+      }
+      @if (facade.isThinking()) {
+        <div class="msg-row">
+          <div class="msg-avatar--ai"><i class="pi pi-sparkles"></i></div>
+          <div class="thinking" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+      }
+      @if (facade.streamingMessage(); as streamingMessage) {
+        <app-assistant-message
+          [message]="streamingMessage"
+          [userInitial]="facade.userInitial()"
+          [toolsEnabled]="false"
+        />
+      }
+    }
+  </div>
+
+  @if (!facade.historyLoading()) {
+    <app-assistant-composer #composer />
+  }
+
+  <app-assistant-history />
+
+  @if (toastText(); as text) {
+    <div class="toast-host">
+      <div class="toast">
+        <i class="pi pi-check-circle"></i><span>{{ text }}</span>
+      </div>
+    </div>
+  }
+</section>

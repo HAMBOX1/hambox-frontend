@@ -28,11 +28,17 @@
 .support-sidebar__link {
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 14px;
   padding: 14px 0;
+  border: none;
   border-bottom: 1px solid var(--color-divider);
+  background: none;
   color: inherit;
+  font: inherit;
+  text-align: inherit;
   text-decoration: none;
+  cursor: pointer;
   transition: var(--hambox-transition-theme);
 
   &:last-of-type {

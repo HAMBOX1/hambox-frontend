@@ -1,0 +1,226 @@
+<div class="msg-row" [class.msg-row--user]="message().role === 'user'">
+  @if (message().role === 'ai') {
+    <div class="msg-avatar msg-avatar--ai"><i class="pi pi-sparkles"></i></div>
+  } @else {
+    <div class="msg-avatar msg-avatar--user">{{ userInitial() }}</div>
+  }
+
+  <div class="msg-col">
+    <div class="bubble" [class.bubble--user]="message().role === 'user'">
+      <div class="bubble-html" [innerHTML]="renderedHtml()"></div>
+
+      @if (message().streaming) {
+        <span class="cursor-blink" aria-hidden="true"></span>
+      }
+
+      @for (card of message().cards ?? []; track $index) {
+        @if (card.type === 'product') {
+          <div class="card pcard">
+            <div class="pcard-media">
+              @if (card.data.discountPercent) {
+                <span class="pcard-off">-{{ card.data.discountPercent }}%</span>
+              }
+              <i class="pi pi-credit-card"></i>
+            </div>
+            <div class="card-body">
+              <div class="pcard-name">{{ card.data.name }}</div>
+              <div class="pcard-row">
+                <span class="pcard-stars">
+                  <span class="pcard-stars-glyph" aria-hidden="true">★★★★★</span>
+                  <span class="pcard-rating-text"
+                    >{{ card.data.rating }} ({{ card.data.reviews }})</span
+                  >
+                </span>
+                <span class="stock-pill">{{ 'ASSISTANT.IN_STOCK' | translate }}</span>
+              </div>
+              <div class="pcard-price">
+                <span class="pcard-price-now">${{ card.data.price }}</span>
+                @if (card.data.oldPrice) {
+                  <span class="pcard-price-old">${{ card.data.oldPrice }}</span>
+                }
+              </div>
+              <div class="pcard-btns">
+                <button
+                  type="button"
+                  class="action-btn action-btn--primary"
+                  (click)="onCardAction('quick-add')"
+                >
+                  <i class="pi pi-shopping-cart"></i>{{ 'ASSISTANT.QUICK_ADD' | translate }}
+                </button>
+                <button type="button" class="action-btn" (click)="onCardAction('view-details')">
+                  <i class="pi pi-external-link"></i>{{ 'ASSISTANT.VIEW_DETAILS' | translate }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (card.type === 'order') {
+          <div class="card kv-card">
+            <div class="card-body">
+              <div class="kv-top">
+                <div>
+                  <div class="kv-title">{{ card.data.number }}</div>
+                  <div class="kv-sub">
+                    {{ 'ASSISTANT.PURCHASED_ON' | translate: { date: card.data.date } }}
+                  </div>
+                </div>
+                <span class="status-pill status-pill--ok"
+                  ><i class="pi pi-check-circle"></i>{{ card.data.status }}</span
+                >
+              </div>
+              <div class="track-steps">
+                @for (step of card.data.steps; track step.label) {
+                  <div class="track-step" [class.track-step--done]="step.done">
+                    <span class="track-step-dot"></span>
+                    <span class="track-step-label">{{ step.label }}</span>
+                  </div>
+                }
+              </div>
+              <button
+                type="button"
+                class="action-btn action-btn--primary action-btn--block"
+                (click)="onCardAction('open-order')"
+              >
+                <i class="pi pi-external-link"></i>{{ 'ASSISTANT.OPEN_ORDER' | translate }}
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (card.type === 'license') {
+          <div class="card kv-card">
+            <div class="card-body">
+              <div class="kv-top">
+                <div>
+                  <div class="kv-title">{{ card.data.product }}</div>
+                  <div class="kv-sub">{{ 'ASSISTANT.LICENSE_KEY_LABEL' | translate }}</div>
+                </div>
+                @if (card.data.activated) {
+                  <span class="status-pill status-pill--ok"
+                    ><i class="pi pi-check-circle"></i>{{ 'ASSISTANT.ACTIVATED' | translate }}</span
+                  >
+                } @else {
+                  <span class="status-pill status-pill--warn"
+                    ><i class="pi pi-exclamation-triangle"></i
+                    >{{ 'ASSISTANT.NOT_ACTIVATED' | translate }}</span
+                  >
+                }
+              </div>
+              <div class="kv-row">
+                <span class="kv-row-key" [class.kv-row-key--revealed]="keyRevealed()">{{
+                  card.data.key
+                }}</span>
+                <button
+                  type="button"
+                  class="kv-row-btn"
+                  [attr.aria-label]="
+                    (keyRevealed() ? 'ASSISTANT.HIDE_KEY' : 'ASSISTANT.REVEAL_KEY') | translate
+                  "
+                  (click)="toggleKeyReveal()"
+                >
+                  <i
+                    class="pi"
+                    [class.pi-eye]="!keyRevealed()"
+                    [class.pi-eye-slash]="keyRevealed()"
+                  ></i>
+                </button>
+                <button
+                  type="button"
+                  class="kv-row-btn"
+                  [attr.aria-label]="'ASSISTANT.COPY_KEY' | translate"
+                  (click)="copyText(card.data.key, 'ASSISTANT.TOAST_KEY_COPIED')"
+                >
+                  <i class="pi pi-copy"></i>
+                </button>
+              </div>
+              <button
+                type="button"
+                class="kv-card-link"
+                (click)="onCardAction('view-instructions')"
+              >
+                <i class="pi pi-book"></i>{{ 'ASSISTANT.VIEW_INSTRUCTIONS' | translate }}
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      @if (message().actions && message().actions!.length > 0 && !message().streaming) {
+        <div class="action-row">
+          @for (action of message().actions!; track action.label) {
+            <button
+              type="button"
+              class="action-btn"
+              [class.action-btn--primary]="action.primary"
+              (click)="onActionLabel(action.label)"
+            >
+              <i class="pi" [attr.class]="'pi pi-' + action.icon"></i>{{ action.label }}
+            </button>
+          }
+        </div>
+      }
+
+      @if (message().error) {
+        <div class="error-box">
+          <div class="error-box-title">
+            <i class="pi pi-exclamation-triangle"></i>{{ 'ASSISTANT.ERROR_TITLE' | translate }}
+          </div>
+          <p>{{ 'ASSISTANT.ERROR_BODY' | translate }}</p>
+          <div class="error-box-row">
+            <button type="button" class="action-btn action-btn--primary" (click)="onRetry()">
+              <i class="pi pi-refresh"></i>{{ 'ASSISTANT.RETRY' | translate }}
+            </button>
+            <button type="button" class="action-btn" (click)="onReportIssue()">
+              <i class="pi pi-comment"></i>{{ 'ASSISTANT.REPORT_ISSUE' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="msg-meta">
+      <span class="msg-time">{{ message().time }}</span>
+      @if (toolsEnabled() && !message().streaming) {
+        <div class="msg-tools">
+          <button
+            type="button"
+            class="tool-btn"
+            [attr.aria-label]="'ASSISTANT.COPY' | translate"
+            (click)="copyText(message().content, 'ASSISTANT.TOAST_COPIED')"
+          >
+            <i class="pi pi-copy"></i>
+          </button>
+          @if (message().role === 'ai') {
+            <button
+              type="button"
+              class="tool-btn"
+              [attr.aria-label]="'ASSISTANT.REGENERATE' | translate"
+              (click)="onRegenerate()"
+            >
+              <i class="pi pi-refresh"></i>
+            </button>
+            <button
+              type="button"
+              class="tool-btn"
+              [class.tool-btn--active]="message().liked"
+              [attr.aria-label]="'ASSISTANT.GOOD_RESPONSE' | translate"
+              (click)="onLike()"
+            >
+              <i class="pi pi-thumbs-up"></i>
+            </button>
+            <button
+              type="button"
+              class="tool-btn tool-btn--flip"
+              [class.tool-btn--danger]="message().disliked"
+              [attr.aria-label]="'ASSISTANT.BAD_RESPONSE' | translate"
+              (click)="onDislike()"
+            >
+              <i class="pi pi-thumbs-down"></i>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
