@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 
 import { FlashDealsSectionConfig } from '../../../../home/section-registry/models/section-config.model';
 import { FLASH_DEALS_SORT_OPTIONS, SettingsFieldConfig } from '../../../settings/models/platform-settings.model';
@@ -36,6 +36,8 @@ export class FlashDealsSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<FlashDealsSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'sectionTitle', control: 'text', validators: { required: true }, ...KEY('SECTION_TITLE') },
     { key: 'sectionSubtitle', control: 'textarea', rows: 2, ...KEY('SECTION_SUBTITLE') },
@@ -47,11 +49,13 @@ export class FlashDealsSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
     const next = value === '' && key === 'countdownDateUtc' ? null : value;
-    this.configChange.emit({ ...this.config(), [key]: next });
+    const updated = { ...this.localConfig(), [key]: next };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

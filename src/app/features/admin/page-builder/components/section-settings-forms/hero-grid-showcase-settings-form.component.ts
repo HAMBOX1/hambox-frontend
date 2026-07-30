@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { HeroGridShowcaseConfig } from '../../../../home/section-registry/models/section-config.model';
@@ -26,8 +26,8 @@ const KEY = (path: string) => sectionFieldKeys('GRID_SHOWCASE', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.GRID_SHOWCASE.PRIMARY_BUTTON.LABEL' | translate"
-        [label]="config().primaryButtonText"
-        [url]="config().primaryButtonUrl"
+        [label]="localConfig().primaryButtonText"
+        [url]="localConfig().primaryButtonUrl"
         [disabled]="disabled()"
         (labelChange)="setField('primaryButtonText', $event)"
         (urlChange)="setField('primaryButtonUrl', $event)"
@@ -35,8 +35,8 @@ const KEY = (path: string) => sectionFieldKeys('GRID_SHOWCASE', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.GRID_SHOWCASE.SECONDARY_BUTTON.LABEL' | translate"
-        [label]="config().secondaryButtonText"
-        [url]="config().secondaryButtonUrl"
+        [label]="localConfig().secondaryButtonText"
+        [url]="localConfig().secondaryButtonUrl"
         [disabled]="disabled()"
         (labelChange)="setField('secondaryButtonText', $event)"
         (urlChange)="setField('secondaryButtonUrl', $event)"
@@ -56,6 +56,12 @@ export class HeroGridShowcaseSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<HeroGridShowcaseConfig>();
 
+  /** Local accumulating copy of `config`, seeded once per mount — every `setField` merges onto
+   * this instead of the frozen `config()` input, so successive edits within the same section don't
+   * clobber each other (the previous "spread from `config()` on every keystroke" pattern only ever
+   * kept the last-edited field, since `config()` itself is never re-fed after mount). */
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'badgeText', control: 'text', ...KEY('BADGE_TEXT') },
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
@@ -67,12 +73,14 @@ export class HeroGridShowcaseSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
     const next = value === '' && this.isNullable(key) ? null : value;
-    this.configChange.emit({ ...this.config(), [key]: next });
+    const updated = { ...this.localConfig(), [key]: next };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   private isNullable(key: string): boolean {

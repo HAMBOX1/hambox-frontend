@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
@@ -34,11 +34,14 @@ export class TrustBarSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<TrustBarSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected updateItem(index: number, patch: Partial<TrustItemConfig>): void {
     if (this.disabled()) {
       return;
     }
-    const items = this.config().items.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    const items = this.localConfig().items.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 
@@ -47,9 +50,10 @@ export class TrustBarSettingsFormComponent {
       return;
     }
     const items: TrustItemConfig[] = [
-      ...this.config().items,
-      { id: crypto.randomUUID(), iconUrl: '', title: '', description: '', sortOrder: this.config().items.length },
+      ...this.localConfig().items,
+      { id: crypto.randomUUID(), iconUrl: '', title: '', description: '', sortOrder: this.localConfig().items.length },
     ];
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 
@@ -57,9 +61,10 @@ export class TrustBarSettingsFormComponent {
     if (this.disabled()) {
       return;
     }
-    const items = this.config()
+    const items = this.localConfig()
       .items.filter((_, i) => i !== index)
       .map((item, i) => ({ ...item, sortOrder: i }));
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 
@@ -67,8 +72,10 @@ export class TrustBarSettingsFormComponent {
     if (this.disabled()) {
       return;
     }
-    const items = [...this.config().items];
+    const items = [...this.localConfig().items];
     moveItemInArray(items, event.previousIndex, event.currentIndex);
-    this.configChange.emit({ items: items.map((item, i) => ({ ...item, sortOrder: i })) });
+    const reordered = { items: items.map((item, i) => ({ ...item, sortOrder: i })) };
+    this.localConfig.set(reordered);
+    this.configChange.emit(reordered);
   }
 }

@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
@@ -35,11 +35,14 @@ export class PlatformSelectorSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<PlatformSelectorSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected updateItem(index: number, patch: Partial<PlatformSelectorItemConfig>): void {
     if (this.disabled()) {
       return;
     }
-    const items = this.config().items.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    const items = this.localConfig().items.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 
@@ -48,9 +51,10 @@ export class PlatformSelectorSettingsFormComponent {
       return;
     }
     const items: PlatformSelectorItemConfig[] = [
-      ...this.config().items,
+      ...this.localConfig().items,
       { id: crypto.randomUUID(), label: '', iconClass: 'pi pi-desktop', linkUrl: '' },
     ];
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 
@@ -58,7 +62,8 @@ export class PlatformSelectorSettingsFormComponent {
     if (this.disabled()) {
       return;
     }
-    const items = this.config().items.filter((_, i) => i !== index);
+    const items = this.localConfig().items.filter((_, i) => i !== index);
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 
@@ -66,8 +71,9 @@ export class PlatformSelectorSettingsFormComponent {
     if (this.disabled()) {
       return;
     }
-    const items = [...this.config().items];
+    const items = [...this.localConfig().items];
     moveItemInArray(items, event.previousIndex, event.currentIndex);
+    this.localConfig.set({ items });
     this.configChange.emit({ items });
   }
 }

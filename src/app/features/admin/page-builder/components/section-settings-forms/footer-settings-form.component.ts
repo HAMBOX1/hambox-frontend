@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 
 import { FooterSectionConfig } from '../../../../home/section-registry/models/section-config.model';
 import { SettingsFieldConfig } from '../../../settings/models/platform-settings.model';
@@ -36,6 +36,8 @@ export class FooterSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<FooterSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   private static readonly NULLABLE_KEYS = new Set([
     'facebookUrl',
     'instagramUrl',
@@ -65,11 +67,13 @@ export class FooterSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
     const next = value === '' && FooterSettingsFormComponent.NULLABLE_KEYS.has(key) ? null : value;
-    this.configChange.emit({ ...this.config(), [key]: next });
+    const updated = { ...this.localConfig(), [key]: next };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

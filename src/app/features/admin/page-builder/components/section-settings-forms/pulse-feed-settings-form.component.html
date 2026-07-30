@@ -10,7 +10,7 @@
     }
   </div>
 
-  @if (!config().items.length) {
+  @if (!localConfig().items.length) {
     <p class="pulse-feed-form__empty">
       {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.EMPTY' | translate }}
     </p>
@@ -22,7 +22,7 @@
     [cdkDropListDisabled]="disabled()"
     (cdkDropListDropped)="onDrop($event)"
   >
-    @for (item of config().items; track item.id; let i = $index) {
+    @for (item of localConfig().items; track item.id; let i = $index) {
       <li class="pulse-feed-form__item" cdkDrag [cdkDragDisabled]="disabled()">
         <i class="pi pi-bars pulse-feed-form__handle" cdkDragHandle aria-hidden="true"></i>
 

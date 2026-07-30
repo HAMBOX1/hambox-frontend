@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
@@ -46,6 +46,8 @@ export class CollectionShowcaseSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<CollectionShowcaseSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly headingFields: SettingsFieldConfig[] = [
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
     { key: 'titleAccent', control: 'text', ...KEY('TITLE_ACCENT') },
@@ -53,19 +55,23 @@ export class CollectionShowcaseSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected updateCard(index: number, patch: Partial<CollectionShowcaseCardConfig>): void {
     if (this.disabled()) {
       return;
     }
-    const cards = this.config().cards.map((card, i) => (i === index ? { ...card, ...patch } : card));
-    this.configChange.emit({ ...this.config(), cards });
+    const cards = this.localConfig().cards.map((card, i) => (i === index ? { ...card, ...patch } : card));
+    const updated = { ...this.localConfig(), cards };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected addCard(): void {
@@ -73,26 +79,32 @@ export class CollectionShowcaseSettingsFormComponent {
       return;
     }
     const cards: CollectionShowcaseCardConfig[] = [
-      ...this.config().cards,
+      ...this.localConfig().cards,
       { id: crypto.randomUUID(), imageUrl: '', title: '', subtitle: '', buttonText: '', buttonUrl: '' },
     ];
-    this.configChange.emit({ ...this.config(), cards });
+    const updated = { ...this.localConfig(), cards };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected removeCard(index: number): void {
     if (this.disabled()) {
       return;
     }
-    const cards = this.config().cards.filter((_, i) => i !== index);
-    this.configChange.emit({ ...this.config(), cards });
+    const cards = this.localConfig().cards.filter((_, i) => i !== index);
+    const updated = { ...this.localConfig(), cards };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected onDrop(event: CdkDragDrop<readonly CollectionShowcaseCardConfig[]>): void {
     if (this.disabled()) {
       return;
     }
-    const cards = [...this.config().cards];
+    const cards = [...this.localConfig().cards];
     moveItemInArray(cards, event.previousIndex, event.currentIndex);
-    this.configChange.emit({ ...this.config(), cards });
+    const updated = { ...this.localConfig(), cards };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

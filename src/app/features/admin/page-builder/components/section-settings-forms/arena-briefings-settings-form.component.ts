@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
@@ -46,6 +46,8 @@ export class ArenaBriefingsSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<ArenaBriefingsSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
     { key: 'featuredTagText', control: 'text', ...KEY('FEATURED_TAG_TEXT') },
@@ -55,19 +57,23 @@ export class ArenaBriefingsSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected updateItem(index: number, patch: Partial<ArenaBriefingSideItemConfig>): void {
     if (this.disabled()) {
       return;
     }
-    const sideItems = this.config().sideItems.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    this.configChange.emit({ ...this.config(), sideItems });
+    const sideItems = this.localConfig().sideItems.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    const updated = { ...this.localConfig(), sideItems };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected addItem(): void {
@@ -75,26 +81,32 @@ export class ArenaBriefingsSettingsFormComponent {
       return;
     }
     const sideItems: ArenaBriefingSideItemConfig[] = [
-      ...this.config().sideItems,
+      ...this.localConfig().sideItems,
       { id: crypto.randomUUID(), tagText: '', title: '', imageUrl: '', linkUrl: '' },
     ];
-    this.configChange.emit({ ...this.config(), sideItems });
+    const updated = { ...this.localConfig(), sideItems };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected removeItem(index: number): void {
     if (this.disabled()) {
       return;
     }
-    const sideItems = this.config().sideItems.filter((_, i) => i !== index);
-    this.configChange.emit({ ...this.config(), sideItems });
+    const sideItems = this.localConfig().sideItems.filter((_, i) => i !== index);
+    const updated = { ...this.localConfig(), sideItems };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected onDrop(event: CdkDragDrop<readonly ArenaBriefingSideItemConfig[]>): void {
     if (this.disabled()) {
       return;
     }
-    const sideItems = [...this.config().sideItems];
+    const sideItems = [...this.localConfig().sideItems];
     moveItemInArray(sideItems, event.previousIndex, event.currentIndex);
-    this.configChange.emit({ ...this.config(), sideItems });
+    const updated = { ...this.localConfig(), sideItems };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

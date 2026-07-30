@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
@@ -50,6 +50,8 @@ export class PulseFeedSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<PulseFeedSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly tagToneOptions = TAG_TONE_OPTIONS;
 
   protected readonly headingFields: SettingsFieldConfig[] = [
@@ -58,19 +60,23 @@ export class PulseFeedSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected updateItem(index: number, patch: Partial<PulseFeedItemConfig>): void {
     if (this.disabled()) {
       return;
     }
-    const items = this.config().items.map((item, i) => (i === index ? { ...item, ...patch } : item));
-    this.configChange.emit({ ...this.config(), items });
+    const items = this.localConfig().items.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    const updated = { ...this.localConfig(), items };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected addItem(): void {
@@ -78,7 +84,7 @@ export class PulseFeedSettingsFormComponent {
       return;
     }
     const items: PulseFeedItemConfig[] = [
-      ...this.config().items,
+      ...this.localConfig().items,
       {
         id: crypto.randomUUID(),
         tagText: '',
@@ -89,23 +95,29 @@ export class PulseFeedSettingsFormComponent {
         linkUrl: '',
       },
     ];
-    this.configChange.emit({ ...this.config(), items });
+    const updated = { ...this.localConfig(), items };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected removeItem(index: number): void {
     if (this.disabled()) {
       return;
     }
-    const items = this.config().items.filter((_, i) => i !== index);
-    this.configChange.emit({ ...this.config(), items });
+    const items = this.localConfig().items.filter((_, i) => i !== index);
+    const updated = { ...this.localConfig(), items };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 
   protected onDrop(event: CdkDragDrop<readonly PulseFeedItemConfig[]>): void {
     if (this.disabled()) {
       return;
     }
-    const items = [...this.config().items];
+    const items = [...this.localConfig().items];
     moveItemInArray(items, event.previousIndex, event.currentIndex);
-    this.configChange.emit({ ...this.config(), items });
+    const updated = { ...this.localConfig(), items };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

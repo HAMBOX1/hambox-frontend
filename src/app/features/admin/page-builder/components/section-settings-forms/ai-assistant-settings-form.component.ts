@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AiAssistantSectionConfig } from '../../../../home/section-registry/models/section-config.model';
@@ -26,8 +26,8 @@ const KEY = (path: string) => sectionFieldKeys('AI_ASSISTANT', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.AI_ASSISTANT.BUTTON.LABEL' | translate"
-        [label]="config().buttonText"
-        [url]="config().buttonUrl"
+        [label]="localConfig().buttonText"
+        [url]="localConfig().buttonUrl"
         [disabled]="disabled()"
         (labelChange)="setField('buttonText', $event)"
         (urlChange)="setField('buttonUrl', $event)"
@@ -47,6 +47,8 @@ export class AiAssistantSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<AiAssistantSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'statusText', control: 'text', ...KEY('STATUS_TEXT') },
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
@@ -55,10 +57,12 @@ export class AiAssistantSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

@@ -10,7 +10,7 @@
     }
   </div>
 
-  @if (!config().cards.length) {
+  @if (!localConfig().cards.length) {
     <p class="collection-showcase-form__empty">
       {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.EMPTY' | translate }}
     </p>
@@ -22,7 +22,7 @@
     [cdkDropListDisabled]="disabled()"
     (cdkDropListDropped)="onDrop($event)"
   >
-    @for (card of config().cards; track card.id; let i = $index) {
+    @for (card of localConfig().cards; track card.id; let i = $index) {
       <li class="collection-showcase-form__item" cdkDrag [cdkDragDisabled]="disabled()">
         <i class="pi pi-bars collection-showcase-form__handle" cdkDragHandle aria-hidden="true"></i>
 

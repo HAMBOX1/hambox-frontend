@@ -1,10 +1,10 @@
 <div class="trust-bar-form">
-  @if (!config().items.length) {
+  @if (!localConfig().items.length) {
     <p class="trust-bar-form__empty">{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.EMPTY' | translate }}</p>
   }
 
   <ul class="trust-bar-form__list" cdkDropList [cdkDropListDisabled]="disabled()" (cdkDropListDropped)="onDrop($event)">
-    @for (item of config().items; track item.id; let i = $index) {
+    @for (item of localConfig().items; track item.id; let i = $index) {
       <li class="trust-bar-form__item" cdkDrag [cdkDragDisabled]="disabled()">
         <i class="pi pi-bars trust-bar-form__handle" cdkDragHandle aria-hidden="true"></i>
 

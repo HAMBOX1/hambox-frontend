@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { HeroEditorialSpotlightConfig } from '../../../../home/section-registry/models/section-config.model';
@@ -26,8 +26,8 @@ const KEY = (path: string) => sectionFieldKeys('EDITORIAL_SPOTLIGHT', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.EDITORIAL_SPOTLIGHT.VIEW_ALL_BUTTON.LABEL' | translate"
-        [label]="config().viewAllText"
-        [url]="config().viewAllUrl"
+        [label]="localConfig().viewAllText"
+        [url]="localConfig().viewAllUrl"
         [disabled]="disabled()"
         (labelChange)="setField('viewAllText', $event)"
         (urlChange)="setField('viewAllUrl', $event)"
@@ -35,8 +35,8 @@ const KEY = (path: string) => sectionFieldKeys('EDITORIAL_SPOTLIGHT', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.EDITORIAL_SPOTLIGHT.FEATURED_BUTTON.LABEL' | translate"
-        [label]="config().featuredButtonText"
-        [url]="config().featuredButtonUrl"
+        [label]="localConfig().featuredButtonText"
+        [url]="localConfig().featuredButtonUrl"
         [disabled]="disabled()"
         (labelChange)="setField('featuredButtonText', $event)"
         (urlChange)="setField('featuredButtonUrl', $event)"
@@ -56,6 +56,8 @@ export class HeroEditorialSpotlightSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<HeroEditorialSpotlightConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'eyebrowText', control: 'text', ...KEY('EYEBROW_TEXT') },
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
@@ -70,10 +72,12 @@ export class HeroEditorialSpotlightSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

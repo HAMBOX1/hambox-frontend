@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 
 import { PopularCategoriesSectionConfig } from '../../../../home/section-registry/models/section-config.model';
 import { CATEGORY_SORT_OPTIONS, SettingsFieldConfig } from '../../../settings/models/platform-settings.model';
@@ -36,6 +36,8 @@ export class PopularCategoriesSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<PopularCategoriesSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'sectionTitle', control: 'text', validators: { required: true }, ...KEY('SECTION_TITLE') },
     { key: 'maximumCategories', control: 'stepper', min: 1, max: 24, ...KEY('MAXIMUM_CATEGORIES') },
@@ -43,10 +45,12 @@ export class PopularCategoriesSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

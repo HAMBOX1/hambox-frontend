@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { CommunityNewsletterSectionConfig } from '../../../../home/section-registry/models/section-config.model';
@@ -26,8 +26,8 @@ const KEY = (path: string) => sectionFieldKeys('COMMUNITY_NEWSLETTER', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COMMUNITY_NEWSLETTER.DISCORD_BUTTON.LABEL' | translate"
-        [label]="config().discordButtonText"
-        [url]="config().discordButtonUrl"
+        [label]="localConfig().discordButtonText"
+        [url]="localConfig().discordButtonUrl"
         [disabled]="disabled()"
         (labelChange)="setField('discordButtonText', $event)"
         (urlChange)="setField('discordButtonUrl', $event)"
@@ -47,6 +47,8 @@ export class CommunityNewsletterSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<CommunityNewsletterSectionConfig>();
 
+  protected readonly localConfig = linkedSignal(() => this.config());
+
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'discordTitle', control: 'text', validators: { required: true }, ...KEY('DISCORD_TITLE') },
     { key: 'discordDescription', control: 'textarea', rows: 2, ...KEY('DISCORD_DESCRIPTION') },
@@ -58,10 +60,12 @@ export class CommunityNewsletterSettingsFormComponent {
   ];
 
   protected fieldValue(key: string): unknown {
-    return (this.config() as unknown as Record<string, unknown>)[key];
+    return (this.localConfig() as unknown as Record<string, unknown>)[key];
   }
 
   protected setField(key: string, value: unknown): void {
-    this.configChange.emit({ ...this.config(), [key]: value });
+    const updated = { ...this.localConfig(), [key]: value };
+    this.localConfig.set(updated);
+    this.configChange.emit(updated);
   }
 }

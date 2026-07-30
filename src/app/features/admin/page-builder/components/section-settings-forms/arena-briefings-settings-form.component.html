@@ -11,15 +11,15 @@
 
     <app-button-editor
       [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.ARENA_BRIEFINGS.FEATURED_BUTTON.LABEL' | translate"
-      [label]="config().featuredButtonText"
-      [url]="config().featuredButtonUrl"
+      [label]="localConfig().featuredButtonText"
+      [url]="localConfig().featuredButtonUrl"
       [disabled]="disabled()"
       (labelChange)="setField('featuredButtonText', $event)"
       (urlChange)="setField('featuredButtonUrl', $event)"
     />
   </div>
 
-  @if (!config().sideItems.length) {
+  @if (!localConfig().sideItems.length) {
     <p class="arena-briefings-form__empty">
       {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.ARENA_BRIEFINGS.EMPTY' | translate }}
     </p>
@@ -31,7 +31,7 @@
     [cdkDropListDisabled]="disabled()"
     (cdkDropListDropped)="onDrop($event)"
   >
-    @for (item of config().sideItems; track item.id; let i = $index) {
+    @for (item of localConfig().sideItems; track item.id; let i = $index) {
       <li class="arena-briefings-form__item" cdkDrag [cdkDragDisabled]="disabled()">
         <i class="pi pi-bars arena-briefings-form__handle" cdkDragHandle aria-hidden="true"></i>
 
