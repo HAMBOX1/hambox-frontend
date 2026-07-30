@@ -49,6 +49,13 @@
   font-weight: 600;
   color: var(--color-text-secondary);
 
+  input[type='text'],
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
   &--wide {
     grid-column: 1 / -1;
   }
