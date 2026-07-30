@@ -29,7 +29,10 @@ export type SettingsFieldControl =
   | 'multiselect'
   | 'slider'
   | 'stepper'
-  | 'autocomplete';
+  | 'autocomplete'
+  | 'route'
+  | 'media'
+  | 'icon';
 
 export interface SettingsFieldOption {
   label: string;
@@ -71,6 +74,8 @@ export interface SettingsFieldConfig {
   /** When set, the control displays value/scale (e.g. bytes -> MB) but the stored value stays unscaled. */
   scale?: number;
   rows?: number;
+  /** 'media' control only: recommended dimensions/format shown under the field, e.g. "1920×800px". */
+  recommendedSize?: string;
 }
 
 export function fieldKeys(path: string): { labelKey: string; helperKey: string; tooltipKey: string } {
@@ -81,6 +86,8 @@ export function fieldKeys(path: string): { labelKey: string; helperKey: string; 
 const HEX_PATTERN = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const URL_PATTERN = /^https?:\/\/[^\s]+$/i;
+/** A "route" field accepts either an app-relative path (`/products`) or a full external URL. */
+const ROUTE_VALUE_PATTERN = /^(\/[^\s]*|https?:\/\/[^\s]+)$/i;
 
 /** Runs the field's declared validators against a value. Returns an i18n error code (resolved by the caller), or null when valid. No server-side validators exist for these payloads — this is a new client-side guardrail layer, not a mirror of pre-existing backend rules. */
 export function validateFieldValue(field: SettingsFieldConfig, value: unknown): string | null {
@@ -113,6 +120,9 @@ export function validateFieldValue(field: SettingsFieldConfig, value: unknown): 
     }
     if (v.format === 'hex' && !HEX_PATTERN.test(value)) {
       return 'INVALID_HEX';
+    }
+    if (field.control === 'route' && !ROUTE_VALUE_PATTERN.test(value)) {
+      return 'INVALID_ROUTE';
     }
   }
 

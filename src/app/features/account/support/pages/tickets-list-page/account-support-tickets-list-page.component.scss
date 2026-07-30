@@ -1,0 +1,103 @@
+.tickets-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-4);
+}
+
+.tickets-list-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-3);
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0 0 var(--hambox-spacing-1);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+}
+
+.tickets-list-page__new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  padding: var(--hambox-spacing-2) var(--hambox-spacing-4);
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tickets-list-page__search {
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-panel-bg);
+  color: var(--color-text-primary);
+  font: inherit;
+  max-inline-size: 360px;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+  }
+}
+
+.tickets-list-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-2);
+}
+
+.ticket-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-3);
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-4);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-panel-bg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    box-shadow: var(--color-shadow-xs);
+  }
+}
+
+.ticket-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-inline-size: 0;
+
+  strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.ticket-row__meta {
+  color: var(--color-text-secondary);
+  font-size: var(--hambox-font-size-xs);
+}
+
+.ticket-row__badges {
+  display: flex;
+  gap: var(--hambox-spacing-2);
+  flex-shrink: 0;
+}
+
+.tickets-list-page__empty {
+  color: var(--color-text-secondary);
+  padding: var(--hambox-spacing-6) 0;
+  text-align: center;
+}

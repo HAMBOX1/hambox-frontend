@@ -55,6 +55,20 @@
     }
   </div>
 
+  @if (themeSwatches().length) {
+    <div class="ui-color-picker__theme-row">
+      @for (swatch of themeSwatches(); track swatch.name) {
+        <button
+          type="button"
+          class="ui-color-picker__swatch ui-color-picker__swatch--theme"
+          [style.background-color]="swatch.hex"
+          [title]="swatch.name"
+          (click)="applyThemeSwatch(swatch)"
+        ></button>
+      }
+    </div>
+  }
+
   @if (recentColors().length) {
     <div class="ui-color-picker__recent">
       @for (color of recentColors(); track color) {

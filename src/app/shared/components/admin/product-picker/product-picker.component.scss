@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.product-picker {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.product-picker__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.product-picker__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  font-size: 0.8rem;
+}
+
+.product-picker__chip img {
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.product-picker__chip button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.product-picker__chip button:hover {
+  opacity: 1;
+}
+
+.product-picker__limit {
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.product-picker__results {
+  display: grid;
+  gap: 0.15rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  padding: 0.3rem;
+}
+
+.product-picker__status {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-align: center;
+}
+
+.product-picker__result {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+.product-picker__result:hover {
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+}
+
+.product-picker__result--selected {
+  background: var(--color-primary-muted, rgba(99, 102, 241, 0.12));
+}
+
+.product-picker__result img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.product-picker__result i.pi-image {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  flex: 0 0 auto;
+}
+
+.product-picker__result-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+}
+
+.product-picker__result-name {
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-picker__result-meta {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}

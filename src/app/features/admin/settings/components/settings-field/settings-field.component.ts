@@ -22,6 +22,9 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { TranslationService } from '../../../../../core/i18n/translation.service';
 import { UiColorPickerComponent } from '../../../../../shared/components/ui/ui-color-picker/ui-color-picker.component';
+import { IconPickerComponent } from '../../../../../shared/components/admin/icon-picker/icon-picker.component';
+import { MediaPickerComponent } from '../../../../../shared/components/admin/media-picker/media-picker.component';
+import { RoutePickerComponent } from '../../../../../shared/components/admin/route-picker/route-picker.component';
 import { SettingsFieldConfig, SettingsFieldOption } from '../../models/platform-settings.model';
 
 let nextFieldId = 0;
@@ -43,6 +46,9 @@ let nextFieldId = 0;
     ToggleSwitchModule,
     TooltipModule,
     UiColorPickerComponent,
+    IconPickerComponent,
+    MediaPickerComponent,
+    RoutePickerComponent,
   ],
   templateUrl: './settings-field.component.html',
   styleUrl: './settings-field.component.scss',

@@ -1,0 +1,92 @@
+<div class="collection-showcase-form">
+  <div class="collection-showcase-form__heading">
+    @for (field of headingFields; track field.key) {
+      <app-settings-field
+        [field]="field"
+        [value]="fieldValue(field.key)"
+        [disabled]="disabled()"
+        (valueChange)="setField(field.key, $event)"
+      />
+    }
+  </div>
+
+  @if (!config().cards.length) {
+    <p class="collection-showcase-form__empty">
+      {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.EMPTY' | translate }}
+    </p>
+  }
+
+  <ul
+    class="collection-showcase-form__list"
+    cdkDropList
+    [cdkDropListDisabled]="disabled()"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    @for (card of config().cards; track card.id; let i = $index) {
+      <li class="collection-showcase-form__item" cdkDrag [cdkDragDisabled]="disabled()">
+        <i class="pi pi-bars collection-showcase-form__handle" cdkDragHandle aria-hidden="true"></i>
+
+        <div class="collection-showcase-form__item-fields">
+          <label class="collection-showcase-form__field collection-showcase-form__field--wide">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.IMAGE_URL' | translate }}</span>
+            <app-media-picker
+              [value]="card.imageUrl"
+              [disabled]="disabled()"
+              recommendedSize="600×600px, JPG/WebP"
+              (valueChange)="updateCard(i, { imageUrl: $event ?? '' })"
+            />
+          </label>
+
+          <label class="collection-showcase-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.CARD_TITLE' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="card.title"
+              [disabled]="disabled()"
+              (ngModelChange)="updateCard(i, { title: $event })"
+            />
+          </label>
+
+          <label class="collection-showcase-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.CARD_SUBTITLE' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="card.subtitle"
+              [disabled]="disabled()"
+              (ngModelChange)="updateCard(i, { subtitle: $event })"
+            />
+          </label>
+
+          <div class="collection-showcase-form__field collection-showcase-form__field--wide">
+            <app-button-editor
+              [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.BUTTON.LABEL' | translate"
+              [label]="card.buttonText"
+              [url]="card.buttonUrl"
+              [disabled]="disabled()"
+              (labelChange)="updateCard(i, { buttonText: $event })"
+              (urlChange)="updateCard(i, { buttonUrl: $event ?? '' })"
+            />
+          </div>
+        </div>
+
+        <app-admin-icon-button
+          icon="pi pi-trash"
+          severity="danger"
+          [disabled]="disabled()"
+          [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.REMOVE_CARD' | translate"
+          (pressed)="removeCard(i)"
+        />
+      </li>
+    }
+  </ul>
+
+  <app-admin-icon-button
+    icon="pi pi-plus"
+    severity="secondary"
+    [disabled]="disabled()"
+    [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.COLLECTION_SHOWCASE.ADD_CARD' | translate"
+    (pressed)="addCard()"
+  />
+</div>

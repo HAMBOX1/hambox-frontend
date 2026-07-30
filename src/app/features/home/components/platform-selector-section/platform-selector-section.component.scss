@@ -1,0 +1,97 @@
+:host {
+  display: block;
+}
+
+.platform-selector {
+  width: 100%;
+  padding: var(--sf-section-gap) 0;
+  background: var(--sf-bg-base);
+}
+
+.platform-selector__inner {
+  max-width: var(--sf-container-max);
+  margin: 0 auto;
+  padding: 0 var(--sf-container-px);
+}
+
+.platform-selector__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.platform-selector__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 112px;
+  border: 1px solid var(--sf-border-subtle);
+  border-radius: var(--sf-radius-md);
+  background: var(--sf-bg-card);
+  color: var(--sf-text-secondary);
+  text-decoration: none;
+  transition: var(--hambox-transition-theme), border-color var(--hambox-transition-default),
+    color var(--hambox-transition-default), transform var(--hambox-transition-default),
+    background var(--hambox-transition-default);
+
+  .pi {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--sf-radius-pill);
+    background: var(--sf-bg-icon);
+    font-size: 20px;
+    transition: background var(--hambox-transition-default), color var(--hambox-transition-default);
+  }
+
+  span {
+    font-family: var(--sf-font-body);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--sf-accent-border);
+    background: var(--color-btn-ghost-hover);
+    color: var(--sf-text-primary);
+    transform: translateY(-2px);
+
+    .pi {
+      background: var(--sf-accent-muted);
+      color: var(--sf-accent);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 991px) {
+  .platform-selector__inner {
+    padding: 0 var(--sf-container-px-tablet);
+  }
+
+  .platform-selector__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .platform-selector__inner {
+    padding: 0 var(--sf-container-px-mobile);
+  }
+
+  .platform-selector__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

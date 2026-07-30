@@ -1,0 +1,65 @@
+<section
+  class="console-favorites"
+  [class.console-favorites--visible]="visible()"
+  aria-labelledby="console-favorites-title"
+>
+  <div class="console-favorites__inner">
+    <div class="console-favorites__header">
+      <h2 id="console-favorites-title" class="console-favorites__title">{{ config().title }}</h2>
+
+      @if (config().cards.length > 1) {
+        <div class="console-favorites__nav">
+          <button
+            type="button"
+            class="console-favorites__nav-button"
+            (click)="scrollByDirection(-1)"
+            aria-label="Scroll favorites left"
+          >
+            <i class="pi pi-chevron-left" aria-hidden="true"></i>
+          </button>
+          <button
+            type="button"
+            class="console-favorites__nav-button"
+            (click)="scrollByDirection(1)"
+            aria-label="Scroll favorites right"
+          >
+            <i class="pi pi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="console-favorites__track" #track>
+      @for (card of config().cards; track card.id; let i = $index) {
+        <article
+          class="console-favorites__card"
+          [class.console-favorites__card--featured]="card.featured"
+          [style.transition-delay.ms]="i * 70"
+        >
+          <img class="console-favorites__card-image" [src]="card.imageUrl" alt="" />
+          <div class="console-favorites__card-shade"></div>
+
+          @if (card.badgeText) {
+            <span class="console-favorites__card-badge">{{ card.badgeText }}</span>
+          }
+
+          <div class="console-favorites__card-copy">
+            <h3 class="console-favorites__card-title">{{ card.title }}</h3>
+
+            @if (card.tags.length) {
+              <div class="console-favorites__card-tags">
+                @for (tag of card.tags; track tag) {
+                  <span class="console-favorites__card-tag">{{ tag }}</span>
+                }
+              </div>
+            }
+
+            @if (card.featured && card.buttonText) {
+              <a class="console-favorites__card-button" [routerLink]="card.buttonUrl">{{ card.buttonText }}</a>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

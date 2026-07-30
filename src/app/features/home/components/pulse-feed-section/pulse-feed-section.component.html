@@ -1,0 +1,27 @@
+<section class="pulse-feed" aria-labelledby="pulse-feed-title">
+  <div class="pulse-feed__inner">
+    <h2 id="pulse-feed-title" class="pulse-feed__title">
+      <span>{{ config().title }}</span>
+      @if (config().titleAccent) {
+        <span class="pulse-feed__title-accent">{{ config().titleAccent }}</span>
+      }
+    </h2>
+
+    <div class="pulse-feed__grid">
+      @for (item of config().items; track item.id) {
+        <a class="pulse-card" [routerLink]="item.linkUrl">
+          <div class="pulse-card__meta">
+            <span class="pulse-card__tag pulse-card__tag--{{ item.tagTone }}">{{ item.tagText }}</span>
+            <span class="pulse-card__time">
+              <i class="pi pi-clock" aria-hidden="true"></i>
+              {{ item.timestampText }}
+            </span>
+          </div>
+
+          <h3 class="pulse-card__title">{{ item.title }}</h3>
+          <p class="pulse-card__description">{{ item.description }}</p>
+        </a>
+      }
+    </div>
+  </div>
+</section>

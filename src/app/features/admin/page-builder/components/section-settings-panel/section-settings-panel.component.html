@@ -1,0 +1,54 @@
+<app-admin-section-card
+  [title]="'ADMIN.PAGE_BUILDER.SETTINGS.TITLE' | translate"
+  [compact]="true"
+>
+  @if (!entry()) {
+    <app-admin-empty-state
+      icon="pi pi-sliders-h"
+      [title]="'ADMIN.PAGE_BUILDER.SETTINGS.EMPTY' | translate"
+      [compact]="true"
+    />
+  } @else {
+    <div class="section-settings-panel__meta">
+      <span class="section-settings-panel__category">{{ entry()!.category }}</span>
+      <span class="section-settings-panel__variant">{{ variant()?.displayName ?? entry()!.variantKey }}</span>
+    </div>
+
+    <label class="section-settings-panel__toggle">
+      <input
+        type="checkbox"
+        [checked]="entry()!.isVisible"
+        [disabled]="!editable()"
+        (change)="visibilityToggle.emit(entry()!.instanceId)"
+      />
+      {{ 'ADMIN.PAGE_BUILDER.SECTIONS.VISIBLE' | translate }}
+    </label>
+
+    @if (settingsFormType()) {
+      <ng-container #formHost></ng-container>
+    } @else {
+      <app-admin-error-alert
+        class="section-settings-panel__stopgap-note"
+        [message]="'ADMIN.PAGE_BUILDER.SETTINGS.STOPGAP_NOTE' | translate"
+        [showRetry]="false"
+      />
+
+      <label class="section-settings-panel__json-label" for="section-config-json">
+        {{ 'ADMIN.PAGE_BUILDER.SETTINGS.CONFIG_JSON' | translate }}
+      </label>
+      <textarea
+        id="section-config-json"
+        class="section-settings-panel__json"
+        [class.section-settings-panel__json--invalid]="jsonError()"
+        rows="10"
+        spellcheck="false"
+        [disabled]="!editable()"
+        [value]="draftJson()"
+        (input)="onJsonInput($any($event.target).value)"
+      ></textarea>
+      @if (jsonError()) {
+        <p class="section-settings-panel__json-error">{{ jsonError()! | translate }}</p>
+      }
+    }
+  }
+</app-admin-section-card>

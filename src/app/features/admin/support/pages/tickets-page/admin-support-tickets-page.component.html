@@ -1,0 +1,413 @@
+<section class="admin-page admin-support-workspace">
+  @if (isMobile()) {
+    <!-- ============ MOBILE: navigation-based, one screen at a time ============ -->
+    @if (!selectedTicketId()) {
+      <!-- Screen 1: ticket list -->
+      <header class="mobile-topbar">
+        <h1 class="mobile-topbar__title">{{ 'ADMIN.SUPPORT.LIST.TITLE' | translate }}</h1>
+        <button type="button" class="mobile-topbar__filter-btn" (click)="mobileFiltersOpen.set(true)" [attr.aria-label]="'ADMIN.SUPPORT.LIST.FILTERS' | translate">
+          <i class="pi pi-sliders-h" aria-hidden="true"></i>
+          @if (activeFilterCount() > 0) {
+            <span class="mobile-topbar__filter-count">{{ activeFilterCount() }}</span>
+          }
+        </button>
+      </header>
+
+      <div class="mobile-search">
+        <app-admin-search-bar [value]="searchTerm()" [placeholder]="'ADMIN.SUPPORT.LIST.SEARCH' | translate" (searchChange)="onSearchChange($event)" />
+      </div>
+
+      <div class="mobile-list">
+        @if (listLoading()) {
+          <app-admin-empty-state icon="pi pi-spin pi-spinner" [title]="'COMMON.LOADING' | translate" [compact]="true" />
+        } @else if (tickets().length === 0) {
+          <app-admin-empty-state icon="pi pi-inbox" [title]="'ADMIN.SUPPORT.LIST.EMPTY' | translate" [compact]="true" />
+        } @else {
+          @for (t of tickets(); track t.id) {
+            <button type="button" class="mobile-ticket-row" [class.mobile-ticket-row--unread]="t.unreadByAgent" (click)="selectTicket(t)">
+              <span class="mobile-ticket-row__avatar">{{ t.customerName.charAt(0) }}</span>
+              <span class="mobile-ticket-row__body">
+                <span class="mobile-ticket-row__top">
+                  <strong class="mobile-ticket-row__name">{{ t.customerName }}</strong>
+                  <span class="mobile-ticket-row__time">{{ (t.lastReplyAtUtc ?? t.createdAtUtc) | hamboxDate:'short' }}</span>
+                </span>
+                <span class="mobile-ticket-row__bottom">
+                  <span class="mobile-ticket-row__subject">{{ t.subject }}</span>
+                  @if (t.unreadByAgent) {
+                    <span class="mobile-ticket-row__unread-dot" aria-hidden="true"></span>
+                  }
+                </span>
+              </span>
+            </button>
+          }
+        }
+      </div>
+
+      <app-hambox-bottom-sheet [open]="mobileFiltersOpen()" [solid]="true" [title]="'ADMIN.SUPPORT.LIST.FILTERS' | translate" (closed)="mobileFiltersOpen.set(false)">
+        <div class="mobile-filters">
+          <p-select
+            [ngModel]="statusFilter()"
+            (ngModelChange)="statusFilter.set($event)"
+            [options]="statusOptions"
+            optionValue="value"
+            [placeholder]="'ADMIN.SUPPORT.LIST.ALL_STATUSES' | translate"
+            [showClear]="true"
+            styleClass="mobile-filters__field"
+          >
+            <ng-template let-item pTemplate="item">{{ item.labelKey | translate }}</ng-template>
+            <ng-template let-item pTemplate="selectedItem">{{ item.labelKey | translate }}</ng-template>
+          </p-select>
+
+          <p-select
+            [ngModel]="priorityFilter()"
+            (ngModelChange)="priorityFilter.set($event)"
+            [options]="$any(priorities())"
+            optionValue="id"
+            optionLabel="name"
+            [placeholder]="'ADMIN.SUPPORT.LIST.ALL_PRIORITIES' | translate"
+            [showClear]="true"
+            styleClass="mobile-filters__field"
+          />
+
+          <p-select
+            [ngModel]="categoryFilter()"
+            (ngModelChange)="categoryFilter.set($event)"
+            [options]="$any(categories())"
+            optionValue="id"
+            optionLabel="name"
+            [placeholder]="'ADMIN.SUPPORT.LIST.ALL_CATEGORIES' | translate"
+            [showClear]="true"
+            styleClass="mobile-filters__field"
+          />
+
+          <button type="button" class="mobile-filters__clear" [disabled]="activeFilterCount() === 0" (click)="clearFilters()">
+            {{ 'ADMIN.SUPPORT.LIST.CLEAR_FILTERS' | translate }}
+          </button>
+        </div>
+      </app-hambox-bottom-sheet>
+    } @else {
+      <!-- Screen 2: conversation -->
+      @if (ticketLoading()) {
+        <app-admin-empty-state icon="pi pi-spin pi-spinner" [title]="'COMMON.LOADING' | translate" [compact]="true" />
+      } @else if (ticket(); as t) {
+        <header class="mobile-chat-header">
+          <button type="button" class="mobile-chat-header__back" (click)="backToList()" [attr.aria-label]="'ADMIN.SUPPORT.DETAIL.BACK_TO_LIST' | translate">
+            <i class="pi pi-arrow-left" aria-hidden="true"></i>
+          </button>
+
+          <button type="button" class="mobile-chat-header__identity" (click)="mobileContextOpen.set(true)">
+            <span class="mobile-chat-header__avatar">{{ t.customerName.charAt(0) }}</span>
+            <span class="mobile-chat-header__meta">
+              <strong>{{ t.customerName }}</strong>
+              <small>{{ statusLabelKey(t.status) | translate }} · {{ t.number }}</small>
+            </span>
+          </button>
+
+          @if (connectionState() !== 'connected') {
+            <span class="mobile-chat-header__connection" [attr.data-state]="connectionState()" aria-hidden="true"></span>
+          }
+
+          <app-admin-action-menu [items]="mobileTicketActions()" [label]="'ADMIN.SUPPORT.DETAIL.MORE_ACTIONS' | translate" />
+        </header>
+
+        <div class="mobile-messages" #conversation>
+          <ng-container [ngTemplateOutlet]="messagesContent" [ngTemplateOutletContext]="{ $implicit: t }" />
+        </div>
+
+        <div class="mobile-composer" [style.bottom.px]="composerBottomOffsetPx()">
+          <div class="mobile-composer__mode">
+            <button type="button" [class.active]="!replyInternal()" (click)="replyInternal.set(false)">
+              {{ 'ADMIN.SUPPORT.DETAIL.PUBLIC_REPLY' | translate }}
+            </button>
+            <button type="button" [class.active]="replyInternal()" (click)="replyInternal.set(true)">
+              {{ 'ADMIN.SUPPORT.DETAIL.INTERNAL_NOTE' | translate }}
+            </button>
+          </div>
+          <div class="mobile-composer__row">
+            <textarea
+              #mobileComposer
+              class="mobile-composer__input"
+              rows="1"
+              [ngModel]="mobileReplyText()"
+              (ngModelChange)="mobileReplyText.set($event)"
+              (input)="onMobileComposerInput($event)"
+              [placeholder]="(replyInternal() ? 'ADMIN.SUPPORT.DETAIL.INTERNAL_PLACEHOLDER' : 'ADMIN.SUPPORT.DETAIL.REPLY_PLACEHOLDER') | translate"
+            ></textarea>
+            <button
+              type="button"
+              class="mobile-composer__send"
+              [disabled]="sending() || !mobileReplyText().trim()"
+              (click)="sendMobileReply()"
+              [attr.aria-label]="'ADMIN.SUPPORT.DETAIL.SEND' | translate"
+            >
+              <i class="pi pi-send" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Screen 3: customer details, reached by tapping the header identity -->
+        <app-hambox-bottom-sheet
+          [open]="mobileContextOpen()"
+          [solid]="true"
+          [title]="'ADMIN.SUPPORT.DETAIL.CUSTOMER' | translate"
+          (closed)="mobileContextOpen.set(false)"
+        >
+          <ng-container [ngTemplateOutlet]="contextContent" />
+        </app-hambox-bottom-sheet>
+      }
+    }
+  } @else {
+    <!-- ============ DESKTOP / TABLET: fixed multi-column workspace, no reflow ============ -->
+    <app-admin-page-header [title]="'ADMIN.SUPPORT.LIST.TITLE' | translate" [breadcrumbs]="breadcrumbs" [stackedActions]="true">
+      <div adminHeaderActions class="admin-support-workspace__toolbar">
+        <app-admin-search-bar [value]="searchTerm()" [placeholder]="'ADMIN.SUPPORT.LIST.SEARCH' | translate" (searchChange)="onSearchChange($event)" />
+
+        <p-select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="statusFilter.set($event)"
+          [options]="statusOptions"
+          optionValue="value"
+          [placeholder]="'ADMIN.SUPPORT.LIST.ALL_STATUSES' | translate"
+          [showClear]="true"
+        >
+          <ng-template let-item pTemplate="item">{{ item.labelKey | translate }}</ng-template>
+          <ng-template let-item pTemplate="selectedItem">{{ item.labelKey | translate }}</ng-template>
+        </p-select>
+
+        <p-select
+          [ngModel]="priorityFilter()"
+          (ngModelChange)="priorityFilter.set($event)"
+          [options]="$any(priorities())"
+          optionValue="id"
+          optionLabel="name"
+          [placeholder]="'ADMIN.SUPPORT.LIST.ALL_PRIORITIES' | translate"
+          [showClear]="true"
+        />
+
+        <p-select
+          [ngModel]="categoryFilter()"
+          (ngModelChange)="categoryFilter.set($event)"
+          [options]="$any(categories())"
+          optionValue="id"
+          optionLabel="name"
+          [placeholder]="'ADMIN.SUPPORT.LIST.ALL_CATEGORIES' | translate"
+          [showClear]="true"
+        />
+      </div>
+    </app-admin-page-header>
+
+    <div class="admin-support-workspace__layout">
+      <aside class="admin-support-workspace__list">
+        <div class="admin-support-workspace__list-scroll">
+          @if (listLoading()) {
+            <app-admin-empty-state icon="pi pi-spin pi-spinner" [title]="'COMMON.LOADING' | translate" [compact]="true" />
+          } @else if (tickets().length === 0) {
+            <app-admin-empty-state icon="pi pi-inbox" [title]="'ADMIN.SUPPORT.LIST.EMPTY' | translate" [compact]="true" />
+          } @else {
+            @for (t of tickets(); track t.id) {
+              <button
+                type="button"
+                class="ticket-row"
+                [class.ticket-row--active]="isSelected(t.id)"
+                [class.ticket-row--unread]="t.unreadByAgent"
+                (click)="selectTicket(t)"
+              >
+                <div class="ticket-row__top">
+                  <span class="ticket-row__number">{{ t.number }}</span>
+                  <app-admin-status-badge [label]="statusLabelKey(t.status) | translate" [tone]="statusTone(t.status)" />
+                </div>
+                <div class="ticket-row__subject">{{ t.subject }}</div>
+                <div class="ticket-row__meta">
+                  <span class="ticket-row__customer">{{ t.customerName }}</span>
+                  <span class="ticket-row__time">{{ (t.lastReplyAtUtc ?? t.createdAtUtc) | hamboxDate:'short' }}</span>
+                </div>
+                @if (t.unreadByAgent) {
+                  <i class="pi pi-circle-fill ticket-row__unread-dot" aria-hidden="true"></i>
+                }
+              </button>
+            }
+          }
+        </div>
+      </aside>
+
+      <div class="admin-support-workspace__conversation">
+        @if (selectedTicketId() && ticketLoading()) {
+          <app-admin-empty-state icon="pi pi-spin pi-spinner" [title]="'COMMON.LOADING' | translate" [compact]="true" />
+        } @else if (ticket(); as t) {
+          <header class="admin-support-workspace__conversation-header">
+            <div class="admin-support-workspace__conversation-title">
+              <h2>{{ t.subject }}</h2>
+              <span>{{ t.number }}</span>
+            </div>
+
+            <div class="admin-support-workspace__conversation-controls">
+              @if (connectionState() !== 'connected') {
+                <span class="admin-support-detail__connection-state" [attr.data-state]="connectionState()">
+                  {{ 'ADMIN.SUPPORT.DETAIL.CONNECTION.' + connectionState().toUpperCase() | translate }}
+                </span>
+              }
+              <p-select [ngModel]="t.status" (ngModelChange)="onStatusChange($event)" [options]="statusOptions" optionValue="value">
+                <ng-template let-item pTemplate="item">{{ item.labelKey | translate }}</ng-template>
+                <ng-template let-item pTemplate="selectedItem">{{ item.labelKey | translate }}</ng-template>
+              </p-select>
+              <p-select
+                [ngModel]="t.priority?.id ?? null"
+                (ngModelChange)="onPriorityChange($event)"
+                [options]="$any(priorities())"
+                optionLabel="name"
+                optionValue="id"
+                [placeholder]="'ADMIN.SUPPORT.DETAIL.PRIORITY' | translate"
+              />
+              @if (!t.assignedAgentId) {
+                <button type="button" pButton [label]="'ADMIN.SUPPORT.DETAIL.ASSIGN_TO_ME' | translate" icon="pi pi-user" severity="secondary" (click)="assignToMe()"></button>
+              }
+              @if (t.status !== 'closed') {
+                <button type="button" pButton [label]="'SUPPORT.DETAIL.CLOSE' | translate" icon="pi pi-check-circle" severity="secondary" (click)="closeTicket()"></button>
+              }
+              @if (t.status === 'resolved') {
+                <button type="button" pButton [label]="'SUPPORT.DETAIL.REOPEN' | translate" icon="pi pi-replay" severity="secondary" (click)="reopenTicket()"></button>
+              }
+            </div>
+          </header>
+
+          <div class="admin-support-workspace__messages" #conversation>
+            <ng-container [ngTemplateOutlet]="messagesContent" [ngTemplateOutletContext]="{ $implicit: t }" />
+          </div>
+
+          <div class="admin-support-workspace__composer">
+            <div class="admin-support-detail__reply-toggle">
+              <button type="button" [class.active]="!replyInternal()" (click)="replyInternal.set(false)">
+                <i class="pi pi-send" aria-hidden="true"></i> {{ 'ADMIN.SUPPORT.DETAIL.PUBLIC_REPLY' | translate }}
+              </button>
+              <button type="button" [class.active]="replyInternal()" (click)="replyInternal.set(true)">
+                <i class="pi pi-lock" aria-hidden="true"></i> {{ 'ADMIN.SUPPORT.DETAIL.INTERNAL_NOTE' | translate }}
+              </button>
+            </div>
+            <p-editor
+              [ngModel]="replyHtml()"
+              (ngModelChange)="replyHtml.set($event); onComposerInput()"
+              [style]="{ height: '120px' }"
+              [placeholder]="(replyInternal() ? 'ADMIN.SUPPORT.DETAIL.INTERNAL_PLACEHOLDER' : 'ADMIN.SUPPORT.DETAIL.REPLY_PLACEHOLDER') | translate"
+            />
+            <div class="admin-support-detail__composer-actions">
+              <button type="button" pButton [disabled]="sending()" [label]="'ADMIN.SUPPORT.DETAIL.SEND' | translate" icon="pi pi-send" (click)="sendReply()"></button>
+            </div>
+          </div>
+        } @else {
+          <app-admin-empty-state icon="pi pi-comments" [title]="'ADMIN.SUPPORT.DETAIL.SELECT_TICKET' | translate" />
+        }
+      </div>
+
+      @if (ticket()) {
+        <aside class="admin-support-workspace__context">
+          <ng-container [ngTemplateOutlet]="contextContent" />
+        </aside>
+      }
+    </div>
+  }
+</section>
+
+<ng-template #messagesContent let-t>
+  @for (message of t.messages; track message.id) {
+    <div class="detail-bubble-row" [class.detail-bubble-row--customer]="message.authorRole === 'customer'">
+      <div class="detail-bubble" [attr.data-role]="message.authorRole" [class.detail-bubble--internal]="message.internal">
+        <div class="detail-bubble__author">
+          {{ message.authorName }}
+          @if (message.internal) {
+            <span class="detail-bubble__internal-tag">{{ 'ADMIN.SUPPORT.DETAIL.INTERNAL_NOTE' | translate }}</span>
+          }
+        </div>
+        <div class="detail-bubble__body" [innerHTML]="message.bodyHtml"></div>
+        @if (message.attachments.length) {
+          <div class="detail-bubble__attachments">
+            @for (attachment of message.attachments; track attachment.id) {
+              <span><i class="pi pi-paperclip" aria-hidden="true"></i>{{ attachment.name }}</span>
+            }
+          </div>
+        }
+        <span class="detail-bubble__time">{{ message.createdAtUtc | hamboxDate:'short' }}</span>
+      </div>
+    </div>
+  }
+  @if (customerTyping()) {
+    <div class="detail-bubble-row detail-bubble-row--customer">
+      <div class="detail-bubble detail-bubble--typing" data-role="customer">
+        <span class="admin-support-detail__typing-dot"></span>
+        <span class="admin-support-detail__typing-dot"></span>
+        <span class="admin-support-detail__typing-dot"></span>
+      </div>
+    </div>
+  }
+</ng-template>
+
+<ng-template #contextContent>
+  @if (ticket(); as t) {
+    <app-admin-section-card [title]="'ADMIN.SUPPORT.DETAIL.CUSTOMER' | translate">
+      <div class="customer-panel">
+        <div class="customer-panel__identity">
+          <div class="customer-panel__avatar">{{ t.customerName.charAt(0) }}</div>
+          <div>
+            <strong>{{ t.customerName }}</strong>
+            <p>{{ t.customerEmail }}</p>
+          </div>
+        </div>
+        <dl class="admin-meta-grid">
+          <dt>{{ 'ADMIN.SUPPORT.DETAIL.MEMBERSHIP' | translate }}</dt>
+          <dd>{{ t.context?.membershipPlanName ?? t.membershipTier ?? '—' }}</dd>
+          <dt>{{ 'ADMIN.SUPPORT.DETAIL.RELATED_ORDER' | translate }}</dt>
+          <dd>{{ t.relatedOrderNumber ?? '—' }}</dd>
+          <dt>{{ 'ADMIN.SUPPORT.DETAIL.RELATED_PRODUCT' | translate }}</dt>
+          <dd>{{ t.relatedProductName ?? '—' }}</dd>
+          @if (t.context?.customerCountry) {
+            <dt>{{ 'ADMIN.SUPPORT.DETAIL.COUNTRY' | translate }}</dt>
+            <dd>{{ t.context!.customerCountry }}</dd>
+          }
+          @if (t.context?.customerDevice) {
+            <dt>{{ 'ADMIN.SUPPORT.DETAIL.DEVICE' | translate }}</dt>
+            <dd>{{ t.context!.customerDevice }}</dd>
+          }
+          @if (t.context) {
+            <dt>{{ 'ADMIN.SUPPORT.DETAIL.RECENT_TICKETS_COUNT' | translate }}</dt>
+            <dd>{{ t.context.recentTicketsCount }}</dd>
+          }
+        </dl>
+        @if (t.tags.length) {
+          <div class="customer-panel__tags">
+            @for (tag of t.tags; track tag.id) {
+              <span class="customer-panel__tag" [style.color]="tag.color">{{ tag.name }}</span>
+            }
+          </div>
+        }
+      </div>
+    </app-admin-section-card>
+
+    @if (t.context?.recentOrders?.length) {
+      <app-admin-section-card [title]="'ADMIN.SUPPORT.DETAIL.RECENT_ORDERS' | translate">
+        <ul class="admin-support-detail__related-list">
+          @for (order of t.context!.recentOrders; track order.orderId) {
+            <li>
+              <span>{{ order.orderNumber }} — {{ order.status }}</span>
+              <span>{{ order.productNames.join(', ') }}</span>
+              @if (order.hasLicenseKeys) {
+                <span class="admin-support-workspace__license-badge">
+                  <i class="pi pi-key" aria-hidden="true"></i> {{ 'ADMIN.SUPPORT.DETAIL.LICENSE_KEYS' | translate }}
+                </span>
+              }
+            </li>
+          }
+        </ul>
+      </app-admin-section-card>
+    }
+
+    <app-admin-section-card [title]="'ADMIN.SUPPORT.DETAIL.TIMELINE' | translate">
+      <ol class="admin-support-detail__timeline">
+        @for (entry of t.timeline; track entry.id) {
+          <li>
+            <span>{{ entry.labelKey | translate }}@if (entry.detail) {: {{ entry.detail }}}</span>
+            <time>{{ entry.atUtc | hamboxDate:'short' }}</time>
+          </li>
+        }
+      </ol>
+    </app-admin-section-card>
+  }
+</ng-template>

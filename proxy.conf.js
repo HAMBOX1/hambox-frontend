@@ -21,4 +21,10 @@ module.exports = {
     secure: false,
     changeOrigin: true,
   },
+  '/hubs': {
+    target: proxyTarget,
+    secure: false,
+    changeOrigin: true,
+    ws: true,
+  },
 };

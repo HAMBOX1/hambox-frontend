@@ -1,0 +1,62 @@
+<section class="hero-editorial" aria-labelledby="hambox-hero-editorial-title">
+  <div class="hero-editorial__container">
+    <header class="hero-editorial__header">
+      <div class="hero-editorial__heading">
+        @if (hero().eyebrowText) {
+          <p class="hero-editorial__eyebrow">{{ hero().eyebrowText }}</p>
+        }
+        <h1 id="hambox-hero-editorial-title" class="hero-editorial__title">{{ hero().title }}</h1>
+      </div>
+
+      @if (hero().viewAllText) {
+        <a class="hero-editorial__view-all" [routerLink]="hero().viewAllUrl">
+          <span>{{ hero().viewAllText }}</span>
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+      }
+    </header>
+
+    <div class="hero-editorial__grid">
+      <article class="hero-editorial__card hero-editorial__card--featured">
+        <img class="hero-editorial__card-image" [src]="hero().featuredImageUrl" alt="" />
+        <div class="hero-editorial__card-shade"></div>
+
+        @if (hero().featuredBadgeText) {
+          <span class="hero-editorial__card-badge">{{ hero().featuredBadgeText }}</span>
+        }
+
+        <div class="hero-editorial__card-copy">
+          <h2 class="hero-editorial__card-title">{{ hero().featuredTitle }}</h2>
+          @if (hero().featuredSubtitle) {
+            <p class="hero-editorial__card-subtitle">{{ hero().featuredSubtitle }}</p>
+          }
+          @if (hero().featuredButtonText) {
+            <a
+              pButton
+              [routerLink]="hero().featuredButtonUrl"
+              class="hero-editorial__card-button"
+              styleClass="hero-editorial__card-button"
+            >
+              <i class="pi pi-shopping-bag" aria-hidden="true"></i>
+              <span>{{ hero().featuredButtonText }}</span>
+            </a>
+          }
+        </div>
+      </article>
+
+      <div class="hero-editorial__side">
+        <article class="hero-editorial__card hero-editorial__card--side">
+          <img class="hero-editorial__card-image" [src]="hero().secondaryImageUrl" alt="" />
+          <div class="hero-editorial__card-shade"></div>
+          <span class="hero-editorial__card-label">{{ hero().secondaryLabel }}</span>
+        </article>
+
+        <article class="hero-editorial__card hero-editorial__card--side">
+          <img class="hero-editorial__card-image" [src]="hero().tertiaryImageUrl" alt="" />
+          <div class="hero-editorial__card-shade"></div>
+          <span class="hero-editorial__card-label">{{ hero().tertiaryLabel }}</span>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>

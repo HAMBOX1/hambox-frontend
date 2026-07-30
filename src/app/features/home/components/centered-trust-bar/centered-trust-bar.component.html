@@ -1,0 +1,15 @@
+<section class="centered-trust" [attr.aria-label]="features()[0]?.title || 'Trust'">
+  <div class="centered-trust__inner">
+    <ul class="centered-trust__grid">
+      @for (feature of features(); track feature.id) {
+        <li class="centered-trust__item">
+          <div class="centered-trust__icon" aria-hidden="true">
+            <img [src]="feature.iconSrc" alt="" />
+          </div>
+          <h2 class="centered-trust__title">{{ feature.title }}</h2>
+          <p class="centered-trust__description">{{ feature.description }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

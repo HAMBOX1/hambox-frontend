@@ -31,6 +31,10 @@
     animation: none;
     transition: none;
   }
+
+  &--solid {
+    background: var(--admin-bg-elevated, var(--color-panel-bg));
+  }
 }
 
 .hambox-sheet__handle {

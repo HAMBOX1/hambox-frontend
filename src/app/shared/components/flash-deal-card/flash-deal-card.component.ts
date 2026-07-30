@@ -15,4 +15,7 @@ import { FlashDeal } from '../../../features/home/models/storefront-home';
 })
 export class FlashDealCardComponent {
   deal = input.required<FlashDeal>();
+  /** Larger media + a real "Add to Cart" button instead of the compact "Buy Now" text link — used for
+   * a single spotlighted card next to a grid of regular ones (e.g. the "Latest Arrivals" layout). */
+  featured = input(false);
 }

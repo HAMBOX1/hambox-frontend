@@ -1,0 +1,43 @@
+<section class="kb-page" hamboxTranslateRefresh>
+  <app-support-subnav />
+
+  <header class="kb-page__header">
+    <h1>{{ 'SUPPORT.KB.TITLE' | translate }}</h1>
+    <p>{{ 'SUPPORT.KB.SUBTITLE' | translate }}</p>
+  </header>
+
+  <input
+    type="search"
+    class="kb-page__search"
+    [value]="searchTerm()"
+    (input)="onSearchChange($event)"
+    [placeholder]="'SUPPORT.KB.SEARCH_PLACEHOLDER' | translate"
+    [attr.aria-label]="'SUPPORT.KB.SEARCH_PLACEHOLDER' | translate"
+  />
+
+  @if (loading()) {
+    <p class="kb-page__empty">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else if (articles().length) {
+    <div class="kb-page__list">
+      @for (article of articles(); track article.id) {
+        <article class="kb-article" [class.kb-article--expanded]="expandedId() === article.id">
+          <button type="button" class="kb-article__header" (click)="toggle(article.id)">
+            <div>
+              <span class="kb-article__category">{{ article.categoryName }}</span>
+              <h2>{{ article.title }}</h2>
+            </div>
+            <i class="pi" [class.pi-chevron-down]="expandedId() !== article.id" [class.pi-chevron-up]="expandedId() === article.id" aria-hidden="true"></i>
+          </button>
+          @if (expandedId() === article.id) {
+            <div class="kb-article__body">
+              <p [innerHTML]="expandedBody()"></p>
+              <span class="kb-article__helpful">{{ article.viewCount }} {{ 'SUPPORT.KB.VIEWS' | translate }}</span>
+            </div>
+          }
+        </article>
+      }
+    </div>
+  } @else {
+    <p class="kb-page__empty">{{ 'SUPPORT.KB.EMPTY' | translate }}</p>
+  }
+</section>

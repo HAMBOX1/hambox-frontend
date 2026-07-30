@@ -1,0 +1,54 @@
+<div class="category-picker">
+  @if (value().length) {
+    <div class="category-picker__chips">
+      @for (id of value(); track id) {
+        <span class="category-picker__chip">
+          {{ nameFor(id) }}
+          <button
+            type="button"
+            [disabled]="disabled()"
+            [attr.aria-label]="'ADMIN.PICKERS.CATEGORY_PICKER.REMOVE' | translate"
+            (click)="remove(id)"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </span>
+      }
+    </div>
+  }
+
+  <input
+    pInputText
+    [id]="fieldId"
+    class="w-full"
+    type="text"
+    [placeholder]="'ADMIN.PICKERS.CATEGORY_PICKER.SEARCH_PLACEHOLDER' | translate"
+    [ngModel]="query()"
+    [disabled]="disabled()"
+    (ngModelChange)="onQueryChange($event)"
+  />
+
+  @if (query()) {
+    <div class="category-picker__results">
+      @if (loading()) {
+        <p class="category-picker__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.LOADING' | translate }}</p>
+      } @else if (!results().length) {
+        <p class="category-picker__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.NO_RESULTS' | translate }}</p>
+      } @else {
+        @for (category of results(); track category.id) {
+          <button
+            type="button"
+            class="category-picker__result"
+            [class.category-picker__result--selected]="isSelected(category.id)"
+            (click)="toggle(category)"
+          >
+            <span>{{ category.nameEn }}</span>
+            @if (isSelected(category.id)) {
+              <i class="pi pi-check" aria-hidden="true"></i>
+            }
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

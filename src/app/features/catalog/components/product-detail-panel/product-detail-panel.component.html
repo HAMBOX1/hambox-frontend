@@ -192,6 +192,18 @@
         </a>
 
         <div class="detail-panel__action-row">
+          <a
+            *hamboxHasPermission="permissions.Support.View"
+            pButton
+            type="button"
+            label="Support Tickets"
+            icon="pi pi-ticket"
+            severity="secondary"
+            class="detail-panel__action-btn"
+            [routerLink]="['/admin/support/tickets']"
+            [queryParams]="{ search: selected.nameEn }"
+          ></a>
+
           @if (canPublish(selected.status)) {
             <button
               *hamboxHasPermission="permissions.Catalog.Products.Edit"

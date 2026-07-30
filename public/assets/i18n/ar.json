@@ -384,6 +384,7 @@
       "NAV_DASHBOARD": "لوحة التحكم",
       "NAV_LIBRARY": "المكتبة",
       "NAV_ORDERS": "الطلبات",
+      "NAV_SUPPORT": "الدعم الفني",
       "NAV_MEMBERSHIP": "العضوية",
       "NAV_WISHLIST": "الخزنة",
       "NAV_NOTIFICATIONS": "الإشعارات",
@@ -585,6 +586,142 @@
       "SUPPORT_DESC": "نحن هنا متى لعبت"
     }
   },
+  "SUPPORT": {
+    "STATUS": {
+      "OPEN": "مفتوحة",
+      "PENDING": "قيد الانتظار",
+      "WAITING_CUSTOMER": "بانتظار ردك",
+      "WAITING_AGENT": "بانتظار الوكيل",
+      "RESOLVED": "تم الحل",
+      "CLOSED": "مغلقة",
+      "ESCALATED": "تم التصعيد",
+      "AI_HANDLING": "يعالجها الذكاء الاصطناعي"
+    },
+    "PRIORITY": {
+      "LOW": "منخفضة",
+      "NORMAL": "عادية",
+      "HIGH": "مرتفعة",
+      "URGENT": "عاجلة",
+      "CRITICAL": "حرجة"
+    },
+    "CATEGORY": {
+      "BILLING": "الفواتير",
+      "TECHNICAL": "تقني",
+      "ACCOUNT": "الحساب",
+      "ORDER": "الطلب",
+      "PRODUCT": "المنتج",
+      "GENERAL": "عام"
+    },
+    "TIMELINE": {
+      "CREATED": "تم إنشاء التذكرة",
+      "ASSIGNED": "تم التعيين إلى",
+      "PRIORITY_CHANGED": "تم تغيير الأولوية إلى",
+      "RESOLVED": "تم وضع علامة محلولة",
+      "CLOSED": "تم الإغلاق",
+      "STATUS_CHANGED": "تم تغيير الحالة إلى"
+    },
+    "SUBNAV": {
+      "ARIA": "تنقل الدعم",
+      "HOME": "الرئيسية",
+      "OPEN": "التذاكر المفتوحة",
+      "CLOSED": "التذاكر المغلقة",
+      "CREATE": "إنشاء تذكرة",
+      "KNOWLEDGE_BASE": "قاعدة المعرفة",
+      "AI_ASSISTANT": "اسأل الذكاء الاصطناعي"
+    },
+    "HOME": {
+      "TITLE": "الدعم الفني",
+      "SUBTITLE": "مرحبًا {{name}}، كيف يمكننا المساعدة اليوم؟",
+      "QUICK": {
+        "OPEN_TICKET": "فتح تذكرة",
+        "OPEN_TICKET_HINT": "احصل على مساعدة من فريق الدعم",
+        "ASK_AI": "اسأل الذكاء الاصطناعي",
+        "ASK_AI_HINT": "احصل على إجابة فورية",
+        "HELP_CENTER": "تصفح مركز المساعدة",
+        "HELP_CENTER_HINT": "ابحث عن إجابات في أدلتنا"
+      },
+      "STATS": {
+        "OPEN": "التذاكر المفتوحة",
+        "WAITING": "بانتظار الرد",
+        "RESOLVED": "تم الحل",
+        "TOTAL": "إجمالي التذاكر",
+        "AVG_RESPONSE": "متوسط وقت الاستجابة",
+        "MINUTES": "{{count}} دقيقة"
+      },
+      "STATUS_ONLINE": "الدعم متصل الآن — {{count}} وكيل متاح",
+      "STATUS_OFFLINE": "الدعم غير متصل حاليًا — سنرد بمجرد عودتنا",
+      "RECENT_TITLE": "المحادثات الأخيرة",
+      "VIEW_ALL": "عرض الكل",
+      "EMPTY": "لم تتواصل مع الدعم بعد."
+    },
+    "LIST": {
+      "OPEN_TITLE": "التذاكر المفتوحة",
+      "OPEN_SUBTITLE": "التذاكر قيد المعالجة حاليًا.",
+      "CLOSED_TITLE": "التذاكر المغلقة",
+      "CLOSED_SUBTITLE": "التذاكر التي تم حلها أو إغلاقها.",
+      "NEW_TICKET": "تذكرة جديدة",
+      "SEARCH_PLACEHOLDER": "ابحث في التذاكر...",
+      "EMPTY": "لا توجد تذاكر هنا بعد."
+    },
+    "CREATE": {
+      "TITLE": "إنشاء تذكرة دعم",
+      "SUBTITLE": "أخبرنا بما يحدث وسنرد عليك في أقرب وقت ممكن.",
+      "CATEGORY": "الفئة",
+      "CATEGORY_DEFAULT": "عام",
+      "SUBCATEGORY": "الفئة الفرعية",
+      "PRIORITY": "الأولوية",
+      "PRIORITY_DEFAULT": "عادية",
+      "SUBJECT": "الموضوع",
+      "SUBJECT_PLACEHOLDER": "ملخص قصير عن مشكلتك",
+      "DESCRIPTION": "الوصف",
+      "DESCRIPTION_PLACEHOLDER": "صف مشكلتك بالتفصيل...",
+      "RELATED_ORDER": "الطلب المرتبط",
+      "RELATED_PRODUCT": "المنتج المرتبط",
+      "RELATED_PRODUCT_PLACEHOLDER": "ما هو المنتج المعني؟",
+      "MEMBERSHIP": "العضوية",
+      "MEMBERSHIP_NONE": "غير منطبق",
+      "TAGS": "الوسوم",
+      "TAGS_PLACEHOLDER": "أضف وسمًا واضغط Enter",
+      "REMOVE_TAG": "إزالة الوسم",
+      "ATTACHMENTS": "المرفقات",
+      "DROPZONE_HINT": "اسحب وأفلت الملفات هنا",
+      "BROWSE_FILES": "تصفح الملفات",
+      "DROPZONE_TYPES": "الصور، PDF، ZIP، السجلات، والفيديوهات مدعومة",
+      "REMOVE_ATTACHMENT": "إزالة المرفق",
+      "SUBMIT": "إرسال التذكرة",
+      "ERRORS": {
+        "SUBJECT_REQUIRED": "الرجاء إدخال موضوع.",
+        "DESCRIPTION_REQUIRED": "الرجاء وصف مشكلتك."
+      }
+    },
+    "DETAIL": {
+      "ASSIGNED_TO": "معينة إلى {{name}}",
+      "CREATED": "تاريخ الإنشاء",
+      "TIMELINE": "الجدول الزمني",
+      "YOU": "أنت",
+      "REPLY_PLACEHOLDER": "اكتب ردًا...",
+      "SEND": "إرسال",
+      "NOT_FOUND": "التذكرة غير موجودة.",
+      "CLOSE": "إغلاق التذكرة",
+      "REOPEN": "إعادة فتح التذكرة",
+      "RATE_PROMPT": "كيف كانت تجربتك مع الدعم؟ قيّمها.",
+      "RATE_COMMENT_PLACEHOLDER": "تعليق اختياري...",
+      "RATE_SUBMIT": "إرسال التقييم",
+      "CONNECTION": {
+        "CONNECTING": "جارٍ الاتصال…",
+        "RECONNECTING": "إعادة الاتصال…",
+        "DISCONNECTED": "غير متصل — قد تتأخر الرسائل"
+      }
+    },
+    "KB": {
+      "TITLE": "قاعدة المعرفة",
+      "SUBTITLE": "اعثر على إجابات سريعة قبل فتح تذكرة.",
+      "SEARCH_PLACEHOLDER": "ابحث في المقالات...",
+      "HELPFUL": "وجد {{percent}}% هذا مفيدًا",
+      "VIEWS": "مشاهدة",
+      "EMPTY": "لا توجد مقالات مطابقة لبحثك."
+    }
+  },
   "ADMIN": {
     "CLEARANCE": "تصريح المستوى 4",
     "UTILITIES": "أدوات الإدارة",
@@ -602,9 +739,9 @@
       "BACK_TO_INVENTORY": "الانتقال إلى المخزون"
     },
     "TOPBAR": {
-      "WORKSPACE": "مساحة الإدارة",
-      "WORKSPACE_HINT": "إدارة الكتالوج والوصول والتجارة",
-      "MORE": "خيارات إضافية"
+      "MORE": "خيارات إضافية",
+      "LOGOUT": "تسجيل الخروج",
+      "LOGGING_OUT": "جارٍ تسجيل الخروج…"
     },
     "SIDEBAR": {
       "NAV_ARIA": "تنقل الإدارة",
@@ -797,9 +934,11 @@
       "PROMOTIONS": "العروض",
       "MEMBERSHIPS": "العضويات",
       "THEMES": "السمات",
+      "PAGE_BUILDER": "منشئ الصفحات",
       "LEGAL": "المركز القانوني",
       "ORDERS": "الطلبات",
       "OPERATIONS": "العمليات",
+      "SUPPORT": "الدعم الفني",
       "ANALYTICS": "التحليلات",
       "REPORTS": "التقارير",
       "SETTINGS": "الإعدادات",
@@ -1038,6 +1177,70 @@
         "API_LOGS": "لا توجد سجلات API بعد.",
         "RECURRING": "لا توجد مهام متكررة مسجَّلة.",
         "HISTORY": "لا يوجد سجل تنفيذ بعد."
+      }
+    },
+    "SUPPORT": {
+      "LIST": {
+        "TITLE": "التذاكر",
+        "SUBTITLE": "جميع تذاكر دعم العملاء عبر المنصة.",
+        "SEARCH": "ابحث في التذاكر أو العملاء أو أرقام التذاكر",
+        "ALL_STATUSES": "كل الحالات",
+        "ALL_PRIORITIES": "كل الأولويات",
+        "ALL_CATEGORIES": "كل الفئات",
+        "BULK_RESOLVE": "وضع علامة محلولة",
+        "UNASSIGNED": "غير معينة",
+        "EMPTY": "لا توجد تذاكر مطابقة لعوامل التصفية.",
+        "FILTERS": "عوامل التصفية",
+        "CLEAR_FILTERS": "مسح عوامل التصفية",
+        "COLS": {
+          "NUMBER": "#",
+          "SUBJECT": "الموضوع",
+          "CUSTOMER": "العميل",
+          "STATUS": "الحالة",
+          "PRIORITY": "الأولوية",
+          "CATEGORY": "الفئة",
+          "ASSIGNED": "معينة إلى",
+          "LAST_REPLY": "آخر رد",
+          "CREATED": "تاريخ الإنشاء",
+          "UNREAD": "غير مقروءة",
+          "AI": "الذكاء الاصطناعي"
+        }
+      },
+      "DETAIL": {
+        "ASSIGN": "تعيين وكيل",
+        "ASSIGN_TO_ME": "تعيين لي",
+        "STATUS": "الحالة",
+        "PRIORITY": "الأولوية",
+        "MORE_ACTIONS": "المزيد من الإجراءات",
+        "CONVERSATION": "المحادثة",
+        "INTERNAL_NOTE": "ملاحظة داخلية",
+        "REPLY": "الرد",
+        "PUBLIC_REPLY": "رد عام",
+        "INTERNAL_PLACEHOLDER": "اكتب ملاحظة داخلية يراها الوكلاء فقط...",
+        "REPLY_PLACEHOLDER": "اكتب ردًا للعميل...",
+        "SEND": "إرسال",
+        "CUSTOMER": "العميل",
+        "MEMBERSHIP": "العضوية",
+        "RELATED_ORDER": "الطلب المرتبط",
+        "RELATED_PRODUCT": "المنتج المرتبط",
+        "COUNTRY": "الدولة",
+        "DEVICE": "الجهاز",
+        "RECENT_TICKETS_COUNT": "تذاكر أخرى لهذا العميل",
+        "RECENT_ORDERS": "الطلبات الأخيرة",
+        "LICENSE_KEYS": "يتضمن مفاتيح ترخيص",
+        "AI_SUMMARY": "ملخص الذكاء الاصطناعي",
+        "AI_NOT_AVAILABLE": "ملخص الذكاء الاصطناعي غير متاح بعد.",
+        "RECENT_TICKETS": "التذاكر الأخيرة",
+        "NO_RECENT_TICKETS": "لا توجد تذاكر أخرى لهذا العميل.",
+        "TIMELINE": "الجدول الزمني",
+        "NOT_FOUND": "التذكرة غير موجودة.",
+        "SELECT_TICKET": "اختر تذكرة لعرض المحادثة.",
+        "BACK_TO_LIST": "العودة إلى التذاكر",
+        "CONNECTION": {
+          "CONNECTING": "جارٍ الاتصال…",
+          "RECONNECTING": "إعادة الاتصال…",
+          "DISCONNECTED": "غير متصل"
+        }
       }
     },
     "ANALYTICS": {
@@ -1387,7 +1590,8 @@
         "INVALID_URL": "أدخل رابطًا صالحًا يبدأ بـ https://.",
         "INVALID_HEX": "أدخل لونًا سداسيًا صالحًا، مثل ‎#6366F1.",
         "MIN_VALUE": "يجب ألا تقل القيمة عن {{min}}.",
-        "MAX_VALUE": "يجب ألا تزيد القيمة عن {{max}}."
+        "MAX_VALUE": "يجب ألا تزيد القيمة عن {{max}}.",
+        "INVALID_ROUTE": "أدخل مسارًا صالحًا (يبدأ بـ /) أو رابط https:// كاملاً."
       },
       "DANGER": {
         "TITLE": "تأكيد هذا التغيير",
@@ -2704,6 +2908,7 @@
         "EDIT_NOTE": "تعديل",
         "EDITED": "معدَّل",
         "AUDIT": "سجل التدقيق",
+        "SUPPORT_TICKETS": "تذاكر الدعم",
         "CHANGE_STATUS": "تغيير الحالة",
         "STATUS_CONFIRM": "اختر حالة الطلب الجديدة.",
         "CONFIRM": "تأكيد",
@@ -2964,6 +3169,708 @@
         "EXPORT": "تصدير",
         "PREVIEW": "معاينة",
         "ROLLBACK": "تراجع"
+      }
+    },
+    "PAGE_BUILDER": {
+      "TITLE": "منشئ الصفحات",
+      "SUBTITLE": "إدارة قوالب صفحة الهبوط والتحكم في القالب المفعل حالياً على الصفحة الرئيسية للمتجر.",
+      "TEMPLATES": {
+        "TITLE": "القوالب",
+        "LIVE": "مفعل",
+        "UNPUBLISHED_CHANGES": "تغييرات غير منشورة",
+        "SET_ACTIVE": "تفعيل",
+        "UPDATED": "آخر تحديث",
+        "EMPTY": "لا توجد قوالب صفحة هبوط بعد.",
+        "NEW": "قالب جديد",
+        "NAME": "الاسم",
+        "CLONE_FROM": "نسخ من (اختياري)",
+        "CLONE_FROM_NONE": "ابدأ فارغاً",
+        "CREATE": "إنشاء",
+        "DUPLICATE": "نسخ",
+        "DELETE": "حذف",
+        "COPY_SUFFIX": "(نسخة)",
+        "DELETE_CONFIRM_TITLE": "حذف القالب",
+        "DELETE_CONFIRM_MESSAGE": "سيتم حذف هذا القالب وأقسامه نهائياً. لا يمكن التراجع عن هذا الإجراء."
+      },
+      "SECTIONS": {
+        "TITLE": "الأقسام",
+        "SUBTITLE": "أضف الأقسام وأعد ترتيبها واضبط إعداداتها ضمن هذا القالب.",
+        "EMPTY": "اختر قالباً لتحرير أقسامه.",
+        "EMPTY_SECTIONS": "لا يحتوي هذا القالب على أقسام بعد.",
+        "VISIBLE": "ظاهر",
+        "HIDDEN": "مخفي",
+        "ADD": "إضافة قسم",
+        "TOGGLE_VISIBILITY": "تبديل الظهور",
+        "DUPLICATE": "نسخ القسم",
+        "REMOVE": "إزالة القسم",
+        "REMOVE_CONFIRM_TITLE": "إزالة القسم",
+        "REMOVE_CONFIRM_MESSAGE": "ستتم إزالة هذا القسم من المسودة. احفظ المسودة للاحتفاظ بالتغيير.",
+        "UNDO": "تراجع",
+        "REDO": "إعادة"
+      },
+      "LIBRARY": {
+        "TITLE": "إضافة قسم",
+        "SEARCH_PLACEHOLDER": "ابحث عن الأقسام...",
+        "EMPTY": "لا توجد أقسام مطابقة لبحثك."
+      },
+      "PREVIEW": {
+        "TITLE": "معاينة",
+        "SUBTITLE": "شاهد كيف ستظهر هذه الأقسام على الصفحة الرئيسية للمتجر.",
+        "EMPTY": "لا توجد أقسام ظاهرة لمعاينتها بعد.",
+        "DEVICE_GROUP": "عرض جهاز المعاينة",
+        "DEVICE_DESKTOP": "سطح المكتب",
+        "DEVICE_TABLET": "لوحي",
+        "DEVICE_MOBILE": "جوال"
+      },
+      "SETTINGS": {
+        "TITLE": "إعدادات القسم",
+        "EMPTY": "اختر قسماً لتحرير إعداداته.",
+        "STOPGAP_NOTE": "لا يحتوي هذا النوع من الأقسام على محرر إعدادات مرئي بعد — قم بتحرير الإعدادات الخام في الوقت الحالي.",
+        "CONFIG_JSON": "الإعدادات (JSON)",
+        "INVALID_JSON": "JSON غير صالح — لن يتم حفظ التغييرات حتى يتم إصلاح هذا.",
+        "FIELDS": {
+          "HERO": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "العنوان الرئيسي في قسم البطل."
+            },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان الرئيسي."
+            },
+            "PRIMARY_BUTTON_TEXT": {
+              "LABEL": "نص الزر الأساسي",
+              "HELP": "التسمية على زر الدعوة الأساسي."
+            },
+            "PRIMARY_BUTTON_URL": {
+              "LABEL": "رابط الزر الأساسي",
+              "HELP": "الوجهة التي ينتقل إليها الزر الأساسي."
+            },
+            "SECONDARY_BUTTON_TEXT": {
+              "LABEL": "نص الزر الثانوي",
+              "HELP": "التسمية على الزر الثانوي."
+            },
+            "SECONDARY_BUTTON_URL": {
+              "LABEL": "رابط الزر الثانوي",
+              "HELP": "الوجهة التي ينتقل إليها الزر الثانوي."
+            },
+            "BACKGROUND_IMAGE_URL": {
+              "LABEL": "رابط صورة الخلفية",
+              "HELP": "صورة خلفية قسم البطل."
+            },
+            "OVERLAY_IMAGE_URL": {
+              "LABEL": "رابط صورة التراكب",
+              "HELP": "صورة اختيارية توضع فوق الخلفية."
+            },
+            "OVERLAY_OPACITY": {
+              "LABEL": "شفافية التراكب",
+              "HELP": "شفافية صورة التراكب، من 0 إلى 1."
+            },
+            "BADGE_TEXT": {
+              "LABEL": "نص الشارة",
+              "HELP": "تسمية صغيرة تظهر أعلى العنوان."
+            },
+            "BADGE_COLOR": {
+              "LABEL": "لون الشارة",
+              "HELP": "لون نص الشارة."
+            },
+            "PRIMARY_BUTTON": {
+              "LABEL": "الزر الأساسي"
+            },
+            "SECONDARY_BUTTON": {
+              "LABEL": "الزر الثانوي"
+            }
+          },
+          "GRID_SHOWCASE": {
+            "BADGE_TEXT": {
+              "LABEL": "نص الشارة",
+              "HELP": "تسمية صغيرة تظهر أعلى العنوان."
+            },
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "السطر الأول من عنوان قسم البطل."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "سطر العنوان المميز",
+              "HELP": "السطر الثاني الملون من العنوان."
+            },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان الرئيسي."
+            },
+            "PRIMARY_BUTTON_TEXT": {
+              "LABEL": "نص الزر الأساسي",
+              "HELP": "التسمية على زر الدعوة الأساسي."
+            },
+            "PRIMARY_BUTTON_URL": {
+              "LABEL": "رابط الزر الأساسي",
+              "HELP": "الوجهة التي ينتقل إليها الزر الأساسي."
+            },
+            "SECONDARY_BUTTON_TEXT": {
+              "LABEL": "نص الزر الثانوي",
+              "HELP": "التسمية على الزر الثانوي."
+            },
+            "SECONDARY_BUTTON_URL": {
+              "LABEL": "رابط الزر الثانوي",
+              "HELP": "الوجهة التي ينتقل إليها الزر الثانوي."
+            },
+            "BACKGROUND_IMAGE_URL": {
+              "LABEL": "رابط صورة الخلفية",
+              "HELP": "صورة خلفية قسم البطل."
+            },
+            "OVERLAY_IMAGE_URL": {
+              "LABEL": "رابط صورة التراكب",
+              "HELP": "صورة اختيارية توضع فوق الخلفية."
+            },
+            "OVERLAY_OPACITY": {
+              "LABEL": "شفافية الخلفية",
+              "HELP": "شفافية صورة الخلفية، من 0 إلى 1."
+            },
+            "PRIMARY_BUTTON": {
+              "LABEL": "الزر الأساسي"
+            },
+            "SECONDARY_BUTTON": {
+              "LABEL": "الزر الثانوي"
+            }
+          },
+          "EDITORIAL_SPOTLIGHT": {
+            "EYEBROW_TEXT": {
+              "LABEL": "النص العلوي",
+              "HELP": "تسمية صغيرة تظهر أعلى العنوان."
+            },
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "عنوان القسم."
+            },
+            "VIEW_ALL_TEXT": {
+              "LABEL": "نص رابط عرض الكل",
+              "HELP": "تسمية الرابط في الزاوية العلوية اليمنى."
+            },
+            "VIEW_ALL_URL": {
+              "LABEL": "رابط عرض الكل",
+              "HELP": "الوجهة التي ينتقل إليها الرابط."
+            },
+            "FEATURED_BADGE_TEXT": {
+              "LABEL": "شارة البطاقة المميزة",
+              "HELP": "شارة صغيرة تظهر على البطاقة الكبيرة."
+            },
+            "FEATURED_IMAGE_URL": {
+              "LABEL": "رابط صورة البطاقة المميزة",
+              "HELP": "صورة البطاقة الكبيرة المميزة."
+            },
+            "FEATURED_TITLE": {
+              "LABEL": "عنوان البطاقة المميزة",
+              "HELP": "العنوان الذي يظهر على البطاقة الكبيرة."
+            },
+            "FEATURED_SUBTITLE": {
+              "LABEL": "العنوان الفرعي للبطاقة المميزة",
+              "HELP": "السطر الداعم على البطاقة الكبيرة."
+            },
+            "FEATURED_BUTTON_TEXT": {
+              "LABEL": "نص زر البطاقة المميزة",
+              "HELP": "التسمية على زر البطاقة المميزة."
+            },
+            "FEATURED_BUTTON_URL": {
+              "LABEL": "رابط زر البطاقة المميزة",
+              "HELP": "الوجهة التي ينتقل إليها زر البطاقة المميزة."
+            },
+            "SECONDARY_IMAGE_URL": {
+              "LABEL": "رابط صورة البطاقة الثانية",
+              "HELP": "صورة البطاقة الجانبية الصغيرة الأولى."
+            },
+            "SECONDARY_LABEL": {
+              "LABEL": "تسمية البطاقة الثانية",
+              "HELP": "التسمية على البطاقة الجانبية الصغيرة الأولى."
+            },
+            "TERTIARY_IMAGE_URL": {
+              "LABEL": "رابط صورة البطاقة الثالثة",
+              "HELP": "صورة البطاقة الجانبية الصغيرة الثانية."
+            },
+            "TERTIARY_LABEL": {
+              "LABEL": "تسمية البطاقة الثالثة",
+              "HELP": "التسمية على البطاقة الجانبية الصغيرة الثانية."
+            },
+            "VIEW_ALL_BUTTON": {
+              "LABEL": "زر عرض الكل"
+            },
+            "FEATURED_BUTTON": {
+              "LABEL": "الزر المميز"
+            }
+          },
+          "PROMO_BANNER": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "عنوان اللافتة."
+            },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان."
+            },
+            "IMAGE_URL": {
+              "LABEL": "رابط الصورة",
+              "HELP": "صورة خلفية اللافتة."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "نص الزر",
+              "HELP": "التسمية على زر الدعوة في اللافتة."
+            },
+            "BUTTON_URL": {
+              "LABEL": "رابط الزر",
+              "HELP": "الوجهة التي ينتقل إليها الزر."
+            },
+            "COUNTDOWN_SECONDS": {
+              "LABEL": "مدة العد التنازلي",
+              "HELP": "المدة الابتدائية للعد التنازلي بالثواني."
+            },
+            "COUNTDOWN_ENDS_AT_UTC": {
+              "LABEL": "نهاية العد التنازلي (UTC)",
+              "HELP": "الطابع الزمني ISO الذي ينتهي عنده العد التنازلي، إن وُجد."
+            },
+            "BACKGROUND_COLOR": {
+              "LABEL": "لون الخلفية",
+              "HELP": "لون خلفية اللافتة."
+            },
+            "BUTTON": {
+              "LABEL": "الزر"
+            }
+          },
+          "SEASONAL_CAMPAIGN": {
+            "EYEBROW_TEXT": {
+              "LABEL": "النص العلوي",
+              "HELP": "تسمية صغيرة تظهر أعلى العنوان."
+            },
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "السطر الأول من عنوان اللافتة."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "سطر العنوان المميز",
+              "HELP": "السطر الثاني الملون من العنوان."
+            },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان."
+            },
+            "IMAGE_URL": {
+              "LABEL": "رابط الصورة",
+              "HELP": "صورة زخرفية للافتة."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "نص الزر",
+              "HELP": "التسمية على زر الدعوة في اللافتة."
+            },
+            "BUTTON_URL": {
+              "LABEL": "رابط الزر",
+              "HELP": "الوجهة التي ينتقل إليها الزر."
+            },
+            "COUNTDOWN_SECONDS": {
+              "LABEL": "مدة العد التنازلي",
+              "HELP": "المدة الابتدائية للعد التنازلي بالثواني."
+            },
+            "COUNTDOWN_ENDS_AT_UTC": {
+              "LABEL": "نهاية العد التنازلي (UTC)",
+              "HELP": "الطابع الزمني ISO الذي ينتهي عنده العد التنازلي، إن وُجد."
+            },
+            "BUTTON": {
+              "LABEL": "الزر"
+            }
+          },
+          "POPULAR_CATEGORIES": {
+            "SECTION_TITLE": {
+              "LABEL": "عنوان القسم",
+              "HELP": "العنوان الذي يظهر أعلى الفئات."
+            },
+            "MAXIMUM_CATEGORIES": {
+              "LABEL": "الحد الأقصى للفئات",
+              "HELP": "عدد الفئات المعروضة."
+            },
+            "SORT_ORDER": {
+              "LABEL": "ترتيب الفرز",
+              "HELP": "طريقة ترتيب الفئات."
+            }
+          },
+          "FLASH_DEALS": {
+            "SECTION_TITLE": {
+              "LABEL": "عنوان القسم",
+              "HELP": "العنوان الذي يظهر أعلى العروض السريعة."
+            },
+            "SECTION_SUBTITLE": {
+              "LABEL": "العنوان الفرعي للقسم",
+              "HELP": "السطر الداعم أسفل العنوان."
+            },
+            "COUNTDOWN_ENABLED": {
+              "LABEL": "إظهار العد التنازلي",
+              "HELP": "عرض مؤقت عد تنازلي في هذا القسم."
+            },
+            "COUNTDOWN_DATE_UTC": {
+              "LABEL": "تاريخ انتهاء العد التنازلي (UTC)",
+              "HELP": "الطابع الزمني ISO الذي ينتهي عنده العد التنازلي، إن وُجد."
+            },
+            "COUNTDOWN_SECONDS": {
+              "LABEL": "مدة العد التنازلي",
+              "HELP": "المدة الابتدائية للعد التنازلي بالثواني."
+            },
+            "MAXIMUM_PRODUCTS": {
+              "LABEL": "الحد الأقصى للمنتجات",
+              "HELP": "عدد المنتجات المعروضة."
+            },
+            "SORT_METHOD": {
+              "LABEL": "طريقة الفرز",
+              "HELP": "طريقة ترتيب المنتجات المميزة."
+            }
+          },
+          "LATEST_ARRIVALS": {
+            "SECTION_TITLE": {
+              "LABEL": "عنوان القسم",
+              "HELP": "الجزء الأول من عنوان القسم."
+            },
+            "SECTION_TITLE_ACCENT": {
+              "LABEL": "العنوان المميز",
+              "HELP": "الجزء الثاني الملون من العنوان."
+            },
+            "SECTION_SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان."
+            },
+            "MAXIMUM_PRODUCTS": {
+              "LABEL": "الحد الأقصى للمنتجات",
+              "HELP": "عدد المنتجات المعروضة (منتج مميز واحد والباقي في شبكة)."
+            },
+            "SORT_METHOD": {
+              "LABEL": "طريقة الفرز",
+              "HELP": "طريقة ترتيب المنتجات."
+            }
+          },
+          "FEATURED_COLLECTIONS": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "عنوان القسم."
+            },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان."
+            },
+            "MAXIMUM_ITEMS": {
+              "LABEL": "الحد الأقصى للعناصر",
+              "HELP": "عدد العناصر المعروضة."
+            },
+            "DISPLAY_STYLE": {
+              "LABEL": "نمط العرض",
+              "HELP": "التخطيط المستخدم لعرض العناصر."
+            }
+          },
+          "COLLECTION_SHOWCASE": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "الجزء الأول من عنوان القسم."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "العنوان المميز",
+              "HELP": "الجزء الثاني الملون من العنوان."
+            },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "السطر الداعم أسفل العنوان."
+            },
+            "EMPTY": "لا توجد بطاقات مجموعات بعد — أضف واحدة أدناه.",
+            "IMAGE_URL": "رابط الصورة",
+            "CARD_TITLE": "العنوان",
+            "CARD_SUBTITLE": "العنوان الفرعي",
+            "BUTTON_TEXT": "نص الزر",
+            "BUTTON_URL": "رابط الزر",
+            "ADD_CARD": "إضافة بطاقة",
+            "REMOVE_CARD": "إزالة البطاقة",
+            "BUTTON": {
+              "LABEL": "الزر"
+            }
+          },
+          "PULSE_FEED": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "الجزء الأول من عنوان القسم."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "العنوان المميز",
+              "HELP": "الجزء الثاني الملون من العنوان."
+            },
+            "EMPTY": "لا توجد عناصر تغذية بعد — أضف واحداً أدناه.",
+            "TAG_TEXT": "نص الوسم",
+            "TAG_TONE": "لون الوسم",
+            "TIMESTAMP_TEXT": "الطابع الزمني",
+            "ITEM_TITLE": "العنوان",
+            "ITEM_DESCRIPTION": "الوصف",
+            "LINK_URL": "رابط",
+            "ADD_ITEM": "إضافة عنصر",
+            "REMOVE_ITEM": "إزالة العنصر"
+          },
+          "ARENA_BRIEFINGS": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "عنوان القسم في المنتصف."
+            },
+            "FEATURED_TAG_TEXT": {
+              "LABEL": "وسم القصة المميزة",
+              "HELP": "شارة صغيرة على القصة المميزة."
+            },
+            "FEATURED_IMAGE_URL": {
+              "LABEL": "رابط صورة القصة المميزة",
+              "HELP": "صورة القصة المميزة."
+            },
+            "FEATURED_TITLE": {
+              "LABEL": "عنوان القصة المميزة",
+              "HELP": "العنوان على القصة المميزة."
+            },
+            "FEATURED_DESCRIPTION": {
+              "LABEL": "وصف القصة المميزة",
+              "HELP": "النص الداعم على القصة المميزة."
+            },
+            "FEATURED_BUTTON_TEXT": {
+              "LABEL": "نص رابط القصة المميزة",
+              "HELP": "التسمية على رابط القصة المميزة."
+            },
+            "FEATURED_BUTTON_URL": {
+              "LABEL": "رابط القصة المميزة",
+              "HELP": "الوجهة التي ينتقل إليها رابط القصة المميزة."
+            },
+            "EMPTY": "لا توجد عناصر جانبية بعد — أضف واحداً أدناه.",
+            "SIDE_TAG_TEXT": "نص الوسم",
+            "SIDE_TITLE": "العنوان",
+            "SIDE_IMAGE_URL": "رابط الصورة",
+            "SIDE_LINK_URL": "رابط",
+            "ADD_ITEM": "إضافة عنصر",
+            "REMOVE_ITEM": "إزالة العنصر",
+            "FEATURED_BUTTON": {
+              "LABEL": "الزر المميز"
+            }
+          },
+          "CONSOLE_FAVORITES": {
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "عنوان القسم."
+            },
+            "EMPTY": "لا توجد بطاقات بعد — أضف واحدة أدناه.",
+            "CARD_TITLE": "العنوان",
+            "BADGE_TEXT": "نص الشارة",
+            "IMAGE_URL": "رابط الصورة",
+            "TAGS": "الوسوم (مفصولة بفواصل)",
+            "BUTTON_TEXT": "نص الزر",
+            "BUTTON_URL": "رابط الزر",
+            "FEATURED": "مميزة (بطاقة أكبر وبارزة)",
+            "ADD_CARD": "إضافة بطاقة",
+            "REMOVE_CARD": "إزالة البطاقة",
+            "BUTTON": {
+              "LABEL": "الزر"
+            }
+          },
+          "PLATFORM_SELECTOR": {
+            "EMPTY": "لا توجد منصات بعد — أضف واحدة أدناه.",
+            "LABEL": "التسمية",
+            "ICON_CLASS": "فئة PrimeIcons (مثال: pi pi-desktop)",
+            "LINK_URL": "رابط",
+            "ADD_ITEM": "إضافة عنصر",
+            "REMOVE_ITEM": "إزالة العنصر"
+          },
+          "AI_ASSISTANT": {
+            "STATUS_TEXT": {
+              "LABEL": "نص الحالة",
+              "HELP": "شارة الحالة الصغيرة أعلى العنوان."
+            },
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "الجزء الأول من العنوان."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "العنوان المميز",
+              "HELP": "الجزء الثاني الملون من العنوان."
+            },
+            "DESCRIPTION": {
+              "LABEL": "الوصف",
+              "HELP": "الفقرة الداعمة."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "نص الزر",
+              "HELP": "التسمية على زر الدعوة."
+            },
+            "BUTTON_URL": {
+              "LABEL": "رابط الزر",
+              "HELP": "الوجهة التي ينتقل إليها الزر."
+            },
+            "BUTTON": {
+              "LABEL": "الزر"
+            }
+          },
+          "HARDWARE_SHOWCASE": {
+            "EYEBROW_TEXT": {
+              "LABEL": "النص العلوي",
+              "HELP": "تسمية صغيرة تظهر أعلى العنوان."
+            },
+            "BADGE_TEXT": {
+              "LABEL": "نص الشارة",
+              "HELP": "شارة صغيرة تظهر على الصورة."
+            },
+            "TITLE": {
+              "LABEL": "العنوان",
+              "HELP": "عنوان القسم."
+            },
+            "DESCRIPTION": {
+              "LABEL": "الوصف",
+              "HELP": "الفقرة الداعمة."
+            },
+            "IMAGE_URL": {
+              "LABEL": "رابط الصورة",
+              "HELP": "صورة المنتج."
+            },
+            "PRIMARY_BUTTON_TEXT": {
+              "LABEL": "نص الزر الأساسي",
+              "HELP": "التسمية على زر الدعوة الأساسي."
+            },
+            "PRIMARY_BUTTON_URL": {
+              "LABEL": "رابط الزر الأساسي",
+              "HELP": "الوجهة التي ينتقل إليها الزر الأساسي."
+            },
+            "SECONDARY_BUTTON_TEXT": {
+              "LABEL": "نص الزر الثانوي",
+              "HELP": "التسمية على الزر الثانوي."
+            },
+            "SECONDARY_BUTTON_URL": {
+              "LABEL": "رابط الزر الثانوي",
+              "HELP": "الوجهة التي ينتقل إليها الزر الثانوي."
+            },
+            "PRIMARY_BUTTON": {
+              "LABEL": "الزر الأساسي"
+            },
+            "SECONDARY_BUTTON": {
+              "LABEL": "الزر الثانوي"
+            }
+          },
+          "TRUST_BAR": {
+            "EMPTY": "لا توجد عناصر ثقة بعد — أضف واحداً أدناه.",
+            "ICON_URL": "رابط الأيقونة",
+            "ITEM_TITLE": "العنوان",
+            "ITEM_DESCRIPTION": "الوصف",
+            "ADD_ITEM": "إضافة عنصر",
+            "REMOVE_ITEM": "إزالة العنصر"
+          },
+          "COMMUNITY_NEWSLETTER": {
+            "DISCORD_TITLE": {
+              "LABEL": "عنوان بطاقة ديسكورد",
+              "HELP": "العنوان على بطاقة المجتمع."
+            },
+            "DISCORD_DESCRIPTION": {
+              "LABEL": "وصف بطاقة ديسكورد",
+              "HELP": "النص الداعم على بطاقة المجتمع."
+            },
+            "DISCORD_BUTTON_TEXT": {
+              "LABEL": "نص زر ديسكورد",
+              "HELP": "التسمية على رابط الانضمام للسيرفر."
+            },
+            "DISCORD_BUTTON_URL": {
+              "LABEL": "رابط زر ديسكورد",
+              "HELP": "الوجهة التي ينتقل إليها رابط الانضمام."
+            },
+            "NEWSLETTER_TITLE": {
+              "LABEL": "عنوان بطاقة النشرة",
+              "HELP": "العنوان على بطاقة النشرة الإخبارية."
+            },
+            "NEWSLETTER_DESCRIPTION": {
+              "LABEL": "وصف بطاقة النشرة",
+              "HELP": "النص الداعم على بطاقة النشرة الإخبارية."
+            },
+            "NEWSLETTER_PLACEHOLDER": {
+              "LABEL": "نص حقل البريد",
+              "HELP": "النص التوضيحي في حقل البريد الإلكتروني."
+            },
+            "NEWSLETTER_BUTTON_TEXT": {
+              "LABEL": "نص زر الاشتراك",
+              "HELP": "التسمية على زر الاشتراك."
+            },
+            "NEWSLETTER_PRIVACY_TEXT": {
+              "LABEL": "ملاحظة الخصوصية",
+              "HELP": "النص الصغير الذي يظهر أسفل النموذج."
+            },
+            "DISCORD_BUTTON": {
+              "LABEL": "زر ديسكورد"
+            }
+          },
+          "FOOTER": {
+            "COMPANY_NAME": {
+              "LABEL": "اسم الشركة",
+              "HELP": "يظهر في التذييل."
+            },
+            "COPYRIGHT": {
+              "LABEL": "نص حقوق النشر",
+              "HELP": "سطر حقوق النشر الذي يظهر في التذييل."
+            },
+            "SUPPORT_EMAIL": {
+              "LABEL": "بريد الدعم",
+              "HELP": "بريد التواصل مع دعم العملاء."
+            },
+            "SUPPORT_PHONE": {
+              "LABEL": "هاتف الدعم",
+              "HELP": "رقم هاتف التواصل مع دعم العملاء."
+            },
+            "ADDRESS": {
+              "LABEL": "العنوان",
+              "HELP": "العنوان البريدي للشركة."
+            },
+            "WORKING_HOURS": {
+              "LABEL": "ساعات العمل",
+              "HELP": "ساعات الدعم التي تظهر في التذييل."
+            },
+            "FACEBOOK_URL": {
+              "LABEL": "رابط فيسبوك",
+              "HELP": "رابط صفحة فيسبوك."
+            },
+            "INSTAGRAM_URL": {
+              "LABEL": "رابط إنستغرام",
+              "HELP": "رابط حساب إنستغرام."
+            },
+            "X_URL": {
+              "LABEL": "رابط X (تويتر)",
+              "HELP": "رابط حساب X."
+            },
+            "DISCORD_URL": {
+              "LABEL": "رابط ديسكورد",
+              "HELP": "رابط خادم ديسكورد."
+            },
+            "TELEGRAM_URL": {
+              "LABEL": "رابط تيليجرام",
+              "HELP": "رابط قناة تيليجرام."
+            },
+            "YOUTUBE_URL": {
+              "LABEL": "رابط يوتيوب",
+              "HELP": "رابط قناة يوتيوب."
+            },
+            "TIKTOK_URL": {
+              "LABEL": "رابط تيك توك",
+              "HELP": "رابط حساب تيك توك."
+            },
+            "WHATSAPP_URL": {
+              "LABEL": "رابط واتساب",
+              "HELP": "رابط التواصل عبر واتساب."
+            }
+          }
+        }
+      },
+      "SAVE_BAR": {
+        "HINT": "لديك تغييرات غير محفوظة على أقسام هذا القالب.",
+        "DISCARD": "تجاهل التغييرات",
+        "SAVE": "حفظ المسودة",
+        "PUBLISH": "نشر"
+      },
+      "MESSAGES": {
+        "ACTIVATED": "تم تفعيل القالب.",
+        "ACTIVATE_FAILED": "فشل تفعيل القالب.",
+        "CREATED": "تم إنشاء القالب.",
+        "CREATE_FAILED": "فشل إنشاء القالب.",
+        "DELETED": "تم حذف القالب.",
+        "DELETE_FAILED": "فشل حذف القالب.",
+        "SAVED": "تم حفظ المسودة.",
+        "SAVE_FAILED": "فشل حفظ المسودة.",
+        "PUBLISHED": "تم نشر القالب.",
+        "PUBLISH_FAILED": "فشل نشر القالب.",
+        "DISCARDED": "تم تجاهل المسودة.",
+        "DISCARD_FAILED": "فشل تجاهل المسودة."
       }
     },
     "LEGAL": {
@@ -3291,6 +4198,70 @@
         "ACTION_FAILED": "فشل الإجراء.",
         "EMAIL_BLOCKED": "تم حظر البريد الإلكتروني.",
         "IP_BLOCKED": "تم حظر عنوان IP."
+      }
+    },
+    "PICKERS": {
+      "ROUTE_PICKER": {
+        "MODE_PAGE": "اختر صفحة",
+        "MODE_CUSTOM": "رابط مخصص",
+        "SELECT_PLACEHOLDER": "ابحث عن صفحة…",
+        "RECENT": "الأخيرة:",
+        "GROUPS": {
+          "STOREFRONT": "المتجر",
+          "ACCOUNT": "الحساب",
+          "INFO": "معلومات"
+        },
+        "ROUTES": {
+          "HOME": "الرئيسية",
+          "PRODUCTS": "المنتجات",
+          "CART": "السلة",
+          "CHECKOUT": "الدفع",
+          "MEMBERSHIP_CHECKOUT": "دفع العضوية",
+          "SUPPORT_CHAT": "الدردشة مع الدعم",
+          "LEGAL": "السياسات والشروط",
+          "DASHBOARD": "لوحة التحكم",
+          "LIBRARY": "مكتبتي",
+          "ORDERS": "الطلبات",
+          "WISHLIST": "المفضلة",
+          "MEMBERSHIP": "العضوية",
+          "REFERRAL": "الإحالة",
+          "NOTIFICATIONS": "الإشعارات",
+          "PROFILE": "الملف الشخصي",
+          "SUPPORT": "الدعم"
+        }
+      },
+      "MEDIA_PICKER": {
+        "PREVIEW_ALT": "معاينة الصورة",
+        "BROKEN_IMAGE": "تعذر تحميل هذه الصورة — تحقق من الرابط.",
+        "RECENT": "المستخدمة مؤخرًا:",
+        "REMOVE": "إزالة الصورة",
+        "UPLOAD": "رفع صورة",
+        "INVALID_TYPE": "يرجى اختيار ملف صورة.",
+        "TOO_LARGE": "يجب ألا يتجاوز حجم الصورة 5 ميجابايت.",
+        "UPLOAD_FAILED": "فشل الرفع. حاول مرة أخرى."
+      },
+      "ICON_PICKER": {
+        "PLACEHOLDER": "اختر أيقونة…",
+        "SEARCH_PLACEHOLDER": "ابحث عن أيقونة…",
+        "NO_RESULTS": "لا توجد أيقونات مطابقة لبحثك."
+      },
+      "BUTTON_EDITOR": {
+        "LABEL": "النص",
+        "DESTINATION": "الوجهة",
+        "MISSING_LABEL": "أضف نصًا حتى يظهر على الزر."
+      },
+      "PRODUCT_PICKER": {
+        "SEARCH_PLACEHOLDER": "ابحث عن منتج…",
+        "LOADING": "جارٍ البحث…",
+        "NO_RESULTS": "لا توجد منتجات مطابقة لبحثك.",
+        "LIMIT_REACHED": "تم الوصول للحد الأقصى من المنتجات المحددة.",
+        "REMOVE": "إزالة المنتج"
+      },
+      "CATEGORY_PICKER": {
+        "SEARCH_PLACEHOLDER": "ابحث عن تصنيف…",
+        "LOADING": "جارٍ البحث…",
+        "NO_RESULTS": "لا توجد تصنيفات مطابقة لبحثك.",
+        "REMOVE": "إزالة التصنيف"
       }
     }
   },

@@ -1,0 +1,335 @@
+<p-toast position="top-right" />
+
+<section class="admin-page page-builder-page">
+  <app-admin-page-header
+    [title]="'ADMIN.PAGE_BUILDER.TITLE' | translate"
+    [subtitle]="'ADMIN.PAGE_BUILDER.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+    [compactActions]="true"
+  >
+    <app-admin-icon-button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.PageBuilder.Edit"
+      icon="pi pi-plus"
+      [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.NEW' | translate"
+      severity="primary"
+      [loading]="facade.creating()"
+      (pressed)="openNewTemplateDialog()"
+    />
+  </app-admin-page-header>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  @if (loading() && !templates().length) {
+    <app-admin-loading-skeleton [rows]="4" />
+  } @else if (!templates().length) {
+    <app-admin-empty-state
+      icon="pi pi-objects-column"
+      [title]="'ADMIN.PAGE_BUILDER.TEMPLATES.EMPTY' | translate"
+      [primaryLabel]="canEdit() ? ('ADMIN.PAGE_BUILDER.TEMPLATES.NEW' | translate) : null"
+      (primaryAction)="openNewTemplateDialog()"
+    />
+  } @else {
+    @if (selectedTemplate()) {
+      <app-admin-section-card
+        class="page-builder-page__preview-card"
+        [title]="'ADMIN.PAGE_BUILDER.PREVIEW.TITLE' | translate"
+        [description]="'ADMIN.PAGE_BUILDER.PREVIEW.SUBTITLE' | translate"
+        [collapsible]="true"
+        [(collapsed)]="previewCollapsed"
+      >
+        <app-device-preview-toggle
+          adminSectionActions
+          [selected]="previewDevice()"
+          (selectedChange)="previewDevice.set($event)"
+        />
+        <app-builder-preview-pane [sections]="draftSections()" [device]="previewDevice()" />
+      </app-admin-section-card>
+    }
+
+    <div class="page-builder-page__layout">
+      <app-admin-section-card
+        class="page-builder-page__templates"
+        [title]="'ADMIN.PAGE_BUILDER.TEMPLATES.TITLE' | translate"
+      >
+        <ul class="page-builder-page__template-list">
+          @for (template of templates(); track template.id) {
+            <li
+              class="page-builder-page__template-row"
+              [class.page-builder-page__template-row--selected]="selectedId() === template.id"
+              (click)="selectTemplate(template)"
+            >
+              <div class="page-builder-page__template-main">
+                <div class="page-builder-page__template-title-row">
+                  <span class="page-builder-page__template-name">{{ template.name }}</span>
+                  @if (template.isActive) {
+                    <app-admin-status-badge
+                      [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.LIVE' | translate"
+                      tone="success"
+                    />
+                  }
+                  @if (template.hasUnpublishedChanges) {
+                    <app-admin-status-badge
+                      [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.UNPUBLISHED_CHANGES' | translate"
+                      tone="warning"
+                      [outlined]="true"
+                    />
+                  }
+                </div>
+                <span class="page-builder-page__template-updated">
+                  {{ 'ADMIN.PAGE_BUILDER.TEMPLATES.UPDATED' | translate }}
+                  {{ template.modifiedOnUtc | date: 'mediumDate' }}
+                </span>
+              </div>
+
+              <div class="page-builder-page__template-actions" (click)="$event.stopPropagation()">
+                @if (!template.isActive) {
+                  <app-admin-icon-button
+                    icon="pi pi-check-circle"
+                    [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.SET_ACTIVE' | translate"
+                    [loading]="activatingId() === template.id"
+                    [disabled]="activatingId() !== null"
+                    *hamboxHasPermission="permissions.PageBuilder.Publish"
+                    (pressed)="activate(template)"
+                  />
+                }
+                <app-admin-action-menu
+                  *hamboxHasPermission="permissions.PageBuilder.Edit"
+                  [items]="templateActionMenuItems(template)"
+                />
+              </div>
+            </li>
+          }
+        </ul>
+      </app-admin-section-card>
+
+      <app-admin-section-card
+        class="page-builder-page__sections"
+        [title]="'ADMIN.PAGE_BUILDER.SECTIONS.TITLE' | translate"
+        [description]="'ADMIN.PAGE_BUILDER.SECTIONS.SUBTITLE' | translate"
+      >
+        @if (selectedLoading()) {
+          <app-admin-loading-skeleton variant="table" [rows]="3" />
+        } @else if (!selectedTemplate()) {
+          <app-admin-empty-state
+            icon="pi pi-list"
+            [title]="'ADMIN.PAGE_BUILDER.SECTIONS.EMPTY' | translate"
+            [compact]="true"
+          />
+        } @else {
+          <div class="page-builder-page__section-toolbar">
+            <app-admin-icon-button
+              class="page-builder-page__add-section"
+              *hamboxHasPermission="permissions.PageBuilder.Edit"
+              icon="pi pi-plus"
+              [label]="'ADMIN.PAGE_BUILDER.SECTIONS.ADD' | translate"
+              severity="secondary"
+              (pressed)="libraryOpen.set(true)"
+            />
+
+            <div class="page-builder-page__undo-redo" *hamboxHasPermission="permissions.PageBuilder.Edit">
+              <app-admin-icon-button
+                icon="pi pi-undo"
+                [label]="'ADMIN.PAGE_BUILDER.SECTIONS.UNDO' | translate"
+                [disabled]="!commandStack.canUndo()"
+                (pressed)="commandStack.undo()"
+              />
+              <app-admin-icon-button
+                icon="pi pi-replay"
+                [label]="'ADMIN.PAGE_BUILDER.SECTIONS.REDO' | translate"
+                [disabled]="!commandStack.canRedo()"
+                (pressed)="commandStack.redo()"
+              />
+            </div>
+          </div>
+
+          @if (!draftSections().length) {
+            <app-admin-empty-state
+              icon="pi pi-list"
+              [title]="'ADMIN.PAGE_BUILDER.SECTIONS.EMPTY_SECTIONS' | translate"
+              [compact]="true"
+            />
+          } @else {
+            <ol
+              class="page-builder-page__section-list"
+              cdkDropList
+              [cdkDropListDisabled]="!canEdit()"
+              (cdkDropListDropped)="onDrop($event)"
+            >
+              @for (section of draftSections(); track section.instanceId; let i = $index) {
+                <li
+                  class="page-builder-page__section-row"
+                  [class.page-builder-page__section-row--selected]="selectedInstanceId() === section.instanceId"
+                  cdkDrag
+                  [cdkDragDisabled]="!canEdit()"
+                  (click)="selectSection(section.instanceId)"
+                >
+                  <i
+                    class="pi pi-bars page-builder-page__section-handle"
+                    cdkDragHandle
+                    aria-hidden="true"
+                  ></i>
+                  <span class="page-builder-page__section-order">{{ i + 1 }}</span>
+                  <div class="page-builder-page__section-info">
+                    <span class="page-builder-page__section-category">{{ section.category }}</span>
+                    <span class="page-builder-page__section-variant">{{ variantLabel(section) }}</span>
+                  </div>
+                  <app-admin-status-badge
+                    [label]="
+                      (section.isVisible
+                        ? 'ADMIN.PAGE_BUILDER.SECTIONS.VISIBLE'
+                        : 'ADMIN.PAGE_BUILDER.SECTIONS.HIDDEN'
+                      ) | translate
+                    "
+                    [tone]="section.isVisible ? 'success' : 'neutral'"
+                  />
+                  <div class="page-builder-page__section-actions" (click)="$event.stopPropagation()">
+                    <app-admin-icon-button
+                      [icon]="section.isVisible ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                      [label]="'ADMIN.PAGE_BUILDER.SECTIONS.TOGGLE_VISIBILITY' | translate"
+                      *hamboxHasPermission="permissions.PageBuilder.Edit"
+                      (pressed)="toggleVisibility(section.instanceId)"
+                    />
+                    <app-admin-icon-button
+                      icon="pi pi-copy"
+                      [label]="'ADMIN.PAGE_BUILDER.SECTIONS.DUPLICATE' | translate"
+                      *hamboxHasPermission="permissions.PageBuilder.Edit"
+                      (pressed)="duplicateSection(section.instanceId)"
+                    />
+                    <app-admin-icon-button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      [label]="'ADMIN.PAGE_BUILDER.SECTIONS.REMOVE' | translate"
+                      *hamboxHasPermission="permissions.PageBuilder.Edit"
+                      (pressed)="requestRemoveSection(section.instanceId)"
+                    />
+                  </div>
+                </li>
+              }
+            </ol>
+          }
+        }
+      </app-admin-section-card>
+
+      <app-section-settings-panel
+        class="page-builder-page__settings"
+        [entry]="selectedEntry()"
+        [editable]="canEdit()"
+        (visibilityToggle)="toggleVisibility($event)"
+        (configChange)="onConfigChange($event)"
+      />
+    </div>
+  }
+</section>
+
+<app-section-library-drawer
+  [visible]="libraryOpen()"
+  (visibleChange)="libraryOpen.set($event)"
+  (variantSelected)="onVariantSelected($event)"
+/>
+
+<app-admin-sticky-save-bar
+  [visible]="stickyBarVisible()"
+  [dirty]="dirty()"
+  [hint]="'ADMIN.PAGE_BUILDER.SAVE_BAR.HINT' | translate"
+>
+  <p-button
+    [label]="'ADMIN.PAGE_BUILDER.SAVE_BAR.DISCARD' | translate"
+    severity="secondary"
+    [text]="true"
+    [disabled]="saving() || publishing()"
+    (onClick)="discardDraft()"
+    *hamboxHasPermission="permissions.PageBuilder.Edit"
+  />
+  <p-button
+    [label]="'ADMIN.PAGE_BUILDER.SAVE_BAR.SAVE' | translate"
+    severity="secondary"
+    [loading]="saving()"
+    [disabled]="!dirty() || publishing()"
+    (onClick)="saveDraft()"
+    *hamboxHasPermission="permissions.PageBuilder.Edit"
+  />
+  <p-button
+    [label]="'ADMIN.PAGE_BUILDER.SAVE_BAR.PUBLISH' | translate"
+    severity="primary"
+    [loading]="publishing()"
+    [disabled]="saving()"
+    (onClick)="publish()"
+    *hamboxHasPermission="permissions.PageBuilder.Publish"
+  />
+</app-admin-sticky-save-bar>
+
+<p-dialog
+  [header]="'ADMIN.PAGE_BUILDER.TEMPLATES.NEW' | translate"
+  [visible]="newTemplateDialogOpen()"
+  (visibleChange)="newTemplateDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="page-builder-page__new-template-form">
+    <label class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.PAGE_BUILDER.TEMPLATES.NAME' | translate }}</span>
+      <input
+        pInputText
+        class="admin-field__input"
+        type="text"
+        [ngModel]="newTemplateName()"
+        (ngModelChange)="newTemplateName.set($event)"
+        name="newTemplateName"
+      />
+    </label>
+
+    <label class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.PAGE_BUILDER.TEMPLATES.CLONE_FROM' | translate }}</span>
+      <p-select
+        [options]="cloneOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'ADMIN.PAGE_BUILDER.TEMPLATES.CLONE_FROM_NONE' | translate"
+        [ngModel]="newTemplateCloneFromId()"
+        (ngModelChange)="newTemplateCloneFromId.set($event)"
+        name="newTemplateCloneFrom"
+      />
+    </label>
+  </div>
+
+  <div class="page-builder-page__new-template-actions">
+    <p-button
+      [label]="'ADMIN.CONFIRM.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="newTemplateDialogOpen.set(false)"
+    />
+    <p-button
+      [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.CREATE' | translate"
+      severity="primary"
+      [loading]="facade.creating()"
+      [disabled]="!newTemplateName().trim()"
+      (onClick)="confirmCreateTemplate()"
+    />
+  </div>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="pendingRemoveInstanceId() !== null"
+  [title]="'ADMIN.PAGE_BUILDER.SECTIONS.REMOVE_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.PAGE_BUILDER.SECTIONS.REMOVE_CONFIRM_MESSAGE' | translate"
+  [destructive]="true"
+  (visibleChange)="pendingRemoveInstanceId.set(null)"
+  (confirmed)="confirmRemoveSection()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="pendingDeleteTemplate() !== null"
+  [title]="'ADMIN.PAGE_BUILDER.TEMPLATES.DELETE_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.PAGE_BUILDER.TEMPLATES.DELETE_CONFIRM_MESSAGE' | translate"
+  [destructive]="true"
+  (visibleChange)="pendingDeleteTemplate.set(null)"
+  (confirmed)="confirmDeleteTemplate()"
+/>

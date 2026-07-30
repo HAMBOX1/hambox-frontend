@@ -1,0 +1,63 @@
+<div class="trust-bar-form">
+  @if (!config().items.length) {
+    <p class="trust-bar-form__empty">{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.EMPTY' | translate }}</p>
+  }
+
+  <ul class="trust-bar-form__list" cdkDropList [cdkDropListDisabled]="disabled()" (cdkDropListDropped)="onDrop($event)">
+    @for (item of config().items; track item.id; let i = $index) {
+      <li class="trust-bar-form__item" cdkDrag [cdkDragDisabled]="disabled()">
+        <i class="pi pi-bars trust-bar-form__handle" cdkDragHandle aria-hidden="true"></i>
+
+        <div class="trust-bar-form__item-fields">
+          <label class="trust-bar-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.ICON_URL' | translate }}</span>
+            <app-media-picker
+              [value]="item.iconUrl"
+              [disabled]="disabled()"
+              recommendedSize="64×64px, transparent PNG/SVG"
+              (valueChange)="updateItem(i, { iconUrl: $event ?? '' })"
+            />
+          </label>
+
+          <label class="trust-bar-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.ITEM_TITLE' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="item.title"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { title: $event })"
+            />
+          </label>
+
+          <label class="trust-bar-form__field trust-bar-form__field--wide">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.ITEM_DESCRIPTION' | translate }}</span>
+            <textarea
+              pTextarea
+              rows="2"
+              [ngModel]="item.description"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { description: $event })"
+            ></textarea>
+          </label>
+        </div>
+
+        <app-admin-icon-button
+          icon="pi pi-trash"
+          severity="danger"
+          [disabled]="disabled()"
+          [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.REMOVE_ITEM' | translate"
+          (pressed)="removeItem(i)"
+        />
+      </li>
+    }
+  </ul>
+
+  <app-admin-icon-button
+    icon="pi pi-plus"
+    severity="secondary"
+    [disabled]="disabled()"
+    [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.TRUST_BAR.ADD_ITEM' | translate"
+    (pressed)="addItem()"
+  />
+</div>

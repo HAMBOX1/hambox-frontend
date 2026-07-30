@@ -39,6 +39,9 @@ export class HamboxBottomSheetComponent {
   readonly ariaLabel = input('');
   readonly dragToDismiss = input(true);
   readonly portal = input(true);
+  // Default panel bg is intentionally translucent (storefront glass-panel look). Consumers that
+  // need a fully opaque panel (e.g. admin bottom sheets over dense content) opt in with this.
+  readonly solid = input(false);
 
   readonly closed = output<void>();
 

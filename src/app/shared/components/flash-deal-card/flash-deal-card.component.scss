@@ -38,6 +38,22 @@
   }
 }
 
+.flash-card--featured .flash-card__media {
+  height: 320px;
+}
+
+.flash-card--featured .flash-card__title {
+  font-size: 22px;
+  line-height: 30px;
+}
+
+.flash-card--featured .flash-card__subtitle {
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
 :host ::ng-deep .flash-card__badge.p-tag {
   position: absolute;
   top: 16px;
@@ -129,4 +145,23 @@
   font-weight: 600;
   line-height: 20px;
   letter-spacing: 0.7px;
+}
+
+.flash-card__buy--featured {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--sf-radius-md);
+  background: var(--color-text-primary);
+  color: var(--color-background);
+  font-family: var(--sf-font-body);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.7px;
+
+  .pi {
+    font-size: 13px;
+  }
 }

@@ -256,31 +256,31 @@
           </app-admin-section-card>
         }
       }
+
+      <app-admin-sticky-save-bar
+        [dirty]="dirty()"
+        [visible]="canEdit()"
+        [hint]="hasValidationErrors() ? ('ADMIN.SETTINGS.VALIDATION.BLOCKED' | translate) : ''"
+      >
+      @if (canEdit()) {
+        <p-button
+          [label]="'ADMIN.SETTINGS.RESTORE_DEFAULTS' | translate"
+          severity="secondary"
+          [text]="true"
+          [disabled]="facade.saving()"
+          (onClick)="requestRestore()"
+        />
+        <p-button
+          [label]="'ADMIN.SETTINGS.SAVE_CHANGES' | translate"
+          icon="pi pi-check"
+          [loading]="facade.saving()"
+          [disabled]="!dirty() || hasValidationErrors()"
+          (onClick)="saveActive()"
+        />
+      }
+      </app-admin-sticky-save-bar>
     </section>
   </div>
-
-  <app-admin-sticky-save-bar
-    [dirty]="dirty()"
-    [visible]="canEdit()"
-    [hint]="hasValidationErrors() ? ('ADMIN.SETTINGS.VALIDATION.BLOCKED' | translate) : ''"
-  >
-  @if (canEdit()) {
-    <p-button
-      [label]="'ADMIN.SETTINGS.RESTORE_DEFAULTS' | translate"
-      severity="secondary"
-      [text]="true"
-      [disabled]="facade.saving()"
-      (onClick)="requestRestore()"
-    />
-    <p-button
-      [label]="'ADMIN.SETTINGS.SAVE_CHANGES' | translate"
-      icon="pi pi-check"
-      [loading]="facade.saving()"
-      [disabled]="!dirty() || hasValidationErrors()"
-      (onClick)="saveActive()"
-    />
-  }
-  </app-admin-sticky-save-bar>
 }
 
 <app-admin-unsaved-changes-dialog

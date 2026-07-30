@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PopoverModule } from 'primeng/popover';
 
 import { LanguageSwitcherComponent } from '../../../../shared/components/language-switcher/language-switcher.component';
 import { CurrencySwitcherComponent } from '../../../../shared/components/currency-switcher/currency-switcher.component';
 import { ThemeToggleComponent } from '../../../../shared/components/theme-toggle/theme-toggle.component';
-import { Auth } from '../../../auth/services/auth';
-import { AdminSidebarStateService } from '../../services/admin-sidebar-state.service';
+import { AdminAuth } from '../../../auth/services/admin-auth';
+import { AdminPageTitleService } from '../../services/admin-page-title.service';
 
 @Component({
   selector: 'app-admin-topbar',
   standalone: true,
   imports: [
-    RouterLink,
     ThemeToggleComponent,
     LanguageSwitcherComponent,
     CurrencySwitcherComponent,
@@ -25,8 +24,9 @@ import { AdminSidebarStateService } from '../../services/admin-sidebar-state.ser
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminTopbarComponent {
-  private readonly auth = inject(Auth);
-  protected readonly sidebarState = inject(AdminSidebarStateService);
+  private readonly auth = inject(AdminAuth);
+  private readonly router = inject(Router);
+  protected readonly pageTitle = inject(AdminPageTitleService);
 
   readonly menuToggle = output<void>();
 
@@ -47,11 +47,27 @@ export class AdminTopbarComponent {
     return source.charAt(0).toUpperCase();
   });
 
-  protected openMobileMenu(): void {
-    this.menuToggle.emit();
+  protected readonly isLoggingOut = signal(false);
+
+  protected logout(): void {
+    if (this.isLoggingOut()) {
+      return;
+    }
+
+    this.isLoggingOut.set(true);
+    this.auth.logout().subscribe({
+      next: () => {
+        this.isLoggingOut.set(false);
+        void this.router.navigate(['/admin/login']);
+      },
+      error: () => {
+        this.isLoggingOut.set(false);
+        void this.router.navigate(['/admin/login']);
+      },
+    });
   }
 
-  protected toggleSidebar(): void {
-    this.sidebarState.toggle();
+  protected openMobileMenu(): void {
+    this.menuToggle.emit();
   }
 }

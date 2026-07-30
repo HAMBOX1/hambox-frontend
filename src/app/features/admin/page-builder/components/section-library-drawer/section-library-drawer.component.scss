@@ -1,0 +1,61 @@
+.section-library-drawer__search {
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.section-library-drawer__group {
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-library-drawer__group-title {
+  margin: 0 0 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-secondary);
+}
+
+.section-library-drawer__cards {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.section-library-drawer__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--admin-radius-md, 10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--ui-primary);
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  }
+}
+
+.section-library-drawer__card-icon {
+  color: var(--ui-primary);
+  font-size: 1.1rem;
+}
+
+.section-library-drawer__card-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.section-library-drawer__card-key {
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+}

@@ -384,6 +384,7 @@
       "NAV_DASHBOARD": "Dashboard",
       "NAV_LIBRARY": "Library",
       "NAV_ORDERS": "Orders",
+      "NAV_SUPPORT": "Support",
       "NAV_MEMBERSHIP": "Membership",
       "NAV_WISHLIST": "Vault",
       "NAV_NOTIFICATIONS": "Notifications",
@@ -585,6 +586,142 @@
       "SUPPORT_DESC": "We're here whenever you play"
     }
   },
+  "SUPPORT": {
+    "STATUS": {
+      "OPEN": "Open",
+      "PENDING": "Pending",
+      "WAITING_CUSTOMER": "Waiting on you",
+      "WAITING_AGENT": "Waiting on agent",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed",
+      "ESCALATED": "Escalated",
+      "AI_HANDLING": "AI handling"
+    },
+    "PRIORITY": {
+      "LOW": "Low",
+      "NORMAL": "Normal",
+      "HIGH": "High",
+      "URGENT": "Urgent",
+      "CRITICAL": "Critical"
+    },
+    "CATEGORY": {
+      "BILLING": "Billing",
+      "TECHNICAL": "Technical",
+      "ACCOUNT": "Account",
+      "ORDER": "Order",
+      "PRODUCT": "Product",
+      "GENERAL": "General"
+    },
+    "TIMELINE": {
+      "CREATED": "Ticket created",
+      "ASSIGNED": "Assigned to",
+      "PRIORITY_CHANGED": "Priority changed to",
+      "RESOLVED": "Marked resolved",
+      "CLOSED": "Closed",
+      "STATUS_CHANGED": "Status changed to"
+    },
+    "SUBNAV": {
+      "ARIA": "Support navigation",
+      "HOME": "Support Home",
+      "OPEN": "Open Tickets",
+      "CLOSED": "Closed Tickets",
+      "CREATE": "Create Ticket",
+      "KNOWLEDGE_BASE": "Knowledge Base",
+      "AI_ASSISTANT": "Ask AI"
+    },
+    "HOME": {
+      "TITLE": "Support",
+      "SUBTITLE": "Hi {{name}}, how can we help today?",
+      "QUICK": {
+        "OPEN_TICKET": "Open a Ticket",
+        "OPEN_TICKET_HINT": "Get help from our support team",
+        "ASK_AI": "Ask AI",
+        "ASK_AI_HINT": "Get an instant answer",
+        "HELP_CENTER": "Browse Help Center",
+        "HELP_CENTER_HINT": "Find answers in our guides"
+      },
+      "STATS": {
+        "OPEN": "Open Tickets",
+        "WAITING": "Waiting for Reply",
+        "RESOLVED": "Resolved",
+        "TOTAL": "Total Tickets",
+        "AVG_RESPONSE": "Avg. Response Time",
+        "MINUTES": "{{count}} min"
+      },
+      "STATUS_ONLINE": "Support is online — {{count}} agents available",
+      "STATUS_OFFLINE": "Support is offline right now — we'll reply as soon as we're back",
+      "RECENT_TITLE": "Recent Conversations",
+      "VIEW_ALL": "View all",
+      "EMPTY": "You haven't contacted support yet."
+    },
+    "LIST": {
+      "OPEN_TITLE": "Open Tickets",
+      "OPEN_SUBTITLE": "Tickets currently being worked on.",
+      "CLOSED_TITLE": "Closed Tickets",
+      "CLOSED_SUBTITLE": "Tickets that have been resolved or closed.",
+      "NEW_TICKET": "New Ticket",
+      "SEARCH_PLACEHOLDER": "Search tickets...",
+      "EMPTY": "No tickets here yet."
+    },
+    "CREATE": {
+      "TITLE": "Create a Support Ticket",
+      "SUBTITLE": "Tell us what's going on and we'll get back to you as soon as possible.",
+      "CATEGORY": "Category",
+      "CATEGORY_DEFAULT": "General",
+      "SUBCATEGORY": "Subcategory",
+      "PRIORITY": "Priority",
+      "PRIORITY_DEFAULT": "Normal",
+      "SUBJECT": "Subject",
+      "SUBJECT_PLACEHOLDER": "A short summary of your issue",
+      "DESCRIPTION": "Description",
+      "DESCRIPTION_PLACEHOLDER": "Describe your issue in detail...",
+      "RELATED_ORDER": "Related Order",
+      "RELATED_PRODUCT": "Related Product",
+      "RELATED_PRODUCT_PLACEHOLDER": "Which product is this about?",
+      "MEMBERSHIP": "Membership",
+      "MEMBERSHIP_NONE": "Not applicable",
+      "TAGS": "Tags",
+      "TAGS_PLACEHOLDER": "Add a tag and press Enter",
+      "REMOVE_TAG": "Remove tag",
+      "ATTACHMENTS": "Attachments",
+      "DROPZONE_HINT": "Drag and drop files here",
+      "BROWSE_FILES": "Browse files",
+      "DROPZONE_TYPES": "Images, PDF, ZIP, logs, and videos supported",
+      "REMOVE_ATTACHMENT": "Remove attachment",
+      "SUBMIT": "Submit Ticket",
+      "ERRORS": {
+        "SUBJECT_REQUIRED": "Please enter a subject.",
+        "DESCRIPTION_REQUIRED": "Please describe your issue."
+      }
+    },
+    "DETAIL": {
+      "ASSIGNED_TO": "Assigned to {{name}}",
+      "CREATED": "Created",
+      "TIMELINE": "Timeline",
+      "YOU": "You",
+      "REPLY_PLACEHOLDER": "Write a reply...",
+      "SEND": "Send",
+      "NOT_FOUND": "Ticket not found.",
+      "CLOSE": "Close ticket",
+      "REOPEN": "Reopen ticket",
+      "RATE_PROMPT": "How did we do? Rate your support experience.",
+      "RATE_COMMENT_PLACEHOLDER": "Optional comment...",
+      "RATE_SUBMIT": "Submit rating",
+      "CONNECTION": {
+        "CONNECTING": "Connecting…",
+        "RECONNECTING": "Reconnecting…",
+        "DISCONNECTED": "Offline — messages may be delayed"
+      }
+    },
+    "KB": {
+      "TITLE": "Knowledge Base",
+      "SUBTITLE": "Find quick answers before opening a ticket.",
+      "SEARCH_PLACEHOLDER": "Search articles...",
+      "HELPFUL": "{{percent}}% found this helpful",
+      "VIEWS": "views",
+      "EMPTY": "No articles match your search."
+    }
+  },
   "ADMIN": {
     "CLEARANCE": "Level 4 clearance",
     "UTILITIES": "Admin utilities",
@@ -602,9 +739,9 @@
       "BACK_TO_INVENTORY": "Go to inventory"
     },
     "TOPBAR": {
-      "WORKSPACE": "Admin workspace",
-      "WORKSPACE_HINT": "Manage catalog, access, and commerce",
-      "MORE": "More options"
+      "MORE": "More options",
+      "LOGOUT": "Log out",
+      "LOGGING_OUT": "Signing out…"
     },
     "SIDEBAR": {
       "NAV_ARIA": "Admin navigation",
@@ -807,9 +944,11 @@
       "PROMOTIONS": "Promotions",
       "MEMBERSHIPS": "Memberships",
       "THEMES": "Themes",
+      "PAGE_BUILDER": "Page Builder",
       "LEGAL": "Legal Center",
       "ORDERS": "Orders",
       "OPERATIONS": "Operations",
+      "SUPPORT": "Support",
       "ANALYTICS": "Analytics",
       "REPORTS": "Reports",
       "SETTINGS": "Settings",
@@ -1048,6 +1187,70 @@
         "API_LOGS": "No API logs yet.",
         "RECURRING": "No recurring jobs registered.",
         "HISTORY": "No execution history yet."
+      }
+    },
+    "SUPPORT": {
+      "LIST": {
+        "TITLE": "Tickets",
+        "SUBTITLE": "Every customer support ticket across the platform.",
+        "SEARCH": "Search tickets, customers, or ticket numbers",
+        "ALL_STATUSES": "All statuses",
+        "ALL_PRIORITIES": "All priorities",
+        "ALL_CATEGORIES": "All categories",
+        "BULK_RESOLVE": "Mark resolved",
+        "UNASSIGNED": "Unassigned",
+        "EMPTY": "No tickets match your filters.",
+        "FILTERS": "Filters",
+        "CLEAR_FILTERS": "Clear filters",
+        "COLS": {
+          "NUMBER": "#",
+          "SUBJECT": "Subject",
+          "CUSTOMER": "Customer",
+          "STATUS": "Status",
+          "PRIORITY": "Priority",
+          "CATEGORY": "Category",
+          "ASSIGNED": "Assigned",
+          "LAST_REPLY": "Last reply",
+          "CREATED": "Created",
+          "UNREAD": "Unread",
+          "AI": "AI"
+        }
+      },
+      "DETAIL": {
+        "ASSIGN": "Assign agent",
+        "ASSIGN_TO_ME": "Assign to me",
+        "STATUS": "Status",
+        "PRIORITY": "Priority",
+        "MORE_ACTIONS": "More actions",
+        "CONVERSATION": "Conversation",
+        "INTERNAL_NOTE": "Internal note",
+        "REPLY": "Reply",
+        "PUBLIC_REPLY": "Public reply",
+        "INTERNAL_PLACEHOLDER": "Write an internal note visible only to agents...",
+        "REPLY_PLACEHOLDER": "Write a reply to the customer...",
+        "SEND": "Send",
+        "CUSTOMER": "Customer",
+        "MEMBERSHIP": "Membership",
+        "RELATED_ORDER": "Related order",
+        "RELATED_PRODUCT": "Related product",
+        "COUNTRY": "Country",
+        "DEVICE": "Device",
+        "RECENT_TICKETS_COUNT": "Other tickets from this customer",
+        "RECENT_ORDERS": "Recent orders",
+        "LICENSE_KEYS": "License keys included",
+        "AI_SUMMARY": "AI summary",
+        "AI_NOT_AVAILABLE": "AI summary not available yet.",
+        "RECENT_TICKETS": "Recent tickets",
+        "NO_RECENT_TICKETS": "No other tickets from this customer.",
+        "TIMELINE": "Timeline",
+        "NOT_FOUND": "Ticket not found.",
+        "SELECT_TICKET": "Select a ticket to view the conversation.",
+        "BACK_TO_LIST": "Back to tickets",
+        "CONNECTION": {
+          "CONNECTING": "Connecting…",
+          "RECONNECTING": "Reconnecting…",
+          "DISCONNECTED": "Offline"
+        }
       }
     },
     "ANALYTICS": {
@@ -1397,7 +1600,8 @@
         "INVALID_URL": "Enter a valid URL starting with https://.",
         "INVALID_HEX": "Enter a valid hex color, e.g. #6366F1.",
         "MIN_VALUE": "Must be at least {{min}}.",
-        "MAX_VALUE": "Must be no more than {{max}}."
+        "MAX_VALUE": "Must be no more than {{max}}.",
+        "INVALID_ROUTE": "Enter a valid path (starting with /) or a full https:// URL."
       },
       "DANGER": {
         "TITLE": "Confirm this change",
@@ -2714,6 +2918,7 @@
         "EDIT_NOTE": "Edit",
         "EDITED": "edited",
         "AUDIT": "Audit history",
+        "SUPPORT_TICKETS": "Support Tickets",
         "CHANGE_STATUS": "Change status",
         "STATUS_CONFIRM": "Select the new order status.",
         "CONFIRM": "Confirm",
@@ -3073,6 +3278,708 @@
         "EXPORT": "Export",
         "PREVIEW": "Preview",
         "ROLLBACK": "Rollback"
+      }
+    },
+    "PAGE_BUILDER": {
+      "TITLE": "Page Builder",
+      "SUBTITLE": "Manage landing page templates and control which one is live on the storefront homepage.",
+      "TEMPLATES": {
+        "TITLE": "Templates",
+        "LIVE": "Live",
+        "UNPUBLISHED_CHANGES": "Unpublished changes",
+        "SET_ACTIVE": "Set active",
+        "UPDATED": "Updated",
+        "EMPTY": "No landing page templates yet.",
+        "NEW": "New Template",
+        "NAME": "Name",
+        "CLONE_FROM": "Duplicate from (optional)",
+        "CLONE_FROM_NONE": "Start blank",
+        "CREATE": "Create",
+        "DUPLICATE": "Duplicate",
+        "DELETE": "Delete",
+        "COPY_SUFFIX": "(Copy)",
+        "DELETE_CONFIRM_TITLE": "Delete template",
+        "DELETE_CONFIRM_MESSAGE": "This template and its sections will be permanently deleted. This cannot be undone."
+      },
+      "SECTIONS": {
+        "TITLE": "Sections",
+        "SUBTITLE": "Add, reorder, and configure the sections that make up this template.",
+        "EMPTY": "Select a template to edit its sections.",
+        "EMPTY_SECTIONS": "This template has no sections yet.",
+        "VISIBLE": "Visible",
+        "HIDDEN": "Hidden",
+        "ADD": "Add Section",
+        "TOGGLE_VISIBILITY": "Toggle visibility",
+        "DUPLICATE": "Duplicate section",
+        "REMOVE": "Remove section",
+        "REMOVE_CONFIRM_TITLE": "Remove section",
+        "REMOVE_CONFIRM_MESSAGE": "This section will be removed from the draft. Save the draft to keep the change.",
+        "UNDO": "Undo",
+        "REDO": "Redo"
+      },
+      "LIBRARY": {
+        "TITLE": "Add a Section",
+        "SEARCH_PLACEHOLDER": "Search sections...",
+        "EMPTY": "No sections match your search."
+      },
+      "PREVIEW": {
+        "TITLE": "Preview",
+        "SUBTITLE": "See how these sections will look on the storefront homepage.",
+        "EMPTY": "No visible sections to preview yet.",
+        "DEVICE_GROUP": "Preview device width",
+        "DEVICE_DESKTOP": "Desktop",
+        "DEVICE_TABLET": "Tablet",
+        "DEVICE_MOBILE": "Mobile"
+      },
+      "SETTINGS": {
+        "TITLE": "Section Settings",
+        "EMPTY": "Select a section to edit its settings.",
+        "STOPGAP_NOTE": "This section variant doesn't have a visual settings editor yet — edit raw configuration for now.",
+        "CONFIG_JSON": "Configuration (JSON)",
+        "INVALID_JSON": "Invalid JSON — changes will not be saved until this is fixed.",
+        "FIELDS": {
+          "HERO": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Main hero headline."
+            },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Supporting line shown under the headline."
+            },
+            "PRIMARY_BUTTON_TEXT": {
+              "LABEL": "Primary button text",
+              "HELP": "Label on the main call-to-action button."
+            },
+            "PRIMARY_BUTTON_URL": {
+              "LABEL": "Primary button link",
+              "HELP": "Where the primary button navigates to."
+            },
+            "SECONDARY_BUTTON_TEXT": {
+              "LABEL": "Secondary button text",
+              "HELP": "Label on the secondary button."
+            },
+            "SECONDARY_BUTTON_URL": {
+              "LABEL": "Secondary button link",
+              "HELP": "Where the secondary button navigates to."
+            },
+            "BACKGROUND_IMAGE_URL": {
+              "LABEL": "Background image URL",
+              "HELP": "Hero background image."
+            },
+            "OVERLAY_IMAGE_URL": {
+              "LABEL": "Overlay image URL",
+              "HELP": "Optional image layered over the background."
+            },
+            "OVERLAY_OPACITY": {
+              "LABEL": "Overlay opacity",
+              "HELP": "Opacity of the overlay image, from 0 to 1."
+            },
+            "BADGE_TEXT": {
+              "LABEL": "Badge text",
+              "HELP": "Small eyebrow label shown above the title."
+            },
+            "BADGE_COLOR": {
+              "LABEL": "Badge color",
+              "HELP": "Text color of the badge."
+            },
+            "PRIMARY_BUTTON": {
+              "LABEL": "Primary Button"
+            },
+            "SECONDARY_BUTTON": {
+              "LABEL": "Secondary Button"
+            }
+          },
+          "GRID_SHOWCASE": {
+            "BADGE_TEXT": {
+              "LABEL": "Badge text",
+              "HELP": "Small eyebrow label shown above the title."
+            },
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "First line of the hero headline."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "Title accent line",
+              "HELP": "Second, accent-colored line of the headline."
+            },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Supporting line shown under the headline."
+            },
+            "PRIMARY_BUTTON_TEXT": {
+              "LABEL": "Primary button text",
+              "HELP": "Label on the main call-to-action button."
+            },
+            "PRIMARY_BUTTON_URL": {
+              "LABEL": "Primary button link",
+              "HELP": "Where the primary button navigates to."
+            },
+            "SECONDARY_BUTTON_TEXT": {
+              "LABEL": "Secondary button text",
+              "HELP": "Label on the secondary button."
+            },
+            "SECONDARY_BUTTON_URL": {
+              "LABEL": "Secondary button link",
+              "HELP": "Where the secondary button navigates to."
+            },
+            "BACKGROUND_IMAGE_URL": {
+              "LABEL": "Background image URL",
+              "HELP": "Hero background image."
+            },
+            "OVERLAY_IMAGE_URL": {
+              "LABEL": "Overlay image URL",
+              "HELP": "Optional image layered over the background."
+            },
+            "OVERLAY_OPACITY": {
+              "LABEL": "Overlay opacity",
+              "HELP": "Opacity of the background image, from 0 to 1."
+            },
+            "PRIMARY_BUTTON": {
+              "LABEL": "Primary Button"
+            },
+            "SECONDARY_BUTTON": {
+              "LABEL": "Secondary Button"
+            }
+          },
+          "EDITORIAL_SPOTLIGHT": {
+            "EYEBROW_TEXT": {
+              "LABEL": "Eyebrow text",
+              "HELP": "Small label shown above the title."
+            },
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Section heading."
+            },
+            "VIEW_ALL_TEXT": {
+              "LABEL": "View all link text",
+              "HELP": "Label for the top-right link."
+            },
+            "VIEW_ALL_URL": {
+              "LABEL": "View all link URL",
+              "HELP": "Where the top-right link navigates to."
+            },
+            "FEATURED_BADGE_TEXT": {
+              "LABEL": "Featured card badge",
+              "HELP": "Small badge shown on the large card."
+            },
+            "FEATURED_IMAGE_URL": {
+              "LABEL": "Featured card image URL",
+              "HELP": "Image for the large featured card."
+            },
+            "FEATURED_TITLE": {
+              "LABEL": "Featured card title",
+              "HELP": "Title shown on the large featured card."
+            },
+            "FEATURED_SUBTITLE": {
+              "LABEL": "Featured card subtitle",
+              "HELP": "Supporting line on the large featured card."
+            },
+            "FEATURED_BUTTON_TEXT": {
+              "LABEL": "Featured card button text",
+              "HELP": "Label on the featured card's button."
+            },
+            "FEATURED_BUTTON_URL": {
+              "LABEL": "Featured card button link",
+              "HELP": "Where the featured card's button navigates to."
+            },
+            "SECONDARY_IMAGE_URL": {
+              "LABEL": "Second card image URL",
+              "HELP": "Image for the first small side card."
+            },
+            "SECONDARY_LABEL": {
+              "LABEL": "Second card label",
+              "HELP": "Label shown on the first small side card."
+            },
+            "TERTIARY_IMAGE_URL": {
+              "LABEL": "Third card image URL",
+              "HELP": "Image for the second small side card."
+            },
+            "TERTIARY_LABEL": {
+              "LABEL": "Third card label",
+              "HELP": "Label shown on the second small side card."
+            },
+            "VIEW_ALL_BUTTON": {
+              "LABEL": "View All Button"
+            },
+            "FEATURED_BUTTON": {
+              "LABEL": "Featured Button"
+            }
+          },
+          "PROMO_BANNER": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Banner headline."
+            },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Supporting line shown under the headline."
+            },
+            "IMAGE_URL": {
+              "LABEL": "Image URL",
+              "HELP": "Background image for the banner."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "Button text",
+              "HELP": "Label on the banner's call-to-action button."
+            },
+            "BUTTON_URL": {
+              "LABEL": "Button link",
+              "HELP": "Where the button navigates to."
+            },
+            "COUNTDOWN_SECONDS": {
+              "LABEL": "Countdown duration",
+              "HELP": "Initial countdown length, in seconds."
+            },
+            "COUNTDOWN_ENDS_AT_UTC": {
+              "LABEL": "Countdown end (UTC)",
+              "HELP": "ISO timestamp the countdown ends at, if used."
+            },
+            "BACKGROUND_COLOR": {
+              "LABEL": "Background color",
+              "HELP": "Banner background color."
+            },
+            "BUTTON": {
+              "LABEL": "Button"
+            }
+          },
+          "SEASONAL_CAMPAIGN": {
+            "EYEBROW_TEXT": {
+              "LABEL": "Eyebrow text",
+              "HELP": "Small label shown above the title."
+            },
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "First line of the banner headline."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "Title accent line",
+              "HELP": "Second, accent-colored line of the headline."
+            },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Supporting line shown under the headline."
+            },
+            "IMAGE_URL": {
+              "LABEL": "Image URL",
+              "HELP": "Decorative image for the banner."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "Button text",
+              "HELP": "Label on the banner's call-to-action button."
+            },
+            "BUTTON_URL": {
+              "LABEL": "Button link",
+              "HELP": "Where the button navigates to."
+            },
+            "COUNTDOWN_SECONDS": {
+              "LABEL": "Countdown duration",
+              "HELP": "Initial countdown length, in seconds."
+            },
+            "COUNTDOWN_ENDS_AT_UTC": {
+              "LABEL": "Countdown end (UTC)",
+              "HELP": "ISO timestamp the countdown ends at, if used."
+            },
+            "BUTTON": {
+              "LABEL": "Button"
+            }
+          },
+          "POPULAR_CATEGORIES": {
+            "SECTION_TITLE": {
+              "LABEL": "Section title",
+              "HELP": "Heading shown above the categories."
+            },
+            "MAXIMUM_CATEGORIES": {
+              "LABEL": "Maximum categories",
+              "HELP": "How many categories to display."
+            },
+            "SORT_ORDER": {
+              "LABEL": "Sort order",
+              "HELP": "How categories are ordered."
+            }
+          },
+          "FLASH_DEALS": {
+            "SECTION_TITLE": {
+              "LABEL": "Section title",
+              "HELP": "Heading shown above the flash deals."
+            },
+            "SECTION_SUBTITLE": {
+              "LABEL": "Section subtitle",
+              "HELP": "Supporting line shown under the heading."
+            },
+            "COUNTDOWN_ENABLED": {
+              "LABEL": "Show countdown",
+              "HELP": "Display a countdown timer on this section."
+            },
+            "COUNTDOWN_DATE_UTC": {
+              "LABEL": "Countdown end date (UTC)",
+              "HELP": "ISO timestamp the countdown ends at, if used."
+            },
+            "COUNTDOWN_SECONDS": {
+              "LABEL": "Countdown duration",
+              "HELP": "Initial countdown length, in seconds."
+            },
+            "MAXIMUM_PRODUCTS": {
+              "LABEL": "Maximum products",
+              "HELP": "How many products to display."
+            },
+            "SORT_METHOD": {
+              "LABEL": "Sort method",
+              "HELP": "How featured products are ordered."
+            }
+          },
+          "LATEST_ARRIVALS": {
+            "SECTION_TITLE": {
+              "LABEL": "Section title",
+              "HELP": "First part of the section heading."
+            },
+            "SECTION_TITLE_ACCENT": {
+              "LABEL": "Section title accent",
+              "HELP": "Accent-colored second part of the heading."
+            },
+            "SECTION_SUBTITLE": {
+              "LABEL": "Section subtitle",
+              "HELP": "Supporting line shown under the heading."
+            },
+            "MAXIMUM_PRODUCTS": {
+              "LABEL": "Maximum products",
+              "HELP": "How many products to display (1 featured + the rest in a grid)."
+            },
+            "SORT_METHOD": {
+              "LABEL": "Sort method",
+              "HELP": "How products are ordered."
+            }
+          },
+          "FEATURED_COLLECTIONS": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Section heading."
+            },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Supporting line shown under the heading."
+            },
+            "MAXIMUM_ITEMS": {
+              "LABEL": "Maximum items",
+              "HELP": "How many items to display."
+            },
+            "DISPLAY_STYLE": {
+              "LABEL": "Display style",
+              "HELP": "Layout used to present items."
+            }
+          },
+          "COLLECTION_SHOWCASE": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "First part of the section heading."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "Title accent",
+              "HELP": "Accent-colored second part of the heading."
+            },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Supporting line shown under the heading."
+            },
+            "EMPTY": "No collection cards yet — add one below.",
+            "IMAGE_URL": "Image URL",
+            "CARD_TITLE": "Title",
+            "CARD_SUBTITLE": "Subtitle",
+            "BUTTON_TEXT": "Button text",
+            "BUTTON_URL": "Button link",
+            "ADD_CARD": "Add card",
+            "REMOVE_CARD": "Remove card",
+            "BUTTON": {
+              "LABEL": "Button"
+            }
+          },
+          "PULSE_FEED": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "First part of the section heading."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "Title accent",
+              "HELP": "Accent-colored second part of the heading."
+            },
+            "EMPTY": "No feed items yet — add one below.",
+            "TAG_TEXT": "Tag text",
+            "TAG_TONE": "Tag color",
+            "TIMESTAMP_TEXT": "Timestamp",
+            "ITEM_TITLE": "Title",
+            "ITEM_DESCRIPTION": "Description",
+            "LINK_URL": "Link URL",
+            "ADD_ITEM": "Add item",
+            "REMOVE_ITEM": "Remove item"
+          },
+          "ARENA_BRIEFINGS": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Centered section heading."
+            },
+            "FEATURED_TAG_TEXT": {
+              "LABEL": "Featured story tag",
+              "HELP": "Small badge on the featured story."
+            },
+            "FEATURED_IMAGE_URL": {
+              "LABEL": "Featured story image URL",
+              "HELP": "Image for the featured story."
+            },
+            "FEATURED_TITLE": {
+              "LABEL": "Featured story title",
+              "HELP": "Title on the featured story."
+            },
+            "FEATURED_DESCRIPTION": {
+              "LABEL": "Featured story description",
+              "HELP": "Supporting text on the featured story."
+            },
+            "FEATURED_BUTTON_TEXT": {
+              "LABEL": "Featured story link text",
+              "HELP": "Label on the featured story's link."
+            },
+            "FEATURED_BUTTON_URL": {
+              "LABEL": "Featured story link URL",
+              "HELP": "Where the featured story's link navigates to."
+            },
+            "EMPTY": "No side items yet — add one below.",
+            "SIDE_TAG_TEXT": "Tag text",
+            "SIDE_TITLE": "Title",
+            "SIDE_IMAGE_URL": "Image URL",
+            "SIDE_LINK_URL": "Link URL",
+            "ADD_ITEM": "Add item",
+            "REMOVE_ITEM": "Remove item",
+            "FEATURED_BUTTON": {
+              "LABEL": "Featured Button"
+            }
+          },
+          "CONSOLE_FAVORITES": {
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Section heading."
+            },
+            "EMPTY": "No cards yet — add one below.",
+            "CARD_TITLE": "Title",
+            "BADGE_TEXT": "Badge text",
+            "IMAGE_URL": "Image URL",
+            "TAGS": "Tags (comma-separated)",
+            "BUTTON_TEXT": "Button text",
+            "BUTTON_URL": "Button link",
+            "FEATURED": "Featured (larger, highlighted card)",
+            "ADD_CARD": "Add card",
+            "REMOVE_CARD": "Remove card",
+            "BUTTON": {
+              "LABEL": "Button"
+            }
+          },
+          "PLATFORM_SELECTOR": {
+            "EMPTY": "No platforms yet — add one below.",
+            "LABEL": "Label",
+            "ICON_CLASS": "PrimeIcons class (e.g. pi pi-desktop)",
+            "LINK_URL": "Link URL",
+            "ADD_ITEM": "Add item",
+            "REMOVE_ITEM": "Remove item"
+          },
+          "AI_ASSISTANT": {
+            "STATUS_TEXT": {
+              "LABEL": "Status text",
+              "HELP": "Small status pill above the title."
+            },
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "First part of the heading."
+            },
+            "TITLE_ACCENT": {
+              "LABEL": "Title accent",
+              "HELP": "Accent-colored second part of the heading."
+            },
+            "DESCRIPTION": {
+              "LABEL": "Description",
+              "HELP": "Supporting paragraph."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "Button text",
+              "HELP": "Label on the call-to-action button."
+            },
+            "BUTTON_URL": {
+              "LABEL": "Button link",
+              "HELP": "Where the button navigates to."
+            },
+            "BUTTON": {
+              "LABEL": "Button"
+            }
+          },
+          "HARDWARE_SHOWCASE": {
+            "EYEBROW_TEXT": {
+              "LABEL": "Eyebrow text",
+              "HELP": "Small label shown above the title."
+            },
+            "BADGE_TEXT": {
+              "LABEL": "Badge text",
+              "HELP": "Small badge shown on the image."
+            },
+            "TITLE": {
+              "LABEL": "Title",
+              "HELP": "Section heading."
+            },
+            "DESCRIPTION": {
+              "LABEL": "Description",
+              "HELP": "Supporting paragraph."
+            },
+            "IMAGE_URL": {
+              "LABEL": "Image URL",
+              "HELP": "Product image."
+            },
+            "PRIMARY_BUTTON_TEXT": {
+              "LABEL": "Primary button text",
+              "HELP": "Label on the main call-to-action button."
+            },
+            "PRIMARY_BUTTON_URL": {
+              "LABEL": "Primary button link",
+              "HELP": "Where the primary button navigates to."
+            },
+            "SECONDARY_BUTTON_TEXT": {
+              "LABEL": "Secondary button text",
+              "HELP": "Label on the secondary button."
+            },
+            "SECONDARY_BUTTON_URL": {
+              "LABEL": "Secondary button link",
+              "HELP": "Where the secondary button navigates to."
+            },
+            "PRIMARY_BUTTON": {
+              "LABEL": "Primary Button"
+            },
+            "SECONDARY_BUTTON": {
+              "LABEL": "Secondary Button"
+            }
+          },
+          "TRUST_BAR": {
+            "EMPTY": "No trust items yet — add one below.",
+            "ICON_URL": "Icon URL",
+            "ITEM_TITLE": "Title",
+            "ITEM_DESCRIPTION": "Description",
+            "ADD_ITEM": "Add item",
+            "REMOVE_ITEM": "Remove item"
+          },
+          "COMMUNITY_NEWSLETTER": {
+            "DISCORD_TITLE": {
+              "LABEL": "Discord card title",
+              "HELP": "Heading on the community card."
+            },
+            "DISCORD_DESCRIPTION": {
+              "LABEL": "Discord card description",
+              "HELP": "Supporting text on the community card."
+            },
+            "DISCORD_BUTTON_TEXT": {
+              "LABEL": "Discord button text",
+              "HELP": "Label on the join-server link."
+            },
+            "DISCORD_BUTTON_URL": {
+              "LABEL": "Discord button link",
+              "HELP": "Where the join-server link navigates to."
+            },
+            "NEWSLETTER_TITLE": {
+              "LABEL": "Newsletter card title",
+              "HELP": "Heading on the newsletter card."
+            },
+            "NEWSLETTER_DESCRIPTION": {
+              "LABEL": "Newsletter card description",
+              "HELP": "Supporting text on the newsletter card."
+            },
+            "NEWSLETTER_PLACEHOLDER": {
+              "LABEL": "Email placeholder",
+              "HELP": "Placeholder text in the email field."
+            },
+            "NEWSLETTER_BUTTON_TEXT": {
+              "LABEL": "Subscribe button text",
+              "HELP": "Label on the subscribe button."
+            },
+            "NEWSLETTER_PRIVACY_TEXT": {
+              "LABEL": "Privacy note",
+              "HELP": "Small print shown under the form."
+            },
+            "DISCORD_BUTTON": {
+              "LABEL": "Discord Button"
+            }
+          },
+          "FOOTER": {
+            "COMPANY_NAME": {
+              "LABEL": "Company name",
+              "HELP": "Shown in the footer."
+            },
+            "COPYRIGHT": {
+              "LABEL": "Copyright text",
+              "HELP": "Copyright line shown in the footer."
+            },
+            "SUPPORT_EMAIL": {
+              "LABEL": "Support email",
+              "HELP": "Customer support contact email."
+            },
+            "SUPPORT_PHONE": {
+              "LABEL": "Support phone",
+              "HELP": "Customer support contact phone number."
+            },
+            "ADDRESS": {
+              "LABEL": "Address",
+              "HELP": "Company mailing address."
+            },
+            "WORKING_HOURS": {
+              "LABEL": "Working hours",
+              "HELP": "Support hours shown in the footer."
+            },
+            "FACEBOOK_URL": {
+              "LABEL": "Facebook URL",
+              "HELP": "Link to the Facebook page."
+            },
+            "INSTAGRAM_URL": {
+              "LABEL": "Instagram URL",
+              "HELP": "Link to the Instagram profile."
+            },
+            "X_URL": {
+              "LABEL": "X (Twitter) URL",
+              "HELP": "Link to the X profile."
+            },
+            "DISCORD_URL": {
+              "LABEL": "Discord URL",
+              "HELP": "Link to the Discord server."
+            },
+            "TELEGRAM_URL": {
+              "LABEL": "Telegram URL",
+              "HELP": "Link to the Telegram channel."
+            },
+            "YOUTUBE_URL": {
+              "LABEL": "YouTube URL",
+              "HELP": "Link to the YouTube channel."
+            },
+            "TIKTOK_URL": {
+              "LABEL": "TikTok URL",
+              "HELP": "Link to the TikTok profile."
+            },
+            "WHATSAPP_URL": {
+              "LABEL": "WhatsApp URL",
+              "HELP": "Link to WhatsApp contact/chat."
+            }
+          }
+        }
+      },
+      "SAVE_BAR": {
+        "HINT": "You have unsaved changes to this template's sections.",
+        "DISCARD": "Discard changes",
+        "SAVE": "Save Draft",
+        "PUBLISH": "Publish"
+      },
+      "MESSAGES": {
+        "ACTIVATED": "Template activated.",
+        "ACTIVATE_FAILED": "Failed to activate template.",
+        "CREATED": "Template created.",
+        "CREATE_FAILED": "Failed to create template.",
+        "DELETED": "Template deleted.",
+        "DELETE_FAILED": "Failed to delete template.",
+        "SAVED": "Draft saved.",
+        "SAVE_FAILED": "Failed to save draft.",
+        "PUBLISHED": "Template published.",
+        "PUBLISH_FAILED": "Failed to publish template.",
+        "DISCARDED": "Draft discarded.",
+        "DISCARD_FAILED": "Failed to discard draft."
       }
     },
     "LEGAL": {
@@ -3492,6 +4399,70 @@
         "ACTION_FAILED": "Action failed.",
         "EMAIL_BLOCKED": "Email blocked.",
         "IP_BLOCKED": "IP address blocked."
+      }
+    },
+    "PICKERS": {
+      "ROUTE_PICKER": {
+        "MODE_PAGE": "Choose a page",
+        "MODE_CUSTOM": "Custom link",
+        "SELECT_PLACEHOLDER": "Search pages…",
+        "RECENT": "Recent:",
+        "GROUPS": {
+          "STOREFRONT": "Storefront",
+          "ACCOUNT": "Account",
+          "INFO": "Info"
+        },
+        "ROUTES": {
+          "HOME": "Home",
+          "PRODUCTS": "Products",
+          "CART": "Cart",
+          "CHECKOUT": "Checkout",
+          "MEMBERSHIP_CHECKOUT": "Membership Checkout",
+          "SUPPORT_CHAT": "Support Chat",
+          "LEGAL": "Legal & Policies",
+          "DASHBOARD": "Dashboard",
+          "LIBRARY": "Library",
+          "ORDERS": "Orders",
+          "WISHLIST": "Wishlist",
+          "MEMBERSHIP": "Membership",
+          "REFERRAL": "Referral",
+          "NOTIFICATIONS": "Notifications",
+          "PROFILE": "Profile",
+          "SUPPORT": "Support"
+        }
+      },
+      "MEDIA_PICKER": {
+        "PREVIEW_ALT": "Image preview",
+        "BROKEN_IMAGE": "This image could not be loaded — check the URL.",
+        "RECENT": "Recently used:",
+        "REMOVE": "Remove image",
+        "UPLOAD": "Upload image",
+        "INVALID_TYPE": "Please choose an image file.",
+        "TOO_LARGE": "Image must be 5 MB or smaller.",
+        "UPLOAD_FAILED": "Upload failed. Please try again."
+      },
+      "ICON_PICKER": {
+        "PLACEHOLDER": "Choose an icon…",
+        "SEARCH_PLACEHOLDER": "Search icons…",
+        "NO_RESULTS": "No icons match your search."
+      },
+      "BUTTON_EDITOR": {
+        "LABEL": "Label",
+        "DESTINATION": "Destination",
+        "MISSING_LABEL": "Add a label so this button has visible text."
+      },
+      "PRODUCT_PICKER": {
+        "SEARCH_PLACEHOLDER": "Search products…",
+        "LOADING": "Searching…",
+        "NO_RESULTS": "No products match your search.",
+        "LIMIT_REACHED": "Maximum number of products selected.",
+        "REMOVE": "Remove product"
+      },
+      "CATEGORY_PICKER": {
+        "SEARCH_PLACEHOLDER": "Search categories…",
+        "LOADING": "Searching…",
+        "NO_RESULTS": "No categories match your search.",
+        "REMOVE": "Remove category"
       }
     }
   },

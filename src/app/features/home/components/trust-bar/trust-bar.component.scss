@@ -4,7 +4,7 @@
 
 .trust-bar {
   width: 100%;
-  padding: 17px 0;
+  padding: var(--sf-section-gap) 0;
   border-top: 1px solid var(--sf-border-subtle);
   border-bottom: 1px solid var(--sf-border-subtle);
   background: var(--sf-bg-section);
@@ -18,7 +18,7 @@
 
 .trust-bar__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--sf-section-gap);
   margin: 0;
   padding: 0;
@@ -29,23 +29,35 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  min-height: 48px;
+  min-height: 56px;
+  padding: 8px;
+  border-radius: var(--sf-radius-md);
+  transition: background var(--hambox-transition-default);
+
+  &:hover {
+    background: var(--color-btn-ghost-hover);
+
+    .trust-bar__icon {
+      transform: scale(1.05);
+    }
+  }
 }
 
 .trust-bar__icon {
   display: flex;
-  flex: 0 0 48px;
+  flex: 0 0 56px;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: var(--sf-radius-pill);
   background: var(--sf-bg-icon);
+  transition: transform var(--hambox-transition-default);
 
   img {
     display: block;
-    max-width: 20px;
-    max-height: 20px;
+    max-width: 24px;
+    max-height: 24px;
   }
 }
 

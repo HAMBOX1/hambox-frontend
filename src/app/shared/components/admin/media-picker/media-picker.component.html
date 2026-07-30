@@ -1,0 +1,94 @@
+<div class="media-picker">
+  <div class="media-picker__row">
+    <div class="media-picker__preview" [class.media-picker__preview--empty]="!displayValue()">
+      @if (displayValue()) {
+        @if (broken()) {
+          <i class="pi pi-image media-picker__broken" aria-hidden="true"></i>
+        } @else {
+          <img
+            [src]="displayValue()"
+            [alt]="'ADMIN.PICKERS.MEDIA_PICKER.PREVIEW_ALT' | translate"
+            (error)="onImageError()"
+            (load)="onImageLoad()"
+          />
+        }
+      } @else {
+        <i class="pi pi-image" aria-hidden="true"></i>
+      }
+    </div>
+
+    <div class="media-picker__input-col">
+      <input
+        pInputText
+        [id]="fieldId"
+        class="w-full"
+        type="text"
+        [placeholder]="placeholder()"
+        [ngModel]="displayValue() ?? ''"
+        [disabled]="disabled()"
+        (ngModelChange)="onInput($event)"
+      />
+      @if (broken()) {
+        <small class="media-picker__error">{{ 'ADMIN.PICKERS.MEDIA_PICKER.BROKEN_IMAGE' | translate }}</small>
+      }
+      @if (uploadError()) {
+        <small class="media-picker__error">{{ uploadError() | translate }}</small>
+      }
+      @if (recommendedSize()) {
+        <small class="media-picker__hint">{{ recommendedSize() }}</small>
+      }
+    </div>
+
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      class="media-picker__file-input"
+      [disabled]="disabled() || uploading()"
+      (change)="onFileSelected($event)"
+    />
+    <button
+      type="button"
+      class="media-picker__upload"
+      [disabled]="disabled() || uploading()"
+      [attr.aria-label]="'ADMIN.PICKERS.MEDIA_PICKER.UPLOAD' | translate"
+      (click)="fileInput.click()"
+    >
+      <i class="pi" [class.pi-spin]="uploading()" [class.pi-upload]="!uploading()" [class.pi-spinner]="uploading()" aria-hidden="true"></i>
+    </button>
+
+    @if (displayValue()) {
+      <button
+        type="button"
+        class="media-picker__clear"
+        [disabled]="disabled()"
+        [attr.aria-label]="'ADMIN.PICKERS.MEDIA_PICKER.REMOVE' | translate"
+        (click)="clear()"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    }
+  </div>
+
+  @if (recentImages().length) {
+    <div class="media-picker__recent">
+      <span class="media-picker__recent-label">{{ 'ADMIN.PICKERS.MEDIA_PICKER.RECENT' | translate }}</span>
+      <div class="media-picker__recent-strip">
+        @for (url of recentImages(); track url) {
+          <button
+            type="button"
+            class="media-picker__recent-thumb"
+            [class.media-picker__recent-thumb--active]="url === displayValue()"
+            [disabled]="disabled()"
+            (click)="applyRecent(url)"
+          >
+            <img [src]="url" [alt]="url" />
+            <span class="media-picker__recent-remove" (click)="removeRecent(url, $event)">
+              <i class="pi pi-times" aria-hidden="true"></i>
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

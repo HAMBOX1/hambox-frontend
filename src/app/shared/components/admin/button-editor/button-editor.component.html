@@ -1,0 +1,25 @@
+<div class="button-editor">
+  <span class="button-editor__title">{{ title() }}</span>
+
+  <div class="button-editor__field">
+    <label [for]="fieldId + '-label'">{{ 'ADMIN.PICKERS.BUTTON_EDITOR.LABEL' | translate }}</label>
+    <input
+      pInputText
+      [id]="fieldId + '-label'"
+      class="w-full"
+      type="text"
+      [ngModel]="label() ?? ''"
+      [disabled]="disabled()"
+      (ngModelChange)="setLabel($event)"
+    />
+  </div>
+
+  <div class="button-editor__field">
+    <label [for]="fieldId + '-url'">{{ 'ADMIN.PICKERS.BUTTON_EDITOR.DESTINATION' | translate }}</label>
+    <app-route-picker [value]="url()" [disabled]="disabled()" (valueChange)="setUrl($event)" />
+  </div>
+
+  @if (incomplete()) {
+    <small class="button-editor__warning">{{ 'ADMIN.PICKERS.BUTTON_EDITOR.MISSING_LABEL' | translate }}</small>
+  }
+</div>

@@ -1,0 +1,14 @@
+<section class="platform-selector" aria-label="Shop by platform">
+  <div class="platform-selector__inner">
+    <ul class="platform-selector__grid">
+      @for (item of config().items; track item.id) {
+        <li>
+          <a class="platform-selector__item" [routerLink]="item.linkUrl">
+            <i class="{{ item.iconClass }}" aria-hidden="true"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

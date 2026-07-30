@@ -27,6 +27,18 @@ export class MaintenanceService {
   readonly enabled = this.enabledState.asReadonly();
   readonly message = this.messageState.asReadonly();
 
+  /**
+   * Called by the error interceptor when the backend's MaintenanceModeMiddleware rejects a
+   * request with 503 MAINTENANCE — that response is the authoritative signal, so it must win
+   * even if our own flag fetch raced it or returned stale/cached state.
+   */
+  markEnabled(message?: string): void {
+    const resolvedMessage = message ?? this.messageState();
+    this.enabledState.set(true);
+    this.messageState.set(resolvedMessage);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: true, message: resolvedMessage }));
+  }
+
   async init(): Promise<void> {
     try {
       const response = await firstValueFrom(

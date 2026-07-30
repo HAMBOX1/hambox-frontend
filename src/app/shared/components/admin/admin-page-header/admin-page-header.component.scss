@@ -6,16 +6,10 @@
 
 .admin-page-header__row {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1.5rem;
-}
-
-.admin-page-header__main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-  min-width: 0;
 }
 
 .admin-page-header__back {
@@ -40,29 +34,22 @@
   }
 }
 
-.admin-page-header__title {
-  margin: 0;
-  color: var(--admin-text-primary);
-  font-family: var(--admin-font-heading);
-  font-size: var(--admin-type-page-title);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
-}
-
-.admin-page-header__subtitle {
-  margin: 0.625rem 0 0;
-  max-width: 44rem;
-  color: var(--admin-text-secondary);
-  font-size: var(--admin-type-body);
-  line-height: 1.55;
-}
-
 .admin-page-header__actions {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   gap: 0.75rem;
+}
+
+/* Forces title and actions onto separate rows regardless of viewport width. */
+.admin-page-header__row--stacked {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.admin-page-header__row--stacked .admin-page-header__actions {
+  flex-wrap: wrap;
+  inline-size: 100%;
 }
 
 @media (max-width: 767px) {
@@ -75,20 +62,10 @@
     justify-content: flex-start;
   }
 
-  /* Compact mode: title and actions stay on one row instead of stacking. */
+  /* Compact mode: back-link and actions stay on one row instead of stacking. */
   .admin-page-header__row--compact {
     flex-direction: row;
     align-items: center;
-  }
-
-  .admin-page-header__row--compact .admin-page-header__main {
-    min-width: 0;
-  }
-
-  .admin-page-header__row--compact .admin-page-header__title {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   .admin-page-header__row--compact .admin-page-header__actions {

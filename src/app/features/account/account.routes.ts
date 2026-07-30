@@ -81,6 +81,50 @@ export const routes: Routes = [
             (c) => c.AccountProfilePageComponent,
           ),
       },
+      {
+        path: 'support',
+        loadComponent: () =>
+          import('./support/pages/support-home-page/account-support-home-page.component').then(
+            (c) => c.AccountSupportHomePageComponent,
+          ),
+      },
+      {
+        path: 'support/tickets/open',
+        data: { statusGroup: 'open' },
+        loadComponent: () =>
+          import('./support/pages/tickets-list-page/account-support-tickets-list-page.component').then(
+            (c) => c.AccountSupportTicketsListPageComponent,
+          ),
+      },
+      {
+        path: 'support/tickets/closed',
+        data: { statusGroup: 'closed' },
+        loadComponent: () =>
+          import('./support/pages/tickets-list-page/account-support-tickets-list-page.component').then(
+            (c) => c.AccountSupportTicketsListPageComponent,
+          ),
+      },
+      {
+        path: 'support/tickets/new',
+        loadComponent: () =>
+          import('./support/pages/create-ticket-page/account-create-ticket-page.component').then(
+            (c) => c.AccountCreateTicketPageComponent,
+          ),
+      },
+      {
+        path: 'support/tickets/:ticketId',
+        loadComponent: () =>
+          import('./support/pages/ticket-detail-page/account-ticket-detail-page.component').then(
+            (c) => c.AccountTicketDetailPageComponent,
+          ),
+      },
+      {
+        path: 'support/knowledge-base',
+        loadComponent: () =>
+          import('./support/pages/knowledge-base-page/account-knowledge-base-page.component').then(
+            (c) => c.AccountKnowledgeBasePageComponent,
+          ),
+      },
     ],
   },
 ];

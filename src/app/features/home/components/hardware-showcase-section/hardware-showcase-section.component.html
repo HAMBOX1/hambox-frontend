@@ -1,0 +1,45 @@
+<section class="hardware-showcase" aria-labelledby="hardware-showcase-title">
+  <div class="hardware-showcase__inner">
+    <div class="hardware-showcase__media">
+      <div class="hardware-showcase__stack">
+        <span class="hardware-showcase__card hardware-showcase__card--back-2" aria-hidden="true">
+          <span class="hardware-showcase__card-float"></span>
+        </span>
+        <span class="hardware-showcase__card hardware-showcase__card--back-1" aria-hidden="true">
+          <span class="hardware-showcase__card-float"></span>
+        </span>
+        <div class="hardware-showcase__card hardware-showcase__card--front">
+          <span class="hardware-showcase__card-float">
+            <img class="hardware-showcase__image" [src]="config().imageUrl" alt="" />
+            @if (config().badgeText) {
+              <span class="hardware-showcase__badge">{{ config().badgeText }}</span>
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hardware-showcase__copy">
+      @if (config().eyebrowText) {
+        <p class="hardware-showcase__eyebrow">{{ config().eyebrowText }}</p>
+      }
+
+      <h2 id="hardware-showcase-title" class="hardware-showcase__title">{{ config().title }}</h2>
+      <p class="hardware-showcase__description">{{ config().description }}</p>
+
+      <div class="hardware-showcase__actions">
+        @if (config().primaryButtonText) {
+          <a class="hardware-showcase__button hardware-showcase__button--primary" [routerLink]="config().primaryButtonUrl">
+            {{ config().primaryButtonText }}
+          </a>
+        }
+
+        @if (config().secondaryButtonText) {
+          <a class="hardware-showcase__button hardware-showcase__button--secondary" [routerLink]="config().secondaryButtonUrl">
+            {{ config().secondaryButtonText }}
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</section>

@@ -90,10 +90,15 @@
   }
 }
 
-.ui-color-picker__recent {
+.ui-color-picker__recent,
+.ui-color-picker__theme-row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.ui-color-picker__swatch--theme {
+  border-width: 2px;
 }
 
 .ui-color-picker__swatch {

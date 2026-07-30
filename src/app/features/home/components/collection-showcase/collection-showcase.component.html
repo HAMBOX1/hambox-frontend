@@ -1,0 +1,61 @@
+<section class="collection-showcase" aria-labelledby="collection-showcase-title">
+  <div class="collection-showcase__inner">
+    <div class="collection-showcase__header">
+      <div class="collection-showcase__heading">
+        <h2 id="collection-showcase-title" class="collection-showcase__title">
+          <span>{{ config().title }}</span>
+          @if (config().titleAccent) {
+            <span class="collection-showcase__title-accent">{{ config().titleAccent }}</span>
+          }
+        </h2>
+
+        @if (config().subtitle) {
+          <p class="collection-showcase__subtitle">{{ config().subtitle }}</p>
+        }
+      </div>
+
+      @if (config().cards.length > 1) {
+        <div class="collection-showcase__nav">
+          <button
+            type="button"
+            class="collection-showcase__nav-button"
+            (click)="scrollByDirection(-1)"
+            aria-label="Scroll collections left"
+          >
+            <i class="pi pi-chevron-left" aria-hidden="true"></i>
+          </button>
+          <button
+            type="button"
+            class="collection-showcase__nav-button"
+            (click)="scrollByDirection(1)"
+            aria-label="Scroll collections right"
+          >
+            <i class="pi pi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="collection-showcase__track" #track>
+      @for (card of config().cards; track card.id) {
+        <article class="collection-showcase__card">
+          <img class="collection-showcase__card-image" [src]="card.imageUrl" alt="" />
+          <div class="collection-showcase__card-shade"></div>
+
+          <div class="collection-showcase__card-copy">
+            <h3 class="collection-showcase__card-title">{{ card.title }}</h3>
+            @if (card.subtitle) {
+              <p class="collection-showcase__card-subtitle">{{ card.subtitle }}</p>
+            }
+            @if (card.buttonText) {
+              <a class="collection-showcase__card-link" [routerLink]="card.buttonUrl">
+                <span>{{ card.buttonText }}</span>
+                <i class="pi pi-arrow-right" aria-hidden="true"></i>
+              </a>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>

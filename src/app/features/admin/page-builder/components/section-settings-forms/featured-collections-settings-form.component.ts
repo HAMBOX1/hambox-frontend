@@ -1,0 +1,53 @@
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+
+import { FeaturedCollectionsSectionConfig } from '../../../../home/section-registry/models/section-config.model';
+import { DISPLAY_STYLE_OPTIONS, SettingsFieldConfig } from '../../../settings/models/platform-settings.model';
+import { SettingsFieldComponent } from '../../../settings/components/settings-field/settings-field.component';
+import { sectionFieldKeys } from './section-field-keys.util';
+
+const KEY = (path: string) => sectionFieldKeys('FEATURED_COLLECTIONS', path);
+
+@Component({
+  selector: 'app-featured-collections-settings-form',
+  standalone: true,
+  imports: [SettingsFieldComponent],
+  template: `
+    <div class="section-settings-form">
+      @for (field of fields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="fieldValue(field.key)"
+          [disabled]="disabled()"
+          (valueChange)="setField(field.key, $event)"
+        />
+      }
+    </div>
+  `,
+  styles: `
+    .section-settings-form {
+      display: grid;
+      gap: 0.85rem;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class FeaturedCollectionsSettingsFormComponent {
+  readonly config = input.required<FeaturedCollectionsSectionConfig>();
+  readonly disabled = input(false);
+  readonly configChange = output<FeaturedCollectionsSectionConfig>();
+
+  protected readonly fields: SettingsFieldConfig[] = [
+    { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
+    { key: 'subtitle', control: 'textarea', rows: 2, ...KEY('SUBTITLE') },
+    { key: 'maximumItems', control: 'stepper', min: 1, max: 24, ...KEY('MAXIMUM_ITEMS') },
+    { key: 'displayStyle', control: 'select', options: DISPLAY_STYLE_OPTIONS, ...KEY('DISPLAY_STYLE') },
+  ];
+
+  protected fieldValue(key: string): unknown {
+    return (this.config() as unknown as Record<string, unknown>)[key];
+  }
+
+  protected setField(key: string, value: unknown): void {
+    this.configChange.emit({ ...this.config(), [key]: value });
+  }
+}

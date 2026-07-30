@@ -1,0 +1,49 @@
+<section class="campaign-banner" aria-labelledby="campaign-banner-title">
+  <div class="campaign-banner__copy">
+    @if (banner().eyebrowText) {
+      <p class="campaign-banner__eyebrow">{{ banner().eyebrowText }}</p>
+    }
+
+    <h2 id="campaign-banner-title" class="campaign-banner__title">
+      <span class="campaign-banner__title-line">{{ banner().title }}</span>
+      @if (banner().titleAccent) {
+        <span class="campaign-banner__title-line campaign-banner__title-line--accent">{{
+          banner().titleAccent
+        }}</span>
+      }
+    </h2>
+
+    @if (banner().subtitle) {
+      <p class="campaign-banner__subtitle">{{ banner().subtitle }}</p>
+    }
+
+    <div class="campaign-banner__actions">
+      @if (banner().buttonText) {
+        <a class="campaign-banner__button" [routerLink]="banner().buttonUrl">{{ banner().buttonText }}</a>
+      }
+
+      @if (banner().countdownSeconds > 0) {
+        <div class="campaign-banner__countdown" aria-label="Offer countdown">
+          <div class="campaign-banner__countdown-unit">
+            <span class="campaign-banner__countdown-value">{{ hours() }}</span>
+            <span class="campaign-banner__countdown-label">Hrs</span>
+          </div>
+          <span class="campaign-banner__countdown-sep">:</span>
+          <div class="campaign-banner__countdown-unit">
+            <span class="campaign-banner__countdown-value">{{ minutes() }}</span>
+            <span class="campaign-banner__countdown-label">Min</span>
+          </div>
+          <span class="campaign-banner__countdown-sep">:</span>
+          <div class="campaign-banner__countdown-unit">
+            <span class="campaign-banner__countdown-value">{{ seconds() }}</span>
+            <span class="campaign-banner__countdown-label">Sec</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="campaign-banner__media" aria-hidden="true">
+    <img [src]="banner().imageUrl" alt="" />
+  </div>
+</section>

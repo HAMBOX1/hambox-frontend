@@ -1,0 +1,59 @@
+<section class="arena-briefings" aria-labelledby="arena-briefings-title">
+  <div class="arena-briefings__inner">
+    <header class="arena-briefings__header">
+      <h2 id="arena-briefings-title" class="arena-briefings__title">{{ config().title }}</h2>
+      <span class="arena-briefings__underline" aria-hidden="true"></span>
+    </header>
+
+    <div class="arena-briefings__layout">
+      <ul class="arena-briefings__column">
+        @for (item of leftItems(); track item.id) {
+          <li>
+            <a class="arena-briefings__side-item" [routerLink]="item.linkUrl">
+              <img class="arena-briefings__side-image" [src]="item.imageUrl" alt="" />
+              <span class="arena-briefings__side-copy">
+                <span class="arena-briefings__side-tag">{{ item.tagText }}</span>
+                <span class="arena-briefings__side-title">{{ item.title }}</span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+
+      <article class="arena-briefings__featured">
+        <img class="arena-briefings__featured-image" [src]="config().featuredImageUrl" alt="" />
+        <div class="arena-briefings__featured-shade"></div>
+
+        @if (config().featuredTagText) {
+          <span class="arena-briefings__featured-tag">{{ config().featuredTagText }}</span>
+        }
+
+        <div class="arena-briefings__featured-copy">
+          <h3 class="arena-briefings__featured-title">{{ config().featuredTitle }}</h3>
+          <p class="arena-briefings__featured-description">{{ config().featuredDescription }}</p>
+
+          @if (config().featuredButtonText) {
+            <a class="arena-briefings__featured-link" [routerLink]="config().featuredButtonUrl">
+              <span>{{ config().featuredButtonText }}</span>
+              <i class="pi pi-arrow-right" aria-hidden="true"></i>
+            </a>
+          }
+        </div>
+      </article>
+
+      <ul class="arena-briefings__column">
+        @for (item of rightItems(); track item.id) {
+          <li>
+            <a class="arena-briefings__side-item" [routerLink]="item.linkUrl">
+              <img class="arena-briefings__side-image" [src]="item.imageUrl" alt="" />
+              <span class="arena-briefings__side-copy">
+                <span class="arena-briefings__side-tag">{{ item.tagText }}</span>
+                <span class="arena-briefings__side-title">{{ item.title }}</span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</section>

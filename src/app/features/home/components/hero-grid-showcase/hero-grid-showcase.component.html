@@ -1,0 +1,51 @@
+<section
+  class="hero-grid"
+  aria-labelledby="hambox-hero-grid-title"
+  [style.--hero-overlay-opacity]="hero().overlayOpacity"
+>
+  <div class="hero-grid__media" aria-hidden="true">
+    <img class="hero-grid__image hero-grid__image--background" [src]="hero().backgroundImageUrl" alt="" />
+    @if (hero().overlayImageUrl) {
+      <img class="hero-grid__image hero-grid__image--overlay" [src]="hero().overlayImageUrl!" alt="" />
+    }
+    <div class="hero-grid__shade"></div>
+  </div>
+
+  <div class="hero-grid__container">
+    <div class="hero-grid__copy">
+      @if (hero().badgeText) {
+        <p class="hero-grid__eyebrow">{{ hero().badgeText }}</p>
+      }
+
+      <h1 id="hambox-hero-grid-title" class="hero-grid__title">
+        <span class="hero-grid__title-line">{{ hero().title }}</span>
+        @if (hero().titleAccent) {
+          <span class="hero-grid__title-line hero-grid__title-line--accent">{{ hero().titleAccent }}</span>
+        }
+      </h1>
+
+      <p class="hero-grid__description">{{ hero().subtitle }}</p>
+
+      <div class="hero-grid__actions" aria-label="Hero actions">
+        <a
+          pButton
+          [routerLink]="hero().primaryButtonUrl"
+          class="hero-grid__button hero-grid__button--primary"
+          styleClass="hero-grid__button hero-grid__button--primary"
+        >
+          <img class="hero-grid__button-icon" [src]="boltIcon" alt="" aria-hidden="true" />
+          <span class="hero-grid__button-label">{{ hero().primaryButtonText }}</span>
+        </a>
+
+        <a
+          pButton
+          [routerLink]="hero().secondaryButtonUrl"
+          class="hero-grid__button hero-grid__button--secondary"
+          styleClass="hero-grid__button hero-grid__button--secondary"
+        >
+          <span class="hero-grid__button-label">{{ hero().secondaryButtonText }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

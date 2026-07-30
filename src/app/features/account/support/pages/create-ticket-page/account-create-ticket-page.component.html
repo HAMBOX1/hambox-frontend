@@ -1,0 +1,131 @@
+<section class="create-ticket-page" hamboxTranslateRefresh>
+  <app-support-subnav />
+
+  <header class="create-ticket-page__header">
+    <h1>{{ 'SUPPORT.CREATE.TITLE' | translate }}</h1>
+    <p>{{ 'SUPPORT.CREATE.SUBTITLE' | translate }}</p>
+  </header>
+
+  <form class="create-ticket-page__form" (ngSubmit)="submit()">
+    <div class="form-row form-row--split">
+      <label class="form-field">
+        <span>{{ 'SUPPORT.CREATE.CATEGORY' | translate }}</span>
+        <select [ngModel]="categoryId()" name="category" (ngModelChange)="categoryId.set($event)">
+          <option [value]="null">{{ 'SUPPORT.CREATE.CATEGORY_DEFAULT' | translate }}</option>
+          @for (entry of categories(); track entry.id) {
+            <option [value]="entry.id">{{ entry.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="form-field">
+        <span>{{ 'SUPPORT.CREATE.PRIORITY' | translate }}</span>
+        <select [ngModel]="priorityId()" name="priority" (ngModelChange)="priorityId.set($event)">
+          <option [value]="null">{{ 'SUPPORT.CREATE.PRIORITY_DEFAULT' | translate }}</option>
+          @for (entry of priorities(); track entry.id) {
+            <option [value]="entry.id">{{ entry.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <label class="form-field">
+      <span>{{ 'SUPPORT.CREATE.SUBJECT' | translate }}</span>
+      <input
+        type="text"
+        name="subject"
+        [ngModel]="subject()"
+        (ngModelChange)="subject.set($event)"
+        [placeholder]="'SUPPORT.CREATE.SUBJECT_PLACEHOLDER' | translate"
+      />
+      @if (subjectError(); as error) {
+        <span class="form-field__error">{{ error | translate }}</span>
+      }
+    </label>
+
+    <label class="form-field">
+      <span>{{ 'SUPPORT.CREATE.DESCRIPTION' | translate }}</span>
+      <p-editor
+        [ngModel]="descriptionHtml()"
+        (ngModelChange)="descriptionHtml.set($event)"
+        name="description"
+        [style]="{ height: '220px' }"
+        [placeholder]="'SUPPORT.CREATE.DESCRIPTION_PLACEHOLDER' | translate"
+      />
+      @if (descriptionError(); as error) {
+        <span class="form-field__error">{{ error | translate }}</span>
+      }
+    </label>
+
+    <div class="form-row form-row--split">
+      <label class="form-field">
+        <span>{{ 'SUPPORT.CREATE.RELATED_ORDER' | translate }}</span>
+        <input
+          type="text"
+          name="relatedOrder"
+          [ngModel]="relatedOrderNumber()"
+          (ngModelChange)="relatedOrderNumber.set($event)"
+          placeholder="ORD-88231"
+        />
+      </label>
+
+      <label class="form-field">
+        <span>{{ 'SUPPORT.CREATE.RELATED_PRODUCT' | translate }}</span>
+        <input
+          type="text"
+          name="relatedProduct"
+          [ngModel]="relatedProductName()"
+          (ngModelChange)="relatedProductName.set($event)"
+          [placeholder]="'SUPPORT.CREATE.RELATED_PRODUCT_PLACEHOLDER' | translate"
+        />
+      </label>
+    </div>
+
+    <div class="form-field">
+      <span>{{ 'SUPPORT.CREATE.ATTACHMENTS' | translate }}</span>
+      <div
+        class="dropzone"
+        [class.dropzone--active]="dragActive()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+      >
+        <i class="pi pi-cloud-upload" aria-hidden="true"></i>
+        <p>{{ 'SUPPORT.CREATE.DROPZONE_HINT' | translate }}</p>
+        <label class="dropzone__browse">
+          {{ 'SUPPORT.CREATE.BROWSE_FILES' | translate }}
+          <input type="file" multiple hidden (change)="onFileInputChange($event)" />
+        </label>
+        <span class="dropzone__types">{{ 'SUPPORT.CREATE.DROPZONE_TYPES' | translate }}</span>
+      </div>
+
+      @if (attachments().length) {
+        <ul class="attachment-list">
+          @for (attachment of attachments(); track attachment.name) {
+            <li>
+              <i class="pi {{ attachmentIcon(attachment) }}" aria-hidden="true"></i>
+              <span>{{ attachment.name }}</span>
+              <span class="attachment-list__size">{{ attachmentSizeKb(attachment) }} KB</span>
+              <button
+                type="button"
+                (click)="removeAttachment(attachment)"
+                [attr.aria-label]="'SUPPORT.CREATE.REMOVE_ATTACHMENT' | translate"
+              >
+                ×
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="create-ticket-page__actions">
+      <button type="submit" class="submit-btn" [disabled]="submitting()">
+        @if (submitting()) {
+          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        }
+        {{ 'SUPPORT.CREATE.SUBMIT' | translate }}
+      </button>
+    </div>
+  </form>
+</section>

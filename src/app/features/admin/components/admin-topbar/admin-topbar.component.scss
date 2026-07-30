@@ -48,13 +48,8 @@
   }
 }
 
-.admin-topbar__menu-btn,
-.admin-topbar__sidebar-btn {
+.admin-topbar__menu-btn {
   display: none;
-}
-
-.admin-topbar__sidebar-btn {
-  display: grid;
 }
 
 .admin-topbar__context {
@@ -68,17 +63,12 @@
 .admin-topbar__context-label {
   overflow: hidden;
   color: var(--admin-text-primary);
-  font-size: var(--admin-type-caption);
+  font-family: var(--admin-font-heading);
+  font-size: var(--admin-type-card-title);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.admin-topbar__context-hint {
-  color: var(--admin-text-muted);
-  font-size: var(--admin-type-label);
-  font-weight: 500;
 }
 
 .admin-topbar__actions {
@@ -112,9 +102,47 @@
   align-items: center;
   gap: 0.75rem;
   margin-left: 0.25rem;
-  padding-left: 0.75rem;
+  padding: 0 0 0 0.75rem;
+  border: none;
   border-left: 1px solid var(--admin-border-subtle);
+  background: transparent;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-topbar__profile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 11rem;
+}
+
+.admin-topbar__profile-panel-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  border: none;
+  border-radius: var(--admin-radius-sm);
+  background: transparent;
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-type-label);
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--admin-bg-panel);
+    color: var(--admin-text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .admin-topbar__profile-copy {
@@ -161,20 +189,12 @@
     display: grid;
   }
 
-  .admin-topbar__sidebar-btn {
-    display: none;
-  }
-
   .admin-topbar__profile-copy {
     display: none;
   }
 }
 
 @media (max-width: 767px) {
-  .admin-topbar__context-hint {
-    display: none;
-  }
-
   .admin-topbar__inline-switchers {
     display: none;
   }

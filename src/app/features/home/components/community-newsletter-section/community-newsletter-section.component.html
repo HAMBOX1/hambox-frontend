@@ -1,0 +1,49 @@
+<section class="community-newsletter" aria-label="Community and newsletter">
+  <div class="community-newsletter__inner">
+    <article class="community-newsletter__card community-newsletter__card--discord">
+      <h2 class="community-newsletter__title community-newsletter__title--accent">
+        {{ config().discordTitle }}
+      </h2>
+      <p class="community-newsletter__description">{{ config().discordDescription }}</p>
+
+      <div class="community-newsletter__footer">
+        <div class="community-newsletter__avatars" aria-hidden="true">
+          <span class="community-newsletter__avatar"></span>
+          <span class="community-newsletter__avatar"></span>
+          <span class="community-newsletter__avatar"></span>
+          <span class="community-newsletter__avatar-count">+423</span>
+        </div>
+
+        <a class="community-newsletter__discord-link" [routerLink]="config().discordButtonUrl">
+          <span>{{ config().discordButtonText }}</span>
+          <i class="pi pi-check-circle" aria-hidden="true"></i>
+        </a>
+      </div>
+    </article>
+
+    <article class="community-newsletter__card community-newsletter__card--newsletter">
+      <h2 class="community-newsletter__title">{{ config().newsletterTitle }}</h2>
+      <p class="community-newsletter__description">{{ config().newsletterDescription }}</p>
+
+      <form class="community-newsletter__form" (ngSubmit)="onSubmit()">
+        <ui-input
+          type="email"
+          [placeholder]="config().newsletterPlaceholder"
+          autocomplete="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="newsletterEmail"
+        />
+        <ui-button type="submit" variant="primary" [label]="config().newsletterButtonText" />
+      </form>
+
+      @if (emailInvalid) {
+        <p class="community-newsletter__error">Enter a valid email address.</p>
+      }
+
+      @if (config().newsletterPrivacyText) {
+        <p class="community-newsletter__privacy">{{ config().newsletterPrivacyText }}</p>
+      }
+    </article>
+  </div>
+</section>

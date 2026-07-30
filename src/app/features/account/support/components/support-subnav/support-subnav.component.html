@@ -1,0 +1,20 @@
+<nav class="support-subnav" [attr.aria-label]="'SUPPORT.SUBNAV.ARIA' | translate">
+  <div class="support-subnav__items">
+    @for (item of navItems; track item.route) {
+      <a
+        class="support-subnav__item"
+        [routerLink]="item.route"
+        routerLinkActive="support-subnav__item--active"
+        [routerLinkActiveOptions]="{ exact: !!item.exact }"
+      >
+        <i class="pi {{ item.icon }}" aria-hidden="true"></i>
+        <span>{{ item.labelKey | translate }}</span>
+      </a>
+    }
+  </div>
+
+  <button type="button" class="support-subnav__ai-btn" (click)="openAiAssistant()">
+    <i class="pi pi-sparkles" aria-hidden="true"></i>
+    <span>{{ 'SUPPORT.SUBNAV.AI_ASSISTANT' | translate }}</span>
+  </button>
+</nav>

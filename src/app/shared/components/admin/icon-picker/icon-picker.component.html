@@ -1,0 +1,58 @@
+<div class="icon-picker">
+  <button
+    type="button"
+    class="icon-picker__trigger"
+    [disabled]="disabled()"
+    (click)="toggleOpen()"
+  >
+    <span class="icon-picker__swatch">
+      @if (currentIconClass()) {
+        <i [class]="currentIconClass()" aria-hidden="true"></i>
+      } @else {
+        <i class="pi pi-search" aria-hidden="true"></i>
+      }
+    </span>
+    <span class="icon-picker__value">
+      {{ currentIconClass() ?? ('ADMIN.PICKERS.ICON_PICKER.PLACEHOLDER' | translate) }}
+    </span>
+    @if (currentIconClass()) {
+      <span class="icon-picker__clear" (click)="clear($event)">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="icon-picker__panel">
+      <input
+        pInputText
+        [id]="fieldId"
+        class="w-full"
+        type="text"
+        [placeholder]="'ADMIN.PICKERS.ICON_PICKER.SEARCH_PLACEHOLDER' | translate"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      />
+
+      @if (filteredIcons().length) {
+        <div class="icon-picker__grid">
+          @for (name of filteredIcons(); track name) {
+            <button
+              type="button"
+              class="icon-picker__cell"
+              [class.icon-picker__cell--active]="currentIconClass() === 'pi ' + name"
+              [attr.aria-label]="iconLabel(name)"
+              [pTooltip]="iconLabel(name)"
+              tooltipPosition="top"
+              (click)="select(name)"
+            >
+              <i [class]="'pi ' + name" aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="icon-picker__empty">{{ 'ADMIN.PICKERS.ICON_PICKER.NO_RESULTS' | translate }}</p>
+      }
+    </div>
+  }
+</div>

@@ -8,6 +8,9 @@ html[data-theme='hambox-light'] {
   --p-surface-0: var(--surface);
   --p-surface-50: var(--background);
   --p-surface-100: var(--surface-elevated);
+  --p-surface-300: var(--text-secondary);
+  --p-surface-400: var(--text-muted);
+  --p-surface-500: var(--color-text-disabled);
   --p-surface-900: var(--text-primary);
   --p-surface-950: var(--background);
   --p-content-background: var(--surface);

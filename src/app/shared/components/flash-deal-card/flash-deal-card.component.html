@@ -1,4 +1,4 @@
-<article class="flash-card">
+<article class="flash-card" [class.flash-card--featured]="featured()">
   <a class="flash-card__link" [routerLink]="['/products', deal().id]">
     <div class="flash-card__media">
       <img [src]="deal().imageUrl" [alt]="deal().title" loading="lazy" />
@@ -23,7 +23,14 @@
           </span>
         </div>
 
-        <span class="flash-card__buy">Buy Now</span>
+        @if (featured()) {
+          <span class="flash-card__buy flash-card__buy--featured">
+            <i class="pi pi-shopping-cart" aria-hidden="true"></i>
+            <span>Add to Cart</span>
+          </span>
+        } @else {
+          <span class="flash-card__buy">Buy Now</span>
+        }
       </footer>
     </div>
   </a>

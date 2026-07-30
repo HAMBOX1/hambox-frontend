@@ -10,6 +10,16 @@
   >
     @if (detail(); as order) {
       <div adminHeaderActions class="order-detail-page__actions">
+        <a
+          *hamboxHasPermission="permissions.Support.View"
+          pButton
+          type="button"
+          severity="secondary"
+          icon="pi pi-ticket"
+          [label]="'ADMIN.ORDERS.DETAIL.SUPPORT_TICKETS' | translate"
+          [routerLink]="['/admin/support/tickets']"
+          [queryParams]="{ search: order.orderNumber }"
+        ></a>
         <app-admin-action-menu [items]="overflowActions(order)" [label]="'ADMIN.ORDERS.ACTIONS.MORE' | translate" />
         <button
           *hamboxHasPermission="permissions.Orders.Edit"

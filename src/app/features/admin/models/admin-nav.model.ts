@@ -11,11 +11,13 @@ export type AdminNavId =
   | 'promotions'
   | 'memberships'
   | 'themes'
+  | 'page-builder'
   | 'legal'
   | 'suppliers'
   | 'communication'
   | 'orders'
   | 'operations'
+  | 'support'
   | 'analytics'
   | 'reports'
   | 'settings';
@@ -100,6 +102,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     permission: PERMISSIONS.Themes.View,
   },
   {
+    id: 'page-builder',
+    labelKey: 'ADMIN.NAV.PAGE_BUILDER',
+    route: '/admin/page-builder',
+    icon: 'pi pi-objects-column',
+    permission: PERMISSIONS.PageBuilder.View,
+  },
+  {
     id: 'legal',
     labelKey: 'ADMIN.NAV.LEGAL',
     route: '/admin/legal',
@@ -133,6 +142,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/operations',
     icon: 'pi pi-sitemap',
     permission: PERMISSIONS.Operations.View,
+  },
+  {
+    id: 'support',
+    labelKey: 'ADMIN.NAV.SUPPORT',
+    route: '/admin/support',
+    icon: 'pi pi-ticket',
+    permission: PERMISSIONS.Support.View,
   },
   {
     id: 'analytics',

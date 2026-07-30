@@ -43,6 +43,23 @@
         />
       }
 
+      @case ('route') {
+        <app-route-picker [value]="$any(value())" [disabled]="disabled()" (valueChange)="emit($event)" />
+      }
+
+      @case ('media') {
+        <app-media-picker
+          [value]="$any(value())"
+          [disabled]="disabled()"
+          [recommendedSize]="field().recommendedSize ?? null"
+          (valueChange)="emit($event)"
+        />
+      }
+
+      @case ('icon') {
+        <app-icon-picker [value]="$any(value())" [disabled]="disabled()" (valueChange)="emit($event)" />
+      }
+
       @case ('select') {
         <p-select
           [inputId]="fieldId"

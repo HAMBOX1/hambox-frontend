@@ -1,0 +1,76 @@
+<section class="support-home" hamboxTranslateRefresh>
+  <app-support-subnav />
+
+  <header class="support-home__header">
+    <div>
+      <h1>{{ 'SUPPORT.HOME.TITLE' | translate }}</h1>
+      <p>{{ 'SUPPORT.HOME.SUBTITLE' | translate:{ name: displayName() } }}</p>
+    </div>
+  </header>
+
+  <div class="support-home__quick-actions">
+    <a class="quick-action" routerLink="/account/support/tickets/new">
+      <i class="pi pi-plus-circle" aria-hidden="true"></i>
+      <div>
+        <strong>{{ 'SUPPORT.HOME.QUICK.OPEN_TICKET' | translate }}</strong>
+        <span>{{ 'SUPPORT.HOME.QUICK.OPEN_TICKET_HINT' | translate }}</span>
+      </div>
+    </a>
+    <button type="button" class="quick-action" (click)="openAiAssistant()">
+      <i class="pi pi-sparkles" aria-hidden="true"></i>
+      <div>
+        <strong>{{ 'SUPPORT.HOME.QUICK.ASK_AI' | translate }}</strong>
+        <span>{{ 'SUPPORT.HOME.QUICK.ASK_AI_HINT' | translate }}</span>
+      </div>
+    </button>
+    <a class="quick-action" routerLink="/account/support/knowledge-base">
+      <i class="pi pi-book" aria-hidden="true"></i>
+      <div>
+        <strong>{{ 'SUPPORT.HOME.QUICK.HELP_CENTER' | translate }}</strong>
+        <span>{{ 'SUPPORT.HOME.QUICK.HELP_CENTER_HINT' | translate }}</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="support-home__stats">
+    <div class="stat-card">
+      <span class="stat-card__label">{{ 'SUPPORT.HOME.STATS.OPEN' | translate }}</span>
+      <strong class="stat-card__value">{{ openCount() }}</strong>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">{{ 'SUPPORT.HOME.STATS.WAITING' | translate }}</span>
+      <strong class="stat-card__value">{{ waitingCount() }}</strong>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">{{ 'SUPPORT.HOME.STATS.RESOLVED' | translate }}</span>
+      <strong class="stat-card__value">{{ resolvedCount() }}</strong>
+    </div>
+    <div class="stat-card">
+      <span class="stat-card__label">{{ 'SUPPORT.HOME.STATS.TOTAL' | translate }}</span>
+      <strong class="stat-card__value">{{ totalCount() }}</strong>
+    </div>
+  </div>
+
+  <section class="support-home__recent">
+    <div class="support-home__section-head">
+      <h2>{{ 'SUPPORT.HOME.RECENT_TITLE' | translate }}</h2>
+      <a routerLink="/account/support/tickets/open">{{ 'SUPPORT.HOME.VIEW_ALL' | translate }}</a>
+    </div>
+
+    @if (recentTickets().length) {
+      <div class="support-home__recent-list">
+        @for (ticket of recentTickets(); track ticket.id) {
+          <a class="conversation-row" [routerLink]="['/account/support/tickets', ticket.id]">
+            <div class="conversation-row__main">
+              <strong>{{ ticket.subject }}</strong>
+              <span class="conversation-row__meta">{{ ticket.number }} · {{ ticket.updatedAtUtc | hamboxDate:'MMM d, y' }}</span>
+            </div>
+            <app-support-chip [labelKey]="statusMeta[ticket.status].labelKey" [tone]="statusMeta[ticket.status].tone" />
+          </a>
+        }
+      </div>
+    } @else {
+      <p class="support-home__empty">{{ 'SUPPORT.HOME.EMPTY' | translate }}</p>
+    }
+  </section>
+</section>

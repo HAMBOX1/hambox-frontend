@@ -1,0 +1,67 @@
+<div class="platform-selector-form">
+  @if (!config().items.length) {
+    <p class="platform-selector-form__empty">
+      {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.EMPTY' | translate }}
+    </p>
+  }
+
+  <ul
+    class="platform-selector-form__list"
+    cdkDropList
+    [cdkDropListDisabled]="disabled()"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    @for (item of config().items; track item.id; let i = $index) {
+      <li class="platform-selector-form__item" cdkDrag [cdkDragDisabled]="disabled()">
+        <i class="pi pi-bars platform-selector-form__handle" cdkDragHandle aria-hidden="true"></i>
+
+        <div class="platform-selector-form__item-fields">
+          <label class="platform-selector-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.LABEL' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="item.label"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { label: $event })"
+            />
+          </label>
+
+          <label class="platform-selector-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.ICON_CLASS' | translate }}</span>
+            <app-icon-picker
+              [value]="item.iconClass"
+              [disabled]="disabled()"
+              (valueChange)="updateItem(i, { iconClass: $event ?? '' })"
+            />
+          </label>
+
+          <label class="platform-selector-form__field platform-selector-form__field--wide">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.LINK_URL' | translate }}</span>
+            <app-route-picker
+              [value]="item.linkUrl"
+              [disabled]="disabled()"
+              (valueChange)="updateItem(i, { linkUrl: $event ?? '' })"
+            />
+          </label>
+        </div>
+
+        <app-admin-icon-button
+          icon="pi pi-trash"
+          severity="danger"
+          [disabled]="disabled()"
+          [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.REMOVE_ITEM' | translate"
+          (pressed)="removeItem(i)"
+        />
+      </li>
+    }
+  </ul>
+
+  <app-admin-icon-button
+    icon="pi pi-plus"
+    severity="secondary"
+    [disabled]="disabled()"
+    [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.ADD_ITEM' | translate"
+    (pressed)="addItem()"
+  />
+</div>

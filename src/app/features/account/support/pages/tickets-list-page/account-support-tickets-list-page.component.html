@@ -1,0 +1,49 @@
+<section class="tickets-list-page" hamboxTranslateRefresh>
+  <app-support-subnav />
+
+  <header class="tickets-list-page__header">
+    <div>
+      <h1>{{ (isOpenView() ? 'SUPPORT.LIST.OPEN_TITLE' : 'SUPPORT.LIST.CLOSED_TITLE') | translate }}</h1>
+      <p>{{ (isOpenView() ? 'SUPPORT.LIST.OPEN_SUBTITLE' : 'SUPPORT.LIST.CLOSED_SUBTITLE') | translate }}</p>
+    </div>
+    <a class="tickets-list-page__new-btn" routerLink="/account/support/tickets/new">
+      <i class="pi pi-plus" aria-hidden="true"></i>
+      {{ 'SUPPORT.LIST.NEW_TICKET' | translate }}
+    </a>
+  </header>
+
+  <input
+    type="search"
+    class="tickets-list-page__search"
+    [value]="searchTerm()"
+    (input)="onSearchChange($event)"
+    [placeholder]="'SUPPORT.LIST.SEARCH_PLACEHOLDER' | translate"
+    [attr.aria-label]="'SUPPORT.LIST.SEARCH_PLACEHOLDER' | translate"
+  />
+
+  @if (loading()) {
+    <p class="tickets-list-page__empty">{{ 'COMMON.LOADING' | translate }}</p>
+  } @else if (tickets().length) {
+    <div class="tickets-list-page__list">
+      @for (ticket of tickets(); track ticket.id) {
+        <a class="ticket-row" [routerLink]="['/account/support/tickets', ticket.id]">
+          <div class="ticket-row__main">
+            <strong>{{ ticket.subject }}</strong>
+            <span class="ticket-row__meta">
+              {{ ticket.number }} @if (ticket.category) { · {{ ticket.category.name }} } ·
+              {{ ticket.updatedAtUtc | hamboxDate:'MMM d, y' }}
+            </span>
+          </div>
+          <div class="ticket-row__badges">
+            @if (ticket.priority) {
+              <app-support-chip [labelKey]="ticket.priority.name" [color]="ticket.priority.color" />
+            }
+            <app-support-chip [labelKey]="statusMeta[ticket.status].labelKey" [tone]="statusMeta[ticket.status].tone" />
+          </div>
+        </a>
+      }
+    </div>
+  } @else {
+    <p class="tickets-list-page__empty">{{ 'SUPPORT.LIST.EMPTY' | translate }}</p>
+  }
+</section>

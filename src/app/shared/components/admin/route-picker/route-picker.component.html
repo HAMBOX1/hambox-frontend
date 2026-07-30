@@ -1,0 +1,62 @@
+<div class="route-picker">
+  <div class="route-picker__mode-toggle" role="tablist">
+    <button
+      type="button"
+      class="route-picker__mode-btn"
+      [class.route-picker__mode-btn--active]="activeMode() === 'page'"
+      [disabled]="disabled()"
+      (click)="setMode('page')"
+    >
+      <i class="pi pi-sitemap" aria-hidden="true"></i>
+      {{ 'ADMIN.PICKERS.ROUTE_PICKER.MODE_PAGE' | translate }}
+    </button>
+    <button
+      type="button"
+      class="route-picker__mode-btn"
+      [class.route-picker__mode-btn--active]="activeMode() === 'custom'"
+      [disabled]="disabled()"
+      (click)="setMode('custom')"
+    >
+      <i class="pi pi-link" aria-hidden="true"></i>
+      {{ 'ADMIN.PICKERS.ROUTE_PICKER.MODE_CUSTOM' | translate }}
+    </button>
+  </div>
+
+  @if (activeMode() === 'page') {
+    <p-select
+      [inputId]="fieldId"
+      class="w-full"
+      [options]="options()"
+      optionLabel="label"
+      optionValue="value"
+      [filter]="true"
+      filterBy="label"
+      [showClear]="true"
+      [placeholder]="'ADMIN.PICKERS.ROUTE_PICKER.SELECT_PLACEHOLDER' | translate"
+      [ngModel]="value()"
+      [disabled]="disabled()"
+      (ngModelChange)="emit($event)"
+    />
+  } @else {
+    <input
+      pInputText
+      class="w-full"
+      type="text"
+      [placeholder]="placeholder()"
+      [ngModel]="value() ?? ''"
+      [disabled]="disabled()"
+      (ngModelChange)="emit($event)"
+    />
+  }
+
+  @if (recentRoutes().length && activeMode() === 'page') {
+    <div class="route-picker__recent">
+      <span class="route-picker__recent-label">{{ 'ADMIN.PICKERS.ROUTE_PICKER.RECENT' | translate }}</span>
+      @for (path of recentRoutes(); track path) {
+        <button type="button" class="route-picker__recent-chip" [disabled]="disabled()" (click)="applyRecent(path)">
+          {{ recentLabel(path) }}
+        </button>
+      }
+    </div>
+  }
+</div>

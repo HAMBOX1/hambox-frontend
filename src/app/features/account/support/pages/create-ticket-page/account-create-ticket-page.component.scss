@@ -1,0 +1,207 @@
+.create-ticket-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-5);
+  max-inline-size: 760px;
+}
+
+.create-ticket-page__header h1 {
+  margin: 0 0 var(--hambox-spacing-1);
+}
+
+.create-ticket-page__header p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.create-ticket-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-4);
+}
+
+.form-row {
+  display: grid;
+  gap: var(--hambox-spacing-4);
+
+  &--split {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-2);
+
+  > span:first-child {
+    font-size: var(--hambox-font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  input[type='text'],
+  select {
+    padding: var(--hambox-spacing-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--sf-radius-md);
+    background: var(--color-panel-bg);
+    color: var(--color-text-primary);
+    font: inherit;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-focus-ring);
+    }
+  }
+}
+
+.form-field__error {
+  color: var(--color-danger);
+  font-size: var(--hambox-font-size-xs);
+}
+
+.tags-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  padding: var(--hambox-spacing-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-panel-bg);
+
+  input {
+    flex: 1;
+    min-inline-size: 120px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-primary);
+    font: inherit;
+    outline: none;
+  }
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hambox-spacing-1);
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  font-size: var(--hambox-font-size-xs);
+
+  button {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  padding: var(--hambox-spacing-6);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--sf-radius-lg);
+  color: var(--color-text-secondary);
+  text-align: center;
+  transition: var(--hambox-transition-theme);
+
+  &--active {
+    border-color: var(--color-primary);
+    background: var(--color-primary-muted);
+  }
+
+  i {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.dropzone__browse {
+  padding: var(--hambox-spacing-2) var(--hambox-spacing-4);
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--sf-radius-pill);
+  color: var(--color-primary);
+  font-size: var(--hambox-font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dropzone__types {
+  font-size: var(--hambox-font-size-xs);
+}
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-2);
+  margin: var(--hambox-spacing-3) 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+    padding: var(--hambox-spacing-2) var(--hambox-spacing-3);
+    border: 1px solid var(--color-panel-border);
+    border-radius: var(--sf-radius-md);
+    background: var(--color-panel-bg);
+    font-size: var(--hambox-font-size-sm);
+  }
+
+  span:first-of-type {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .attachment-list__size {
+    color: var(--color-text-secondary);
+    font-size: var(--hambox-font-size-xs);
+    flex: none;
+  }
+
+  button {
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+}
+
+.create-ticket-page__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-6);
+  border: none;
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

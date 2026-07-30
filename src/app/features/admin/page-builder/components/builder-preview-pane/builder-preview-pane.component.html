@@ -1,0 +1,23 @@
+<div class="builder-preview-pane">
+  @if (loading()) {
+    <app-admin-loading-skeleton [rows]="4" />
+  } @else if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retry()" />
+  } @else if (!visibleSections().length) {
+    <app-admin-empty-state
+      icon="pi pi-eye-slash"
+      [title]="'ADMIN.PAGE_BUILDER.PREVIEW.EMPTY' | translate"
+      [compact]="true"
+    />
+  } @else if (context(); as ctx) {
+    <div
+      class="builder-preview-pane__frame"
+      [class.builder-preview-pane__frame--tablet]="device() === 'tablet'"
+      [class.builder-preview-pane__frame--mobile]="device() === 'mobile'"
+    >
+      @for (section of visibleSections(); track section.instanceId) {
+        <app-section-renderer [entry]="section" [context]="ctx" />
+      }
+    </div>
+  }
+</div>

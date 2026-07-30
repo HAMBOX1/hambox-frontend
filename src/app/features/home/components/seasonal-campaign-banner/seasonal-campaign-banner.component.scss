@@ -1,0 +1,212 @@
+:host {
+  display: block;
+  padding: var(--sf-section-gap) var(--sf-container-px);
+}
+
+.campaign-banner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  gap: 48px;
+  max-width: var(--sf-container-max);
+  min-height: 260px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: var(--sf-radius-xl);
+  background: var(--color-referral-banner-bg);
+  box-shadow: var(--color-shadow-md);
+}
+
+.campaign-banner__copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: center;
+  gap: 12px;
+  max-width: 480px;
+  padding: 40px 0 40px 48px;
+}
+
+.campaign-banner__eyebrow {
+  margin: 0;
+  color: var(--color-info);
+  font-family: var(--sf-font-body);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* `campaign-banner` sits on the fixed brand gradient (`--color-referral-banner-bg`), not the
+ * theme's normal surface, so its copy uses a literal white rather than `--color-text-inverse` —
+ * that token flips to near-black in dark mode (correct for light-surface buttons, wrong here). */
+.campaign-banner__title {
+  margin: 0;
+  color: #fff;
+  font-family: var(--sf-font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.campaign-banner__title-line {
+  display: block;
+}
+
+.campaign-banner__title-line--accent {
+  color: var(--color-info);
+}
+
+.campaign-banner__subtitle {
+  margin: 0;
+  color: rgb(255 255 255 / 82%);
+  font-family: var(--sf-font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.campaign-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.campaign-banner__button {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 28px;
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-surface);
+  color: var(--color-info);
+  font-family: var(--sf-font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 20px;
+  text-decoration: none;
+  box-shadow: var(--color-shadow-sm);
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    filter: brightness(1.03);
+    transform: translateY(-2px);
+    box-shadow: var(--color-shadow-md);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.campaign-banner__countdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campaign-banner__countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 44px;
+  padding: 6px 4px;
+  border-radius: var(--sf-radius-sm);
+  background: rgb(255 255 255 / 12%);
+}
+
+.campaign-banner__countdown-value {
+  color: #fff;
+  font-family: var(--sf-font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 28px;
+}
+
+.campaign-banner__countdown-label {
+  color: rgb(255 255 255 / 70%);
+  font-family: var(--sf-font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.campaign-banner__countdown-sep {
+  color: var(--color-info);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.campaign-banner__media {
+  position: relative;
+  z-index: 0;
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 380px;
+  max-width: 40%;
+  margin-left: auto;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 991px) {
+  :host {
+    padding: var(--sf-section-gap) var(--sf-container-px-tablet);
+  }
+
+  .campaign-banner__copy {
+    padding: 32px 0 32px 32px;
+  }
+
+  .campaign-banner__title {
+    font-size: 28px;
+    line-height: 36px;
+  }
+}
+
+@media (max-width: 767px) {
+  :host {
+    padding: var(--sf-section-gap) var(--sf-container-px-mobile);
+  }
+
+  .campaign-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 0;
+  }
+
+  .campaign-banner__copy {
+    align-self: stretch;
+    max-width: none;
+    padding: 28px 28px 20px;
+  }
+
+  .campaign-banner__media {
+    width: 100%;
+    max-width: none;
+    height: 160px;
+    align-self: stretch;
+  }
+
+  .campaign-banner__actions {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}

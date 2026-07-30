@@ -13,6 +13,7 @@
       [style.max-height]="panelHeightStyle()"
       [style.transform]="panelTransform()"
       [class.hambox-sheet__panel--dragging]="isDragging()"
+      [class.hambox-sheet__panel--solid]="solid()"
       (click)="onPanelClick($event)"
     >
       @if (dragToDismiss()) {

@@ -1,0 +1,137 @@
+@if (loading()) {
+  <section class="ticket-detail__not-found" hamboxTranslateRefresh>
+    <p>{{ 'COMMON.LOADING' | translate }}</p>
+  </section>
+} @else if (ticket(); as ticket) {
+  <section class="ticket-detail" hamboxTranslateRefresh>
+    <header class="ticket-detail__header">
+      <button type="button" class="ticket-detail__back" (click)="backToList()">
+        <i class="pi pi-arrow-left" aria-hidden="true"></i>
+      </button>
+      <div class="ticket-detail__header-main">
+        <h1>{{ ticket.subject }}</h1>
+        <div class="ticket-detail__meta">
+          <span>{{ ticket.number }}</span>
+          <app-support-chip [labelKey]="statusMeta[ticket.status].labelKey" [tone]="statusMeta[ticket.status].tone" />
+          @if (ticket.priority) {
+            <app-support-chip [labelKey]="ticket.priority.name" [color]="ticket.priority.color" />
+          }
+          @if (ticket.assignedAgentName) {
+            <span>{{ 'SUPPORT.DETAIL.ASSIGNED_TO' | translate:{ name: ticket.assignedAgentName } }}</span>
+          }
+          <span>{{ 'SUPPORT.DETAIL.CREATED' | translate }} {{ ticket.createdAtUtc | hamboxDate:'MMM d, y' }}</span>
+          @if (connectionState() !== 'connected') {
+            <span class="ticket-detail__connection-state" [attr.data-state]="connectionState()">
+              {{ 'SUPPORT.DETAIL.CONNECTION.' + connectionState().toUpperCase() | translate }}
+            </span>
+          }
+        </div>
+      </div>
+      <div class="ticket-detail__header-actions">
+        @if (ticket.status !== 'closed') {
+          <button type="button" (click)="closeTicket()">{{ 'SUPPORT.DETAIL.CLOSE' | translate }}</button>
+        }
+        @if (ticket.status === 'resolved') {
+          <button type="button" (click)="reopenTicket()">{{ 'SUPPORT.DETAIL.REOPEN' | translate }}</button>
+        }
+      </div>
+    </header>
+
+    <details class="ticket-detail__timeline">
+      <summary>{{ 'SUPPORT.DETAIL.TIMELINE' | translate }}</summary>
+      <ol>
+        @for (entry of ticket.timeline; track entry.id) {
+          <li>
+            <span>{{ entry.labelKey | translate }}@if (entry.detail) {: {{ entry.detail }}}</span>
+            <time>{{ entry.atUtc | hamboxDate:'short' }}</time>
+          </li>
+        }
+      </ol>
+    </details>
+
+    <div class="ticket-detail__conversation" #conversation>
+      @for (message of messages(); track message.id) {
+        <div class="bubble-row" [class.bubble-row--own]="message.authorRole === 'customer'">
+          <div class="bubble" [attr.data-role]="message.authorRole">
+            <div class="bubble__author">
+              {{ message.authorRole === 'customer' ? ('SUPPORT.DETAIL.YOU' | translate) : message.authorName }}
+            </div>
+            <div class="bubble__body" [innerHTML]="message.bodyHtml"></div>
+            @if (message.attachments.length) {
+              <div class="bubble__attachments">
+                @for (attachment of message.attachments; track attachment.id) {
+                  <span class="bubble__attachment"><i class="pi pi-paperclip" aria-hidden="true"></i>{{ attachment.name }}</span>
+                }
+              </div>
+            }
+            <div class="bubble__footer">
+              <span>{{ message.createdAtUtc | hamboxDate:'short' }}</span>
+              @if (message.authorRole === 'customer') {
+                <i
+                  class="pi"
+                  [class.pi-check]="message.deliveryState !== 'seen'"
+                  [class.pi-check-circle]="message.deliveryState === 'seen'"
+                  [class.bubble__seen]="message.deliveryState === 'seen'"
+                  aria-hidden="true"
+                ></i>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      @if (agentTyping()) {
+        <div class="bubble-row">
+          <div class="bubble bubble--typing" data-role="agent">
+            <span class="ticket-detail__typing-dot"></span>
+            <span class="ticket-detail__typing-dot"></span>
+            <span class="ticket-detail__typing-dot"></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (ticket.status === 'resolved' && !ticket.ratingScore) {
+      <form class="ticket-detail__rating" (ngSubmit)="submitRating()">
+        <p>{{ 'SUPPORT.DETAIL.RATE_PROMPT' | translate }}</p>
+        <div class="ticket-detail__stars">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <button
+              type="button"
+              [class.ticket-detail__star--filled]="star <= ratingScore()"
+              (click)="ratingScore.set(star)"
+            >★</button>
+          }
+        </div>
+        <input
+          type="text"
+          [ngModel]="ratingComment()"
+          (ngModelChange)="ratingComment.set($event)"
+          name="ratingComment"
+          [placeholder]="'SUPPORT.DETAIL.RATE_COMMENT_PLACEHOLDER' | translate"
+        />
+        <button type="submit" [disabled]="ratingScore() < 1">{{ 'SUPPORT.DETAIL.RATE_SUBMIT' | translate }}</button>
+      </form>
+    }
+
+    @if (ticket.status !== 'closed') {
+      <form class="ticket-detail__composer" (ngSubmit)="sendReply()">
+        <p-editor
+          [ngModel]="replyHtml()"
+          (ngModelChange)="replyHtml.set($event); onComposerInput()"
+          name="reply"
+          [style]="{ height: '120px' }"
+          [placeholder]="'SUPPORT.DETAIL.REPLY_PLACEHOLDER' | translate"
+        />
+        <button type="submit" class="ticket-detail__send-btn" [disabled]="sending()">
+          <i class="pi pi-send" aria-hidden="true"></i>
+          {{ 'SUPPORT.DETAIL.SEND' | translate }}
+        </button>
+      </form>
+    }
+  </section>
+} @else {
+  <section class="ticket-detail__not-found" hamboxTranslateRefresh>
+    <p>{{ 'SUPPORT.DETAIL.NOT_FOUND' | translate }}</p>
+    <a routerLink="/account/support">{{ 'SUPPORT.SUBNAV.HOME' | translate }}</a>
+  </section>
+}

@@ -39,6 +39,18 @@ export const CATALOG_API = {
     `/api/v1/storefront/products/${productId}/configuration/preview`,
 } as const;
 
+export const PAGE_BUILDER_API = {
+  published: '/api/v1/page-builder/published',
+  publishedFooter: '/api/v1/page-builder/published/footer',
+  templates: '/api/v1/page-builder/templates',
+  template: (id: string) => `/api/v1/page-builder/templates/${id}`,
+  templateDraft: (id: string) => `/api/v1/page-builder/templates/${id}/draft`,
+  templatePublish: (id: string) => `/api/v1/page-builder/templates/${id}/publish`,
+  templateDiscardDraft: (id: string) => `/api/v1/page-builder/templates/${id}/discard-draft`,
+  templateActivate: (id: string) => `/api/v1/page-builder/templates/${id}/activate`,
+  templateImages: '/api/v1/page-builder/templates/images',
+} as const;
+
 export const CATALOG_IMPORT_EXPORT_API = {
   export: '/api/v1/catalog/export',
   importTemplate: (entityType: string) => `/api/v1/catalog/import/templates/${entityType}`,
@@ -359,6 +371,70 @@ export const COMMUNICATION_API = {
   provider: (id: string) => `/api/v1/communication/providers/${id}`,
   auditLog: '/api/v1/communication/audit-log',
   preferences: '/api/v1/communication/preferences',
+} as const;
+
+export const SUPPORT_API = {
+  // Customer-facing (RequireCustomerContext)
+  tickets: '/api/v1/support/tickets',
+  ticket: (id: string) => `/api/v1/support/tickets/${id}`,
+  ticketMessages: (id: string) => `/api/v1/support/tickets/${id}/messages`,
+  ticketClose: (id: string) => `/api/v1/support/tickets/${id}/close`,
+  ticketReopen: (id: string) => `/api/v1/support/tickets/${id}/reopen`,
+  ticketRate: (id: string) => `/api/v1/support/tickets/${id}/rate`,
+  ticketAttachments: (id: string) => `/api/v1/support/tickets/${id}/attachments`,
+
+  // Agent/admin-facing (permission-gated)
+  adminTickets: '/api/v1/support/admin/tickets',
+  adminTicket: (id: string) => `/api/v1/support/admin/tickets/${id}`,
+  adminTicketMessages: (id: string) => `/api/v1/support/admin/tickets/${id}/messages`,
+  adminTicketAssign: (id: string) => `/api/v1/support/admin/tickets/${id}/assign`,
+  adminTicketStatus: (id: string) => `/api/v1/support/admin/tickets/${id}/status`,
+  adminTicketPriority: (id: string) => `/api/v1/support/admin/tickets/${id}/priority`,
+  adminTicketClose: (id: string) => `/api/v1/support/admin/tickets/${id}/close`,
+  adminTicketReopen: (id: string) => `/api/v1/support/admin/tickets/${id}/reopen`,
+  adminTicketMerge: (id: string) => `/api/v1/support/admin/tickets/${id}/merge`,
+  adminTicketAttachments: (id: string) => `/api/v1/support/admin/tickets/${id}/attachments`,
+  adminTicketTag: (id: string, tagId: string) => `/api/v1/support/admin/tickets/${id}/tags/${tagId}`,
+
+  // Lookups (any authenticated user)
+  categories: '/api/v1/support/categories',
+  priorities: '/api/v1/support/priorities',
+  tags: '/api/v1/support/tags',
+
+  // Lookup admin CRUD (Support.ManageCategories)
+  adminCategories: '/api/v1/support/admin/categories',
+  adminCategory: (id: string) => `/api/v1/support/admin/categories/${id}`,
+  adminPriorities: '/api/v1/support/admin/priorities',
+  adminPriority: (id: string) => `/api/v1/support/admin/priorities/${id}`,
+  adminTags: '/api/v1/support/admin/tags',
+  adminTag: (id: string) => `/api/v1/support/admin/tags/${id}`,
+
+  // Knowledge base — public (storefront) + admin authoring
+  kbCategories: '/api/v1/knowledge-base/categories',
+  kbArticles: '/api/v1/knowledge-base/articles',
+  kbArticle: (id: string) => `/api/v1/knowledge-base/articles/${id}`,
+  adminKbArticles: '/api/v1/support/admin/knowledge-base/articles',
+  adminKbArticle: (id: string) => `/api/v1/support/admin/knowledge-base/articles/${id}`,
+  adminKbArticlePublish: (id: string) => `/api/v1/support/admin/knowledge-base/articles/${id}/publish`,
+  adminKbArticleUnpublish: (id: string) => `/api/v1/support/admin/knowledge-base/articles/${id}/unpublish`,
+  adminKbCategories: '/api/v1/support/admin/knowledge-base/categories',
+  adminKbCategory: (id: string) => `/api/v1/support/admin/knowledge-base/categories/${id}`,
+
+  // Saved replies — agent search/render + admin authoring
+  savedReplies: '/api/v1/support/saved-replies',
+  savedReplyFolders: '/api/v1/support/saved-replies/folders',
+  savedReplyRender: (id: string, ticketId: string) =>
+    `/api/v1/support/saved-replies/${id}/render?ticketId=${ticketId}`,
+  adminSavedReplies: '/api/v1/support/admin/saved-replies',
+  adminSavedReply: (id: string) => `/api/v1/support/admin/saved-replies/${id}`,
+  adminSavedReplyFolders: '/api/v1/support/admin/saved-replies/folders',
+  adminSavedReplyFolder: (id: string) => `/api/v1/support/admin/saved-replies/folders/${id}`,
+
+  // Analytics
+  analytics: '/api/v1/support/admin/analytics',
+
+  // SignalR hub (not an HTTP endpoint — base path for the hub connection)
+  hub: '/hubs/support',
 } as const;
 
 export const SECURITY_API = {

@@ -37,7 +37,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth/login',
-    canActivate: [guestGuard],
+    canActivate: [maintenanceGuard, guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/login-page/login-page.component').then(
         (c) => c.LoginPageComponent,
@@ -45,7 +45,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth/register',
-    canActivate: [guestGuard],
+    canActivate: [maintenanceGuard, guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/register-page/register-page.component').then(
         (c) => c.RegisterPageComponent,
@@ -53,6 +53,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    canActivate: [maintenanceGuard],
     loadComponent: () => import('./layouts/auth-layout/auth-layout.component').then(c => c.AuthLayoutComponent),
     children: [
       {
@@ -63,6 +64,7 @@ export const routes: Routes = [
   },
   {
     path: 'access-denied',
+    canActivate: [maintenanceGuard],
     loadComponent: () =>
       import('./features/auth/pages/access-denied-page/access-denied-page.component').then(
         (c) => c.AccessDeniedPageComponent,

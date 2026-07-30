@@ -1,0 +1,30 @@
+<section class="latest-arrivals" aria-labelledby="latest-arrivals-title">
+  <div class="latest-arrivals__inner">
+    <div class="latest-arrivals__heading">
+      <h2 id="latest-arrivals-title" class="latest-arrivals__title">
+        <span>{{ sectionTitle() }}</span>
+        @if (sectionTitleAccent()) {
+          <span class="latest-arrivals__title-accent">{{ sectionTitleAccent() }}</span>
+        }
+      </h2>
+
+      @if (sectionSubtitle()) {
+        <p class="latest-arrivals__subtitle">{{ sectionSubtitle() }}</p>
+      }
+    </div>
+
+    @if (featured(); as featuredDeal) {
+      <div class="latest-arrivals__layout">
+        <div class="latest-arrivals__featured">
+          <app-flash-deal-card [deal]="featuredDeal" [featured]="true" />
+        </div>
+
+        <div class="latest-arrivals__grid">
+          @for (deal of gridItems(); track deal.id) {
+            <app-flash-deal-card [deal]="deal" />
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

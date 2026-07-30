@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { CategoryApiService } from '../../catalog/services/category-api.service';
 import { ProductApiService } from '../../catalog/services/product-api.service';
 import { Product } from '../../catalog/models/product.model';
+import { LandingPageSectionEntry } from '../models/landing-page-section.model';
 import { StorefrontContent } from '../models/storefront-content.model';
 import {
   mapCategoryToStorefrontCategory,
@@ -23,10 +24,12 @@ import {
   TrustFeature,
 } from '../models/storefront-home';
 import { StorefrontApiService } from './storefront-api.service';
+import { PageBuilderPublicApiService } from './page-builder-public-api.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
 
 export interface StorefrontHomeData {
   readonly content: StorefrontContent;
+  readonly sections: readonly LandingPageSectionEntry[];
   readonly categories: readonly StorefrontCategory[];
   readonly featuredProducts: readonly FlashDeal[];
   readonly newArrivals: readonly Product[];
@@ -41,13 +44,17 @@ export interface StorefrontHomeData {
 })
 export class Home {
   private readonly storefrontApi = inject(StorefrontApiService);
+  private readonly pageBuilderApi = inject(PageBuilderPublicApiService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly productApi = inject(ProductApiService);
   private readonly translation = inject(TranslationService);
 
   async loadHomeData(): Promise<StorefrontHomeData> {
     const lang = this.translation.language();
-    const contentResponse = await firstValueFrom(this.storefrontApi.getContent());
+    const [contentResponse, publishedPage] = await Promise.all([
+      firstValueFrom(this.storefrontApi.getContent()),
+      firstValueFrom(this.pageBuilderApi.getPublishedSections()),
+    ]);
     const content = mapStorefrontContent(contentResponse);
 
     const categoryLimit = content.popularCategories.maximumCategories || 8;
@@ -127,6 +134,7 @@ export class Home {
 
     return {
       content,
+      sections: publishedPage.sections,
       categories,
       featuredProducts,
       newArrivals,

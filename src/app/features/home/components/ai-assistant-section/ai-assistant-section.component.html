@@ -1,0 +1,32 @@
+<section class="ai-assistant" aria-labelledby="ai-assistant-title">
+  <div class="ai-assistant__inner">
+    <div class="ai-assistant__card">
+      <div class="ai-assistant__glow" aria-hidden="true"></div>
+
+      <div class="ai-assistant__content">
+        @if (config().statusText) {
+          <div class="ai-assistant__status">
+            <span class="ai-assistant__status-dot" aria-hidden="true"></span>
+            <span>{{ config().statusText }}</span>
+          </div>
+        }
+
+        <h2 id="ai-assistant-title" class="ai-assistant__title">
+          <span>{{ config().title }}</span>
+          @if (config().titleAccent) {
+            <span class="ai-assistant__title-accent">{{ config().titleAccent }}</span>
+          }
+        </h2>
+
+        <p class="ai-assistant__description">{{ config().description }}</p>
+
+        @if (config().buttonText) {
+          <a class="ai-assistant__button" [routerLink]="config().buttonUrl">
+            <i class="pi pi-bolt" aria-hidden="true"></i>
+            <span>{{ config().buttonText }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</section>

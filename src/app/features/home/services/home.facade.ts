@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { ApiError } from '../../../core/models/api-error.model';
+import { LandingPageSectionEntry } from '../models/landing-page-section.model';
 import { StorefrontContent } from '../models/storefront-content.model';
 import {
   FlashDeal,
@@ -19,6 +20,7 @@ export class HomeFacade {
   private readonly loadingState = signal(true);
   private readonly errorState = signal<string | null>(null);
   private readonly contentState = signal<StorefrontContent | null>(null);
+  private readonly sectionsState = signal<readonly LandingPageSectionEntry[]>([]);
   private readonly categoriesState = signal<readonly StorefrontCategory[]>([]);
   private readonly featuredProductsState = signal<readonly FlashDeal[]>([]);
   private readonly featuredHighlightState = signal<StorefrontFeaturedProduct | null>(null);
@@ -29,6 +31,7 @@ export class HomeFacade {
   readonly loading = this.loadingState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly content = this.contentState.asReadonly();
+  readonly sections = this.sectionsState.asReadonly();
   readonly categories = this.categoriesState.asReadonly();
   readonly featuredProducts = this.featuredProductsState.asReadonly();
   readonly featuredHighlight = this.featuredHighlightState.asReadonly();
@@ -56,6 +59,7 @@ export class HomeFacade {
       const data = await this.home.loadHomeData();
 
       this.contentState.set(data.content);
+      this.sectionsState.set(data.sections);
       this.categoriesState.set(data.categories);
       this.featuredProductsState.set(data.featuredProducts);
       this.featuredHighlightState.set(data.featuredHighlight);
@@ -64,6 +68,7 @@ export class HomeFacade {
       this.trustFeaturesState.set(data.trustFeatures);
     } catch (error) {
       this.contentState.set(null);
+      this.sectionsState.set([]);
       this.categoriesState.set([]);
       this.featuredProductsState.set([]);
       this.featuredHighlightState.set(null);

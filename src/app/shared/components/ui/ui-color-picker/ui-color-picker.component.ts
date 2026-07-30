@@ -33,6 +33,21 @@ const RECENT_COLORS_KEY = 'hambox.theme-editor.recent-colors';
 const MAX_RECENT_COLORS = 12;
 let nextPickerId = 0;
 
+/** Semantic design tokens offered as one-click swatches — see `styles/themes/tokens.scss` for the source values. */
+const THEME_TOKEN_VARS: readonly { name: string; cssVar: string }[] = [
+  { name: 'PRIMARY', cssVar: '--color-primary' },
+  { name: 'ACCENT', cssVar: '--color-accent' },
+  { name: 'SUCCESS', cssVar: '--color-success' },
+  { name: 'WARNING', cssVar: '--color-warning' },
+  { name: 'DANGER', cssVar: '--color-danger' },
+  { name: 'INFO', cssVar: '--color-info' },
+];
+
+export interface ThemeColorSwatch {
+  readonly name: string;
+  readonly hex: string;
+}
+
 @Component({
   selector: 'ui-color-picker',
   standalone: true,
@@ -60,6 +75,10 @@ export class UiColorPickerComponent implements ControlValueAccessor {
   protected readonly textValue = computed(() => this.formatFor(this.format(), this.hex()));
   protected readonly recentColors = signal<string[]>(loadRecentColors());
   protected readonly supportsEyeDropper = typeof window !== 'undefined' && 'EyeDropper' in window;
+  /* ponytail: resolved once per component instance rather than reactively on theme toggle — this
+     picker is typically opened fresh per edit session, so a stale swatch after a live theme switch
+     is an acceptable gap; re-resolve on toggle if that turns out to matter in practice. */
+  protected readonly themeSwatches = signal<ThemeColorSwatch[]>(resolveThemeSwatches());
 
   private onChange: (value: string) => void = () => undefined;
   private onTouched: () => void = () => undefined;
@@ -119,6 +138,10 @@ export class UiColorPickerComponent implements ControlValueAccessor {
     this.commit(color, this.alpha());
   }
 
+  protected applyThemeSwatch(swatch: ThemeColorSwatch): void {
+    this.commit(swatch.hex, 100);
+  }
+
   protected async pickWithEyeDropper(): Promise<void> {
     if (!this.supportsEyeDropper) {
       return;
@@ -155,6 +178,22 @@ export class UiColorPickerComponent implements ControlValueAccessor {
         return hex;
     }
   }
+}
+
+function resolveThemeSwatches(): ThemeColorSwatch[] {
+  if (typeof document === 'undefined') {
+    return [];
+  }
+  const styles = getComputedStyle(document.documentElement);
+  const swatches: ThemeColorSwatch[] = [];
+  for (const token of THEME_TOKEN_VARS) {
+    const raw = styles.getPropertyValue(token.cssVar).trim();
+    const parsed = raw ? parseColorWithAlpha(raw) : null;
+    if (parsed) {
+      swatches.push({ name: token.name, hex: parsed.hex });
+    }
+  }
+  return swatches;
 }
 
 function loadRecentColors(): string[] {

@@ -15,6 +15,7 @@ describe('HomePageComponent', () => {
       loading: signal(false),
       error: signal<string | null>(null),
       content: signal(null),
+      sections: signal([]),
       categories: signal([]),
       featuredProducts: signal([]),
       featuredHighlight: signal(null),

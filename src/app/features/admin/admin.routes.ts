@@ -134,6 +134,11 @@ export const routes: Routes = [
       import('./themes/admin-themes.routes').then((m) => m.routes),
   },
   {
+    path: 'page-builder',
+    loadChildren: () =>
+      import('./page-builder/admin-page-builder.routes').then((m) => m.routes),
+  },
+  {
     path: 'legal',
     loadChildren: () =>
       import('./legal/admin-legal.routes').then((m) => m.routes),
@@ -157,6 +162,11 @@ export const routes: Routes = [
     path: 'operations',
     loadChildren: () =>
       import('./operations/admin-operations.routes').then((m) => m.routes),
+  },
+  {
+    path: 'support',
+    loadChildren: () =>
+      import('./support/admin-support.routes').then((m) => m.routes),
   },
   {
     path: 'analytics',

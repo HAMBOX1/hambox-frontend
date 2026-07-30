@@ -1,0 +1,69 @@
+<div class="product-picker">
+  @if (value().length) {
+    <div class="product-picker__chips">
+      @for (id of value(); track id) {
+        <span class="product-picker__chip">
+          @if (detailsFor(id)?.primaryImageUrl) {
+            <img [src]="detailsFor(id)!.primaryImageUrl!" alt="" />
+          }
+          <span class="product-picker__chip-name">{{ detailsFor(id) ? productName(detailsFor(id)!) : id }}</span>
+          <button
+            type="button"
+            [disabled]="disabled()"
+            [attr.aria-label]="'ADMIN.PICKERS.PRODUCT_PICKER.REMOVE' | translate"
+            (click)="remove(id)"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </span>
+      }
+    </div>
+  }
+
+  <input
+    pInputText
+    [id]="fieldId"
+    class="w-full"
+    type="text"
+    [placeholder]="'ADMIN.PICKERS.PRODUCT_PICKER.SEARCH_PLACEHOLDER' | translate"
+    [ngModel]="query()"
+    [disabled]="disabled() || atLimit()"
+    (ngModelChange)="onQueryChange($event)"
+  />
+
+  @if (atLimit()) {
+    <small class="product-picker__limit">{{ 'ADMIN.PICKERS.PRODUCT_PICKER.LIMIT_REACHED' | translate }}</small>
+  }
+
+  @if (query() && !atLimit()) {
+    <div class="product-picker__results">
+      @if (loading()) {
+        <p class="product-picker__status">{{ 'ADMIN.PICKERS.PRODUCT_PICKER.LOADING' | translate }}</p>
+      } @else if (!results().length) {
+        <p class="product-picker__status">{{ 'ADMIN.PICKERS.PRODUCT_PICKER.NO_RESULTS' | translate }}</p>
+      } @else {
+        @for (product of results(); track product.id) {
+          <button
+            type="button"
+            class="product-picker__result"
+            [class.product-picker__result--selected]="isSelected(product.id)"
+            (click)="toggle(product)"
+          >
+            @if (product.primaryImageUrl) {
+              <img [src]="product.primaryImageUrl" alt="" />
+            } @else {
+              <i class="pi pi-image" aria-hidden="true"></i>
+            }
+            <span class="product-picker__result-info">
+              <span class="product-picker__result-name">{{ productName(product) }}</span>
+              <span class="product-picker__result-meta">{{ product.categoryName }} · {{ product.price | number: '1.2-2' }}</span>
+            </span>
+            @if (isSelected(product.id)) {
+              <i class="pi pi-check" aria-hidden="true"></i>
+            }
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,114 @@
+<div class="pulse-feed-form">
+  <div class="pulse-feed-form__heading">
+    @for (field of headingFields; track field.key) {
+      <app-settings-field
+        [field]="field"
+        [value]="fieldValue(field.key)"
+        [disabled]="disabled()"
+        (valueChange)="setField(field.key, $event)"
+      />
+    }
+  </div>
+
+  @if (!config().items.length) {
+    <p class="pulse-feed-form__empty">
+      {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.EMPTY' | translate }}
+    </p>
+  }
+
+  <ul
+    class="pulse-feed-form__list"
+    cdkDropList
+    [cdkDropListDisabled]="disabled()"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    @for (item of config().items; track item.id; let i = $index) {
+      <li class="pulse-feed-form__item" cdkDrag [cdkDragDisabled]="disabled()">
+        <i class="pi pi-bars pulse-feed-form__handle" cdkDragHandle aria-hidden="true"></i>
+
+        <div class="pulse-feed-form__item-fields">
+          <label class="pulse-feed-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.TAG_TEXT' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="item.tagText"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { tagText: $event })"
+            />
+          </label>
+
+          <label class="pulse-feed-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.TAG_TONE' | translate }}</span>
+            <p-select
+              [options]="tagToneOptions"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="item.tagTone"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { tagTone: $event })"
+            />
+          </label>
+
+          <label class="pulse-feed-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.TIMESTAMP_TEXT' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="item.timestampText"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { timestampText: $event })"
+            />
+          </label>
+
+          <label class="pulse-feed-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.ITEM_TITLE' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="item.title"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { title: $event })"
+            />
+          </label>
+
+          <label class="pulse-feed-form__field pulse-feed-form__field--wide">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.ITEM_DESCRIPTION' | translate }}</span>
+            <textarea
+              pTextarea
+              rows="2"
+              [ngModel]="item.description"
+              [disabled]="disabled()"
+              (ngModelChange)="updateItem(i, { description: $event })"
+            ></textarea>
+          </label>
+
+          <label class="pulse-feed-form__field pulse-feed-form__field--wide">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.LINK_URL' | translate }}</span>
+            <app-route-picker
+              [value]="item.linkUrl"
+              [disabled]="disabled()"
+              (valueChange)="updateItem(i, { linkUrl: $event ?? '' })"
+            />
+          </label>
+        </div>
+
+        <app-admin-icon-button
+          icon="pi pi-trash"
+          severity="danger"
+          [disabled]="disabled()"
+          [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.REMOVE_ITEM' | translate"
+          (pressed)="removeItem(i)"
+        />
+      </li>
+    }
+  </ul>
+
+  <app-admin-icon-button
+    icon="pi pi-plus"
+    severity="secondary"
+    [disabled]="disabled()"
+    [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PULSE_FEED.ADD_ITEM' | translate"
+    (pressed)="addItem()"
+  />
+</div>

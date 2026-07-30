@@ -1,0 +1,853 @@
+// Unstyled custom elements default to display: inline, which breaks the .admin-page
+// height: 100% chain (percentage height can't resolve against an auto-sized inline host).
+// `flex: 1` (as used on orders-list-page) only sizes the host if ITS parent is a flex/grid
+// container — .admin-layout__content is a plain block element, so that trick does nothing
+// here and the host silently grows to fit content instead of being clipped. This page needs
+// a hard height ceiling (not just a flex hint) so the message list scrolls internally and the
+// composer stays pinned, so bind directly to the parent's resolved height instead.
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.admin-support-workspace {
+  flex: 1;
+  min-block-size: 0;
+  // The shared .admin-page entrance animation (admin-page-enter, fill-mode: both) ends on
+  // `transform: translateY(0)` rather than `transform: none`. A finished transform other than
+  // none still establishes a containing block for descendant position: fixed elements per the
+  // CSS Transforms spec — so .mobile-composer below was never actually fixed to the viewport,
+  // it was fixed relative to this (scrollable, taller-than-viewport) section instead. Opt this
+  // page out of the animation; it's the one page here with a real fixed-position child.
+  animation: none !important;
+}
+
+// Desktop (>1280px): fixed 3-column workspace. Tablet (768–1280px): fixed 2-column workspace
+// (context panel dropped). Neither reflows further — below 768px the whole markup tree switches
+// to the dedicated mobile screens above, it does not squeeze this grid any narrower.
+.admin-support-workspace__layout {
+  // .admin-page is already a height: 100% flex column — stretch into the space left after
+  // the header instead of guessing a viewport calc.
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) 320px;
+  gap: var(--admin-section-gap, 1.5rem);
+  flex: 1;
+  // Floor covers the worst case of conversation-header (wraps up to ~160px) + composer
+  // (~340px, rich text toolbar + editor) + a real minimum for the message thread itself
+  // (.admin-support-workspace__messages below) — without this the message list was the
+  // one flexible piece and got squeezed to a sliver on anything but a tall viewport.
+  min-block-size: 720px;
+
+  @media (max-width: 1280px) {
+    grid-template-columns: 280px minmax(0, 1fr);
+
+    .admin-support-workspace__context {
+      display: none;
+    }
+  }
+}
+
+.admin-support-workspace__list {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  block-size: 100%;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-bg-elevated);
+  overflow: hidden;
+}
+
+.admin-support-workspace__toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--hambox-spacing-3);
+  align-items: center;
+  inline-size: 100%;
+
+  app-admin-search-bar {
+    flex: 1 1 12rem;
+    min-inline-size: 0;
+  }
+
+  p-select {
+    flex-shrink: 1;
+    min-inline-size: 140px;
+  }
+}
+
+.admin-support-workspace__list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: var(--hambox-spacing-3);
+  border: none;
+  border-block-end: 1px solid var(--admin-border-subtle);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+
+  &:hover {
+    background: var(--admin-bg-hover, var(--admin-bg-elevated));
+  }
+
+  &--active {
+    background: color-mix(in srgb, var(--admin-accent-green) 12%, transparent);
+    border-inline-start: 3px solid var(--admin-accent-green);
+  }
+
+  &--unread .ticket-row__subject {
+    font-weight: 700;
+  }
+}
+
+.ticket-row__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-2);
+}
+
+.ticket-row__number {
+  font-size: 0.7rem;
+  color: var(--admin-text-secondary);
+}
+
+.ticket-row__subject {
+  font-size: var(--admin-type-caption);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-row__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-2);
+  font-size: 0.72rem;
+  color: var(--admin-text-secondary);
+}
+
+.ticket-row__customer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-row__time {
+  flex-shrink: 0;
+}
+
+.ticket-row__unread-dot {
+  position: absolute;
+  inset-block-start: var(--hambox-spacing-3);
+  inset-inline-end: var(--hambox-spacing-3);
+  color: var(--admin-accent-green, var(--color-info));
+  font-size: 0.5rem;
+}
+
+.admin-support-workspace__conversation {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  block-size: 100%;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-bg-elevated);
+  overflow: hidden;
+}
+
+.admin-support-workspace__conversation-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--hambox-spacing-3);
+  padding: var(--hambox-spacing-3) var(--admin-card-padding, 1.5rem);
+  border-block-end: 1px solid var(--admin-border-subtle);
+}
+
+.admin-support-workspace__conversation-title {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-inline-size: 0;
+
+  h2 {
+    margin: 0;
+    font-size: var(--hambox-font-size-lg, 1.125rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    color: var(--admin-text-secondary);
+    font-size: 0.75rem;
+  }
+}
+
+.admin-support-workspace__conversation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hambox-spacing-2);
+  align-items: center;
+}
+
+.admin-support-workspace__messages {
+  flex: 1;
+  // overflow-y:auto alone lets this shrink to 0 (scrollable content has an automatic min
+  // size of 0) whenever the header/composer around it are tall — floor it so a few messages
+  // are always visible instead of scrolling within a sliver.
+  min-block-size: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-3);
+  padding: var(--admin-card-padding, 1.5rem);
+}
+
+.admin-support-workspace__composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-3);
+  padding: var(--admin-card-padding, 1.5rem);
+  border-block-start: 1px solid var(--admin-border-subtle);
+}
+
+.admin-support-workspace__context {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-section-gap, 1.5rem);
+  block-size: 100%;
+  overflow-y: auto;
+}
+
+.admin-support-workspace__license-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--admin-accent-amber);
+}
+
+.admin-support-detail__connection-state {
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--admin-radius-pill, 9999px);
+  font-size: var(--hambox-font-size-xs);
+  font-weight: 600;
+  background: var(--color-warning-muted);
+  color: var(--color-warning);
+
+  &[data-state='disconnected'] {
+    background: var(--color-danger-muted);
+    color: var(--color-danger);
+  }
+}
+
+.detail-bubble--typing {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+}
+
+.admin-support-detail__typing-dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--color-text-secondary);
+  opacity: 0.5;
+  animation: admin-support-detail-typing-blink 1.2s infinite ease-in-out;
+
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes admin-support-detail-typing-blink {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+.detail-bubble-row {
+  display: flex;
+  justify-content: flex-start;
+
+  &--customer {
+    justify-content: flex-end;
+  }
+}
+
+.detail-bubble {
+  max-inline-size: 70%;
+  padding: var(--hambox-spacing-3) var(--hambox-spacing-4);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-bg-base, var(--admin-bg-elevated));
+  border: 1px solid var(--admin-border-subtle);
+
+  &[data-role='customer'] {
+    background: var(--admin-accent-green);
+    color: var(--color-text-inverse);
+    border-color: transparent;
+  }
+
+  &[data-role='ai'] {
+    background: var(--color-info-muted);
+    border-color: var(--color-info);
+  }
+
+  &--internal {
+    background: color-mix(in srgb, var(--admin-accent-amber) 12%, var(--admin-bg-elevated));
+    border-color: var(--admin-accent-amber);
+    color: var(--admin-text-primary);
+  }
+}
+
+.detail-bubble__author {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  margin-block-end: var(--hambox-spacing-1);
+  font-size: var(--admin-type-caption);
+  font-weight: 600;
+}
+
+.detail-bubble__internal-tag {
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--sf-radius-pill);
+  background: color-mix(in srgb, var(--admin-accent-amber) 20%, transparent);
+  color: var(--admin-accent-amber);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-bubble__body {
+  font-size: var(--admin-type-caption);
+  line-height: 1.5;
+}
+
+.detail-bubble__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hambox-spacing-2);
+  margin-block-start: var(--hambox-spacing-2);
+  font-size: 0.75rem;
+}
+
+.detail-bubble__time {
+  display: block;
+  margin-block-start: var(--hambox-spacing-1);
+  font-size: 0.7rem;
+  opacity: 0.7;
+  text-align: end;
+}
+
+.admin-support-detail__reply-toggle {
+  display: inline-flex;
+  gap: var(--hambox-spacing-2);
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+    padding: var(--hambox-spacing-2) var(--hambox-spacing-4);
+    border: 1px solid var(--admin-border-default);
+    border-radius: var(--sf-radius-pill);
+    background: transparent;
+    color: var(--admin-text-secondary);
+    cursor: pointer;
+    font-size: var(--admin-type-caption);
+    font-weight: 600;
+
+    &.active {
+      background: var(--admin-accent-green);
+      color: var(--color-text-inverse);
+      border-color: transparent;
+    }
+  }
+}
+
+.admin-support-detail__composer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.customer-panel__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-3);
+  margin-block-end: var(--hambox-spacing-4);
+
+  strong {
+    display: block;
+  }
+
+  p {
+    margin: 0;
+    color: var(--admin-text-secondary);
+    font-size: var(--admin-type-caption);
+  }
+}
+
+.customer-panel__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: 50%;
+  background: var(--admin-accent-green);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.customer-panel__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hambox-spacing-2);
+  margin-block-start: var(--hambox-spacing-3);
+}
+
+.customer-panel__tag {
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--sf-radius-pill);
+  background: var(--admin-bg-elevated);
+  color: var(--admin-text-secondary);
+  font-size: 0.7rem;
+}
+
+
+.admin-support-detail__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--admin-type-caption);
+
+  li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--hambox-spacing-2);
+    padding-inline-start: var(--hambox-spacing-3);
+    border-inline-start: 2px solid var(--admin-border-default);
+    color: var(--admin-text-secondary);
+  }
+
+  time {
+    flex-shrink: 0;
+    font-size: 0.7rem;
+  }
+}
+
+.admin-support-detail__related-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-block: var(--hambox-spacing-2);
+    border-block-end: 1px solid var(--admin-border-subtle);
+    font-size: var(--admin-type-caption);
+
+    &:last-child {
+      border-block-end: none;
+    }
+  }
+}
+
+// ============================================================================
+// Mobile (<=767px, MobileViewportService.isMobile) — a dedicated navigation-based
+// flow, not a squeezed desktop layout. Chat-app conventions throughout: rounded
+// pill composer, avatar-led list rows, bottom sheets for anything secondary.
+// ============================================================================
+
+$mobile-avatar-color: var(--admin-accent-green);
+
+@mixin mobile-icon-button($size: 2.25rem) {
+  display: grid;
+  place-items: center;
+  inline-size: $size;
+  block-size: $size;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--admin-text-secondary);
+  cursor: pointer;
+
+  &:active {
+    background: var(--admin-bg-hover, var(--admin-bg-elevated));
+  }
+}
+
+// ---- Screen 1: ticket list ----
+
+.mobile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-3);
+  padding-block-end: var(--hambox-spacing-2);
+}
+
+.mobile-topbar__title {
+  margin: 0;
+  font-family: var(--admin-font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+}
+
+.mobile-topbar__filter-btn {
+  position: relative;
+  @include mobile-icon-button(2.5rem);
+  border: 1px solid var(--admin-border-default);
+  background: var(--admin-bg-elevated);
+}
+
+.mobile-topbar__filter-count {
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-end: -2px;
+  display: grid;
+  place-items: center;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  border-radius: 50%;
+  background: $mobile-avatar-color;
+  color: var(--color-text-inverse);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.mobile-search {
+  padding-block-end: var(--hambox-spacing-3);
+}
+
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  margin-inline: calc(-1 * var(--admin-content-padding-mobile, 1.25rem));
+}
+
+.mobile-ticket-row {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-3);
+  min-block-size: 4.5rem;
+  padding: var(--hambox-spacing-2) var(--admin-content-padding-mobile, 1.25rem);
+  border: none;
+  border-block-end: 1px solid var(--admin-border-subtle);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+
+  &:active {
+    background: var(--admin-bg-hover, var(--admin-bg-elevated));
+  }
+
+  &--unread {
+    .mobile-ticket-row__name,
+    .mobile-ticket-row__subject {
+      color: var(--admin-text-primary);
+      font-weight: 700;
+    }
+  }
+}
+
+.mobile-ticket-row__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: $mobile-avatar-color;
+  color: var(--color-text-inverse);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.mobile-ticket-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.mobile-ticket-row__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-2);
+}
+
+.mobile-ticket-row__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+}
+
+.mobile-ticket-row__time {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--admin-text-secondary);
+}
+
+.mobile-ticket-row__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hambox-spacing-2);
+}
+
+.mobile-ticket-row__subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: var(--admin-text-secondary);
+}
+
+.mobile-ticket-row__unread-dot {
+  flex-shrink: 0;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: 50%;
+  background: $mobile-avatar-color;
+}
+
+// ---- Filters bottom sheet ----
+
+.mobile-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-3);
+}
+
+.mobile-filters__field {
+  inline-size: 100%;
+}
+
+.mobile-filters__clear {
+  padding: var(--hambox-spacing-3);
+  border: none;
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-bg-elevated);
+  color: var(--admin-accent-red, var(--color-danger));
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ---- Screen 2: conversation ----
+
+.mobile-chat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  padding-block-end: var(--hambox-spacing-3);
+  border-block-end: 1px solid var(--admin-border-subtle);
+}
+
+.mobile-chat-header__back {
+  @include mobile-icon-button;
+}
+
+.mobile-chat-header__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  flex: 1;
+  min-inline-size: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.mobile-chat-header__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: $mobile-avatar-color;
+  color: var(--color-text-inverse);
+  font-weight: 700;
+}
+
+.mobile-chat-header__meta {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+
+  strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9375rem;
+  }
+
+  small {
+    color: var(--admin-text-secondary);
+    font-size: 0.7rem;
+  }
+}
+
+.mobile-chat-header__connection {
+  flex-shrink: 0;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: 50%;
+  background: var(--color-warning);
+
+  &[data-state='disconnected'] {
+    background: var(--color-danger);
+  }
+}
+
+.mobile-messages {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  gap: var(--hambox-spacing-3);
+  padding-block: var(--hambox-spacing-4);
+  // ponytail: static reserve for the fixed composer below, sized for its ~1-line resting
+  // height. A composer grown to multiple lines can crowd the last message rather than the
+  // scroll area re-measuring live — upgrade to a ResizeObserver-driven CSS var if that bites.
+  padding-block-end: 6.5rem;
+  margin-inline: calc(-1 * var(--admin-content-padding-mobile, 1.25rem));
+  padding-inline: var(--admin-content-padding-mobile, 1.25rem);
+}
+
+// ---- Mobile-first composer: plain textarea + round send button, not the rich editor ----
+// position: fixed (viewport-relative), not a flex-chain "last child sticks to the bottom" —
+// that chain silently breaks the moment the on-screen keyboard resizes the visual viewport,
+// leaving the composer scrolled off past the bottom of the page instead of pinned to the screen.
+.mobile-composer {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--hambox-spacing-2);
+  padding-inline: var(--admin-content-padding-mobile, 1.25rem);
+  padding-block-start: var(--hambox-spacing-2);
+  padding-block-end: calc(var(--hambox-spacing-2) + env(safe-area-inset-bottom, 0px));
+  border-block-start: 1px solid var(--admin-border-subtle);
+  background: var(--admin-bg-elevated);
+}
+
+.mobile-composer__mode {
+  display: inline-flex;
+  gap: var(--hambox-spacing-2);
+
+  button {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--admin-border-default);
+    border-radius: var(--sf-radius-pill);
+    background: transparent;
+    color: var(--admin-text-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.active {
+      background: var(--admin-accent-green);
+      color: var(--color-text-inverse);
+      border-color: transparent;
+    }
+  }
+}
+
+.mobile-composer__row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--hambox-spacing-2);
+}
+
+.mobile-composer__input {
+  flex: 1;
+  min-block-size: 2.75rem;
+  max-block-size: 120px;
+  padding: 0.625rem 1rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: 1.375rem;
+  background: var(--admin-bg-input, var(--admin-bg-elevated));
+  color: var(--admin-text-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  resize: none;
+  overflow-y: auto;
+
+  &:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--admin-accent-green) 55%, var(--admin-border-default));
+  }
+}
+
+.mobile-composer__send {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--admin-accent-green);
+  color: var(--color-text-inverse);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}

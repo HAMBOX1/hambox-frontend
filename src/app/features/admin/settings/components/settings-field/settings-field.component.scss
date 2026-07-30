@@ -99,6 +99,21 @@
   grid-template-columns: minmax(0, 1fr) 8rem;
   align-items: center;
   gap: 1rem;
+
+  /* p-inputNumber here is a grandchild of `.settings-field__control` (nested inside this grid row),
+     so the `> p-inputnumber { width: 100% }` rule below never matches it — its wrapper does size to
+     the 8rem track, but PrimeNG's own internal <input> doesn't inherit that width and renders at its
+     native intrinsic size, overflowing the track. Left unconstrained, that overflow gets clipped by
+     the settings panel card's `overflow-x: hidden`, and any focus/scroll event that nudges the
+     card's hidden scroll position shifts every row in the panel sideways. */
+  > p-inputnumber {
+    min-width: 0;
+
+    ::ng-deep .p-inputnumber-input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
 }
 
 .settings-field__slider {

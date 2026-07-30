@@ -44,3 +44,12 @@ export type { AdminStepperStep } from './admin-stepper/admin-stepper.component';
 export { AdminProgressBarComponent } from './admin-progress-bar/admin-progress-bar.component';
 export { AdminFileDropzoneComponent } from './admin-file-dropzone/admin-file-dropzone.component';
 
+export { RoutePickerComponent } from './route-picker/route-picker.component';
+export { APP_ROUTE_REGISTRY } from './route-picker/route-registry';
+export type { AppRouteOption } from './route-picker/route-registry';
+export { MediaPickerComponent } from './media-picker/media-picker.component';
+export { IconPickerComponent } from './icon-picker/icon-picker.component';
+export { ButtonEditorComponent } from './button-editor/button-editor.component';
+export { ProductPickerComponent } from './product-picker/product-picker.component';
+export { CategoryPickerComponent } from './category-picker/category-picker.component';
+
