@@ -35,14 +35,16 @@
 
 .trust-bar-form__item-fields {
   flex: 1;
+  min-width: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.6rem;
 }
 
 .trust-bar-form__field {
   display: grid;
   gap: 0.3rem;
+  min-width: 0;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--color-text-secondary);

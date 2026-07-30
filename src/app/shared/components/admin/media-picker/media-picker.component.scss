@@ -1,17 +1,21 @@
 :host {
   display: block;
   width: 100%;
+  min-width: 0;
 }
 
 .media-picker {
   display: grid;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .media-picker__row {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 0.65rem;
+  min-width: 0;
 }
 
 .media-picker__preview {
