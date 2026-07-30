@@ -57,6 +57,7 @@
 
 .page-builder-page__template-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -120,6 +121,7 @@
 
 .page-builder-page__section-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
   padding: 0.65rem 0.85rem;
@@ -189,6 +191,7 @@
   align-items: center;
   gap: 0.25rem;
   flex-shrink: 0;
+  margin-inline-start: auto;
 }
 
 .page-builder-page__add-section {
