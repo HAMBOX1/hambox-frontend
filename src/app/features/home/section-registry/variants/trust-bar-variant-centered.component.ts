@@ -22,7 +22,7 @@ export class TrustBarVariantCenteredComponent {
   readonly config = input.required<TrustBarSectionConfig>();
 
   protected readonly features = computed<readonly TrustFeature[]>(() =>
-    this.config().items.map((item) => ({
+    (this.config().items ?? []).map((item) => ({
       id: item.id,
       iconSrc: resolveStorefrontImageUrl(item.iconUrl, 'assets/images/trust/instant-delivery.svg'),
       title: item.title,
