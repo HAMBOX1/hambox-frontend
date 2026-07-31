@@ -1,0 +1,163 @@
+<section class="admin-page role-compare-page">
+  <app-admin-page-header
+    [title]="'ADMIN.ROLES.COMPARE.TITLE' | translate"
+    [subtitle]="'ADMIN.ROLES.COMPARE.SUBTITLE' | translate"
+    [backLink]="'/admin/roles'"
+    [backLabel]="'ADMIN.ROLES.EDIT.BACK' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-section-card [padded]="true">
+    <div class="role-compare-page__picker-row">
+      <p-select
+        class="role-compare-page__picker"
+        [options]="roleOptions()"
+        [ngModel]="leftId()"
+        (ngModelChange)="leftId.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'ADMIN.ROLES.COMPARE.LEFT_PLACEHOLDER' | translate"
+      />
+      <i class="pi pi-arrow-right-arrow-left role-compare-page__picker-icon" aria-hidden="true"></i>
+      <p-select
+        class="role-compare-page__picker"
+        [options]="roleOptions()"
+        [ngModel]="rightId()"
+        (ngModelChange)="rightId.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'ADMIN.ROLES.COMPARE.RIGHT_PLACEHOLDER' | translate"
+      />
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.ROLES.COMPARE.RUN' | translate"
+        icon="pi pi-sliders-h"
+        [disabled]="!leftId() || !rightId() || leftId() === rightId()"
+        [loading]="compareLoading()"
+        (click)="runCompare()"
+      ></button>
+    </div>
+  </app-admin-section-card>
+
+  @if (compareError()) {
+    <app-admin-error-alert [message]="compareError()!" (retry)="retryCompare()" />
+  }
+
+  @if (compareLoading()) {
+    <app-admin-loading-skeleton variant="table" [rows]="6" />
+  } @else if (left() && right()) {
+    <div class="role-compare-page__summary-row">
+      <app-admin-section-card [title]="left()!.name" [padded]="true">
+        <dl class="role-compare-page__summary-list">
+          <div>
+            <dt>{{ 'ADMIN.ROLES.LIST.PRIORITY' | translate }}</dt>
+            <dd>{{ left()!.priorityLevel }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ROLES.MATRIX.RISK_SCORE' | translate }}</dt>
+            <dd>
+              <app-admin-status-badge
+                [label]="riskLabelKey(riskLevelFor(left()!.priorityLevel)) | translate"
+                [tone]="riskTone(riskLevelFor(left()!.priorityLevel))"
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ROLES.LIST.COLUMNS.USERS' | translate }}</dt>
+            <dd>{{ left()!.userCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate }}</dt>
+            <dd>{{ left()!.permissionIds.length }}</dd>
+          </div>
+        </dl>
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="right()!.name" [padded]="true">
+        <dl class="role-compare-page__summary-list">
+          <div>
+            <dt>{{ 'ADMIN.ROLES.LIST.PRIORITY' | translate }}</dt>
+            <dd>{{ right()!.priorityLevel }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ROLES.MATRIX.RISK_SCORE' | translate }}</dt>
+            <dd>
+              <app-admin-status-badge
+                [label]="riskLabelKey(riskLevelFor(right()!.priorityLevel)) | translate"
+                [tone]="riskTone(riskLevelFor(right()!.priorityLevel))"
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ROLES.LIST.COLUMNS.USERS' | translate }}</dt>
+            <dd>{{ right()!.userCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate }}</dt>
+            <dd>{{ right()!.permissionIds.length }}</dd>
+          </div>
+        </dl>
+      </app-admin-section-card>
+    </div>
+
+    <app-admin-section-card
+      [title]="'ADMIN.ROLES.COMPARE.DIFF_TITLE' | translate"
+      [description]="
+        ('ADMIN.ROLES.COMPARE.DIFF_SUBTITLE' | translate: { shared: sharedPermissionCount() })
+      "
+      [padded]="false"
+    >
+      @if (diffRows().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-check-circle"
+          [title]="'ADMIN.ROLES.COMPARE.NO_DIFF' | translate"
+          [compact]="true"
+        />
+      } @else {
+        <app-admin-data-table-shell>
+          <p-table class="admin-data-table" [value]="diffRows()" dataKey="permissionId" scrollable scrollHeight="flex">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate }}</th>
+                <th>{{ 'ADMIN.ROLES.PERMISSIONS.MODULE_FILTER' | translate }}</th>
+                <th>{{ left()!.name }}</th>
+                <th>{{ right()!.name }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td><span class="admin-cell-primary">{{ row.name }}</span></td>
+                <td><span class="admin-cell-secondary">{{ row.module }}</span></td>
+                <td>
+                  <i
+                    class="pi"
+                    [class.pi-check]="row.inLeft"
+                    [class.pi-times]="!row.inLeft"
+                    [class.role-compare-page__diff-yes]="row.inLeft"
+                    [class.role-compare-page__diff-no]="!row.inLeft"
+                  ></i>
+                </td>
+                <td>
+                  <i
+                    class="pi"
+                    [class.pi-check]="row.inRight"
+                    [class.pi-times]="!row.inRight"
+                    [class.role-compare-page__diff-yes]="row.inRight"
+                    [class.role-compare-page__diff-no]="!row.inRight"
+                  ></i>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      }
+    </app-admin-section-card>
+  } @else {
+    <app-admin-empty-state
+      icon="pi pi-sliders-h"
+      [title]="'ADMIN.ROLES.COMPARE.EMPTY' | translate"
+      [compact]="true"
+    />
+  }
+</section>

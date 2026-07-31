@@ -226,4 +226,8 @@ export class CategoryListPageComponent implements OnInit {
   protected onCreateCancelled(): void {
     this.facade.closeCreateDialog();
   }
+
+  protected onCategoryImageChanged(): void {
+    void this.facade.refreshAfterImageChange();
+  }
 }

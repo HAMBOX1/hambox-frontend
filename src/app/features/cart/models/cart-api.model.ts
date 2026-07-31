@@ -10,6 +10,7 @@ export interface CartItemApiDto {
   readonly region?: string | null;
   readonly edition?: string | null;
   readonly variantSummary?: string | null;
+  readonly imageUrl?: string | null;
 }
 
 export interface AppliedPromotionApiDto {
@@ -46,6 +47,7 @@ export interface OrderItemApiDto {
   readonly quantity: number;
   readonly unitPrice: number;
   readonly lineTotal: number;
+  readonly imageUrl?: string | null;
 }
 
 export interface OrderApiDto {

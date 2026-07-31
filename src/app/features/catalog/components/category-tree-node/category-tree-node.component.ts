@@ -5,6 +5,7 @@ import { MenuItem } from 'primeng/api';
 import { AdminActionMenuComponent } from '../../../../shared/components/admin';
 import { CategoryTreeNode } from '../../models/category.model';
 import { CategoryTreeCallbacks } from '../../utils/category-tree-callbacks.model';
+import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
 /** Recursive tree row: renders itself, then (once expanded) hands its children off to more
  * `app-category-tree-node` instances — mirrors the self-recursive pattern already used by
@@ -28,6 +29,10 @@ export class CategoryTreeNodeComponent {
 
   protected readonly hasChildren = computed(() => this.node().children.length > 0);
   protected readonly isExpanded = computed(() => this.callbacks().isExpanded(this.node().id));
+  protected readonly thumbnailUrl = computed(() => {
+    const imageUrl = this.node().imageUrl;
+    return imageUrl ? resolveProductImageUrl(imageUrl) || null : null;
+  });
 
   protected readonly menuItems = computed<MenuItem[]>(() => {
     const node = this.node();

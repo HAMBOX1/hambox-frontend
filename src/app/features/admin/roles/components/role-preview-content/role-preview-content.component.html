@@ -1,0 +1,120 @@
+@if (loading() || !role()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else {
+  @let r = role()!;
+
+  <header class="role-preview__header">
+    <div class="role-preview__title-row">
+      <h2 class="role-preview__title">{{ r.name }}</h2>
+      <div class="role-preview__badges">
+        <app-admin-status-badge
+          [label]="r.isSystem ? ('ADMIN.ROLES.LIST.SYSTEM' | translate) : ('ADMIN.ROLES.LIST.CUSTOM' | translate)"
+          [tone]="r.isSystem ? 'info' : 'neutral'"
+        />
+        @if (risk()) {
+          <app-admin-status-badge
+            [label]="riskKey() | translate"
+            [tone]="riskTone()"
+          />
+        }
+      </div>
+    </div>
+    @if (r.description) {
+      <p class="role-preview__description">{{ r.description }}</p>
+    }
+  </header>
+
+  <div class="role-preview__meta-grid">
+    <div class="role-preview__meta-item">
+      <span class="role-preview__meta-label">{{ 'ADMIN.ROLES.LIST.PRIORITY' | translate }}</span>
+      <span class="role-preview__meta-value">{{ r.priorityLevel }}</span>
+    </div>
+    <div class="role-preview__meta-item">
+      <span class="role-preview__meta-label">{{ 'ADMIN.ROLES.LIST.COLUMNS.USERS' | translate }}</span>
+      <span class="role-preview__meta-value">{{ r.userCount }}</span>
+    </div>
+    <div class="role-preview__meta-item">
+      <span class="role-preview__meta-label">{{ 'ADMIN.ROLES.DRAWER.CREATED' | translate }}</span>
+      <span class="role-preview__meta-value">{{ r.createdOnUtc | hamboxDate: 'mediumDate' }}</span>
+    </div>
+    <div class="role-preview__meta-item">
+      <span class="role-preview__meta-label">{{ 'ADMIN.ROLES.DRAWER.MODIFIED' | translate }}</span>
+      <span class="role-preview__meta-value">
+        {{ (r.modifiedOnUtc | hamboxDate: 'mediumDate') || '—' }}
+      </span>
+    </div>
+  </div>
+
+  <section class="role-preview__section">
+    <h3 class="role-preview__section-title">
+      {{ 'ADMIN.ROLES.DRAWER.PERMISSIONS_TITLE' | translate }}
+    </h3>
+    <app-admin-progress-bar
+      [percent]="permissionCoveragePercent()"
+      [label]="(detail()?.permissionIds?.length ?? 0) + ' / ' + totalPermissionCount()"
+    />
+
+    @if (moduleSummary().length > 0) {
+      <ul class="role-preview__module-list">
+        @for (entry of moduleSummary(); track entry.module) {
+          <li class="role-preview__module-item">
+            <span class="role-preview__module-name">{{ entry.module }}</span>
+            <span class="role-preview__module-count">{{ entry.count }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="role-preview__section role-preview__section--danger">
+    <h3 class="role-preview__section-title">{{ 'ADMIN.ROLES.DRAWER.DANGER_ZONE' | translate }}</h3>
+    <p class="role-preview__danger-hint">
+      {{
+        r.isSystem
+          ? ('ADMIN.ROLES.DRAWER.SYSTEM_PROTECTED' | translate)
+          : ('ADMIN.ROLES.DRAWER.DELETE_HINT' | translate)
+      }}
+    </p>
+  </section>
+
+  <footer class="role-preview__actions">
+    <button
+      *hamboxHasPermission="permissions.Roles.Create"
+      type="button"
+      class="role-preview__action-btn"
+      (click)="duplicateRequested.emit()"
+    >
+      <i class="pi pi-copy" aria-hidden="true"></i>
+      {{ 'ADMIN.ROLES.ACTIONS.DUPLICATE' | translate }}
+    </button>
+    <button
+      *hamboxHasPermission="permissions.Roles.AssignUsers"
+      type="button"
+      class="role-preview__action-btn"
+      (click)="assignUsersRequested.emit()"
+    >
+      <i class="pi pi-user-plus" aria-hidden="true"></i>
+      {{ 'ADMIN.ROLES.DRAWER.ASSIGN_USERS' | translate }}
+    </button>
+    <button
+      *hamboxHasPermission="permissions.Roles.Edit"
+      type="button"
+      class="role-preview__action-btn role-preview__action-btn--primary"
+      (click)="editRequested.emit()"
+    >
+      <i class="pi pi-pencil" aria-hidden="true"></i>
+      {{ 'ADMIN.ROLES.ACTIONS.EDIT' | translate }}
+    </button>
+    @if (!r.isSystem) {
+      <button
+        *hamboxHasPermission="permissions.Roles.Delete"
+        type="button"
+        class="role-preview__action-btn role-preview__action-btn--danger"
+        (click)="deleteRequested.emit()"
+      >
+        <i class="pi pi-trash" aria-hidden="true"></i>
+        {{ 'ADMIN.ROLES.ACTIONS.DELETE' | translate }}
+      </button>
+    }
+  </footer>
+}

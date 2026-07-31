@@ -1,4 +1,5 @@
 import { OrderApiDto } from '../../cart/models/cart-api.model';
+import { resolveProductImageUrl } from '../../catalog/utils/product-image.utils';
 import { OrderRecommendation, OrderSuccessDetails } from '../models/order-success';
 
 const ORDER_ITEM_PLACEHOLDER_IMAGE = 'assets/images/placeholders/product.svg';
@@ -10,7 +11,7 @@ export function mapOrderToSuccessDetails(order: OrderApiDto): OrderSuccessDetail
       id: item.productId,
       title: item.productNameEn,
       subtitle: `Qty ${item.quantity}`,
-      imageUrl: ORDER_ITEM_PLACEHOLDER_IMAGE,
+      imageUrl: resolveProductImageUrl(item.imageUrl ?? '') || ORDER_ITEM_PLACEHOLDER_IMAGE,
       price: item.lineTotal,
     })),
     total: order.totalAmount,

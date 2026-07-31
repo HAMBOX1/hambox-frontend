@@ -29,14 +29,6 @@ const CATEGORY_PLACEHOLDER_IMAGE = 'assets/images/categories/game-keys.svg';
 const PRICE_TONES: readonly StorefrontPriceTone[] = ['green', 'blue', 'peach'];
 const RANK_TONES: Array<'green' | 'blue'> = ['green', 'blue'];
 
-const CATEGORY_IMAGE_BY_SLUG: Readonly<Record<string, string>> = {
-  'game-keys': 'assets/images/categories/game-keys.svg',
-  'gift-cards': 'assets/images/categories/gift-cards.svg',
-  subscriptions: 'assets/images/categories/subscriptions.svg',
-  'top-ups': 'assets/images/categories/top-ups.svg',
-  'account-top-ups': 'assets/images/categories/top-ups.svg',
-};
-
 export function productPlaceholderImage(index = 0): string {
   return PRODUCT_PLACEHOLDER_IMAGES[index % PRODUCT_PLACEHOLDER_IMAGES.length] ?? PRODUCT_PLACEHOLDER_IMAGES[0];
 }
@@ -61,14 +53,13 @@ export function mapCategoryToStorefrontCategory(
   category: Category,
   lang: SupportedLanguageId,
 ): StorefrontCategory {
-  const normalizedSlug = category.slug.trim().toLowerCase();
   const name = resolveLocalizedText(category.nameEn, category.nameAr, lang);
 
   return {
     id: category.id,
     title: name,
     subtitle: `Browse ${name}`,
-    imageUrl: CATEGORY_IMAGE_BY_SLUG[normalizedSlug] ?? CATEGORY_PLACEHOLDER_IMAGE,
+    imageUrl: resolveStorefrontImageUrl(category.imageUrl, CATEGORY_PLACEHOLDER_IMAGE),
     route: `/products?category=${category.id}`,
   };
 }
@@ -78,7 +69,7 @@ export function mapProductToFlashDeal(product: Product, lang: SupportedLanguageI
     id: product.id,
     title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
     subtitle: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
-    imageUrl: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
+    imageUrl: resolveStorefrontImageUrl(product.displayImageUrl),
     discountLabel: '',
     originalPriceUsd: product.price,
     currentPriceUsd: product.price,
@@ -95,7 +86,7 @@ export function mapProductToTrendingRank(
     id: product.id,
     rank: `#${index + 1}`,
     rankTone: RANK_TONES[index % RANK_TONES.length] ?? 'green',
-    iconSrc: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
+    iconSrc: resolveStorefrontImageUrl(product.displayImageUrl),
     title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
     subtitle: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     priceUsd: product.price,
@@ -127,7 +118,7 @@ export function mapProductToFeaturedProduct(
     badge,
     title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
     description: resolveLocalizedText(product.descriptionEn, product.descriptionAr, lang),
-    imageUrl: resolveStorefrontImageUrl(product.primaryImageUrl, productPlaceholderImage(index)),
+    imageUrl: resolveStorefrontImageUrl(product.displayImageUrl),
     ctaLabel,
     route: `/products/${product.id}`,
   };

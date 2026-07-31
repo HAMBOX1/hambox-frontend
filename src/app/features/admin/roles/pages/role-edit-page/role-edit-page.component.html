@@ -24,6 +24,7 @@
       <app-admin-section-card
         [title]="'ADMIN.ROLES.EDIT.DETAILS' | translate"
         [padded]="true"
+        [compact]="true"
       >
         <div class="admin-form-grid admin-form-grid--single">
           <label class="admin-field">
@@ -81,32 +82,50 @@
         </div>
       </app-admin-section-card>
 
-      <app-admin-section-card
-        [title]="'ADMIN.ROLES.PERMISSIONS.TITLE' | translate"
-        [padded]="false"
-        [noDivider]="true"
-      >
+      <div class="role-edit-page__permissions">
+        <header class="role-edit-page__permissions-header">
+          <h2 class="role-edit-page__permissions-title">
+            {{ 'ADMIN.ROLES.PERMISSIONS.TITLE' | translate }}
+          </h2>
+          @if (!matrixLoading() && totalPermissionCount() > 0) {
+            <span class="role-edit-page__permissions-count">
+              {{ selectedPermissionIds().length }}/{{ totalPermissionCount() }}
+            </span>
+          }
+        </header>
+
         @if (matrixError()) {
           <div class="role-edit-page__matrix-error">
             <app-admin-error-alert [message]="matrixError()!" />
           </div>
         }
 
-        <app-permission-matrix
-          [groups]="matrix()"
-          [modules]="matrixModules()"
-          [selectedIds]="selectedPermissionIds()"
-          [loading]="matrixLoading()"
-          [disabled]="formDisabled()"
-          (permissionToggle)="onPermissionToggle($event)"
-          (selectAllGroup)="facade.selectAllInGroup($event)"
-          (clearAllGroup)="facade.clearAllInGroup($event)"
-        />
-      </app-admin-section-card>
+        <div class="role-edit-page__matrix-workspace">
+          <app-permission-matrix
+            [groups]="matrix()"
+            [modules]="matrixModules()"
+            [selectedIds]="selectedPermissionIds()"
+            [loading]="matrixLoading()"
+            [disabled]="formDisabled()"
+            (permissionToggle)="onPermissionToggle($event)"
+            (selectAllRequested)="facade.selectAllIds($event)"
+            (clearAllRequested)="facade.clearAllIds($event)"
+            (invertRequested)="facade.invertIds($event)"
+          />
+          <app-permission-live-summary
+            class="role-edit-page__matrix-summary"
+            [groups]="matrix()"
+            [selectedIds]="selectedPermissionIds()"
+            [userCount]="detail()?.userCount ?? null"
+            [priorityLevel]="priorityLevel()"
+          />
+        </div>
+      </div>
     </div>
 
     @if (!isCreateMode() && roleId()) {
       <app-admin-section-card
+        id="role-users-panel"
         [title]="'ADMIN.ROLES.USERS.TITLE' | translate"
         [description]="'ADMIN.ROLES.USERS.SUBTITLE' | translate"
         [padded]="false"

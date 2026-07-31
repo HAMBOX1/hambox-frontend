@@ -7,7 +7,9 @@ import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/h
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 import { AccountOrdersFacade } from '../../services/account-orders.facade';
-import { productPlaceholderImage } from '../../../home/utils/storefront-home.mapper';
+import { resolveProductImageUrl } from '../../../catalog/utils/product-image.utils';
+
+const ORDER_PLACEHOLDER_IMAGE = 'assets/images/placeholders/product.svg';
 
 type DateRangeFilter = 'all' | '30' | '90' | '365';
 
@@ -50,8 +52,8 @@ export class AccountOrdersPageComponent implements OnInit {
     void this.facade.loadOrders();
   }
 
-  protected placeholderImage(index: number): string {
-    return productPlaceholderImage(index);
+  protected orderImage(imageUrl?: string | null): string {
+    return resolveProductImageUrl(imageUrl ?? '') || ORDER_PLACEHOLDER_IMAGE;
   }
 
   protected statusClass(status: string): string {

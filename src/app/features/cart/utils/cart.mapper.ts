@@ -5,7 +5,7 @@ import {
   CartTotalsApiDto,
 } from '../models/cart-api.model';
 import { AppliedPromotion, CartLineItem, CartSummary } from '../models/cart';
-import { productPlaceholderImage } from '../../home/utils/storefront-home.mapper';
+import { resolveProductImageUrl } from '../../catalog/utils/product-image.utils';
 
 export function mapAppliedPromotion(dto: AppliedPromotionApiDto): AppliedPromotion {
   return {
@@ -19,7 +19,7 @@ export function mapAppliedPromotion(dto: AppliedPromotionApiDto): AppliedPromoti
   };
 }
 
-export function mapCartLineItem(item: CartItemApiDto, index = 0): CartLineItem {
+export function mapCartLineItem(item: CartItemApiDto): CartLineItem {
   const lineId = item.productVariantId
     ? `${item.productId}:${item.productVariantId}`
     : item.productId;
@@ -35,7 +35,7 @@ export function mapCartLineItem(item: CartItemApiDto, index = 0): CartLineItem {
     productVariantId: item.productVariantId,
     variantSku: item.variantSku,
     title: item.productNameEn,
-    imageUrl: productPlaceholderImage(index),
+    imageUrl: resolveProductImageUrl(item.imageUrl ?? '') || 'assets/images/placeholders/product.svg',
     platform: item.platform ?? null,
     region: item.region ?? null,
     edition: item.edition ?? null,
@@ -64,7 +64,7 @@ export function mapCartResponse(cart: CartApiDto): {
   readonly summary: CartSummary;
 } {
   return {
-    items: cart.items.map((item, index) => mapCartLineItem(item, index)),
+    items: cart.items.map((item) => mapCartLineItem(item)),
     summary: mapCartSummary(cart.totals),
   };
 }

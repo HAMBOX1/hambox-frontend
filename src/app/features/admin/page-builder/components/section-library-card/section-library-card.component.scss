@@ -1,0 +1,177 @@
+@use '../../../../../../styles/enterprise-admin-mixins' as enterprise;
+
+.section-library-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--admin-radius-md, 10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+  &:hover,
+  &:focus-within {
+    transform: translateY(-2px) scale(1.015);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    border-color: var(--ui-primary);
+
+    .section-library-card__quick-add-row {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+.section-library-card__preview-trigger {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include enterprise.ui-focus-ring;
+  }
+}
+
+.section-library-card__thumb {
+  display: block;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+/* Absolutely positioned over the thumb, matching its dimensions exactly. `pointer-events: none` lets
+ * clicks fall through to `.section-library-card__preview-trigger` beneath everywhere except the
+ * favorite/quick-add buttons themselves, which re-enable `pointer-events: auto`. This keeps the
+ * favorite and quick-add controls as true DOM siblings of the trigger button (never nested inside
+ * it), so their native Enter/Space handling never bubbles into the trigger's own click/dblclick. */
+.section-library-card__thumb-overlay {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.section-library-card__favorite {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-overlay);
+  color: var(--color-on-primary, #fff);
+  cursor: pointer;
+  pointer-events: auto;
+
+  &--active {
+    color: var(--admin-accent-amber);
+  }
+
+  &:focus-visible {
+    @include enterprise.ui-focus-ring;
+  }
+}
+
+.section-library-card__badge {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+}
+
+.section-library-card__quick-add-row {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.section-library-card__quick-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--admin-radius-sm, 8px);
+  background: var(--ui-primary);
+  color: var(--color-on-primary, #fff);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+
+  &:focus-visible {
+    @include enterprise.ui-focus-ring;
+  }
+}
+
+.section-library-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem 0.9rem;
+}
+
+.section-library-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  app-admin-status-badge {
+    flex-shrink: 0;
+  }
+}
+
+.section-library-card__name {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-library-card__description {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

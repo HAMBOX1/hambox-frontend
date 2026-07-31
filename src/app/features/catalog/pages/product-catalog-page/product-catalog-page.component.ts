@@ -591,6 +591,14 @@ export class ProductCatalogPageComponent implements OnInit {
     this.bulkPriceDialogOpen.set(false);
   }
 
+  protected navigateToExport(): void {
+    const ids = this.selectAllMatchingActive() ? [] : [...this.bulkSelectedIds()];
+    void this.router.navigate(
+      ['/admin/products/export'],
+      ids.length > 0 ? { queryParams: { productIds: ids.join(',') } } : undefined,
+    );
+  }
+
   protected async bulkExport(): Promise<void> {
     const blob = await this.facade.exportSelected();
     if (!blob) {

@@ -1,61 +1,92 @@
+@use '../../../../../../styles/enterprise-admin-mixins' as enterprise;
+
+/* Sticky so search/filters/categories stay reachable while the card grid below scrolls — otherwise
+ * changing the search term or filter after scrolling down means scrolling back to the top first. */
+.section-library-drawer__toolbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background: var(--color-surface);
+  padding-block-end: 0.75rem;
+  margin-block-end: 0.5rem;
+  border-block-end: 1px solid var(--color-border);
+}
+
 .section-library-drawer__search {
   display: block;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
-.section-library-drawer__group {
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.section-library-drawer__group-title {
-  margin: 0 0 0.625rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--color-text-secondary);
-}
-
-.section-library-drawer__cards {
-  display: grid;
-  gap: 0.625rem;
-}
-
-.section-library-drawer__card {
+.section-library-drawer__filters {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  padding: 0.85rem 1rem;
-  border-radius: var(--admin-radius-md, 10px);
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-library-drawer__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--admin-radius-sm, 8px);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
-  &:hover,
-  &:focus-visible {
+  &:hover {
     border-color: var(--ui-primary);
-    background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  }
+
+  &:focus-visible {
+    @include enterprise.ui-focus-ring;
+  }
+
+  &--active {
+    background: var(--ui-primary);
+    border-color: var(--ui-primary);
+    color: var(--color-on-primary, #fff);
   }
 }
 
-.section-library-drawer__card-icon {
-  color: var(--ui-primary);
-  font-size: 1.1rem;
+.section-library-drawer__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
-.section-library-drawer__card-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.section-library-drawer__card-key {
-  font-size: 0.6875rem;
+.section-library-drawer__chip {
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background: transparent;
   color: var(--color-text-secondary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--ui-primary);
+  }
+
+  &:focus-visible {
+    @include enterprise.ui-focus-ring;
+  }
+
+  &--active {
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.08));
+    border-color: var(--ui-primary);
+    color: var(--ui-primary);
+  }
+}
+
+.section-library-drawer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
 }

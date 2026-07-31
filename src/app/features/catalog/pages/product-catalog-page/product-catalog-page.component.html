@@ -48,7 +48,14 @@
       *hamboxHasPermission="permissions.Catalog.Products.Export"
       icon="pi pi-download"
       [label]="'ADMIN.CATALOG_PAGE.EXPORT' | translate"
-      routerLink="/admin/products/export"
+      (pressed)="navigateToExport()"
+    />
+    <app-admin-icon-button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Products.View"
+      icon="pi pi-sync"
+      [label]="'ADMIN.CATALOG_PAGE.IMPORT_EXPORT_JOBS' | translate"
+      routerLink="/admin/products/import-export/jobs"
     />
     <app-admin-icon-button
       adminHeaderActions

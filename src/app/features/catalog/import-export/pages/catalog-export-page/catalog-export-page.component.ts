@@ -158,10 +158,14 @@ type ExportScopeMode = 'entire' | 'filtered' | 'selected';
     </div>
 
     @if (exportState().status === 'running' || exportState().status === 'done') {
-      <app-admin-progress-bar
-        [percent]="exportState().job?.progressPercent ?? 0"
-        [label]="exportState().status === 'done' ? 'Export complete' : 'Building package…'"
-      />
+      @if (exportState().job; as job) {
+        <app-admin-progress-bar
+          [percent]="job.progressPercent"
+          [label]="exportState().status === 'done' ? 'Export complete' : 'Building package…'"
+        />
+      } @else {
+        <app-admin-progress-bar [indeterminate]="true" label="Starting export…" />
+      }
     }
 
     @if (exportState().status === 'error') {

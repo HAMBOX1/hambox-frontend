@@ -9,7 +9,7 @@
   } @else if (product(); as selected) {
     <header class="detail-panel__header">
       <div class="detail-panel__identity">
-        @if (selected.primaryImageUrl) {
+        @if (selected.displayImageUrl) {
           <a
             class="detail-panel__thumb-link"
             [routerLink]="['/admin/products', selected.id, 'edit']"
@@ -18,7 +18,7 @@
           >
             <img
               class="detail-panel__thumb"
-              [src]="resolveImageUrl(selected.primaryImageUrl)"
+              [src]="resolveImageUrl(selected.displayImageUrl)"
               [alt]="selected.nameEn"
             />
           </a>

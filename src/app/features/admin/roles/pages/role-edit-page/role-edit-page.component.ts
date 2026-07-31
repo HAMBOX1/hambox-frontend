@@ -59,6 +59,8 @@ import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-b
 
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
 
+import { PermissionLiveSummaryComponent } from '../../components/permission-live-summary/permission-live-summary.component';
+
 import { PermissionMatrixComponent } from '../../components/permission-matrix/permission-matrix.component';
 
 import { RoleUsersPanelComponent } from '../../components/role-users-panel/role-users-panel.component';
@@ -104,6 +106,8 @@ import { RoleManagementFacade } from '../../services/role-management.facade';
     AdminStickySaveBarComponent,
 
     PermissionMatrixComponent,
+
+    PermissionLiveSummaryComponent,
 
     RoleUsersPanelComponent,
 
@@ -186,6 +190,8 @@ export class RoleEditPageComponent implements OnInit {
   protected readonly matrixModules = this.facade.matrixModules;
 
   protected readonly selectedPermissionIds = this.facade.selectedPermissionIds;
+
+  protected readonly totalPermissionCount = this.facade.matrixTotalPermissionCount;
 
 
 

@@ -4,6 +4,7 @@ export const CATALOG_API = {
   categoriesReorder: '/api/v1/categories/reorder',
   category: (id: string) => `/api/v1/categories/${id}`,
   categoryRestore: (id: string) => `/api/v1/categories/${id}/restore`,
+  categoryImage: (id: string) => `/api/v1/categories/${id}/image`,
   collections: '/api/v1/collections',
   collectionsTree: '/api/v1/collections/tree',
   collectionsReorder: '/api/v1/collections/reorder',
@@ -57,6 +58,8 @@ export const CATALOG_IMPORT_EXPORT_API = {
   importUpload: '/api/v1/catalog/import/upload',
   importValidate: (uploadId: string) => `/api/v1/catalog/import/${uploadId}/validate`,
   importExecute: (uploadId: string) => `/api/v1/catalog/import/${uploadId}/execute`,
+  importLookups: '/api/v1/catalog/import/lookups',
+  jobs: '/api/v1/catalog/import-export/jobs',
   job: (jobId: string) => `/api/v1/catalog/import-export/jobs/${jobId}`,
   jobDownload: (jobId: string) => `/api/v1/catalog/import-export/jobs/${jobId}/download`,
 } as const;

@@ -32,10 +32,10 @@
             (click)="$event.stopPropagation()"
           />
           <span class="product-catalog-cards__thumb">
-            @if (product.primaryImageUrl && !isImageFailed(product.id)) {
+            @if (product.displayImageUrl && !isImageFailed(product.id)) {
               <img
                 class="product-catalog-cards__thumb-img"
-                [src]="resolveImageUrl(product.primaryImageUrl)"
+                [src]="resolveImageUrl(product.displayImageUrl)"
                 [alt]="product.nameEn"
                 loading="lazy"
                 (error)="onImageError(product.id)"

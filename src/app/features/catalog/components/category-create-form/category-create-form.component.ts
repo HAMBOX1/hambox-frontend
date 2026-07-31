@@ -3,13 +3,16 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -18,7 +21,13 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { AdminErrorAlertComponent, AdminSectionCardComponent } from '../../../../shared/components/admin';
 import { Category, CategoryOption, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
+import { CategoryApiService } from '../../services/category-api.service';
 import { slugify } from '../../utils/product-display.utils';
+import {
+  isAllowedProductImage,
+  PRODUCT_IMAGE_MAX_BYTES,
+  resolveProductImageUrl,
+} from '../../utils/product-image.utils';
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const NEW_PARENT_OPTION_VALUE = '__new_parent__';
@@ -47,6 +56,9 @@ const FIELD_LABELS = {
 })
 export class CategoryCreateFormComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly categoryApi = inject(CategoryApiService);
+
+  private readonly imageInput = viewChild<ElementRef<HTMLInputElement>>('categoryImageInput');
 
   readonly mode = input<'create' | 'edit'>('create');
   readonly submitting = input(false);
@@ -60,6 +72,13 @@ export class CategoryCreateFormComponent {
   readonly updateSubmitted = output<UpdateCategoryRequest>();
   readonly deleteRequested = output<void>();
   readonly cancelled = output<void>();
+  /** Emitted after the image is uploaded/removed directly against the backend (independent
+   * of the Save button) — lets the host refresh anything else showing this category's thumbnail. */
+  readonly imageChanged = output<void>();
+
+  protected readonly imagePreviewUrl = signal<string | null>(null);
+  protected readonly uploadingImage = signal(false);
+  protected readonly imageError = signal<string | null>(null);
 
   protected readonly showArabic = signal(false);
   protected readonly advancedCollapsed = signal(true);
@@ -129,6 +148,9 @@ export class CategoryCreateFormComponent {
       this.subcategories.clear({ emitEvent: false });
       this.updateParentValidity();
 
+      this.imagePreviewUrl.set(editing ? resolveProductImageUrl(category.imageUrl ?? '') || null : null);
+      this.imageError.set(null);
+
       const hasArabic = !!editing && category.nameAr.trim().length > 0 && category.nameAr !== category.nameEn;
       this.showArabic.set(hasArabic);
       this.arabicHasValueState.set(hasArabic);
@@ -154,6 +176,64 @@ export class CategoryCreateFormComponent {
 
   protected hideArabic(): void {
     this.showArabic.set(false);
+  }
+
+  protected openImagePicker(): void {
+    this.imageInput()?.nativeElement.click();
+  }
+
+  protected async onImageSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    input.value = '';
+
+    const categoryId = this.initialCategory()?.id;
+    if (!file || !categoryId) {
+      return;
+    }
+
+    if (!isAllowedProductImage(file)) {
+      this.imageError.set('Only JPG, PNG, WEBP, and GIF images are allowed.');
+      return;
+    }
+
+    if (file.size > PRODUCT_IMAGE_MAX_BYTES) {
+      this.imageError.set('Image must be 5 MB or smaller.');
+      return;
+    }
+
+    this.imageError.set(null);
+    this.uploadingImage.set(true);
+
+    try {
+      const { imageUrl } = await firstValueFrom(this.categoryApi.uploadCategoryImage(categoryId, file));
+      this.imagePreviewUrl.set(resolveProductImageUrl(imageUrl));
+      this.imageChanged.emit();
+    } catch {
+      this.imageError.set('Unable to upload image.');
+    } finally {
+      this.uploadingImage.set(false);
+    }
+  }
+
+  protected async removeImage(): Promise<void> {
+    const categoryId = this.initialCategory()?.id;
+    if (!categoryId) {
+      return;
+    }
+
+    this.imageError.set(null);
+    this.uploadingImage.set(true);
+
+    try {
+      await firstValueFrom(this.categoryApi.removeCategoryImage(categoryId));
+      this.imagePreviewUrl.set(null);
+      this.imageChanged.emit();
+    } catch {
+      this.imageError.set('Unable to remove image.');
+    } finally {
+      this.uploadingImage.set(false);
+    }
   }
 
   protected isChildCategory(): boolean {

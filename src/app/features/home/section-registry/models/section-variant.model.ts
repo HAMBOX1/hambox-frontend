@@ -36,6 +36,20 @@ export interface SectionVariantDefinition {
   readonly variantKey: string;
   readonly displayName: string;
   readonly renderComponent: Type<unknown>;
+  /** One-line merchant-facing summary shown on the Section Library card and full-preview header. */
+  readonly description: string;
+  /** Free-form labels for search matching (e.g. "banner", "countdown") — not rendered as UI chips. */
+  readonly tags: readonly string[];
+  /** Curated, not analytics-derived — mirrors the spec's "if available" framing. */
+  readonly badge?: 'popular' | 'new';
+  /** Optional real WebP screenshot path (e.g. `assets/page-builder/previews/hero-kinetic-glass.webp`).
+   * Falls back to a generated placeholder thumbnail when omitted — no screenshot pipeline exists yet. */
+  readonly previewImage?: string;
+  /** Demo config the real component renders with in the Section Library (fast-preview fallback data
+   * and full-preview). Deliberately static/offline — never sourced from an API. */
+  readonly previewConfig: unknown;
+  /** Breakpoints this variant can be meaningfully previewed at; all three today for every variant. */
+  readonly supportedBreakpoints: readonly ('desktop' | 'tablet' | 'mobile')[];
 }
 
 /**

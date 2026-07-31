@@ -2,15 +2,20 @@ import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { downloadBlob } from '../../../admin/reports/utils/reports-download.util';
-import { CatalogImportExportApiService } from './catalog-import-export-api.service';
+import { CatalogImportExportApiService, CatalogPackageJobListParams } from './catalog-import-export-api.service';
 import {
   CatalogDuplicateStrategy,
   CatalogExportRequest,
+  CatalogImportCorrection,
   CatalogImportEntityType,
+  CatalogImportLookups,
+  CatalogImportRowOverride,
   CatalogImportValidationReport,
   CatalogPackageJobDto,
   CatalogPackageOptions,
+  CatalogSkuStrategy,
   ImportWizardStep,
+  PagedResult,
   defaultCatalogPackageOptions,
 } from '../models/import-export.model';
 
@@ -29,8 +34,11 @@ interface ImportState {
   readonly uploadJob: CatalogPackageJobDto | null;
   readonly validation: CatalogImportValidationReport | null;
   readonly strategy: CatalogDuplicateStrategy;
+  readonly skuStrategy: CatalogSkuStrategy;
   readonly options: CatalogPackageOptions;
   readonly packagePassword: string;
+  readonly corrections: readonly CatalogImportCorrection[];
+  readonly rowOverrides: readonly CatalogImportRowOverride[];
   readonly executeJob: CatalogPackageJobDto | null;
   readonly loading: boolean;
   readonly error: string | null;
@@ -48,21 +56,39 @@ export class CatalogImportExportFacade implements OnDestroy {
     uploadJob: null,
     validation: null,
     strategy: 'Skip',
+    skuStrategy: 'UseImportedSku',
     options: defaultCatalogPackageOptions(),
     packagePassword: '',
+    corrections: [],
+    rowOverrides: [],
     executeJob: null,
     loading: false,
     error: null,
   });
 
+  private readonly jobListStateSignal = signal<PagedResult<CatalogPackageJobDto> | null>(null);
+  private readonly jobListLoadingSignal = signal(false);
+  private readonly jobListErrorSignal = signal<string | null>(null);
+  private readonly selectedJobDetailSignal = signal<CatalogPackageJobDto | null>(null);
+  private readonly lookupsSignal = signal<CatalogImportLookups | null>(null);
+
   readonly exportState = this.exportStateSignal.asReadonly();
   readonly importState = this.importStateSignal.asReadonly();
+  /** Categories/Collections/status/currency values backing the wizard's inline correction pickers — loaded once, reused across an import session. */
+  readonly lookups = this.lookupsSignal.asReadonly();
   readonly canDownloadExport = computed(
     () => this.exportStateSignal().status === 'done' && !!this.exportStateSignal().job,
   );
+  readonly jobList = this.jobListStateSignal.asReadonly();
+  readonly jobListLoading = this.jobListLoadingSignal.asReadonly();
+  readonly jobListError = this.jobListErrorSignal.asReadonly();
+  /** Out-of-band detail for a job the caller has selected but that's no longer in the current page/filter. */
+  readonly selectedJobDetail = this.selectedJobDetailSignal.asReadonly();
 
   private exportPollHandle: ReturnType<typeof setInterval> | null = null;
   private importPollHandle: ReturnType<typeof setInterval> | null = null;
+  private selectedJobPollHandle: ReturnType<typeof setInterval> | null = null;
+  private selectedJobPollTargetId: string | null = null;
 
   ngOnDestroy(): void {
     this.stopPolling();
@@ -82,13 +108,7 @@ export class CatalogImportExportFacade implements OnDestroy {
   }
 
   async downloadExport(): Promise<void> {
-    const job = this.exportStateSignal().job;
-    if (!job) {
-      return;
-    }
-
-    const blob = await firstValueFrom(this.api.downloadJobResult(job.id));
-    downloadBlob(blob, job.resultFileName ?? 'catalog-export');
+    await this.downloadJobFile(this.exportStateSignal().job, 'catalog-export');
   }
 
   resetExport(): void {
@@ -132,8 +152,11 @@ export class CatalogImportExportFacade implements OnDestroy {
       uploadJob: null,
       validation: null,
       strategy: 'Skip',
+      skuStrategy: 'UseImportedSku',
       options: defaultCatalogPackageOptions(),
       packagePassword: '',
+      corrections: [],
+      rowOverrides: [],
       executeJob: null,
       loading: false,
       error: null,
@@ -182,8 +205,10 @@ export class CatalogImportExportFacade implements OnDestroy {
     this.importStateSignal.update((state) => ({ ...state, loading: true, error: null }));
 
     try {
-      const password = this.importStateSignal().packagePassword;
-      const validation = await firstValueFrom(this.api.validateImport(uploadJob.id, password || undefined));
+      const { packagePassword, skuStrategy, corrections } = this.importStateSignal();
+      const validation = await firstValueFrom(
+        this.api.validateImport(uploadJob.id, packagePassword || undefined, skuStrategy, corrections),
+      );
       this.importStateSignal.update((state) => ({ ...state, validation, loading: false }));
     } catch (error) {
       this.importStateSignal.update((state) => ({
@@ -198,8 +223,51 @@ export class CatalogImportExportFacade implements OnDestroy {
     this.importStateSignal.update((state) => ({ ...state, step }));
   }
 
+  setSkuStrategy(skuStrategy: CatalogSkuStrategy): void {
+    this.importStateSignal.update((state) => ({ ...state, skuStrategy }));
+  }
+
+  async loadLookups(): Promise<void> {
+    if (this.lookupsSignal()) {
+      return;
+    }
+
+    try {
+      this.lookupsSignal.set(await firstValueFrom(this.api.getImportLookups()));
+    } catch {
+      // Non-fatal — the wizard still works without dropdown-assisted corrections, just with free text.
+    }
+  }
+
+  /** "Apply to all N occurrences" — appends the correction and revalidates against the already-uploaded file, no re-upload needed. `createNew` additionally creates a category/collection named `toValue` (Category/Collection columns only — see `CatalogImportCorrectionApplier`). */
+  async applyCorrection(
+    entityType: string,
+    column: string,
+    fromValue: string,
+    toValue: string,
+    createNew = false,
+  ): Promise<void> {
+    this.importStateSignal.update((state) => ({
+      ...state,
+      corrections: [...state.corrections, { entityType, column, fromValue, toValue, createNew }],
+    }));
+    await this.runValidation();
+  }
+
+  /** Duplicate-SKU row decision (Update Existing / Generate New / Skip) — only consumed at Execute, so no revalidate call needed. */
+  applyRowOverride(rowNumber: number, entityType: string, strategy: CatalogDuplicateStrategy): void {
+    this.importStateSignal.update((state) => ({
+      ...state,
+      rowOverrides: [
+        ...state.rowOverrides.filter((o) => !(o.rowNumber === rowNumber && o.entityType === entityType)),
+        { rowNumber, entityType, strategy },
+      ],
+    }));
+  }
+
   async executeImport(): Promise<void> {
-    const { uploadJob, strategy, options, packagePassword } = this.importStateSignal();
+    const { uploadJob, strategy, options, packagePassword, skuStrategy, corrections, rowOverrides } =
+      this.importStateSignal();
     if (!uploadJob) {
       return;
     }
@@ -208,7 +276,15 @@ export class CatalogImportExportFacade implements OnDestroy {
 
     try {
       const jobId = await firstValueFrom(
-        this.api.executeImport(uploadJob.id, strategy, options, packagePassword || undefined),
+        this.api.executeImport(
+          uploadJob.id,
+          strategy,
+          options,
+          packagePassword || undefined,
+          skuStrategy,
+          corrections,
+          rowOverrides,
+        ),
       );
       this.pollImportJob(jobId);
     } catch (error) {
@@ -221,13 +297,7 @@ export class CatalogImportExportFacade implements OnDestroy {
   }
 
   async downloadImportReport(): Promise<void> {
-    const job = this.importStateSignal().executeJob;
-    if (!job?.resultFileName) {
-      return;
-    }
-
-    const blob = await firstValueFrom(this.api.downloadJobResult(job.id));
-    downloadBlob(blob, job.resultFileName);
+    await this.downloadJobFile(this.importStateSignal().executeJob);
   }
 
   private pollImportJob(jobId: string): void {
@@ -255,7 +325,68 @@ export class CatalogImportExportFacade implements OnDestroy {
     this.importPollHandle = setInterval(() => void tick(), POLL_INTERVAL_MS);
   }
 
-  private stopPolling(which?: 'export' | 'import'): void {
+  // ---------- Jobs list ----------
+
+  async loadJobList(params: CatalogPackageJobListParams): Promise<void> {
+    this.jobListLoadingSignal.set(true);
+    this.jobListErrorSignal.set(null);
+
+    try {
+      this.jobListStateSignal.set(await firstValueFrom(this.api.listJobs(params)));
+    } catch {
+      this.jobListErrorSignal.set('Unable to load import/export jobs.');
+    } finally {
+      this.jobListLoadingSignal.set(false);
+    }
+  }
+
+  async downloadJob(job: CatalogPackageJobDto): Promise<void> {
+    await this.downloadJobFile(job);
+  }
+
+  private async downloadJobFile(
+    job: CatalogPackageJobDto | null | undefined,
+    fallbackFileName?: string,
+  ): Promise<void> {
+    if (!job || (!job.resultFileName && !fallbackFileName)) {
+      return;
+    }
+
+    const blob = await firstValueFrom(this.api.downloadJobResult(job.id));
+    downloadBlob(blob, job.resultFileName ?? fallbackFileName!);
+  }
+
+  /** Fetches and polls a single job by id — used when a selected job falls out of the current page/filter. No-ops if already watching this id. */
+  watchJobDetail(jobId: string): void {
+    if (this.selectedJobPollTargetId === jobId && this.selectedJobPollHandle) {
+      return;
+    }
+
+    this.stopPolling('selectedJob');
+    this.selectedJobPollTargetId = jobId;
+
+    const tick = async () => {
+      try {
+        const job = await firstValueFrom(this.api.getJob(jobId));
+        this.selectedJobDetailSignal.set(job);
+
+        if (TERMINAL_STATUSES.has(job.status)) {
+          this.stopPolling('selectedJob');
+        }
+      } catch {
+        this.stopPolling('selectedJob');
+      }
+    };
+
+    void tick();
+    this.selectedJobPollHandle = setInterval(() => void tick(), POLL_INTERVAL_MS);
+  }
+
+  stopWatchingJobDetail(): void {
+    this.stopPolling('selectedJob');
+  }
+
+  private stopPolling(which?: 'export' | 'import' | 'selectedJob'): void {
     if ((!which || which === 'export') && this.exportPollHandle) {
       clearInterval(this.exportPollHandle);
       this.exportPollHandle = null;
@@ -264,6 +395,12 @@ export class CatalogImportExportFacade implements OnDestroy {
     if ((!which || which === 'import') && this.importPollHandle) {
       clearInterval(this.importPollHandle);
       this.importPollHandle = null;
+    }
+
+    if ((!which || which === 'selectedJob') && this.selectedJobPollHandle) {
+      clearInterval(this.selectedJobPollHandle);
+      this.selectedJobPollHandle = null;
+      this.selectedJobPollTargetId = null;
     }
   }
 }

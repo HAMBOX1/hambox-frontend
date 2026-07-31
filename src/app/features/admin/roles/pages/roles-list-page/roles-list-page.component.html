@@ -17,35 +17,6 @@
     ></a>
   </app-admin-page-header>
 
-  <app-admin-stat-grid>
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.ROLES.STATS.TOTAL' | translate"
-      [value]="listStats().total"
-      icon="pi-shield"
-      tone="info"
-    />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.ROLES.STATS.SYSTEM' | translate"
-      [value]="listStats().system"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-lock"
-      tone="warning"
-    />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.ROLES.STATS.CUSTOM' | translate"
-      [value]="listStats().custom"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-users"
-    />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.ROLES.STATS.USERS' | translate"
-      [value]="listStats().users"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-user"
-      tone="success"
-    />
-  </app-admin-stat-grid>
-
   <app-admin-toolbar>
     <app-admin-search-bar
       adminToolbarSearch
@@ -53,6 +24,42 @@
       [placeholder]="'ADMIN.ROLES.LIST.SEARCH_PLACEHOLDER' | translate"
       (searchChange)="onSearchChange($event)"
     />
+    <p-select
+      adminToolbarFilters
+      class="roles-list-page__filter-select"
+      [options]="filterOptions()"
+      [ngModel]="activeFilter()"
+      (ngModelChange)="setFilter($event)"
+      optionLabel="label"
+      optionValue="value"
+      [ariaLabel]="'ADMIN.ROLES.FILTERS.ALL' | translate"
+    />
+    @if (activeFilter() !== 'all') {
+      <button
+        adminToolbarFilters
+        type="button"
+        class="roles-list-page__filter-clear"
+        (click)="setFilter('all')"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+        {{ 'ADMIN.ROLES.FILTERS.CLEAR' | translate }}
+      </button>
+    }
+    <div adminToolbarActions>
+      <button
+        *hamboxHasPermission="permissions.Roles.View"
+        pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        [label]="'ADMIN.ROLES.BULK.EXPORT_ALL' | translate"
+        icon="pi pi-download"
+        [loading]="bulkExporting()"
+        [disabled]="filteredRoles().length === 0"
+        (click)="exportAll()"
+      ></button>
+    </div>
   </app-admin-toolbar>
 
   @if (error()) {
@@ -64,6 +71,48 @@
     (clearSelection)="clearSelection()"
   >
     <button
+      *hamboxHasPermission="permissions.Roles.Create"
+      pButton
+      type="button"
+      [label]="'ADMIN.ROLES.BULK.DUPLICATE' | translate"
+      icon="pi pi-copy"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="duplicateSelected()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Roles.AssignUsers"
+      pButton
+      type="button"
+      [label]="'ADMIN.ROLES.BULK.ASSIGN_USERS' | translate"
+      icon="pi pi-user-plus"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="openBulkAssignDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ROLES.BULK.EXPORT' | translate"
+      icon="pi pi-download"
+      severity="secondary"
+      size="small"
+      [loading]="bulkExporting()"
+      (click)="exportSelected()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ROLES.BULK.COMPARE' | translate"
+      icon="pi pi-sliders-h"
+      severity="secondary"
+      size="small"
+      [disabled]="!canCompareSelected()"
+      (click)="compareSelected()"
+    ></button>
+    <button
       *hamboxHasPermission="permissions.Roles.Delete"
       pButton
       type="button"
@@ -71,126 +120,200 @@
       icon="pi pi-trash"
       severity="danger"
       size="small"
-      [disabled]="actionLoading()"
+      [disabled]="actionLoading() || !canBulkDeleteSelected()"
       (click)="requestDeleteSelected()"
     ></button>
   </app-admin-bulk-bar>
 
-  <app-admin-data-table-shell>
-    <p-table
-      class="admin-data-table"
-      [value]="[...roles()]"
-      [loading]="loading()"
-      [lazy]="true"
-      [paginator]="totalCount() > 0"
-      [rows]="pageSize()"
-      [totalRecords]="totalCount()"
-      [first]="tableFirst()"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      [selection]="selectedRoles()"
-      (selectionChange)="onSelectionChange($event)"
-      dataKey="id"
-      scrollable
-      scrollHeight="flex"
-      responsiveLayout="scroll"
-      (onLazyLoad)="onPageChange($event)"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 3.5rem">
-            <p-tableHeaderCheckbox />
-          </th>
-          <th pSortableColumn="name">
-            {{ 'ADMIN.ROLES.LIST.COLUMNS.NAME' | translate }}
-            <p-sortIcon field="name" />
-          </th>
-          <th>{{ 'ADMIN.ROLES.LIST.COLUMNS.DESCRIPTION' | translate }}</th>
-          <th>{{ 'ADMIN.ROLES.LIST.COLUMNS.USERS' | translate }}</th>
-          <th>{{ 'ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate }}</th>
-          <th>{{ 'ADMIN.ROLES.LIST.COLUMNS.FLAGS' | translate }}</th>
-          <th style="width: 6rem"></th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-role>
-        <tr>
-          <td>
-            <p-tableCheckbox [value]="role" />
-          </td>
-          <td>
-            <span class="admin-cell-primary">{{ role.name }}</span>
-            @if (role.priorityLevel != null) {
-              <span class="admin-cell-secondary">
-                {{ 'ADMIN.ROLES.LIST.PRIORITY' | translate }}: {{ role.priorityLevel }}
-              </span>
+  @if (loading() && roles().length === 0) {
+    <app-admin-loading-skeleton variant="table" [rows]="6" />
+  } @else if (mobileViewport.isMobile()) {
+    <div class="roles-list-page__mobile-cards">
+      @if (filteredRoles().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-shield"
+          [title]="emptyStateTitleKey() | translate"
+          [description]="'ADMIN.ROLES.LIST.EMPTY_HINT' | translate"
+          [primaryLabel]="'ADMIN.ROLES.LIST.NEW_ROLE' | translate"
+          primaryIcon="pi pi-plus"
+          (primaryAction)="navigateToNew()"
+        />
+      } @else {
+        @for (role of filteredRoles(); track role.id) {
+          <app-admin-section-card
+            class="roles-list-page__mobile-card"
+            [class]="'roles-list-page__mobile-card--' + riskLevelFor(role.priorityLevel)"
+            (click)="openPreview(role)"
+          >
+            <div class="roles-list-page__mobile-card-top">
+              <span class="roles-list-page__mobile-card-name">{{ role.name }}</span>
+              <app-admin-status-badge
+                [label]="riskLabelKey(riskLevelFor(role.priorityLevel)) | translate"
+                [tone]="riskTone(riskLevelFor(role.priorityLevel))"
+              />
+            </div>
+            @if (role.description) {
+              <span class="admin-cell-secondary roles-list-page__mobile-card-description">{{ role.description }}</span>
             }
-          </td>
-          <td>
-            <span class="admin-cell-secondary">{{ role.description || '—' }}</span>
-          </td>
-          <td>
-            <span class="admin-cell-badge">{{ role.userCount }}</span>
-          </td>
-          <td>
-            <span class="admin-cell-badge">{{ role.permissionCount }}</span>
-          </td>
-          <td>
-            <div class="roles-list-page__badges">
+            <div class="roles-list-page__mobile-card-badges">
               @if (role.isSystem) {
-                <app-admin-status-badge
-                  [label]="'ADMIN.ROLES.LIST.SYSTEM' | translate"
-                  tone="info"
-                />
+                <app-admin-status-badge [label]="'ADMIN.ROLES.LIST.SYSTEM' | translate" tone="info" [outlined]="true" />
+              } @else {
+                <app-admin-status-badge [label]="'ADMIN.ROLES.LIST.CUSTOM' | translate" tone="neutral" [outlined]="true" />
               }
               @if (role.isDefault) {
-                <app-admin-status-badge
-                  [label]="'ADMIN.ROLES.LIST.DEFAULT' | translate"
-                  tone="success"
-                />
+                <app-admin-status-badge [label]="'ADMIN.ROLES.LIST.DEFAULT' | translate" tone="success" [outlined]="true" />
               }
+              <span class="roles-list-page__mobile-card-users">
+                <i class="pi pi-users" aria-hidden="true"></i> {{ role.userCount }}
+              </span>
             </div>
-          </td>
-          <td>
-            @let menuItems = roleActionMenuItems(role);
-            <div class="admin-actions-row">
-              <app-admin-icon-button
-                *hamboxHasPermission="permissions.Roles.Edit"
-                icon="pi pi-pencil"
-                [label]="'ADMIN.ROLES.ACTIONS.EDIT' | translate"
-                [routerLink]="'/admin/roles/' + role.id + '/edit'"
-              />
-              @if (menuItems.length > 0) {
-                <app-admin-action-menu
-                  [items]="menuItems"
-                  [disabled]="actionLoading()"
-                />
-              }
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="7">
-            <app-admin-empty-state
-              icon="pi pi-shield"
-              [title]="
-                hasActiveSearch()
-                  ? ('ADMIN.ROLES.LIST.EMPTY_SEARCH' | translate)
-                  : ('ADMIN.ROLES.LIST.EMPTY' | translate)
-              "
-              [description]="'ADMIN.ROLES.LIST.EMPTY_HINT' | translate"
-              [primaryLabel]="'ADMIN.ROLES.LIST.NEW_ROLE' | translate"
-              primaryIcon="pi pi-plus"
-              (primaryAction)="navigateToNew()"
+            <app-admin-progress-bar
+              [percent]="permissionCoveragePercent(role)"
+              [label]="role.permissionCount + '/' + totalPermissionCount() + ' ' + ('ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate)"
             />
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </app-admin-data-table-shell>
+          </app-admin-section-card>
+        }
+      }
+    </div>
+  } @else {
+    <app-admin-data-table-shell>
+      <p-table
+        class="admin-data-table"
+        [value]="filteredRoles()"
+        [loading]="loading()"
+        [paginator]="filteredRoles().length > 0"
+        [rows]="20"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [selection]="selectedRoles()"
+        (selectionChange)="onSelectionChange($event)"
+        dataKey="id"
+        scrollable
+        scrollHeight="flex"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="name">
+              {{ 'ADMIN.ROLES.LIST.COLUMNS.NAME' | translate }}
+              <p-sortIcon field="name" />
+            </th>
+            <th class="roles-list-page__col-coverage">
+              {{ 'ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate }}
+            </th>
+            <th pSortableColumn="userCount" style="width: 5.5rem">
+              {{ 'ADMIN.ROLES.LIST.COLUMNS.USERS' | translate }}
+              <p-sortIcon field="userCount" />
+            </th>
+            <th style="width: 7rem">{{ 'ADMIN.ROLES.LIST.COLUMNS.MODIFIED' | translate }}</th>
+            <th style="width: 4.5rem"></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-role>
+          <tr
+            class="roles-list-page__row"
+            [class]="'roles-list-page__row--' + riskLevelFor(role.priorityLevel)"
+            (click)="openPreview(role)"
+          >
+            <td (click)="$event.stopPropagation()">
+              <p-tableCheckbox [value]="role" />
+            </td>
+            <td class="roles-list-page__role-cell">
+              <div class="roles-list-page__role-identity">
+                <span class="roles-list-page__role-name">{{ role.name }}</span>
+                <app-admin-status-badge
+                  class="roles-list-page__risk-badge"
+                  [label]="riskLabelKey(riskLevelFor(role.priorityLevel)) | translate"
+                  [tone]="riskTone(riskLevelFor(role.priorityLevel))"
+                />
+                @if (role.isSystem) {
+                  <app-admin-status-badge [label]="'ADMIN.ROLES.LIST.SYSTEM' | translate" tone="info" [outlined]="true" />
+                } @else {
+                  <app-admin-status-badge [label]="'ADMIN.ROLES.LIST.CUSTOM' | translate" tone="neutral" [outlined]="true" />
+                }
+                @if (role.isDefault) {
+                  <app-admin-status-badge [label]="'ADMIN.ROLES.LIST.DEFAULT' | translate" tone="success" [outlined]="true" />
+                }
+              </div>
+              @if (role.description) {
+                <span class="roles-list-page__role-description">{{ role.description }}</span>
+              }
+            </td>
+            <td class="roles-list-page__coverage-cell">
+              <div class="roles-list-page__coverage">
+                <div class="roles-list-page__coverage-track">
+                  <div
+                    class="roles-list-page__coverage-fill"
+                    [style.width.%]="permissionCoveragePercent(role)"
+                  ></div>
+                </div>
+                <span class="roles-list-page__coverage-text">{{ permissionCoveragePercent(role) }}%</span>
+              </div>
+            </td>
+            <td>
+              <span class="roles-list-page__chip">
+                <i class="pi pi-users" aria-hidden="true"></i>{{ role.userCount }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="roles-list-page__chip roles-list-page__chip--muted"
+                [title]="role.modifiedOnUtc | hamboxDate: 'medium'"
+              >
+                <i class="pi pi-history" aria-hidden="true"></i>{{ role.modifiedOnUtc | hamboxRelativeTime }}
+              </span>
+            </td>
+            <td (click)="$event.stopPropagation()">
+              @let menuItems = roleActionMenuItems(role);
+              <div class="admin-actions-row">
+                <app-admin-icon-button
+                  *hamboxHasPermission="permissions.Roles.Edit"
+                  icon="pi pi-pencil"
+                  [label]="'ADMIN.ROLES.ACTIONS.EDIT' | translate"
+                  [routerLink]="'/admin/roles/' + role.id + '/edit'"
+                />
+                @if (menuItems.length > 0) {
+                  <app-admin-action-menu
+                    [items]="menuItems"
+                    [disabled]="actionLoading()"
+                  />
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <app-admin-empty-state
+                icon="pi pi-shield"
+                [title]="emptyStateTitleKey() | translate"
+                [description]="'ADMIN.ROLES.LIST.EMPTY_HINT' | translate"
+                [primaryLabel]="'ADMIN.ROLES.LIST.NEW_ROLE' | translate"
+                primaryIcon="pi pi-plus"
+                (primaryAction)="navigateToNew()"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-data-table-shell>
+  }
 </section>
+
+<app-role-quick-preview-drawer
+  [role]="previewRole()"
+  (closed)="closePreview()"
+  (editRequested)="onPreviewEdit($event)"
+  (duplicateRequested)="onPreviewDuplicate($event)"
+  (assignUsersRequested)="onPreviewAssignUsers($event)"
+  (deleteRequested)="onPreviewDelete($event)"
+/>
 
 <p-dialog
   [header]="'ADMIN.ROLES.DUPLICATE.TITLE' | translate"
@@ -230,6 +353,78 @@
       icon="pi pi-copy"
       [disabled]="!duplicateName().trim() || actionLoading()"
       (click)="confirmDuplicate()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.ROLES.BULK.ASSIGN_DIALOG_TITLE' | translate"
+  [visible]="bulkAssignDialogOpen()"
+  (visibleChange)="bulkAssignDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(40rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeBulkAssignDialog()"
+>
+  <p class="roles-list-page__field-label">
+    {{ 'ADMIN.ROLES.BULK.ASSIGN_DIALOG_HINT' | translate: { count: selectedRoles().length } }}
+  </p>
+
+  <app-admin-search-bar
+    class="roles-list-page__dialog-search"
+    [value]="userSearchTerm()"
+    [placeholder]="'ADMIN.ROLES.USERS.ASSIGN_SEARCH_PLACEHOLDER' | translate"
+    (searchChange)="onBulkAssignSearchChange($event)"
+  />
+
+  @if (userSearchError()) {
+    <app-admin-error-alert [message]="userSearchError()!" />
+  }
+
+  <div class="roles-list-page__dialog-results">
+    @if (userSearchLoading()) {
+      <app-admin-loading-skeleton variant="table" [rows]="4" />
+    } @else if (userSearchResults().length === 0) {
+      <app-admin-empty-state icon="pi pi-search" [title]="'ADMIN.ROLES.USERS.ASSIGN_EMPTY' | translate" [compact]="true" />
+    } @else {
+      <ul class="roles-list-page__candidate-list">
+        @for (user of userSearchResults(); track user.id) {
+          <li>
+            <label class="roles-list-page__candidate">
+              <input
+                type="checkbox"
+                [checked]="isBulkAssignUserSelected(user.id)"
+                (change)="toggleBulkAssignUser(user.id, $any($event.target).checked)"
+              />
+              <span class="roles-list-page__candidate-text">
+                <span class="roles-list-page__candidate-name">{{ user.firstName }} {{ user.lastName }}</span>
+                <span class="roles-list-page__candidate-email">{{ user.email }}</span>
+              </span>
+            </label>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ROLES.ACTIONS.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (click)="closeBulkAssignDialog()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ROLES.USERS.ASSIGN_SELECTED' | translate"
+      icon="pi pi-check"
+      [disabled]="bulkAssignSelectedUserIds().length === 0 || actionLoading()"
+      (click)="confirmBulkAssign()"
     ></button>
   </ng-template>
 </p-dialog>

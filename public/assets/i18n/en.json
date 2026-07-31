@@ -754,7 +754,8 @@
       "TITLE": "Products",
       "INVENTORY_DASHBOARD": "Inventory Dashboard",
       "IMPORT": "Import",
-      "EXPORT": "Export",
+      "EXPORT": "Package Export",
+      "IMPORT_EXPORT_JOBS": "Import/Export Jobs",
       "CREATE_PRODUCT": "Create Product",
       "STATS": {
         "TOTAL": "Total Products",
@@ -799,7 +800,7 @@
         "ASSIGN": "Assign",
         "REMOVE": "Remove",
         "CREATE_AND_ASSIGN": "Create & Assign",
-        "EXPORT": "Export",
+        "EXPORT": "Quick CSV Export",
         "MANAGE_INVENTORY": "Manage inventory",
         "DELETE_TITLE": "Delete selected products",
         "DUPLICATE_TITLE": "Duplicate selected products",
@@ -829,6 +830,37 @@
         "DELETED_DETAIL": "\"{{name}}\" was removed.",
         "PREVIEW_BLOCKED_TITLE": "Preview unavailable",
         "PREVIEW_BLOCKED_DETAIL": "The product must be Active to preview it on the storefront."
+      }
+    },
+    "CATALOG_IMPORT_EXPORT_JOBS": {
+      "TITLE": "Import/Export Jobs",
+      "SUBTITLE": "Track catalog import and export background jobs.",
+      "SEARCH_PLACEHOLDER": "Search by file name",
+      "FILTER_TYPE": "Type",
+      "FILTER_STATUS": "Status",
+      "EMPTY": "No import or export jobs yet.",
+      "EMPTY_SEARCH": "No jobs match your filters.",
+      "COLUMNS": {
+        "TYPE": "Type",
+        "FILE_NAME": "File Name",
+        "STATUS": "Status",
+        "STARTED_BY": "Started By",
+        "STARTED_AT": "Started At",
+        "DURATION": "Duration",
+        "PROGRESS": "Progress",
+        "ERROR": "Error",
+        "ACTIONS": "Actions"
+      },
+      "ACTIONS": {
+        "DETAILS": "Details",
+        "DETAILS_FOR": "View details for {{fileName}}",
+        "DOWNLOAD": "Download",
+        "DOWNLOAD_FOR": "Download {{fileName}}",
+        "REFRESH": "Refresh"
+      },
+      "SUMMARY": {
+        "TITLE": "Summary",
+        "LINE": "{{created}} created, {{updated}} updated, {{skipped}} skipped, {{failed}} failed"
       }
     },
     "INVENTORY_PANEL": {
@@ -2747,23 +2779,75 @@
         "SEARCH_PLACEHOLDER": "Search roles by name or description…",
         "COLUMNS": {
           "NAME": "Role",
-          "DESCRIPTION": "Description",
           "USERS": "Users",
           "PERMISSIONS": "Permissions",
-          "FLAGS": "Flags"
+          "MODIFIED": "Modified"
         },
         "SYSTEM": "System",
+        "CUSTOM": "Custom",
         "DEFAULT": "Default",
         "EMPTY": "No roles yet. Create a role to define custom access.",
         "EMPTY_SEARCH": "No roles match your search.",
         "EMPTY_HINT": "Roles control what each team member can view and manage in the admin.",
         "PRIORITY": "Priority"
       },
-      "STATS": {
-        "TOTAL": "Total roles",
-        "SYSTEM": "System roles",
-        "CUSTOM": "Custom roles",
-        "USERS": "Users assigned"
+      "FILTERS": {
+        "ALL": "All roles",
+        "SYSTEM": "System",
+        "CUSTOM": "Custom",
+        "HIGH_RISK": "High risk",
+        "UNUSED": "Unused",
+        "ASSIGNED": "Assigned",
+        "RECENTLY_MODIFIED": "Recently modified",
+        "CLEAR": "Clear filter"
+      },
+      "RISK": {
+        "CRITICAL": "Critical",
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low",
+        "MINIMAL": "Minimal"
+      },
+      "EMPTY": {
+        "UNUSED": "No unused roles",
+        "NO_CUSTOM": "No custom roles yet"
+      },
+      "DRAWER": {
+        "TITLE": "Role preview",
+        "CREATED": "Created",
+        "MODIFIED": "Last modified",
+        "PERMISSIONS_TITLE": "Permission coverage",
+        "DANGER_ZONE": "Danger zone",
+        "SYSTEM_PROTECTED": "System roles are protected and cannot be deleted.",
+        "DELETE_HINT": "Deleting this role removes it permanently. Assigned users lose its permissions immediately.",
+        "ASSIGN_USERS": "Assign users"
+      },
+      "BULK": {
+        "DUPLICATE": "Duplicate",
+        "ASSIGN_USERS": "Assign users",
+        "EXPORT": "Export selected",
+        "EXPORT_ALL": "Export all",
+        "COMPARE": "Compare",
+        "ASSIGN_DIALOG_TITLE": "Assign users to roles",
+        "ASSIGN_DIALOG_HINT": "Assign the selected users to {{count}} selected role(s)."
+      },
+      "COMPARE": {
+        "TITLE": "Compare roles",
+        "SUBTITLE": "See exactly how two roles differ in permissions, priority, and risk.",
+        "LEFT_PLACEHOLDER": "Select first role…",
+        "RIGHT_PLACEHOLDER": "Select second role…",
+        "RUN": "Compare",
+        "EMPTY": "Select two roles to compare.",
+        "DIFF_TITLE": "Permission differences",
+        "DIFF_SUBTITLE": "{{shared}} permissions are shared between both roles.",
+        "NO_DIFF": "These roles have identical permissions."
+      },
+      "MATRIX": {
+        "SUMMARY_TITLE": "Live summary",
+        "GRANTED": "Permissions granted",
+        "DENIED": "Permissions denied",
+        "AFFECTED_USERS": "Affected users",
+        "RISK_SCORE": "Risk score"
       },
       "DUPLICATE": {
         "TITLE": "Duplicate role",
@@ -2785,13 +2869,18 @@
       },
       "PERMISSIONS": {
         "TITLE": "Permissions",
-        "MODULE_FILTER": "Module",
-        "SEARCH_PLACEHOLDER": "Search permissions by name or description…",
+        "MODULE_FILTER": "Modules",
+        "SEARCH_PLACEHOLDER": "Search permissions…",
         "LOADING": "Loading permission matrix…",
-        "EMPTY": "No permission groups available.",
+        "EMPTY": "No permissions match your search.",
         "SELECT_ALL": "Select all",
         "CLEAR_ALL": "Clear all",
-        "SELECTED": "selected"
+        "INVERT_SELECTION": "Invert selection",
+        "SELECTED": "selected",
+        "BACK_TO_MODULES": "Modules",
+        "SEARCH_ALL_MODULES": "Search all modules",
+        "SEARCH_ALL_HINT": "Type at least 2 characters to search every module.",
+        "NO_MATCHES": "No permissions match your search."
       },
       "USERS": {
         "TITLE": "Assigned users",
@@ -3320,7 +3409,25 @@
       "LIBRARY": {
         "TITLE": "Add a Section",
         "SEARCH_PLACEHOLDER": "Search sections...",
-        "EMPTY": "No sections match your search."
+        "EMPTY": "No sections match your search.",
+        "EMPTY_SEARCH": "No sections match your search.",
+        "EMPTY_FAVORITES": "You haven't favorited any sections yet.",
+        "EMPTY_RECENT": "You haven't added any sections yet.",
+        "EMPTY_CATEGORY": "No sections in this category.",
+        "PREVIEW_UNAVAILABLE_TITLE": "Section unavailable",
+        "PREVIEW_UNAVAILABLE_DESCRIPTION": "This section preview couldn't be loaded. Close this dialog and try again.",
+        "ALL_CATEGORIES": "All Categories",
+        "FILTER_ALL": "All",
+        "FILTER_FAVORITES": "Favorites",
+        "FILTER_RECENT": "Recently Used",
+        "FILTER_POPULAR": "Most Popular",
+        "FILTER_NEWEST": "Newest",
+        "BADGE_POPULAR": "Popular",
+        "BADGE_NEW": "New",
+        "QUICK_ADD": "Quick Add",
+        "CANCEL": "Cancel",
+        "FAVORITE": "Add to favorites",
+        "UNFAVORITE": "Remove from favorites"
       },
       "PREVIEW": {
         "TITLE": "Preview",

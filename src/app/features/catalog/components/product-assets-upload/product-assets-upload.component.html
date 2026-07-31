@@ -25,6 +25,13 @@
       aria-label="Product image previews"
       (cdkDropListDropped)="onAssetDrop($event)"
     >
+      @if (assets().length === 0 && resolvedFallbackImageUrl() && fallbackBadgeLabel(); as badgeLabel) {
+        <article class="assets-upload__card assets-upload__card--fallback">
+          <img class="assets-upload__image" [src]="resolvedFallbackImageUrl()" alt="" />
+          <span class="assets-upload__fallback-badge">{{ badgeLabel }}</span>
+        </article>
+      }
+
       <button
         type="button"
         class="assets-upload__add"
@@ -35,7 +42,7 @@
       >
         <i class="pi pi-plus" aria-hidden="true"></i>
         @if (assets().length === 0) {
-          <span>Add Image</span>
+          <span>Upload Image</span>
         }
       </button>
 

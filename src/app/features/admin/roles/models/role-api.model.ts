@@ -11,6 +11,8 @@ export interface RoleListItemApiDto {
   readonly priorityLevel: number;
   readonly userCount: number;
   readonly permissionCount: number;
+  readonly createdOnUtc: string;
+  readonly modifiedOnUtc: string | null;
 }
 
 export interface RoleDetailApiDto {
@@ -22,6 +24,8 @@ export interface RoleDetailApiDto {
   readonly priorityLevel: number;
   readonly userCount: number;
   readonly permissionIds: readonly string[];
+  readonly createdOnUtc: string;
+  readonly modifiedOnUtc: string | null;
 }
 
 export interface PermissionApiDto {

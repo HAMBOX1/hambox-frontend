@@ -103,6 +103,7 @@ export interface OrderSummaryApiDto {
   readonly totalAmount: number;
   readonly itemCount: number;
   readonly createdOnUtc: string;
+  readonly imageUrl?: string | null;
 }
 
 export interface OrderTimelineEventApiDto {
@@ -178,6 +179,7 @@ export interface OrderItemApiDto {
   readonly quantity: number;
   readonly unitPrice: number;
   readonly lineTotal: number;
+  readonly imageUrl?: string | null;
 }
 
 export interface OrderDetailApiDto {

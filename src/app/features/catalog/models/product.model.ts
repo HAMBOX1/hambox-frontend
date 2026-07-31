@@ -4,6 +4,9 @@ export type { PagedResult };
 
 export type ProductStatus = 'Draft' | 'Active' | 'Inactive' | 'Archived';
 
+/** Where `Product.displayImageUrl` was resolved from — see backend `ProductDisplayImageSource`. */
+export type ProductDisplayImageSource = 'Product' | 'Category' | 'ParentCategory' | 'Placeholder';
+
 export type ProductSortBy =
   | 'Newest'
   | 'PriceAsc'
@@ -44,6 +47,10 @@ export interface Product {
   readonly images?: readonly ProductImage[] | null;
   readonly createdOnUtc?: string;
   readonly availableStock?: number;
+  /** Resolved server-side (product image, else category image, else placeholder) — always
+   * present on real API responses; optional here only so existing test fixtures still compile. */
+  readonly displayImageUrl?: string;
+  readonly displayImageSource?: ProductDisplayImageSource;
 }
 
 export interface CreateProductRequest {

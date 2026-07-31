@@ -1,129 +1,201 @@
-<section class="permission-matrix" [class.permission-matrix--loading]="loading()">
-
-  <app-admin-toolbar>
-    <app-admin-search-bar
-      adminToolbarSearch
-      [value]="permissionSearchTerm()"
-      [placeholder]="'ADMIN.ROLES.PERMISSIONS.SEARCH_PLACEHOLDER' | translate"
-      [ariaLabel]="'ADMIN.ROLES.PERMISSIONS.SEARCH_PLACEHOLDER' | translate"
-      (searchChange)="onSearchChange($event)"
-    />
-
-    <div adminToolbarFilters class="admin-filter-chips permission-matrix__module-filters">
-      <span class="permission-matrix__module-label">
+<div class="permission-matrix" [class.permission-matrix--loading]="loading()">
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="table" [rows]="6" />
+  } @else {
+    <nav
+      class="permission-matrix__nav"
+      [class.permission-matrix__nav--mobile-hidden]="mobileViewport.isMobile() && mobileShowingPanel()"
+    >
+      <span class="permission-matrix__nav-label">
         {{ 'ADMIN.ROLES.PERMISSIONS.MODULE_FILTER' | translate }}
       </span>
-      @for (option of moduleOptions(); track option.value) {
-        <button
-          type="button"
-          class="admin-filter-chip"
-          [class.admin-filter-chip--active]="selectedModule() === option.value"
-          [disabled]="loading() || disabled()"
-          (click)="onModuleSelect(option.value)"
-        >
-          {{ option.label }}
-        </button>
-      }
-    </div>
-  </app-admin-toolbar>
-
-  <div class="permission-matrix__body">
-    @if (loading()) {
-      <app-admin-loading-skeleton variant="table" [rows]="5" />
-    } @else if (!hasVisibleGroups()) {
-      <app-admin-empty-state
-        icon="pi pi-shield"
-        [title]="'ADMIN.ROLES.PERMISSIONS.EMPTY' | translate"
-        [compact]="true"
-      />
-    } @else {
-      <div class="permission-matrix__groups">
-        @for (group of filteredGroups(); track group.id) {
-          @if (visiblePermissions(group).length > 0) {
-            <app-admin-section-card
-              class="permission-matrix__group-card"
-              [title]="group.name"
-              [description]="group.description ?? ''"
-              [padded]="true"
-            >
-              <div adminSectionActions class="permission-matrix__group-actions">
-                <button
-                  pButton
-                  type="button"
-                  class="permission-matrix__action-btn"
-                  [label]="'ADMIN.ROLES.PERMISSIONS.SELECT_ALL' | translate"
-                  severity="secondary"
-                  size="small"
-                  [disabled]="disabled()"
-                  (click)="onSelectAll(group)"
-                ></button>
-                <button
-                  pButton
-                  type="button"
-                  class="permission-matrix__action-btn"
-                  [label]="'ADMIN.ROLES.PERMISSIONS.CLEAR_ALL' | translate"
-                  severity="secondary"
-                  size="small"
-                  [text]="true"
-                  [disabled]="disabled()"
-                  (click)="onClearAll(group)"
-                ></button>
-              </div>
-
-              <div class="permission-matrix__progress-wrap">
-                <div class="permission-matrix__progress-meta">
-                  <span class="permission-matrix__progress-label">
-                    {{ selectedCount(group) }}/{{ group.permissions.length }}
-                    {{ 'ADMIN.ROLES.PERMISSIONS.SELECTED' | translate }}
-                  </span>
-                  <span class="permission-matrix__module-badge">{{ group.module }}</span>
-                </div>
-                <div
-                  class="permission-matrix__progress"
-                  role="progressbar"
-                  [attr.aria-valuenow]="selectedCount(group)"
-                  [attr.aria-valuemin]="0"
-                  [attr.aria-valuemax]="group.permissions.length"
-                >
-                  <div
-                    class="permission-matrix__progress-bar"
-                    [style.width.%]="progressPercent(group)"
-                  ></div>
-                </div>
-              </div>
-
-              <div class="permission-matrix__chip-grid">
-                @for (permission of visiblePermissions(group); track permission.id) {
-                  <label
-                    class="permission-matrix__chip"
-                    [class.permission-matrix__chip--selected]="isSelected(permission.id)"
-                    [class.permission-matrix__chip--disabled]="disabled()"
-                  >
-                    <input
-                      type="checkbox"
-                      class="permission-matrix__chip-input"
-                      [checked]="isSelected(permission.id)"
-                      [disabled]="disabled()"
-                      (change)="onPermissionChange(permission.id, $any($event.target).checked)"
-                    />
-                    <span class="permission-matrix__chip-indicator" aria-hidden="true">
-                      <i class="pi pi-check"></i>
-                    </span>
-                    <span class="permission-matrix__chip-content">
-                      <span class="permission-matrix__chip-name">{{ permission.name }}</span>
-                      @if (permission.description) {
-                        <span class="permission-matrix__chip-description">
-                          {{ permission.description }}
-                        </span>
-                      }
-                    </span>
-                  </label>
-                }
-              </div>
-            </app-admin-section-card>
-          }
+      <div class="permission-matrix__nav-list">
+        @for (item of moduleSummaries(); track item.module) {
+          <button
+            type="button"
+            class="permission-matrix__nav-item"
+            [class.permission-matrix__nav-item--active]="activeModule() === item.module"
+            [disabled]="disabled()"
+            (click)="selectModule(item.module)"
+          >
+            <span class="permission-matrix__nav-item-top">
+              <span class="permission-matrix__nav-item-name">{{ item.module }}</span>
+              <span class="permission-matrix__nav-item-count">{{ item.granted }}/{{ item.total }}</span>
+            </span>
+            <span class="permission-matrix__nav-item-track">
+              <span
+                class="permission-matrix__nav-item-fill"
+                [style.width.%]="item.total === 0 ? 0 : (item.granted / item.total) * 100"
+              ></span>
+            </span>
+          </button>
         }
       </div>
-    }
-  </div>
-</section>
+    </nav>
+
+    <div
+      class="permission-matrix__panel"
+      [class.permission-matrix__panel--mobile-hidden]="mobileViewport.isMobile() && !mobileShowingPanel()"
+    >
+      <header class="permission-matrix__panel-header">
+        @if (mobileViewport.isMobile()) {
+          <button type="button" class="permission-matrix__back" (click)="backToModuleList()">
+            <i class="pi pi-arrow-left" aria-hidden="true"></i>
+            {{ 'ADMIN.ROLES.PERMISSIONS.BACK_TO_MODULES' | translate }}
+          </button>
+        }
+        <div class="permission-matrix__panel-heading">
+          <h3 class="permission-matrix__panel-title">{{ activeModule() }}</h3>
+          <span class="permission-matrix__panel-count">
+            {{ activeModuleTotal() }} {{ 'ADMIN.ROLES.LIST.COLUMNS.PERMISSIONS' | translate }}
+          </span>
+        </div>
+      </header>
+
+      <div class="permission-matrix__search-row">
+        <app-admin-search-bar
+          class="permission-matrix__search"
+          [value]="searchTerm()"
+          [placeholder]="'ADMIN.ROLES.PERMISSIONS.SEARCH_PLACEHOLDER' | translate"
+          [ariaLabel]="'ADMIN.ROLES.PERMISSIONS.SEARCH_PLACEHOLDER' | translate"
+          (searchChange)="onSearchChange($event)"
+        />
+        <label class="permission-matrix__search-all-toggle">
+          <input
+            type="checkbox"
+            [checked]="searchAllModules()"
+            (change)="toggleSearchAllModules()"
+          />
+          {{ 'ADMIN.ROLES.PERMISSIONS.SEARCH_ALL_MODULES' | translate }}
+        </label>
+      </div>
+
+      @if (searchAllModules()) {
+        @if (showSearchAllPrompt()) {
+          <app-admin-empty-state
+            icon="pi pi-search"
+            [title]="'ADMIN.ROLES.PERMISSIONS.SEARCH_ALL_HINT' | translate"
+            [compact]="true"
+          />
+        } @else if (searchAllResults().length === 0) {
+          <app-admin-empty-state
+            icon="pi pi-search"
+            [title]="'ADMIN.ROLES.PERMISSIONS.NO_MATCHES' | translate"
+            [compact]="true"
+          />
+        } @else {
+          <div class="permission-matrix__search-all-results">
+            @for (result of searchAllResults(); track result.module) {
+              <section class="permission-matrix__search-all-group">
+                <button
+                  type="button"
+                  class="permission-matrix__search-all-module"
+                  (click)="selectModule(result.module)"
+                >
+                  {{ result.module }}
+                  <i class="pi pi-arrow-up-right" aria-hidden="true"></i>
+                </button>
+                <div class="permission-matrix__row-list">
+                  @for (permission of result.permissions; track permission.id) {
+                    <label
+                      class="permission-matrix__row"
+                      [class.permission-matrix__row--selected]="isSelected(permission.id)"
+                      [class.permission-matrix__row--disabled]="disabled()"
+                    >
+                      <input
+                        type="checkbox"
+                        class="permission-matrix__row-input"
+                        [checked]="isSelected(permission.id)"
+                        [disabled]="disabled()"
+                        (change)="onPermissionChange(permission.id, $any($event.target).checked)"
+                      />
+                      <span class="permission-matrix__row-indicator" aria-hidden="true">
+                        <i class="pi pi-check"></i>
+                      </span>
+                      <span class="permission-matrix__row-text">
+                        <span class="permission-matrix__row-name">{{ permission.name }}</span>
+                        @if (permission.description) {
+                          <span class="permission-matrix__row-description">{{ permission.description }}</span>
+                        }
+                      </span>
+                    </label>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        }
+      } @else {
+        <div class="permission-matrix__actions-row">
+          <span class="permission-matrix__granted-count">
+            {{ activeModuleGranted() }}/{{ activeModuleTotal() }}
+            {{ 'ADMIN.ROLES.PERMISSIONS.SELECTED' | translate }}
+          </span>
+          <div class="permission-matrix__bulk-actions">
+            <button
+              type="button"
+              class="permission-matrix__bulk-action"
+              [disabled]="disabled() || activeModuleTotal() === 0"
+              (click)="selectAll()"
+            >
+              {{ 'ADMIN.ROLES.PERMISSIONS.SELECT_ALL' | translate }}
+            </button>
+            <span class="permission-matrix__bulk-action-sep" aria-hidden="true">·</span>
+            <button
+              type="button"
+              class="permission-matrix__bulk-action"
+              [disabled]="disabled() || activeModuleTotal() === 0"
+              (click)="clearAll()"
+            >
+              {{ 'ADMIN.ROLES.PERMISSIONS.CLEAR_ALL' | translate }}
+            </button>
+            <span class="permission-matrix__bulk-action-sep" aria-hidden="true">·</span>
+            <button
+              type="button"
+              class="permission-matrix__bulk-action"
+              [disabled]="disabled() || activeModuleTotal() === 0"
+              (click)="invertSelection()"
+            >
+              {{ 'ADMIN.ROLES.PERMISSIONS.INVERT_SELECTION' | translate }}
+            </button>
+          </div>
+        </div>
+
+        @if (visiblePermissions().length === 0) {
+          <app-admin-empty-state
+            icon="pi pi-shield"
+            [title]="'ADMIN.ROLES.PERMISSIONS.EMPTY' | translate"
+            [compact]="true"
+          />
+        } @else {
+          <div class="permission-matrix__row-list">
+            @for (permission of visiblePermissions(); track permission.id) {
+              <label
+                class="permission-matrix__row"
+                [class.permission-matrix__row--selected]="isSelected(permission.id)"
+                [class.permission-matrix__row--disabled]="disabled()"
+              >
+                <input
+                  type="checkbox"
+                  class="permission-matrix__row-input"
+                  [checked]="isSelected(permission.id)"
+                  [disabled]="disabled()"
+                  (change)="onPermissionChange(permission.id, $any($event.target).checked)"
+                />
+                <span class="permission-matrix__row-indicator" aria-hidden="true">
+                  <i class="pi pi-check"></i>
+                </span>
+                <span class="permission-matrix__row-text">
+                  <span class="permission-matrix__row-name">{{ permission.name }}</span>
+                  @if (permission.description) {
+                    <span class="permission-matrix__row-description">{{ permission.description }}</span>
+                  }
+                </span>
+              </label>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

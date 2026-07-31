@@ -5,6 +5,7 @@ export interface Category {
   readonly slug: string;
   readonly isActive: boolean;
   readonly parentId: string | null;
+  readonly imageUrl?: string | null;
 }
 
 export interface CategoryTreeItem extends Category {

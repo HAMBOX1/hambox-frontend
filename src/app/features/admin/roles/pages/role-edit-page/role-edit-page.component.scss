@@ -12,6 +12,15 @@
 
 .role-edit-page__detail {
   min-width: 0;
+
+  // Role Details only needs a handful of short fields — give the rest of the width to the
+  // permission editor instead of the shared 1 : 1.35 split (compound selector so this local
+  // override reliably beats the global single-class rule regardless of stylesheet load order).
+  &.admin-detail-layout {
+    @media (min-width: 1100px) {
+      grid-template-columns: 20rem minmax(0, 1fr);
+    }
+  }
 }
 
 .role-edit-page__checkbox {
@@ -22,10 +31,56 @@
   font-size: 0.875rem;
 }
 
-.role-edit-page__matrix-error {
-  padding: 0 2rem 1rem;
+// Permissions used to live inside its own AdminSectionCard, nested one level below the matrix's
+// own sidebar/toolbar chrome — a card inside a card. Flattened to a plain heading so there's one
+// layer of chrome (the matrix's own), not two.
+.role-edit-page__permissions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
 
-  @media (max-width: 767px) {
-    padding-inline: 1.25rem;
+.role-edit-page__permissions-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.role-edit-page__permissions-title {
+  margin: 0;
+  color: var(--admin-text-primary);
+  font-family: var(--admin-font-heading);
+  font-size: var(--admin-type-card-title);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.role-edit-page__permissions-count {
+  color: var(--admin-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.role-edit-page__matrix-error {
+  margin-bottom: 0.25rem;
+}
+
+.role-edit-page__matrix-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16rem;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.role-edit-page__matrix-summary {
+  @media (max-width: 1024px) {
+    order: -1;
   }
 }

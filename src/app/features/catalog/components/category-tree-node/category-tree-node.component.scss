@@ -153,6 +153,14 @@ $action-column: 2.25rem;
   flex-shrink: 0;
 }
 
+.category-tree-node__thumbnail {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border-radius: var(--admin-radius-sm, 0.25rem);
+  object-fit: cover;
+}
+
 .category-tree-node__name {
   flex: 1;
   overflow: hidden;

@@ -754,7 +754,8 @@
       "TITLE": "المنتجات",
       "INVENTORY_DASHBOARD": "لوحة المخزون",
       "IMPORT": "استيراد",
-      "EXPORT": "تصدير",
+      "EXPORT": "تصدير الحزمة",
+      "IMPORT_EXPORT_JOBS": "مهام الاستيراد والتصدير",
       "CREATE_PRODUCT": "إنشاء منتج",
       "STATS": {
         "TOTAL": "إجمالي المنتجات",
@@ -799,7 +800,7 @@
         "ASSIGN": "تعيين",
         "REMOVE": "إزالة",
         "CREATE_AND_ASSIGN": "إنشاء وتعيين",
-        "EXPORT": "تصدير",
+        "EXPORT": "تصدير CSV سريع",
         "MANAGE_INVENTORY": "إدارة المخزون",
         "DELETE_TITLE": "حذف المنتجات المحددة",
         "DUPLICATE_TITLE": "نسخ المنتجات المحددة",
@@ -829,6 +830,37 @@
         "DELETED_DETAIL": "تمت إزالة \"{{name}}\".",
         "PREVIEW_BLOCKED_TITLE": "المعاينة غير متاحة",
         "PREVIEW_BLOCKED_DETAIL": "يجب أن يكون المنتج نشطاً لمعاينته في المتجر."
+      }
+    },
+    "CATALOG_IMPORT_EXPORT_JOBS": {
+      "TITLE": "مهام الاستيراد والتصدير",
+      "SUBTITLE": "تتبّع مهام استيراد وتصدير الكتالوج في الخلفية.",
+      "SEARCH_PLACEHOLDER": "البحث باسم الملف",
+      "FILTER_TYPE": "النوع",
+      "FILTER_STATUS": "الحالة",
+      "EMPTY": "لا توجد مهام استيراد أو تصدير بعد.",
+      "EMPTY_SEARCH": "لا توجد مهام مطابقة للمرشحات.",
+      "COLUMNS": {
+        "TYPE": "النوع",
+        "FILE_NAME": "اسم الملف",
+        "STATUS": "الحالة",
+        "STARTED_BY": "بدأها",
+        "STARTED_AT": "وقت البدء",
+        "DURATION": "المدة",
+        "PROGRESS": "التقدم",
+        "ERROR": "الخطأ",
+        "ACTIONS": "الإجراءات"
+      },
+      "ACTIONS": {
+        "DETAILS": "التفاصيل",
+        "DETAILS_FOR": "عرض تفاصيل {{fileName}}",
+        "DOWNLOAD": "تنزيل",
+        "DOWNLOAD_FOR": "تنزيل {{fileName}}",
+        "REFRESH": "تحديث"
+      },
+      "SUMMARY": {
+        "TITLE": "الملخص",
+        "LINE": "{{created}} تم إنشاؤها، {{updated}} تم تحديثها، {{skipped}} تم تخطيها، {{failed}} فشلت"
       }
     },
     "INVENTORY_PANEL": {
@@ -2737,23 +2769,75 @@
         "SEARCH_PLACEHOLDER": "ابحث في الأدوار بالاسم أو الوصف…",
         "COLUMNS": {
           "NAME": "الدور",
-          "DESCRIPTION": "الوصف",
           "USERS": "المستخدمون",
           "PERMISSIONS": "الصلاحيات",
-          "FLAGS": "العلامات"
+          "MODIFIED": "آخر تعديل"
         },
         "SYSTEM": "نظام",
+        "CUSTOM": "مخصص",
         "DEFAULT": "افتراضي",
         "EMPTY": "لا توجد أدوار بعد. أنشئ دورًا لتحديد صلاحيات مخصصة.",
         "EMPTY_SEARCH": "لا توجد أدوار مطابقة لبحثك.",
         "EMPTY_HINT": "تتحكم الأدوار فيما يمكن لكل عضو في الفريق عرضه وإدارته في لوحة الإدارة.",
         "PRIORITY": "الأولوية"
       },
-      "STATS": {
-        "TOTAL": "إجمالي الأدوار",
-        "SYSTEM": "أدوار النظام",
-        "CUSTOM": "أدوار مخصصة",
-        "USERS": "المستخدمون المعيّنون"
+      "FILTERS": {
+        "ALL": "كل الأدوار",
+        "SYSTEM": "نظام",
+        "CUSTOM": "مخصص",
+        "HIGH_RISK": "مخاطر عالية",
+        "UNUSED": "غير مستخدم",
+        "ASSIGNED": "معيّن",
+        "RECENTLY_MODIFIED": "معدّل مؤخرًا",
+        "CLEAR": "مسح الفلتر"
+      },
+      "RISK": {
+        "CRITICAL": "حرج",
+        "HIGH": "عالٍ",
+        "MEDIUM": "متوسط",
+        "LOW": "منخفض",
+        "MINIMAL": "ضئيل"
+      },
+      "EMPTY": {
+        "UNUSED": "لا توجد أدوار غير مستخدمة",
+        "NO_CUSTOM": "لا توجد أدوار مخصصة بعد"
+      },
+      "DRAWER": {
+        "TITLE": "معاينة الدور",
+        "CREATED": "تاريخ الإنشاء",
+        "MODIFIED": "آخر تعديل",
+        "PERMISSIONS_TITLE": "تغطية الصلاحيات",
+        "DANGER_ZONE": "منطقة الخطر",
+        "SYSTEM_PROTECTED": "أدوار النظام محمية ولا يمكن حذفها.",
+        "DELETE_HINT": "حذف هذا الدور يزيله نهائيًا. يفقد المستخدمون المعيّنون صلاحياته فورًا.",
+        "ASSIGN_USERS": "تعيين مستخدمين"
+      },
+      "BULK": {
+        "DUPLICATE": "نسخ",
+        "ASSIGN_USERS": "تعيين مستخدمين",
+        "EXPORT": "تصدير المحدد",
+        "EXPORT_ALL": "تصدير الكل",
+        "COMPARE": "مقارنة",
+        "ASSIGN_DIALOG_TITLE": "تعيين مستخدمين للأدوار",
+        "ASSIGN_DIALOG_HINT": "سيتم تعيين المستخدمين المحددين إلى {{count}} دور محدد."
+      },
+      "COMPARE": {
+        "TITLE": "مقارنة الأدوار",
+        "SUBTITLE": "شاهد بدقة كيف يختلف دوران في الصلاحيات والأولوية والمخاطر.",
+        "LEFT_PLACEHOLDER": "اختر الدور الأول…",
+        "RIGHT_PLACEHOLDER": "اختر الدور الثاني…",
+        "RUN": "مقارنة",
+        "EMPTY": "اختر دورين للمقارنة.",
+        "DIFF_TITLE": "اختلافات الصلاحيات",
+        "DIFF_SUBTITLE": "{{shared}} صلاحية مشتركة بين الدورين.",
+        "NO_DIFF": "هذان الدوران متطابقان في الصلاحيات."
+      },
+      "MATRIX": {
+        "SUMMARY_TITLE": "ملخص مباشر",
+        "GRANTED": "الصلاحيات الممنوحة",
+        "DENIED": "الصلاحيات المرفوضة",
+        "AFFECTED_USERS": "المستخدمون المتأثرون",
+        "RISK_SCORE": "درجة المخاطر"
       },
       "DUPLICATE": {
         "TITLE": "نسخ الدور",
@@ -2775,13 +2859,18 @@
       },
       "PERMISSIONS": {
         "TITLE": "الصلاحيات",
-        "MODULE_FILTER": "الوحدة",
-        "SEARCH_PLACEHOLDER": "ابحث في الصلاحيات بالاسم أو الوصف…",
+        "MODULE_FILTER": "الوحدات",
+        "SEARCH_PLACEHOLDER": "ابحث في الصلاحيات…",
         "LOADING": "جارٍ تحميل مصفوفة الصلاحيات…",
-        "EMPTY": "لا توجد مجموعات صلاحيات متاحة.",
+        "EMPTY": "لا توجد صلاحيات مطابقة لبحثك.",
         "SELECT_ALL": "تحديد الكل",
         "CLEAR_ALL": "مسح الكل",
-        "SELECTED": "محدد"
+        "INVERT_SELECTION": "عكس التحديد",
+        "SELECTED": "محدد",
+        "BACK_TO_MODULES": "الوحدات",
+        "SEARCH_ALL_MODULES": "البحث في كل الوحدات",
+        "SEARCH_ALL_HINT": "اكتب حرفين على الأقل للبحث في كل وحدة.",
+        "NO_MATCHES": "لا توجد صلاحيات مطابقة لبحثك."
       },
       "USERS": {
         "TITLE": "المستخدمون المعيّنون",
@@ -3211,7 +3300,25 @@
       "LIBRARY": {
         "TITLE": "إضافة قسم",
         "SEARCH_PLACEHOLDER": "ابحث عن الأقسام...",
-        "EMPTY": "لا توجد أقسام مطابقة لبحثك."
+        "EMPTY": "لا توجد أقسام مطابقة لبحثك.",
+        "EMPTY_SEARCH": "لا توجد أقسام مطابقة لبحثك.",
+        "EMPTY_FAVORITES": "لم تقم بإضافة أي قسم إلى المفضلة بعد.",
+        "EMPTY_RECENT": "لم تقم بإضافة أي قسم بعد.",
+        "EMPTY_CATEGORY": "لا توجد أقسام في هذه الفئة.",
+        "PREVIEW_UNAVAILABLE_TITLE": "المعاينة غير متاحة",
+        "PREVIEW_UNAVAILABLE_DESCRIPTION": "تعذر تحميل معاينة هذا القسم. أغلق هذه النافذة وحاول مرة أخرى.",
+        "ALL_CATEGORIES": "جميع الفئات",
+        "FILTER_ALL": "الكل",
+        "FILTER_FAVORITES": "المفضلة",
+        "FILTER_RECENT": "المستخدمة مؤخراً",
+        "FILTER_POPULAR": "الأكثر استخداماً",
+        "FILTER_NEWEST": "الأحدث",
+        "BADGE_POPULAR": "شائع",
+        "BADGE_NEW": "جديد",
+        "QUICK_ADD": "إضافة سريعة",
+        "CANCEL": "إلغاء",
+        "FAVORITE": "أضف إلى المفضلة",
+        "UNFAVORITE": "إزالة من المفضلة"
       },
       "PREVIEW": {
         "TITLE": "معاينة",

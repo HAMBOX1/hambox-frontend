@@ -1,0 +1,71 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [style]="{ width: 'min(72rem, 96vw)' }"
+  styleClass="admin-dialog section-full-preview-dialog"
+>
+  @if (displayVariant(); as v) {
+    <ng-template pTemplate="header">
+      <div class="section-full-preview-dialog__header">
+        <div class="section-full-preview-dialog__heading">
+          <div class="section-full-preview-dialog__title-row">
+            <span class="section-full-preview-dialog__name">{{ v.displayName }}</span>
+            <app-admin-status-badge [label]="v.category" tone="info" />
+          </div>
+          <p class="section-full-preview-dialog__description">{{ v.description }}</p>
+        </div>
+        <app-device-preview-toggle [selected]="device()" (selectedChange)="device.set($event)" />
+      </div>
+    </ng-template>
+
+    <div class="section-full-preview-dialog__body">
+      <div class="section-full-preview-dialog__frame" [style.width]="frameWidth()">
+        @if (!iframeLoaded()) {
+          <app-admin-empty-state
+            class="section-full-preview-dialog__loading"
+            icon="pi pi-spin pi-spinner"
+            [title]="'COMMON.LOADING' | translate"
+            [compact]="true"
+          />
+        }
+        @if (previewUrl(); as url) {
+          <iframe
+            class="section-full-preview-dialog__iframe"
+            [class.section-full-preview-dialog__iframe--loaded]="iframeLoaded()"
+            [src]="url"
+            [attr.title]="v.displayName + ' preview'"
+            (load)="onIframeLoad()"
+          ></iframe>
+        }
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        [label]="'ADMIN.PAGE_BUILDER.LIBRARY.CANCEL' | translate"
+        severity="secondary"
+        [text]="true"
+        (onClick)="close()"
+      />
+      <p-button
+        [label]="'ADMIN.PAGE_BUILDER.LIBRARY.QUICK_ADD' | translate"
+        severity="primary"
+        icon="pi pi-plus"
+        (onClick)="quickAdd.emit()"
+      />
+    </ng-template>
+  } @else {
+    <app-admin-empty-state
+      icon="pi pi-exclamation-triangle"
+      [title]="'ADMIN.PAGE_BUILDER.LIBRARY.PREVIEW_UNAVAILABLE_TITLE' | translate"
+      [description]="'ADMIN.PAGE_BUILDER.LIBRARY.PREVIEW_UNAVAILABLE_DESCRIPTION' | translate"
+      [primaryLabel]="'COMMON.CLOSE' | translate"
+      (primaryAction)="close()"
+    />
+  }
+</p-dialog>

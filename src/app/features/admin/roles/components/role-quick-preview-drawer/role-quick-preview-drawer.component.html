@@ -1,0 +1,42 @@
+<ng-template #previewContent>
+  <app-role-preview-content
+    [role]="role()"
+    [detail]="detail()"
+    [matrix]="matrix()"
+    [loading]="detailLoading()"
+    (editRequested)="onEdit()"
+    (duplicateRequested)="onDuplicate()"
+    (assignUsersRequested)="onAssignUsers()"
+    (deleteRequested)="onDelete()"
+  />
+</ng-template>
+
+@if (mobileViewport.isMobile()) {
+  <app-hambox-bottom-sheet
+    [open]="!!role()"
+    [title]="title()"
+    [heightVh]="88"
+    [solid]="true"
+    (closed)="onVisibleChange(false)"
+  >
+    <ng-container [ngTemplateOutlet]="previewContent" />
+  </app-hambox-bottom-sheet>
+} @else {
+  <p-drawer
+    [visible]="!!role()"
+    (visibleChange)="onVisibleChange($event)"
+    position="right"
+    [modal]="true"
+    [dismissible]="true"
+    [closeOnEscape]="true"
+    appendTo="body"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    [transitionOptions]="'200ms cubic-bezier(0.4, 0, 0.2, 1)'"
+    styleClass="role-quick-preview-drawer"
+  >
+    <ng-template #header>
+      <span class="role-quick-preview-drawer__header-title">{{ title() }}</span>
+    </ng-template>
+    <ng-container [ngTemplateOutlet]="previewContent" />
+  </p-drawer>
+}

@@ -1,8 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 
 import { CATALOG_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
+import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import {
   Category,
   CategoryListQuery,
@@ -18,6 +20,8 @@ import {
 })
 export class CategoryApiService {
   private readonly api = inject(ApiClientService);
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
 
   getCategories(query: CategoryListQuery): Observable<PagedResult<Category>> {
     const params: Record<string, string | number | boolean> = {
@@ -63,6 +67,23 @@ export class CategoryApiService {
 
   restoreCategory(id: string): Observable<void> {
     return this.api.post<void>(CATALOG_API.categoryRestore(id), {});
+  }
+
+  uploadCategoryImage(categoryId: string, file: File): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+
+    return this.http.post<{ imageUrl: string }>(this.resolveUrl(CATALOG_API.categoryImage(categoryId)), formData);
+  }
+
+  removeCategoryImage(categoryId: string): Observable<void> {
+    return this.api.delete<void>(CATALOG_API.categoryImage(categoryId));
+  }
+
+  private resolveUrl(path: string): string {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    const base = (this.apiBaseUrl as string).replace(/\/$/, '');
+    return `${base}${normalizedPath}`;
   }
 }
 

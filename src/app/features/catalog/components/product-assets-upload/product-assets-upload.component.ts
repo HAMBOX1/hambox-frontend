@@ -15,7 +15,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { firstValueFrom } from 'rxjs';
 
-import { ProductAssetFile, ProductImage } from '../../models/product.model';
+import { ProductAssetFile, ProductDisplayImageSource, ProductImage } from '../../models/product.model';
 import { ProductApiService } from '../../services/product-api.service';
 import {
   isAllowedProductImage,
@@ -38,8 +38,28 @@ export class ProductAssetsUploadComponent implements OnDestroy {
   private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   readonly productId = input<string | null>(null);
+  /** Backend-resolved fallback shown when the product has no uploaded image of its own —
+   * see `ProductDto.DisplayImageUrl`. Never computed on the frontend. */
+  readonly fallbackImageUrl = input<string | null>(null);
+  readonly fallbackImageSource = input<ProductDisplayImageSource | null>(null);
 
   protected readonly maxCount = PRODUCT_IMAGE_MAX_COUNT;
+
+  protected readonly resolvedFallbackImageUrl = computed(() => {
+    const url = this.fallbackImageUrl();
+    return url ? resolveProductImageUrl(url) || null : null;
+  });
+
+  protected readonly fallbackBadgeLabel = computed(() => {
+    switch (this.fallbackImageSource()) {
+      case 'ParentCategory':
+        return 'Using Parent Category Image';
+      case 'Category':
+        return 'Using Category Image';
+      default:
+        return null;
+    }
+  });
 
   protected readonly assets = signal<readonly ProductAssetFile[]>([]);
   protected readonly isDragOver = signal(false);

@@ -107,7 +107,11 @@
           (collectionCreated)="onCollectionCreated()"
         >
           <div #imagesAnchor>
-            <app-product-assets-upload [productId]="productId()" />
+            <app-product-assets-upload
+              [productId]="productId()"
+              [fallbackImageUrl]="product()?.displayImageUrl ?? null"
+              [fallbackImageSource]="product()?.displayImageSource ?? null"
+            />
           </div>
         </app-product-basic-info-form>
       </app-admin-section-card>

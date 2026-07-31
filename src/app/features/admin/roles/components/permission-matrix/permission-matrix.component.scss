@@ -1,164 +1,282 @@
 :host {
-  display: flex;
-  flex-direction: column;
+  display: block;
   min-height: 0;
 }
 
 .permission-matrix {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 1.5rem;
   min-height: 0;
-  padding-top: 0.25rem;
 }
 
-:host ::ng-deep {
-  .permission-matrix .admin-toolbar {
-    margin-inline: 2rem;
-
-    @media (max-width: 767px) {
-      margin-inline: 1.25rem;
-    }
-  }
+// ---- Left: module nav — always visible, single selection, sticky so it stays reachable
+// while the center list (or the page) scrolls. Internally scrollable so it stays usable
+// regardless of how many modules exist, without pushing the page height around.
+.permission-matrix__nav {
+  flex: 0 0 14rem;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-height: min(70vh, 40rem);
+  overflow-y: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-bg-elevated);
 }
 
-.permission-matrix__module-filters {
-  align-items: center;
-}
-
-.permission-matrix__module-label {
+.permission-matrix__nav-label {
+  padding: 0 0.375rem;
   color: var(--admin-text-muted);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.permission-matrix__body {
+.permission-matrix__nav-list {
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  padding: 0 2rem 2rem;
+  gap: 0.125rem;
+}
 
-  @media (max-width: 767px) {
-    padding-inline: 1.25rem;
-    padding-bottom: 1.25rem;
+.permission-matrix__nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: none;
+  border-radius: var(--admin-radius-md, 0.5rem);
+  background: transparent;
+  cursor: pointer;
+  text-align: start;
+  transition: background 150ms ease;
+
+  &:hover:not(:disabled) {
+    background: var(--admin-bg-input);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 }
 
-.permission-matrix__groups {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-height: min(68vh, 44rem);
-  overflow-y: auto;
-  padding-right: 0.25rem;
-  scroll-padding-bottom: 1rem;
+.permission-matrix__nav-item--active {
+  background: color-mix(in srgb, var(--admin-accent-green) 12%, var(--admin-bg-input));
 }
 
-.permission-matrix__group-card {
-  flex-shrink: 0;
-}
-
-.permission-matrix__group-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-}
-
-.permission-matrix__progress-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-
-.permission-matrix__progress-meta {
+.permission-matrix__nav-item-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-.permission-matrix__progress-label {
-  color: var(--admin-text-secondary);
+.permission-matrix__nav-item-name {
+  overflow: hidden;
+  color: var(--admin-text-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .permission-matrix__nav-item--active & {
+    color: var(--admin-accent-green);
+  }
+}
+
+.permission-matrix__nav-item-count {
+  flex-shrink: 0;
+  color: var(--admin-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+// Completion indicator.
+.permission-matrix__nav-item-track {
+  height: 0.1875rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--admin-border-subtle);
+}
+
+.permission-matrix__nav-item-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--admin-accent-green);
+  transition: width 0.25s ease;
+}
+
+// ---- Center: the active module's permission list only. Everything else in the catalog is
+// never rendered.
+.permission-matrix__panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.permission-matrix__panel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.permission-matrix__back {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--admin-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--admin-text-primary);
+  }
+}
+
+.permission-matrix__panel-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+}
+
+.permission-matrix__panel-title {
+  margin: 0;
+  color: var(--admin-text-primary);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.permission-matrix__panel-count {
+  color: var(--admin-text-muted);
   font-size: 0.8125rem;
   font-weight: 600;
 }
 
-.permission-matrix__module-badge {
-  display: inline-flex;
-  padding: 0.2rem 0.625rem;
-  border-radius: var(--admin-radius-pill, 999px);
-  background: var(--admin-bg-elevated);
-  color: var(--admin-text-muted);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.permission-matrix__progress {
-  height: 0.375rem;
-  border-radius: 999px;
-  background: var(--admin-border-subtle);
-  overflow: hidden;
-}
-
-.permission-matrix__progress-bar {
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--admin-accent-green),
-    color-mix(in srgb, var(--admin-accent-blue) 70%, var(--admin-accent-green))
-  );
-  transition: width var(--admin-transition, 180ms ease);
-}
-
-.permission-matrix__chip-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
-  gap: 0.625rem;
-}
-
-.permission-matrix__chip {
+.permission-matrix__search-row {
   display: flex;
-  align-items: flex-start;
-  gap: 0.625rem;
-  padding: 0.75rem 0.875rem;
-  border: 1px solid var(--admin-border-subtle);
-  border-radius: var(--admin-radius-lg);
-  background: var(--admin-bg-input);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.permission-matrix__search {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+
+  ::ng-deep .admin-search-bar {
+    min-height: 2.625rem;
+  }
+}
+
+.permission-matrix__search-all-toggle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--admin-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
   cursor: pointer;
-  transition:
-    border-color var(--admin-transition, 180ms ease),
-    background var(--admin-transition, 180ms ease),
-    box-shadow var(--admin-transition, 180ms ease);
+  white-space: nowrap;
+}
 
-  &:hover:not(.permission-matrix__chip--disabled) {
-    border-color: color-mix(in srgb, var(--admin-accent-green) 35%, transparent);
-    background: color-mix(in srgb, var(--admin-accent-green) 6%, var(--admin-bg-input));
+.permission-matrix__actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.permission-matrix__granted-count {
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.permission-matrix__bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.permission-matrix__bulk-action {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--admin-accent-green);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
   }
 
-  &:has(.permission-matrix__chip-input:focus-visible) {
+  &:disabled {
+    color: var(--admin-text-muted);
+    cursor: not-allowed;
+  }
+}
+
+.permission-matrix__bulk-action-sep {
+  color: var(--admin-border-default);
+  font-size: 0.75rem;
+}
+
+// ---- Rows: compact, ~28-36px tall, entire row is the click target, checkbox on the left.
+.permission-matrix__row-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.permission-matrix__row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.4375rem 0.5rem;
+  border-radius: var(--admin-radius-md, 0.5rem);
+  cursor: pointer;
+  transition: background 120ms ease;
+
+  &:hover:not(.permission-matrix__row--disabled) {
+    background: var(--admin-bg-hover, var(--admin-bg-input));
+  }
+
+  &:has(.permission-matrix__row-input:focus-visible) {
     outline: 2px solid var(--admin-accent-green);
-    outline-offset: 2px;
+    outline-offset: -1px;
   }
 }
 
-.permission-matrix__chip--selected {
-  border-color: color-mix(in srgb, var(--admin-accent-green) 45%, transparent);
-  background: color-mix(in srgb, var(--admin-accent-green) 10%, var(--admin-bg-input));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--admin-accent-green) 18%, transparent);
+.permission-matrix__row--selected {
+  background: color-mix(in srgb, var(--admin-accent-green) 7%, transparent);
 }
 
-.permission-matrix__chip--disabled {
-  opacity: 0.6;
+.permission-matrix__row--disabled {
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
-.permission-matrix__chip-input {
+.permission-matrix__row-input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -170,60 +288,106 @@
   white-space: nowrap;
 }
 
-.permission-matrix__chip-indicator {
+.permission-matrix__row-indicator {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 1.125rem;
-  height: 1.125rem;
-  margin-top: 0.125rem;
+  width: 1.0625rem;
+  height: 1.0625rem;
   border: 1.5px solid var(--admin-border-default);
   border-radius: 0.3125rem;
   background: var(--admin-bg-panel);
   color: transparent;
   font-size: 0.625rem;
   transition:
-    border-color var(--admin-transition, 180ms ease),
-    background var(--admin-transition, 180ms ease),
-    color var(--admin-transition, 180ms ease);
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
 
-  .permission-matrix__chip--selected & {
+  .permission-matrix__row--selected & {
     border-color: var(--admin-accent-green);
     background: var(--admin-accent-green);
     color: var(--admin-text-inverse);
   }
 }
 
-.permission-matrix__chip-content {
+.permission-matrix__row-text {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
   min-width: 0;
 }
 
-.permission-matrix__chip-name {
+.permission-matrix__row-name {
   color: var(--admin-text-primary);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
-.permission-matrix__chip-description {
+.permission-matrix__row-description {
+  overflow: hidden;
   color: var(--admin-text-muted);
   font-size: 0.75rem;
-  line-height: 1.45;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-:host ::ng-deep {
-  .permission-matrix__group-card.admin-section-card {
-    border-radius: var(--admin-radius-lg);
-    box-shadow: none;
+// ---- "Search all modules" grouped results.
+.permission-matrix__search-all-results {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.permission-matrix__search-all-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.permission-matrix__search-all-module {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-pill, 999px);
+  background: var(--admin-bg-elevated);
+  color: var(--admin-text-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--admin-accent-green);
+    color: var(--admin-accent-green);
+  }
+
+  .pi {
+    font-size: 0.625rem;
   }
 }
 
 @media (max-width: 767px) {
-  .permission-matrix__chip-grid {
-    grid-template-columns: 1fr;
+  .permission-matrix {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .permission-matrix__nav {
+    position: static;
+    flex: none;
+    width: 100%;
+    max-height: none;
+  }
+
+  // Mobile: one screen at a time, not two stacked columns — matches the module-nav ->
+  // full-screen-panel navigation pattern already used elsewhere in admin (e.g. support tickets).
+  .permission-matrix__nav--mobile-hidden,
+  .permission-matrix__panel--mobile-hidden {
+    display: none;
   }
 }

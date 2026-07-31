@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ProductApiService } from '../../features/catalog/services/product-api.service';
 import { resolveProductImageUrl } from '../../features/catalog/utils/product-image.utils';
-import { productPlaceholderImage, resolveStorefrontImageUrl } from '../../features/home/utils/storefront-home.mapper';
+import { productPlaceholderImage } from '../../features/home/utils/storefront-home.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class ProductImageCacheService {
@@ -50,17 +50,7 @@ export class ProductImageCacheService {
   private async fetchImageUrl(productId: string, index: number): Promise<string> {
     try {
       const product = await firstValueFrom(this.productApi.getProductById(productId));
-      const primary = resolveProductImageUrl(product.primaryImageUrl);
-      const gallery = product.images
-        ?.slice()
-        .sort((left, right) => left.displayOrder - right.displayOrder)
-        .map((image) => resolveProductImageUrl(image.url))
-        .find(Boolean);
-
-      const resolved = resolveStorefrontImageUrl(
-        primary || gallery || '',
-        productPlaceholderImage(index),
-      );
+      const resolved = resolveProductImageUrl(product.displayImageUrl) || productPlaceholderImage(index);
 
       this.cache.set(productId, resolved);
       return resolved;

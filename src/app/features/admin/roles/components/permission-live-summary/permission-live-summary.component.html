@@ -1,0 +1,37 @@
+<app-admin-section-card
+  [title]="'ADMIN.ROLES.MATRIX.SUMMARY_TITLE' | translate"
+  [padded]="true"
+  class="permission-live-summary"
+>
+  <app-admin-progress-bar
+    [percent]="coveragePercent()"
+    [label]="grantedCount() + ' / ' + totalCount()"
+  />
+
+  <dl class="permission-live-summary__stats">
+    <div class="permission-live-summary__stat">
+      <dt>{{ 'ADMIN.ROLES.MATRIX.GRANTED' | translate }}</dt>
+      <dd>{{ grantedCount() }}</dd>
+    </div>
+    <div class="permission-live-summary__stat">
+      <dt>{{ 'ADMIN.ROLES.MATRIX.DENIED' | translate }}</dt>
+      <dd>{{ deniedCount() }}</dd>
+    </div>
+    @if (userCount() !== null) {
+      <div class="permission-live-summary__stat">
+        <dt>{{ 'ADMIN.ROLES.MATRIX.AFFECTED_USERS' | translate }}</dt>
+        <dd>{{ userCount() }}</dd>
+      </div>
+    }
+  </dl>
+
+  <div class="permission-live-summary__risk">
+    <span class="permission-live-summary__risk-label">
+      {{ 'ADMIN.ROLES.MATRIX.RISK_SCORE' | translate }}
+    </span>
+    <app-admin-status-badge
+      [label]="riskKey() | translate"
+      [tone]="riskTone()"
+    />
+  </div>
+</app-admin-section-card>

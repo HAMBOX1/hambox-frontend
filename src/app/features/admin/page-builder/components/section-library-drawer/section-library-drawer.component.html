@@ -7,36 +7,88 @@
   [dismissible]="true"
   [closeOnEscape]="true"
   appendTo="body"
-  [style]="{ width: 'min(28rem, 92vw)' }"
+  [style]="{ width: 'min(64rem, 96vw)' }"
   styleClass="section-library-drawer"
 >
-  <app-admin-search-bar
-    class="section-library-drawer__search"
-    [value]="searchTerm()"
-    [placeholder]="'ADMIN.PAGE_BUILDER.LIBRARY.SEARCH_PLACEHOLDER' | translate"
-    (searchChange)="searchTerm.set($event)"
-  />
+  <div class="section-library-drawer__toolbar">
+    <app-admin-search-bar
+      class="section-library-drawer__search"
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.PAGE_BUILDER.LIBRARY.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="searchTerm.set($event)"
+    />
 
-  @if (!groups().length) {
+    <div
+      class="section-library-drawer__filters"
+      role="group"
+      [attr.aria-label]="'ADMIN.PAGE_BUILDER.LIBRARY.TITLE' | translate"
+    >
+      @for (filter of filters; track filter.value) {
+        <button
+          type="button"
+          class="section-library-drawer__filter"
+          [class.section-library-drawer__filter--active]="activeFilter() === filter.value"
+          [attr.aria-pressed]="activeFilter() === filter.value"
+          (click)="activeFilter.set(filter.value)"
+        >
+          <i [class]="filter.icon" aria-hidden="true"></i>
+          {{ filter.labelKey | translate }}
+        </button>
+      }
+    </div>
+
+    <div
+      class="section-library-drawer__categories"
+      role="group"
+      [attr.aria-label]="'ADMIN.PAGE_BUILDER.LIBRARY.ALL_CATEGORIES' | translate"
+    >
+      <button
+        type="button"
+        class="section-library-drawer__chip"
+        [class.section-library-drawer__chip--active]="activeCategory() === null"
+        [attr.aria-pressed]="activeCategory() === null"
+        (click)="activeCategory.set(null)"
+      >
+        {{ 'ADMIN.PAGE_BUILDER.LIBRARY.ALL_CATEGORIES' | translate }}
+      </button>
+      @for (category of categories(); track category) {
+        <button
+          type="button"
+          class="section-library-drawer__chip"
+          [class.section-library-drawer__chip--active]="activeCategory() === category"
+          [attr.aria-pressed]="activeCategory() === category"
+          (click)="activeCategory.set(category)"
+        >
+          {{ category }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (!cards().length) {
     <app-admin-empty-state
       icon="pi pi-search"
-      [title]="'ADMIN.PAGE_BUILDER.LIBRARY.EMPTY' | translate"
+      [title]="emptyStateKey() | translate"
       [compact]="true"
     />
   } @else {
-    @for (group of groups(); track group[0]) {
-      <div class="section-library-drawer__group">
-        <h4 class="section-library-drawer__group-title">{{ group[0] }}</h4>
-        <div class="section-library-drawer__cards">
-          @for (variant of group[1]; track variant.variantKey) {
-            <button type="button" class="section-library-drawer__card" (click)="select(variant)">
-              <i class="pi pi-th-large section-library-drawer__card-icon" aria-hidden="true"></i>
-              <span class="section-library-drawer__card-name">{{ variant.displayName }}</span>
-              <span class="section-library-drawer__card-key">{{ variant.variantKey }}</span>
-            </button>
-          }
-        </div>
-      </div>
-    }
+    <div class="section-library-drawer__grid">
+      @for (card of cards(); track (card.variant.category + ':' + card.variant.variantKey)) {
+        <app-section-library-card
+          [variant]="card.variant"
+          [favorited]="card.favorited"
+          (preview)="openPreview(card.variant)"
+          (quickAdd)="select(card.variant)"
+          (favoriteToggle)="toggleFavorite(card.variant)"
+        />
+      }
+    </div>
   }
 </p-drawer>
+
+<app-section-full-preview-dialog
+  [visible]="previewVariant() !== null"
+  [variant]="previewVariant()"
+  (visibleChange)="closePreview()"
+  (quickAdd)="quickAddFromPreview()"
+/>

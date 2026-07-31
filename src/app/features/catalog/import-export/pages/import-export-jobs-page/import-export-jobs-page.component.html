@@ -1,0 +1,210 @@
+<section class="admin-page">
+  <app-admin-page-header
+    [title]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.TITLE' | translate"
+    [subtitle]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.SEARCH_PLACEHOLDER' | translate"
+      [ariaLabel]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      [options]="directionOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="directionFilter()"
+      (ngModelChange)="onDirectionChange($event)"
+      [placeholder]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.FILTER_TYPE' | translate"
+      [ariaLabel]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.FILTER_TYPE' | translate"
+    />
+    <p-select
+      adminToolbarFilters
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      [placeholder]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.FILTER_STATUS' | translate"
+      [ariaLabel]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.FILTER_STATUS' | translate"
+    />
+
+    <app-admin-icon-button
+      adminToolbarActions
+      icon="pi pi-refresh"
+      [label]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.ACTIONS.REFRESH' | translate"
+      [loading]="loading()"
+      (pressed)="refresh()"
+    />
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table jobs-table"
+      [value]="[...rows()]"
+      [loading]="loading() && !result()"
+      [lazy]="true"
+      [paginator]="totalCount() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [sortField]="'createdOnUtc'"
+      [sortOrder]="sortOrder()"
+      sortMode="single"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.TYPE' | translate }}</th>
+          <th>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.FILE_NAME' | translate }}</th>
+          <th>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.STATUS' | translate }}</th>
+          <th class="jobs-table__col--secondary">{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.STARTED_BY' | translate }}</th>
+          <th class="jobs-table__col--secondary" pSortableColumn="createdOnUtc">
+            {{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.STARTED_AT' | translate }}
+            <p-sortIcon field="createdOnUtc" />
+          </th>
+          <th class="jobs-table__col--secondary">{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.DURATION' | translate }}</th>
+          <th>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.PROGRESS' | translate }}</th>
+          <th class="jobs-table__col--actions" style="width: 8rem">
+            <span class="jobs-page__sr-only">{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.ACTIONS' | translate }}</span>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-job>
+        <tr>
+          <td>
+            <i
+              class="pi"
+              aria-hidden="true"
+              [class.pi-upload]="job.direction === 'Import'"
+              [class.pi-download]="job.direction === 'Export'"
+            ></i>
+            {{ job.direction }}
+          </td>
+          <td>{{ job.fileName || job.resultFileName || '—' }}</td>
+          <td><app-admin-status-badge [label]="job.status" [tone]="statusTone(job.status)" /></td>
+          <td class="jobs-table__col--secondary">{{ job.createdBy || '—' }}</td>
+          <td class="jobs-table__col--secondary">{{ job.createdOnUtc | date: 'short' }}</td>
+          <td class="jobs-table__col--secondary">
+            {{ durationSeconds(job) != null ? (durationSeconds(job) | number: '1.0-1') + 's' : '—' }}
+          </td>
+          <td class="jobs-table__progress">
+            <app-admin-progress-bar [percent]="job.progressPercent" [label]="job.status" />
+          </td>
+          <td class="jobs-table__col--actions">
+            <div class="jobs-table__actions">
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [label]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.ACTIONS.DETAILS' | translate"
+                [attr.aria-label]="detailsLabel(job)"
+                (click)="openDetails(job)"
+              ></button>
+              @if (canDownload(job)) {
+                <app-admin-icon-button
+                  icon="pi pi-download"
+                  [label]="downloadLabel(job)"
+                  (pressed)="download(job)"
+                />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">
+            <app-admin-empty-state
+              icon="pi pi-sync"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.CATALOG_IMPORT_EXPORT_JOBS.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.CATALOG_IMPORT_EXPORT_JOBS.EMPTY' | translate)
+              "
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+
+  <p-drawer
+    [visible]="detailsVisible()"
+    (visibleChange)="onDetailsVisibleChange($event)"
+    position="right"
+    [header]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.ACTIONS.DETAILS' | translate"
+    styleClass="admin-drawer"
+  >
+    @if (selectedJob(); as job) {
+      <dl class="admin-detail-list">
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.TYPE' | translate }}</dt>
+        <dd>{{ job.direction }}</dd>
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.FILE_NAME' | translate }}</dt>
+        <dd>{{ job.fileName || '—' }}</dd>
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.STATUS' | translate }}</dt>
+        <dd><app-admin-status-badge [label]="job.status" [tone]="statusTone(job.status)" /></dd>
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.STARTED_BY' | translate }}</dt>
+        <dd>{{ job.createdBy || '—' }}</dd>
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.STARTED_AT' | translate }}</dt>
+        <dd>{{ job.createdOnUtc | date: 'medium' }}</dd>
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.DURATION' | translate }}</dt>
+        <dd>{{ durationSeconds(job) != null ? (durationSeconds(job) | number: '1.0-1') + 's' : '—' }}</dd>
+        <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.PROGRESS' | translate }}</dt>
+        <dd>
+          <app-admin-progress-bar [percent]="job.progressPercent" [label]="job.status" />
+        </dd>
+
+        @if (job.summary) {
+          <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.SUMMARY.TITLE' | translate }}</dt>
+          <dd>
+            {{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.SUMMARY.LINE' | translate: {
+              created: job.summary.createdCount,
+              updated: job.summary.updatedCount,
+              skipped: job.summary.skippedCount,
+              failed: job.summary.failedCount
+            } }}
+          </dd>
+        }
+
+        @if (job.status === 'Failed') {
+          <dt>{{ 'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.COLUMNS.ERROR' | translate }}</dt>
+          <dd><pre class="jobs-page__error-text">{{ job.errorMessage || '—' }}</pre></dd>
+        }
+      </dl>
+
+      @if (canDownload(job)) {
+        <div class="admin-page__actions">
+          <button
+            *hamboxHasPermission="permissions.Catalog.Products.View"
+            pButton
+            type="button"
+            size="small"
+            icon="pi pi-download"
+            [label]="'ADMIN.CATALOG_IMPORT_EXPORT_JOBS.ACTIONS.DOWNLOAD' | translate"
+            [attr.aria-label]="downloadLabel(job)"
+            (click)="download(job)"
+          ></button>
+        </div>
+      }
+    }
+  </p-drawer>
+</section>

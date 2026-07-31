@@ -3,8 +3,8 @@
     <div class="product-picker__chips">
       @for (id of value(); track id) {
         <span class="product-picker__chip">
-          @if (detailsFor(id)?.primaryImageUrl) {
-            <img [src]="detailsFor(id)!.primaryImageUrl!" alt="" />
+          @if (detailsFor(id)?.displayImageUrl) {
+            <img [src]="detailsFor(id)!.displayImageUrl!" alt="" />
           }
           <span class="product-picker__chip-name">{{ detailsFor(id) ? productName(detailsFor(id)!) : id }}</span>
           <button
@@ -49,8 +49,8 @@
             [class.product-picker__result--selected]="isSelected(product.id)"
             (click)="toggle(product)"
           >
-            @if (product.primaryImageUrl) {
-              <img [src]="product.primaryImageUrl" alt="" />
+            @if (product.displayImageUrl) {
+              <img [src]="product.displayImageUrl" alt="" />
             } @else {
               <i class="pi pi-image" aria-hidden="true"></i>
             }

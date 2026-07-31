@@ -148,6 +148,13 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'page-builder/preview-section',
+    loadComponent: () =>
+      import('./features/home/section-registry/preview/section-preview-stage.component').then(
+        (c) => c.SectionPreviewStageComponent,
+      ),
+  },
+  {
     path: 'admin',
     canActivate: [adminAuthenticationGuard],
     loadComponent: () =>

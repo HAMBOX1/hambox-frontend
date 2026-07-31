@@ -25,7 +25,7 @@ function resolveGalleryImages(product: Product): readonly string[] {
       .map((image) => resolveImageUrl(image.url));
   }
 
-  const primary = resolveImageUrl(product.primaryImageUrl);
+  const primary = resolveImageUrl(product.displayImageUrl);
   return primary ? [primary] : [];
 }
 
@@ -58,7 +58,7 @@ export function mapProductToStoreProduct(
   return {
     id: product.id,
     title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
-    imageUrl: resolveImageUrl(product.primaryImageUrl, index),
+    imageUrl: resolveImageUrl(product.displayImageUrl, index),
     platformLabel: categoryName,
     platformTone: resolvePlatformTone(product.categoryName),
     categoryName,

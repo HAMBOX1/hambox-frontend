@@ -1,0 +1,52 @@
+<div class="section-library-card">
+  <button
+    type="button"
+    class="section-library-card__preview-trigger"
+    [attr.aria-label]="variant().displayName"
+    (click)="preview.emit()"
+    (dblclick)="quickAdd.emit()"
+  >
+    <span class="section-library-card__thumb">
+      <img [src]="thumbnail()" [alt]="''" loading="lazy" />
+    </span>
+
+    <span class="section-library-card__body">
+      <span class="section-library-card__title-row">
+        <span class="section-library-card__name" [title]="variant().displayName">{{ variant().displayName }}</span>
+        <app-admin-status-badge [label]="variant().category" tone="neutral" [outlined]="true" />
+      </span>
+      <span class="section-library-card__description">{{ variant().description }}</span>
+    </span>
+  </button>
+
+  <div class="section-library-card__thumb-overlay">
+    <button
+      type="button"
+      class="section-library-card__favorite"
+      [class.section-library-card__favorite--active]="favorited()"
+      [attr.aria-pressed]="favorited()"
+      [attr.aria-label]="
+        (favorited() ? 'ADMIN.PAGE_BUILDER.LIBRARY.UNFAVORITE' : 'ADMIN.PAGE_BUILDER.LIBRARY.FAVORITE') | translate
+      "
+      (click)="favoriteToggle.emit()"
+    >
+      <i [class]="favorited() ? 'pi pi-star-fill' : 'pi pi-star'" aria-hidden="true"></i>
+    </button>
+
+    @if (variant().badge; as badge) {
+      <span class="section-library-card__badge">
+        <app-admin-status-badge
+          [label]="('ADMIN.PAGE_BUILDER.LIBRARY.BADGE_' + badge.toUpperCase()) | translate"
+          [tone]="badge === 'popular' ? 'success' : 'info'"
+        />
+      </span>
+    }
+
+    <div class="section-library-card__quick-add-row">
+      <button type="button" class="section-library-card__quick-add" (click)="quickAdd.emit()">
+        <i class="pi pi-plus" aria-hidden="true"></i>
+        {{ 'ADMIN.PAGE_BUILDER.LIBRARY.QUICK_ADD' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

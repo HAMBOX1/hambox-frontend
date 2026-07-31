@@ -254,6 +254,14 @@ export class CategoryListFacade {
     }
   }
 
+  /** Called after `CategoryCreateFormComponent` uploads/removes an image directly via
+   * `CategoryApiService` (it has no guaranteed `CategoryListFacade` ancestor — it's also
+   * embedded in the product editor's inline "create category" flow) — just refreshes the
+   * tree so thumbnails elsewhere (list, other open dialogs) pick up the change. */
+  async refreshAfterImageChange(): Promise<void> {
+    await this.loadTree();
+  }
+
   async reorderCategories(entries: readonly CategoryReorderEntry[]): Promise<boolean> {
     if (entries.length === 0) {
       return true;

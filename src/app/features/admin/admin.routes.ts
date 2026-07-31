@@ -51,6 +51,14 @@ export const routes: Routes = [
       ).then((c) => c.CatalogImportWizardPageComponent),
   },
   {
+    path: 'products/import-export/jobs',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.View])],
+    loadComponent: () =>
+      import(
+        '../catalog/import-export/pages/import-export-jobs-page/import-export-jobs-page.component'
+      ).then((c) => c.ImportExportJobsPageComponent),
+  },
+  {
     path: 'products/:id/edit',
     canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.Edit])],
     loadComponent: () =>

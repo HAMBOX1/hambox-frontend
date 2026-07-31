@@ -37,12 +37,16 @@
         <i class="pi" [class.pi-chevron-right]="!isExpanded()" [class.pi-chevron-down]="isExpanded()" aria-hidden="true"></i>
       </button>
 
-      <i
-        class="pi category-tree-node__icon"
-        [class.pi-folder-open]="hasChildren()"
-        [class.pi-folder]="!hasChildren()"
-        aria-hidden="true"
-      ></i>
+      @if (thumbnailUrl(); as thumbnail) {
+        <img class="category-tree-node__thumbnail" [src]="thumbnail" alt="" />
+      } @else {
+        <i
+          class="pi category-tree-node__icon"
+          [class.pi-folder-open]="hasChildren()"
+          [class.pi-folder]="!hasChildren()"
+          aria-hidden="true"
+        ></i>
+      }
 
       <span class="category-tree-node__name">
         @for (segment of nameSegments(); track $index) {

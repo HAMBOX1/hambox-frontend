@@ -43,7 +43,7 @@
       @for (order of filteredOrders(); track order.id; let i = $index) {
         <article class="order-card">
           <div class="order-card__image">
-            <img [src]="placeholderImage(i)" alt="" />
+            <img [src]="orderImage(order.imageUrl)" alt="" />
             <span class="order-card__platform">{{ 'ACCOUNT.ORDERS_UI.DIGITAL' | translate }}</span>
           </div>
 
