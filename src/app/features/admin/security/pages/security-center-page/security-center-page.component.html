@@ -9,53 +9,45 @@
 
   <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
     <p-tablist>
-      <p-tab value="0">{{ 'ADMIN.SECURITY.TABS.DASHBOARD' | translate }}</p-tab>
-      <p-tab value="1">{{ 'ADMIN.SECURITY.TABS.USERS' | translate }}</p-tab>
-      <p-tab value="2">{{ 'ADMIN.SECURITY.TABS.EMAILS' | translate }}</p-tab>
-      <p-tab value="3">{{ 'ADMIN.SECURITY.TABS.IPS' | translate }}</p-tab>
-      <p-tab value="4">{{ 'ADMIN.SECURITY.TABS.COUNTRIES' | translate }}</p-tab>
-      <p-tab value="5">{{ 'ADMIN.SECURITY.TABS.EVENTS' | translate }}</p-tab>
+      <p-tab value="0">{{ 'ADMIN.SECURITY.TABS.OVERVIEW' | translate }}</p-tab>
+      <p-tab value="1">{{ 'ADMIN.SECURITY.TABS.LOGIN_EVENTS' | translate }}</p-tab>
+      <p-tab value="2">{{ 'ADMIN.SECURITY.TABS.ALERTS' | translate }}</p-tab>
+      <p-tab value="3">{{ 'ADMIN.SECURITY.TABS.TIMELINE' | translate }}</p-tab>
+      <p-tab value="4">{{ 'ADMIN.SECURITY.TABS.SESSIONS_DEVICES' | translate }}</p-tab>
+      <p-tab value="5">{{ 'ADMIN.SECURITY.TABS.USERS' | translate }}</p-tab>
+      <p-tab value="6">{{ 'ADMIN.SECURITY.TABS.EMAILS' | translate }}</p-tab>
+      <p-tab value="7">{{ 'ADMIN.SECURITY.TABS.IPS' | translate }}</p-tab>
+      <p-tab value="8">{{ 'ADMIN.SECURITY.TABS.COUNTRIES' | translate }}</p-tab>
     </p-tablist>
 
     <p-tabpanels>
-      <!-- Dashboard -->
+      <!-- Overview -->
       <p-tabpanel value="0">
-        @if (facade.dashboardLoading()) {
-          <app-admin-empty-state icon="pi pi-spin pi-spinner" [title]="'COMMON.LOADING' | translate" [compact]="true" />
-        } @else if (facade.dashboardError()) {
-          <app-admin-error-alert [message]="facade.dashboardError()!" (retry)="retryDashboard()" />
-        } @else if (facade.dashboard(); as stats) {
-          <app-admin-stat-grid>
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_USERS' | translate" [value]="stats.blockedUsers" icon="pi pi-user-minus" tone="warning" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.SUSPENDED_USERS' | translate" [value]="stats.suspendedUsers" icon="pi pi-pause" tone="warning" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_EMAILS' | translate" [value]="stats.blockedEmails" icon="pi pi-envelope" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_DOMAINS' | translate" [value]="stats.blockedDomains" icon="pi pi-at" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_COUNTRIES' | translate" [value]="stats.blockedCountries" icon="pi pi-flag" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.BLOCKED_IPS' | translate" [value]="stats.blockedIps" icon="pi pi-desktop" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.EVENTS_TODAY' | translate" [value]="stats.securityEventsToday" icon="pi pi-bell" tone="info" />
-            <app-admin-stat-card [label]="'ADMIN.SECURITY.STATS.FAILED_LOGINS_TODAY' | translate" [value]="stats.failedLoginsToday" icon="pi pi-exclamation-triangle" tone="warning" />
-          </app-admin-stat-grid>
+        <app-security-overview-panel [active]="activeTab() === '0'" (viewAlerts)="viewAllAlerts()" />
+      </p-tabpanel>
 
-          <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.RECENT_EVENTS' | translate">
-            @if (stats.recentEvents.length === 0) {
-              <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate" [compact]="true" />
-            } @else {
-              <ul class="security-center-page__event-list">
-                @for (event of stats.recentEvents; track event.id) {
-                  <li>
-                    <app-admin-status-badge [label]="event.severity" [tone]="eventSeverityTone(event.severity)" />
-                    <span class="security-center-page__event-desc">{{ event.description }}</span>
-                    <span class="security-center-page__event-date">{{ event.occurredOnUtc | date: 'short' }}</span>
-                  </li>
-                }
-              </ul>
-            }
-          </app-admin-section-card>
-        }
+      <!-- Login Events -->
+      <p-tabpanel value="1">
+        <app-login-events-table [active]="activeTab() === '1'" />
+      </p-tabpanel>
+
+      <!-- Alerts -->
+      <p-tabpanel value="2">
+        <app-security-event-table mode="alerts" [active]="activeTab() === '2'" />
+      </p-tabpanel>
+
+      <!-- Timeline -->
+      <p-tabpanel value="3">
+        <app-security-event-table mode="timeline" [active]="activeTab() === '3'" />
+      </p-tabpanel>
+
+      <!-- Sessions & Devices -->
+      <p-tabpanel value="4">
+        <app-sessions-devices-panel [active]="activeTab() === '4'" [initialUserId]="sessionsUserId()" />
       </p-tabpanel>
 
       <!-- Users -->
-      <p-tabpanel value="1">
+      <p-tabpanel value="5">
         <app-admin-toolbar>
           <app-admin-search-bar
             adminToolbarSearch
@@ -136,7 +128,7 @@
       </p-tabpanel>
 
       <!-- Emails -->
-      <p-tabpanel value="2">
+      <p-tabpanel value="6">
         <app-admin-toolbar>
           <app-admin-search-bar
             adminToolbarSearch
@@ -212,7 +204,7 @@
       </p-tabpanel>
 
       <!-- IPs -->
-      <p-tabpanel value="3">
+      <p-tabpanel value="7">
         <app-admin-toolbar>
           <app-admin-search-bar
             adminToolbarSearch
@@ -288,7 +280,7 @@
       </p-tabpanel>
 
       <!-- Countries -->
-      <p-tabpanel value="4">
+      <p-tabpanel value="8">
         <app-admin-toolbar>
           <app-admin-search-bar
             adminToolbarSearch
@@ -358,66 +350,6 @@
         </app-admin-data-table-shell>
       </p-tabpanel>
 
-      <!-- Events -->
-      <p-tabpanel value="5">
-        <app-admin-toolbar>
-          <app-admin-search-bar
-            adminToolbarSearch
-            [value]="eventSearchTerm()"
-            [placeholder]="'ADMIN.SECURITY.EVENTS.SEARCH_PLACEHOLDER' | translate"
-            (searchChange)="onEventSearchChange($event)"
-          />
-        </app-admin-toolbar>
-
-        @if (facade.eventsError()) {
-          <app-admin-error-alert [message]="facade.eventsError()!" />
-        }
-
-        <app-admin-data-table-shell>
-          <p-table
-            class="admin-data-table"
-            [value]="[...events()]"
-            [loading]="facade.eventsLoading()"
-            [lazy]="true"
-            [paginator]="eventsTotal() > 0"
-            [rows]="eventPageSize()"
-            [totalRecords]="eventsTotal()"
-            [first]="eventTableFirst()"
-            [rowsPerPageOptions]="[20, 50, 100]"
-            (onLazyLoad)="onEventPageChange($event)"
-            dataKey="id"
-            scrollable
-            scrollHeight="flex"
-            responsiveLayout="scroll"
-          >
-            <ng-template pTemplate="header">
-              <tr>
-                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.SEVERITY' | translate }}</th>
-                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.TYPE' | translate }}</th>
-                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.DESCRIPTION' | translate }}</th>
-                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.IP' | translate }}</th>
-                <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.OCCURRED' | translate }}</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-event>
-              <tr>
-                <td><app-admin-status-badge [label]="event.severity" [tone]="eventSeverityTone(event.severity)" /></td>
-                <td>{{ event.eventType }}</td>
-                <td>{{ event.description }}</td>
-                <td>{{ event.ipAddress ?? '—' }}</td>
-                <td>{{ event.occurredOnUtc | date: 'short' }}</td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="5">
-                  <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate" />
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </app-admin-data-table-shell>
-      </p-tabpanel>
     </p-tabpanels>
   </p-tabs>
 </section>

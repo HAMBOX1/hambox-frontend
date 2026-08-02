@@ -15,9 +15,12 @@ export type SecurityEventType =
   | 'ManualBan'
   | 'PermissionDenied'
   | 'AdminUnlock'
-  | 'AdminBlock';
+  | 'AdminBlock'
+  | 'DeviceBlock';
 
 export type SecurityEventSeverity = 'Low' | 'Medium' | 'High' | 'Critical';
+
+export type SecurityEventStatus = 'Open' | 'Acknowledged' | 'Dismissed' | 'Resolved';
 
 export type CountryRestrictionStatus = 'Allowed' | 'Blocked' | 'TemporarilyBlocked';
 
@@ -72,21 +75,92 @@ export interface SecurityEventDto {
   readonly targetEmail: string | null;
   readonly ipAddress: string | null;
   readonly country: string | null;
+  readonly city: string | null;
   readonly userAgent: string | null;
   readonly correlationId: string | null;
   readonly occurredOnUtc: string;
+  readonly status: SecurityEventStatus;
+  readonly acknowledgedByUserId: string | null;
+  readonly acknowledgedOnUtc: string | null;
+  readonly resolvedByUserId: string | null;
+  readonly resolvedOnUtc: string | null;
+  readonly resolutionNotes: string | null;
 }
 
+export interface LoginTrendPointDto {
+  readonly date: string;
+  readonly successfulLogins: number;
+  readonly failedLogins: number;
+}
+
+export interface CountryFailureCountDto {
+  readonly countryCode: string;
+  readonly failedLogins: number;
+}
+
+/**
+ * Meaningful, decision-oriented metrics for the Security Center overview — not a flat list of
+ * table-row counts. Every field here is something an owner would act on.
+ */
 export interface SecurityDashboardDto {
-  readonly blockedUsers: number;
-  readonly suspendedUsers: number;
-  readonly blockedEmails: number;
-  readonly blockedDomains: number;
-  readonly blockedCountries: number;
-  readonly blockedIps: number;
-  readonly securityEventsToday: number;
-  readonly failedLoginsToday: number;
-  readonly recentEvents: readonly SecurityEventDto[];
+  readonly openAlerts: number;
+  readonly failedLoginsLast24h: number;
+  readonly failedLoginsPrevious24h: number;
+  readonly activeSessions: number;
+  readonly newDevicesLast7Days: number;
+  readonly loginTrend: readonly LoginTrendPointDto[];
+  readonly topFailureCountries: readonly CountryFailureCountDto[];
+  readonly openAlertsPreview: readonly SecurityEventDto[];
+}
+
+export interface LoginHistoryDto {
+  readonly id: string;
+  readonly userId: string;
+  readonly userEmail: string | null;
+  readonly ipAddress: string;
+  readonly countryCode: string | null;
+  readonly city: string | null;
+  readonly browserName: string | null;
+  readonly osName: string | null;
+  readonly deviceType: string | null;
+  readonly isSuccessful: boolean;
+  readonly failureReason: string | null;
+  readonly riskLevel: SecurityEventSeverity | null;
+  readonly occurredOnUtc: string;
+}
+
+export interface UserSessionDto {
+  readonly id: string;
+  readonly authContext: string;
+  readonly ipAddress: string;
+  readonly userAgent: string;
+  readonly browserName: string | null;
+  readonly deviceName: string | null;
+  readonly startedOnUtc: string;
+  readonly lastActivityOnUtc: string;
+  readonly endedOnUtc: string | null;
+  readonly isActive: boolean;
+}
+
+export interface TrustedDeviceDto {
+  readonly id: string;
+  readonly userId: string;
+  readonly userEmail: string | null;
+  readonly displayName: string;
+  readonly browserName: string | null;
+  readonly osName: string | null;
+  readonly deviceType: string | null;
+  readonly firstSeenUtc: string;
+  readonly lastSeenUtc: string;
+  readonly lastIpAddress: string;
+  readonly lastCountryCode: string | null;
+  readonly lastCity: string | null;
+  readonly loginCount: number;
+  readonly isTrusted: boolean;
+  readonly trustedOnUtc: string | null;
+  readonly isBlocked: boolean;
+  readonly blockedOnUtc: string | null;
+  readonly blockReason: string | null;
 }
 
 export interface BlockUserRequest {
@@ -124,4 +198,13 @@ export interface SetCountryRestrictionRequest {
   readonly reason: string;
   readonly notes?: string | null;
   readonly expiresOnUtc?: string | null;
+}
+
+export interface UpdateSecurityEventStatusRequest {
+  readonly status: Exclude<SecurityEventStatus, 'Open'>;
+  readonly notes?: string | null;
+}
+
+export interface BlockDeviceRequest {
+  readonly reason?: string | null;
 }

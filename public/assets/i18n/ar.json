@@ -752,7 +752,6 @@
     },
     "CATALOG_PAGE": {
       "TITLE": "المنتجات",
-      "INVENTORY_DASHBOARD": "لوحة المخزون",
       "IMPORT": "استيراد",
       "EXPORT": "تصدير الحزمة",
       "IMPORT_EXPORT_JOBS": "مهام الاستيراد والتصدير",
@@ -959,7 +958,6 @@
       "DASHBOARD": "لوحة التحكم",
       "PRODUCTS_IMPORT": "استيراد المنتجات",
       "PRODUCTS_EXPORT": "تصدير المنتجات",
-      "INVENTORY": "المخزون",
       "CATEGORIES": "الفئات",
       "COLLECTIONS": "المجموعات",
       "ROLES": "الأدوار",
@@ -1507,7 +1505,6 @@
       "TITLE": "لوحة العمليات",
       "SUBTITLE": "مقاييس التجارة والمخزون والعضويات من بيانات الإنتاج.",
       "VIEW_ORDERS": "عرض الطلبات",
-      "VIEW_INVENTORY": "عرض المخزون",
       "CREATE_PRODUCT": "إنشاء منتج",
       "VIEW_PROMOTIONS": "العروض",
       "STATS": {
@@ -4203,30 +4200,107 @@
     },
     "SECURITY": {
       "TITLE": "مركز الأمان",
-      "SUBTITLE": "إدارة المستخدمين المحظورين والبريد الإلكتروني والدول وعناوين IP، ومراجعة أحداث الأمان.",
+      "SUBTITLE": "تتبّع محاولات الدخول والجلسات والأجهزة، وأدر قوائم الحظر، وتعامل مع تنبيهات الأمان.",
       "TABS": {
-        "DASHBOARD": "لوحة التحكم",
+        "OVERVIEW": "نظرة عامة",
+        "LOGIN_EVENTS": "أحداث الدخول",
+        "ALERTS": "التنبيهات",
+        "TIMELINE": "الجدول الزمني",
+        "SESSIONS_DEVICES": "الجلسات والأجهزة",
         "USERS": "المستخدمون",
         "EMAILS": "البريد الإلكتروني",
         "IPS": "عناوين IP",
-        "COUNTRIES": "الدول",
-        "EVENTS": "الأحداث"
+        "COUNTRIES": "الدول"
       },
       "STATS": {
-        "BLOCKED_USERS": "المستخدمون المحظورون",
-        "SUSPENDED_USERS": "المستخدمون المعلّقون",
-        "BLOCKED_EMAILS": "البريد الإلكتروني المحظور",
-        "BLOCKED_DOMAINS": "النطاقات المحظورة",
-        "BLOCKED_COUNTRIES": "الدول المحظورة",
-        "BLOCKED_IPS": "عناوين IP المحظورة",
-        "EVENTS_TODAY": "أحداث اليوم",
-        "FAILED_LOGINS_TODAY": "محاولات الدخول الفاشلة اليوم",
-        "RECENT_EVENTS": "الأحداث الأخيرة"
+        "OPEN_ALERTS": "التنبيهات المفتوحة",
+        "FAILED_LOGINS_24H": "محاولات الدخول الفاشلة (24 ساعة)",
+        "ACTIVE_SESSIONS": "الجلسات النشطة",
+        "NEW_DEVICES_7D": "أجهزة جديدة (7 أيام)",
+        "LOGIN_TREND": "محاولات الدخول عبر الزمن",
+        "TOP_FAILURE_COUNTRIES": "أكثر الدول من حيث محاولات الدخول الفاشلة",
+        "OPEN_ALERTS_PREVIEW": "التنبيهات المفتوحة",
+        "VIEW_ALL_ALERTS": "عرض كل التنبيهات"
+      },
+      "EMPTY": {
+        "CHART": "لا توجد بيانات كافية بعد."
       },
       "FORM": {
         "REASON": "السبب",
         "NOTES": "ملاحظات",
         "EXPIRES_ON": "تاريخ الانتهاء"
+      },
+      "LOGIN_EVENTS": {
+        "SEARCH_PLACEHOLDER": "البحث بعنوان IP...",
+        "EMPTY": "لا توجد أحداث دخول مسجلة.",
+        "DETAIL_TITLE": "تفاصيل حدث الدخول",
+        "FAILURE_REASON": "سبب الفشل",
+        "COLUMNS": {
+          "TIMESTAMP": "الوقت",
+          "USER": "المستخدم",
+          "IP": "عنوان IP",
+          "LOCATION": "الموقع",
+          "BROWSER": "المتصفح",
+          "OS": "نظام التشغيل",
+          "DEVICE": "الجهاز",
+          "OUTCOME": "النتيجة",
+          "RISK": "المخاطرة"
+        },
+        "OUTCOME": {
+          "SUCCESS": "نجاح",
+          "FAILED": "فشل"
+        }
+      },
+      "ALERTS": {
+        "EMPTY": "لا توجد تنبيهات مفتوحة.",
+        "ACTIONS": {
+          "ACKNOWLEDGE": "الإقرار",
+          "RESOLVE": "حل",
+          "DISMISS": "تجاهل"
+        }
+      },
+      "DEVICES": {
+        "TITLE": "الأجهزة الموثوقة",
+        "SEARCH_PLACEHOLDER": "البحث بعنوان IP أو المتصفح أو نظام التشغيل...",
+        "EMPTY": "لا توجد أجهزة مسجلة.",
+        "COLUMNS": {
+          "DEVICE": "الجهاز",
+          "USER": "المستخدم",
+          "LOCATION": "آخر موقع",
+          "LAST_SEEN": "آخر ظهور",
+          "LOGIN_COUNT": "عدد مرات الدخول",
+          "STATUS": "الحالة"
+        },
+        "STATUS": {
+          "TRUSTED": "موثوق",
+          "BLOCKED": "محظور",
+          "NEW": "جديد"
+        },
+        "ACTIONS": {
+          "TRUST": "الوثوق بالجهاز",
+          "UNTRUST": "إلغاء الوثوق",
+          "BLOCK": "حظر الجهاز",
+          "UNBLOCK": "إلغاء حظر الجهاز",
+          "VIEW_SESSIONS": "عرض الجلسات"
+        }
+      },
+      "SESSIONS": {
+        "TITLE": "الجلسات النشطة",
+        "EMPTY": "لا توجد جلسات مسجلة لهذا المستخدم.",
+        "COLUMNS": {
+          "DEVICE": "الجهاز",
+          "IP": "عنوان IP",
+          "STARTED": "بدأت",
+          "LAST_ACTIVITY": "آخر نشاط",
+          "STATUS": "الحالة"
+        },
+        "STATUS": {
+          "ACTIVE": "نشطة",
+          "ENDED": "منتهية"
+        },
+        "REVOKE": "إلغاء",
+        "REVOKE_ALL": "إلغاء كل الجلسات",
+        "REVOKE_ALL_CONFIRM": "إلغاء كل جلسة نشطة لهذا المستخدم؟ سيتم تسجيل خروجه من كل مكان."
       },
       "USERS": {
         "SEARCH_PLACEHOLDER": "البحث بالاسم أو البريد الإلكتروني...",
@@ -4244,7 +4318,8 @@
           "BLOCK": "حظر",
           "SUSPEND": "تعليق",
           "BAN": "حظر دائم",
-          "RESTORE": "استعادة الوصول"
+          "RESTORE": "استعادة الوصول",
+          "VIEW_SESSIONS": "عرض الجلسات والأجهزة"
         }
       },
       "EMAILS": {
@@ -4294,9 +4369,11 @@
         "EMPTY": "لا توجد أحداث أمان مسجلة.",
         "COLUMNS": {
           "SEVERITY": "الخطورة",
+          "STATUS": "الحالة",
           "TYPE": "النوع",
           "DESCRIPTION": "الوصف",
           "IP": "عنوان IP",
+          "LOCATION": "الموقع",
           "OCCURRED": "وقت الحدوث"
         }
       },

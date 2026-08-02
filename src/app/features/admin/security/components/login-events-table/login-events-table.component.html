@@ -1,0 +1,149 @@
+<app-admin-toolbar>
+  <app-admin-search-bar
+    adminToolbarSearch
+    [value]="searchTerm()"
+    [placeholder]="'ADMIN.SECURITY.LOGIN_EVENTS.SEARCH_PLACEHOLDER' | translate"
+    (searchChange)="onSearchChange($event)"
+  />
+  <p-select
+    adminToolbarFilters
+    [options]="outcomeOptions"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="outcomeFilter()"
+    (ngModelChange)="onOutcomeChange($event)"
+  />
+  <p-select
+    adminToolbarFilters
+    [options]="riskOptions"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="riskFilter()"
+    (ngModelChange)="onRiskChange($event)"
+  />
+</app-admin-toolbar>
+
+@if (facade.loginHistoryError()) {
+  <app-admin-error-alert [message]="facade.loginHistoryError()!" (retry)="retry()" />
+}
+
+<app-admin-data-table-shell>
+  <p-table
+    class="admin-data-table"
+    [value]="[...events()]"
+    [loading]="facade.loginHistoryLoading()"
+    [lazy]="true"
+    [paginator]="total() > 0"
+    [rows]="pageSize()"
+    [totalRecords]="total()"
+    [first]="tableFirst()"
+    [rowsPerPageOptions]="[20, 50, 100]"
+    (onLazyLoad)="onPageChange($event)"
+    dataKey="id"
+    scrollable
+    scrollHeight="flex"
+    responsiveLayout="scroll"
+    selectionMode="single"
+    (onRowSelect)="openDetail($event.data)"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.TIMESTAMP' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.USER' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.IP' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.LOCATION' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.BROWSER' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.OS' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.DEVICE' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.OUTCOME' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.RISK' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-event>
+      <tr [pSelectableRow]="event" class="login-events-table__row">
+        <td>{{ event.occurredOnUtc | date: 'short' }}</td>
+        <td>{{ event.userEmail ?? '—' }}</td>
+        <td>{{ event.ipAddress }}</td>
+        <td>{{ flag(event.countryCode) }} {{ event.city ? event.city + ', ' : '' }}{{ event.countryCode ?? '—' }}</td>
+        <td>{{ event.browserName ?? '—' }}</td>
+        <td>{{ event.osName ?? '—' }}</td>
+        <td>{{ event.deviceType ?? '—' }}</td>
+        <td>
+          <app-admin-status-badge
+            [label]="event.isSuccessful ? ('ADMIN.SECURITY.LOGIN_EVENTS.OUTCOME.SUCCESS' | translate) : ('ADMIN.SECURITY.LOGIN_EVENTS.OUTCOME.FAILED' | translate)"
+            [tone]="outcomeTone(event.isSuccessful)"
+          />
+        </td>
+        <td>
+          @if (event.riskLevel) {
+            <app-admin-status-badge [label]="event.riskLevel" [tone]="riskTone(event.riskLevel)" />
+          } @else {
+            —
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9">
+          <app-admin-empty-state icon="pi pi-sign-in" [title]="'ADMIN.SECURITY.LOGIN_EVENTS.EMPTY' | translate" />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</app-admin-data-table-shell>
+
+<p-dialog
+  [visible]="detailTarget() !== null"
+  (visibleChange)="!$event && detailTarget.set(null)"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+  [header]="'ADMIN.SECURITY.LOGIN_EVENTS.DETAIL_TITLE' | translate"
+>
+  @if (detailTarget(); as detail) {
+    <dl class="login-events-table__detail">
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.TIMESTAMP' | translate }}</dt>
+      <dd>{{ detail.occurredOnUtc | date: 'medium' }}</dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.USER' | translate }}</dt>
+      <dd>{{ detail.userEmail ?? '—' }}</dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.OUTCOME' | translate }}</dt>
+      <dd>
+        <app-admin-status-badge
+          [label]="detail.isSuccessful ? ('ADMIN.SECURITY.LOGIN_EVENTS.OUTCOME.SUCCESS' | translate) : ('ADMIN.SECURITY.LOGIN_EVENTS.OUTCOME.FAILED' | translate)"
+          [tone]="outcomeTone(detail.isSuccessful)"
+        />
+      </dd>
+
+      @if (detail.failureReason) {
+        <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.FAILURE_REASON' | translate }}</dt>
+        <dd>{{ detail.failureReason }}</dd>
+      }
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.RISK' | translate }}</dt>
+      <dd>
+        @if (detail.riskLevel) {
+          <app-admin-status-badge [label]="detail.riskLevel" [tone]="riskTone(detail.riskLevel)" />
+        } @else {
+          —
+        }
+      </dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.IP' | translate }}</dt>
+      <dd>{{ detail.ipAddress }}</dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.LOCATION' | translate }}</dt>
+      <dd>{{ flag(detail.countryCode) }} {{ detail.city ? detail.city + ', ' : '' }}{{ detail.countryCode ?? 'Unknown' }}</dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.BROWSER' | translate }}</dt>
+      <dd>{{ detail.browserName ?? '—' }}</dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.OS' | translate }}</dt>
+      <dd>{{ detail.osName ?? '—' }}</dd>
+
+      <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.DEVICE' | translate }}</dt>
+      <dd>{{ detail.deviceType ?? '—' }}</dd>
+    </dl>
+  }
+</p-dialog>

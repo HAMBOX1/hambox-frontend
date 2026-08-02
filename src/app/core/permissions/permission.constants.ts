@@ -126,6 +126,8 @@ export const PERMISSIONS = {
     ManageCountries: 'Security.ManageCountries',
     ManageIPs: 'Security.ManageIPs',
     ViewEvents: 'Security.ViewEvents',
+    ManageAlerts: 'Security.ManageAlerts',
+    ManageDevices: 'Security.ManageDevices',
   },
   Reviews: {
     View: 'Reviews.View',
@@ -277,6 +279,8 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Security.ManageCountries,
   PERMISSIONS.Security.ManageIPs,
   PERMISSIONS.Security.ViewEvents,
+  PERMISSIONS.Security.ManageAlerts,
+  PERMISSIONS.Security.ManageDevices,
   PERMISSIONS.Reviews.View,
   PERMISSIONS.Reviews.Moderate,
   PERMISSIONS.Notifications.View,

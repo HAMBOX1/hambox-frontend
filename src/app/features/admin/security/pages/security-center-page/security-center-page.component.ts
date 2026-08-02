@@ -24,15 +24,16 @@ import {
   AdminIconButtonComponent,
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
-  AdminSectionCardComponent,
-  AdminStatCardComponent,
-  AdminStatGridComponent,
   AdminStatusBadgeComponent,
   AdminStatusTone,
   AdminToolbarComponent,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
+import { LoginEventsTableComponent } from '../../components/login-events-table/login-events-table.component';
+import { OverviewPanelComponent } from '../../components/overview-panel/overview-panel.component';
+import { SecurityEventTableComponent } from '../../components/security-event-table/security-event-table.component';
+import { SessionsDevicesPanelComponent } from '../../components/sessions-devices-panel/sessions-devices-panel.component';
 import {
   BlockedEmailDto,
   BlockedIpDto,
@@ -43,7 +44,7 @@ import {
 import { SecurityManagementFacade } from '../../services/security-management.facade';
 
 type UserActionMode = 'block' | 'suspend' | 'ban';
-type TabKey = '0' | '1' | '2' | '3' | '4' | '5';
+type TabKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
 
 @Component({
   selector: 'app-security-center-page',
@@ -72,9 +73,10 @@ type TabKey = '0' | '1' | '2' | '3' | '4' | '5';
     AdminActionMenuComponent,
     AdminConfirmDialogComponent,
     AdminStatusBadgeComponent,
-    AdminSectionCardComponent,
-    AdminStatCardComponent,
-    AdminStatGridComponent,
+    OverviewPanelComponent,
+    LoginEventsTableComponent,
+    SecurityEventTableComponent,
+    SessionsDevicesPanelComponent,
   ],
   providers: [SecurityManagementFacade, MessageService],
   templateUrl: './security-center-page.component.html',
@@ -145,27 +147,29 @@ export class SecurityCenterPageComponent implements OnInit {
   protected readonly countryDialogTarget = signal<CountryRestrictionDto | null>(null);
   protected readonly countryStatus = signal<CountryRestrictionStatus>('Blocked');
 
-  // ── Events tab ────────────────────────────────────────────
-  protected readonly eventSearchTerm = signal('');
-  protected readonly eventPage = signal(1);
-  protected readonly eventPageSize = signal(20);
-  protected readonly events = computed(() => this.facade.events()?.items ?? []);
-  protected readonly eventsTotal = computed(() => this.facade.events()?.totalCount ?? 0);
-  protected readonly eventTableFirst = computed(() => (this.eventPage() - 1) * this.eventPageSize());
+  // ── Sessions & Devices tab (deep-linked from Users) ────────
+  protected readonly sessionsUserId = signal<string | null>(null);
 
   ngOnInit(): void {
-    void this.facade.loadDashboard();
     this.reloadUsers();
   }
 
   protected onTabChange(value: string | number | undefined): void {
     const tab = String(value ?? '0') as TabKey;
     this.activeTab.set(tab);
-    if (tab === '1' && !this.facade.users()) this.reloadUsers();
-    if (tab === '2' && !this.facade.emails()) this.reloadEmails();
-    if (tab === '3' && !this.facade.ips()) this.reloadIps();
-    if (tab === '4' && this.facade.countries().length === 0) this.reloadCountries();
-    if (tab === '5' && !this.facade.events()) this.reloadEvents();
+    if (tab === '5' && !this.facade.users()) this.reloadUsers();
+    if (tab === '6' && !this.facade.emails()) this.reloadEmails();
+    if (tab === '7' && !this.facade.ips()) this.reloadIps();
+    if (tab === '8' && this.facade.countries().length === 0) this.reloadCountries();
+  }
+
+  protected viewUserSessions(user: BlockedUserListItemDto): void {
+    this.sessionsUserId.set(user.id);
+    this.activeTab.set('4');
+  }
+
+  protected viewAllAlerts(): void {
+    this.activeTab.set('2');
   }
 
   // ── Users ─────────────────────────────────────────────────
@@ -223,6 +227,12 @@ export class SecurityCenterPageComponent implements OnInit {
         },
       });
     }
+
+    items.push({
+      label: t('ADMIN.SECURITY.USERS.ACTIONS.VIEW_SESSIONS'),
+      icon: 'pi pi-desktop',
+      command: () => this.viewUserSessions(user),
+    });
 
     return items;
   }
@@ -493,40 +503,5 @@ export class SecurityCenterPageComponent implements OnInit {
 
   private reloadCountries(): void {
     void this.facade.loadCountries(this.countrySearchTerm(), this.countryOverriddenOnly());
-  }
-
-  // ── Events ────────────────────────────────────────────────
-  protected onEventSearchChange(term: string): void {
-    this.eventSearchTerm.set(term);
-    this.eventPage.set(1);
-    this.reloadEvents();
-  }
-
-  protected onEventPageChange(event: TableLazyLoadEvent): void {
-    const rows = event.rows ?? this.eventPageSize();
-    const first = event.first ?? 0;
-    this.eventPageSize.set(rows);
-    this.eventPage.set(Math.floor(first / rows) + 1);
-    this.reloadEvents();
-  }
-
-  protected eventSeverityTone(severity: string): AdminStatusTone {
-    switch (severity) {
-      case 'Critical':
-      case 'High':
-        return 'danger';
-      case 'Medium':
-        return 'warning';
-      default:
-        return 'neutral';
-    }
-  }
-
-  protected retryDashboard(): void {
-    void this.facade.loadDashboard();
-  }
-
-  private reloadEvents(): void {
-    void this.facade.loadEvents(this.eventPage(), this.eventPageSize(), { searchTerm: this.eventSearchTerm() });
   }
 }

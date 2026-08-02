@@ -1,0 +1,177 @@
+<app-admin-section-card [title]="'ADMIN.SECURITY.DEVICES.TITLE' | translate">
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="deviceSearchTerm()"
+      [placeholder]="'ADMIN.SECURITY.DEVICES.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onDeviceSearchChange($event)"
+    />
+    <p-select
+      adminToolbarFilters
+      [options]="deviceStatusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="deviceStatusFilter()"
+      (ngModelChange)="onDeviceStatusFilterChange($event)"
+    />
+  </app-admin-toolbar>
+
+  @if (facade.devicesError()) {
+    <app-admin-error-alert [message]="facade.devicesError()!" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table"
+      [value]="[...devices()]"
+      [loading]="facade.devicesLoading()"
+      [lazy]="true"
+      [paginator]="devicesTotal() > 0"
+      [rows]="devicePageSize()"
+      [totalRecords]="devicesTotal()"
+      [first]="deviceTableFirst()"
+      [rowsPerPageOptions]="[20, 50, 100]"
+      (onLazyLoad)="onDevicePageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.SECURITY.DEVICES.COLUMNS.DEVICE' | translate }}</th>
+          <th>{{ 'ADMIN.SECURITY.DEVICES.COLUMNS.USER' | translate }}</th>
+          <th>{{ 'ADMIN.SECURITY.DEVICES.COLUMNS.LOCATION' | translate }}</th>
+          <th>{{ 'ADMIN.SECURITY.DEVICES.COLUMNS.LAST_SEEN' | translate }}</th>
+          <th>{{ 'ADMIN.SECURITY.DEVICES.COLUMNS.LOGIN_COUNT' | translate }}</th>
+          <th>{{ 'ADMIN.SECURITY.DEVICES.COLUMNS.STATUS' | translate }}</th>
+          <th style="width: 4rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-device>
+        <tr>
+          <td>{{ device.displayName }}</td>
+          <td>{{ device.userEmail ?? '—' }}</td>
+          <td>{{ device.lastCity ? device.lastCity + ', ' : '' }}{{ device.lastCountryCode ?? '—' }} · {{ device.lastIpAddress }}</td>
+          <td>{{ device.lastSeenUtc | date: 'short' }}</td>
+          <td>{{ device.loginCount }}</td>
+          <td><app-admin-status-badge [label]="deviceStatusLabel(device)" [tone]="deviceStatusTone(device)" /></td>
+          <td>
+            @let menuItems = deviceActionMenuItems(device);
+            @if (menuItems.length > 0) {
+              <app-admin-action-menu [items]="menuItems" [disabled]="facade.actionLoading()" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.DEVICES.EMPTY' | translate" />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</app-admin-section-card>
+
+@if (selectedUserId(); as userId) {
+  <app-admin-section-card [title]="('ADMIN.SECURITY.SESSIONS.TITLE' | translate) + (selectedUserEmail() ? ' — ' + selectedUserEmail() : '')">
+    @if (facade.userSessionsError()) {
+      <app-admin-error-alert [message]="facade.userSessionsError()!" />
+    }
+
+    @if (sessions().length > 0) {
+      <div class="sessions-devices-panel__actions-row">
+        <button
+          pButton
+          type="button"
+          class="admin-btn-secondary"
+          [label]="'ADMIN.SECURITY.SESSIONS.REVOKE_ALL' | translate"
+          icon="pi pi-power-off"
+          (click)="revokeAllDialogOpen.set(true)"
+        ></button>
+      </div>
+    }
+
+    <app-admin-data-table-shell>
+      <p-table class="admin-data-table" [value]="[...sessions()]" [loading]="facade.userSessionsLoading()" dataKey="id" scrollable scrollHeight="flex" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'ADMIN.SECURITY.SESSIONS.COLUMNS.DEVICE' | translate }}</th>
+            <th>{{ 'ADMIN.SECURITY.SESSIONS.COLUMNS.IP' | translate }}</th>
+            <th>{{ 'ADMIN.SECURITY.SESSIONS.COLUMNS.STARTED' | translate }}</th>
+            <th>{{ 'ADMIN.SECURITY.SESSIONS.COLUMNS.LAST_ACTIVITY' | translate }}</th>
+            <th>{{ 'ADMIN.SECURITY.SESSIONS.COLUMNS.STATUS' | translate }}</th>
+            <th style="width: 4rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-session>
+          <tr>
+            <td>{{ session.browserName ?? 'Unknown' }} · {{ session.deviceName ?? 'Unknown' }}</td>
+            <td>{{ session.ipAddress }}</td>
+            <td>{{ session.startedOnUtc | date: 'short' }}</td>
+            <td>{{ session.lastActivityOnUtc | date: 'short' }}</td>
+            <td>
+              <app-admin-status-badge
+                [label]="session.isActive ? ('ADMIN.SECURITY.SESSIONS.STATUS.ACTIVE' | translate) : ('ADMIN.SECURITY.SESSIONS.STATUS.ENDED' | translate)"
+                [tone]="session.isActive ? 'success' : 'neutral'"
+              />
+            </td>
+            <td>
+              @if (session.isActive) {
+                <app-admin-icon-button
+                  icon="pi pi-power-off"
+                  [label]="'ADMIN.SECURITY.SESSIONS.REVOKE' | translate"
+                  (pressed)="revokeSession(session.id)"
+                />
+              }
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.SESSIONS.EMPTY' | translate" />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </app-admin-data-table-shell>
+  </app-admin-section-card>
+
+  <app-admin-confirm-dialog
+    [visible]="revokeAllDialogOpen()"
+    (visibleChange)="revokeAllDialogOpen.set($event)"
+    [title]="'ADMIN.SECURITY.SESSIONS.REVOKE_ALL' | translate"
+    [message]="'ADMIN.SECURITY.SESSIONS.REVOKE_ALL_CONFIRM' | translate"
+    [destructive]="true"
+    [loading]="facade.actionLoading()"
+    (confirmed)="confirmRevokeAllSessions()"
+  />
+}
+
+<p-dialog
+  [visible]="blockDeviceDialogOpen()"
+  (visibleChange)="blockDeviceDialogOpen.set($event)"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+  [header]="'ADMIN.SECURITY.DEVICES.ACTIONS.BLOCK' | translate"
+>
+  <div class="sessions-devices-panel__form">
+    <label for="security-device-block-reason">{{ 'ADMIN.SECURITY.FORM.REASON' | translate }}</label>
+    <textarea pTextarea id="security-device-block-reason" rows="3" [ngModel]="blockReason()" (ngModelChange)="blockReason.set($event)"></textarea>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="admin-btn-secondary" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="blockDeviceDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.CONFIRM.CONFIRM' | translate"
+      [disabled]="facade.actionLoading()"
+      (click)="confirmBlockDevice()"
+    ></button>
+  </ng-template>
+</p-dialog>

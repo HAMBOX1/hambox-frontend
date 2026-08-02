@@ -1,0 +1,100 @@
+<app-admin-toolbar>
+  <app-admin-search-bar
+    adminToolbarSearch
+    [value]="searchTerm()"
+    [placeholder]="'ADMIN.SECURITY.EVENTS.SEARCH_PLACEHOLDER' | translate"
+    (searchChange)="onSearchChange($event)"
+  />
+
+  @if (isAlerts()) {
+    <p-select
+      adminToolbarFilters
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusFilterChange($event)"
+    />
+  } @else {
+    <ng-container adminToolbarFilters>
+      <p-select
+        [options]="eventTypeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="eventTypeFilter()"
+        (ngModelChange)="onEventTypeChange($event)"
+      />
+      <p-select
+        [options]="severityOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="severityFilter()"
+        (ngModelChange)="onSeverityChange($event)"
+      />
+    </ng-container>
+  }
+</app-admin-toolbar>
+
+@if (error()) {
+  <app-admin-error-alert [message]="error()!" (retry)="retry()" />
+}
+
+<app-admin-data-table-shell>
+  <p-table
+    class="admin-data-table"
+    [value]="[...events()]"
+    [loading]="loading()"
+    [lazy]="true"
+    [paginator]="total() > 0"
+    [rows]="pageSize()"
+    [totalRecords]="total()"
+    [first]="tableFirst()"
+    [rowsPerPageOptions]="[20, 50, 100]"
+    (onLazyLoad)="onPageChange($event)"
+    dataKey="id"
+    scrollable
+    scrollHeight="flex"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.SEVERITY' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.STATUS' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.TYPE' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.DESCRIPTION' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.IP' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.LOCATION' | translate }}</th>
+        <th>{{ 'ADMIN.SECURITY.EVENTS.COLUMNS.OCCURRED' | translate }}</th>
+        @if (isAlerts()) {
+          <th style="width: 4rem"></th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-event>
+      <tr>
+        <td><app-admin-status-badge [label]="event.severity" [tone]="severityTone(event.severity)" /></td>
+        <td><app-admin-status-badge [label]="event.status" [tone]="statusTone(event.status)" [outlined]="true" /></td>
+        <td>{{ event.eventType }}</td>
+        <td>{{ event.description }}</td>
+        <td>{{ event.ipAddress ?? '—' }}</td>
+        <td>{{ event.city ? event.city + ', ' : '' }}{{ event.country ?? '—' }}</td>
+        <td>{{ event.occurredOnUtc | date: 'short' }}</td>
+        @if (isAlerts()) {
+          <td>
+            @let menuItems = rowActionMenuItems(event);
+            @if (menuItems.length > 0) {
+              <app-admin-action-menu [items]="menuItems" [disabled]="facade.actionLoading()" />
+            }
+          </td>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="isAlerts() ? 8 : 7">
+          <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate" />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</app-admin-data-table-shell>

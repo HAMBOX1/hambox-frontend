@@ -1,0 +1,21 @@
+.login-events-table {
+  &__row {
+    cursor: pointer;
+  }
+
+  &__detail {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--hambox-spacing-2, 0.5rem) var(--hambox-spacing-3, 0.75rem);
+    margin: 0;
+
+    dt {
+      font-weight: 600;
+      color: var(--color-text-muted, inherit);
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+}

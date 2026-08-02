@@ -1,0 +1,18 @@
+.sessions-devices-panel {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--admin-field-gap, 1.25rem);
+
+    label {
+      font-weight: 600;
+      margin-bottom: -0.75rem;
+    }
+  }
+
+  &__actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--hambox-spacing-3, 0.75rem);
+  }
+}

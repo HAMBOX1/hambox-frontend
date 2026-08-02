@@ -6,19 +6,44 @@ import { SECURITY_API } from '../../../../core/api/api-endpoints';
 import { ApiError } from '../../../../core/models/api-error.model';
 import {
   BanUserRequest,
+  BlockDeviceRequest,
   BlockedEmailDto,
   BlockedIpDto,
   BlockUserRequest,
   CountryRestrictionDto,
   CreateBlockedEmailRequest,
   CreateBlockedIpRequest,
+  LoginHistoryDto,
   PagedResult,
   SecurityDashboardDto,
   SecurityEventDto,
   SetCountryRestrictionRequest,
   SuspendUserRequest,
   BlockedUserListItemDto,
+  TrustedDeviceDto,
+  UpdateSecurityEventStatusRequest,
+  UserSessionDto,
 } from '../models/security.model';
+
+export interface SecurityEventFilters {
+  eventType?: string;
+  severity?: string;
+  minSeverity?: string;
+  status?: string;
+  fromUtc?: string;
+  toUtc?: string;
+  searchTerm?: string;
+}
+
+export interface LoginHistoryFilters {
+  userId?: string;
+  isSuccessful?: boolean;
+  countryCode?: string;
+  riskLevel?: string;
+  fromUtc?: string;
+  toUtc?: string;
+  searchTerm?: string;
+}
 
 @Injectable()
 export class SecurityManagementFacade {
@@ -48,6 +73,22 @@ export class SecurityManagementFacade {
   private readonly eventsLoadingState = signal(false);
   private readonly eventsErrorState = signal<string | null>(null);
 
+  private readonly alertsState = signal<PagedResult<SecurityEventDto> | null>(null);
+  private readonly alertsLoadingState = signal(false);
+  private readonly alertsErrorState = signal<string | null>(null);
+
+  private readonly loginHistoryState = signal<PagedResult<LoginHistoryDto> | null>(null);
+  private readonly loginHistoryLoadingState = signal(false);
+  private readonly loginHistoryErrorState = signal<string | null>(null);
+
+  private readonly devicesState = signal<PagedResult<TrustedDeviceDto> | null>(null);
+  private readonly devicesLoadingState = signal(false);
+  private readonly devicesErrorState = signal<string | null>(null);
+
+  private readonly userSessionsState = signal<readonly UserSessionDto[]>([]);
+  private readonly userSessionsLoadingState = signal(false);
+  private readonly userSessionsErrorState = signal<string | null>(null);
+
   private readonly actionLoadingState = signal(false);
 
   readonly dashboard = this.dashboardState.asReadonly();
@@ -73,6 +114,22 @@ export class SecurityManagementFacade {
   readonly events = this.eventsState.asReadonly();
   readonly eventsLoading = this.eventsLoadingState.asReadonly();
   readonly eventsError = this.eventsErrorState.asReadonly();
+
+  readonly alerts = this.alertsState.asReadonly();
+  readonly alertsLoading = this.alertsLoadingState.asReadonly();
+  readonly alertsError = this.alertsErrorState.asReadonly();
+
+  readonly loginHistory = this.loginHistoryState.asReadonly();
+  readonly loginHistoryLoading = this.loginHistoryLoadingState.asReadonly();
+  readonly loginHistoryError = this.loginHistoryErrorState.asReadonly();
+
+  readonly devices = this.devicesState.asReadonly();
+  readonly devicesLoading = this.devicesLoadingState.asReadonly();
+  readonly devicesError = this.devicesErrorState.asReadonly();
+
+  readonly userSessions = this.userSessionsState.asReadonly();
+  readonly userSessionsLoading = this.userSessionsLoadingState.asReadonly();
+  readonly userSessionsError = this.userSessionsErrorState.asReadonly();
 
   readonly actionLoading = this.actionLoadingState.asReadonly();
 
@@ -215,10 +272,151 @@ export class SecurityManagementFacade {
   async loadEvents(
     pageNumber: number,
     pageSize: number,
-    filters?: { eventType?: string; severity?: string; fromUtc?: string; toUtc?: string; searchTerm?: string },
+    filters?: SecurityEventFilters,
   ): Promise<void> {
-    this.eventsLoadingState.set(true);
-    this.eventsErrorState.set(null);
+    await this.fetchEvents(pageNumber, pageSize, filters, this.eventsState, this.eventsLoadingState, this.eventsErrorState);
+  }
+
+  /** Same endpoint as {@link loadEvents}, defaulting to open High+ severity events — the Alerts feed. */
+  async loadAlerts(
+    pageNumber: number,
+    pageSize: number,
+    filters?: SecurityEventFilters,
+  ): Promise<void> {
+    await this.fetchEvents(
+      pageNumber,
+      pageSize,
+      { status: 'Open', minSeverity: 'High', ...filters },
+      this.alertsState,
+      this.alertsLoadingState,
+      this.alertsErrorState,
+    );
+  }
+
+  async updateEventStatus(id: string, request: UpdateSecurityEventStatusRequest): Promise<boolean> {
+    return this.runAction(
+      () => this.api.put<void>(SECURITY_API.eventStatus(id), request),
+      this.alertsErrorState,
+      'Failed to update the event status.',
+    );
+  }
+
+  async loadLoginHistory(pageNumber: number, pageSize: number, filters?: LoginHistoryFilters): Promise<void> {
+    this.loginHistoryLoadingState.set(true);
+    this.loginHistoryErrorState.set(null);
+
+    try {
+      const result = await firstValueFrom(
+        this.api.get<PagedResult<LoginHistoryDto>>(SECURITY_API.loginHistory, {
+          params: {
+            pageNumber,
+            pageSize,
+            ...(filters?.userId ? { userId: filters.userId } : {}),
+            ...(filters?.isSuccessful !== undefined ? { isSuccessful: filters.isSuccessful } : {}),
+            ...(filters?.countryCode ? { countryCode: filters.countryCode } : {}),
+            ...(filters?.riskLevel ? { riskLevel: filters.riskLevel } : {}),
+            ...(filters?.fromUtc ? { fromUtc: filters.fromUtc } : {}),
+            ...(filters?.toUtc ? { toUtc: filters.toUtc } : {}),
+            ...(filters?.searchTerm?.trim() ? { searchTerm: filters.searchTerm.trim() } : {}),
+          },
+        }),
+      );
+      this.loginHistoryState.set(result);
+    } catch (error) {
+      this.loginHistoryState.set(null);
+      this.loginHistoryErrorState.set(this.toErrorMessage(error, 'Failed to load login events.'));
+    } finally {
+      this.loginHistoryLoadingState.set(false);
+    }
+  }
+
+  async loadDevices(
+    pageNumber: number,
+    pageSize: number,
+    filters?: { userId?: string; isTrusted?: boolean; isBlocked?: boolean; searchTerm?: string },
+  ): Promise<void> {
+    this.devicesLoadingState.set(true);
+    this.devicesErrorState.set(null);
+
+    try {
+      const result = await firstValueFrom(
+        this.api.get<PagedResult<TrustedDeviceDto>>(SECURITY_API.devices, {
+          params: {
+            pageNumber,
+            pageSize,
+            ...(filters?.userId ? { userId: filters.userId } : {}),
+            ...(filters?.isTrusted !== undefined ? { isTrusted: filters.isTrusted } : {}),
+            ...(filters?.isBlocked !== undefined ? { isBlocked: filters.isBlocked } : {}),
+            ...(filters?.searchTerm?.trim() ? { searchTerm: filters.searchTerm.trim() } : {}),
+          },
+        }),
+      );
+      this.devicesState.set(result);
+    } catch (error) {
+      this.devicesState.set(null);
+      this.devicesErrorState.set(this.toErrorMessage(error, 'Failed to load devices.'));
+    } finally {
+      this.devicesLoadingState.set(false);
+    }
+  }
+
+  async trustDevice(id: string): Promise<boolean> {
+    return this.runAction(() => this.api.post<void>(SECURITY_API.trustDevice(id)), this.devicesErrorState, 'Failed to trust the device.');
+  }
+
+  async untrustDevice(id: string): Promise<boolean> {
+    return this.runAction(() => this.api.post<void>(SECURITY_API.untrustDevice(id)), this.devicesErrorState, 'Failed to untrust the device.');
+  }
+
+  async blockDevice(id: string, request: BlockDeviceRequest): Promise<boolean> {
+    return this.runAction(() => this.api.post<void>(SECURITY_API.blockDevice(id), request), this.devicesErrorState, 'Failed to block the device.');
+  }
+
+  async unblockDevice(id: string): Promise<boolean> {
+    return this.runAction(() => this.api.post<void>(SECURITY_API.unblockDevice(id)), this.devicesErrorState, 'Failed to unblock the device.');
+  }
+
+  async loadUserSessions(userId: string): Promise<void> {
+    this.userSessionsLoadingState.set(true);
+    this.userSessionsErrorState.set(null);
+
+    try {
+      const result = await firstValueFrom(this.api.get<readonly UserSessionDto[]>(SECURITY_API.userSessions(userId)));
+      this.userSessionsState.set(result ?? []);
+    } catch (error) {
+      this.userSessionsState.set([]);
+      this.userSessionsErrorState.set(this.toErrorMessage(error, 'Failed to load sessions.'));
+    } finally {
+      this.userSessionsLoadingState.set(false);
+    }
+  }
+
+  async revokeUserSession(userId: string, sessionId: string): Promise<boolean> {
+    return this.runAction(
+      () => this.api.delete<void>(SECURITY_API.revokeUserSession(userId, sessionId)),
+      this.userSessionsErrorState,
+      'Failed to revoke the session.',
+    );
+  }
+
+  async revokeAllUserSessions(userId: string): Promise<boolean> {
+    return this.runAction(
+      () => this.api.post<void>(SECURITY_API.revokeAllUserSessions(userId)),
+      this.userSessionsErrorState,
+      'Failed to revoke sessions.',
+    );
+  }
+
+  private async fetchEvents(
+    pageNumber: number,
+    pageSize: number,
+    filters: SecurityEventFilters | undefined,
+    state: WritableSignal<PagedResult<SecurityEventDto> | null>,
+    loadingState: WritableSignal<boolean>,
+    errorState: WritableSignal<string | null>,
+  ): Promise<void> {
+    loadingState.set(true);
+    errorState.set(null);
 
     try {
       const result = await firstValueFrom(
@@ -228,18 +426,20 @@ export class SecurityManagementFacade {
             pageSize,
             ...(filters?.eventType ? { eventType: filters.eventType } : {}),
             ...(filters?.severity ? { severity: filters.severity } : {}),
+            ...(filters?.minSeverity ? { minSeverity: filters.minSeverity } : {}),
+            ...(filters?.status ? { status: filters.status } : {}),
             ...(filters?.fromUtc ? { fromUtc: filters.fromUtc } : {}),
             ...(filters?.toUtc ? { toUtc: filters.toUtc } : {}),
             ...(filters?.searchTerm?.trim() ? { searchTerm: filters.searchTerm.trim() } : {}),
           },
         }),
       );
-      this.eventsState.set(result);
+      state.set(result);
     } catch (error) {
-      this.eventsState.set(null);
-      this.eventsErrorState.set(this.toErrorMessage(error, 'Failed to load security events.'));
+      state.set(null);
+      errorState.set(this.toErrorMessage(error, 'Failed to load security events.'));
     } finally {
-      this.eventsLoadingState.set(false);
+      loadingState.set(false);
     }
   }
 

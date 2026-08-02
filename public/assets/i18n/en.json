@@ -752,7 +752,6 @@
     },
     "CATALOG_PAGE": {
       "TITLE": "Products",
-      "INVENTORY_DASHBOARD": "Inventory Dashboard",
       "IMPORT": "Import",
       "EXPORT": "Package Export",
       "IMPORT_EXPORT_JOBS": "Import/Export Jobs",
@@ -969,7 +968,6 @@
       "PRODUCTS": "Products",
       "PRODUCTS_IMPORT": "Import Products",
       "PRODUCTS_EXPORT": "Export Products",
-      "INVENTORY": "Inventory",
       "CATEGORIES": "Categories",
       "COLLECTIONS": "Collections",
       "ROLES": "Roles",
@@ -1517,7 +1515,6 @@
       "TITLE": "Operations dashboard",
       "SUBTITLE": "Live commerce, inventory, and membership metrics from production data.",
       "VIEW_ORDERS": "View orders",
-      "VIEW_INVENTORY": "View inventory",
       "CREATE_PRODUCT": "Create product",
       "VIEW_PROMOTIONS": "Promotions",
       "STATS": {
@@ -4404,30 +4401,107 @@
     },
     "SECURITY": {
       "TITLE": "Security Center",
-      "SUBTITLE": "Manage blocked users, emails, countries, IP addresses, and review security events.",
+      "SUBTITLE": "Investigate logins, sessions, and devices; manage blocklists; and act on security alerts.",
       "TABS": {
-        "DASHBOARD": "Dashboard",
+        "OVERVIEW": "Overview",
+        "LOGIN_EVENTS": "Login Events",
+        "ALERTS": "Alerts",
+        "TIMELINE": "Timeline",
+        "SESSIONS_DEVICES": "Sessions & Devices",
         "USERS": "Users",
         "EMAILS": "Emails",
         "IPS": "IP Addresses",
-        "COUNTRIES": "Countries",
-        "EVENTS": "Events"
+        "COUNTRIES": "Countries"
       },
       "STATS": {
-        "BLOCKED_USERS": "Blocked Users",
-        "SUSPENDED_USERS": "Suspended Users",
-        "BLOCKED_EMAILS": "Blocked Emails",
-        "BLOCKED_DOMAINS": "Blocked Domains",
-        "BLOCKED_COUNTRIES": "Blocked Countries",
-        "BLOCKED_IPS": "Blocked IPs",
-        "EVENTS_TODAY": "Events Today",
-        "FAILED_LOGINS_TODAY": "Failed Logins Today",
-        "RECENT_EVENTS": "Recent Events"
+        "OPEN_ALERTS": "Open Alerts",
+        "FAILED_LOGINS_24H": "Failed Logins (24h)",
+        "ACTIVE_SESSIONS": "Active Sessions",
+        "NEW_DEVICES_7D": "New Devices (7d)",
+        "LOGIN_TREND": "Logins over time",
+        "TOP_FAILURE_COUNTRIES": "Top countries by failed logins",
+        "OPEN_ALERTS_PREVIEW": "Open Alerts",
+        "VIEW_ALL_ALERTS": "View all alerts"
+      },
+      "EMPTY": {
+        "CHART": "Not enough data yet."
       },
       "FORM": {
         "REASON": "Reason",
         "NOTES": "Notes",
         "EXPIRES_ON": "Expires on"
+      },
+      "LOGIN_EVENTS": {
+        "SEARCH_PLACEHOLDER": "Search by IP address...",
+        "EMPTY": "No login events recorded.",
+        "DETAIL_TITLE": "Login event details",
+        "FAILURE_REASON": "Failure reason",
+        "COLUMNS": {
+          "TIMESTAMP": "Timestamp",
+          "USER": "User",
+          "IP": "IP Address",
+          "LOCATION": "Location",
+          "BROWSER": "Browser",
+          "OS": "OS",
+          "DEVICE": "Device",
+          "OUTCOME": "Outcome",
+          "RISK": "Risk"
+        },
+        "OUTCOME": {
+          "SUCCESS": "Success",
+          "FAILED": "Failed"
+        }
+      },
+      "ALERTS": {
+        "EMPTY": "No open alerts.",
+        "ACTIONS": {
+          "ACKNOWLEDGE": "Acknowledge",
+          "RESOLVE": "Resolve",
+          "DISMISS": "Dismiss"
+        }
+      },
+      "DEVICES": {
+        "TITLE": "Trusted Devices",
+        "SEARCH_PLACEHOLDER": "Search by IP, browser, or OS...",
+        "EMPTY": "No devices recorded.",
+        "COLUMNS": {
+          "DEVICE": "Device",
+          "USER": "User",
+          "LOCATION": "Last location",
+          "LAST_SEEN": "Last seen",
+          "LOGIN_COUNT": "Logins",
+          "STATUS": "Status"
+        },
+        "STATUS": {
+          "TRUSTED": "Trusted",
+          "BLOCKED": "Blocked",
+          "NEW": "New"
+        },
+        "ACTIONS": {
+          "TRUST": "Trust device",
+          "UNTRUST": "Untrust device",
+          "BLOCK": "Block device",
+          "UNBLOCK": "Unblock device",
+          "VIEW_SESSIONS": "View sessions"
+        }
+      },
+      "SESSIONS": {
+        "TITLE": "Active Sessions",
+        "EMPTY": "No sessions recorded for this user.",
+        "COLUMNS": {
+          "DEVICE": "Device",
+          "IP": "IP Address",
+          "STARTED": "Started",
+          "LAST_ACTIVITY": "Last activity",
+          "STATUS": "Status"
+        },
+        "STATUS": {
+          "ACTIVE": "Active",
+          "ENDED": "Ended"
+        },
+        "REVOKE": "Revoke",
+        "REVOKE_ALL": "Revoke all sessions",
+        "REVOKE_ALL_CONFIRM": "Revoke every active session for this user? They will be signed out everywhere."
       },
       "USERS": {
         "SEARCH_PLACEHOLDER": "Search by name or email...",
@@ -4445,7 +4519,8 @@
           "BLOCK": "Block",
           "SUSPEND": "Suspend",
           "BAN": "Ban",
-          "RESTORE": "Restore access"
+          "RESTORE": "Restore access",
+          "VIEW_SESSIONS": "View sessions & devices"
         }
       },
       "EMAILS": {
@@ -4495,9 +4570,11 @@
         "EMPTY": "No security events recorded.",
         "COLUMNS": {
           "SEVERITY": "Severity",
+          "STATUS": "Status",
           "TYPE": "Type",
           "DESCRIPTION": "Description",
           "IP": "IP Address",
+          "LOCATION": "Location",
           "OCCURRED": "Occurred"
         }
       },
