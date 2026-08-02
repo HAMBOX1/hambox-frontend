@@ -68,11 +68,8 @@ export const routes: Routes = [
   },
   {
     path: 'inventory',
-    canActivate: [permissionGuard([PERMISSIONS.Catalog.Inventory.View])],
-    loadComponent: () =>
-      import('../catalog/pages/inventory-dashboard-page/inventory-dashboard-page.component').then(
-        (c) => c.InventoryDashboardPageComponent,
-      ),
+    redirectTo: 'products',
+    pathMatch: 'full',
   },
   {
     path: 'inventory/:variantId',
@@ -84,7 +81,7 @@ export const routes: Routes = [
   },
   {
     path: 'inventory/dashboard',
-    redirectTo: 'inventory',
+    redirectTo: 'products',
     pathMatch: 'full',
   },
   {

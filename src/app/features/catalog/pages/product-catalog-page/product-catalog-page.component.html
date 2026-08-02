@@ -31,13 +31,6 @@
 
     <app-admin-icon-button
       adminHeaderActions
-      *hamboxHasPermission="permissions.Catalog.Inventory.View"
-      icon="pi pi-chart-bar"
-      [label]="'ADMIN.CATALOG_PAGE.INVENTORY_DASHBOARD' | translate"
-      routerLink="/admin/inventory"
-    />
-    <app-admin-icon-button
-      adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Products.Import"
       icon="pi pi-upload"
       [label]="'ADMIN.CATALOG_PAGE.IMPORT' | translate"

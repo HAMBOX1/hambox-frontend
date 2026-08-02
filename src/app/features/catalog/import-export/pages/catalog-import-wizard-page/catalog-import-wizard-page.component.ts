@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
 import { PasswordModule } from 'primeng/password';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TableModule } from 'primeng/table';
@@ -18,6 +19,9 @@ import {
   AdminStepperStep,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
+import { CategoryCreateFormComponent } from '../../../components/category-create-form/category-create-form.component';
+import { CategoryOption, CreateCategoryRequest } from '../../../models/category.model';
+import { CategoryApiService, createCategoryWithHierarchy } from '../../../services/category-api.service';
 import {
   CatalogDuplicateStrategy,
   CatalogImportEntityType,
@@ -28,7 +32,7 @@ import {
   ImportWizardStep,
 } from '../../models/import-export.model';
 import { CatalogImportExportApiService } from '../../services/catalog-import-export-api.service';
-import { CatalogImportExportFacade } from '../../services/catalog-import-export.facade';
+import { CatalogImportExportFacade, extractErrorDetail } from '../../services/catalog-import-export.facade';
 
 interface CorrectionGroup {
   readonly issueType: string;
@@ -61,6 +65,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
   standalone: true,
   imports: [
     FormsModule,
+    DialogModule,
     PasswordModule,
     RadioButtonModule,
     TableModule,
@@ -72,6 +77,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
     AdminSectionCardComponent,
     AdminStatusBadgeComponent,
     AdminStepperComponent,
+    CategoryCreateFormComponent,
   ],
   providers: [CatalogImportExportFacade, MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -123,7 +129,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
 
           <app-admin-file-dropzone
             [accept]="acceptFor(state().entityType)"
-            hint="Accepts .hambox, .xlsx, or .csv"
+            hint="Accepts .hambox, .xlsx, .xlsm, or .csv"
             [disabled]="state().loading"
             (fileSelected)="onFileSelected($event)"
           />
@@ -178,7 +184,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
                         }
                       </datalist>
                     }
-                    @if (supportsCreateNew(group.issueType)) {
+                    @if (group.issueType === 'UnknownCollection') {
                       <label class="wizard__correction-create-new">
                         <input
                           type="checkbox"
@@ -192,8 +198,17 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
                       class="wizard__secondary-button"
                       (click)="applyCorrection(group)"
                     >
-                      Apply to all {{ group.count }}
+                      Map to existing ({{ group.count }})
                     </button>
+                    @if (group.issueType === 'UnknownCategory') {
+                      <button
+                        type="button"
+                        class="wizard__secondary-button"
+                        (click)="openCategoryCreateDialog(group)"
+                      >
+                        Create New Category
+                      </button>
+                    }
                   </div>
                 }
               </div>
@@ -336,6 +351,33 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
       (visibleChange)="confirmExecuteDialogOpen.set($event)"
       (confirmed)="onConfirmExecute()"
     />
+
+    <p-dialog
+      header="Create New Category"
+      [visible]="categoryDialogOpen()"
+      (visibleChange)="onCategoryDialogVisibleChange($event)"
+      [modal]="true"
+      [style]="{ width: '32rem' }"
+      [dismissableMask]="false"
+    >
+      <app-category-create-form
+        mode="create"
+        [submitting]="categoryDialogSubmitting()"
+        [serverError]="categoryDialogError()"
+        [resetToken]="categoryDialogResetToken()"
+        [parentOptions]="categoryParentOptions()"
+        [initialNameEn]="categoryDialogInitialName()"
+        (submitted)="onCategoryCreateSubmit($event)"
+        (cancelled)="closeCategoryDialog()"
+      />
+      <div class="wizard__category-image-picker">
+        <span class="wizard__category-image-label">Image (optional)</span>
+        <app-admin-file-dropzone accept="image/*" hint="PNG, JPG, WEBP, or GIF" (fileSelected)="onCategoryImageSelected($event)" />
+        @if (categoryDialogImageFile(); as file) {
+          <span class="wizard__category-image-name">{{ file.name }}</span>
+        }
+      </div>
+    </p-dialog>
   `,
   styles: `
     .wizard__entity-picker,
@@ -489,11 +531,29 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
       border-color: var(--admin-accent-green);
       color: #fff;
     }
+    .wizard__category-image-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--admin-border-default);
+    }
+    .wizard__category-image-label {
+      font-weight: 600;
+      font-size: var(--admin-type-caption, 0.8125rem);
+      color: var(--admin-text-secondary);
+    }
+    .wizard__category-image-name {
+      font-size: var(--admin-type-caption, 0.8125rem);
+      color: var(--admin-text-secondary);
+    }
   `,
 })
 export class CatalogImportWizardPageComponent {
   protected readonly facade = inject(CatalogImportExportFacade);
   private readonly api = inject(CatalogImportExportApiService);
+  private readonly categoryApi = inject(CategoryApiService);
   private readonly messageService = inject(MessageService);
 
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Products', route: '/admin/products' }, { label: 'Import', route: null });
@@ -555,7 +615,7 @@ export class CatalogImportWizardPageComponent {
   }
 
   protected acceptFor(entityType: CatalogImportEntityType): string {
-    return entityType === 'FullPackage' ? '.hambox' : '.xlsx,.csv';
+    return entityType === 'FullPackage' ? '.hambox' : '.xlsx,.xlsm,.csv';
   }
 
   protected toneFor(status: CatalogImportRowStatus): 'success' | 'info' | 'neutral' | 'danger' {
@@ -641,6 +701,99 @@ export class CatalogImportWizardPageComponent {
     await this.facade.applyCorrection(group.entityType, group.column, group.value, toValue, createNew);
     delete this.correctionInputs[key];
     delete this.correctionCreateNew[key];
+  }
+
+  // ---------- Create New Category dialog ----------
+
+  protected readonly categoryDialogOpen = signal(false);
+  protected readonly categoryDialogGroup = signal<CorrectionGroup | null>(null);
+  protected readonly categoryDialogInitialName = signal('');
+  protected readonly categoryDialogImageFile = signal<File | null>(null);
+  protected readonly categoryDialogSubmitting = signal(false);
+  protected readonly categoryDialogError = signal<string | null>(null);
+  protected readonly categoryDialogResetToken = signal(0);
+  protected readonly categoryParentOptions = signal<readonly CategoryOption[]>([]);
+  private categoryParentOptionsLoaded = false;
+
+  protected async openCategoryCreateDialog(group: CorrectionGroup): Promise<void> {
+    this.categoryDialogGroup.set(group);
+    this.categoryDialogInitialName.set(group.value);
+    this.categoryDialogImageFile.set(null);
+    this.categoryDialogError.set(null);
+    this.categoryDialogResetToken.update((token) => token + 1);
+    this.categoryDialogOpen.set(true);
+
+    if (this.categoryParentOptionsLoaded) {
+      return;
+    }
+    this.categoryParentOptionsLoaded = true;
+
+    try {
+      const result = await firstValueFrom(this.categoryApi.getCategories({ pageNumber: 1, pageSize: 500 }));
+      this.categoryParentOptions.set(
+        result.items.map((category) => ({ id: category.id, label: category.nameEn, parentId: category.parentId })),
+      );
+    } catch {
+      // Non-fatal — the dialog still works, just without a parent category to pick from.
+    }
+  }
+
+  protected closeCategoryDialog(): void {
+    this.categoryDialogOpen.set(false);
+    this.categoryDialogGroup.set(null);
+  }
+
+  protected onCategoryDialogVisibleChange(visible: boolean): void {
+    this.categoryDialogOpen.set(visible);
+    if (!visible) {
+      this.categoryDialogGroup.set(null);
+    }
+  }
+
+  protected onCategoryImageSelected(file: File): void {
+    this.categoryDialogImageFile.set(file);
+  }
+
+  protected async onCategoryCreateSubmit(request: CreateCategoryRequest): Promise<void> {
+    const group = this.categoryDialogGroup();
+    if (!group) {
+      return;
+    }
+
+    this.categoryDialogSubmitting.set(true);
+    this.categoryDialogError.set(null);
+
+    try {
+      const newCategoryId = await createCategoryWithHierarchy(this.categoryApi, request);
+
+      const imageFile = this.categoryDialogImageFile();
+      if (imageFile) {
+        try {
+          await firstValueFrom(this.categoryApi.uploadCategoryImage(newCategoryId, imageFile));
+        } catch {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Category created',
+            detail: 'The image could not be uploaded — add it later from Categories.',
+            life: 6000,
+          });
+        }
+      }
+
+      this.facade.addCategoryLookup({ value: request.slug, label: request.nameEn });
+      this.closeCategoryDialog();
+      await this.facade.applyCorrection(group.entityType, group.column, group.value, request.slug, false);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Category created',
+        detail: `"${request.nameEn}" is now available and applied to ${group.count} ${group.count === 1 ? 'row' : 'rows'}.`,
+        life: 5000,
+      });
+    } catch (error) {
+      this.categoryDialogError.set(extractErrorDetail(error, 'Unable to create this category.'));
+    } finally {
+      this.categoryDialogSubmitting.set(false);
+    }
   }
 
   protected hasDuplicateSku(row: CatalogImportRowResult): boolean {

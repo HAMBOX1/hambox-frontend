@@ -8,6 +8,7 @@ import {
   CatalogExportRequest,
   CatalogImportCorrection,
   CatalogImportEntityType,
+  CatalogImportLookupItem,
   CatalogImportLookups,
   CatalogImportRowOverride,
   CatalogImportValidationReport,
@@ -239,6 +240,16 @@ export class CatalogImportExportFacade implements OnDestroy {
     }
   }
 
+  /** Injects a just-created category into the in-session lookup cache (datalist suggestions + "already known" checks) so later rows referencing the same name resolve without another round trip. No-op if a category with that slug is already cached. */
+  addCategoryLookup(item: CatalogImportLookupItem): void {
+    const current = this.lookupsSignal();
+    if (!current || current.categories.some((c) => c.value.toLowerCase() === item.value.toLowerCase())) {
+      return;
+    }
+
+    this.lookupsSignal.update((state) => state && { ...state, categories: [...state.categories, item] });
+  }
+
   /** "Apply to all N occurrences" — appends the correction and revalidates against the already-uploaded file, no re-upload needed. `createNew` additionally creates a category/collection named `toValue` (Category/Collection columns only — see `CatalogImportCorrectionApplier`). */
   async applyCorrection(
     entityType: string,
@@ -405,7 +416,7 @@ export class CatalogImportExportFacade implements OnDestroy {
   }
 }
 
-function extractErrorDetail(error: unknown, fallback: string): string {
+export function extractErrorDetail(error: unknown, fallback: string): string {
   if (error && typeof error === 'object' && 'error' in error) {
     const httpError = (error as { error?: { detail?: string } }).error;
     if (httpError?.detail) {

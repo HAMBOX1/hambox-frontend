@@ -61,7 +61,7 @@ export class VariantInventoryPageComponent implements OnInit {
     const variant = this.variant();
 
     return adminBreadcrumbs(
-      { label: 'Inventory', route: '/admin/inventory' },
+      { label: 'Products', route: '/admin/products' },
       {
         label: product?.nameEn ?? 'Product',
         route: product ? `/admin/products/${product.id}/edit` : null,
@@ -95,7 +95,7 @@ export class VariantInventoryPageComponent implements OnInit {
     this.productId.set(productId);
 
     if (!variantId || !productId) {
-      void this.router.navigate(['/admin/inventory']);
+      void this.router.navigate(['/admin/products']);
       return;
     }
 

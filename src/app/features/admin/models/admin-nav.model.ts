@@ -5,7 +5,6 @@ export type AdminNavId =
   | 'products'
   | 'categories'
   | 'collections'
-  | 'inventory'
   | 'roles'
   | 'security'
   | 'promotions'
@@ -58,13 +57,6 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/collections',
     icon: 'pi pi-folder',
     permission: PERMISSIONS.Catalog.Collections.View,
-  },
-  {
-    id: 'inventory',
-    labelKey: 'ADMIN.NAV.INVENTORY',
-    route: '/admin/inventory',
-    icon: 'pi pi-box',
-    permission: PERMISSIONS.Catalog.Inventory.View,
   },
   {
     id: 'roles',

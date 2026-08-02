@@ -67,6 +67,8 @@ export class CategoryCreateFormComponent {
   readonly parentOptions = input<readonly CategoryOption[]>([]);
   readonly initialCategory = input<Category | null>(null);
   readonly initialParentId = input<string | null>(null);
+  /** Pre-fills `nameEn`/`slug` in create mode only (e.g. from an import-wizard correction) — ignored once `initialCategory` supplies a value via edit mode. */
+  readonly initialNameEn = input<string>('');
 
   readonly submitted = output<CreateCategoryRequest>();
   readonly updateSubmitted = output<UpdateCategoryRequest>();
@@ -132,11 +134,13 @@ export class CategoryCreateFormComponent {
       const editing = mode === 'edit' && category;
       const parentId = editing ? category.parentId : this.initialParentId();
 
+      const prefillNameEn = editing ? '' : this.initialNameEn();
+
       this.form.reset(
         {
-          nameEn: editing ? category.nameEn : '',
+          nameEn: editing ? category.nameEn : prefillNameEn,
           nameAr: editing ? category.nameAr : '',
-          slug: editing ? category.slug : '',
+          slug: editing ? category.slug : (prefillNameEn ? slugify(prefillNameEn) : ''),
           categoryType: parentId ? 'child' : 'root',
           parentId,
           isActive: editing ? category.isActive : true,

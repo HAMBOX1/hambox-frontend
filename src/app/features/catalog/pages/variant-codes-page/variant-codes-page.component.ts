@@ -107,7 +107,7 @@ export class VariantCodesPageComponent implements OnInit {
     const product = this.product();
     const variant = this.variant();
     return [
-      { label: 'Inventory', routerLink: '/admin/inventory' },
+      { label: 'Products', routerLink: '/admin/products' },
       {
         label: product?.nameEn ?? 'Product',
         routerLink: product ? `/admin/inventory/${product.id}/edit` : undefined,
