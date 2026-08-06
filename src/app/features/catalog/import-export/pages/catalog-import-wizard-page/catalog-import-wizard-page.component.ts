@@ -317,6 +317,15 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
                 <span class="wizard__count wizard__count--invalid">{{ summary.failedCount }} failed</span>
               </div>
 
+              @if (summary.newVariantGroups && summary.newVariantGroups.length > 0) {
+                <p class="wizard__summary-subheading">New Variant Groups created</p>
+                <ul class="wizard__warnings">
+                  @for (group of summary.newVariantGroups; track group) {
+                    <li>{{ group }}</li>
+                  }
+                </ul>
+              }
+
               @if (summary.errors.length > 0) {
                 <ul class="wizard__warnings">
                   @for (error of summary.errors; track error) {
@@ -423,6 +432,12 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
     .wizard__warnings {
       margin: 0 0 1rem;
       padding-left: 1.25rem;
+      color: var(--admin-text-secondary);
+    }
+    .wizard__summary-subheading {
+      margin: 0 0 0.375rem;
+      font-weight: 600;
+      font-size: var(--admin-type-caption, 0.8125rem);
       color: var(--admin-text-secondary);
     }
     .wizard__row-filters {

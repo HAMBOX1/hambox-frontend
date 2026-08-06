@@ -122,6 +122,7 @@ export interface CatalogPackageSummary {
   readonly skippedCount: number;
   readonly failedCount: number;
   readonly errors: readonly string[];
+  readonly newVariantGroups?: readonly string[];
 }
 
 export interface CatalogPackageJobDto {
