@@ -14,6 +14,14 @@
           </button>
         </span>
       }
+      <button
+        type="button"
+        class="category-picker__clear-all"
+        [disabled]="disabled()"
+        (click)="clearAll()"
+      >
+        {{ 'ADMIN.PICKERS.CLEAR_ALL' | translate }}
+      </button>
     </div>
   }
 
@@ -23,30 +31,34 @@
     class="w-full"
     type="text"
     [placeholder]="'ADMIN.PICKERS.CATEGORY_PICKER.SEARCH_PLACEHOLDER' | translate"
-    [ngModel]="query()"
+    [value]="query()"
     [disabled]="disabled()"
-    (ngModelChange)="onQueryChange($event)"
+    (input)="onQueryChange($any($event.target).value)"
   />
 
   @if (query()) {
     <div class="category-picker__results">
       @if (loading()) {
         <p class="category-picker__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.LOADING' | translate }}</p>
+      } @else if (error()) {
+        <p class="category-picker__status category-picker__status--error">{{ 'ADMIN.PICKERS.SEARCH_FAILED' | translate }}</p>
       } @else if (!results().length) {
         <p class="category-picker__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.NO_RESULTS' | translate }}</p>
       } @else {
         @for (category of results(); track category.id) {
-          <button
-            type="button"
+          <label
             class="category-picker__result"
             [class.category-picker__result--selected]="isSelected(category.id)"
-            (click)="toggle(category)"
           >
+            <input
+              type="checkbox"
+              class="category-picker__result-checkbox"
+              [checked]="isSelected(category.id)"
+              [disabled]="disabled()"
+              (change)="toggle(category)"
+            />
             <span>{{ category.nameEn }}</span>
-            @if (isSelected(category.id)) {
-              <i class="pi pi-check" aria-hidden="true"></i>
-            }
-          </button>
+          </label>
         }
       }
     </div>

@@ -1,12 +1,12 @@
 import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
-import { Subject, debounceTime, switchMap } from 'rxjs';
+import { catchError, debounceTime, of, Subject, switchMap } from 'rxjs';
 
 import { ProductApiService } from '../../../../features/catalog/services/product-api.service';
+import { PagedResult } from '../../../../features/catalog/models/category.model';
 import { Product } from '../../../../features/catalog/models/product.model';
 
 let nextId = 0;
@@ -20,7 +20,7 @@ let nextId = 0;
 @Component({
   selector: 'app-product-picker',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, InputTextModule, DecimalPipe],
+  imports: [TranslatePipe, InputTextModule, DecimalPipe],
   templateUrl: './product-picker.component.html',
   styleUrl: './product-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +36,7 @@ export class ProductPickerComponent {
   protected readonly query = signal('');
   protected readonly results = signal<Product[]>([]);
   protected readonly loading = signal(false);
+  protected readonly error = signal(false);
   protected readonly selectedDetails = signal<Map<string, Product>>(new Map());
 
   private readonly api = inject(ProductApiService);
@@ -52,7 +53,13 @@ export class ProductPickerComponent {
       .pipe(
         debounceTime(300),
         switchMap((term) =>
-          this.api.getProducts({ pageNumber: 1, pageSize: 20, searchTerm: term, sortBy: 'Newest' }),
+          this.api.getProducts({ pageNumber: 1, pageSize: 20, searchTerm: term, sortBy: 'Newest' }).pipe(
+            catchError((err) => {
+              console.error('ProductPickerComponent: search failed', err);
+              this.error.set(true);
+              return of<PagedResult<Product>>({ items: [], pageNumber: 1, pageSize: 20, totalCount: 0 });
+            }),
+          ),
         ),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -66,6 +73,7 @@ export class ProductPickerComponent {
   protected onQueryChange(value: string): void {
     this.query.set(value);
     this.loading.set(true);
+    this.error.set(false);
     this.search$.next(value);
   }
 
@@ -91,6 +99,12 @@ export class ProductPickerComponent {
   protected remove(id: string): void {
     if (!this.disabled()) {
       this.valueChange.emit(this.value().filter((existing) => existing !== id));
+    }
+  }
+
+  protected clearAll(): void {
+    if (!this.disabled()) {
+      this.valueChange.emit([]);
     }
   }
 

@@ -45,6 +45,27 @@
   opacity: 1;
 }
 
+.product-picker__clear-all {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--admin-text-muted, inherit);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--admin-text-primary, inherit);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .product-picker__limit {
   font-size: 0.78rem;
   opacity: 0.65;
@@ -68,17 +89,26 @@
   text-align: center;
 }
 
+.product-picker__status--error {
+  opacity: 1;
+  color: var(--admin-accent-red);
+}
+
 .product-picker__result {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.4rem;
-  border: 0;
   border-radius: 6px;
   background: transparent;
   color: inherit;
   cursor: pointer;
   text-align: start;
+}
+
+.product-picker__result-checkbox {
+  flex: 0 0 auto;
+  cursor: pointer;
 }
 
 .product-picker__result:hover {

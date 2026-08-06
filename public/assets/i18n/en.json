@@ -3047,8 +3047,13 @@
           "DISCOUNT": "Discount",
           "STATUS": "Status",
           "REDEMPTIONS": "Redemptions",
-          "COUPONS": "Coupons"
+          "COUPONS": "Coupons",
+          "SCOPE": "Scope",
+          "SCHEDULE": "Schedule",
+          "USAGE": "Usage",
+          "CREATED": "Created"
         },
+        "EXPORT": "Export",
         "EMPTY": "No promotions yet. Create your first campaign.",
         "EMPTY_SEARCH": "No promotions match your filters."
       },
@@ -3074,19 +3079,44 @@
         "INITIAL_COUPON": "Initial coupon code",
         "DISCOUNT_TYPE": "Discount type",
         "DISCOUNT_VALUE": "Discount value",
+        "DISCOUNT_PREVIEW": "Preview",
         "START_DATE": "Start date",
         "END_DATE": "End date",
         "CONDITIONS": "Conditions",
+        "ELIGIBILITY": "Eligibility",
         "MIN_ORDER": "Minimum order amount",
         "MAX_DISCOUNT": "Maximum discount amount",
         "USAGE_LIMIT": "Total usage limit",
         "PER_USER_LIMIT": "Per-user limit",
         "FIRST_PURCHASE": "First purchase only",
         "MEMBERSHIP_REQUIRED": "Membership required",
+        "COUNTRY": "Country",
+        "COUNTRY_PLACEHOLDER": "Restrict to a country…",
+        "GROUP_ORDER": "Order requirements",
+        "GROUP_CUSTOMER": "Customer requirements",
+        "GROUP_USAGE": "Usage limits",
         "TARGETS": "Targets",
+        "TARGETS_HINT": "Search and select the specific products or categories this promotion applies to.",
+        "PRODUCTS": "Products",
+        "CATEGORIES": "Categories",
         "PRODUCT_IDS": "Product IDs",
         "CATEGORY_IDS": "Category IDs",
-        "GUID_PLACEHOLDER": "Comma-separated GUIDs"
+        "GUID_PLACEHOLDER": "Comma-separated GUIDs",
+        "STEP_BASICS": "Basics",
+        "STEP_DISCOUNT": "Discount",
+        "STEP_ELIGIBILITY": "Eligibility",
+        "STEP_TARGETS": "Targets",
+        "STEP_REVIEW": "Review",
+        "STARTS_AS_DRAFT": "New promotions start as Draft — publish or activate them from the promotion page once you're ready.",
+        "REVIEW_HINT": "Review everything below, then save. You can keep editing after saving.",
+        "BACK_STEP": "Back",
+        "NEXT_STEP": "Next",
+        "RESTORE_DRAFT_TITLE": "Restore unsaved draft?",
+        "RESTORE_DRAFT_MESSAGE": "We found unsaved changes from your last visit to this promotion. Restore them?",
+        "RESTORE_DRAFT_CONFIRM": "Restore draft",
+        "RESTORE_DRAFT_DISCARD": "Discard",
+        "WARNING_FULL_DISCOUNT": "This discount is 100% or more — double-check that's intentional before publishing.",
+        "WARNING_HIGH_DISCOUNT": "This is a high discount (70%+). Make sure that's intentional before publishing."
       },
       "DETAIL": {
         "TAB_OVERVIEW": "Overview",
@@ -3115,8 +3145,29 @@
         "PREFIX": "Prefix",
         "SINGLE_USE": "Single use",
         "USES": "Uses",
+        "MAX_USES": "Max total uses",
+        "SINGLE_USE_LOCKED": "Locked to 1",
+        "PER_USER_MAX_USES": "Max uses per user",
+        "UNLIMITED": "Unlimited",
+        "TYPE_RESTRICTED": "Coupons can only be added to \"Coupon code\" promotions. Change the promotion type or create a new coupon-code promotion.",
+        "REMAINING": "Remaining",
         "EXPIRES": "Expires",
-        "EMPTY": "No coupon codes for this promotion yet."
+        "NEVER": "Never",
+        "COPY": "Copy code",
+        "COPIED": "Coupon code copied",
+        "EXPORT": "Export",
+        "EMPTY": "No coupon codes for this promotion yet.",
+        "GENERATE_SUCCESS": "Coupons generated",
+        "GENERATE_FAILED": "Generation failed",
+        "CUSTOM_SUCCESS": "Coupon created",
+        "CUSTOM_FAILED": "Create failed",
+        "PICK_PROMOTION": "Choose a promotion",
+        "STATUS": {
+          "ACTIVE": "Active",
+          "EXPIRED": "Expired",
+          "EXHAUSTED": "Exhausted",
+          "INACTIVE": "Inactive"
+        }
       },
       "ACTIONS": {
         "SAVE": "Save",
@@ -3130,6 +3181,50 @@
         "ARCHIVE": "Archive",
         "ACTIVATE": "Activate",
         "DEACTIVATE": "Deactivate"
+      },
+      "SCOPE": {
+        "COUPON_CODE": "Coupon code",
+        "AUTOMATIC": "Automatic",
+        "MEMBERSHIP": "Membership",
+        "CATEGORY": "Category",
+        "PRODUCT": "Product",
+        "FLASH_SALE": "Flash sale",
+        "REFERRAL_REWARD": "Referral reward"
+      },
+      "SCHEDULE_STATUS": {
+        "LIVE": "Live",
+        "SCHEDULED": "Scheduled",
+        "ENDED": "Ended",
+        "OPEN_ENDED": "No schedule"
+      },
+      "SUMMARY": {
+        "TITLE": "Live summary",
+        "UNNAMED": "Unnamed promotion",
+        "DISCOUNT_PREVIEW": "Discount preview",
+        "SAVE_PERCENT": "Customers save {{value}}",
+        "SAVE_FIXED": "{{value}} off",
+        "SCHEDULE": "Schedule",
+        "NO_START": "No start date",
+        "NO_END": "No end date",
+        "ESTIMATED_BEHAVIOR": "Estimated behavior",
+        "RESTRICTIONS": "Restrictions",
+        "USAGE_LIMITS": "Usage limits",
+        "WARNINGS": "Warnings",
+        "NO_TARGETS": "Applies without selecting specific products or categories.",
+        "HAS_TARGETS": "Applies to {{products}} product(s) and {{categories}} category/categories.",
+        "WARNING_NO_TARGETS": "This promotion type requires at least one product or category target."
+      },
+      "CONDITION_TYPE": {
+        "MINORDERAMOUNT": "Minimum order amount",
+        "MAXDISCOUNTAMOUNT": "Maximum discount amount",
+        "USAGELIMIT": "Total usage limit",
+        "PERUSERLIMIT": "Per-user limit",
+        "FIRSTPURCHASEONLY": "First purchase only",
+        "MEMBERSHIPREQUIRED": "Membership required",
+        "COUNTRYCODE": "Country"
+      },
+      "PREVIEW": {
+        "TARGETS_COUNT": "target(s) selected"
       }
     },
     "THEMES": {
@@ -4647,7 +4742,9 @@
         "LOADING": "Searching…",
         "NO_RESULTS": "No categories match your search.",
         "REMOVE": "Remove category"
-      }
+      },
+      "CLEAR_ALL": "Clear all",
+      "SEARCH_FAILED": "Search failed. Please try again."
     }
   },
   "ASSISTANT": {

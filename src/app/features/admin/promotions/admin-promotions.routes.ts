@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { permissionGuard } from '../../../core/guards/permission.guard';
+import { unsavedChangesGuard } from '../../../core/guards/unsaved-changes.guard';
 import { PERMISSIONS } from '../../../core/permissions/permission.constants';
 
 export const routes: Routes = [
@@ -19,6 +20,7 @@ export const routes: Routes = [
         (c) => c.PromotionEditPageComponent,
       ),
     canActivate: [permissionGuard([PERMISSIONS.Promotions.Create])],
+    canDeactivate: [unsavedChangesGuard],
   },
   {
     path: ':id/edit',
@@ -27,6 +29,7 @@ export const routes: Routes = [
         (c) => c.PromotionEditPageComponent,
       ),
     canActivate: [permissionGuard([PERMISSIONS.Promotions.Edit])],
+    canDeactivate: [unsavedChangesGuard],
   },
   {
     path: ':id',

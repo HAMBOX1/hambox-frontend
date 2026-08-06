@@ -17,6 +17,14 @@
           </button>
         </span>
       }
+      <button
+        type="button"
+        class="product-picker__clear-all"
+        [disabled]="disabled()"
+        (click)="clearAll()"
+      >
+        {{ 'ADMIN.PICKERS.CLEAR_ALL' | translate }}
+      </button>
     </div>
   }
 
@@ -26,9 +34,9 @@
     class="w-full"
     type="text"
     [placeholder]="'ADMIN.PICKERS.PRODUCT_PICKER.SEARCH_PLACEHOLDER' | translate"
-    [ngModel]="query()"
+    [value]="query()"
     [disabled]="disabled() || atLimit()"
-    (ngModelChange)="onQueryChange($event)"
+    (input)="onQueryChange($any($event.target).value)"
   />
 
   @if (atLimit()) {
@@ -39,16 +47,23 @@
     <div class="product-picker__results">
       @if (loading()) {
         <p class="product-picker__status">{{ 'ADMIN.PICKERS.PRODUCT_PICKER.LOADING' | translate }}</p>
+      } @else if (error()) {
+        <p class="product-picker__status product-picker__status--error">{{ 'ADMIN.PICKERS.SEARCH_FAILED' | translate }}</p>
       } @else if (!results().length) {
         <p class="product-picker__status">{{ 'ADMIN.PICKERS.PRODUCT_PICKER.NO_RESULTS' | translate }}</p>
       } @else {
         @for (product of results(); track product.id) {
-          <button
-            type="button"
+          <label
             class="product-picker__result"
             [class.product-picker__result--selected]="isSelected(product.id)"
-            (click)="toggle(product)"
           >
+            <input
+              type="checkbox"
+              class="product-picker__result-checkbox"
+              [checked]="isSelected(product.id)"
+              [disabled]="disabled() || (atLimit() && !isSelected(product.id))"
+              (change)="toggle(product)"
+            />
             @if (product.displayImageUrl) {
               <img [src]="product.displayImageUrl" alt="" />
             } @else {
@@ -58,10 +73,7 @@
               <span class="product-picker__result-name">{{ productName(product) }}</span>
               <span class="product-picker__result-meta">{{ product.categoryName }} · {{ product.price | number: '1.2-2' }}</span>
             </span>
-            @if (isSelected(product.id)) {
-              <i class="pi pi-check" aria-hidden="true"></i>
-            }
-          </button>
+          </label>
         }
       }
     </div>

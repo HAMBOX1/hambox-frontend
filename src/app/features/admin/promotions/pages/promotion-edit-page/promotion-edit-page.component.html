@@ -20,214 +20,328 @@
   @if (detailLoading()) {
     <app-admin-loading-skeleton variant="form" />
   } @else {
+    <app-admin-stepper [steps]="steps()" [activeIndex]="activeIndex()" />
+
     <form class="promotion-edit-page__form" (ngSubmit)="save()">
-      <div class="admin-detail-layout">
-        <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.DETAILS' | translate">
-          <div class="admin-form-grid admin-form-grid--single">
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.NAME' | translate }}</span>
-              <input
-                pInputText
-                class="admin-field__input"
-                type="text"
-                [ngModel]="name()"
-                (ngModelChange)="name.set($event)"
-                name="name"
-                required
-              />
-            </label>
+      <div class="promotion-edit-page__workspace">
+        <div class="promotion-edit-page__steps">
+          @switch (activeIndex()) {
+            @case (0) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.STEP_BASICS' | translate">
+                <div class="admin-form-grid admin-form-grid--single">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.NAME' | translate }}</span>
+                    <input
+                      pInputText
+                      class="admin-field__input"
+                      type="text"
+                      [ngModel]="name()"
+                      (ngModelChange)="name.set($event)"
+                      name="name"
+                      required
+                    />
+                  </label>
 
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.DESCRIPTION' | translate }}</span>
-              <textarea
-                pTextarea
-                class="admin-field__input"
-                rows="3"
-                [ngModel]="description()"
-                (ngModelChange)="description.set($event)"
-                name="description"
-              ></textarea>
-            </label>
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.DESCRIPTION' | translate }}</span>
+                    <textarea
+                      pTextarea
+                      class="admin-field__input"
+                      rows="3"
+                      [ngModel]="description()"
+                      (ngModelChange)="description.set($event)"
+                      name="description"
+                    ></textarea>
+                  </label>
 
-            @if (isCreateMode()) {
-              <label class="admin-field">
-                <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.TYPE' | translate }}</span>
-                <p-select
-                  [options]="typeOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [ngModel]="type()"
-                  (ngModelChange)="type.set($event)"
-                  name="type"
-                />
-              </label>
+                  @if (isCreateMode()) {
+                    <label class="admin-field">
+                      <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.TYPE' | translate }}</span>
+                      <p-select
+                        [options]="typeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        [ngModel]="type()"
+                        (ngModelChange)="type.set($event)"
+                        name="type"
+                      />
+                    </label>
 
-              @if (type() === 'CouponCode') {
-                <label class="admin-field">
-                  <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.INITIAL_COUPON' | translate }}</span>
-                  <input
-                    pInputText
-                    class="admin-field__input"
-                    type="text"
-                    [ngModel]="initialCouponCode()"
-                    (ngModelChange)="initialCouponCode.set($event)"
-                    name="initialCouponCode"
-                  />
-                </label>
-              }
+                    @if (type() === 'CouponCode') {
+                      <label class="admin-field">
+                        <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.INITIAL_COUPON' | translate }}</span>
+                        <input
+                          pInputText
+                          class="admin-field__input"
+                          type="text"
+                          [ngModel]="initialCouponCode()"
+                          (ngModelChange)="initialCouponCode.set($event)"
+                          name="initialCouponCode"
+                        />
+                      </label>
+                    }
+
+                    <p class="promotion-edit-page__hint">
+                      <i class="pi pi-info-circle" aria-hidden="true"></i>
+                      {{ 'ADMIN.PROMOTIONS.EDIT.STARTS_AS_DRAFT' | translate }}
+                    </p>
+                  }
+                </div>
+
+                <div class="admin-form-grid">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.START_DATE' | translate }}</span>
+                    <input
+                      type="datetime-local"
+                      class="admin-field__input promotion-edit-page__date-input"
+                      [ngModel]="startDate()"
+                      (ngModelChange)="startDate.set($event)"
+                      name="startDate"
+                    />
+                  </label>
+
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.END_DATE' | translate }}</span>
+                    <input
+                      type="datetime-local"
+                      class="admin-field__input promotion-edit-page__date-input"
+                      [ngModel]="endDate()"
+                      (ngModelChange)="endDate.set($event)"
+                      name="endDate"
+                    />
+                  </label>
+                </div>
+              </app-admin-section-card>
             }
-          </div>
 
-          <div class="admin-form-grid">
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.DISCOUNT_TYPE' | translate }}</span>
-              <p-select
-                [options]="discountTypeOptions"
-                optionLabel="label"
-                optionValue="value"
-                [ngModel]="discountType()"
-                (ngModelChange)="discountType.set($event)"
-                name="discountType"
+            @case (1) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.STEP_DISCOUNT' | translate">
+                <div class="admin-form-grid">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.DISCOUNT_TYPE' | translate }}</span>
+                    <p-select
+                      [options]="discountTypeOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      [ngModel]="discountType()"
+                      (ngModelChange)="discountType.set($event)"
+                      name="discountType"
+                    />
+                  </label>
+
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.DISCOUNT_VALUE' | translate }}</span>
+                    <p-inputNumber
+                      [ngModel]="discountValue()"
+                      (ngModelChange)="discountValue.set($event)"
+                      name="discountValue"
+                      [min]="0.01"
+                      [mode]="discountType() === 'Percentage' ? 'decimal' : 'currency'"
+                      currency="USD"
+                      [suffix]="discountType() === 'Percentage' ? ' %' : ''"
+                      [minFractionDigits]="0"
+                      [maxFractionDigits]="2"
+                    />
+                  </label>
+                </div>
+
+                <p class="promotion-edit-page__preview">
+                  {{ 'ADMIN.PROMOTIONS.EDIT.DISCOUNT_PREVIEW' | translate }}:
+                  <strong>
+                    {{
+                      discountType() === 'Percentage'
+                        ? ('ADMIN.PROMOTIONS.SUMMARY.SAVE_PERCENT' | translate: { value: discountPreview() })
+                        : ('ADMIN.PROMOTIONS.SUMMARY.SAVE_FIXED' | translate: { value: discountPreview() })
+                    }}
+                  </strong>
+                </p>
+
+                @if (discountWarningKey(); as key) {
+                  <p class="promotion-edit-page__warning">
+                    <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                    {{ key | translate }}
+                  </p>
+                }
+              </app-admin-section-card>
+            }
+
+            @case (2) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.GROUP_ORDER' | translate">
+                <div class="admin-form-grid">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.MIN_ORDER' | translate }}</span>
+                    <p-inputNumber
+                      [ngModel]="minOrderAmount()"
+                      (ngModelChange)="minOrderAmount.set($event)"
+                      name="minOrderAmount"
+                      [min]="0"
+                      mode="currency"
+                      currency="USD"
+                      [minFractionDigits]="2"
+                      [maxFractionDigits]="2"
+                    />
+                  </label>
+
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.MAX_DISCOUNT' | translate }}</span>
+                    <p-inputNumber
+                      [ngModel]="maxDiscountAmount()"
+                      (ngModelChange)="maxDiscountAmount.set($event)"
+                      name="maxDiscountAmount"
+                      [min]="0"
+                      mode="currency"
+                      currency="USD"
+                      [minFractionDigits]="2"
+                      [maxFractionDigits]="2"
+                    />
+                  </label>
+                </div>
+              </app-admin-section-card>
+
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.GROUP_CUSTOMER' | translate">
+                <div class="admin-form-grid admin-form-grid--single">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.COUNTRY' | translate }}</span>
+                    <p-multiSelect
+                      class="admin-field__input"
+                      [options]="[...countryOptions]"
+                      optionLabel="label"
+                      optionValue="value"
+                      [selectionLimit]="1"
+                      display="chip"
+                      [filter]="true"
+                      filterPlaceHolder="Search countries…"
+                      [showClear]="true"
+                      [ngModel]="countryCodes()"
+                      (ngModelChange)="countryCodes.set($event)"
+                      name="countryCodes"
+                      [placeholder]="'ADMIN.PROMOTIONS.EDIT.COUNTRY_PLACEHOLDER' | translate"
+                    />
+                  </label>
+                </div>
+
+                <div class="promotion-edit-page__checks">
+                  <label class="promotion-edit-page__check">
+                    <p-checkbox [ngModel]="firstPurchaseOnly()" (ngModelChange)="firstPurchaseOnly.set($event)" name="firstPurchaseOnly" [binary]="true" />
+                    <span>{{ 'ADMIN.PROMOTIONS.EDIT.FIRST_PURCHASE' | translate }}</span>
+                  </label>
+
+                  <label class="promotion-edit-page__check">
+                    <p-checkbox [ngModel]="membershipRequired()" (ngModelChange)="membershipRequired.set($event)" name="membershipRequired" [binary]="true" />
+                    <span>{{ 'ADMIN.PROMOTIONS.EDIT.MEMBERSHIP_REQUIRED' | translate }}</span>
+                  </label>
+                </div>
+              </app-admin-section-card>
+
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.GROUP_USAGE' | translate">
+                <div class="admin-form-grid">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.USAGE_LIMIT' | translate }}</span>
+                    <p-inputNumber
+                      [ngModel]="usageLimit()"
+                      (ngModelChange)="usageLimit.set($event)"
+                      name="usageLimit"
+                      [min]="0"
+                    />
+                  </label>
+
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.PER_USER_LIMIT' | translate }}</span>
+                    <p-inputNumber
+                      [ngModel]="perUserLimit()"
+                      (ngModelChange)="perUserLimit.set($event)"
+                      name="perUserLimit"
+                      [min]="0"
+                    />
+                  </label>
+                </div>
+              </app-admin-section-card>
+            }
+
+            @case (3) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.TARGETS' | translate" [description]="'ADMIN.PROMOTIONS.EDIT.TARGETS_HINT' | translate">
+                <div class="admin-form-grid admin-form-grid--single">
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.PRODUCTS' | translate }}</span>
+                    <app-product-picker
+                      [value]="productTargetIds()"
+                      (valueChange)="productTargetIds.set($event)"
+                    />
+                  </label>
+
+                  <label class="admin-field">
+                    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.CATEGORIES' | translate }}</span>
+                    <app-category-picker
+                      [value]="categoryTargetIds()"
+                      (valueChange)="categoryTargetIds.set($event)"
+                    />
+                  </label>
+                </div>
+              </app-admin-section-card>
+            }
+
+            @case (4) {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.STEP_REVIEW' | translate">
+                <p class="promotion-edit-page__hint">{{ 'ADMIN.PROMOTIONS.EDIT.REVIEW_HINT' | translate }}</p>
+              </app-admin-section-card>
+              <app-promotion-summary-panel
+                class="promotion-edit-page__mobile-summary"
+                [data]="summaryData()"
+                [warningKey]="discountWarningKey()"
               />
-            </label>
+            }
+          }
+        </div>
 
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.DISCOUNT_VALUE' | translate }}</span>
-              <p-inputNumber
-                [ngModel]="discountValue()"
-                (ngModelChange)="discountValue.set($event)"
-                name="discountValue"
-                [min]="0.01"
-                mode="decimal"
-                [minFractionDigits]="0"
-                [maxFractionDigits]="2"
-              />
-            </label>
-
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.START_DATE' | translate }}</span>
-              <input
-                type="datetime-local"
-                class="admin-field__input promotion-edit-page__date-input"
-                [ngModel]="startDate()"
-                (ngModelChange)="startDate.set($event)"
-                name="startDate"
-              />
-            </label>
-
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.END_DATE' | translate }}</span>
-              <input
-                type="datetime-local"
-                class="admin-field__input promotion-edit-page__date-input"
-                [ngModel]="endDate()"
-                (ngModelChange)="endDate.set($event)"
-                name="endDate"
-              />
-            </label>
-          </div>
-        </app-admin-section-card>
-
-        <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.CONDITIONS' | translate">
-          <div class="admin-form-grid">
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.MIN_ORDER' | translate }}</span>
-              <p-inputNumber
-                [ngModel]="minOrderAmount()"
-                (ngModelChange)="minOrderAmount.set($event)"
-                name="minOrderAmount"
-                [min]="0"
-                mode="decimal"
-              />
-            </label>
-
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.MAX_DISCOUNT' | translate }}</span>
-              <p-inputNumber
-                [ngModel]="maxDiscountAmount()"
-                (ngModelChange)="maxDiscountAmount.set($event)"
-                name="maxDiscountAmount"
-                [min]="0"
-                mode="decimal"
-              />
-            </label>
-
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.USAGE_LIMIT' | translate }}</span>
-              <p-inputNumber
-                [ngModel]="usageLimit()"
-                (ngModelChange)="usageLimit.set($event)"
-                name="usageLimit"
-                [min]="0"
-              />
-            </label>
-
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.PER_USER_LIMIT' | translate }}</span>
-              <p-inputNumber
-                [ngModel]="perUserLimit()"
-                (ngModelChange)="perUserLimit.set($event)"
-                name="perUserLimit"
-                [min]="0"
-              />
-            </label>
-          </div>
-
-          <div class="promotion-edit-page__checks">
-            <label class="promotion-edit-page__check">
-              <p-checkbox [ngModel]="firstPurchaseOnly()" (ngModelChange)="firstPurchaseOnly.set($event)" name="firstPurchaseOnly" [binary]="true" />
-              <span>{{ 'ADMIN.PROMOTIONS.EDIT.FIRST_PURCHASE' | translate }}</span>
-            </label>
-
-            <label class="promotion-edit-page__check">
-              <p-checkbox [ngModel]="membershipRequired()" (ngModelChange)="membershipRequired.set($event)" name="membershipRequired" [binary]="true" />
-              <span>{{ 'ADMIN.PROMOTIONS.EDIT.MEMBERSHIP_REQUIRED' | translate }}</span>
-            </label>
-          </div>
-        </app-admin-section-card>
-
-        <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.TARGETS' | translate">
-          <div class="admin-form-grid admin-form-grid--single">
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.PRODUCT_IDS' | translate }}</span>
-              <input
-                pInputText
-                class="admin-field__input"
-                type="text"
-                [ngModel]="productTargetIds()"
-                (ngModelChange)="productTargetIds.set($event)"
-                name="productTargetIds"
-                [placeholder]="'ADMIN.PROMOTIONS.EDIT.GUID_PLACEHOLDER' | translate"
-              />
-            </label>
-
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.EDIT.CATEGORY_IDS' | translate }}</span>
-              <input
-                pInputText
-                class="admin-field__input"
-                type="text"
-                [ngModel]="categoryTargetIds()"
-                (ngModelChange)="categoryTargetIds.set($event)"
-                name="categoryTargetIds"
-                [placeholder]="'ADMIN.PROMOTIONS.EDIT.GUID_PLACEHOLDER' | translate"
-              />
-            </label>
-          </div>
-        </app-admin-section-card>
+        <aside class="promotion-edit-page__summary">
+          <app-promotion-summary-panel [data]="summaryData()" [warningKey]="discountWarningKey()" />
+        </aside>
       </div>
 
       <app-admin-sticky-save-bar>
         <a pButton routerLink="/admin/promotions" [label]="'ADMIN.PROMOTIONS.ACTIONS.CANCEL' | translate" severity="secondary" [text]="true"></a>
-        <button
-          pButton
-          type="submit"
-          [label]="'ADMIN.PROMOTIONS.ACTIONS.SAVE' | translate"
-          icon="pi pi-check"
-          [loading]="detailSaving()"
-          [disabled]="detailSaving() || !name().trim()"
-        ></button>
+        @if (activeIndex() > 0) {
+          <button pButton type="button" severity="secondary" [label]="'ADMIN.PROMOTIONS.EDIT.BACK_STEP' | translate" icon="pi pi-arrow-left" (click)="previousStep()"></button>
+        }
+        @if (activeIndex() < steps().length - 1) {
+          <button
+            pButton
+            type="button"
+            [label]="'ADMIN.PROMOTIONS.EDIT.NEXT_STEP' | translate"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [disabled]="activeIndex() === 0 && !canAdvanceFromBasics()"
+            (click)="nextStep()"
+          ></button>
+        } @else {
+          <button
+            pButton
+            type="submit"
+            [label]="'ADMIN.PROMOTIONS.ACTIONS.SAVE' | translate"
+            icon="pi pi-check"
+            [loading]="detailSaving()"
+            [disabled]="detailSaving() || !name().trim()"
+          ></button>
+        }
       </app-admin-sticky-save-bar>
     </form>
   }
 </section>
+
+<app-admin-unsaved-changes-dialog
+  [visible]="unsavedDialogOpen()"
+  [saving]="detailSaving()"
+  (visibleChange)="onUnsavedDialogVisibleChange($event)"
+  (save)="onUnsavedSave()"
+  (discard)="onUnsavedDiscard()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="restoreDraftDialogOpen()"
+  (visibleChange)="onRestoreDraftDialogVisibleChange($event)"
+  [title]="'ADMIN.PROMOTIONS.EDIT.RESTORE_DRAFT_TITLE' | translate"
+  [message]="'ADMIN.PROMOTIONS.EDIT.RESTORE_DRAFT_MESSAGE' | translate"
+  [confirmLabel]="'ADMIN.PROMOTIONS.EDIT.RESTORE_DRAFT_CONFIRM'"
+  [cancelLabel]="'ADMIN.PROMOTIONS.EDIT.RESTORE_DRAFT_DISCARD'"
+  (confirmed)="confirmRestoreDraft()"
+/>

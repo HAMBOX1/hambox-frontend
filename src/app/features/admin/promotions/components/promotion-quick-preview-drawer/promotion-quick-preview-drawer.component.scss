@@ -1,0 +1,9 @@
+.promotion-quick-preview-drawer__header-title {
+  color: var(--admin-text-primary);
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+:host ::ng-deep .promotion-quick-preview-drawer .p-drawer-content {
+  padding: 1.5rem;
+}

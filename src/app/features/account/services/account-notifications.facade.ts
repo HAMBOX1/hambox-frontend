@@ -1,6 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { AUTH_CONTEXT } from '../../../core/auth/auth-context';
+import { NotificationHubService } from '../../../core/notifications/notification-hub.service';
 import { CommunicationPreferencesApiDto, NotificationQuery, UserNotificationApiDto } from '../models/account-api.model';
 import { AccountApiService } from './account-api.service';
 
@@ -9,6 +11,8 @@ import { AccountApiService } from './account-api.service';
 })
 export class AccountNotificationsFacade {
   private readonly api = inject(AccountApiService);
+  private readonly hub = inject(NotificationHubService);
+  private realtimeWired = false;
 
   private readonly itemsState = signal<readonly UserNotificationApiDto[]>([]);
   private readonly unreadCountState = signal(0);
@@ -36,6 +40,7 @@ export class AccountNotificationsFacade {
   async load(query: NotificationQuery = {}): Promise<void> {
     this.loadingState.set(true);
     this.errorState.set(null);
+    void this.ensureRealtime();
 
     try {
       const [page, count] = await Promise.all([
@@ -129,5 +134,45 @@ export class AccountNotificationsFacade {
     } finally {
       this.preferencesSavingState.set(false);
     }
+  }
+
+  /** Connects the notification hub and wires its events into local state, once. Failures (e.g. an
+   * unauthenticated caller) leave `realtimeWired` false so the next `load()` retries. */
+  private async ensureRealtime(): Promise<void> {
+    if (this.realtimeWired) {
+      return;
+    }
+    this.realtimeWired = true;
+
+    try {
+      await this.hub.connect(AUTH_CONTEXT.Customer);
+    } catch {
+      this.realtimeWired = false;
+      return;
+    }
+
+    this.hub.notificationCreated$.subscribe(({ notification, unreadCount }) => {
+      this.itemsState.update((items) => [notification, ...items.filter((item) => item.id !== notification.id)]);
+      this.unreadCountState.set(unreadCount);
+    });
+
+    this.hub.notificationUpdated$.subscribe(({ notification, unreadCount }) => {
+      this.itemsState.update((items) =>
+        notification.isArchived
+          ? items.filter((item) => item.id !== notification.id)
+          : items.map((item) => (item.id === notification.id ? notification : item)),
+      );
+      this.unreadCountState.set(unreadCount);
+    });
+
+    this.hub.notificationDeleted$.subscribe(({ notificationId, unreadCount }) => {
+      this.itemsState.update((items) => items.filter((item) => item.id !== notificationId));
+      this.unreadCountState.set(unreadCount);
+    });
+
+    this.hub.allRead$.subscribe(() => {
+      this.itemsState.update((items) => items.map((item) => ({ ...item, isRead: true })));
+      this.unreadCountState.set(0);
+    });
   }
 }

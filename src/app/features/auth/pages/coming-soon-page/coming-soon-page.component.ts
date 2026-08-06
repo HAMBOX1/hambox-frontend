@@ -12,6 +12,13 @@ import { MaintenanceBypassService } from '../../../../core/maintenance/maintenan
 import { MaintenanceService } from '../../../../core/maintenance/maintenance.service';
 import { getControlErrorMessage } from '../../utils/auth-form.utils';
 
+/**
+ * At most one automatic bounce out of /coming-soon per page load. Landing here a second time
+ * means the server disagrees with our local access state, and bouncing again would put the
+ * storefront in a redirect loop. A real hard refresh resets this and gets a fresh attempt.
+ */
+let hasAutoRedirected = false;
+
 @Component({
   selector: 'app-coming-soon-page',
   standalone: true,
@@ -51,7 +58,12 @@ export class ComingSoonPageComponent {
   });
 
   constructor() {
+    if (hasAutoRedirected) {
+      return;
+    }
+
     if (!this.maintenance.enabled() || this.bypass.hasValidToken()) {
+      hasAutoRedirected = true;
       void this.router.navigateByUrl('/home');
     }
   }

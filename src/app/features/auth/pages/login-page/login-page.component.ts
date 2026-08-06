@@ -90,10 +90,10 @@ export class LoginPageComponent {
     }
 
     this.isSubmitting.set(true);
-    const { email, password } = this.form.getRawValue();
+    const { email, password, rememberMe } = this.form.getRawValue();
 
     this.auth
-      .login({ email, password })
+      .login({ email, password, rememberMe })
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => this.onLoginSuccess(),

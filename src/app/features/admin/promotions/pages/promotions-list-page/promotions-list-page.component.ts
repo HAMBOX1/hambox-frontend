@@ -30,20 +30,38 @@ import {
   AdminIconButtonComponent,
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
-  AdminStatCardComponent,
-  AdminStatGridComponent,
   AdminStatusBadgeComponent,
   AdminStatusTone,
   AdminToolbarComponent,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
+import {
+  CouponFormValue,
+  EMPTY_COUPON_FORM_VALUE,
+  GenerateCouponsFormComponent,
+} from '../../components/generate-coupons-form/generate-coupons-form.component';
+import { PromotionQuickPreviewDrawerComponent } from '../../components/promotion-quick-preview-drawer/promotion-quick-preview-drawer.component';
 import {
   PROMOTION_STATUS_OPTIONS,
   PROMOTION_TYPE_OPTIONS,
   PromotionListItemDto,
 } from '../../models/promotion-api.model';
 import { PromotionManagementFacade } from '../../services/promotion-management.facade';
+import {
+  discountPreviewText,
+  scheduleStatus,
+  ScheduleStatus,
+  scopeLabelKey,
+} from '../../utils/promotion-display.util';
+
+const SCHEDULE_TONE: Record<ScheduleStatus, AdminStatusTone> = {
+  live: 'success',
+  scheduled: 'info',
+  ended: 'neutral',
+  'open-ended': 'neutral',
+};
 
 @Component({
   selector: 'app-promotions-list-page',
@@ -52,6 +70,7 @@ import { PromotionManagementFacade } from '../../services/promotion-management.f
     FormsModule,
     RouterLink,
     TranslatePipe,
+    HamboxDatePipe,
     ButtonModule,
     CheckboxModule,
     DialogModule,
@@ -61,8 +80,6 @@ import { PromotionManagementFacade } from '../../services/promotion-management.f
     ToastModule,
     HasPermissionDirective,
     AdminPageHeaderComponent,
-    AdminStatGridComponent,
-    AdminStatCardComponent,
     AdminToolbarComponent,
     AdminSearchBarComponent,
     AdminErrorAlertComponent,
@@ -73,6 +90,8 @@ import { PromotionManagementFacade } from '../../services/promotion-management.f
     AdminConfirmDialogComponent,
     AdminStatusBadgeComponent,
     AdminBulkBarComponent,
+    GenerateCouponsFormComponent,
+    PromotionQuickPreviewDrawerComponent,
   ],
   providers: [PromotionManagementFacade, MessageService],
   templateUrl: './promotions-list-page.component.html',
@@ -92,6 +111,12 @@ export class PromotionsListPageComponent implements OnInit {
   protected readonly typeOptions = [...PROMOTION_TYPE_OPTIONS];
 
   protected readonly promotions = this.facade.promotions;
+  // Backend only allows coupon generation/creation on CouponCode-type promotions (see
+  // CreateCouponCommandHandler/GenerateCouponsCommandHandler) — filtered here so this picker
+  // can't offer an ineligible promotion in the first place.
+  protected readonly couponEligiblePromotions = computed(() =>
+    this.promotions().filter((p) => p.type === 'CouponCode'),
+  );
   protected readonly loading = this.facade.promotionsLoading;
   protected readonly error = this.facade.promotionsError;
   protected readonly searchTerm = this.facade.searchTerm;
@@ -101,9 +126,10 @@ export class PromotionsListPageComponent implements OnInit {
   protected readonly pageSize = this.facade.pageSize;
   protected readonly hasActiveFilters = this.facade.hasActiveFilters;
   protected readonly actionLoading = this.facade.actionLoading;
-  protected readonly listStats = this.facade.listStats;
 
   protected readonly selectedPromotions = signal<PromotionListItemDto[]>([]);
+  protected readonly previewPromotion = signal<PromotionListItemDto | null>(null);
+
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateTarget = signal<PromotionListItemDto | null>(null);
   protected readonly duplicateName = signal('');
@@ -111,6 +137,13 @@ export class PromotionsListPageComponent implements OnInit {
   protected readonly deleteDialogOpen = signal(false);
   protected readonly deleteTarget = signal<PromotionListItemDto | null>(null);
   protected readonly bulkDeleteDialogOpen = signal(false);
+
+  protected readonly generateCouponsDialogOpen = signal(false);
+  protected readonly generateCouponsTargetId = signal<string | null>(null);
+  protected readonly generateCouponsForm = signal<CouponFormValue>({
+    ...EMPTY_COUPON_FORM_VALUE,
+    count: 10,
+  });
 
   protected readonly tableFirst = computed(
     () => (this.facade.pageNumber() - 1) * this.facade.pageSize(),
@@ -156,6 +189,18 @@ export class PromotionsListPageComponent implements OnInit {
     void this.facade.reloadPromotions();
   }
 
+  protected scopeOf(promotion: PromotionListItemDto): string {
+    return scopeLabelKey(promotion.type);
+  }
+
+  protected scheduleOf(promotion: PromotionListItemDto): ScheduleStatus {
+    return scheduleStatus(promotion.startDateUtc, promotion.endDateUtc);
+  }
+
+  protected scheduleTone(status: ScheduleStatus): AdminStatusTone {
+    return SCHEDULE_TONE[status];
+  }
+
   protected statusTone(status: string): AdminStatusTone {
     switch (status) {
       case 'Active':
@@ -172,10 +217,45 @@ export class PromotionsListPageComponent implements OnInit {
   }
 
   protected formatDiscount(item: PromotionListItemDto): string {
-    if (item.discountType === 'Percentage') {
-      return `${item.discountValue}%`;
-    }
-    return `${item.discountValue}`;
+    return discountPreviewText(item.discountType, item.discountValue);
+  }
+
+  protected openPreview(promotion: PromotionListItemDto): void {
+    this.previewPromotion.set(promotion);
+  }
+
+  protected closePreview(): void {
+    this.previewPromotion.set(null);
+  }
+
+  protected onPreviewEdit(promotion: PromotionListItemDto): void {
+    this.closePreview();
+    void this.router.navigate(['/admin/promotions', promotion.id, 'edit']);
+  }
+
+  protected onPreviewDuplicate(promotion: PromotionListItemDto): void {
+    this.closePreview();
+    this.openDuplicateDialog(promotion);
+  }
+
+  protected async onPreviewPublish(promotion: PromotionListItemDto): Promise<void> {
+    await this.publishPromotion(promotion);
+    this.closePreview();
+  }
+
+  protected async onPreviewActivate(promotion: PromotionListItemDto): Promise<void> {
+    await this.activatePromotion(promotion);
+    this.closePreview();
+  }
+
+  protected async onPreviewDeactivate(promotion: PromotionListItemDto): Promise<void> {
+    await this.deactivatePromotion(promotion);
+    this.closePreview();
+  }
+
+  protected async onPreviewArchive(promotion: PromotionListItemDto): Promise<void> {
+    await this.archivePromotion(promotion);
+    this.closePreview();
   }
 
   protected openDuplicateDialog(promotion: PromotionListItemDto): void {
@@ -302,45 +382,79 @@ export class PromotionsListPageComponent implements OnInit {
     this.showActionResult(success, 'Promotion published', 'Publish failed');
   }
 
+  protected async activatePromotion(promotion: PromotionListItemDto): Promise<void> {
+    const success = await this.facade.activatePromotion(promotion.id);
+    this.showActionResult(success, 'Promotion activated', 'Activate failed');
+  }
+
+  protected async deactivatePromotion(promotion: PromotionListItemDto): Promise<void> {
+    const success = await this.facade.deactivatePromotion(promotion.id);
+    this.showActionResult(success, 'Promotion paused', 'Pause failed');
+  }
+
   protected async archivePromotion(promotion: PromotionListItemDto): Promise<void> {
     const success = await this.facade.archivePromotion(promotion.id);
     this.showActionResult(success, 'Promotion archived', 'Archive failed');
   }
 
   protected async archiveSelected(): Promise<void> {
-    const archivable = this.selectedPromotions().filter((p) => p.status !== 'Archived');
-    if (archivable.length === 0) {
-      return;
-    }
-
-    for (const promotion of archivable) {
-      await this.facade.archivePromotion(promotion.id);
-    }
-
-    this.selectedPromotions.set([]);
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Promotions archived',
-      detail: `${archivable.length} promotion(s) archived.`,
-      life: 4000,
-    });
+    await this.runBulk(
+      this.selectedPromotions().filter((p) => p.status !== 'Archived'),
+      (p) => this.facade.archivePromotion(p.id),
+      'Promotions archived',
+    );
   }
 
   protected async publishSelected(): Promise<void> {
-    const publishable = this.selectedPromotions().filter((p) => p.status !== 'Active');
-    if (publishable.length === 0) {
+    await this.runBulk(
+      this.selectedPromotions().filter((p) => p.status !== 'Active'),
+      (p) => this.facade.publishPromotion(p.id),
+      'Promotions published',
+    );
+  }
+
+  protected async activateSelected(): Promise<void> {
+    await this.runBulk(
+      this.selectedPromotions().filter((p) => p.status !== 'Active'),
+      (p) => this.facade.activatePromotion(p.id),
+      'Promotions activated',
+    );
+  }
+
+  protected async deactivateSelected(): Promise<void> {
+    await this.runBulk(
+      this.selectedPromotions().filter((p) => p.status === 'Active'),
+      (p) => this.facade.deactivatePromotion(p.id),
+      'Promotions paused',
+    );
+  }
+
+  protected async duplicateSelected(): Promise<void> {
+    await this.runBulk(
+      this.selectedPromotions(),
+      (p) => this.facade.duplicatePromotion(p.id).then((id) => id !== null),
+      'Promotions duplicated',
+    );
+  }
+
+  private async runBulk(
+    targets: readonly PromotionListItemDto[],
+    action: (promotion: PromotionListItemDto) => Promise<boolean>,
+    successMessage: string,
+  ): Promise<void> {
+    if (targets.length === 0) {
       return;
     }
 
-    for (const promotion of publishable) {
-      await this.facade.publishPromotion(promotion.id);
+    for (const promotion of targets) {
+      await action(promotion);
     }
 
     this.selectedPromotions.set([]);
     this.messageService.add({
       severity: 'success',
-      summary: 'Promotions published',
-      detail: `${publishable.length} promotion(s) published.`,
+      summary: successMessage,
+      detail: `${targets.length} promotion(s) updated.`,
       life: 4000,
     });
   }
@@ -359,6 +473,89 @@ export class PromotionsListPageComponent implements OnInit {
       severity: 'error',
       summary: failMsg,
       detail: this.facade.promotionsError() ?? 'Action failed.',
+      life: 5000,
+    });
+  }
+
+  protected exportSelected(): void {
+    this.exportPromotions(this.selectedPromotions(), 'selected-promotions');
+  }
+
+  protected exportAll(): void {
+    this.exportPromotions(this.promotions(), 'promotions');
+  }
+
+  private exportPromotions(items: readonly PromotionListItemDto[], filename: string): void {
+    if (items.length === 0) {
+      return;
+    }
+
+    const header = ['Name', 'Type', 'Discount', 'Status', 'Start', 'End', 'Redemptions', 'Coupons', 'Created'];
+    const rows = items.map((p) => [
+      p.name,
+      p.type,
+      this.formatDiscount(p),
+      p.status,
+      p.startDateUtc ?? '',
+      p.endDateUtc ?? '',
+      String(p.totalRedemptions),
+      String(p.couponCount),
+      p.createdOnUtc,
+    ]);
+
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  protected openGenerateCouponsDialog(): void {
+    this.generateCouponsTargetId.set(null);
+    this.generateCouponsForm.set({ ...EMPTY_COUPON_FORM_VALUE, count: 10 });
+    this.generateCouponsDialogOpen.set(true);
+  }
+
+  protected closeGenerateCouponsDialog(): void {
+    this.generateCouponsDialogOpen.set(false);
+  }
+
+  protected async confirmGenerateCoupons(): Promise<void> {
+    const promotionId = this.generateCouponsTargetId();
+    if (!promotionId) {
+      return;
+    }
+
+    const form = this.generateCouponsForm();
+    const success = await this.facade.generateCoupons(promotionId, {
+      count: form.count,
+      prefix: form.prefix.trim() || null,
+      isSingleUse: form.isSingleUse,
+      maxUses: form.maxUses,
+      perUserMaxUses: form.perUserMaxUses,
+      expiresOnUtc: form.expiresOnUtc.trim() ? new Date(form.expiresOnUtc).toISOString() : null,
+    });
+
+    if (success) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Coupons generated',
+        life: 4000,
+      });
+      this.closeGenerateCouponsDialog();
+      return;
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Generation failed',
+      detail: this.facade.promotionsError() ?? undefined,
       life: 5000,
     });
   }
@@ -388,6 +585,22 @@ export class PromotionsListPageComponent implements OnInit {
         icon: 'pi pi-send',
         disabled: this.actionLoading() || promotion.status === 'Active',
         command: () => void this.publishPromotion(promotion),
+      });
+    }
+
+    if (
+      this.permissionService.hasPermission(this.permissions.Coupons.Generate) &&
+      promotion.type === 'CouponCode'
+    ) {
+      items.push({
+        label: t('ADMIN.PROMOTIONS.COUPONS.GENERATE'),
+        icon: 'pi pi-bolt',
+        disabled: this.actionLoading(),
+        command: () => {
+          this.generateCouponsTargetId.set(promotion.id);
+          this.generateCouponsForm.set({ ...EMPTY_COUPON_FORM_VALUE, count: 10 });
+          this.generateCouponsDialogOpen.set(true);
+        },
       });
     }
 

@@ -1,0 +1,84 @@
+<div class="promotion-summary">
+  <header class="promotion-summary__header">
+    <h3 class="promotion-summary__title">{{ 'ADMIN.PROMOTIONS.SUMMARY.TITLE' | translate }}</h3>
+    <p class="promotion-summary__name">{{ data().name || ('ADMIN.PROMOTIONS.SUMMARY.UNNAMED' | translate) }}</p>
+    <span class="promotion-summary__scope">{{ scopeKey() | translate }}</span>
+  </header>
+
+  <section class="promotion-summary__block promotion-summary__block--accent">
+    <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.DISCOUNT_PREVIEW' | translate }}</span>
+    <p class="promotion-summary__discount">
+      {{
+        data().discountType === 'Percentage'
+          ? ('ADMIN.PROMOTIONS.SUMMARY.SAVE_PERCENT' | translate: { value: discountText() })
+          : ('ADMIN.PROMOTIONS.SUMMARY.SAVE_FIXED' | translate: { value: discountText() })
+      }}
+    </p>
+  </section>
+
+  <section class="promotion-summary__block">
+    <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.SCHEDULE' | translate }}</span>
+    <p class="promotion-summary__text">
+      {{ ('ADMIN.PROMOTIONS.SCHEDULE_STATUS.' + schedule().toUpperCase().replace('-', '_')) | translate }}
+      @if (data().startDateUtc || data().endDateUtc) {
+        <span class="promotion-summary__muted">
+          &middot;
+          {{ (data().startDateUtc | hamboxDate: 'mediumDate') || ('ADMIN.PROMOTIONS.SUMMARY.NO_START' | translate) }}
+          &ndash;
+          {{ (data().endDateUtc | hamboxDate: 'mediumDate') || ('ADMIN.PROMOTIONS.SUMMARY.NO_END' | translate) }}
+        </span>
+      }
+    </p>
+  </section>
+
+  <section class="promotion-summary__block">
+    <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.ESTIMATED_BEHAVIOR' | translate }}</span>
+    <p class="promotion-summary__text">{{ targetSummaryKey() | translate: { products: data().productTargetCount, categories: data().categoryTargetCount } }}</p>
+  </section>
+
+  @if (restrictions().length > 0) {
+    <section class="promotion-summary__block">
+      <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.RESTRICTIONS' | translate }}</span>
+      <ul class="promotion-summary__list">
+        @for (condition of restrictions(); track condition.type + condition.value) {
+          <li>
+            <span>{{ conditionLabelKey(condition) | translate }}</span>
+            <span class="promotion-summary__muted">{{ condition.value }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (usageLimits().length > 0) {
+    <section class="promotion-summary__block">
+      <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.USAGE_LIMITS' | translate }}</span>
+      <ul class="promotion-summary__list">
+        @for (condition of usageLimits(); track condition.type + condition.value) {
+          <li>
+            <span>{{ conditionLabelKey(condition) | translate }}</span>
+            <span class="promotion-summary__muted">{{ condition.value }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (warningKey() || configWarningKey()) {
+    <section class="promotion-summary__block promotion-summary__block--warning">
+      <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.WARNINGS' | translate }}</span>
+      @if (warningKey(); as key) {
+        <p class="promotion-summary__warning">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          {{ key | translate }}
+        </p>
+      }
+      @if (configWarningKey(); as key) {
+        <p class="promotion-summary__warning">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          {{ key | translate }}
+        </p>
+      }
+    </section>
+  }
+</div>

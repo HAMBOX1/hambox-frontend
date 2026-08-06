@@ -170,6 +170,8 @@ export const ACCOUNT_API = {
   markAllNotificationsRead: '/api/v1/account/notifications/read-all',
   archiveNotification: (id: string) => `/api/v1/account/notifications/${id}/archive`,
   deleteNotification: (id: string) => `/api/v1/account/notifications/${id}`,
+  // SignalR hub (not an HTTP endpoint — base path for the hub connection)
+  notificationsHub: '/hubs/notifications',
   referral: '/api/v1/account/referral',
   referralHistory: '/api/v1/account/referral/history',
   membership: '/api/v1/account/membership',

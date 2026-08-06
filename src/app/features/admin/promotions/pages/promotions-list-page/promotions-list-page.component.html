@@ -6,45 +6,26 @@
     [subtitle]="'ADMIN.PROMOTIONS.LIST.SUBTITLE' | translate"
     [breadcrumbs]="breadcrumbs"
   >
-    <a
-      adminHeaderActions
-      *hamboxHasPermission="permissions.Promotions.Create"
-      pButton
-      class="admin-btn-primary"
-      routerLink="/admin/promotions/new"
-      [label]="'ADMIN.PROMOTIONS.LIST.NEW' | translate"
-      icon="pi pi-plus"
-    ></a>
+    <div adminHeaderActions class="promotions-list-page__header-actions">
+      <button
+        *hamboxHasPermission="permissions.Coupons.Generate"
+        pButton
+        type="button"
+        severity="secondary"
+        [label]="'ADMIN.PROMOTIONS.COUPONS.GENERATE' | translate"
+        icon="pi pi-bolt"
+        (click)="openGenerateCouponsDialog()"
+      ></button>
+      <a
+        *hamboxHasPermission="permissions.Promotions.Create"
+        pButton
+        class="admin-btn-primary"
+        routerLink="/admin/promotions/new"
+        [label]="'ADMIN.PROMOTIONS.LIST.NEW' | translate"
+        icon="pi pi-plus"
+      ></a>
+    </div>
   </app-admin-page-header>
-
-  <app-admin-stat-grid>
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.PROMOTIONS.STATS.TOTAL' | translate"
-      [value]="listStats().total"
-      icon="pi-percentage"
-    />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.PROMOTIONS.STATS.ACTIVE' | translate"
-      [value]="listStats().active"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-check-circle"
-      tone="success"
-    />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.PROMOTIONS.STATS.REDEMPTIONS' | translate"
-      [value]="listStats().redemptions"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-shopping-cart"
-      tone="info"
-    />
-    <app-admin-stat-card [compact]="true"
-      [label]="'ADMIN.PROMOTIONS.STATS.COUPONS' | translate"
-      [value]="listStats().coupons"
-      [hint]="'ADMIN.STATS.ON_PAGE' | translate"
-      icon="pi-ticket"
-      tone="warning"
-    />
-  </app-admin-stat-grid>
 
   <app-admin-toolbar>
     <app-admin-search-bar
@@ -75,6 +56,21 @@
       (ngModelChange)="onTypeChange($event)"
       [placeholder]="'ADMIN.PROMOTIONS.LIST.FILTER_TYPE' | translate"
     />
+
+    <div adminToolbarActions>
+      <button
+        *hamboxHasPermission="permissions.Coupons.Export"
+        pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        [label]="'ADMIN.PROMOTIONS.LIST.EXPORT' | translate"
+        icon="pi pi-download"
+        [disabled]="promotions().length === 0"
+        (click)="exportAll()"
+      ></button>
+    </div>
   </app-admin-toolbar>
 
   @if (error()) {
@@ -89,11 +85,23 @@
       *hamboxHasPermission="permissions.Promotions.Publish"
       pButton
       type="button"
-      [label]="'ADMIN.PROMOTIONS.ACTIONS.PUBLISH' | translate"
-      icon="pi pi-send"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.ACTIVATE' | translate"
+      icon="pi pi-play"
+      severity="secondary"
       size="small"
       [disabled]="actionLoading()"
-      (click)="publishSelected()"
+      (click)="activateSelected()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Promotions.Publish"
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.DEACTIVATE' | translate"
+      icon="pi pi-pause"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="deactivateSelected()"
     ></button>
     <button
       *hamboxHasPermission="permissions.Promotions.Edit"
@@ -105,6 +113,27 @@
       size="small"
       [disabled]="actionLoading()"
       (click)="archiveSelected()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Promotions.Create"
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.ACTIONS.DUPLICATE' | translate"
+      icon="pi pi-copy"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="duplicateSelected()"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Coupons.Export"
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.LIST.EXPORT' | translate"
+      icon="pi pi-download"
+      severity="secondary"
+      size="small"
+      (click)="exportSelected()"
     ></button>
     <button
       *hamboxHasPermission="permissions.Promotions.Delete"
@@ -130,6 +159,8 @@
       [totalRecords]="totalCount()"
       [first]="tableFirst()"
       [rowsPerPageOptions]="[10, 20, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first} - {last} of {totalRecords} promotions"
       [selection]="selectedPromotions()"
       (selectionChange)="onSelectionChange($event)"
       (onLazyLoad)="onPageChange($event)"
@@ -144,27 +175,33 @@
             <p-tableHeaderCheckbox />
           </th>
           <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.NAME' | translate }}</th>
-          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.TYPE' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.SCOPE' | translate }}</th>
           <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.DISCOUNT' | translate }}</th>
           <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.STATUS' | translate }}</th>
-          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.REDEMPTIONS' | translate }}</th>
-          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.COUPONS' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.SCHEDULE' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.USAGE' | translate }}</th>
+          <th>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.CREATED' | translate }}</th>
           <th style="width: 6rem"></th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-promotion>
-        <tr>
-          <td>
+        <tr class="promotions-list-page__row" (click)="openPreview(promotion)">
+          <td (click)="$event.stopPropagation()">
             <p-tableCheckbox [value]="promotion" />
           </td>
           <td>
-            <a class="admin-cell-primary" [routerLink]="['/admin/promotions', promotion.id]">
+            <a
+              class="admin-cell-primary"
+              [routerLink]="['/admin/promotions', promotion.id]"
+              (click)="$event.stopPropagation()"
+            >
               {{ promotion.name }}
             </a>
           </td>
           <td>
             <span class="admin-cell-secondary">{{ promotion.type }}</span>
+            <span class="promotions-list-page__scope-hint">{{ scopeOf(promotion) | translate }}</span>
           </td>
           <td>
             <span class="admin-cell-badge">{{ formatDiscount(promotion) }}</span>
@@ -176,12 +213,19 @@
             />
           </td>
           <td>
-            <span class="admin-cell-badge">{{ promotion.totalRedemptions }}</span>
+            <app-admin-status-badge
+              [label]="('ADMIN.PROMOTIONS.SCHEDULE_STATUS.' + scheduleOf(promotion).toUpperCase().replace('-', '_')) | translate"
+              [tone]="scheduleTone(scheduleOf(promotion))"
+              [outlined]="true"
+            />
           </td>
           <td>
-            <span class="admin-cell-badge">{{ promotion.couponCount }}</span>
+            <span class="admin-cell-badge">{{ promotion.totalRedemptions }} / {{ promotion.couponCount }}</span>
           </td>
           <td>
+            <span class="admin-cell-secondary">{{ promotion.createdOnUtc | hamboxDate: 'mediumDate' }}</span>
+          </td>
+          <td (click)="$event.stopPropagation()">
             @let menuItems = promotionActionMenuItems(promotion);
             <div class="admin-actions-row">
               <app-admin-icon-button
@@ -203,7 +247,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="8">
+          <td colspan="9">
             <app-admin-empty-state
               icon="pi pi-percentage"
               [title]="
@@ -221,6 +265,17 @@
     </p-table>
   </app-admin-data-table-shell>
 </section>
+
+<app-promotion-quick-preview-drawer
+  [promotion]="previewPromotion()"
+  (closed)="closePreview()"
+  (editRequested)="onPreviewEdit($event)"
+  (duplicateRequested)="onPreviewDuplicate($event)"
+  (publishRequested)="onPreviewPublish($event)"
+  (activateRequested)="onPreviewActivate($event)"
+  (deactivateRequested)="onPreviewDeactivate($event)"
+  (archiveRequested)="onPreviewArchive($event)"
+/>
 
 <p-dialog
   [header]="'ADMIN.PROMOTIONS.DUPLICATE.TITLE' | translate"
@@ -260,6 +315,53 @@
       icon="pi pi-copy"
       [disabled]="!duplicateName().trim() || actionLoading()"
       (click)="confirmDuplicate()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.PROMOTIONS.COUPONS.GENERATE_TITLE' | translate"
+  [visible]="generateCouponsDialogOpen()"
+  (visibleChange)="generateCouponsDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+  (onHide)="closeGenerateCouponsDialog()"
+>
+  <label class="admin-field">
+    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.LIST.TITLE' | translate }}</span>
+    <p-select
+      [options]="[...couponEligiblePromotions()]"
+      optionLabel="name"
+      optionValue="id"
+      [filter]="true"
+      filterBy="name"
+      [ngModel]="generateCouponsTargetId()"
+      (ngModelChange)="generateCouponsTargetId.set($event)"
+      [placeholder]="'ADMIN.PROMOTIONS.COUPONS.PICK_PROMOTION' | translate"
+    />
+    @if (couponEligiblePromotions().length === 0) {
+      <span class="admin-field__hint">{{ 'ADMIN.PROMOTIONS.COUPONS.TYPE_RESTRICTED' | translate }}</span>
+    }
+  </label>
+
+  <app-generate-coupons-form
+    mode="bulk"
+    [value]="generateCouponsForm()"
+    (valueChange)="generateCouponsForm.set($event)"
+  />
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'ADMIN.PROMOTIONS.ACTIONS.CANCEL' | translate" [text]="true" (click)="closeGenerateCouponsDialog()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.PROMOTIONS.COUPONS.GENERATE' | translate"
+      [loading]="actionLoading()"
+      [disabled]="actionLoading() || !generateCouponsTargetId()"
+      (click)="confirmGenerateCoupons()"
     ></button>
   </ng-template>
 </p-dialog>

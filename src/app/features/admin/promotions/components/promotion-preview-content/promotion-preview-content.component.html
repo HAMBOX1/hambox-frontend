@@ -1,0 +1,108 @@
+@if (!promotion()) {
+  <app-admin-loading-skeleton variant="detail" />
+} @else {
+  @let promo = promotion()!;
+
+  <header class="promotion-preview__header">
+    <div class="promotion-preview__title-row">
+      <h2 class="promotion-preview__title">{{ promo.name }}</h2>
+      <div class="promotion-preview__badges">
+        <app-admin-status-badge [label]="promo.status" [tone]="statusTone(promo.status)" />
+        <app-admin-status-badge [label]="scopeKey() | translate" tone="neutral" [outlined]="true" />
+      </div>
+    </div>
+  </header>
+
+  <div class="promotion-preview__meta-grid">
+    <div class="promotion-preview__meta-item">
+      <span class="promotion-preview__meta-label">{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.DISCOUNT' | translate }}</span>
+      <span class="promotion-preview__meta-value">{{ discountText() }}</span>
+    </div>
+    <div class="promotion-preview__meta-item">
+      <span class="promotion-preview__meta-label">{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.USAGE' | translate }}</span>
+      <span class="promotion-preview__meta-value">{{ promo.totalRedemptions }}</span>
+    </div>
+    <div class="promotion-preview__meta-item">
+      <span class="promotion-preview__meta-label">{{ 'ADMIN.PROMOTIONS.EDIT.START_DATE' | translate }}</span>
+      <span class="promotion-preview__meta-value">
+        {{ (promo.startDateUtc | hamboxDate: 'mediumDate') || '—' }}
+      </span>
+    </div>
+    <div class="promotion-preview__meta-item">
+      <span class="promotion-preview__meta-label">{{ 'ADMIN.PROMOTIONS.EDIT.END_DATE' | translate }}</span>
+      <span class="promotion-preview__meta-value">
+        {{ (promo.endDateUtc | hamboxDate: 'mediumDate') || '—' }}
+      </span>
+    </div>
+  </div>
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="detail" [rows]="2" />
+  } @else if (detail(); as full) {
+    @if (full.conditions.length > 0) {
+      <section class="promotion-preview__section">
+        <h3 class="promotion-preview__section-title">{{ 'ADMIN.PROMOTIONS.EDIT.ELIGIBILITY' | translate }}</h3>
+        <ul class="promotion-preview__list">
+          @for (condition of full.conditions; track condition.type + condition.value) {
+            <li class="promotion-preview__list-item">
+              <span class="promotion-preview__list-primary">{{ condition.type }}</span>
+              <span class="promotion-preview__list-secondary">{{ condition.value }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (full.targets.length > 0) {
+      <section class="promotion-preview__section">
+        <h3 class="promotion-preview__section-title">{{ 'ADMIN.PROMOTIONS.EDIT.TARGETS' | translate }}</h3>
+        <p class="promotion-preview__hint">
+          {{ full.targets.length }} {{ 'ADMIN.PROMOTIONS.PREVIEW.TARGETS_COUNT' | translate }}
+        </p>
+      </section>
+    }
+  }
+
+  <footer class="promotion-preview__actions">
+    @if (primaryAction(promo.status); as action) {
+      <button
+        *hamboxHasPermission="permissions.Promotions.Publish"
+        type="button"
+        class="promotion-preview__action-btn promotion-preview__action-btn--primary"
+        (click)="runPrimaryAction(promo.status)"
+      >
+        <i [class]="primaryActionIcon(promo.status)" aria-hidden="true"></i>
+        {{ ('ADMIN.PROMOTIONS.ACTIONS.' + action.toUpperCase()) | translate }}
+      </button>
+    }
+    <button
+      *hamboxHasPermission="permissions.Promotions.Edit"
+      type="button"
+      class="promotion-preview__action-btn"
+      (click)="editRequested.emit()"
+    >
+      <i class="pi pi-pencil" aria-hidden="true"></i>
+      {{ 'ADMIN.PROMOTIONS.ACTIONS.EDIT' | translate }}
+    </button>
+    <button
+      *hamboxHasPermission="permissions.Promotions.Create"
+      type="button"
+      class="promotion-preview__action-btn"
+      (click)="duplicateRequested.emit()"
+    >
+      <i class="pi pi-copy" aria-hidden="true"></i>
+      {{ 'ADMIN.PROMOTIONS.ACTIONS.DUPLICATE' | translate }}
+    </button>
+    @if (promo.status !== 'Archived') {
+      <button
+        *hamboxHasPermission="permissions.Promotions.Edit"
+        type="button"
+        class="promotion-preview__action-btn promotion-preview__action-btn--danger"
+        (click)="archiveRequested.emit()"
+      >
+        <i class="pi pi-inbox" aria-hidden="true"></i>
+        {{ 'ADMIN.PROMOTIONS.ACTIONS.ARCHIVE' | translate }}
+      </button>
+    }
+  </footer>
+}

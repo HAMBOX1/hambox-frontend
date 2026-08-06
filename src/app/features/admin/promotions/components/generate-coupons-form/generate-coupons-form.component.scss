@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+
+.generate-coupons-form__date-input {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg-input);
+  color: var(--admin-text-primary);
+  font-size: 0.875rem;
+}
+
+.generate-coupons-form__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: var(--admin-text-primary);
+  font-size: 0.875rem;
+}

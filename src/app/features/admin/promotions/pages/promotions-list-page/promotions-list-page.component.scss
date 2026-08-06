@@ -3,6 +3,23 @@
   flex-direction: column;
   min-height: 0;
   height: 100%;
+
+  // Dense-row override for this page only, same tokens `.admin-data-table` already reads
+  // globally (`_admin-design-system.scss`) — smaller local values so the table fills the freed
+  // viewport instead of the old KPI-card row. Not a new token, not a global change.
+  --admin-row-min-height: 2.5rem;
+  --admin-cell-padding-y: 0.5rem;
+}
+
+.promotions-list-page {
+  flex: 1;
+  min-height: 0;
+}
+
+.promotions-list-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
 }
 
 .promotions-list-page__filter {
@@ -23,6 +40,20 @@
 
 .promotions-list-page__field-input {
   width: 100%;
+}
+
+.promotions-list-page__row {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--admin-bg-elevated);
+  }
+}
+
+.promotions-list-page__scope-hint {
+  display: block;
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
 }
 
 a.admin-cell-primary {

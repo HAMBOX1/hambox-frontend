@@ -23,15 +23,17 @@ import {
   AdminErrorAlertComponent,
   AdminLoadingSkeletonComponent,
   AdminPageHeaderComponent,
-  AdminSectionCardComponent,
   AdminStatCardComponent,
   AdminStatGridComponent,
   AdminStatusBadgeComponent,
   AdminStatusTone,
 } from '../../../../../shared/components/admin';
 import { HamboxCurrencyPipe } from '../../../../../shared/pipes/hambox-currency.pipe';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { PromotionCouponsPanelComponent } from '../../components/promotion-coupons-panel/promotion-coupons-panel.component';
+import { PromotionSummaryPanelComponent } from '../../components/promotion-summary-panel/promotion-summary-panel.component';
 import { PromotionManagementFacade } from '../../services/promotion-management.facade';
+import { discountWarning, scopeLabelKey } from '../../utils/promotion-display.util';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 
 @Component({
@@ -44,7 +46,9 @@ import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-b
     TabsModule,
     ToastModule,
     HamboxCurrencyPipe,
+    HamboxDatePipe,
     PromotionCouponsPanelComponent,
+    PromotionSummaryPanelComponent,
     AdminPageHeaderComponent,
     AdminErrorAlertComponent,
     AdminLoadingSkeletonComponent,
@@ -52,7 +56,6 @@ import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-b
     AdminActionMenuComponent,
     AdminStatGridComponent,
     AdminStatCardComponent,
-    AdminSectionCardComponent,
     AdminDataTableShellComponent,
     AdminEmptyStateComponent,
   ],
@@ -96,6 +99,34 @@ export class PromotionDetailPageComponent implements OnInit {
       },
       { label: promo?.name ?? this.translate.instant('ADMIN.PROMOTIONS.DETAIL.TAB_OVERVIEW') },
     );
+  });
+
+  protected readonly scopeKey = computed(() => {
+    const promo = this.detail();
+    return promo ? scopeLabelKey(promo.type) : '';
+  });
+
+  protected readonly discountWarningKey = computed(() => {
+    const promo = this.detail();
+    return promo ? discountWarning(promo.discountType, promo.discountValue) : null;
+  });
+
+  protected readonly summaryData = computed(() => {
+    const promo = this.detail();
+    if (!promo) {
+      return null;
+    }
+    return {
+      name: promo.name,
+      type: promo.type,
+      discountType: promo.discountType,
+      discountValue: promo.discountValue,
+      startDateUtc: promo.startDateUtc,
+      endDateUtc: promo.endDateUtc,
+      conditions: promo.conditions,
+      productTargetCount: promo.targets.filter((t) => t.type === 'Product').length,
+      categoryTargetCount: promo.targets.filter((t) => t.type === 'Category').length,
+    };
   });
 
   ngOnInit(): void {
@@ -170,17 +201,6 @@ export class PromotionDetailPageComponent implements OnInit {
     if (id) {
       void this.facade.loadDetail(id);
     }
-  }
-
-  protected formatDiscount(): string {
-    const item = this.detail();
-    if (!item) {
-      return '—';
-    }
-    if (item.discountType === 'Percentage') {
-      return `${item.discountValue}%`;
-    }
-    return `${item.discountValue}`;
   }
 
   protected statusTone(status: string): AdminStatusTone {

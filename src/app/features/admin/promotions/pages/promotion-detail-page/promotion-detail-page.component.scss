@@ -19,19 +19,5 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-}
-
-.promotion-detail-page__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-
-  li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
+  max-width: 32rem;
 }

@@ -1,0 +1,43 @@
+<ng-template #previewContent>
+  <app-promotion-preview-content
+    [promotion]="promotion()"
+    [detail]="detail()"
+    [detailLoading]="detailLoading()"
+    (editRequested)="onEdit()"
+    (duplicateRequested)="onDuplicate()"
+    (publishRequested)="onPublish()"
+    (activateRequested)="onActivate()"
+    (deactivateRequested)="onDeactivate()"
+    (archiveRequested)="onArchive()"
+  />
+</ng-template>
+
+@if (mobileViewport.isMobile()) {
+  <app-hambox-bottom-sheet
+    [open]="!!promotion()"
+    [title]="title()"
+    [heightVh]="88"
+    [solid]="true"
+    (closed)="onVisibleChange(false)"
+  >
+    <ng-container [ngTemplateOutlet]="previewContent" />
+  </app-hambox-bottom-sheet>
+} @else {
+  <p-drawer
+    [visible]="!!promotion()"
+    (visibleChange)="onVisibleChange($event)"
+    position="right"
+    [modal]="true"
+    [dismissible]="true"
+    [closeOnEscape]="true"
+    appendTo="body"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    [transitionOptions]="'200ms cubic-bezier(0.4, 0, 0.2, 1)'"
+    styleClass="promotion-quick-preview-drawer"
+  >
+    <ng-template #header>
+      <span class="promotion-quick-preview-drawer__header-title">{{ title() }}</span>
+    </ng-template>
+    <ng-container [ngTemplateOutlet]="previewContent" />
+  </p-drawer>
+}

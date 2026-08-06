@@ -11,6 +11,7 @@
     @if (detail(); as promo) {
       <div adminHeaderActions class="promotion-detail-page__header-actions">
         <app-admin-status-badge [label]="promo.status" [tone]="statusTone(promo.status)" />
+        <app-admin-status-badge [label]="scopeKey() | translate" tone="neutral" [outlined]="true" />
         @if (canPublish() && primaryActionLabel(promo.status); as label) {
           <button
             pButton
@@ -85,53 +86,8 @@
       <p-tabpanels>
         <p-tabpanel value="0">
           <div class="promotion-detail-page__preview">
-            <dl class="admin-meta-grid">
-              <div>
-                <dt>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.TYPE' | translate }}</dt>
-                <dd>{{ promo.type }}</dd>
-              </div>
-              <div>
-                <dt>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.DISCOUNT' | translate }}</dt>
-                <dd>{{ formatDiscount() }}</dd>
-              </div>
-              <div>
-                <dt>{{ 'ADMIN.PROMOTIONS.EDIT.START_DATE' | translate }}</dt>
-                <dd>{{ promo.startDateUtc || '—' }}</dd>
-              </div>
-              <div>
-                <dt>{{ 'ADMIN.PROMOTIONS.EDIT.END_DATE' | translate }}</dt>
-                <dd>{{ promo.endDateUtc || '—' }}</dd>
-              </div>
-              <div>
-                <dt>{{ 'ADMIN.PROMOTIONS.LIST.COLUMNS.REDEMPTIONS' | translate }}</dt>
-                <dd>{{ promo.totalRedemptions }}</dd>
-              </div>
-            </dl>
-
-            @if (promo.conditions.length > 0) {
-              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.CONDITIONS' | translate" [padded]="true">
-                <ul class="promotion-detail-page__list">
-                  @for (condition of promo.conditions; track condition.type + condition.value) {
-                    <li>
-                      <span class="admin-cell-primary">{{ condition.type }}</span>
-                      <span class="admin-cell-secondary">{{ condition.value }}</span>
-                    </li>
-                  }
-                </ul>
-              </app-admin-section-card>
-            }
-
-            @if (promo.targets.length > 0) {
-              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.EDIT.TARGETS' | translate" [padded]="true">
-                <ul class="promotion-detail-page__list">
-                  @for (target of promo.targets; track target.type + target.targetId) {
-                    <li>
-                      <span class="admin-cell-primary">{{ target.type }}</span>
-                      <span class="admin-cell-secondary">{{ target.targetId }}</span>
-                    </li>
-                  }
-                </ul>
-              </app-admin-section-card>
+            @if (summaryData(); as summary) {
+              <app-promotion-summary-panel [data]="summary" [warningKey]="discountWarningKey()" />
             }
           </div>
         </p-tabpanel>
@@ -216,7 +172,7 @@
                     <span class="admin-cell-secondary">{{ row.orderId || '—' }}</span>
                   </td>
                   <td>
-                    <span class="admin-cell-secondary">{{ row.redeemedOnUtc }}</span>
+                    <span class="admin-cell-secondary">{{ row.redeemedOnUtc | hamboxDate: 'medium' }}</span>
                   </td>
                 </tr>
               </ng-template>
@@ -236,7 +192,7 @@
         </p-tabpanel>
 
         <p-tabpanel value="3">
-          <app-promotion-coupons-panel [promotionId]="promo.id" [coupons]="promo.couponCodes" />
+          <app-promotion-coupons-panel [promotionId]="promo.id" [promotionName]="promo.name" [promotionType]="promo.type" [coupons]="promo.couponCodes" />
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>
