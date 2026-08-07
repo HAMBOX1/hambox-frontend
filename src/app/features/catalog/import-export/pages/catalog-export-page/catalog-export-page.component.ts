@@ -212,7 +212,7 @@ type ExportScopeMode = 'entire' | 'filtered' | 'selected';
     }
     .export-page__primary-button {
       background: var(--admin-accent-green);
-      color: #fff;
+      color: var(--color-primary-text-on);
     }
     .export-page__primary-button:disabled {
       opacity: 0.6;

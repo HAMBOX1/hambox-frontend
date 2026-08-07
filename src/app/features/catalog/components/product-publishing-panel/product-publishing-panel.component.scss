@@ -17,3 +17,15 @@
   color: var(--admin-text-muted);
   line-height: 1.5;
 }
+
+.product-publishing-panel__form--release {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--admin-border-subtle);
+}
+
+.product-publishing-panel__release-label {
+  font-size: var(--admin-type-caption);
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+}

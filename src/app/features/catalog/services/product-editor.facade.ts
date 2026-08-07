@@ -268,6 +268,8 @@ export class ProductEditorFacade {
 
       collectionIds: product.collectionIds ?? [],
 
+      publicReleaseOnUtc: product.publicReleaseOnUtc ?? null,
+
     };
 
   });
@@ -683,6 +685,17 @@ export class ProductEditorFacade {
   }
 
 
+
+  /** Early Access membership benefit: null makes the product public as soon as it's Active. */
+  async updateReleaseDate(publicReleaseOnUtc: string | null): Promise<boolean> {
+    const snapshot = this.formSnapshot();
+    const status = this.product()?.status;
+    if (!snapshot || !status) {
+      return false;
+    }
+
+    return this.updateProduct({ ...snapshot, status, publicReleaseOnUtc });
+  }
 
   async publishProduct(): Promise<boolean> {
 

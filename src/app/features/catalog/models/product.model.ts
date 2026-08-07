@@ -51,6 +51,15 @@ export interface Product {
    * present on real API responses; optional here only so existing test fixtures still compile. */
   readonly displayImageUrl?: string;
   readonly displayImageSource?: ProductDisplayImageSource;
+  /** Null if already public; a future date if gated behind the Early Access membership benefit. */
+  readonly publicReleaseOnUtc?: string | null;
+  /** True if any membership plan restricts purchase of this product (Exclusive Products benefit). */
+  readonly isMembersOnly?: boolean;
+  /** True if the current viewer may purchase this product right now — both the membership
+   * restriction and the release-date gate are satisfied. Defaults true for existing test fixtures. */
+  readonly canPurchase?: boolean;
+  /** When isMembersOnly is true, the plan(s) that grant access — drives the upgrade CTA copy. */
+  readonly requiredPlanNames?: readonly string[] | null;
 }
 
 export interface CreateProductRequest {
@@ -62,6 +71,7 @@ export interface CreateProductRequest {
   readonly categoryId: string;
   readonly additionalCategoryIds?: readonly string[];
   readonly collectionIds?: readonly string[];
+  readonly publicReleaseOnUtc?: string | null;
 }
 
 export interface UpdateProductRequest {
@@ -74,6 +84,7 @@ export interface UpdateProductRequest {
   readonly status: ProductStatus;
   readonly additionalCategoryIds?: readonly string[];
   readonly collectionIds?: readonly string[];
+  readonly publicReleaseOnUtc?: string | null;
 }
 
 export interface ProductAssetFile {
@@ -96,6 +107,7 @@ export interface ProductDraftFormSnapshot {
   readonly categoryId: string;
   readonly additionalCategoryIds: readonly string[];
   readonly collectionIds: readonly string[];
+  readonly publicReleaseOnUtc: string | null;
 }
 
 export interface ProductListQuery {

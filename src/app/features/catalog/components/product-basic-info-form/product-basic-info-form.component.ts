@@ -278,6 +278,7 @@ export class ProductBasicInfoFormComponent {
       categoryId: value.categoryId,
       additionalCategoryIds: value.additionalCategoryIds,
       collectionIds: value.collectionIds,
+      publicReleaseOnUtc: null,
     };
   }
 

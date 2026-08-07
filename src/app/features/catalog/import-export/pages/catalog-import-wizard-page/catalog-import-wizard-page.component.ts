@@ -475,7 +475,7 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
     }
     .wizard__primary-button {
       background: var(--admin-accent-green);
-      color: #fff;
+      color: var(--color-primary-text-on);
     }
     .wizard__secondary-button {
       background: var(--admin-bg-elevated);

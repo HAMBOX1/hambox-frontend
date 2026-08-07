@@ -35,14 +35,40 @@
         ></button>
       }
     </div>
+
+    <div class="product-publishing-panel__form product-publishing-panel__form--release" *hamboxHasPermission="permissions.Catalog.Products.Edit">
+      <label class="product-publishing-panel__release-label" for="product-release-date">Public release date</label>
+      <input
+        id="product-release-date"
+        type="date"
+        [ngModel]="releaseDate()"
+        (ngModelChange)="releaseDate.set($event)"
+      />
+      <button
+        pButton
+        type="button"
+        label="Save Release Date"
+        icon="pi pi-calendar"
+        severity="secondary"
+        [loading]="submitting()"
+        (click)="saveReleaseDate()"
+      ></button>
+      <p class="product-publishing-panel__note">
+        Leave empty to make this product public as soon as it's Active. Set a future date to gate it
+        behind the Early Access membership benefit — members get access early, everyone else sees a
+        countdown.
+      </p>
+    </div>
   }
 </app-admin-section-card>
 
 <app-admin-section-card
   title="Membership Restrictions"
-  description="Restrict purchase to specific membership tiers."
+  description="Restrict purchase to specific membership plans (Exclusive Products benefit)."
 >
   <p class="product-publishing-panel__note">
-  Membership restrictions are configured per variant via <strong>membershipPlanId</strong>. Product-level membership gating is not yet implemented in the API.
+    Configured from the plan side: open the plan in <strong>Admin → Memberships</strong>, edit its
+    Exclusive Products benefit, and add this product to the picker. A product can belong to more than
+    one plan's exclusive list.
   </p>
 </app-admin-section-card>

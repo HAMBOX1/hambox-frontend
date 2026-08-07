@@ -42,12 +42,14 @@ export class ProductPublishingPanelComponent {
   protected readonly submitting = this.facade.submitting;
   protected readonly statusOptions = STATUS_OPTIONS;
   protected readonly selectedStatus = signal<ProductStatus>('Draft');
+  protected readonly releaseDate = signal<string>('');
 
   constructor() {
     effect(() => {
       const product = this.product();
       if (product) {
         this.selectedStatus.set(product.status);
+        this.releaseDate.set(product.publicReleaseOnUtc?.slice(0, 10) ?? '');
       }
     });
   }
@@ -67,6 +69,11 @@ export class ProductPublishingPanelComponent {
 
   protected async saveStatus(): Promise<void> {
     await this.facade.updateStatus(this.selectedStatus());
+  }
+
+  protected async saveReleaseDate(): Promise<void> {
+    const value = this.releaseDate().trim();
+    await this.facade.updateReleaseDate(value ? new Date(`${value}T00:00:00.000Z`).toISOString() : null);
   }
 
   protected async publish(): Promise<void> {
