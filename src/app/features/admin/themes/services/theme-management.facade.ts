@@ -303,7 +303,9 @@ export class ThemeManagementFacade {
   async publishTheme(themeId: string, versionId?: string): Promise<boolean> {
     return this.runAction(async () => {
       await firstValueFrom(
-        this.api.post<void>(THEMES_API.publish(themeId), versionId ?? null),
+        this.api.post<void>(THEMES_API.publish(themeId), null, {
+          params: versionId ? { versionId } : {},
+        }),
       );
       await this.fetchThemes(true);
     });
@@ -332,7 +334,9 @@ export class ThemeManagementFacade {
 
     try {
       return await firstValueFrom(
-        this.api.post<ThemePreviewSessionDto>(THEMES_API.previewSession(themeId), versionId ?? null),
+        this.api.post<ThemePreviewSessionDto>(THEMES_API.previewSession(themeId), null, {
+          params: versionId ? { versionId } : {},
+        }),
       );
     } catch (error) {
       this.detailErrorState.set(this.toErrorMessage(error, 'Failed to create preview session.'));

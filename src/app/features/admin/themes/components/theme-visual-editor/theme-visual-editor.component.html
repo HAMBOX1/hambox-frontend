@@ -202,14 +202,6 @@
           </div>
         </app-admin-section-card>
       }
-
-      @case ('advanced') {
-        <app-theme-token-editor
-          [tokens]="tokens()"
-          [disabled]="disabled()"
-          (tokensChange)="onAdvancedTokensChange($event)"
-        />
-      }
     }
   </div>
 </div>

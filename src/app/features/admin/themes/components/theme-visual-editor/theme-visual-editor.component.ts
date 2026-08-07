@@ -12,7 +12,6 @@ import {
 import { AdminSectionCardComponent } from '../../../../../shared/components/admin';
 import { UiColorPickerComponent } from '../../../../../shared/components/ui';
 import { shadeRamp } from '../../../../../shared/utils/color.util';
-import { ThemeTokenEditorComponent } from '../theme-token-editor/theme-token-editor.component';
 
 const COLOR_TOKENS: readonly ThemeSemanticTokenKey[] = [
   THEME_SEMANTIC_TOKENS.Primary,
@@ -56,7 +55,7 @@ const RADIUS_TOKENS: readonly ThemeSemanticTokenKey[] = [
   THEME_SEMANTIC_TOKENS.BorderRadius,
 ];
 
-type SectionId = 'brand' | 'typography' | 'surfaces' | 'layout' | 'buttons' | 'effects' | 'advanced';
+type SectionId = 'brand' | 'typography' | 'surfaces' | 'layout' | 'buttons' | 'effects';
 
 interface SectionNavItem {
   readonly id: SectionId;
@@ -71,7 +70,6 @@ const SECTION_NAV: readonly SectionNavItem[] = [
   { id: 'layout', labelKey: 'ADMIN.THEMES.TOKENS.SECTIONS.LAYOUT', icon: 'pi pi-bars' },
   { id: 'buttons', labelKey: 'ADMIN.THEMES.TOKENS.SECTIONS.BUTTONS', icon: 'pi pi-stop' },
   { id: 'effects', labelKey: 'ADMIN.THEMES.TOKENS.SECTIONS.EFFECTS', icon: 'pi pi-sun' },
-  { id: 'advanced', labelKey: 'ADMIN.THEMES.EDITOR.ADVANCED', icon: 'pi pi-code' },
 ];
 
 const loadedFonts = new Set<string>();
@@ -85,7 +83,6 @@ const loadedFonts = new Set<string>();
     SelectModule,
     AdminSectionCardComponent,
     UiColorPickerComponent,
-    ThemeTokenEditorComponent,
   ],
   templateUrl: './theme-visual-editor.component.html',
   styleUrl: './theme-visual-editor.component.scss',
@@ -160,10 +157,6 @@ export class ThemeVisualEditorComponent {
   protected setAnimationSpeed(event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
     this.setToken(THEME_SEMANTIC_TOKENS.AnimationSpeed, `${value}ms`);
-  }
-
-  protected onAdvancedTokensChange(next: Record<string, string>): void {
-    this.tokensChange.emit(next);
   }
 }
 

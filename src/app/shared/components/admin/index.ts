@@ -52,4 +52,5 @@ export { IconPickerComponent } from './icon-picker/icon-picker.component';
 export { ButtonEditorComponent } from './button-editor/button-editor.component';
 export { ProductPickerComponent } from './product-picker/product-picker.component';
 export { CategoryPickerComponent } from './category-picker/category-picker.component';
+export { ThemePickerComponent } from './theme-picker/theme-picker.component';
 

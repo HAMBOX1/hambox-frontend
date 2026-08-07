@@ -273,7 +273,7 @@ export class ThemeDetailPageComponent implements OnInit {
       items.push({
         label: t('ADMIN.THEMES.ACTIONS.PUBLISH'),
         icon: 'pi pi-send',
-        disabled: this.actionLoading() || theme.status === 'Published',
+        disabled: this.actionLoading() || this.latestVersion()?.isPublished !== false,
         command: () => void this.publish(),
       });
     }

@@ -41,7 +41,7 @@
 
   &--active {
     background: var(--ui-primary);
-    color: var(--ui-primary-contrast, #fff);
+    color: var(--color-primary-text-on);
   }
 }
 
@@ -117,7 +117,7 @@
   border-radius: 8px;
   border: none;
   background: var(--ui-primary);
-  color: var(--ui-primary-contrast, #fff);
+  color: var(--color-primary-text-on);
   font-weight: 600;
   cursor: default;
 }

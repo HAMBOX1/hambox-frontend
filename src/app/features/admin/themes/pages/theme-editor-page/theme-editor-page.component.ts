@@ -15,6 +15,7 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
@@ -29,6 +30,7 @@ import {
   AdminStickySaveBarComponent,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
+import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
 import { contrastRatio } from '../../../../../shared/utils/color.util';
 import { ThemePreviewPanelComponent } from '../../components/theme-preview-panel/theme-preview-panel.component';
 import { ThemeVisualEditorComponent } from '../../components/theme-visual-editor/theme-visual-editor.component';
@@ -52,6 +54,7 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
     ButtonModule,
     InputTextModule,
     SelectModule,
+    TabsModule,
     TextareaModule,
     ToastModule,
     TooltipModule,
@@ -62,6 +65,7 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
     AdminStickySaveBarComponent,
     ThemeVisualEditorComponent,
     ThemePreviewPanelComponent,
+    HasPermissionDirective,
   ],
   providers: [ThemeManagementFacade, MessageService],
   templateUrl: './theme-editor-page.component.html',
@@ -81,6 +85,7 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
 
   protected readonly themeId = signal<string | null>(null);
   protected readonly isCreateMode = computed(() => this.themeId() === null);
+  protected readonly activeTab = signal('0');
 
   protected readonly name = signal('');
   protected readonly slug = signal('');
@@ -97,6 +102,11 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
   protected readonly detailLoading = this.facade.detailLoading;
   protected readonly detailSaving = this.facade.detailSaving;
   protected readonly detailError = this.facade.detailError;
+  protected readonly publishing = this.facade.actionLoading;
+
+  protected readonly canPublish = computed(
+    () => !this.isCreateMode() && latestThemeVersion(this.facade.detail())?.isPublished === false,
+  );
 
   protected readonly serverWarnings = computed(
     () => latestThemeVersion(this.facade.detail())?.validationWarnings ?? [],
@@ -194,6 +204,10 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
     this.themeEngine.restoreActiveTheme();
   }
 
+  protected onTabChange(value: string | number | undefined): void {
+    this.activeTab.set(String(value ?? '0'));
+  }
+
   protected onTokensChange(next: Record<string, string>): void {
     this.tokens.set(next);
     this.tokenHistory = [...this.tokenHistory.slice(0, this.historyIndex + 1), next];
@@ -285,6 +299,36 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
         summary: this.translate.instant('ADMIN.THEMES.MESSAGES.SAVED'),
         life: 4000,
       });
+    }
+  }
+
+  protected async publish(): Promise<void> {
+    const id = this.themeId();
+    if (!id || this.saveInFlight) {
+      return;
+    }
+
+    this.saveInFlight = true;
+    try {
+      await this.performSave();
+      const success = await this.facade.publishTheme(id);
+      if (success) {
+        await this.facade.loadDetail(id);
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('ADMIN.THEMES.MESSAGES.PUBLISHED'),
+          life: 4000,
+        });
+        return;
+      }
+
+      this.messageService.add({
+        severity: 'error',
+        summary: this.facade.themesError() ?? 'Failed to publish theme.',
+        life: 6000,
+      });
+    } finally {
+      this.saveInFlight = false;
     }
   }
 

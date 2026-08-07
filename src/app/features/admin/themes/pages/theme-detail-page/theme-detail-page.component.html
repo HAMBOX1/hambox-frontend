@@ -16,7 +16,7 @@
         <span adminHeaderMeta class="theme-detail-page__default">{{ 'ADMIN.THEMES.LIST.DEFAULT' | translate }}</span>
       }
 
-      @if (theme.status === 'Draft' && permissionServicePublic.hasPermission(permissions.Themes.Publish)) {
+      @if (latestVersion()?.isPublished === false && permissionServicePublic.hasPermission(permissions.Themes.Publish)) {
         <button
           adminHeaderActions
           pButton

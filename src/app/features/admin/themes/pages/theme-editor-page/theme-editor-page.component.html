@@ -71,40 +71,49 @@
   } @else {
     <div class="theme-editor-page__layout">
       <div class="theme-editor-page__form">
-        <app-admin-section-card [title]="'ADMIN.THEMES.EDIT.DETAILS' | translate">
-          <div class="theme-editor-page__fields">
-            <label>
-              <span>{{ 'ADMIN.THEMES.EDIT.NAME' | translate }}</span>
-              <input pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.THEMES.EDIT.SLUG' | translate }}</span>
-              <input pInputText [ngModel]="slug()" (ngModelChange)="slug.set($event)" [disabled]="!isCreateMode()" />
-            </label>
-            <label>
-              <span>{{ 'ADMIN.THEMES.EDIT.BASE_MODE' | translate }}</span>
-              <p-select
-                [options]="baseModeOptions"
-                optionLabel="label"
-                optionValue="value"
-                [ngModel]="baseMode()"
-                (ngModelChange)="baseMode.set($event)"
-              />
-            </label>
-            <label class="theme-editor-page__full">
-              <span>{{ 'ADMIN.THEMES.EDIT.DESCRIPTION' | translate }}</span>
-              <textarea pTextarea rows="3" [ngModel]="description()" (ngModelChange)="description.set($event)"></textarea>
-            </label>
-            @if (!isCreateMode()) {
-              <label class="theme-editor-page__full">
-                <span>{{ 'ADMIN.THEMES.EDIT.NOTES' | translate }}</span>
-                <textarea pTextarea rows="2" [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
-              </label>
-            }
-          </div>
-        </app-admin-section-card>
+        <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+          <p-tablist>
+            <p-tab value="0">{{ 'ADMIN.THEMES.EDIT.TAB_DETAILS' | translate }}</p-tab>
+            <p-tab value="1">{{ 'ADMIN.THEMES.EDIT.TAB_THEME' | translate }}</p-tab>
+          </p-tablist>
 
-        <app-theme-visual-editor [tokens]="tokens()" (tokensChange)="onTokensChange($event)" [disabled]="detailSaving()" />
+          <p-tabpanels>
+            <p-tabpanel value="0">
+              <app-admin-section-card [title]="'ADMIN.THEMES.EDIT.DETAILS' | translate">
+                <div class="theme-editor-page__fields">
+                  <label>
+                    <span>{{ 'ADMIN.THEMES.EDIT.NAME' | translate }}</span>
+                    <input pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" />
+                  </label>
+                  <label>
+                    <span>{{ 'ADMIN.THEMES.EDIT.BASE_MODE' | translate }}</span>
+                    <p-select
+                      [options]="baseModeOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      [ngModel]="baseMode()"
+                      (ngModelChange)="baseMode.set($event)"
+                    />
+                  </label>
+                  <label class="theme-editor-page__full">
+                    <span>{{ 'ADMIN.THEMES.EDIT.DESCRIPTION' | translate }}</span>
+                    <textarea pTextarea rows="3" [ngModel]="description()" (ngModelChange)="description.set($event)"></textarea>
+                  </label>
+                  @if (!isCreateMode()) {
+                    <label class="theme-editor-page__full">
+                      <span>{{ 'ADMIN.THEMES.EDIT.NOTES' | translate }}</span>
+                      <textarea pTextarea rows="2" [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
+                    </label>
+                  }
+                </div>
+              </app-admin-section-card>
+            </p-tabpanel>
+
+            <p-tabpanel value="1">
+              <app-theme-visual-editor [tokens]="tokens()" (tokensChange)="onTokensChange($event)" [disabled]="detailSaving()" />
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
       </div>
 
       <aside class="theme-editor-page__preview">
@@ -123,11 +132,23 @@
     <button
       pButton
       type="button"
-      class="admin-btn-primary"
+      class="p-button-outlined"
       [label]="'ADMIN.THEMES.ACTIONS.SAVE' | translate"
       icon="pi pi-check"
       [loading]="detailSaving()"
       (click)="save()"
     ></button>
+    @if (canPublish() && !isCreateMode()) {
+      <button
+        *hamboxHasPermission="permissions.Themes.Publish"
+        pButton
+        type="button"
+        class="admin-btn-primary"
+        [label]="'ADMIN.THEMES.ACTIONS.PUBLISH' | translate"
+        icon="pi pi-send"
+        [loading]="publishing()"
+        (click)="publish()"
+      ></button>
+    }
   </app-admin-sticky-save-bar>
 </section>
