@@ -13,6 +13,7 @@ export interface RegisterRequest {
   readonly password: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly referralCode?: string;
 }
 
 export interface RefreshTokenRequest {

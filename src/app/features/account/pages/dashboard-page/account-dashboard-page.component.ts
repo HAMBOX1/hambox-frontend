@@ -5,6 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
+import { HasFeatureDirective } from '../../../../shared/directives/has-feature.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { WalletCardComponent } from '../../components/wallet-card/wallet-card.component';
 import { AccountDashboardFacade } from '../../services/account-dashboard.facade';
@@ -17,7 +18,7 @@ import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 @Component({
   selector: 'app-account-dashboard-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective, WalletCardComponent],
+  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective, HasFeatureDirective, WalletCardComponent],
   templateUrl: './account-dashboard-page.component.html',
   styleUrl: './account-dashboard-page.component.scss',
 })
@@ -49,6 +50,11 @@ export class AccountDashboardPageComponent implements OnInit {
     }
 
     return referralTierProgress(ref.tier, ref.lifetimePoints);
+  });
+
+  protected readonly referralPointsValue = computed(() => {
+    const ref = this.referral();
+    return ref ? ref.lifetimePoints * ref.pointValueUsd : 0;
   });
 
   protected readonly hasMembershipPlan = computed(() => {

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
 
@@ -35,6 +35,7 @@ export class RegisterPageComponent {
   private readonly auth = inject(Auth);
   private readonly fb = inject(FormBuilder);
   private readonly legal = inject(LegalService);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
@@ -48,6 +49,11 @@ export class RegisterPageComponent {
 
   constructor() {
     void this.legal.loadDocuments();
+
+    const referralCode = this.route.snapshot.queryParamMap.get('ref');
+    if (referralCode) {
+      this.form.controls.referralCode.setValue(referralCode.toUpperCase());
+    }
   }
   protected readonly activeFeatureIndex = signal(2);
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
@@ -122,7 +128,7 @@ export class RegisterPageComponent {
   }
 
   private register(): void {
-    const { fullName, email, password } = this.form.getRawValue();
+    const { fullName, email, password, referralCode } = this.form.getRawValue();
     const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
     const firstName = nameParts[0] ?? '';
     const lastName = nameParts.slice(1).join(' ') || firstName;
@@ -130,7 +136,13 @@ export class RegisterPageComponent {
     this.isSubmitting.set(true);
 
     this.auth
-      .register({ firstName, lastName, email, password })
+      .register({
+        firstName,
+        lastName,
+        email,
+        password,
+        referralCode: referralCode.trim() || undefined,
+      })
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: () => {

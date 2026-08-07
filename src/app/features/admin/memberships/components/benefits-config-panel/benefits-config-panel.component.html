@@ -1,4 +1,7 @@
-<app-admin-section-card [title]="'ADMIN.MEMBERSHIPS.BENEFITS.TITLE' | translate">
+<app-admin-section-card
+  [title]="'ADMIN.MEMBERSHIPS.BENEFITS.TITLE' | translate"
+  [description]="'ADMIN.MEMBERSHIPS.BENEFITS.SUBTITLE' | translate"
+>
   <button
     adminSectionActions
     pButton
@@ -15,70 +18,151 @@
       @for (benefit of sortedBenefits(benefits()); track $index; let i = $index) {
         <article class="benefits-config-panel__item">
           @let benefitIndex = findIndex(benefits(), benefit);
-          <div class="admin-form-grid">
-            <label class="admin-field">
+          @let meta = metaFor(benefit.type);
+
+          <div class="benefits-config-panel__type-row">
+            <label class="admin-field benefits-config-panel__type-field">
               <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.TYPE' | translate }}</span>
               <p-select
                 [options]="typeOptions"
                 optionLabel="label"
                 optionValue="value"
                 [ngModel]="benefit.type"
-                (ngModelChange)="updateBenefit(benefitIndex, { type: $event })"
+                (ngModelChange)="onTypeChange(benefitIndex, $event)"
                 [disabled]="disabled()"
               />
             </label>
 
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.VALUE' | translate }}</span>
-              <input
-                pInputText
-                class="admin-field__input"
-                type="text"
-                [ngModel]="benefit.value"
-                (ngModelChange)="updateBenefit(benefitIndex, { value: $event })"
-                [disabled]="disabled()"
-              />
-            </label>
+            <app-admin-status-badge
+              class="benefits-config-panel__status"
+              [label]="statusLabel(benefit.type) | translate"
+              [tone]="statusTone(benefit.type)"
+            />
+          </div>
 
-            <label class="admin-field benefits-config-panel__field--wide">
-              <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.DISPLAY_NAME' | translate }}</span>
-              <input
-                pInputText
-                class="admin-field__input"
-                type="text"
-                [ngModel]="benefit.displayName"
-                (ngModelChange)="updateBenefit(benefitIndex, { displayName: $event })"
-                [disabled]="disabled()"
-              />
-            </label>
+          @if (meta) {
+            <p class="benefits-config-panel__hint">{{ meta.hint }}</p>
+          }
 
-            <label class="admin-field">
-              <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.SORT_ORDER' | translate }}</span>
-              <p-inputNumber
-                [ngModel]="benefit.sortOrder"
-                (ngModelChange)="updateBenefit(benefitIndex, { sortOrder: $event ?? 0 })"
-                [disabled]="disabled()"
-              />
-            </label>
+          <div class="admin-form-grid">
+            @switch (meta?.valueKind) {
+              @case ('percentage') {
+                <label class="admin-field">
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.VALUE' | translate }}</span>
+                  <p-inputNumber
+                    [ngModel]="numericValue(benefit.value)"
+                    (ngModelChange)="updateBenefit(benefitIndex, { value: ($event ?? 0).toString() })"
+                    suffix="%"
+                    [min]="0"
+                    [max]="100"
+                    [disabled]="disabled()"
+                  />
+                </label>
+              }
+              @case ('multiplier') {
+                <label class="admin-field">
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.VALUE' | translate }}</span>
+                  <p-inputNumber
+                    [ngModel]="numericValue(benefit.value)"
+                    (ngModelChange)="updateBenefit(benefitIndex, { value: ($event ?? 0).toString() })"
+                    suffix="×"
+                    [min]="0"
+                    [step]="0.25"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="2"
+                    [disabled]="disabled()"
+                  />
+                </label>
+              }
+              @case ('number') {
+                <label class="admin-field">
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.PURCHASE_LIMIT_VALUE' | translate }}</span>
+                  <p-inputNumber
+                    [ngModel]="numericValue(benefit.value)"
+                    (ngModelChange)="updateBenefit(benefitIndex, { value: ($event ?? 1).toString() })"
+                    [min]="1"
+                    [suffix]="' ' + ('ADMIN.MEMBERSHIPS.BENEFITS.PER_MONTH' | translate)"
+                    [disabled]="disabled()"
+                  />
+                </label>
+              }
+              @case ('days') {
+                <label class="admin-field">
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.EARLY_ACCESS_DAYS' | translate }}</span>
+                  <p-inputNumber
+                    [ngModel]="numericValue(benefit.value)"
+                    (ngModelChange)="updateBenefit(benefitIndex, { value: ($event ?? 1).toString() })"
+                    [min]="1"
+                    [max]="60"
+                    [suffix]="' ' + ('ADMIN.MEMBERSHIPS.BENEFITS.DAYS' | translate)"
+                    [disabled]="disabled()"
+                  />
+                </label>
+              }
+              @case ('boolean') {
+                <label class="benefits-config-panel__toggle-field">
+                  <p-toggleswitch
+                    [ngModel]="booleanValue(benefit.value)"
+                    (ngModelChange)="updateBenefit(benefitIndex, { value: $event ? 'true' : 'false' })"
+                    [disabled]="disabled()"
+                  />
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.GRANTED' | translate }}</span>
+                </label>
+              }
+              @case ('products') {
+                <div class="admin-field benefits-config-panel__field--wide">
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.EXCLUSIVE_PRODUCTS' | translate }}</span>
+                  <app-product-picker
+                    [value]="exclusiveProductIds()"
+                    (valueChange)="exclusiveProductIdsChange.emit($event)"
+                    [disabled]="disabled()"
+                  />
+                </div>
+              }
+              @case ('theme') {
+                <div class="admin-field benefits-config-panel__field--wide">
+                  <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.UNLOCKED_THEMES' | translate }}</span>
+                  <app-theme-picker
+                    [value]="unlockedThemeIds()"
+                    (valueChange)="unlockedThemeIdsChange.emit($event)"
+                    [disabled]="disabled()"
+                  />
+                </div>
+              }
+            }
+
+            @if (meta?.valueKind !== 'products' && meta?.valueKind !== 'theme') {
+              <label class="admin-field benefits-config-panel__field--wide">
+                <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.DISPLAY_NAME' | translate }}</span>
+                <input
+                  pInputText
+                  class="admin-field__input"
+                  type="text"
+                  [ngModel]="benefit.displayName"
+                  (ngModelChange)="updateBenefit(benefitIndex, { displayName: $event })"
+                  [disabled]="disabled()"
+                />
+              </label>
+            }
           </div>
 
           <div class="admin-actions-row benefits-config-panel__actions">
             <app-admin-icon-button
               icon="pi pi-arrow-up"
-              [label]="'Move up'"
+              [label]="'ADMIN.MEMBERSHIPS.BENEFITS.MOVE_UP' | translate"
               [disabled]="disabled() || i === 0"
               (pressed)="moveBenefit(i, -1)"
             />
             <app-admin-icon-button
               icon="pi pi-arrow-down"
-              [label]="'Move down'"
+              [label]="'ADMIN.MEMBERSHIPS.BENEFITS.MOVE_DOWN' | translate"
               [disabled]="disabled() || i === sortedBenefits(benefits()).length - 1"
               (pressed)="moveBenefit(i, 1)"
             />
             <app-admin-icon-button
               icon="pi pi-trash"
               severity="danger"
-              [label]="'Remove benefit'"
+              [label]="'ADMIN.MEMBERSHIPS.BENEFITS.REMOVE' | translate"
               [disabled]="disabled()"
               (pressed)="removeBenefit(benefitIndex)"
             />
@@ -96,4 +180,21 @@
       (primaryAction)="addBenefit()"
     />
   }
+
+  <div class="benefits-config-panel__flags">
+    <label class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.FEATURE_FLAGS' | translate }}</span>
+      <p-multiSelect
+        [options]="featureFlagOptions"
+        optionLabel="label"
+        optionValue="key"
+        display="chip"
+        [ngModel]="selectedFeatureFlags()"
+        (ngModelChange)="onFeatureFlagsChange($event)"
+        [disabled]="disabled()"
+        [placeholder]="'ADMIN.MEMBERSHIPS.BENEFITS.FEATURE_FLAGS_PLACEHOLDER' | translate"
+      />
+      <span class="admin-field__hint">{{ 'ADMIN.MEMBERSHIPS.BENEFITS.FEATURE_FLAGS_HINT' | translate }}</span>
+    </label>
+  </div>
 </app-admin-section-card>

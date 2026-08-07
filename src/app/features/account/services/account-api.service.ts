@@ -19,6 +19,7 @@ import {
   NotificationQuery,
   ReferralDashboardApiDto,
   ReferralHistoryApiDto,
+  ReferralHistoryQuery,
   UpdateProfileRequest,
   UpdateReviewRequest,
   UserNotificationApiDto,
@@ -156,8 +157,21 @@ export class AccountApiService {
     return this.api.get<ReferralDashboardApiDto>(ACCOUNT_API.referral);
   }
 
-  getReferralHistory(): Observable<readonly ReferralHistoryApiDto[]> {
-    return this.api.get<readonly ReferralHistoryApiDto[]>(ACCOUNT_API.referralHistory);
+  getReferralHistory(query: ReferralHistoryQuery = {}): Observable<PagedResult<ReferralHistoryApiDto>> {
+    const params: Record<string, string | number> = {
+      pageNumber: query.pageNumber ?? 1,
+      pageSize: query.pageSize ?? 10,
+    };
+
+    if (query.search?.trim()) {
+      params['search'] = query.search.trim();
+    }
+
+    if (query.status) {
+      params['status'] = query.status;
+    }
+
+    return this.api.get(ACCOUNT_API.referralHistory, { params });
   }
 
   getLibrary(query: CustomerLibraryQuery = {}): Observable<PagedResult<CustomerLibraryItemApiDto>> {

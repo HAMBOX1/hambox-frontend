@@ -19,7 +19,12 @@
             <p class="dashboard-page__membership-tier">
               {{ card.badgeLabel || card.status }}
             </p>
-            <h2 class="dashboard-page__membership-title">{{ card.planName }}</h2>
+            <h2 class="dashboard-page__membership-title">
+              {{ card.planName }}
+              <span class="dashboard-page__beta-badge" *hamboxHasFeature="'beta-access'">
+                {{ 'ACCOUNT.DASHBOARD_UI.BETA_ACCESS' | translate }}
+              </span>
+            </h2>
             <p class="dashboard-page__membership-meta">
               @if (card.expiresOnUtc) {
                 {{ 'ACCOUNT.DASHBOARD_UI.EXPIRES' | translate }} {{ card.expiresOnUtc | hamboxDate:'mediumDate' }}
@@ -39,7 +44,9 @@
       }
     </header>
 
+    <!-- Hambox Rewards: hidden until the loyalty-points backend ships (currently mock data)
     <app-wallet-card />
+    -->
 
     <div class="dashboard-page__grid">
       <section class="dashboard-page__wishlist">
@@ -80,6 +87,7 @@
           <p class="dashboard-page__referral-label">{{ 'ACCOUNT.DASHBOARD_UI.REFERRAL_STATUS' | translate }}</p>
           <p class="dashboard-page__referral-points">
             {{ 'ACCOUNT.DASHBOARD_UI.LIFETIME_REWARDS' | translate }}: <strong>{{ ref.lifetimePoints | number }} {{ 'ACCOUNT.DASHBOARD_UI.POINTS' | translate }}</strong>
+            <span class="dashboard-page__referral-value">({{ referralPointsValue() | hamboxCurrency }})</span>
           </p>
           <div class="dashboard-page__progress">
             <div class="dashboard-page__progress-bar" [style.width.%]="referralProgress()"></div>

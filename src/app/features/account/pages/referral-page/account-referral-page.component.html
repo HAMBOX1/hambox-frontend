@@ -9,22 +9,36 @@
   } @else if (error()) {
     <p class="referral-page__state">{{ error() }}</p>
   } @else if (dashboard(); as data) {
-    <div class="referral-page__grid">
-      <section class="referral-page__card">
-        <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.LIFETIME_REWARDS' | translate }}</p>
-        <h2>{{ data.lifetimePoints | number }} {{ 'ACCOUNT.REFERRAL_UI.POINTS' | translate }}</h2>
-        <p>{{ 'ACCOUNT.REFERRAL_UI.REFERRAL_TIER' | translate:{ count: data.successfulReferrals, tier: data.tier } }}</p>
-
+    <div class="referral-page__stats">
+      <div class="referral-page__stat">
+        <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.POINTS_BALANCE' | translate }}</p>
+        <p class="referral-page__stat-value">{{ data.lifetimePoints | number }}</p>
+        <p class="referral-page__stat-sub">{{ lifetimePointsValue() | hamboxCurrency }}</p>
+      </div>
+      <div class="referral-page__stat">
+        <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.SUCCESSFUL_REFERRALS' | translate }}</p>
+        <p class="referral-page__stat-value">{{ data.successfulReferrals | number }}</p>
+      </div>
+      <div class="referral-page__stat">
+        <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.PENDING_REFERRALS' | translate }}</p>
+        <p class="referral-page__stat-value">{{ data.pendingReferrals | number }}</p>
+      </div>
+      <div class="referral-page__stat">
+        <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.REFERRAL_TIER' | translate:{ count: data.successfulReferrals, tier: data.tier } }}</p>
         <div class="referral-page__progress">
           <div class="referral-page__progress-bar" [style.width.%]="tierProgress()"></div>
         </div>
-        <p class="referral-page__progress-label">{{ 'ACCOUNT.REFERRAL_UI.TIER_PROGRESS' | translate:{ percent: (tierProgress() | number:'1.0-0') } }}</p>
+      </div>
+    </div>
 
+    <div class="referral-page__grid">
+      <section class="referral-page__card">
+        <h3>{{ 'ACCOUNT.REFERRAL_UI.INVITE_FRIENDS' | translate }}</h3>
+        <p class="referral-page__code">{{ 'ACCOUNT.REFERRAL_UI.CODE' | translate }}: <strong>{{ data.referralCode }}</strong></p>
+        <p class="referral-page__link">{{ inviteLink() }}</p>
         <button type="button" class="referral-page__copy" (click)="copyLink()">
           {{ copied() ? ('ACCOUNT.REFERRAL_UI.COPIED' | translate) : ('ACCOUNT.REFERRAL_UI.COPY_INVITE' | translate) }}
         </button>
-        <p class="referral-page__code">{{ 'ACCOUNT.REFERRAL_UI.CODE' | translate }}: {{ data.referralCode }}</p>
-        <p class="referral-page__link">{{ inviteLink() }}</p>
       </section>
 
       <section class="referral-page__card">
@@ -33,6 +47,7 @@
           <ul>
             @for (entry of data.recentHistory; track entry.id) {
               <li>
+                <span>{{ entry.friendName }}</span>
                 <strong>{{ 'ACCOUNT.REFERRAL_UI.POINTS_GAINED' | translate:{ points: entry.pointsEarned } }}</strong>
                 <span>{{ entry.createdOnUtc | hamboxDate:'mediumDate' }}</span>
               </li>
@@ -43,5 +58,66 @@
         }
       </section>
     </div>
+
+    <section class="referral-page__history">
+      <div class="referral-history__toolbar">
+        <h3>{{ 'ACCOUNT.REFERRAL_UI.HISTORY_TITLE' | translate }}</h3>
+        <div class="referral-history__filters">
+          <input
+            type="search"
+            class="referral-history__search"
+            [value]="search()"
+            (input)="onSearchInput($event)"
+            [placeholder]="'ACCOUNT.REFERRAL_UI.SEARCH_PLACEHOLDER' | translate"
+          />
+          <select class="referral-history__status-select" [value]="statusFilter()" (change)="onStatusFilterChange($event)">
+            @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ option.labelKey | translate }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      @if (historyLoading()) {
+        <p class="referral-page__state">{{ 'ACCOUNT.REFERRAL_UI.LOADING' | translate }}</p>
+      } @else if (history().length === 0) {
+        <p class="referral-page__empty">{{ 'ACCOUNT.REFERRAL_UI.EMPTY_HISTORY' | translate }}</p>
+      } @else {
+        <div class="referral-history__table-wrap">
+          <table class="referral-history__table">
+            <thead>
+              <tr>
+                <th>{{ 'ACCOUNT.REFERRAL_UI.COL_FRIEND' | translate }}</th>
+                <th>{{ 'ACCOUNT.REFERRAL_UI.COL_JOINED' | translate }}</th>
+                <th>{{ 'ACCOUNT.REFERRAL_UI.COL_QUALIFIED' | translate }}</th>
+                <th>{{ 'ACCOUNT.REFERRAL_UI.COL_POINTS' | translate }}</th>
+                <th>{{ 'ACCOUNT.REFERRAL_UI.COL_STATUS' | translate }}</th>
+                <th>{{ 'ACCOUNT.REFERRAL_UI.COL_REWARD_DATE' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of history(); track entry.id) {
+                <tr>
+                  <td>{{ entry.friendName }}</td>
+                  <td>{{ entry.createdOnUtc | hamboxDate:'mediumDate' }}</td>
+                  <td>{{ entry.qualifiedOnUtc ? (entry.qualifiedOnUtc | hamboxDate:'mediumDate') : '—' }}</td>
+                  <td>{{ entry.pointsEarned | number }}</td>
+                  <td><span [class]="statusClass(entry.status)">{{ 'ACCOUNT.REFERRAL_UI.STATUS_' + entry.status.toUpperCase() | translate }}</span></td>
+                  <td>{{ entry.rewardedOnUtc ? (entry.rewardedOnUtc | hamboxDate:'mediumDate') : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="referral-history__pagination" [attr.aria-label]="'ACCOUNT.REFERRAL_UI.PAGINATION_ARIA' | translate">
+            <button type="button" [disabled]="pageNumber() <= 1" (click)="goToPage(pageNumber() - 1)">{{ 'ACCOUNT.REFERRAL_UI.PREVIOUS' | translate }}</button>
+            <span>{{ 'ACCOUNT.REFERRAL_UI.PAGE_OF' | translate:{ page: pageNumber(), total: totalPages() } }}</span>
+            <button type="button" [disabled]="pageNumber() >= totalPages()" (click)="goToPage(pageNumber() + 1)">{{ 'ACCOUNT.REFERRAL_UI.NEXT' | translate }}</button>
+          </nav>
+        }
+      }
+    </section>
   }
 </section>

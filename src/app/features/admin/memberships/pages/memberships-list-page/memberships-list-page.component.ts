@@ -13,6 +13,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -26,6 +27,7 @@ import {
   AdminEmptyStateComponent,
   AdminErrorAlertComponent,
   AdminIconButtonComponent,
+  AdminLoadingSkeletonComponent,
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
   AdminStatCardComponent,
@@ -37,6 +39,8 @@ import {
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../../shared/pipes/hambox-currency.pipe';
+import { MobileViewportService } from '../../../../../shared/services/mobile-viewport.service';
+import { MembershipPlanCardComponent } from '../../components/membership-plan-card/membership-plan-card.component';
 import {
   MEMBERSHIP_STATUS_OPTIONS,
   MembershipPlanListItemDto,
@@ -53,6 +57,7 @@ import { MembershipManagementFacade } from '../../services/membership-management
     ButtonModule,
     DialogModule,
     InputTextModule,
+    PaginatorModule,
     SelectModule,
     TableModule,
     ToastModule,
@@ -70,6 +75,8 @@ import { MembershipManagementFacade } from '../../services/membership-management
     AdminActionMenuComponent,
     AdminConfirmDialogComponent,
     AdminStatusBadgeComponent,
+    AdminLoadingSkeletonComponent,
+    MembershipPlanCardComponent,
   ],
   providers: [MembershipManagementFacade, MessageService],
   templateUrl: './memberships-list-page.component.html',
@@ -82,6 +89,7 @@ export class MembershipsListPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
   private readonly permissionService = inject(PermissionService);
+  protected readonly mobileViewport = inject(MobileViewportService);
 
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Memberships' });
@@ -125,10 +133,17 @@ export class MembershipsListPageComponent implements OnInit {
   }
 
   protected onPageChange(event: TableLazyLoadEvent): void {
-    const rows = event.rows ?? this.facade.pageSize();
-    const first = event.first ?? 0;
-    const pageNumber = Math.floor(first / rows) + 1;
-    this.facade.setPage(pageNumber, rows);
+    this.applyPageChange(event.first, event.rows);
+  }
+
+  protected onCardsPageChange(event: PaginatorState): void {
+    this.applyPageChange(event.first, event.rows);
+  }
+
+  private applyPageChange(first: number | null | undefined, rows: number | null | undefined): void {
+    const resolvedRows = rows ?? this.facade.pageSize();
+    const pageNumber = Math.floor((first ?? 0) / resolvedRows) + 1;
+    this.facade.setPage(pageNumber, resolvedRows);
   }
 
   protected retryLoad(): void {
@@ -150,6 +165,10 @@ export class MembershipsListPageComponent implements OnInit {
 
   protected navigateToNew(): void {
     void this.router.navigate(['/admin/memberships/new']);
+  }
+
+  protected canEditPlans(): boolean {
+    return this.permissionService.hasPermission(this.permissions.Memberships.Edit);
   }
 
   protected openDuplicateDialog(plan: MembershipPlanListItemDto): void {

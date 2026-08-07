@@ -81,6 +81,45 @@
     />
   }
 
+  @if (mobileViewport.isMobile()) {
+    <div class="memberships-list-page__cards">
+      @if (loading()) {
+        <app-admin-loading-skeleton variant="table" [rows]="4" />
+      } @else if (plans().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-id-card"
+          [title]="
+            hasActiveFilters()
+              ? ('ADMIN.MEMBERSHIPS.LIST.EMPTY_SEARCH' | translate)
+              : ('ADMIN.MEMBERSHIPS.LIST.EMPTY' | translate)
+          "
+          [primaryLabel]="'ADMIN.MEMBERSHIPS.LIST.NEW' | translate"
+          primaryIcon="pi pi-plus"
+          (primaryAction)="navigateToNew()"
+        />
+      } @else {
+        @for (plan of plans(); track plan.id) {
+          <app-membership-plan-card
+            [plan]="plan"
+            [statusTone]="statusTone(plan.status)"
+            [menuItems]="planActionMenuItems(plan)"
+            [menuDisabled]="actionLoading()"
+            [canEdit]="canEditPlans()"
+          />
+        }
+
+        @if (totalCount() > pageSize()) {
+          <p-paginator
+            [rows]="pageSize()"
+            [totalRecords]="totalCount()"
+            [first]="tableFirst()"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (onPageChange)="onCardsPageChange($event)"
+          />
+        }
+      }
+    </div>
+  } @else {
   <app-admin-data-table-shell>
     <p-table
       class="admin-data-table"
@@ -170,6 +209,7 @@
       </ng-template>
     </p-table>
   </app-admin-data-table-shell>
+  }
 </section>
 
 <p-dialog

@@ -59,6 +59,21 @@
   font-size: 1.25rem;
 }
 
+.dashboard-page__beta-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-membership-text);
+  color: var(--color-surface, #fff);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
 .dashboard-page__membership-meta {
   margin: 0;
   color: var(--sf-text-secondary);
@@ -187,6 +202,12 @@
   strong {
     color: var(--sf-accent);
   }
+}
+
+.dashboard-page__referral-value {
+  margin-inline-start: 0.25rem;
+  color: var(--sf-text-secondary);
+  font-size: 0.8125rem;
 }
 
 .dashboard-page__progress {

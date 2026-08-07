@@ -18,8 +18,42 @@
   grid-column: 1 / -1;
 }
 
+.benefits-config-panel__type-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.benefits-config-panel__type-field {
+  flex: 1 1 14rem;
+}
+
+.benefits-config-panel__status {
+  margin-bottom: 0.5rem;
+}
+
+.benefits-config-panel__hint {
+  margin: 0;
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-type-caption);
+  line-height: 1.4;
+}
+
+.benefits-config-panel__toggle-field {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
 .benefits-config-panel__actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.25rem;
+}
+
+.benefits-config-panel__flags {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--admin-border-subtle);
 }

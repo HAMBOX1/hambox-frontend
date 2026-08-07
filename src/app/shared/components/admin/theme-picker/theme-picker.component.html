@@ -1,0 +1,63 @@
+<div class="theme-picker">
+  @if (value().length) {
+    <div class="theme-picker__chips">
+      @for (id of value(); track id; let i = $index) {
+        <span class="theme-picker__chip">
+          @if (i === 0) {
+            <span class="theme-picker__primary-tag">{{ 'ADMIN.PICKERS.THEME_PICKER.PRIMARY' | translate }}</span>
+          }
+          <span class="theme-picker__chip-name">{{ detailsFor(id)?.name ?? id }}</span>
+          <button
+            type="button"
+            [disabled]="disabled()"
+            [attr.aria-label]="'ADMIN.PICKERS.PRODUCT_PICKER.REMOVE' | translate"
+            (click)="remove(id)"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </span>
+      }
+    </div>
+  }
+
+  <input
+    pInputText
+    [id]="fieldId"
+    class="w-full"
+    type="text"
+    [placeholder]="'ADMIN.PICKERS.THEME_PICKER.SEARCH_PLACEHOLDER' | translate"
+    [value]="query()"
+    [disabled]="disabled()"
+    (input)="onQueryChange($any($event.target).value)"
+    (focus)="onQueryChange(query())"
+  />
+
+  @if (query() || results().length) {
+    <div class="theme-picker__results">
+      @if (loading()) {
+        <p class="theme-picker__status">{{ 'ADMIN.PICKERS.PRODUCT_PICKER.LOADING' | translate }}</p>
+      } @else if (error()) {
+        <p class="theme-picker__status theme-picker__status--error">{{ 'ADMIN.PICKERS.SEARCH_FAILED' | translate }}</p>
+      } @else if (!results().length) {
+        <p class="theme-picker__status">{{ 'ADMIN.PICKERS.THEME_PICKER.NO_RESULTS' | translate }}</p>
+      } @else {
+        @for (theme of results(); track theme.id) {
+          <label
+            class="theme-picker__result"
+            [class.theme-picker__result--selected]="isSelected(theme.id)"
+          >
+            <input
+              type="checkbox"
+              class="theme-picker__result-checkbox"
+              [checked]="isSelected(theme.id)"
+              [disabled]="disabled()"
+              (change)="toggle(theme)"
+            />
+            <span class="theme-picker__result-name">{{ theme.name }}</span>
+            <span class="theme-picker__result-meta">{{ theme.status }}</span>
+          </label>
+        }
+      }
+    </div>
+  }
+</div>

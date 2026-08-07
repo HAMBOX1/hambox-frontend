@@ -33,3 +33,9 @@ a.admin-cell-primary {
     color: var(--admin-accent-green);
   }
 }
+
+.memberships-list-page__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}

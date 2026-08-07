@@ -70,8 +70,6 @@
 
           {{ sub.expiresOnUtc | hamboxDate:'mediumDate' }}
 
-          · {{ sub.autoRenew ? ('ACCOUNT.MEMBERSHIP.AUTO_RENEW_ON' | translate) : ('ACCOUNT.MEMBERSHIP.AUTO_RENEW_OFF' | translate) }}
-
         </p>
 
 
@@ -124,9 +122,9 @@
 
             <li>
 
-              <strong>{{ benefit.displayName }}</strong>
+              <i class="pi pi-check-circle membership-page__benefit-icon" aria-hidden="true"></i>
 
-              <span>{{ benefit.type }} · {{ benefit.value }}</span>
+              <strong>{{ benefit.displayName }}</strong>
 
             </li>
 
@@ -177,11 +175,13 @@
               <p>{{ plan.price | hamboxCurrency }} · {{ 'ACCOUNT.MEMBERSHIP_UI.DAYS' | translate:{ count: plan.durationDays } }}</p>
 
               <ul class="membership-page__compare-features">
-                <li>{{ 'ACCOUNT.MEMBERSHIP_UI.PLAN_META' | translate:{ benefits: plan.benefitCount, members: plan.activeSubscribers } }}</li>
-                @if (isCurrentPlan(plan.id)) {
-                  @for (benefit of benefits(); track benefit.displayName + benefit.sortOrder) {
-                    <li>{{ benefit.displayName }} · {{ benefit.value }}</li>
-                  }
+                @for (benefit of plan.benefits; track benefit.displayName + benefit.sortOrder) {
+                  <li>
+                    <i class="pi pi-check-circle membership-page__benefit-icon" aria-hidden="true"></i>
+                    {{ benefit.displayName }}
+                  </li>
+                } @empty {
+                  <li>{{ 'ACCOUNT.MEMBERSHIP.NO_BENEFITS' | translate }}</li>
                 }
               </ul>
 

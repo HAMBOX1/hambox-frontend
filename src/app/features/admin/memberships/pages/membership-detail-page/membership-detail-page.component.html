@@ -79,13 +79,21 @@
                   <dd>{{ plan.badgeLabel || '—' }}</dd>
                 </div>
                 <div>
-                  <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.THEME' | translate }}</dt>
-                  <dd>{{ plan.themeKey || '—' }}</dd>
-                </div>
-                <div>
                   <dt>{{ 'ADMIN.MEMBERSHIPS.EDIT.IS_DEFAULT' | translate }}</dt>
                   <dd>{{ plan.isDefault ? 'Yes' : 'No' }}</dd>
                 </div>
+                @if (plan.exclusiveProductIds.length) {
+                  <div>
+                    <dt>{{ 'ADMIN.MEMBERSHIPS.BENEFITS.EXCLUSIVE_PRODUCTS' | translate }}</dt>
+                    <dd>{{ 'ADMIN.MEMBERSHIPS.DETAIL.PRODUCT_COUNT' | translate: { count: plan.exclusiveProductIds.length } }}</dd>
+                  </div>
+                }
+                @if (plan.unlockedThemeIds.length) {
+                  <div>
+                    <dt>{{ 'ADMIN.MEMBERSHIPS.BENEFITS.UNLOCKED_THEMES' | translate }}</dt>
+                    <dd>{{ 'ADMIN.MEMBERSHIPS.DETAIL.THEME_COUNT' | translate: { count: plan.unlockedThemeIds.length } }}</dd>
+                  </div>
+                }
               </dl>
               @if (plan.description) {
                 <p class="membership-detail-page__description">{{ plan.description }}</p>
@@ -97,8 +105,14 @@
                 <ul class="membership-detail-page__benefits">
                   @for (benefit of plan.benefits; track benefit.displayName + benefit.sortOrder) {
                     <li>
-                      <span class="admin-cell-primary">{{ benefit.displayName }}</span>
-                      <span class="admin-cell-secondary">{{ benefit.type }} · {{ benefit.value }}</span>
+                      <div class="membership-detail-page__benefit-info">
+                        <span class="admin-cell-primary">{{ benefit.displayName }}</span>
+                        <span class="admin-cell-secondary">{{ benefit.type }} · {{ benefit.value }}</span>
+                      </div>
+                      <app-admin-status-badge
+                        [label]="benefitStatusLabel(benefit.type) | translate"
+                        [tone]="benefitStatusTone(benefit.type)"
+                      />
                     </li>
                   }
                 </ul>
@@ -276,7 +290,14 @@
                   </p>
                   <ul class="membership-detail-page__comparison-benefits">
                     @for (benefit of comparePlan.benefits; track benefit.displayName) {
-                      <li>{{ benefit.displayName }}</li>
+                      <li>
+                        <span
+                          class="membership-detail-page__comparison-dot"
+                          [class]="'membership-detail-page__comparison-dot--' + benefitStatusTone(benefit.type)"
+                          [title]="benefitStatusLabel(benefit.type) | translate"
+                        ></span>
+                        {{ benefit.displayName }}
+                      </li>
                     }
                   </ul>
                 </app-admin-section-card>
@@ -301,16 +322,49 @@
   (onHide)="closeAssignDialog()"
 >
   <div class="admin-form-grid admin-form-grid--single">
-    <label class="admin-field">
-      <span class="admin-field__label">{{ 'ADMIN.MEMBERSHIPS.MEMBERS.USER_ID' | translate }}</span>
-      <input
-        pInputText
-        class="admin-field__input"
-        type="text"
-        [value]="assignUserId()"
-        (input)="assignUserId.set(($any($event.target)).value)"
+    @if (selectedAssignUser(); as user) {
+      <div class="membership-detail-page__assign-selected">
+        <div class="membership-detail-page__benefit-info">
+          <span class="admin-cell-primary">{{ user.firstName }} {{ user.lastName }}</span>
+          <span class="admin-cell-secondary">{{ user.email }}</span>
+        </div>
+        <app-admin-icon-button
+          icon="pi pi-times"
+          [label]="'ADMIN.MEMBERSHIPS.MEMBERS.CHANGE_USER' | translate"
+          (pressed)="clearAssignUser()"
+        />
+      </div>
+    } @else {
+      <app-admin-search-bar
+        class="membership-detail-page__assign-search"
+        [value]="userSearchTerm()"
+        [placeholder]="'ADMIN.MEMBERSHIPS.MEMBERS.ASSIGN_SEARCH_PLACEHOLDER' | translate"
+        (searchChange)="onAssignSearchChange($event)"
       />
-    </label>
+
+      @if (userSearchLoading()) {
+        <app-admin-loading-skeleton variant="table" [rows]="3" />
+      } @else if (userSearchTerm().trim() && userSearchResults().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-search"
+          [title]="'ADMIN.MEMBERSHIPS.MEMBERS.ASSIGN_EMPTY' | translate"
+          [compact]="true"
+        />
+      } @else if (userSearchResults().length > 0) {
+        <div class="membership-detail-page__assign-results">
+          @for (user of userSearchResults(); track user.id) {
+            <button
+              type="button"
+              class="membership-detail-page__assign-result"
+              (click)="selectAssignUser(user)"
+            >
+              <span class="admin-cell-primary">{{ user.firstName }} {{ user.lastName }}</span>
+              <span class="admin-cell-secondary">{{ user.email }}</span>
+            </button>
+          }
+        </div>
+      }
+    }
 
     <label class="membership-detail-page__checkbox">
       <p-checkbox

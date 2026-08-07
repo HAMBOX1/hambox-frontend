@@ -1,0 +1,53 @@
+@let plan = this.plan();
+
+<article class="membership-plan-card">
+  <a class="membership-plan-card__tap-area" [routerLink]="['/admin/memberships', plan.id]">
+    <header class="membership-plan-card__header">
+      <div class="membership-plan-card__title">
+        <span class="membership-plan-card__name">{{ plan.name }}</span>
+        @if (plan.badgeLabel) {
+          <span class="membership-plan-card__badge">{{ plan.badgeLabel }}</span>
+        }
+      </div>
+      <app-admin-status-badge [label]="plan.status" [tone]="statusTone()" />
+    </header>
+
+    <div class="membership-plan-card__stats">
+      <span class="membership-plan-card__stat membership-plan-card__stat--price">
+        {{ plan.price | hamboxCurrency }}
+      </span>
+      <span class="membership-plan-card__stat">
+        <i class="pi pi-clock" aria-hidden="true"></i>
+        {{ plan.durationDays }}d
+      </span>
+      <span class="membership-plan-card__stat">
+        <i class="pi pi-users" aria-hidden="true"></i>
+        {{ plan.activeSubscribers }}
+      </span>
+      <span class="membership-plan-card__stat">
+        <i class="pi pi-gift" aria-hidden="true"></i>
+        {{ plan.benefitCount }}
+      </span>
+    </div>
+  </a>
+
+  <footer class="membership-plan-card__actions">
+    @if (canEdit()) {
+      <a
+        pButton
+        class="membership-plan-card__edit-btn"
+        [routerLink]="['/admin/memberships', plan.id, 'edit']"
+        [label]="'ADMIN.MEMBERSHIPS.ACTIONS.EDIT' | translate"
+        icon="pi pi-pencil"
+        severity="secondary"
+      ></a>
+    }
+    @if (menuItems().length > 0) {
+      <app-admin-action-menu
+        class="membership-plan-card__menu"
+        [items]="menuItems()"
+        [disabled]="menuDisabled()"
+      />
+    }
+  </footer>
+</article>

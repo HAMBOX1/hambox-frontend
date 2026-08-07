@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { ThemeEngineService } from '../../../core/theme/theme-engine.service';
 import { ThemeService } from '../../../core/theme/theme.service';
 
 @Component({
@@ -8,25 +9,27 @@ import { ThemeService } from '../../../core/theme/theme.service';
   standalone: true,
   imports: [TranslatePipe],
   template: `
-    <button
-      type="button"
-      class="theme-toggle"
-      [class.theme-toggle--compact]="compact()"
-      [attr.aria-label]="
-        (theme.isDark() ? 'COMMON.THEME.SWITCH_TO_LIGHT' : 'COMMON.THEME.SWITCH_TO_DARK') | translate
-      "
-      [attr.aria-pressed]="theme.isDark()"
-      (click)="theme.toggle()"
-    >
-      @if (theme.isDark()) {
-        <i class="pi pi-sun" aria-hidden="true"></i>
-      } @else {
-        <i class="pi pi-moon" aria-hidden="true"></i>
-      }
-      @if (!compact()) {
-        <span>{{ (theme.isDark() ? 'COMMON.THEME.LIGHT' : 'COMMON.THEME.DARK') | translate }}</span>
-      }
-    </button>
+    @if (!themeEngine.hasActiveMembershipTheme()) {
+      <button
+        type="button"
+        class="theme-toggle"
+        [class.theme-toggle--compact]="compact()"
+        [attr.aria-label]="
+          (theme.isDark() ? 'COMMON.THEME.SWITCH_TO_LIGHT' : 'COMMON.THEME.SWITCH_TO_DARK') | translate
+        "
+        [attr.aria-pressed]="theme.isDark()"
+        (click)="theme.toggle()"
+      >
+        @if (theme.isDark()) {
+          <i class="pi pi-sun" aria-hidden="true"></i>
+        } @else {
+          <i class="pi pi-moon" aria-hidden="true"></i>
+        }
+        @if (!compact()) {
+          <span>{{ (theme.isDark() ? 'COMMON.THEME.LIGHT' : 'COMMON.THEME.DARK') | translate }}</span>
+        }
+      </button>
+    }
   `,
   styles: `
     .theme-toggle {
@@ -69,4 +72,5 @@ import { ThemeService } from '../../../core/theme/theme.service';
 export class ThemeToggleComponent {
   readonly compact = input(false);
   protected readonly theme = inject(ThemeService);
+  protected readonly themeEngine = inject(ThemeEngineService);
 }

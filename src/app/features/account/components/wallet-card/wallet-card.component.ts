@@ -16,6 +16,8 @@ import { WalletFacade } from '../../services/wallet.facade';
   styleUrl: './wallet-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+// "HAMBOX Rewards" card on the account dashboard. Data is mocked (see
+// AccountApiService.getWallet / MOCK_WALLET) until the loyalty-points backend ships.
 export class WalletCardComponent implements OnInit {
   protected readonly facade = inject(WalletFacade);
   protected readonly historyOpen = signal(false);

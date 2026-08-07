@@ -38,7 +38,13 @@ import {
 } from '../../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../../shared/pipes/hambox-currency.pipe';
+import {
+  getMembershipBenefitStatusLabelKey,
+  getMembershipBenefitStatusTone,
+  getMembershipBenefitTypeMeta,
+} from '../../../../../shared/utils/membership-benefit.util';
 import { MemberListItemDto } from '../../models/membership-api.model';
+import { UserSearchResultApiDto } from '../../../roles/models/role-api.model';
 import { MembershipManagementFacade } from '../../services/membership-management.facade';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 
@@ -91,6 +97,11 @@ export class MembershipDetailPageComponent implements OnInit {
   protected readonly assignDialogOpen = signal(false);
   protected readonly assignUserId = signal('');
   protected readonly assignAutoRenew = signal(true);
+  protected readonly selectedAssignUser = signal<UserSearchResultApiDto | null>(null);
+
+  protected readonly userSearchResults = this.facade.userSearchResults;
+  protected readonly userSearchLoading = this.facade.userSearchLoading;
+  protected readonly userSearchTerm = this.facade.userSearchTerm;
 
   protected readonly cancelDialogOpen = signal(false);
   protected readonly cancelTarget = signal<MemberListItemDto | null>(null);
@@ -178,11 +189,39 @@ export class MembershipDetailPageComponent implements OnInit {
   protected openAssignDialog(): void {
     this.assignUserId.set('');
     this.assignAutoRenew.set(true);
+    this.selectedAssignUser.set(null);
+    this.facade.resetUserSearch();
     this.assignDialogOpen.set(true);
   }
 
   protected closeAssignDialog(): void {
     this.assignDialogOpen.set(false);
+    this.facade.resetUserSearch();
+  }
+
+  protected onAssignSearchChange(term: string): void {
+    this.selectedAssignUser.set(null);
+    this.assignUserId.set('');
+    this.facade.searchUsersForAssign(term);
+  }
+
+  protected selectAssignUser(user: UserSearchResultApiDto): void {
+    this.selectedAssignUser.set(user);
+    this.assignUserId.set(user.id);
+  }
+
+  protected clearAssignUser(): void {
+    this.selectedAssignUser.set(null);
+    this.assignUserId.set('');
+    this.facade.resetUserSearch();
+  }
+
+  protected benefitStatusTone(type: string): AdminStatusTone {
+    return getMembershipBenefitStatusTone(getMembershipBenefitTypeMeta(type)?.status ?? 'enforced');
+  }
+
+  protected benefitStatusLabel(type: string): string {
+    return getMembershipBenefitStatusLabelKey(getMembershipBenefitTypeMeta(type)?.status ?? 'enforced');
   }
 
   protected async confirmAssign(): Promise<void> {

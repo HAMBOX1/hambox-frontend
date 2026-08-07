@@ -79,6 +79,7 @@ export interface ReferralSummaryApiDto {
   readonly tier: string;
   readonly lifetimePoints: number;
   readonly successfulReferrals: number;
+  readonly pointValueUsd: number;
 }
 
 export interface AccountActivityItemApiDto {
@@ -251,9 +252,19 @@ export interface ReferralTierApiDto {
 
 export interface ReferralHistoryApiDto {
   readonly id: string;
-  readonly referredUserId: string;
+  readonly friendName: string;
   readonly pointsEarned: number;
+  readonly status: 'Pending' | 'Qualified' | 'Rewarded' | 'Rejected' | 'Expired' | 'Reversed';
   readonly createdOnUtc: string;
+  readonly qualifiedOnUtc: string | null;
+  readonly rewardedOnUtc: string | null;
+}
+
+export interface ReferralHistoryQuery {
+  readonly pageNumber?: number;
+  readonly pageSize?: number;
+  readonly search?: string;
+  readonly status?: string;
 }
 
 export interface ReferralDashboardApiDto {
@@ -261,6 +272,8 @@ export interface ReferralDashboardApiDto {
   readonly tier: string;
   readonly lifetimePoints: number;
   readonly successfulReferrals: number;
+  readonly pendingReferrals: number;
+  readonly pointValueUsd: number;
   readonly availableTiers: readonly ReferralTierApiDto[];
   readonly recentHistory: readonly ReferralHistoryApiDto[];
 }

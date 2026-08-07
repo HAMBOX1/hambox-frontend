@@ -17,6 +17,7 @@ export interface MembershipPlanSummaryApiDto {
   readonly isDefault: boolean;
   readonly benefitCount: number;
   readonly activeSubscribers: number;
+  readonly benefits: readonly MembershipBenefitApiDto[];
 }
 
 export interface MembershipSubscriptionApiDto {
@@ -35,6 +36,7 @@ export interface CurrentMembershipApiDto {
   readonly subscription: MembershipSubscriptionApiDto | null;
   readonly benefits: readonly MembershipBenefitApiDto[];
   readonly availablePlans: readonly MembershipPlanSummaryApiDto[];
+  readonly featureFlags: readonly string[];
 }
 
 export interface MembershipHistoryApiDto {

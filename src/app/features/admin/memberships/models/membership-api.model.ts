@@ -1,17 +1,8 @@
 import { PagedResult } from '../../../catalog/models/category.model';
 
-export type MembershipPlanStatus = 'Draft' | 'Active' | 'Archived';
+export type { MembershipBenefitType } from '../../../../shared/utils/membership-benefit.util';
 
-export type MembershipBenefitType =
-  | 'DiscountPercentage'
-  | 'ReferralMultiplier'
-  | 'PrioritySupport'
-  | 'ExclusiveProducts'
-  | 'EarlyAccess'
-  | 'MaxPurchasesPerMonth'
-  | 'Badge'
-  | 'ThemeUnlock'
-  | 'FeatureFlag';
+export type MembershipPlanStatus = 'Draft' | 'Active' | 'Archived';
 
 export interface MembershipBenefitDto {
   readonly type: string;
@@ -47,6 +38,8 @@ export interface MembershipPlanDetailDto {
   readonly themeKey: string | null;
   readonly isDefault: boolean;
   readonly benefits: readonly MembershipBenefitDto[];
+  readonly exclusiveProductIds: readonly string[];
+  readonly unlockedThemeIds: readonly string[];
   readonly createdOnUtc: string;
 }
 
@@ -82,6 +75,8 @@ export interface CreateMembershipPlanRequest {
   readonly themeKey?: string | null;
   readonly isDefault: boolean;
   readonly benefits?: readonly MembershipBenefitDto[] | null;
+  readonly exclusiveProductIds?: readonly string[] | null;
+  readonly unlockedThemeIds?: readonly string[] | null;
 }
 
 export interface UpdateMembershipPlanRequest {
@@ -94,6 +89,8 @@ export interface UpdateMembershipPlanRequest {
   readonly badgeLabel?: string | null;
   readonly themeKey?: string | null;
   readonly benefits?: readonly MembershipBenefitDto[] | null;
+  readonly exclusiveProductIds?: readonly string[] | null;
+  readonly unlockedThemeIds?: readonly string[] | null;
 }
 
 export interface DuplicateMembershipPlanRequest {
@@ -134,14 +131,3 @@ export const MEMBERSHIP_STATUS_OPTIONS: readonly { label: string; value: Members
   { label: 'Archived', value: 'Archived' },
 ];
 
-export const MEMBERSHIP_BENEFIT_TYPE_OPTIONS: readonly { label: string; value: MembershipBenefitType }[] = [
-  { label: 'Discount percentage', value: 'DiscountPercentage' },
-  { label: 'Referral multiplier', value: 'ReferralMultiplier' },
-  { label: 'Priority support', value: 'PrioritySupport' },
-  { label: 'Exclusive products', value: 'ExclusiveProducts' },
-  { label: 'Early access', value: 'EarlyAccess' },
-  { label: 'Max purchases per month', value: 'MaxPurchasesPerMonth' },
-  { label: 'Badge', value: 'Badge' },
-  { label: 'Theme unlock', value: 'ThemeUnlock' },
-  { label: 'Feature flag', value: 'FeatureFlag' },
-];

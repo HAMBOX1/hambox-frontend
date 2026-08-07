@@ -1,9 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import { MEMBERSHIPS_API } from '../../../../core/api/api-endpoints';
+import { MEMBERSHIPS_API, ROLES_API } from '../../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../../core/api/api-client.service';
 import { ApiError } from '../../../../core/models/api-error.model';
+import { PagedResult } from '../../../catalog/models/category.model';
+import { UserSearchResultApiDto } from '../../roles/models/role-api.model';
 import {
   AssignMembershipRequest,
   BulkAssignMembershipRequest,
@@ -61,8 +63,13 @@ export class MembershipManagementFacade {
 
   private readonly actionLoadingState = signal(false);
 
+  private readonly userSearchResultsState = signal<readonly UserSearchResultApiDto[]>([]);
+  private readonly userSearchLoadingState = signal(false);
+  private readonly userSearchTermState = signal('');
+
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   private membersSearchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+  private userSearchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly plans = this.plansState.asReadonly();
   readonly plansLoading = this.plansLoadingState.asReadonly();
@@ -95,6 +102,10 @@ export class MembershipManagementFacade {
   readonly membersPageSize = this.membersPageSizeState.asReadonly();
 
   readonly actionLoading = this.actionLoadingState.asReadonly();
+
+  readonly userSearchResults = this.userSearchResultsState.asReadonly();
+  readonly userSearchLoading = this.userSearchLoadingState.asReadonly();
+  readonly userSearchTerm = this.userSearchTermState.asReadonly();
 
   readonly hasActiveFilters = computed(
     () => this.searchTermState().trim().length > 0 || this.statusFilterState() !== 'all',
@@ -217,6 +228,24 @@ export class MembershipManagementFacade {
     this.membersPageState.set(pageNumber);
     this.membersPageSizeState.set(pageSize);
     void this.fetchMembers();
+  }
+
+  /** Reuses the same user lookup the Roles module exposes (gated by Users.View) instead of
+   * requiring the admin to type a raw user id when assigning a membership. */
+  searchUsersForAssign(term: string): void {
+    this.userSearchTermState.set(term);
+    if (this.userSearchDebounceTimer) {
+      clearTimeout(this.userSearchDebounceTimer);
+    }
+
+    this.userSearchDebounceTimer = setTimeout(() => {
+      void this.fetchUserSearch();
+    }, SEARCH_DEBOUNCE_MS);
+  }
+
+  resetUserSearch(): void {
+    this.userSearchTermState.set('');
+    this.userSearchResultsState.set([]);
   }
 
   async createPlan(request: CreateMembershipPlanRequest): Promise<string | null> {
@@ -468,6 +497,29 @@ export class MembershipManagementFacade {
       this.membersErrorState.set(this.toErrorMessage(error, 'Failed to load members.'));
     } finally {
       this.membersLoadingState.set(false);
+    }
+  }
+
+  private async fetchUserSearch(): Promise<void> {
+    const term = this.userSearchTermState().trim();
+    if (!term) {
+      this.userSearchResultsState.set([]);
+      return;
+    }
+
+    this.userSearchLoadingState.set(true);
+
+    try {
+      const result = await firstValueFrom(
+        this.api.get<PagedResult<UserSearchResultApiDto>>(ROLES_API.userSearch, {
+          params: { pageNumber: 1, pageSize: 10, searchTerm: term },
+        }),
+      );
+      this.userSearchResultsState.set(result.items ?? []);
+    } catch {
+      this.userSearchResultsState.set([]);
+    } finally {
+      this.userSearchLoadingState.set(false);
     }
   }
 

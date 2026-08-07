@@ -11,6 +11,7 @@ import { TokenStorageService } from '../../../core/auth/token-storage.service';
 import { PermissionService } from '../../../core/permissions/permission.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { CurrencyService } from '../../../core/currency/currency.service';
+import { ThemeEngineService } from '../../../core/theme/theme-engine.service';
 import { SKIP_AUTH_INTERCEPTOR } from '../../../core/tokens/http-context.tokens';
 import { UserProfileApiDto } from '../../account/models/account-api.model';
 import {
@@ -36,6 +37,7 @@ export class Auth {
   private readonly permissions = inject(PermissionService);
   private readonly translation = inject(TranslationService);
   private readonly currency = inject(CurrencyService);
+  private readonly themeEngine = inject(ThemeEngineService);
 
   readonly user = this.session.customerUser;
   readonly isAuthenticated = this.session.isCustomerAuthenticated;
@@ -54,6 +56,7 @@ export class Auth {
           void this.syncAccessFromProfile();
           void this.translation.syncFromAuthenticatedUser();
           void this.currency.syncFromAuthenticatedUser();
+          void this.themeEngine.loadActiveTheme();
         }),
       );
   }
@@ -69,6 +72,7 @@ export class Auth {
           void this.syncAccessFromProfile();
           void this.translation.syncFromAuthenticatedUser();
           void this.currency.syncFromAuthenticatedUser();
+          void this.themeEngine.loadActiveTheme();
         }),
       );
   }
@@ -96,6 +100,7 @@ export class Auth {
         tap((tokens) => {
           this.session.setSession(AUTH_CONTEXT.Customer, tokens);
           void this.syncAccessFromProfile();
+          void this.themeEngine.loadActiveTheme();
         }),
       );
   }
@@ -109,7 +114,12 @@ export class Auth {
           .pipe(catchError(() => of(void 0)))
       : of(void 0);
 
-    return logout$.pipe(finalize(() => this.session.clearSession(AUTH_CONTEXT.Customer)));
+    return logout$.pipe(
+      finalize(() => {
+        this.session.clearSession(AUTH_CONTEXT.Customer);
+        void this.themeEngine.loadActiveTheme();
+      }),
+    );
   }
 
   verifyEmail(token: string): Observable<void> {
@@ -134,6 +144,7 @@ export class Auth {
     const restored = this.session.tryRestoreFromStorage(AUTH_CONTEXT.Customer);
     if (restored) {
       this.session.markInitialized(AUTH_CONTEXT.Customer);
+      void this.themeEngine.loadActiveTheme();
       return Promise.resolve(restored);
     }
 

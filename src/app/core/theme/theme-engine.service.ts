@@ -12,6 +12,9 @@ import { THEMES_API } from '../api/api-endpoints';
 
 import { ApiClientService } from '../api/api-client.service';
 
+import { AUTH_CONTEXT } from '../auth/auth-context';
+import { AuthSessionService } from '../auth/auth-session.service';
+
 import { SKIP_AUTH_INTERCEPTOR } from '../tokens/http-context.tokens';
 
 import { ThemeId } from './theme.model';
@@ -79,6 +82,8 @@ export class ThemeEngineService {
 
   private readonly themeService = inject(ThemeService);
 
+  private readonly authSession = inject(AuthSessionService);
+
 
 
   private readonly activeThemeState = signal<ActiveThemePayload | null>(null);
@@ -88,6 +93,13 @@ export class ThemeEngineService {
   private readonly previewTokenState = signal<string | null>(null);
 
   private readonly overrideSnapshot = new Map<string, string>();
+
+  /**
+   * App bootstrap fires an anonymous resolve while `restoreSession()` fires an authenticated one,
+   * and login/logout can add more mid-flight. Only the newest request may touch the DOM — otherwise
+   * a slow anonymous response lands last and clears a member's theme.
+   */
+  private loadSequence = 0;
 
 
 
@@ -99,7 +111,11 @@ export class ThemeEngineService {
 
   readonly baseTheme = computed(() => this.themeService.theme());
 
-
+  /** True while a membership perk's colors are driving the page — the site-wide dark/light
+   *  toggle conflicts with those (mode-specific) tokens, so callers should hide it. */
+  readonly hasActiveMembershipTheme = computed(
+    () => this.activeThemeState()?.resolutionSource === 'membership',
+  );
 
   /** Initialize theme metadata without overriding SCSS base themes on the storefront. */
 
@@ -109,13 +125,20 @@ export class ThemeEngineService {
 
     if (previewToken) {
 
-      await this.activatePreview(previewToken);
+      const activated = await this.activatePreview(previewToken);
 
-      return;
+      if (activated) {
+
+        return;
+
+      }
 
     }
 
 
+
+    // Clear any stale inline --theme-* overrides left from a previous session before resolving.
+    this.respectUserBaseTheme();
 
     const cached = this.readActiveThemeCache();
 
@@ -128,16 +151,6 @@ export class ThemeEngineService {
 
 
     await this.loadActiveTheme(membershipPlanSlug);
-
-
-
-    // Storefront: user preference + SCSS win. Never leave stale inline --theme-* from cache.
-
-    if (!this.previewModeState()) {
-
-      this.respectUserBaseTheme();
-
-    }
 
   }
 
@@ -157,7 +170,14 @@ export class ThemeEngineService {
 
   async loadActiveTheme(membershipPlanSlug?: string): Promise<void> {
 
+    const sequence = ++this.loadSequence;
+
     try {
+
+      // This call must skip the interceptor's route-based auth-context guess (it would attach the
+      // Admin token while browsing /admin routes) but still identify a signed-in customer server-side
+      // so membership-linked themes resolve — so the Customer token, if any, is attached explicitly.
+      const customerToken = this.authSession.getAccessToken(AUTH_CONTEXT.Customer);
 
       const active = await firstValueFrom(
 
@@ -167,9 +187,19 @@ export class ThemeEngineService {
 
           params: membershipPlanSlug ? { membershipPlanSlug } : {},
 
+          headers: customerToken ? { Authorization: `Bearer ${customerToken}` } : undefined,
+
         }),
 
       );
+
+
+
+      if (sequence !== this.loadSequence) {
+
+        return;
+
+      }
 
 
 
@@ -181,9 +211,23 @@ export class ThemeEngineService {
 
       if (this.previewModeState()) {
 
-        this.applyBaseMode(active.baseMode);
+        return;
 
-        this.applyTokenOverrides(active.tokens, false);
+      }
+
+
+
+      // Base mode (light/dark) always stays under the user's own toggle; only design tokens
+      // (accent/primary/etc.) come from a resolved membership theme, and only when one applies.
+      // A membership perk is a storefront concept — never let it bleed into the admin dashboard
+      // (e.g. an admin who still has a stale customer session/token from earlier storefront use).
+      if (active.resolutionSource === 'membership' && !this.isAdminRoute()) {
+
+        this.applyTokenOverrides(active.tokens, true);
+
+      } else {
+
+        this.clearOverrides();
 
       }
 
@@ -398,6 +442,10 @@ export class ThemeEngineService {
 
     this.themeService.setTheme(themeId);
 
+  }
+
+  private isAdminRoute(): boolean {
+    return (this.document.defaultView?.location.pathname ?? '').startsWith('/admin');
   }
 
 

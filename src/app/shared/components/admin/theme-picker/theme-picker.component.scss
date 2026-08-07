@@ -1,0 +1,109 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.theme-picker {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.theme-picker__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.theme-picker__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  font-size: 0.8rem;
+}
+
+.theme-picker__primary-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-accent-green);
+}
+
+.theme-picker__chip button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.theme-picker__chip button:hover {
+  opacity: 1;
+}
+
+.theme-picker__results {
+  display: grid;
+  gap: 0.15rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  padding: 0.3rem;
+}
+
+.theme-picker__status {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-align: center;
+}
+
+.theme-picker__status--error {
+  opacity: 1;
+  color: var(--admin-accent-red);
+}
+
+.theme-picker__result {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+}
+
+.theme-picker__result-checkbox {
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.theme-picker__result:hover {
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+}
+
+.theme-picker__result--selected {
+  background: var(--color-primary-muted, rgba(99, 102, 241, 0.12));
+}
+
+.theme-picker__result-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-picker__result-meta {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
