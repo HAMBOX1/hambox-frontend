@@ -19,7 +19,9 @@
             [label]="label"
             [icon]="primaryActionIcon(promo.status)"
             [severity]="primaryActionSeverity(promo.status)"
-            [disabled]="actionLoading()"
+            [disabled]="actionLoading() || primaryActionBlocked(promo.status)"
+            [pTooltip]="primaryActionBlocked(promo.status) ? (applicabilityIssueKeys()[0] | translate) : ''"
+            tooltipPosition="bottom"
             (click)="runPrimaryAction(promo.status)"
           ></button>
         }
@@ -78,9 +80,7 @@
     <p-tabs class="admin-detail-tabs" [value]="activeTab()" (valueChange)="onTabChange($event)">
       <p-tablist>
         <p-tab value="0">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_OVERVIEW' | translate }}</p-tab>
-        <p-tab value="1">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_STATISTICS' | translate }}</p-tab>
-        <p-tab value="2">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_REDEMPTIONS' | translate }}</p-tab>
-        <p-tab value="3">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_COUPONS' | translate }}</p-tab>
+        <p-tab value="1">{{ 'ADMIN.PROMOTIONS.DETAIL.TAB_REDEMPTIONS' | translate }}</p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -89,48 +89,51 @@
             @if (summaryData(); as summary) {
               <app-promotion-summary-panel [data]="summary" [warningKey]="discountWarningKey()" />
             }
+
+            @if (promo.type === 'CouponCode') {
+              <app-admin-section-card [title]="'ADMIN.PROMOTIONS.DETAIL.COUPON_CODE_TITLE' | translate">
+                @if (singleCoupon(); as coupon) {
+                  <div class="promotion-detail-page__coupon">
+                    <code class="promotion-detail-page__coupon-code">{{ coupon.code }}</code>
+                    <app-admin-status-badge [label]="couponStatusLabel(coupon)" [tone]="couponStatusTone(coupon)" />
+                    <span class="admin-cell-secondary">
+                      {{ coupon.usedCount }} / {{ coupon.maxUses ?? ('ADMIN.PROMOTIONS.COUPONS.UNLIMITED' | translate) }}
+                      {{ 'ADMIN.PROMOTIONS.COUPONS.USES' | translate }}
+                    </span>
+                    <span class="admin-cell-secondary">
+                      {{ 'ADMIN.PROMOTIONS.COUPONS.REMAINING' | translate }}: {{ couponRemainingLabel(coupon) }}
+                    </span>
+                    @if (coupon.expiresOnUtc) {
+                      <span class="admin-cell-secondary">
+                        {{ 'ADMIN.PROMOTIONS.COUPONS.EXPIRES' | translate }}: {{ coupon.expiresOnUtc | hamboxDate: 'mediumDate' }}
+                      </span>
+                    }
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-copy"
+                      severity="secondary"
+                      [text]="true"
+                      size="small"
+                      [pTooltip]="'ADMIN.PROMOTIONS.COUPONS.COPY' | translate"
+                      (click)="copyCouponCode(coupon.code)"
+                    ></button>
+                  </div>
+                } @else {
+                  <app-admin-empty-state
+                    icon="pi pi-ticket"
+                    [title]="'ADMIN.PROMOTIONS.DETAIL.NO_COUPON_CODE' | translate"
+                    [primaryLabel]="'ADMIN.PROMOTIONS.ACTIONS.EDIT' | translate"
+                    [compact]="true"
+                    (primaryAction)="goToEdit(promo.id)"
+                  />
+                }
+              </app-admin-section-card>
+            }
           </div>
         </p-tabpanel>
 
         <p-tabpanel value="1">
-          @if (statisticsLoading()) {
-            <app-admin-loading-skeleton variant="detail" [rows]="3" />
-          } @else if (statistics(); as stats) {
-            <app-admin-stat-grid>
-              <app-admin-stat-card
-                [label]="'ADMIN.PROMOTIONS.STATS.REDEMPTIONS' | translate"
-                [value]="stats.totalRedemptions"
-                icon="pi-shopping-cart"
-                tone="info"
-              />
-              <app-admin-stat-card
-                [label]="'ADMIN.PROMOTIONS.DETAIL.TOTAL_DISCOUNT' | translate"
-                [value]="stats.totalDiscountGiven | hamboxCurrency"
-                icon="pi-wallet"
-                tone="success"
-              />
-              <app-admin-stat-card
-                [label]="'ADMIN.PROMOTIONS.DETAIL.UNIQUE_USERS' | translate"
-                [value]="stats.uniqueUsers"
-                icon="pi-users"
-              />
-              <app-admin-stat-card
-                [label]="'ADMIN.PROMOTIONS.DETAIL.ACTIVE_COUPONS' | translate"
-                [value]="stats.activeCoupons"
-                icon="pi-ticket"
-                tone="success"
-              />
-              <app-admin-stat-card
-                [label]="'ADMIN.PROMOTIONS.DETAIL.EXPIRED_COUPONS' | translate"
-                [value]="stats.expiredCoupons"
-                icon="pi-clock"
-                tone="warning"
-              />
-            </app-admin-stat-grid>
-          }
-        </p-tabpanel>
-
-        <p-tabpanel value="2">
           <app-admin-data-table-shell>
             <p-table
               class="admin-data-table"
@@ -189,10 +192,6 @@
               </ng-template>
             </p-table>
           </app-admin-data-table-shell>
-        </p-tabpanel>
-
-        <p-tabpanel value="3">
-          <app-promotion-coupons-panel [promotionId]="promo.id" [promotionName]="promo.name" [promotionType]="promo.type" [coupons]="promo.couponCodes" />
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>

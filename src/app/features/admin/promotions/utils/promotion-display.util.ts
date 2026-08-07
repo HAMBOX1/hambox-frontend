@@ -10,7 +10,6 @@ const SCOPE_LABEL_KEYS: Record<PromotionType, string> = {
   Category: 'ADMIN.PROMOTIONS.SCOPE.CATEGORY',
   Product: 'ADMIN.PROMOTIONS.SCOPE.PRODUCT',
   FlashSale: 'ADMIN.PROMOTIONS.SCOPE.FLASH_SALE',
-  ReferralReward: 'ADMIN.PROMOTIONS.SCOPE.REFERRAL_REWARD',
 };
 
 /** Translation key for the promotion's scope — derived purely from the real `type` field. */
@@ -78,4 +77,51 @@ export function couponRemaining(coupon: CouponCodeDto): number | null {
     return null;
   }
   return Math.max(0, coupon.maxUses - coupon.usedCount);
+}
+
+export interface PromotionApplicabilityInput {
+  readonly type: string;
+  readonly productTargetCount: number;
+  readonly categoryTargetCount: number;
+  readonly hasCoupon: boolean;
+}
+
+/**
+ * Translation keys explaining why a promotion, as currently configured, could never apply to a
+ * real cart — mirrors the exact gates each backend evaluator checks (see
+ * PromotionDiscountCalculator.GetEligibleSubtotal, CouponPromotionEvaluator.CanEvaluate on the
+ * server). An empty array means the promotion is fully configured for its type; nothing here
+ * changes backend behavior, it only reads the same conditions the backend already enforces.
+ */
+export function promotionApplicabilityIssues(input: PromotionApplicabilityInput): string[] {
+  const issues: string[] = [];
+
+  if (input.type === 'Product' && input.productTargetCount === 0) {
+    issues.push('ADMIN.PROMOTIONS.SUMMARY.ISSUE_NO_PRODUCT_TARGETS');
+  }
+
+  if (input.type === 'Category' && input.categoryTargetCount === 0) {
+    issues.push('ADMIN.PROMOTIONS.SUMMARY.ISSUE_NO_CATEGORY_TARGETS');
+  }
+
+  if (input.type === 'CouponCode' && !input.hasCoupon) {
+    issues.push('ADMIN.PROMOTIONS.SUMMARY.ISSUE_NO_COUPON');
+  }
+
+  return issues;
+}
+
+/** Non-blocking "here's how this type actually behaves" note — for types whose real behavior
+ * isn't obvious from the form alone (see the matching backend evaluator for each). */
+export function promotionInfoNoteKey(type: string): string | null {
+  switch (type) {
+    case 'FlashSale':
+      return 'ADMIN.PROMOTIONS.SUMMARY.INFO_FLASHSALE';
+    case 'Membership':
+      return 'ADMIN.PROMOTIONS.SUMMARY.INFO_MEMBERSHIP';
+    case 'Automatic':
+      return 'ADMIN.PROMOTIONS.SUMMARY.INFO_AUTOMATIC';
+    default:
+      return null;
+  }
 }

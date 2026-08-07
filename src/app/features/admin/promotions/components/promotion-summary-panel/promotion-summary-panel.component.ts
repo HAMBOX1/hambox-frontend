@@ -3,7 +3,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { PromotionConditionDto } from '../../models/promotion-api.model';
-import { discountPreviewText, scheduleStatus, scopeLabelKey } from '../../utils/promotion-display.util';
+import {
+  discountPreviewText,
+  promotionApplicabilityIssues,
+  promotionInfoNoteKey,
+  scheduleStatus,
+  scopeLabelKey,
+} from '../../utils/promotion-display.util';
 
 export interface PromotionSummaryData {
   readonly name: string;
@@ -15,6 +21,7 @@ export interface PromotionSummaryData {
   readonly conditions: readonly PromotionConditionDto[];
   readonly productTargetCount: number;
   readonly categoryTargetCount: number;
+  readonly hasCoupon: boolean;
 }
 
 const RESTRICTION_TYPES = new Set([
@@ -40,6 +47,22 @@ const USAGE_LIMIT_TYPES = new Set(['UsageLimit', 'PerUserLimit']);
 export class PromotionSummaryPanelComponent {
   readonly data = input.required<PromotionSummaryData>();
   readonly warningKey = input<string | null>(null);
+
+  /** Translation keys explaining why this promotion, as configured right now, can never apply —
+   * empty means fully configured for its type. Mirrors the exact gate each backend evaluator
+   * checks; see promotion-display.util's `promotionApplicabilityIssues`. */
+  protected readonly applicabilityIssueKeys = computed(() =>
+    promotionApplicabilityIssues({
+      type: this.data().type,
+      productTargetCount: this.data().productTargetCount,
+      categoryTargetCount: this.data().categoryTargetCount,
+      hasCoupon: this.data().hasCoupon,
+    }),
+  );
+
+  protected readonly canApply = computed(() => this.applicabilityIssueKeys().length === 0);
+
+  protected readonly infoNoteKey = computed(() => promotionInfoNoteKey(this.data().type));
 
   protected readonly scopeKey = computed(() => scopeLabelKey(this.data().type));
 
@@ -67,15 +90,6 @@ export class PromotionSummaryPanelComponent {
       return 'ADMIN.PROMOTIONS.SUMMARY.NO_TARGETS';
     }
     return 'ADMIN.PROMOTIONS.SUMMARY.HAS_TARGETS';
-  });
-
-  protected readonly configWarningKey = computed(() => {
-    const d = this.data();
-    const needsTargets = d.type === 'Product' || d.type === 'Category';
-    if (needsTargets && d.productTargetCount === 0 && d.categoryTargetCount === 0) {
-      return 'ADMIN.PROMOTIONS.SUMMARY.WARNING_NO_TARGETS';
-    }
-    return null;
   });
 
   protected conditionLabelKey(condition: PromotionConditionDto): string {

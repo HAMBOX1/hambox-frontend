@@ -37,11 +37,6 @@ import {
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionDirective } from '../../../../../shared/directives/has-permission.directive';
 import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
-import {
-  CouponFormValue,
-  EMPTY_COUPON_FORM_VALUE,
-  GenerateCouponsFormComponent,
-} from '../../components/generate-coupons-form/generate-coupons-form.component';
 import { PromotionQuickPreviewDrawerComponent } from '../../components/promotion-quick-preview-drawer/promotion-quick-preview-drawer.component';
 import {
   PROMOTION_STATUS_OPTIONS,
@@ -51,10 +46,15 @@ import {
 import { PromotionManagementFacade } from '../../services/promotion-management.facade';
 import {
   discountPreviewText,
+  promotionApplicabilityIssues,
   scheduleStatus,
   ScheduleStatus,
   scopeLabelKey,
 } from '../../utils/promotion-display.util';
+
+/** Types whose applicability never depends on per-promotion config (no targets/coupon/settings to
+ * check) — skipped by `ensureCanApply` to avoid an unnecessary detail fetch. */
+const ALWAYS_APPLICABLE_TYPES = new Set(['Automatic', 'FlashSale', 'Membership']);
 
 const SCHEDULE_TONE: Record<ScheduleStatus, AdminStatusTone> = {
   live: 'success',
@@ -90,7 +90,6 @@ const SCHEDULE_TONE: Record<ScheduleStatus, AdminStatusTone> = {
     AdminConfirmDialogComponent,
     AdminStatusBadgeComponent,
     AdminBulkBarComponent,
-    GenerateCouponsFormComponent,
     PromotionQuickPreviewDrawerComponent,
   ],
   providers: [PromotionManagementFacade, MessageService],
@@ -111,12 +110,6 @@ export class PromotionsListPageComponent implements OnInit {
   protected readonly typeOptions = [...PROMOTION_TYPE_OPTIONS];
 
   protected readonly promotions = this.facade.promotions;
-  // Backend only allows coupon generation/creation on CouponCode-type promotions (see
-  // CreateCouponCommandHandler/GenerateCouponsCommandHandler) — filtered here so this picker
-  // can't offer an ineligible promotion in the first place.
-  protected readonly couponEligiblePromotions = computed(() =>
-    this.promotions().filter((p) => p.type === 'CouponCode'),
-  );
   protected readonly loading = this.facade.promotionsLoading;
   protected readonly error = this.facade.promotionsError;
   protected readonly searchTerm = this.facade.searchTerm;
@@ -137,13 +130,6 @@ export class PromotionsListPageComponent implements OnInit {
   protected readonly deleteDialogOpen = signal(false);
   protected readonly deleteTarget = signal<PromotionListItemDto | null>(null);
   protected readonly bulkDeleteDialogOpen = signal(false);
-
-  protected readonly generateCouponsDialogOpen = signal(false);
-  protected readonly generateCouponsTargetId = signal<string | null>(null);
-  protected readonly generateCouponsForm = signal<CouponFormValue>({
-    ...EMPTY_COUPON_FORM_VALUE,
-    count: 10,
-  });
 
   protected readonly tableFirst = computed(
     () => (this.facade.pageNumber() - 1) * this.facade.pageSize(),
@@ -377,12 +363,65 @@ export class PromotionsListPageComponent implements OnInit {
     }
   }
 
+  /** The list only carries `PromotionListItemDto` (no targets/coupons) — fetches the full detail
+   * on demand to run the same applicability check the edit/detail pages use, rather than let a
+   * promotion that can never apply go live from here. Types with nothing to misconfigure skip the
+   * fetch entirely. */
+  private async ensureCanApply(
+    promotion: PromotionListItemDto,
+  ): Promise<{ ok: true } | { ok: false; reason: string }> {
+    if (ALWAYS_APPLICABLE_TYPES.has(promotion.type)) {
+      return { ok: true };
+    }
+
+    await this.facade.loadDetail(promotion.id);
+    const detail = this.facade.detail();
+    if (!detail || detail.id !== promotion.id) {
+      return { ok: true };
+    }
+
+    const issues = promotionApplicabilityIssues({
+      type: detail.type,
+      productTargetCount: detail.targets.filter((t) => t.type === 'Product').length,
+      categoryTargetCount: detail.targets.filter((t) => t.type === 'Category').length,
+      hasCoupon: detail.couponCodes.length > 0,
+    });
+
+    if (issues.length === 0) {
+      return { ok: true };
+    }
+
+    return { ok: false, reason: this.translate.instant(issues[0]) };
+  }
+
   protected async publishPromotion(promotion: PromotionListItemDto): Promise<void> {
+    const check = await this.ensureCanApply(promotion);
+    if (!check.ok) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.CANNOT_PUBLISH_TITLE'),
+        detail: check.reason,
+        life: 6000,
+      });
+      return;
+    }
+
     const success = await this.facade.publishPromotion(promotion.id);
     this.showActionResult(success, 'Promotion published', 'Publish failed');
   }
 
   protected async activatePromotion(promotion: PromotionListItemDto): Promise<void> {
+    const check = await this.ensureCanApply(promotion);
+    if (!check.ok) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.CANNOT_ACTIVATE_TITLE'),
+        detail: check.reason,
+        life: 6000,
+      });
+      return;
+    }
+
     const success = await this.facade.activatePromotion(promotion.id);
     this.showActionResult(success, 'Promotion activated', 'Activate failed');
   }
@@ -406,19 +445,51 @@ export class PromotionsListPageComponent implements OnInit {
   }
 
   protected async publishSelected(): Promise<void> {
-    await this.runBulk(
+    const { allowed, blockedCount } = await this.partitionByApplicability(
       this.selectedPromotions().filter((p) => p.status !== 'Active'),
-      (p) => this.facade.publishPromotion(p.id),
-      'Promotions published',
     );
+    await this.runBulk(allowed, (p) => this.facade.publishPromotion(p.id), 'Promotions published');
+    this.warnIfSkipped(blockedCount);
   }
 
   protected async activateSelected(): Promise<void> {
-    await this.runBulk(
+    const { allowed, blockedCount } = await this.partitionByApplicability(
       this.selectedPromotions().filter((p) => p.status !== 'Active'),
-      (p) => this.facade.activatePromotion(p.id),
-      'Promotions activated',
     );
+    await this.runBulk(allowed, (p) => this.facade.activatePromotion(p.id), 'Promotions activated');
+    this.warnIfSkipped(blockedCount);
+  }
+
+  private async partitionByApplicability(
+    candidates: readonly PromotionListItemDto[],
+  ): Promise<{ allowed: PromotionListItemDto[]; blockedCount: number }> {
+    const allowed: PromotionListItemDto[] = [];
+    let blockedCount = 0;
+
+    for (const promotion of candidates) {
+      const check = await this.ensureCanApply(promotion);
+      if (check.ok) {
+        allowed.push(promotion);
+      } else {
+        blockedCount++;
+      }
+    }
+
+    return { allowed, blockedCount };
+  }
+
+  private warnIfSkipped(blockedCount: number): void {
+    if (blockedCount === 0) {
+      return;
+    }
+    this.messageService.add({
+      severity: 'warn',
+      summary: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.SOME_SKIPPED_TITLE'),
+      detail: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.SOME_SKIPPED_DETAIL', {
+        count: blockedCount,
+      }),
+      life: 6000,
+    });
   }
 
   protected async deactivateSelected(): Promise<void> {
@@ -516,50 +587,6 @@ export class PromotionsListPageComponent implements OnInit {
     URL.revokeObjectURL(url);
   }
 
-  protected openGenerateCouponsDialog(): void {
-    this.generateCouponsTargetId.set(null);
-    this.generateCouponsForm.set({ ...EMPTY_COUPON_FORM_VALUE, count: 10 });
-    this.generateCouponsDialogOpen.set(true);
-  }
-
-  protected closeGenerateCouponsDialog(): void {
-    this.generateCouponsDialogOpen.set(false);
-  }
-
-  protected async confirmGenerateCoupons(): Promise<void> {
-    const promotionId = this.generateCouponsTargetId();
-    if (!promotionId) {
-      return;
-    }
-
-    const form = this.generateCouponsForm();
-    const success = await this.facade.generateCoupons(promotionId, {
-      count: form.count,
-      prefix: form.prefix.trim() || null,
-      isSingleUse: form.isSingleUse,
-      maxUses: form.maxUses,
-      perUserMaxUses: form.perUserMaxUses,
-      expiresOnUtc: form.expiresOnUtc.trim() ? new Date(form.expiresOnUtc).toISOString() : null,
-    });
-
-    if (success) {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Coupons generated',
-        life: 4000,
-      });
-      this.closeGenerateCouponsDialog();
-      return;
-    }
-
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Generation failed',
-      detail: this.facade.promotionsError() ?? undefined,
-      life: 5000,
-    });
-  }
-
   protected promotionActionMenuItems(promotion: PromotionListItemDto): MenuItem[] {
     const items: MenuItem[] = [];
     const t = (key: string) => this.translate.instant(key);
@@ -585,22 +612,6 @@ export class PromotionsListPageComponent implements OnInit {
         icon: 'pi pi-send',
         disabled: this.actionLoading() || promotion.status === 'Active',
         command: () => void this.publishPromotion(promotion),
-      });
-    }
-
-    if (
-      this.permissionService.hasPermission(this.permissions.Coupons.Generate) &&
-      promotion.type === 'CouponCode'
-    ) {
-      items.push({
-        label: t('ADMIN.PROMOTIONS.COUPONS.GENERATE'),
-        icon: 'pi pi-bolt',
-        disabled: this.actionLoading(),
-        command: () => {
-          this.generateCouponsTargetId.set(promotion.id);
-          this.generateCouponsForm.set({ ...EMPTY_COUPON_FORM_VALUE, count: 10 });
-          this.generateCouponsDialogOpen.set(true);
-        },
       });
     }
 

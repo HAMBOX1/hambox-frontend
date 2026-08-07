@@ -6,13 +6,14 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
 import { PermissionService } from '../../../../../core/permissions/permission.service';
@@ -23,6 +24,7 @@ import {
   AdminErrorAlertComponent,
   AdminLoadingSkeletonComponent,
   AdminPageHeaderComponent,
+  AdminSectionCardComponent,
   AdminStatCardComponent,
   AdminStatGridComponent,
   AdminStatusBadgeComponent,
@@ -30,11 +32,25 @@ import {
 } from '../../../../../shared/components/admin';
 import { HamboxCurrencyPipe } from '../../../../../shared/pipes/hambox-currency.pipe';
 import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
-import { PromotionCouponsPanelComponent } from '../../components/promotion-coupons-panel/promotion-coupons-panel.component';
 import { PromotionSummaryPanelComponent } from '../../components/promotion-summary-panel/promotion-summary-panel.component';
+import { CouponCodeDto } from '../../models/promotion-api.model';
 import { PromotionManagementFacade } from '../../services/promotion-management.facade';
-import { discountWarning, scopeLabelKey } from '../../utils/promotion-display.util';
+import {
+  couponRemaining,
+  couponStatus,
+  CouponStatus,
+  discountWarning,
+  promotionApplicabilityIssues,
+  scopeLabelKey,
+} from '../../utils/promotion-display.util';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
+
+const COUPON_STATUS_TONE: Record<CouponStatus, AdminStatusTone> = {
+  active: 'success',
+  expired: 'warning',
+  exhausted: 'warning',
+  inactive: 'neutral',
+};
 
 @Component({
   selector: 'app-promotion-detail-page',
@@ -45,13 +61,14 @@ import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-b
     TableModule,
     TabsModule,
     ToastModule,
+    TooltipModule,
     HamboxCurrencyPipe,
     HamboxDatePipe,
-    PromotionCouponsPanelComponent,
     PromotionSummaryPanelComponent,
     AdminPageHeaderComponent,
     AdminErrorAlertComponent,
     AdminLoadingSkeletonComponent,
+    AdminSectionCardComponent,
     AdminStatusBadgeComponent,
     AdminActionMenuComponent,
     AdminStatGridComponent,
@@ -66,6 +83,7 @@ import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-b
 })
 export class PromotionDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
   private readonly permissionService = inject(PermissionService);
@@ -126,8 +144,32 @@ export class PromotionDetailPageComponent implements OnInit {
       conditions: promo.conditions,
       productTargetCount: promo.targets.filter((t) => t.type === 'Product').length,
       categoryTargetCount: promo.targets.filter((t) => t.type === 'Category').length,
+      hasCoupon: promo.couponCodes.length > 0,
     };
   });
+
+  // HAMBOX supports exactly one coupon code per Coupon promotion (see promotion-edit-page for the
+  // create/duplicate workflow this pairs with) — the Overview shows that single code inline
+  // instead of linking out to a coupon management screen.
+  protected readonly singleCoupon = computed(() => this.detail()?.couponCodes[0] ?? null);
+
+  /** Translation keys explaining why this promotion, as currently configured, can never apply —
+   * empty means Publish/Activate is safe. Mirrors promotion-summary-panel's own check (same
+   * shared pure function) so the Overview panel and the action buttons never disagree. */
+  protected readonly applicabilityIssueKeys = computed(() => {
+    const promo = this.detail();
+    if (!promo) {
+      return [];
+    }
+    return promotionApplicabilityIssues({
+      type: promo.type,
+      productTargetCount: promo.targets.filter((t) => t.type === 'Product').length,
+      categoryTargetCount: promo.targets.filter((t) => t.type === 'Category').length,
+      hasCoupon: promo.couponCodes.length > 0,
+    });
+  });
+
+  protected readonly canApply = computed(() => this.applicabilityIssueKeys().length === 0);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -157,9 +199,25 @@ export class PromotionDetailPageComponent implements OnInit {
     this.facade.setRedemptionsPage(pageNumber, rows, id);
   }
 
+  /** Guards both the primary action button and the overflow menu item — belt-and-braces on top of
+   * the disabled state, since a stale disabled binding should never be the only thing standing
+   * between "Publish" and a promotion that can never apply. */
+  private blockIfCannotApply(): boolean {
+    if (this.canApply()) {
+      return false;
+    }
+    this.messageService.add({
+      severity: 'warn',
+      summary: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.CANNOT_PUBLISH_TITLE'),
+      detail: this.translate.instant(this.applicabilityIssueKeys()[0]),
+      life: 6000,
+    });
+    return true;
+  }
+
   protected async publish(): Promise<void> {
     const id = this.promotionId();
-    if (!id) {
+    if (!id || this.blockIfCannotApply()) {
       return;
     }
 
@@ -172,7 +230,7 @@ export class PromotionDetailPageComponent implements OnInit {
 
   protected async activate(): Promise<void> {
     const id = this.promotionId();
-    if (!id) {
+    if (!id || this.blockIfCannotApply()) {
       return;
     }
 
@@ -201,6 +259,32 @@ export class PromotionDetailPageComponent implements OnInit {
     if (id) {
       void this.facade.loadDetail(id);
     }
+  }
+
+  protected couponStatusTone(coupon: CouponCodeDto): AdminStatusTone {
+    return COUPON_STATUS_TONE[couponStatus(coupon)];
+  }
+
+  protected couponStatusLabel(coupon: CouponCodeDto): string {
+    return this.translate.instant(`ADMIN.PROMOTIONS.COUPONS.STATUS.${couponStatus(coupon).toUpperCase()}`);
+  }
+
+  protected couponRemainingLabel(coupon: CouponCodeDto): string {
+    const remaining = couponRemaining(coupon);
+    return remaining === null ? this.translate.instant('ADMIN.PROMOTIONS.COUPONS.UNLIMITED') : String(remaining);
+  }
+
+  protected goToEdit(promotionId: string): void {
+    void this.router.navigate(['/admin/promotions', promotionId, 'edit']);
+  }
+
+  protected async copyCouponCode(code: string): Promise<void> {
+    await navigator.clipboard.writeText(code);
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translate.instant('ADMIN.PROMOTIONS.COUPONS.COPIED'),
+      life: 2500,
+    });
   }
 
   protected statusTone(status: string): AdminStatusTone {
@@ -272,6 +356,12 @@ export class PromotionDetailPageComponent implements OnInit {
     return this.permissionService.hasPermission(this.permissions.Promotions.Publish);
   }
 
+  /** True only when the primary action would make the promotion live (Draft→Publish,
+   * Inactive→Activate) and it's currently unable to ever apply. Deactivate is never blocked. */
+  protected primaryActionBlocked(status: string): boolean {
+    return (status === 'Draft' || status === 'Inactive') && !this.canApply();
+  }
+
   protected overflowMenuItems(promo: { id: string; status: string }): MenuItem[] {
     const items: MenuItem[] = [];
     const t = (key: string) => this.translate.instant(key);
@@ -289,7 +379,7 @@ export class PromotionDetailPageComponent implements OnInit {
         items.push({
           label: t('ADMIN.PROMOTIONS.ACTIONS.PUBLISH'),
           icon: 'pi pi-send',
-          disabled: this.actionLoading() || promo.status === 'Active',
+          disabled: this.actionLoading() || promo.status === 'Active' || !this.canApply(),
           command: () => void this.publish(),
         });
       }
@@ -297,7 +387,7 @@ export class PromotionDetailPageComponent implements OnInit {
         items.push({
           label: t('ADMIN.PROMOTIONS.ACTIONS.ACTIVATE'),
           icon: 'pi pi-play',
-          disabled: this.actionLoading(),
+          disabled: this.actionLoading() || !this.canApply(),
           command: () => void this.activate(),
         });
       }

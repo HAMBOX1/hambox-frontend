@@ -6,8 +6,7 @@ export type PromotionType =
   | 'Membership'
   | 'Category'
   | 'Product'
-  | 'FlashSale'
-  | 'ReferralReward';
+  | 'FlashSale';
 
 export type PromotionStatus = 'Draft' | 'Active' | 'Inactive' | 'Archived';
 
@@ -162,7 +161,6 @@ export const PROMOTION_TYPE_OPTIONS: readonly { label: string; value: PromotionT
   { label: 'Category', value: 'Category' },
   { label: 'Product', value: 'Product' },
   { label: 'Flash sale', value: 'FlashSale' },
-  { label: 'Referral reward', value: 'ReferralReward' },
 ];
 
 export const PROMOTION_STATUS_OPTIONS: readonly { label: string; value: PromotionStatus | 'all' }[] = [

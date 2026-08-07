@@ -5,27 +5,7 @@
     [title]="'ADMIN.PROMOTIONS.LIST.TITLE' | translate"
     [subtitle]="'ADMIN.PROMOTIONS.LIST.SUBTITLE' | translate"
     [breadcrumbs]="breadcrumbs"
-  >
-    <div adminHeaderActions class="promotions-list-page__header-actions">
-      <button
-        *hamboxHasPermission="permissions.Coupons.Generate"
-        pButton
-        type="button"
-        severity="secondary"
-        [label]="'ADMIN.PROMOTIONS.COUPONS.GENERATE' | translate"
-        icon="pi pi-bolt"
-        (click)="openGenerateCouponsDialog()"
-      ></button>
-      <a
-        *hamboxHasPermission="permissions.Promotions.Create"
-        pButton
-        class="admin-btn-primary"
-        routerLink="/admin/promotions/new"
-        [label]="'ADMIN.PROMOTIONS.LIST.NEW' | translate"
-        icon="pi pi-plus"
-      ></a>
-    </div>
-  </app-admin-page-header>
+  />
 
   <app-admin-toolbar>
     <app-admin-search-bar
@@ -70,6 +50,13 @@
         [disabled]="promotions().length === 0"
         (click)="exportAll()"
       ></button>
+      <app-admin-icon-button
+        *hamboxHasPermission="permissions.Promotions.Create"
+        icon="pi pi-plus"
+        severity="primary"
+        [label]="'ADMIN.PROMOTIONS.LIST.NEW' | translate"
+        routerLink="/admin/promotions/new"
+      />
     </div>
   </app-admin-toolbar>
 
@@ -315,53 +302,6 @@
       icon="pi pi-copy"
       [disabled]="!duplicateName().trim() || actionLoading()"
       (click)="confirmDuplicate()"
-    ></button>
-  </ng-template>
-</p-dialog>
-
-<p-dialog
-  [header]="'ADMIN.PROMOTIONS.COUPONS.GENERATE_TITLE' | translate"
-  [visible]="generateCouponsDialogOpen()"
-  (visibleChange)="generateCouponsDialogOpen.set($event)"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: 'min(28rem, 92vw)' }"
-  styleClass="admin-dialog"
-  (onHide)="closeGenerateCouponsDialog()"
->
-  <label class="admin-field">
-    <span class="admin-field__label">{{ 'ADMIN.PROMOTIONS.LIST.TITLE' | translate }}</span>
-    <p-select
-      [options]="[...couponEligiblePromotions()]"
-      optionLabel="name"
-      optionValue="id"
-      [filter]="true"
-      filterBy="name"
-      [ngModel]="generateCouponsTargetId()"
-      (ngModelChange)="generateCouponsTargetId.set($event)"
-      [placeholder]="'ADMIN.PROMOTIONS.COUPONS.PICK_PROMOTION' | translate"
-    />
-    @if (couponEligiblePromotions().length === 0) {
-      <span class="admin-field__hint">{{ 'ADMIN.PROMOTIONS.COUPONS.TYPE_RESTRICTED' | translate }}</span>
-    }
-  </label>
-
-  <app-generate-coupons-form
-    mode="bulk"
-    [value]="generateCouponsForm()"
-    (valueChange)="generateCouponsForm.set($event)"
-  />
-
-  <ng-template pTemplate="footer">
-    <button pButton type="button" [label]="'ADMIN.PROMOTIONS.ACTIONS.CANCEL' | translate" [text]="true" (click)="closeGenerateCouponsDialog()"></button>
-    <button
-      pButton
-      type="button"
-      [label]="'ADMIN.PROMOTIONS.COUPONS.GENERATE' | translate"
-      [loading]="actionLoading()"
-      [disabled]="actionLoading() || !generateCouponsTargetId()"
-      (click)="confirmGenerateCoupons()"
     ></button>
   </ng-template>
 </p-dialog>

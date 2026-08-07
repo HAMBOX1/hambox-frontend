@@ -274,6 +274,10 @@ export class PromotionManagementFacade {
     return this.runStatusAction(PROMOTIONS_API.archive(promotionId));
   }
 
+  // HAMBOX's admin UI only ever creates one coupon per promotion (see promotion-edit-page /
+  // promotion-detail-page) — `generateCoupons` has no UI call site today. Kept because the
+  // backend endpoint (and multi-code capability) is intentionally still there for a future
+  // bulk-campaign UI; removing this would silently drop that contract.
   async generateCoupons(promotionId: string, request: GenerateCouponsRequest): Promise<boolean> {
     this.actionLoadingState.set(true);
     this.promotionsErrorState.set(null);

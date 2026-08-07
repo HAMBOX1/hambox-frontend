@@ -8,6 +8,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -20,9 +21,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 import { HasUnsavedChanges } from '../../../../../core/guards/unsaved-changes.guard';
-import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
 import {
   AdminConfirmDialogComponent,
   AdminErrorAlertComponent,
@@ -37,9 +38,11 @@ import {
   ProductPickerComponent,
 } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
+import { MobileViewportService } from '../../../../../shared/services/mobile-viewport.service';
 import { CHECKOUT_COUNTRIES } from '../../../../checkout/services/checkout.constants';
 import { PromotionSummaryPanelComponent } from '../../components/promotion-summary-panel/promotion-summary-panel.component';
 import {
+  CreateCouponRequest,
   CreatePromotionRequest,
   DISCOUNT_TYPE_OPTIONS,
   PromotionConditionDto,
@@ -48,7 +51,18 @@ import {
   UpdatePromotionRequest,
 } from '../../models/promotion-api.model';
 import { PromotionManagementFacade } from '../../services/promotion-management.facade';
-import { discountPreviewText, discountWarning } from '../../utils/promotion-display.util';
+import {
+  discountPreviewText,
+  discountWarning,
+  promotionInfoNoteKey,
+} from '../../utils/promotion-display.util';
+
+// FlashSale behaves identically to Automatic (no distinct backend capability) — excluded from the
+// create picker as not worth offering as a distinct choice. It remains fully supported for any
+// promotion that already has this type (editing, Live Summary, publish-applicability checks all
+// still handle it) and in the list page's type filter — this only narrows what a *new* promotion
+// can be created as.
+const HIDDEN_CREATE_TYPES = new Set(['FlashSale']);
 
 const STEP_KEYS = [
   { key: 'ADMIN.PROMOTIONS.EDIT.STEP_BASICS', icon: 'pi pi-info-circle' },
@@ -86,6 +100,7 @@ const AUTOSAVE_DEBOUNCE_MS = 800;
   standalone: true,
   imports: [
     FormsModule,
+    NgTemplateOutlet,
     RouterLink,
     TranslatePipe,
     ButtonModule,
@@ -96,6 +111,7 @@ const AUTOSAVE_DEBOUNCE_MS = 800;
     SelectModule,
     TextareaModule,
     ToastModule,
+    ToggleSwitchModule,
     AdminPageHeaderComponent,
     AdminErrorAlertComponent,
     AdminSectionCardComponent,
@@ -119,9 +135,13 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
   protected readonly facade = inject(PromotionManagementFacade);
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
+  protected readonly mobileViewport = inject(MobileViewportService);
 
-  protected readonly permissions = PERMISSIONS;
-  protected readonly typeOptions = [...PROMOTION_TYPE_OPTIONS.filter((o) => o.value !== 'all')];
+  protected readonly typeOptions = [
+    ...PROMOTION_TYPE_OPTIONS.filter(
+      (o) => o.value !== 'all' && !HIDDEN_CREATE_TYPES.has(o.value),
+    ),
+  ];
   protected readonly discountTypeOptions = [...DISCOUNT_TYPE_OPTIONS];
   protected readonly steps = computed<readonly AdminStepperStep[]>(() =>
     STEP_KEYS.map((step) => ({ label: this.translate.instant(step.key), icon: step.icon })),
@@ -156,6 +176,12 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
   protected readonly endDate = signal('');
   protected readonly initialCouponCode = signal('');
 
+  // Edit mode only: adding a coupon code to an existing Coupon promotion that doesn't have one yet
+  // (e.g. right after duplicating). There's no backend "rename coupon" endpoint — see
+  // `existingCoupon` below and the CreateCoupon usage in `saveCouponCode()`.
+  protected readonly newCouponCode = signal('');
+  protected readonly existingCoupon = computed(() => this.facade.detail()?.couponCodes[0] ?? null);
+
   protected readonly minOrderAmount = signal<number | null>(null);
   protected readonly maxDiscountAmount = signal<number | null>(null);
   protected readonly usageLimit = signal<number | null>(null);
@@ -167,6 +193,28 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
 
   protected readonly productTargetIds = signal<readonly string[]>([]);
   protected readonly categoryTargetIds = signal<readonly string[]>([]);
+
+  // --- Progressive disclosure: dependent field groups stay hidden until their toggle is
+  // switched on. These are plain signals (not `computed`) so a user can flip a toggle on before
+  // filling in any value underneath it without the toggle immediately flipping back off. They're
+  // (re-)derived from the loaded/restored data exactly once, in `deriveToggleStates()`. ---
+  protected readonly schedulingEnabled = signal(false);
+  protected readonly eligibilityEnabled = signal(false);
+  protected readonly unlimitedUsage = signal(true);
+
+  protected readonly scheduleCollapsed = signal(false);
+  protected readonly eligibilityCollapsed = signal(false);
+  protected readonly usageCollapsed = signal(false);
+  protected readonly targetsCollapsed = signal(false);
+
+  /** Product/Category targets only affect the discount for those two promotion types (see
+   * PromotionDiscountCalculator.GetEligibleSubtotal on the backend) — hide the picker entirely
+   * otherwise instead of showing a control with no effect. */
+  protected readonly showTargets = computed(
+    () => this.type() === 'Product' || this.type() === 'Category',
+  );
+
+  protected readonly typeInfoNoteKey = computed(() => promotionInfoNoteKey(this.type()));
 
   protected readonly detailLoading = this.facade.detailLoading;
   protected readonly detailSaving = this.facade.detailSaving;
@@ -190,6 +238,7 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
     conditions: this.buildConditions(),
     productTargetCount: this.productTargetIds().length,
     categoryTargetCount: this.categoryTargetIds().length,
+    hasCoupon: this.isCreateMode() ? !!this.initialCouponCode().trim() : !!this.existingCoupon(),
   }));
 
   private readonly formSnapshot = computed<PromotionFormSnapshot>(() => ({
@@ -235,6 +284,7 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
       this.endDate.set(this.toDateInput(detail.endDateUtc));
       this.applyConditions(detail.conditions);
       this.applyTargets(detail.targets);
+      this.deriveToggleStates();
       this.markPristine();
       this.checkForDraft();
     });
@@ -273,15 +323,131 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  protected canAdvanceFromBasics(): boolean {
-    return this.name().trim().length > 0;
+  /** Blocks Save on any configuration that the backend would silently never apply — a Coupon
+   * promotion with no code, or a Product/Category promotion with nothing targeted (see
+   * CouponPromotionEvaluator.CanEvaluate / PromotionDiscountCalculator.GetEligibleSubtotal on the
+   * server). Coupon code is only required on create — editing an existing coupon code is a
+   * separate inline action (`saveCouponCode`), not part of the main Save, since Update has no
+   * coupon field at all. Product/Category targets are required in both modes since `targets` IS
+   * part of both Create and Update requests. */
+  protected canSubmit(): boolean {
+    if (!this.name().trim()) {
+      return false;
+    }
+    if (this.isCreateMode() && this.type() === 'CouponCode' && !this.initialCouponCode().trim()) {
+      return false;
+    }
+    if (this.type() === 'Product' && this.productTargetIds().length === 0) {
+      return false;
+    }
+    if (this.type() === 'Category' && this.categoryTargetIds().length === 0) {
+      return false;
+    }
+    return true;
+  }
+
+  /** Only wired to the create-mode type select — type is immutable after creation. Clears
+   * whichever target list no longer applies so a hidden picker can't silently keep submitting
+   * a stale selection (see `showTargets`). */
+  protected onTypeChange(value: string): void {
+    this.type.set(value);
+    if (value !== 'Product') {
+      this.productTargetIds.set([]);
+    }
+    if (value !== 'Category') {
+      this.categoryTargetIds.set([]);
+    }
+  }
+
+  protected async saveCouponCode(): Promise<void> {
+    const promotionId = this.promotionId();
+    const code = this.newCouponCode().trim();
+    if (!promotionId || !code) {
+      return;
+    }
+
+    const request: CreateCouponRequest = {
+      code,
+      isSingleUse: false,
+      maxUses: null,
+      perUserMaxUses: null,
+      expiresOnUtc: null,
+    };
+
+    const success = await this.facade.createCoupon(promotionId, request);
+    if (success) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.COUPON_SAVED'),
+        life: 4000,
+      });
+      this.newCouponCode.set('');
+      return;
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translate.instant('ADMIN.PROMOTIONS.DETAIL.COUPON_SAVE_FAILED'),
+      detail: this.facade.promotionsError() ?? undefined,
+      life: 5000,
+    });
+  }
+
+  protected async copyCouponCode(code: string): Promise<void> {
+    await navigator.clipboard.writeText(code);
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translate.instant('ADMIN.PROMOTIONS.COUPONS.COPIED'),
+      life: 2500,
+    });
+  }
+
+  protected onToggleScheduling(enabled: boolean): void {
+    this.schedulingEnabled.set(enabled);
+    if (!enabled) {
+      this.startDate.set('');
+      this.endDate.set('');
+    }
+  }
+
+  protected onToggleEligibility(enabled: boolean): void {
+    this.eligibilityEnabled.set(enabled);
+    if (!enabled) {
+      this.minOrderAmount.set(null);
+      this.maxDiscountAmount.set(null);
+      this.firstPurchaseOnly.set(false);
+      this.membershipRequired.set(false);
+      this.countryCodes.set([]);
+    }
+  }
+
+  protected onToggleUnlimitedUsage(unlimited: boolean): void {
+    this.unlimitedUsage.set(unlimited);
+    if (unlimited) {
+      this.usageLimit.set(null);
+      this.perUserLimit.set(null);
+    }
+  }
+
+  /** Sets the toggle-gated section visibility from the currently loaded field values. Called once
+   * per load/restore, never reactively — see the field declarations above for why. */
+  private deriveToggleStates(): void {
+    this.schedulingEnabled.set(this.startDate().length > 0 || this.endDate().length > 0);
+    this.eligibilityEnabled.set(
+      this.minOrderAmount() != null ||
+        this.maxDiscountAmount() != null ||
+        this.firstPurchaseOnly() ||
+        this.membershipRequired() ||
+        this.countryCodes().length > 0,
+    );
+    this.unlimitedUsage.set(this.usageLimit() == null && this.perUserLimit() == null);
   }
 
   @HostListener('document:keydown', ['$event'])
   protected onKeydown(event: KeyboardEvent): void {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
       event.preventDefault();
-      if (!this.detailSaving() && this.canAdvanceFromBasics()) {
+      if (!this.detailSaving() && this.canSubmit()) {
         void this.save();
       }
     }
@@ -522,6 +688,7 @@ export class PromotionEditPageComponent implements OnInit, HasUnsavedChanges {
     try {
       const parsed = JSON.parse(raw) as { savedAt: string; data: PromotionFormSnapshot };
       this.applyDraft(parsed.data);
+      this.deriveToggleStates();
     } catch {
       // ignore malformed draft
     }

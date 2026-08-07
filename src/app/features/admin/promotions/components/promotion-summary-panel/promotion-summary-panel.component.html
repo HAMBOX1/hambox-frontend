@@ -5,6 +5,27 @@
     <span class="promotion-summary__scope">{{ scopeKey() | translate }}</span>
   </header>
 
+  @if (!canApply()) {
+    <section class="promotion-summary__block promotion-summary__block--blocking">
+      <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.WHY_CANT_APPLY' | translate }}</span>
+      @for (issueKey of applicabilityIssueKeys(); track issueKey) {
+        <p class="promotion-summary__blocking-text">
+          <i class="pi pi-ban" aria-hidden="true"></i>
+          {{ issueKey | translate }}
+        </p>
+      }
+    </section>
+  }
+
+  @if (infoNoteKey(); as key) {
+    <section class="promotion-summary__block promotion-summary__block--info">
+      <p class="promotion-summary__info-text">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        {{ key | translate }}
+      </p>
+    </section>
+  }
+
   <section class="promotion-summary__block promotion-summary__block--accent">
     <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.DISCOUNT_PREVIEW' | translate }}</span>
     <p class="promotion-summary__discount">
@@ -64,21 +85,13 @@
     </section>
   }
 
-  @if (warningKey() || configWarningKey()) {
+  @if (warningKey(); as key) {
     <section class="promotion-summary__block promotion-summary__block--warning">
       <span class="promotion-summary__block-label">{{ 'ADMIN.PROMOTIONS.SUMMARY.WARNINGS' | translate }}</span>
-      @if (warningKey(); as key) {
-        <p class="promotion-summary__warning">
-          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-          {{ key | translate }}
-        </p>
-      }
-      @if (configWarningKey(); as key) {
-        <p class="promotion-summary__warning">
-          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-          {{ key | translate }}
-        </p>
-      }
+      <p class="promotion-summary__warning">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        {{ key | translate }}
+      </p>
     </section>
   }
 </div>
