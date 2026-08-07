@@ -26,6 +26,10 @@ export interface StoreProduct {
   listIndex?: number;
   requiresOptionSelection?: boolean;
   directVariantId?: string | null;
+  /** Exclusive Products membership benefit — restricted regardless of whether the viewer qualifies. */
+  isMembersOnly?: boolean;
+  /** Early Access membership benefit — publicReleaseOnUtc is in the future and the viewer isn't within their lead window. */
+  isComingSoon?: boolean;
 }
 
 export interface StoreCategoryPill {

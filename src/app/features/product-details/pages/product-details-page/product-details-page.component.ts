@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,6 +8,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
@@ -36,6 +38,8 @@ import { AccountWishlistFacade } from '../../../account/services/account-wishlis
     EmptyStateComponent,
     LoadingSkeletonComponent,
     HamboxCurrencyPipe,
+    DatePipe,
+    TranslatePipe,
   ],
   templateUrl: './product-details-page.component.html',
   styleUrl: './product-details-page.component.scss',
@@ -150,6 +154,10 @@ export class ProductDetailsPageComponent {
 
   protected readonly canPurchase = computed(() => {
     if (this.isPreview()) {
+      return false;
+    }
+
+    if (this.product()?.canPurchase === false) {
       return false;
     }
 

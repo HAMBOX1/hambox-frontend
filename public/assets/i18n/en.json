@@ -171,6 +171,12 @@
     "NOTIFY_ME": "Notify me",
     "INSTANT_DIGITAL": "Instant digital",
     "FEATURED": "Featured",
+    "MEMBERS_ONLY": "Members only",
+    "COMING_SOON": "Coming soon",
+    "UPGRADE_TO_UNLOCK": "This product is exclusive to {{plans}} members.",
+    "UPGRADE_CTA": "Upgrade membership",
+    "EARLY_ACCESS_AVAILABLE": "You have early access to this product.",
+    "AVAILABLE_ON": "Available on {{date}}",
     "IN_STOCK": "In stock",
     "LOW_STOCK": "Low stock",
     "OUT_OF_STOCK": "Out of stock",
@@ -243,7 +249,12 @@
     "PAYMENT": "Payment method",
     "ORDER_SUMMARY": "Order summary",
     "PLACE_ORDER": "Place order",
-    "PROCESSING": "Processing payment…"
+    "PROCESSING": "Processing payment…",
+    "REFERRAL_BANNER": {
+      "TITLE": "Spread the Joy!",
+      "TEXT": "Invite friends and earn referral points when they make their first purchase.",
+      "CTA": "Invite Friends"
+    }
   },
   "ACCOUNT": {
     "DASHBOARD": "Dashboard",
@@ -276,8 +287,6 @@
       "RETRY": "Retry",
       "CURRENT_PLAN": "Current plan",
       "VALID_UNTIL": "Valid until",
-      "AUTO_RENEW_ON": "Auto-renew on",
-      "AUTO_RENEW_OFF": "Auto-renew off",
       "RENEW": "Renew membership",
       "NO_PLAN": "No active membership",
       "NO_PLAN_HINT": "Choose a plan below to unlock member benefits.",
@@ -387,6 +396,7 @@
       "NAV_SUPPORT": "Support",
       "NAV_MEMBERSHIP": "Membership",
       "NAV_WISHLIST": "Vault",
+      "NAV_REFERRAL": "Referral",
       "NAV_NOTIFICATIONS": "Notifications",
       "NAV_MARKETPLACE": "Marketplace",
       "NAV_SETTINGS": "Settings"
@@ -400,6 +410,7 @@
       "EXPIRES": "Expires",
       "MEMBER_DISCOUNT": "{{percent}}% member discount",
       "MEMBERSHIP": "Membership",
+      "BETA_ACCESS": "Beta",
       "NO_ACTIVE_PLAN": "No active plan",
       "EXPLORE_PLANS": "Explore membership plans and unlock benefits.",
       "WISHLIST": "Your Wishlist",
@@ -490,18 +501,41 @@
     },
     "REFERRAL_UI": {
       "TITLE": "Referral Program",
-      "SUBTITLE": "Invite friends and earn lifetime rewards.",
+      "SUBTITLE": "Invite friends and earn referral points.",
       "LOADING": "Loading referral dashboard...",
       "LIFETIME_REWARDS": "Lifetime Rewards",
       "POINTS": "Points",
+      "POINTS_BALANCE": "Points Balance",
+      "SUCCESSFUL_REFERRALS": "Successful Referrals",
+      "PENDING_REFERRALS": "Pending Referrals",
       "REFERRAL_TIER": "{{count}} successful referrals · {{tier}} tier",
       "TIER_PROGRESS": "Tier progress {{percent}}%",
+      "INVITE_FRIENDS": "Invite Friends",
       "COPY_INVITE": "Copy Invite Link",
       "COPIED": "Copied!",
       "CODE": "Code",
-      "RECENT_REFERRALS": "Recent Referrals",
+      "RECENT_REFERRALS": "Recent Referral Activity",
       "POINTS_GAINED": "+{{points}} pts",
-      "EMPTY_HISTORY": "No referral history yet."
+      "EMPTY_HISTORY": "No referral history yet.",
+      "HISTORY_TITLE": "Referral History",
+      "SEARCH_PLACEHOLDER": "Search by friend...",
+      "STATUS_ALL": "All statuses",
+      "STATUS_PENDING": "Pending",
+      "STATUS_QUALIFIED": "Qualified",
+      "STATUS_REWARDED": "Rewarded",
+      "STATUS_EXPIRED": "Expired",
+      "STATUS_REVERSED": "Reversed",
+      "STATUS_REJECTED": "Rejected",
+      "COL_FRIEND": "Friend",
+      "COL_JOINED": "Joined",
+      "COL_QUALIFIED": "Qualified",
+      "COL_POINTS": "Points Earned",
+      "COL_STATUS": "Status",
+      "COL_REWARD_DATE": "Reward Date",
+      "PREVIOUS": "Previous",
+      "NEXT": "Next",
+      "PAGE_OF": "Page {{page}} of {{total}}",
+      "PAGINATION_ARIA": "Referral history pagination"
     },
     "REVIEW_DIALOG_UI": {
       "TITLE": "Write a Review",
@@ -514,7 +548,6 @@
     },
     "MEMBERSHIP_UI": {
       "DAYS": "{{count}} days",
-      "PLAN_META": "{{benefits}} benefits · {{members}} members",
       "HISTORY_ACTION": "Action",
       "HISTORY_PLAN": "Plan",
       "HISTORY_NOTES": "Notes",
@@ -2157,20 +2190,20 @@
             "HELP": "Turns the customer referral program on or off.",
             "TOOLTIP": "When off, referral links and rewards stop working immediately for new referrals."
           },
-          "REFERRER_REWARD_PERCENT": {
-            "LABEL": "Referrer Reward",
-            "HELP": "The reward percentage given to the customer who refers someone.",
-            "TOOLTIP": "Applies to new referrals going forward."
+          "POINTS_PER_REFERRAL": {
+            "LABEL": "Points Awarded Per Successful Referral",
+            "HELP": "Fixed referral points awarded to the referrer when a referred customer completes their first order.",
+            "TOOLTIP": "Awarded once per referral, on the referred customer's first completed order."
           },
-          "REFEREE_DISCOUNT_PERCENT": {
-            "LABEL": "Referee Discount",
-            "HELP": "The discount percentage given to the newly referred customer.",
-            "TOOLTIP": "Applies to new referrals going forward."
+          "POINT_VALUE_USD": {
+            "LABEL": "Monetary Value Per Point",
+            "HELP": "The USD value of one referral point, used to show customers the equivalent dollar value of their points balance.",
+            "TOOLTIP": "Example: 100 points at $0.10 per point is worth $10."
           },
           "REWARD_EXPIRY_DAYS": {
             "LABEL": "Reward Expiry",
-            "HELP": "How many days a referral reward stays valid before expiring.",
-            "TOOLTIP": "Applies to new rewards going forward."
+            "HELP": "How many days a referral stays claimable before it expires if the referred customer hasn't completed an order yet.",
+            "TOOLTIP": "Applies to new referrals going forward."
           }
         },
         "INVENTORY": {
@@ -3076,7 +3109,7 @@
         "NAME": "Name",
         "DESCRIPTION": "Description",
         "TYPE": "Promotion type",
-        "INITIAL_COUPON": "Initial coupon code",
+        "INITIAL_COUPON": "Coupon code",
         "DISCOUNT_TYPE": "Discount type",
         "DISCOUNT_VALUE": "Discount value",
         "DISCOUNT_PREVIEW": "Preview",
@@ -3116,7 +3149,21 @@
         "RESTORE_DRAFT_CONFIRM": "Restore draft",
         "RESTORE_DRAFT_DISCARD": "Discard",
         "WARNING_FULL_DISCOUNT": "This discount is 100% or more — double-check that's intentional before publishing.",
-        "WARNING_HIGH_DISCOUNT": "This is a high discount (70%+). Make sure that's intentional before publishing."
+        "WARNING_HIGH_DISCOUNT": "This is a high discount (70%+). Make sure that's intentional before publishing.",
+        "SCHEDULE_TITLE": "Schedule",
+        "ENABLE_SCHEDULING": "Enable scheduling",
+        "SCHEDULING_HINT": "Without a schedule, this promotion is active immediately and stays active until you turn it off manually.",
+        "ENABLE_ELIGIBILITY": "Add eligibility restrictions",
+        "ELIGIBILITY_HINT": "Without restrictions, every customer and order qualifies for this promotion.",
+        "UNLIMITED_USAGE": "Unlimited usage",
+        "UNLIMITED_USAGE_HINT": "Anyone can redeem this promotion as many times as they like.",
+        "TARGETS_NOT_APPLICABLE": "Targeting doesn't apply to this promotion type — the discount applies to the whole order.",
+        "COUPON_DUPLICATE_HINT": "To use a different code, duplicate this promotion.",
+        "SAVE_CODE": "Save code",
+        "COUPON_PLACEHOLDER": "e.g. SUMMER2026",
+        "COUPON_CUSTOM_HINT": "Type the exact code customers will enter — it's not generated for you.",
+        "TARGETS_REQUIRED_PRODUCT": "Select at least one product — required for this promotion to ever apply.",
+        "TARGETS_REQUIRED_CATEGORY": "Select at least one category — required for this promotion to ever apply."
       },
       "DETAIL": {
         "TAB_OVERVIEW": "Overview",
@@ -3133,7 +3180,15 @@
         "USER": "User",
         "ORDER": "Order",
         "REDEEMED": "Redeemed",
-        "NO_REDEMPTIONS": "No redemptions recorded yet."
+        "NO_REDEMPTIONS": "No redemptions recorded yet.",
+        "COUPON_CODE_TITLE": "Coupon code",
+        "NO_COUPON_CODE": "No coupon code set yet.",
+        "COUPON_SAVED": "Coupon code saved",
+        "COUPON_SAVE_FAILED": "Failed to save coupon code",
+        "CANNOT_PUBLISH_TITLE": "Cannot publish",
+        "CANNOT_ACTIVATE_TITLE": "Cannot activate",
+        "SOME_SKIPPED_TITLE": "Some promotions were skipped",
+        "SOME_SKIPPED_DETAIL": "{{count}} promotion(s) can never apply as configured and were not updated."
       },
       "COUPONS": {
         "GENERATE": "Generate bulk",
@@ -3188,8 +3243,7 @@
         "MEMBERSHIP": "Membership",
         "CATEGORY": "Category",
         "PRODUCT": "Product",
-        "FLASH_SALE": "Flash sale",
-        "REFERRAL_REWARD": "Referral reward"
+        "FLASH_SALE": "Flash sale"
       },
       "SCHEDULE_STATUS": {
         "LIVE": "Live",
@@ -3212,7 +3266,14 @@
         "WARNINGS": "Warnings",
         "NO_TARGETS": "Applies without selecting specific products or categories.",
         "HAS_TARGETS": "Applies to {{products}} product(s) and {{categories}} category/categories.",
-        "WARNING_NO_TARGETS": "This promotion type requires at least one product or category target."
+        "WARNING_NO_TARGETS": "This promotion type requires at least one product or category target.",
+        "WHY_CANT_APPLY": "Why this can't be applied yet",
+        "ISSUE_NO_PRODUCT_TARGETS": "No products are selected — this promotion can never apply to any order.",
+        "ISSUE_NO_CATEGORY_TARGETS": "No categories are selected — this promotion can never apply to any order.",
+        "ISSUE_NO_COUPON": "This promotion has no coupon code yet — it can never be redeemed.",
+        "INFO_FLASHSALE": "Flash Sale behaves exactly like Automatic — it applies to the whole cart with no special scoping. The Schedule below is what makes it a \"flash\": a short, timed window.",
+        "INFO_MEMBERSHIP": "Applies automatically to any customer with an active membership, unless their membership plan already includes its own discount.",
+        "INFO_AUTOMATIC": "Applies automatically to every eligible cart — no coupon or targeting needed."
       },
       "CONDITION_TYPE": {
         "MINORDERAMOUNT": "Minimum order amount",
@@ -3281,7 +3342,9 @@
         "SLUG": "Slug",
         "DESCRIPTION": "Description",
         "BASE_MODE": "Base mode",
-        "NOTES": "Version notes"
+        "NOTES": "Version notes",
+        "TAB_DETAILS": "Details",
+        "TAB_THEME": "Theme"
       },
       "DETAIL": {
         "TAB_OVERVIEW": "Overview",
@@ -3331,7 +3394,6 @@
         "FOOTER": "© Your storefront — preview footer"
       },
       "EDITOR": {
-        "ADVANCED": "Advanced",
         "BRAND_HINT": "These colors drive buttons, links, and accents across the whole storefront.",
         "FONT_FAMILY": "Font family",
         "TYPE_HEADING_PREVIEW": "Heading preview",
@@ -4350,17 +4412,37 @@
         "DURATION": "Duration (days)",
         "SORT_ORDER": "Sort order",
         "BADGE": "Badge label",
-        "THEME": "Theme key",
-        "IS_DEFAULT": "Default plan for new members"
+        "BADGE_PLACEHOLDER": "e.g. VIP, Best value",
+        "IS_DEFAULT": "Default plan for new members",
+        "ADVANCED": "Advanced",
+        "ADVANCED_HINT": "Slug and sort order — rarely changed after a plan is created.",
+        "SLUG_HINT": "Generated automatically from the name. Only change it if you need a specific URL."
       },
       "BENEFITS": {
         "TITLE": "Benefits",
+        "SUBTITLE": "Every benefit below is enforced by real business logic, not just displayed to the member.",
         "ADD": "Add benefit",
         "TYPE": "Benefit type",
         "VALUE": "Value",
+        "PURCHASE_LIMIT_VALUE": "Purchases allowed",
+        "PER_MONTH": "/ month",
+        "EARLY_ACCESS_DAYS": "Early access lead time",
+        "DAYS": "days",
+        "EXCLUSIVE_PRODUCTS": "Exclusive products",
+        "UNLOCKED_THEMES": "Unlocked themes",
+        "FEATURE_FLAGS": "Feature flags",
+        "FEATURE_FLAGS_PLACEHOLDER": "Select capabilities to unlock…",
+        "FEATURE_FLAGS_HINT": "Applies to every plan independently of the benefit list above — evaluated centrally wherever hamboxHasFeature is used.",
         "DISPLAY_NAME": "Display name",
         "SORT_ORDER": "Sort order",
-        "EMPTY": "No benefits configured for this plan."
+        "GRANTED": "Granted",
+        "MOVE_UP": "Move up",
+        "MOVE_DOWN": "Move down",
+        "REMOVE": "Remove benefit",
+        "EMPTY": "No benefits configured for this plan.",
+        "STATUS": {
+          "ENFORCED": "Fully enforced"
+        }
       },
       "DETAIL": {
         "TAB_OVERVIEW": "Overview",
@@ -4370,13 +4452,18 @@
         "LOADING_STATS": "Loading statistics…",
         "LOADING_COMPARISON": "Loading plan comparison…",
         "SUBSCRIBERS": "Subscribers",
-        "BENEFITS": "Benefits"
+        "BENEFITS": "Benefits",
+        "PRODUCT_COUNT": "{{count}} product(s)",
+        "THEME_COUNT": "{{count}} theme(s)"
       },
       "MEMBERS": {
         "SEARCH": "Search members…",
         "ASSIGN": "Assign member",
         "ASSIGN_TITLE": "Assign membership",
         "USER_ID": "User ID",
+        "ASSIGN_SEARCH_PLACEHOLDER": "Search by name or email…",
+        "ASSIGN_EMPTY": "No matching users.",
+        "CHANGE_USER": "Change",
         "AUTO_RENEW": "Auto-renew",
         "EMPTY": "No members found.",
         "PLAN_COUNT": "Members on this plan (current page)",
@@ -4742,6 +4829,11 @@
         "LOADING": "Searching…",
         "NO_RESULTS": "No categories match your search.",
         "REMOVE": "Remove category"
+      },
+      "THEME_PICKER": {
+        "SEARCH_PLACEHOLDER": "Search themes…",
+        "NO_RESULTS": "No themes match your search.",
+        "PRIMARY": "Primary"
       },
       "CLEAR_ALL": "Clear all",
       "SEARCH_FAILED": "Search failed. Please try again."

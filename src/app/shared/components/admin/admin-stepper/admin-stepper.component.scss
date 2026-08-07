@@ -35,7 +35,7 @@
   &[data-state='active'] {
     border-color: var(--admin-accent-green);
     background: var(--admin-accent-green);
-    color: var(--color-primary-contrast, #fff);
+    color: var(--color-primary-text-on);
   }
 
   &[data-state='done'] {

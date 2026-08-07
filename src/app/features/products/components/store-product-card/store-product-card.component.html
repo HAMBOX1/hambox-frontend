@@ -22,6 +22,14 @@
         <span class="store-card__badge store-card__badge--featured">{{ 'PRODUCT.FEATURED' | translate }}</span>
       }
 
+      @if (product().isMembersOnly) {
+        <span class="store-card__badge store-card__badge--members">
+          <i class="pi pi-lock" aria-hidden="true"></i> {{ 'PRODUCT.MEMBERS_ONLY' | translate }}
+        </span>
+      } @else if (product().isComingSoon) {
+        <span class="store-card__badge store-card__badge--members">{{ 'PRODUCT.COMING_SOON' | translate }}</span>
+      }
+
       <span
         class="store-card__stock-badge"
         [class.store-card__stock-badge--in]="product().stockStatus === 'in-stock'"
@@ -97,6 +105,7 @@
           type="button"
           class="store-card__cta store-card__cta--icon"
           [attr.aria-label]="'PRODUCT.ADD_TO_CART' | translate"
+          [disabled]="product().isMembersOnly || product().isComingSoon"
           (click)="addToCart($event)"
         >
           <img [src]="cartIconSrc" alt="" aria-hidden="true" />

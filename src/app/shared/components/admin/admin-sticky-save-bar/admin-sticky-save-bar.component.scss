@@ -1,6 +1,6 @@
 .admin-sticky-save-bar {
   position: sticky;
-  bottom: 0;
+  bottom: var(--admin-page-gap);
   z-index: 20;
   margin-top: auto;
   padding-top: var(--admin-section-gap);

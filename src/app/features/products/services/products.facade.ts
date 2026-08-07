@@ -50,7 +50,7 @@ function attributesEqual(
   return canonicalize(left) === canonicalize(right);
 }
 
-const DEFAULT_PAGE_SIZE = 12;
+const DEFAULT_PAGE_SIZE = 24;
 const DEFAULT_SECTION = 'games';
 
 export interface StorefrontClientFilters {

@@ -16,6 +16,7 @@ import { PaymentProcessingCardComponent } from '../../components/payment-process
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { MembershipCheckoutFacade } from '../../services/membership-checkout.facade';
 import { CartFacade } from '../../../cart/services/cart.facade';
+import { ThemeEngineService } from '../../../../core/theme/theme-engine.service';
 
 const CHECKOUT_STAGES = [
   'Authorizing payment',
@@ -50,6 +51,7 @@ export class PaymentProcessingPageComponent implements OnInit {
   private readonly checkout = inject(CheckoutFacade);
   private readonly membershipCheckout = inject(MembershipCheckoutFacade);
   private readonly cartFacade = inject(CartFacade);
+  private readonly themeEngine = inject(ThemeEngineService);
 
   protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
   protected readonly progress = signal(8);
@@ -149,6 +151,7 @@ export class PaymentProcessingPageComponent implements OnInit {
 
     try {
       const order = await this.membershipCheckout.submitCheckout();
+      await this.themeEngine.loadActiveTheme();
       stageTimer.unsubscribe();
       this.stageLabel.set('Membership activated');
       this.progress.set(100);

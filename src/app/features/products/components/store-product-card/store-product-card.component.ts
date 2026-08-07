@@ -70,7 +70,7 @@ export class StoreProductCardComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.product().outOfStock) {
+    if (this.product().outOfStock || this.product().isMembersOnly || this.product().isComingSoon) {
       return;
     }
 

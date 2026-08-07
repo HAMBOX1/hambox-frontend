@@ -104,6 +104,24 @@
             }
           </div>
 
+          @if (product()?.isMembersOnly && !canPurchase()) {
+            <div class="pdp__membership-gate">
+              <i class="pi pi-lock" aria-hidden="true"></i>
+              <span>{{ 'PRODUCT.UPGRADE_TO_UNLOCK' | translate: { plans: product()!.requiredPlanNames.join(' / ') } }}</span>
+              <a routerLink="/checkout/membership" class="pdp__membership-gate-cta">{{ 'PRODUCT.UPGRADE_CTA' | translate }}</a>
+            </div>
+          } @else if (product()?.publicReleaseOnUtc && !canPurchase()) {
+            <div class="pdp__membership-gate">
+              <i class="pi pi-clock" aria-hidden="true"></i>
+              <span>{{ 'PRODUCT.AVAILABLE_ON' | translate: { date: (product()!.publicReleaseOnUtc | date: 'mediumDate') } }}</span>
+            </div>
+          } @else if (product()?.publicReleaseOnUtc && canPurchase()) {
+            <div class="pdp__membership-gate pdp__membership-gate--positive">
+              <i class="pi pi-verified" aria-hidden="true"></i>
+              <span>{{ 'PRODUCT.EARLY_ACCESS_AVAILABLE' | translate }}</span>
+            </div>
+          }
+
           <div class="pdp__actions">
             <button type="button" class="pdp__cta pdp__cta--cart" [disabled]="!canPurchase()" (click)="addToCart()">
               <img [src]="cartIconSrc" alt="" aria-hidden="true" />

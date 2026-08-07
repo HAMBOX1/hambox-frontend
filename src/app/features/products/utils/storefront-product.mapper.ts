@@ -71,6 +71,8 @@ export function mapProductToStoreProduct(
     highlighted: isActive,
     createdOnUtc: product.createdOnUtc,
     listIndex: index,
+    isMembersOnly: product.isMembersOnly,
+    isComingSoon: product.canPurchase === false && !!product.publicReleaseOnUtc,
   };
 }
 
@@ -92,5 +94,9 @@ export function mapProductToDetailsItem(product: Product, lang: SupportedLanguag
     discountLabel: '',
     categoryName: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     ...DEFAULT_PRODUCT_DETAILS_EXTRAS,
+    publicReleaseOnUtc: product.publicReleaseOnUtc ?? null,
+    isMembersOnly: !!product.isMembersOnly,
+    canPurchase: product.canPurchase !== false,
+    requiredPlanNames: product.requiredPlanNames ?? [],
   };
 }

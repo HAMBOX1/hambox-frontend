@@ -162,6 +162,15 @@
     background: var(--color-featured-bg);
     color: var(--color-featured-text);
   }
+
+  &--members {
+    border: 1px solid var(--color-featured-border);
+    background: var(--color-featured-bg);
+    color: var(--color-featured-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
 }
 
 .store-card__badge--discount ~ .store-card__badge--featured {

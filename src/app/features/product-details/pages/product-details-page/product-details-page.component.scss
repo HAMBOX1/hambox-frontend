@@ -250,6 +250,38 @@
   margin-bottom: 20px;
 }
 
+.pdp__membership-gate {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--color-featured-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-featured-bg);
+  color: var(--color-featured-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  &--positive {
+    border-color: var(--color-success-border, var(--color-featured-border));
+    background: var(--color-success-muted, var(--color-featured-bg));
+    color: var(--color-success, var(--color-featured-text));
+  }
+}
+
+.pdp__membership-gate-cta {
+  margin-inline-start: auto;
+  padding: 6px 14px;
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-primary);
+  color: var(--color-primary-text-on);
+  font-size: 0.8rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 .pdp__action-message {
   margin: 0 0 36px;
   color: var(--color-primary);

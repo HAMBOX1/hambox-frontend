@@ -61,7 +61,7 @@ const DEVICES: readonly { readonly value: PreviewDevice; readonly icon: string; 
 
       &--active {
         background: var(--ui-primary);
-        color: var(--color-on-primary, #fff);
+        color: var(--color-primary-text-on);
       }
     }
   `,

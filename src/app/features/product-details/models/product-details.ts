@@ -24,4 +24,12 @@ export interface ProductDetailsItem {
   categoryName?: string;
   trustFeatures: readonly ProductDetailsTrustFeature[];
   redeemSteps: readonly ProductDetailsRedeemStep[];
+  /** Null if already public; a future date if gated behind the Early Access membership benefit. */
+  publicReleaseOnUtc: string | null;
+  /** True if any membership plan restricts purchase of this product (Exclusive Products benefit). */
+  isMembersOnly: boolean;
+  /** True if the current viewer may purchase this product right now. */
+  canPurchase: boolean;
+  /** When isMembersOnly is true, the plan(s) that grant access — drives the upgrade CTA copy. */
+  requiredPlanNames: readonly string[];
 }

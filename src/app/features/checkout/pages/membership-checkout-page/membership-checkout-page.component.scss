@@ -72,7 +72,7 @@
     border: 0;
     border-radius: var(--sf-radius-sm);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--color-primary-text-on);
     cursor: pointer;
   }
 }
@@ -84,7 +84,7 @@
   border: 0;
   border-radius: var(--sf-radius-sm);
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-primary-text-on);
   font-weight: 700;
   cursor: pointer;
 }

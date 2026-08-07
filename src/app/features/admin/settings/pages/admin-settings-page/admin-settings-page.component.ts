@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -123,6 +124,7 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
 })
 export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
   protected readonly facade = inject(PlatformSettingsFacade);
+  private readonly route = inject(ActivatedRoute);
   private readonly rolesFacade = inject(RoleManagementFacade);
   private readonly themesFacade = inject(ThemeManagementFacade);
   private readonly messageService = inject(MessageService);
@@ -278,7 +280,14 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
     await this.facade.loadAudit();
     this.rolesFacade.loadRoles();
     this.themesFacade.loadThemes();
-    const first = this.facade.categories()[0];
+
+    // Supports deep links like /admin/settings?category=referral (e.g. the "Go to Platform
+    // Settings" shortcut on a Referral Reward promotion) — falls back to the first category.
+    const requestedKey = this.route.snapshot.queryParamMap.get('category');
+    const requested = requestedKey
+      ? this.facade.categories().find((c) => c.key === requestedKey)
+      : undefined;
+    const first = requested ?? this.facade.categories()[0];
     if (first) {
       this.applyCategory(first);
     }
