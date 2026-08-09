@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CheckoutFacade } from '../../services/checkout.facade';
 
 @Component({
   selector: 'app-checkout-card-form',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './checkout-card-form.component.html',
   styleUrl: './checkout-card-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

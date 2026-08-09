@@ -4,6 +4,13 @@ export type ThemeStatus = 'Draft' | 'Published' | 'Archived';
 
 export type ThemeBaseMode = 'Dark' | 'Light';
 
+/**
+ * 'Campaign' | 'Region' | 'Tenant' are reserved/obsolete — never resolved by the backend
+ * ThemeEngine and rejected for new assignments. Kept in the type only so a pre-existing
+ * assignment row (if any) can still render without a type error; never offered for new
+ * assignments (see THEME_ASSIGNMENT_TYPE_OPTIONS). The real campaign mechanism is
+ * features/admin/campaigns.
+ */
 export type ThemeAssignmentType = 'Store' | 'Membership' | 'Campaign' | 'Region' | 'Tenant';
 
 export interface ThemeListItemDto {
@@ -34,6 +41,8 @@ export interface ThemeVersionDto {
   readonly id: string;
   readonly versionNumber: number;
   readonly isPublished: boolean;
+  /** Permanent — stays true after a later publish supersedes this version. Rollback eligibility. */
+  readonly hasEverBeenPublished: boolean;
   readonly publishedOnUtc: string | null;
   readonly notes: string | null;
   readonly tokens: Readonly<Record<string, string>>;
@@ -51,7 +60,10 @@ export interface ThemeScheduleDto {
   readonly startsAtUtc: string;
   readonly endsAtUtc: string | null;
   readonly recurrenceRule: string | null;
+  readonly priority: number;
   readonly isActive: boolean;
+  /** True when this window overlaps another active schedule (any theme) — resolution outcome is ambiguous. */
+  readonly hasOverlap: boolean;
 }
 
 export interface ThemeAssignmentDto {
@@ -147,6 +159,7 @@ export interface ScheduleThemeRequest {
   readonly startsAtUtc: string;
   readonly endsAtUtc?: string | null;
   readonly recurrenceRule?: string | null;
+  readonly priority?: number;
 }
 
 export interface AssignThemeRequest {
@@ -190,12 +203,10 @@ export const THEME_BASE_MODE_OPTIONS = [
   { label: 'Light', value: 'Light' },
 ] as const;
 
+// Campaign/Region/Tenant are intentionally excluded — see the ThemeAssignmentType remarks above.
 export const THEME_ASSIGNMENT_TYPE_OPTIONS = [
   { label: 'Store', value: 'Store' },
   { label: 'Membership', value: 'Membership' },
-  { label: 'Campaign', value: 'Campaign' },
-  { label: 'Region', value: 'Region' },
-  { label: 'Tenant', value: 'Tenant' },
 ] as const;
 
 export function latestThemeVersion(detail: ThemeDetailDto | null): ThemeVersionDto | null {

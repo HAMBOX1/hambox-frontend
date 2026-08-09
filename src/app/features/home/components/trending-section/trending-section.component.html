@@ -1,8 +1,8 @@
 <section class="trending" aria-labelledby="trending-title">
   <div class="trending__inner">
-    <h2 id="trending-title" class="trending__title">Trending Now</h2>
+    <h2 id="trending-title" class="trending__title">Just Landed</h2>
 
-    <div class="trending__bento">
+    <div class="trending__bento motion-fade-up" hamboxReveal>
       @if (featuredProduct(); as featured) {
         <div class="trending__feature">
           <app-trending-feature-card [feature]="featured" />

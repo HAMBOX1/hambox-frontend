@@ -1,5 +1,5 @@
-<aside class="order-summary" aria-label="Order summary">
-  <h2 class="order-summary__title">Order Summary</h2>
+<aside class="order-summary" [attr.aria-label]="'CHECKOUT.ORDER_SUMMARY' | translate">
+  <h2 class="order-summary__title">{{ 'CHECKOUT.ORDER_SUMMARY' | translate }}</h2>
 
   <div class="order-summary__items">
     @for (item of items(); track item.id) {
@@ -34,14 +34,14 @@
           [disabled]="discountApplying()"
           (click)="removeCoupon()"
         >
-          Remove
+          {{ 'CART.REMOVE' | translate }}
         </button>
       </div>
     } @else {
       <input
         class="order-summary__discount-input"
         type="text"
-        placeholder="Discount Code"
+        [placeholder]="'CHECKOUT.DISCOUNT_CODE_PLACEHOLDER' | translate"
         [value]="discountCode()"
         [disabled]="discountApplying()"
         (input)="onDiscountInput($event)"
@@ -52,7 +52,7 @@
         [disabled]="discountApplying()"
         (click)="applyDiscount()"
       >
-        {{ discountApplying() ? 'Applying...' : 'Apply' }}
+        {{ (discountApplying() ? 'CHECKOUT.APPLYING' : 'CART.APPLY') | translate }}
       </button>
     }
   </div>
@@ -67,7 +67,7 @@
 
   <dl class="order-summary__breakdown">
     <div class="order-summary__row">
-      <dt>Subtotal</dt>
+      <dt>{{ 'CART.SUBTOTAL' | translate }}</dt>
       <dd>{{ summary().subtotal | hamboxCurrency }}</dd>
     </div>
     @for (promo of summary().appliedPromotions; track promo.promotionId) {
@@ -83,16 +83,16 @@
     }
     @if (summary().totalDiscount > 0 && summary().appliedPromotions.length === 0) {
       <div class="order-summary__row order-summary__row--promo">
-        <dt>Discount</dt>
+        <dt>{{ 'CART.DISCOUNT' | translate }}</dt>
         <dd>-{{ summary().totalDiscount | hamboxCurrency }}</dd>
       </div>
     }
     <div class="order-summary__row">
-      <dt>Tax (VAT)</dt>
+      <dt>{{ 'CHECKOUT.TAX' | translate }}</dt>
       <dd>{{ summary().tax | hamboxCurrency }}</dd>
     </div>
     <div class="order-summary__row order-summary__row--total">
-      <dt>Total</dt>
+      <dt>{{ 'CART.TOTAL' | translate }}</dt>
       <dd>{{ summary().total | hamboxCurrency }}</dd>
     </div>
   </dl>
@@ -107,7 +107,7 @@
     [disabled]="submitting()"
     (click)="completePurchase()"
   >
-    {{ submitting() ? 'Processing...' : (isDevelopmentCheckout() ? 'Complete Purchase (Development)' : 'Complete Purchase') }}
+    {{ (submitting() ? 'CHECKOUT.PROCESSING' : (isDevelopmentCheckout() ? 'CHECKOUT.COMPLETE_PURCHASE_DEV' : 'CHECKOUT.COMPLETE_PURCHASE')) | translate }}
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
     </svg>
@@ -119,31 +119,30 @@
       <path d="M10 6v5M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
     </svg>
     <p class="order-summary__reassurance-text">
-      Your code will be delivered instantly to your email after payment. Please check your spam
-      folder if you don't see it within 60 seconds.
+      {{ 'CHECKOUT.DELIVERY_REASSURANCE' | translate }}
     </p>
   </div>
 
-  <div class="order-summary__security" aria-label="Security badges">
+  <div class="order-summary__security" [attr.aria-label]="'CHECKOUT.SECURITY_BADGES_ARIA' | translate">
     <div class="order-summary__security-item">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <path d="M7 1l5 2v3c0 3.5-2.2 5.8-5 6.5C4.2 11.8 2 9.5 2 6V3l5-2z" stroke="currentColor" stroke-width="1.2" />
         <path d="M5 7l1.5 1.5L9 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
       </svg>
-      <span>SSL SECURE</span>
+      <span>{{ 'CHECKOUT.SSL_SECURE' | translate }}</span>
     </div>
     <div class="order-summary__security-item">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <path d="M7 1l5 2v3c0 3.5-2.2 5.8-5 6.5C4.2 11.8 2 9.5 2 6V3l5-2z" stroke="currentColor" stroke-width="1.2" />
       </svg>
-      <span>PCI COMPLIANT</span>
+      <span>{{ 'CHECKOUT.PCI_COMPLIANT' | translate }}</span>
     </div>
     <div class="order-summary__security-item">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <rect x="3" y="6" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.2" />
         <path d="M5 6V4.5a2 2 0 014 0V6" stroke="currentColor" stroke-width="1.2" />
       </svg>
-      <span>256-BIT ENCRYPTION</span>
+      <span>{{ 'CHECKOUT.ENCRYPTION_BADGE' | translate }}</span>
     </div>
   </div>
 </aside>

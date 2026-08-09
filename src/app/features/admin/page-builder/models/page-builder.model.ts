@@ -1,4 +1,7 @@
-import { LandingPageSectionEntry } from '../../../home/models/landing-page-section.model';
+import {
+  LandingPageScope,
+  LandingPageSectionEntry,
+} from '../../../home/models/landing-page-section.model';
 
 export interface LandingPageTemplateSummary {
   readonly id: string;
@@ -7,6 +10,8 @@ export interface LandingPageTemplateSummary {
   readonly isActive: boolean;
   readonly hasUnpublishedChanges: boolean;
   readonly modifiedOnUtc: string;
+  readonly scope: LandingPageScope;
+  readonly targetId: string | null;
 }
 
 export interface LandingPageTemplateDetail {
@@ -16,6 +21,11 @@ export interface LandingPageTemplateDetail {
   readonly isActive: boolean;
   readonly hasUnpublishedChanges: boolean;
   readonly sections: readonly LandingPageSectionEntry[];
+  readonly scope: LandingPageScope;
+  readonly targetId: string | null;
+  readonly seoTitle: string | null;
+  readonly seoDescription: string | null;
+  readonly seoOgImageUrl: string | null;
 }
 
-export type { LandingPageSectionEntry };
+export type { LandingPageScope, LandingPageSectionEntry };

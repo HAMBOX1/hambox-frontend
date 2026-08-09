@@ -15,11 +15,15 @@
       <div class="store-card__media-shade" aria-hidden="true"></div>
 
       @if (product().discountLabel) {
-        <span class="store-card__badge store-card__badge--discount">{{ product().discountLabel }}</span>
+        <span class="store-card__badge store-card__badge--discount">{{
+          product().discountLabel
+        }}</span>
       }
 
       @if (product().featuredBadge) {
-        <span class="store-card__badge store-card__badge--featured">{{ 'PRODUCT.FEATURED' | translate }}</span>
+        <span class="store-card__badge store-card__badge--featured">{{
+          'PRODUCT.FEATURED' | translate
+        }}</span>
       }
 
       @if (product().isMembersOnly) {
@@ -27,14 +31,18 @@
           <i class="pi pi-lock" aria-hidden="true"></i> {{ 'PRODUCT.MEMBERS_ONLY' | translate }}
         </span>
       } @else if (product().isComingSoon) {
-        <span class="store-card__badge store-card__badge--members">{{ 'PRODUCT.COMING_SOON' | translate }}</span>
+        <span class="store-card__badge store-card__badge--members">{{
+          'PRODUCT.COMING_SOON' | translate
+        }}</span>
       }
 
       <span
         class="store-card__stock-badge"
         [class.store-card__stock-badge--in]="product().stockStatus === 'in-stock'"
         [class.store-card__stock-badge--low]="product().stockStatus === 'low-stock'"
-        [class.store-card__stock-badge--out]="product().stockStatus === 'out-of-stock' || product().outOfStock"
+        [class.store-card__stock-badge--out]="
+          product().stockStatus === 'out-of-stock' || product().outOfStock
+        "
       >
         {{ stockLabelKey(product()) | translate }}
       </span>
@@ -44,7 +52,9 @@
           type="button"
           class="store-card__favorite"
           [class.store-card__favorite--active]="wishlistAdded()"
-          [attr.aria-label]="(wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate"
+          [attr.aria-label]="
+            (wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate
+          "
           [attr.aria-pressed]="wishlistAdded()"
           (click)="toggleWishlist($event)"
         >
@@ -78,7 +88,21 @@
     </div>
 
     <div class="store-card__content">
-      <h3 class="store-card__title">{{ product().title }}</h3>
+      <div class="store-card__title-row">
+        <h3 class="store-card__title">{{ product().title }}</h3>
+        @if (product().hasMarketingPage) {
+          <button
+            type="button"
+            class="store-card__discover"
+            [attr.aria-label]="'PRODUCT.EXPLORE_PRODUCT' | translate"
+            [pTooltip]="'PRODUCT.EXPLORE_PRODUCT' | translate"
+            tooltipPosition="top"
+            (click)="openMarketingPage($event)"
+          >
+            <i class="pi pi-info-circle" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
 
       @if (product().instantDigital) {
         <span class="store-card__tag">
@@ -111,11 +135,10 @@
           <img [src]="cartIconSrc" alt="" aria-hidden="true" />
         </button>
       }
-      @case ('buy-now') {
-        <button type="button" class="store-card__cta store-card__cta--buy">{{ 'PRODUCT.BUY_NOW' | translate }}</button>
-      }
       @case ('notify-me') {
-        <button type="button" class="store-card__cta store-card__cta--notify">{{ 'PRODUCT.NOTIFY_ME' | translate }}</button>
+        <button type="button" class="store-card__cta store-card__cta--notify" disabled>
+          {{ 'PRODUCT.NOTIFY_ME' | translate }}
+        </button>
       }
     }
   </footer>

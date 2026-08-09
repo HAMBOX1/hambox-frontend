@@ -16,7 +16,7 @@
           {{ 'NAVBAR.SECURE_CHECKOUT' | translate }}
         </p>
       } @else {
-        <app-storefront-search class="storefront-nav__search-host" (submitted)="closeMenu()" />
+        <app-storefront-search class="storefront-nav__search-host" />
       }
 
       <div class="storefront-nav__actions">
@@ -36,19 +36,6 @@
         <app-account-menu [compact]="true" />
       </div>
 
-      <button
-        type="button"
-        class="storefront-nav__menu-button"
-        [attr.aria-expanded]="menuOpen()"
-        aria-controls="top-nav-user-mobile-panel"
-        [attr.aria-label]="'NAVBAR.TOGGLE_NAV' | translate"
-        (click)="toggleMenu()"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
       @if (mode() !== 'checkout') {
       <nav class="storefront-nav__categories" [attr.aria-label]="'NAVBAR.CATEGORY_NAV' | translate">
         @for (item of links(); track item.labelKey) {
@@ -64,31 +51,5 @@
       </nav>
       }
     </div>
-
-    @if (menuOpen()) {
-      <div id="top-nav-user-mobile-panel" class="storefront-nav__mobile-panel">
-        <nav class="storefront-nav__mobile-links" [attr.aria-label]="'NAVBAR.MOBILE_NAV' | translate">
-          @for (item of links(); track item.labelKey) {
-            <a
-              class="storefront-nav__mobile-link"
-              [class.storefront-nav__mobile-link--active]="isLinkActive(item)"
-              [routerLink]="item.route"
-              [queryParams]="linkQueryParams(item)"
-              (click)="closeMenu()"
-            >
-              {{ item.labelKey | translate }}
-            </a>
-          }
-        </nav>
-
-        <app-storefront-search class="storefront-nav__search-host storefront-nav__search-host--mobile" [mobile]="true" (submitted)="closeMenu()" />
-
-        <div class="storefront-nav__mobile-actions">
-          <app-notification-bell />
-          <app-cart-nav-widget (click)="closeMenu()" />
-          <app-account-menu />
-        </div>
-      </div>
-    }
   </div>
 </header>

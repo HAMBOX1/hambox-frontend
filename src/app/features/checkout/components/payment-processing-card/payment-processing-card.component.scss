@@ -105,30 +105,6 @@
   background: var(--color-section);
 }
 
-.processing-card__wait-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 10px;
-}
-
-.processing-card__wait-label {
-  color: var(--color-text-secondary);
-  font-family: var(--sf-font-body);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-}
-
-.processing-card__wait-value {
-  color: var(--color-text-primary);
-  font-family: var(--sf-font-heading);
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 28px;
-}
-
 .processing-card__progress-track {
   height: 6px;
   overflow: hidden;

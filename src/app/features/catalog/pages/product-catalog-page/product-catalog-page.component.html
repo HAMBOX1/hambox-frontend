@@ -132,7 +132,11 @@
       [disabled]="bulkActionLoading()"
       (click)="requestBulkDelete()"
     ></button>
-    <app-admin-action-menu [label]="'ADMIN.CATALOG_PAGE.BULK.MORE' | translate" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
+    <app-admin-action-menu
+      [label]="'ADMIN.CATALOG_PAGE.BULK.MORE' | translate"
+      [items]="bulkMoreMenuItems()"
+      [disabled]="bulkActionLoading()"
+    />
   </app-admin-bulk-bar>
 
   @if (viewMode() === 'table') {
@@ -159,6 +163,7 @@
       (duplicateProduct)="openDuplicateDialog($event)"
       (archiveProduct)="onRowArchive($event)"
       (deleteProduct)="requestDelete($event)"
+      (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
       (fieldEdit)="onFieldEdit($event)"
       (statusEdit)="onStatusEdit($event)"
@@ -184,6 +189,7 @@
       (duplicateProduct)="openDuplicateDialog($event)"
       (archiveProduct)="onRowArchive($event)"
       (deleteProduct)="requestDelete($event)"
+      (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
       (bulkToggle)="onBulkToggle($event)"
       (collectionsEdit)="onCollectionsEdit($event)"
@@ -231,7 +237,9 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label" for="duplicate-suffix">{{ 'ADMIN.CATALOG_PAGE.DUPLICATE.NAME_SUFFIX' | translate }}</label>
+    <label class="admin-field__label" for="duplicate-suffix">{{
+      'ADMIN.CATALOG_PAGE.DUPLICATE.NAME_SUFFIX' | translate
+    }}</label>
     <input
       pInputText
       id="duplicate-suffix"
@@ -241,8 +249,21 @@
     />
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="duplicateDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.DUPLICATE.ACTION' | translate" icon="pi pi-copy" [loading]="actionLoading()" (click)="confirmDuplicate()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="duplicateDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.DUPLICATE.ACTION' | translate"
+      icon="pi pi-copy"
+      [loading]="actionLoading()"
+      (click)="confirmDuplicate()"
+    ></button>
   </div>
 </p-dialog>
 
@@ -277,7 +298,9 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label" for="bulk-duplicate-suffix">{{ 'ADMIN.CATALOG_PAGE.DUPLICATE.NAME_SUFFIX' | translate }}</label>
+    <label class="admin-field__label" for="bulk-duplicate-suffix">{{
+      'ADMIN.CATALOG_PAGE.DUPLICATE.NAME_SUFFIX' | translate
+    }}</label>
     <input
       pInputText
       id="bulk-duplicate-suffix"
@@ -287,8 +310,21 @@
     />
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkDuplicateDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.DUPLICATE.ACTION' | translate" icon="pi pi-copy" [loading]="bulkActionLoading()" (click)="confirmBulkDuplicate()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="bulkDuplicateDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.DUPLICATE.ACTION' | translate"
+      icon="pi pi-copy"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkDuplicate()"
+    ></button>
   </div>
 </p-dialog>
 
@@ -303,7 +339,9 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label" for="bulk-category-select">{{ 'ADMIN.CATALOG_PAGE.BULK.NEW_CATEGORY' | translate }}</label>
+    <label class="admin-field__label" for="bulk-category-select">{{
+      'ADMIN.CATALOG_PAGE.BULK.NEW_CATEGORY' | translate
+    }}</label>
     <p-select
       inputId="bulk-category-select"
       [options]="[...categoryOptions()]"
@@ -316,8 +354,22 @@
     />
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkCategoryDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate" icon="pi pi-check" [disabled]="!bulkTargetCategoryId()" [loading]="bulkActionLoading()" (click)="confirmBulkCategoryChange()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="bulkCategoryDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
+      icon="pi pi-check"
+      [disabled]="!bulkTargetCategoryId()"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkCategoryChange()"
+    ></button>
   </div>
 </p-dialog>
 
@@ -334,22 +386,42 @@
   <div class="admin-field">
     <div class="product-catalog-page__price-mode-options">
       <label>
-        <p-radioButton name="bulkPriceMode" value="IncreasePercent" [ngModel]="bulkPriceMode()" (ngModelChange)="bulkPriceMode.set($event)" />
+        <p-radioButton
+          name="bulkPriceMode"
+          value="IncreasePercent"
+          [ngModel]="bulkPriceMode()"
+          (ngModelChange)="bulkPriceMode.set($event)"
+        />
         {{ 'ADMIN.CATALOG_PAGE.BULK.PRICE_INCREASE' | translate }}
       </label>
       <label>
-        <p-radioButton name="bulkPriceMode" value="DecreasePercent" [ngModel]="bulkPriceMode()" (ngModelChange)="bulkPriceMode.set($event)" />
+        <p-radioButton
+          name="bulkPriceMode"
+          value="DecreasePercent"
+          [ngModel]="bulkPriceMode()"
+          (ngModelChange)="bulkPriceMode.set($event)"
+        />
         {{ 'ADMIN.CATALOG_PAGE.BULK.PRICE_DECREASE' | translate }}
       </label>
       <label>
-        <p-radioButton name="bulkPriceMode" value="SetFixed" [ngModel]="bulkPriceMode()" (ngModelChange)="bulkPriceMode.set($event)" />
+        <p-radioButton
+          name="bulkPriceMode"
+          value="SetFixed"
+          [ngModel]="bulkPriceMode()"
+          (ngModelChange)="bulkPriceMode.set($event)"
+        />
         {{ 'ADMIN.CATALOG_PAGE.BULK.PRICE_FIXED' | translate }}
       </label>
     </div>
   </div>
   <div class="admin-field">
     <label class="admin-field__label" for="bulk-price-value">
-      {{ (bulkPriceMode() === 'SetFixed' ? 'ADMIN.CATALOG_PAGE.BULK.PRICE_NEW_LABEL' : 'ADMIN.CATALOG_PAGE.BULK.PRICE_PERCENT_LABEL') | translate }}
+      {{
+        (bulkPriceMode() === 'SetFixed'
+          ? 'ADMIN.CATALOG_PAGE.BULK.PRICE_NEW_LABEL'
+          : 'ADMIN.CATALOG_PAGE.BULK.PRICE_PERCENT_LABEL'
+        ) | translate
+      }}
     </label>
     <p-inputNumber
       inputId="bulk-price-value"
@@ -362,8 +434,22 @@
     />
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkPriceDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate" icon="pi pi-check" [disabled]="bulkPriceValue() === null" [loading]="bulkActionLoading()" (click)="confirmBulkPriceAdjust()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="bulkPriceDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
+      icon="pi pi-check"
+      [disabled]="bulkPriceValue() === null"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkPriceAdjust()"
+    ></button>
   </div>
 </p-dialog>
 
@@ -378,7 +464,9 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label" for="bulk-assign-collection-select">{{ 'ADMIN.CATALOG_PAGE.BULK.COLLECTION_LABEL' | translate }}</label>
+    <label class="admin-field__label" for="bulk-assign-collection-select">{{
+      'ADMIN.CATALOG_PAGE.BULK.COLLECTION_LABEL' | translate
+    }}</label>
     <p-select
       inputId="bulk-assign-collection-select"
       [options]="[...collectionOptions()]"
@@ -391,8 +479,22 @@
     />
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkAssignCollectionDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.ASSIGN' | translate" icon="pi pi-check" [disabled]="!bulkTargetCollectionId()" [loading]="bulkActionLoading()" (click)="confirmBulkAssignCollection()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="bulkAssignCollectionDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.ASSIGN' | translate"
+      icon="pi pi-check"
+      [disabled]="!bulkTargetCollectionId()"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkAssignCollection()"
+    ></button>
   </div>
 </p-dialog>
 
@@ -407,7 +509,9 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label" for="bulk-remove-collection-select">{{ 'ADMIN.CATALOG_PAGE.BULK.COLLECTION_LABEL' | translate }}</label>
+    <label class="admin-field__label" for="bulk-remove-collection-select">{{
+      'ADMIN.CATALOG_PAGE.BULK.COLLECTION_LABEL' | translate
+    }}</label>
     <p-select
       inputId="bulk-remove-collection-select"
       [options]="[...collectionOptions()]"
@@ -420,8 +524,23 @@
     />
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkRemoveCollectionDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.REMOVE' | translate" icon="pi pi-check" severity="danger" [disabled]="!bulkTargetCollectionId()" [loading]="bulkActionLoading()" (click)="confirmBulkRemoveCollection()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="bulkRemoveCollectionDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.REMOVE' | translate"
+      icon="pi pi-check"
+      severity="danger"
+      [disabled]="!bulkTargetCollectionId()"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkRemoveCollection()"
+    ></button>
   </div>
 </p-dialog>
 
@@ -436,7 +555,9 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label" for="bulk-new-collection-name">{{ 'ADMIN.CATALOG_PAGE.BULK.NEW_COLLECTION_NAME' | translate }}</label>
+    <label class="admin-field__label" for="bulk-new-collection-name">{{
+      'ADMIN.CATALOG_PAGE.BULK.NEW_COLLECTION_NAME' | translate
+    }}</label>
     <input
       pInputText
       id="bulk-new-collection-name"
@@ -445,10 +566,28 @@
       (ngModelChange)="bulkNewCollectionName.set($event)"
       placeholder="e.g. Homepage Featured"
     />
-    <p class="admin-field__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.NEW_COLLECTION_HINT' | translate: { count: bulkSelectedCount() } }}</p>
+    <p class="admin-field__hint">
+      {{
+        'ADMIN.CATALOG_PAGE.BULK.NEW_COLLECTION_HINT' | translate: { count: bulkSelectedCount() }
+      }}
+    </p>
   </div>
   <div class="admin-dialog__actions">
-    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkCreateCollectionDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.CREATE_AND_ASSIGN' | translate" icon="pi pi-check" [disabled]="!bulkNewCollectionName().trim()" [loading]="bulkActionLoading()" (click)="confirmBulkCreateCollection()"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="bulkCreateCollectionDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.CREATE_AND_ASSIGN' | translate"
+      icon="pi pi-check"
+      [disabled]="!bulkNewCollectionName().trim()"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkCreateCollection()"
+    ></button>
   </div>
 </p-dialog>

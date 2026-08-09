@@ -1,0 +1,114 @@
+/* ---------------------------------------------------------
+   Motion primitives — the storefront's shared cinematic-entrance
+   vocabulary. Paired with ScrollRevealDirective (`[hamboxReveal]`),
+   which only ever toggles `.is-visible` on the host; every actual
+   transform/opacity value lives here so the whole storefront reads
+   as one motion language instead of bespoke per-section animation.
+
+   Usage: `<section hamboxReveal class="motion-fade-up">` — starts in
+   the "init" (hidden/offset) state, animates to rest once `.is-visible`
+   lands. `--reveal-delay` (set by the directive) staggers grid items.
+--------------------------------------------------------- */
+
+.motion-reveal-init {
+  transition-duration: 0.7s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.motion-fade-up.motion-reveal-init {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition-property: opacity, transform;
+}
+
+.motion-fade-up.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.motion-scale.motion-reveal-init {
+  opacity: 0;
+  transform: scale3d(0.94, 0.94, 1);
+  transition-property: opacity, transform;
+}
+
+.motion-scale.is-visible {
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+}
+
+/* Direction-aware slide: enters from the trailing edge in LTR, leading edge in RTL. */
+.motion-slide.motion-reveal-init {
+  opacity: 0;
+  transform: translate3d(36px, 0, 0);
+  transition-property: opacity, transform;
+}
+
+.motion-slide:dir(rtl).motion-reveal-init {
+  transform: translate3d(-36px, 0, 0);
+}
+
+.motion-slide.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Masked image reveal: a clip-path wipe rather than a fade, for hero/editorial artwork. */
+.motion-image-reveal.motion-reveal-init {
+  clip-path: inset(0 0 100% 0);
+  transition-property: clip-path;
+  transition-duration: 0.9s;
+}
+
+.motion-image-reveal.is-visible {
+  clip-path: inset(0 0 0 0);
+}
+
+.motion-parallax {
+  transform: translate3d(0, var(--parallax-y, 0), 0);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-fade-up.motion-reveal-init,
+  .motion-scale.motion-reveal-init,
+  .motion-slide.motion-reveal-init,
+  .motion-image-reveal.motion-reveal-init {
+    transition-duration: 0.01s;
+    transform: none;
+    clip-path: none;
+  }
+
+  .motion-parallax {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------
+   Section seam — a soft atmosphere blend at the top edge of every
+   landing-page section (wired once in SectionRendererComponent) so
+   neighbouring sections bleed into each other instead of hard-cutting.
+--------------------------------------------------------- */
+.section-seam {
+  position: relative;
+  display: block;
+}
+
+.section-seam::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 1;
+  height: 96px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--sf-bg-base) 0%, transparent 100%);
+  opacity: 0.55;
+}
+
+@media (max-width: 767px) {
+  .section-seam::before {
+    height: 56px;
+  }
+}

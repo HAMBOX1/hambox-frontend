@@ -168,6 +168,8 @@
   "PRODUCT": {
     "ADD_TO_CART": "Add to cart",
     "BUY_NOW": "Buy now",
+    "EXPLORE_PRODUCT": "Explore this product",
+    "VIEW_DETAILS": "View Details",
     "NOTIFY_ME": "Notify me",
     "INSTANT_DIGITAL": "Instant digital",
     "FEATURED": "Featured",
@@ -183,7 +185,35 @@
     "LOAD_MORE": "Load more products",
     "ADD_TO_WISHLIST": "Add to wishlist",
     "WISHLIST_ADDED": "Added to wishlist",
-    "RESULT_COUNT": "{{count}} results"
+    "WISHLIST_ERROR": "Unable to save this product to your vault.",
+    "RESULT_COUNT": "{{count}} results",
+    "MORE_FROM_CATEGORY": "More from this category",
+    "PREVIEW_BANNER": "Preview mode — this is how the product will look once published. Purchasing is disabled.",
+    "UNAVAILABLE_TITLE": "Product unavailable",
+    "UNAVAILABLE_TEXT": "This product could not be found.",
+    "CATEGORY_NOT_FOUND_TITLE": "Category not found",
+    "CATEGORY_NOT_FOUND_TEXT": "This category could not be found.",
+    "BACK_TO_STORE": "Back to store",
+    "BREADCRUMB_ARIA": "Breadcrumb",
+    "BREADCRUMB_HOME": "Home",
+    "BREADCRUMB_PRODUCTS": "Products",
+    "GALLERY_ARIA": "Product images",
+    "INSTANT_DELIVERY_BADGE": "Instant Delivery",
+    "GALLERY_IMAGE_ARIA": "Product image {{index}}",
+    "STOCK_AVAILABLE": "Available",
+    "STOCK_SELECT_OPTIONS": "Select options",
+    "STOCK_ALL_IN_CART": "All {{count}} in your cart",
+    "STOCK_LOW_WITH_CART": "Low Stock ({{remaining}} more available, {{inCart}} in cart)",
+    "STOCK_LOW_COUNT": "Low Stock ({{count}} left)",
+    "STOCK_IN_WITH_CART": "In Stock ({{remaining}} more available, {{inCart}} in cart)",
+    "STOCK_IN_COUNT": "In Stock ({{count}} available)",
+    "SKU_LABEL": "SKU: {{sku}}",
+    "DELIVERY_ESTIMATE": "Estimated delivery: Instant after payment",
+    "VARIANTS_CONFIGURING": "Variants for this product are being configured. Check back soon.",
+    "HOW_TO_REDEEM": "How to Redeem",
+    "REDEEM_SUBTITLE": "Follow these simple steps to access your digital purchase after checkout.",
+    "PURCHASE_ACTIONS_ARIA": "Purchase actions",
+    "PRICE_LABEL": "Price"
   },
   "PRODUCTS": {
     "HERO": {
@@ -241,7 +271,20 @@
     "DECREASE_QUANTITY": "Decrease quantity",
     "INCREASE_QUANTITY": "Increase quantity",
     "QUANTITY": "Quantity",
-    "ADD_ERROR": "Unable to add to cart."
+    "ADDED": "Added to cart",
+    "ADD_ERROR": "Unable to add to cart.",
+    "COUPON_APPLIED": "Promo code applied",
+    "COUPON_ERROR": "Unable to apply this promo code.",
+    "LOAD_ERROR_TITLE": "Unable to load cart",
+    "TRY_AGAIN": "Try again",
+    "ITEM_COUNT": "{{count}} items",
+    "ITEM_REMOVED": "Removed “{{title}}” from your cart",
+    "UNDO": "Undo",
+    "UNDO_ERROR": "Unable to undo. Please add the item again.",
+    "NAV_LABEL": "Cart",
+    "MINI_CART_ARIA": "Mini cart",
+    "QTY_LABEL": "Qty {{count}}",
+    "VIEW_CART": "View Cart"
   },
   "CHECKOUT": {
     "TITLE": "Secure checkout",
@@ -254,7 +297,32 @@
       "TITLE": "Spread the Joy!",
       "TEXT": "Invite friends and earn referral points when they make their first purchase.",
       "CTA": "Invite Friends"
-    }
+    },
+    "RECOMMENDATIONS_TITLE": "You Might Also Like",
+    "RECOMMENDATIONS_PREV": "Previous recommendations",
+    "RECOMMENDATIONS_NEXT": "Next recommendations",
+    "TAX": "Tax (VAT)",
+    "DISCOUNT_CODE_PLACEHOLDER": "Discount Code",
+    "APPLYING": "Applying…",
+    "COMPLETE_PURCHASE": "Complete Purchase",
+    "COMPLETE_PURCHASE_DEV": "Complete Purchase (Development)",
+    "DELIVERY_REASSURANCE": "Your code will be delivered instantly to your email after payment. Please check your spam folder if you don't see it within a few minutes.",
+    "SSL_SECURE": "SSL Secure",
+    "PCI_COMPLIANT": "PCI Compliant",
+    "ENCRYPTION_BADGE": "256-bit Encryption",
+    "CART_EMPTY_ERROR": "Your cart is empty.",
+    "EMAIL_REQUIRED_ERROR": "Email is required to complete checkout.",
+    "SECURITY_BADGES_ARIA": "Security badges",
+    "METHOD_CARD": "Card",
+    "METHOD_PAYPAL": "PayPal",
+    "METHOD_CRYPTO": "Crypto",
+    "METHOD_APPLE_PAY": "Apple Pay",
+    "METHOD_DEVELOPMENT": "Development",
+    "DEV_NOTE": "Development checkout is enabled. No card or external payment provider is required.",
+    "CARDHOLDER_NAME": "Cardholder Name",
+    "CARD_NUMBER": "Card Number",
+    "EXPIRY_DATE": "Expiry Date",
+    "CVC": "CVC/CVV"
   },
   "ACCOUNT": {
     "DASHBOARD": "Dashboard",
@@ -430,7 +498,8 @@
       "STATUS": "Status",
       "VALUE": "Value",
       "COMPLETED": "Completed",
-      "EMPTY_ACTIVITY": "No recent activity yet."
+      "EMPTY_ACTIVITY": "No recent activity yet.",
+      "TYPE": "Type"
     },
     "WALLET": {
       "TITLE": "HAMBOX Rewards",
@@ -811,7 +880,8 @@
         "PREVIEW": "Preview",
         "DUPLICATE": "Duplicate",
         "ARCHIVE": "Archive",
-        "DELETE": "Delete"
+        "DELETE": "Delete",
+        "MARKETING_PAGE": "Marketing page"
       },
       "BULK": {
         "PUBLISH": "Publish",
@@ -1007,6 +1077,7 @@
       "PROMOTIONS": "Promotions",
       "MEMBERSHIPS": "Memberships",
       "THEMES": "Themes",
+      "CAMPAIGNS": "Campaigns",
       "PAGE_BUILDER": "Page Builder",
       "LEGAL": "Legal Center",
       "ORDERS": "Orders",
@@ -3360,7 +3431,17 @@
         "ASSIGNMENTS": "Assignments",
         "CURRENT_VERSION": "Current version",
         "PUBLISHED": "Published",
-        "VERSIONS_LIST": "Version history"
+        "VERSIONS_LIST": "Version history",
+        "RESOLUTION": {
+          "LIVE_VIA": "Live now — via {{source}}",
+          "HINT": "This is the theme the storefront is actually serving right now, and why.",
+          "CAMPAIGN": "Campaign",
+          "SCHEDULE": "Scheduled theme",
+          "MEMBERSHIP": "Membership",
+          "STORE": "Store default",
+          "DEFAULT": "Store default (fallback)",
+          "PREVIEW": "Preview"
+        }
       },
       "PREVIEW": {
         "TITLE": "Live preview",
@@ -3419,10 +3500,14 @@
         "ENDS": "Ends at",
         "RECURRENCE": "Recurrence rule",
         "RECURRENCE_PLACEHOLDER": "Optional RRULE",
+        "PRIORITY": "Priority",
         "ADD": "Add schedule",
         "EMPTY": "No schedules configured for this theme.",
         "ACTIVE": "Active",
-        "INACTIVE": "Inactive"
+        "INACTIVE": "Inactive",
+        "OVERLAP": "Overlaps",
+        "OVERLAP_ITEM_HINT": "This window overlaps another active schedule. The one with the higher priority wins; ties go to whichever starts later.",
+        "OVERLAP_BANNER": "Some schedules below overlap in time — resolution will favor the higher priority, then the later start time. Review before relying on this timing."
       },
       "ASSIGNMENTS": {
         "TITLE": "Assignments",
@@ -3507,7 +3592,9 @@
         "SCHEDULED": "Schedule added",
         "ASSIGNED": "Assignment added",
         "ROLLED_BACK": "Theme rolled back",
-        "PREVIEW_STARTED": "Preview session started"
+        "ROLLBACK_FAILED": "Rollback failed",
+        "PREVIEW_STARTED": "Preview session started",
+        "PREVIEW_EXITED": "Preview exited"
       },
       "ACTIONS": {
         "SAVE": "Save",
@@ -3520,21 +3607,129 @@
         "ARCHIVE": "Archive",
         "EXPORT": "Export",
         "PREVIEW": "Preview",
+        "EXIT_PREVIEW": "Exit preview",
         "ROLLBACK": "Rollback"
+      }
+    },
+    "CAMPAIGNS": {
+      "LIST": {
+        "TITLE": "Campaigns",
+        "SUBTITLE": "Time-boxed, storewide marketing theme overrides — Black Friday, Ramadan, Eid, and other events.",
+        "NEW": "New campaign",
+        "SEARCH_PLACEHOLDER": "Search campaigns by name…",
+        "FILTER_STATUS": "Status",
+        "LIVE_NOW": "Live now — {{name}} ({{theme}})",
+        "NO_LIVE_CAMPAIGN": "No campaign is live right now.",
+        "NEXT_UP": "Next up — {{name}} starts {{date}}",
+        "OVERLAP_BANNER": "Some campaigns below overlap in time — resolution favors the higher priority, then the later start time, then whichever was created first.",
+        "OVERLAP_ROW_HINT": "This campaign overlaps another live campaign's window.",
+        "EMPTY": "No campaigns yet. Create your first seasonal or sale campaign.",
+        "COLUMNS": {
+          "NAME": "Name",
+          "THEME": "Theme",
+          "SCHEDULE": "Schedule",
+          "PRIORITY": "Priority",
+          "STATUS": "Status"
+        }
+      },
+      "PHASE": {
+        "DRAFT": "Draft",
+        "SCHEDULED": "Scheduled",
+        "ACTIVE": "Active",
+        "ENDED": "Ended",
+        "PAUSED": "Paused",
+        "ARCHIVED": "Archived",
+        "LIVE_NOW": "Live now",
+        "ACTIVE_OVERRIDDEN": "Active — overridden",
+        "OVERRIDDEN_BY": "Overridden by: {{name}}"
+      },
+      "FORM": {
+        "CREATE_TITLE": "Create campaign",
+        "EDIT_TITLE": "Edit campaign",
+        "SUBTITLE": "Choose a theme, set the window, preview it, then publish when ready.",
+        "DETAILS": "Details",
+        "NAME": "Name",
+        "DESCRIPTION": "Description",
+        "THEME": "Theme",
+        "SELECTED_THEME_STATUS": "Selected theme status: {{status}}",
+        "THEME_NOT_PUBLISHABLE": "The selected theme must be published before this campaign can be published.",
+        "SCHEDULE": "Schedule",
+        "STARTS": "Starts at",
+        "ENDS": "Ends at",
+        "PRIORITY": "Priority",
+        "HISTORY": "History",
+        "NO_HISTORY": "No history yet.",
+        "OVERLAP_HINT": "This campaign overlaps another live campaign — the resolver will favor whichever has higher priority, then the later start time.",
+        "LIVE_VIA": "Live now — this is the active theme via Campaign: {{name}}",
+        "OVERRIDDEN_VIA": "Active, but overridden by a higher-priority campaign: {{name}}"
+      },
+      "HISTORY_ACTION": {
+        "CREATED": "Created",
+        "UPDATED": "Updated",
+        "THEMECHANGED": "Theme changed",
+        "SCHEDULECHANGED": "Schedule changed",
+        "PUBLISHED": "Published",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "ARCHIVED": "Archived",
+        "DELETED": "Deleted"
+      },
+      "CONFIRM": {
+        "DELETE_TITLE": "Delete campaign?",
+        "DELETE": "Delete campaign \"{{name}}\"? This cannot be undone."
+      },
+      "MESSAGES": {
+        "CREATED": "Campaign created",
+        "CREATE_FAILED": "Failed to create campaign",
+        "SAVED": "Campaign saved",
+        "SAVE_FAILED": "Failed to save campaign",
+        "PUBLISHED": "Campaign published",
+        "PUBLISH_FAILED": "Publish failed",
+        "ENABLED": "Campaign enabled",
+        "DISABLED": "Campaign disabled",
+        "ARCHIVED": "Campaign archived",
+        "DELETED": "Campaign deleted",
+        "DELETE_FAILED": "Delete failed",
+        "ACTION_FAILED": "Action failed",
+        "PREVIEW_STARTED": "Preview session started"
+      },
+      "ACTIONS": {
+        "SAVE": "Save",
+        "CANCEL": "Cancel",
+        "EDIT": "Edit",
+        "ENABLE": "Enable",
+        "DISABLE": "Disable",
+        "ARCHIVE": "Archive",
+        "DELETE": "Delete",
+        "PREVIEW": "Preview",
+        "EXIT_PREVIEW": "Exit preview",
+        "PUBLISH": "Publish"
       }
     },
     "PAGE_BUILDER": {
       "TITLE": "Page Builder",
       "SUBTITLE": "Manage landing page templates and control which one is live on the storefront homepage.",
+      "SCOPE": {
+        "HOMEPAGE": "Homepage",
+        "PRODUCT": "Product Pages",
+        "CATEGORY": "Category Pages"
+      },
       "TEMPLATES": {
         "TITLE": "Templates",
+        "TITLE_SCOPED": "Pages",
         "LIVE": "Live",
         "UNPUBLISHED_CHANGES": "Unpublished changes",
         "SET_ACTIVE": "Set active",
         "UPDATED": "Updated",
         "EMPTY": "No landing page templates yet.",
+        "EMPTY_SCOPED": "No pages yet.",
         "NEW": "New Template",
+        "NEW_SCOPED": "New Page",
+        "VIEW": "View page",
         "NAME": "Name",
+        "TARGET": "Target",
+        "TARGET_PRODUCT": "Product",
+        "TARGET_CATEGORY": "Category",
         "CLONE_FROM": "Duplicate from (optional)",
         "CLONE_FROM_NONE": "Start blank",
         "CREATE": "Create",
@@ -3542,12 +3737,22 @@
         "DELETE": "Delete",
         "COPY_SUFFIX": "(Copy)",
         "DELETE_CONFIRM_TITLE": "Delete template",
-        "DELETE_CONFIRM_MESSAGE": "This template and its sections will be permanently deleted. This cannot be undone."
+        "DELETE_CONFIRM_TITLE_SCOPED": "Delete page",
+        "DELETE_CONFIRM_MESSAGE": "This template and its sections will be permanently deleted. This cannot be undone.",
+        "DELETE_CONFIRM_MESSAGE_SCOPED": "This page and its sections will be permanently deleted. This cannot be undone."
+      },
+      "SEO": {
+        "TITLE": "Page SEO",
+        "SUBTITLE": "Optional overrides shown when this marketing page is published. Leave blank to use the product/category's own name and description.",
+        "META_TITLE": "Meta title",
+        "META_DESCRIPTION": "Meta description",
+        "OG_IMAGE": "Social share image URL"
       },
       "SECTIONS": {
         "TITLE": "Sections",
         "SUBTITLE": "Add, reorder, and configure the sections that make up this template.",
         "EMPTY": "Select a template to edit its sections.",
+        "EMPTY_SCOPED": "Select a page to edit its sections.",
         "EMPTY_SECTIONS": "This template has no sections yet.",
         "VISIBLE": "Visible",
         "HIDDEN": "Hidden",
@@ -4018,11 +4223,25 @@
               "LABEL": "Title",
               "HELP": "Section heading."
             },
+            "SUBTITLE": {
+              "LABEL": "Subtitle",
+              "HELP": "Small supporting line under the heading."
+            },
+            "VIEW_ALL_TEXT": {
+              "LABEL": "\"View all\" link text",
+              "HELP": "Leave blank to hide the link."
+            },
+            "VIEW_ALL_URL": {
+              "LABEL": "\"View all\" link URL",
+              "HELP": "Where the link should go, e.g. /products."
+            },
             "EMPTY": "No cards yet — add one below.",
             "CARD_TITLE": "Title",
             "BADGE_TEXT": "Badge text",
             "IMAGE_URL": "Image URL",
-            "TAGS": "Tags (comma-separated)",
+            "PLATFORM": "Platform (e.g. PS5, Xbox, PC)",
+            "GENRE": "Genre (e.g. Racing, RPG)",
+            "PRICE": "Price (leave blank to hide)",
             "BUTTON_TEXT": "Button text",
             "BUTTON_URL": "Button link",
             "FEATURED": "Featured (larger, highlighted card)",
@@ -4240,7 +4459,8 @@
         "PUBLISHED": "Template published.",
         "PUBLISH_FAILED": "Failed to publish template.",
         "DISCARDED": "Draft discarded.",
-        "DISCARD_FAILED": "Failed to discard draft."
+        "DISCARD_FAILED": "Failed to discard draft.",
+        "VIEW_FAILED": "Unable to open this page."
       }
     },
     "LEGAL": {

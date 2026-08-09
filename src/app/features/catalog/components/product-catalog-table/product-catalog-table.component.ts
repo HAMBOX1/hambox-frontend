@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -33,7 +42,10 @@ import { CollectionCreateFormComponent } from '../collection-create-form/collect
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
 import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { Product, ProductStatus } from '../../models/product.model';
-import { CategoryApiService, createCategoryWithHierarchy } from '../../services/category-api.service';
+import {
+  CategoryApiService,
+  createCategoryWithHierarchy,
+} from '../../services/category-api.service';
 import { CollectionApiService } from '../../services/collection-api.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
@@ -123,6 +135,7 @@ export class ProductCatalogTableComponent {
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
+  readonly manageMarketingPage = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
   readonly statusEdit = output<ProductStatusEdit>();
   /** Emitted after a category is created inline from the popover, so the parent facade can refresh its category list. */
@@ -214,7 +227,9 @@ export class ProductCatalogTableComponent {
   }
 
   protected collectionLabel(collectionId: string): string {
-    return this.collectionOptions().find((option) => option.id === collectionId)?.label ?? collectionId;
+    return (
+      this.collectionOptions().find((option) => option.id === collectionId)?.label ?? collectionId
+    );
   }
 
   protected productCollectionLabels(product: Product): string[] {
@@ -324,6 +339,14 @@ export class ProductCatalogTableComponent {
         label: t('ADMIN.CATALOG_PAGE.ACTIONS.ARCHIVE'),
         icon: 'pi pi-inbox',
         command: () => this.archiveProduct.emit(product),
+      });
+    }
+
+    if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Edit)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.MARKETING_PAGE'),
+        icon: 'pi pi-megaphone',
+        command: () => this.manageMarketingPage.emit(product),
       });
     }
 
@@ -474,7 +497,11 @@ export class ProductCatalogTableComponent {
 
     try {
       const id = await createCategoryWithHierarchy(this.categoryApi, request);
-      this.newlyCreatedCategoryState.set({ id, label: request.nameEn, parentId: request.parentId ?? null });
+      this.newlyCreatedCategoryState.set({
+        id,
+        label: request.nameEn,
+        parentId: request.parentId ?? null,
+      });
       this.categoryDraftIdsState.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
       this.categoryDialogOpen.set(false);
       this.categoryCreated.emit();
@@ -618,7 +645,11 @@ export class ProductCatalogTableComponent {
 
     try {
       const id = await firstValueFrom(this.collectionApi.createCollection(request));
-      this.newlyCreatedCollectionState.set({ id, label: request.name, parentId: request.parentId ?? null });
+      this.newlyCreatedCollectionState.set({
+        id,
+        label: request.name,
+        parentId: request.parentId ?? null,
+      });
       this.collectionDraftIdsState.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
       this.collectionDialogOpen.set(false);
       this.collectionCreated.emit();

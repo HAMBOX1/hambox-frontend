@@ -22,8 +22,10 @@
     </header>
 
     <div class="flash-deals__grid">
-      @for (deal of deals(); track deal.id) {
-        <app-flash-deal-card [deal]="deal" />
+      @for (deal of deals(); track deal.id; let i = $index) {
+        <div hamboxReveal [hamboxRevealDelay]="i * 60" class="motion-fade-up">
+          <app-flash-deal-card [deal]="deal" />
+        </div>
       }
     </div>
   </div>

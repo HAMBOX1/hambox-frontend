@@ -4,11 +4,14 @@
   [style.--hero-overlay-opacity]="hero().overlayOpacity"
 >
   <div class="hero__media" aria-hidden="true">
-    <img class="hero__image hero__image--background" [src]="hero().backgroundImageUrl" alt="" />
-    @if (hero().overlayImageUrl) {
-      <img class="hero__image hero__image--overlay" [src]="hero().overlayImageUrl!" alt="" />
-    }
+    <div class="hero__media-layer motion-parallax" [hamboxParallax]="18">
+      <img class="hero__image hero__image--background" [src]="hero().backgroundImageUrl" alt="" />
+      @if (hero().overlayImageUrl) {
+        <img class="hero__image hero__image--overlay" [src]="hero().overlayImageUrl!" alt="" />
+      }
+    </div>
     <div class="hero__shade"></div>
+    <div class="hero__seam"></div>
   </div>
 
   <div class="hero__container">

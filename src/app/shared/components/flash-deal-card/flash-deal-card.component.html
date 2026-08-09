@@ -5,6 +5,24 @@
       @if (deal().discountLabel) {
         <p-tag [value]="deal().discountLabel" styleClass="flash-card__badge" />
       }
+
+      <button
+        type="button"
+        class="flash-card__favorite"
+        [class.flash-card__favorite--active]="wishlistAdded()"
+        [attr.aria-label]="(wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate"
+        [attr.aria-pressed]="wishlistAdded()"
+        (click)="toggleWishlist($event)"
+      >
+        <svg width="16" height="15" viewBox="0 0 17 16" fill="none" aria-hidden="true">
+          <path
+            d="M8.5 14.5l-1.1-1C3.7 10.1 1.5 8.1 1.5 5.5 1.5 3.6 3 2 4.9 2c1.1 0 2.1.5 2.8 1.3L8.5 4.2l.8-0.9C10 2.5 11 2 12.1 2 14 2 15.5 3.6 15.5 5.5c0 2.6-2.2 4.6-5.9 8l-1.1 1z"
+            stroke="currentColor"
+            stroke-width="1.2"
+            fill="none"
+          />
+        </svg>
+      </button>
     </div>
 
     <div class="flash-card__body">
@@ -24,12 +42,17 @@
         </div>
 
         @if (featured()) {
-          <span class="flash-card__buy flash-card__buy--featured">
+          <button
+            type="button"
+            class="flash-card__buy flash-card__buy--featured"
+            [disabled]="adding()"
+            (click)="addToCart($event)"
+          >
             <i class="pi pi-shopping-cart" aria-hidden="true"></i>
-            <span>Add to Cart</span>
-          </span>
+            <span>{{ 'PRODUCT.ADD_TO_CART' | translate }}</span>
+          </button>
         } @else {
-          <span class="flash-card__buy">Buy Now</span>
+          <span class="flash-card__buy">{{ 'PRODUCT.BUY_NOW' | translate }}</span>
         }
       </footer>
     </div>

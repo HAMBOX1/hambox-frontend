@@ -45,13 +45,36 @@
   display: block;
   position: relative;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
   background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.section-library-card__thumb-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s ease;
+
+  &--hidden {
+    opacity: 0;
+  }
+}
+
+/* Live preview: rendered at THUMB_BASE_WIDTH/HEIGHT (1280x720, same 16:9 ratio as the thumb box) then
+ * scaled down with `transform` to exactly fill the card — no cropping needed. */
+.section-library-card__thumb-frame {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  border: 0;
+  pointer-events: none;
+  transform-origin: top left;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  &--loaded {
+    opacity: 1;
   }
 }
 

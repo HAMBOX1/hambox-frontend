@@ -1,5 +1,6 @@
 import { InputSignal, OutputEmitterRef, Type } from '@angular/core';
 
+import { StoreProduct } from '../../../products/models/product';
 import { StorefrontContent } from '../../models/storefront-content.model';
 import {
   FlashDeal,
@@ -10,7 +11,16 @@ import {
   TrustFeature,
 } from '../../models/storefront-home';
 
-/** Uniform data payload every registered section variant renders from. */
+/**
+ * Uniform data payload every registered section variant renders from. `targetProduct`/`targetCategory`/
+ * `targetCategoryProducts` are only ever populated when the page being rendered is a Product/Category
+ * marketing page (§ Page Builder scoping) — every existing homepage variant simply never reads them.
+ * A curated subset of variants (Hero, Products) opt in to falling back to this data when their own
+ * `config` leaves a field blank; every other variant stays purely admin-authored JSON. Reuses the
+ * same pre-localized `StorefrontFeaturedProduct`/`StorefrontCategory` shapes (and their existing
+ * `mapProductToFeaturedProduct`/`mapCategoryToStorefrontCategory` mappers) the homepage already uses —
+ * no new "target" DTO shape, no locale-resolution logic inside the render-side variant components.
+ */
 export interface SectionRenderContext {
   readonly content: StorefrontContent;
   readonly categories: readonly StorefrontCategory[];
@@ -20,6 +30,9 @@ export interface SectionRenderContext {
   readonly trendingValue: TrendingValueItem | null;
   readonly trustFeatures: readonly TrustFeature[];
   readonly flashCountdownSeconds: number;
+  readonly targetProduct?: StorefrontFeaturedProduct | null;
+  readonly targetCategory?: StorefrontCategory | null;
+  readonly targetCategoryProducts?: readonly StoreProduct[];
 }
 
 /**
@@ -65,4 +78,7 @@ export type SectionSettingsFormType = Type<unknown>;
 
 /** The real instance shape every settings-form component satisfies — used to cast at the single
  * point of consumption (`SectionSettingsPanelComponent`) after `ViewContainerRef.createComponent`. */
-export type SectionSettingsFormInstance = { config: InputSignal<unknown>; configChange: OutputEmitterRef<unknown> };
+export type SectionSettingsFormInstance = {
+  config: InputSignal<unknown>;
+  configChange: OutputEmitterRef<unknown>;
+};

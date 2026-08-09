@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -23,7 +31,12 @@ import {
 } from '../../components/product-catalog-table/product-catalog-table.component';
 import { ProductCatalogCardsComponent } from '../../components/product-catalog-cards/product-catalog-cards.component';
 import { ProductDetailPanelComponent } from '../../components/product-detail-panel/product-detail-panel.component';
-import { PriceAdjustmentMode, Product, ProductSortBy, ProductStatus } from '../../models/product.model';
+import {
+  PriceAdjustmentMode,
+  Product,
+  ProductSortBy,
+  ProductStatus,
+} from '../../models/product.model';
 import {
   AdminProductsViewMode,
   AdminProductsViewModeService,
@@ -194,7 +207,11 @@ export class ProductCatalogPageComponent implements OnInit {
         command: () => this.bulkCreateCollectionDialogOpen.set(true),
       });
     }
-    items.push({ label: t('ADMIN.CATALOG_PAGE.BULK.EXPORT'), icon: 'pi pi-download', command: () => void this.bulkExport() });
+    items.push({
+      label: t('ADMIN.CATALOG_PAGE.BULK.EXPORT'),
+      icon: 'pi pi-download',
+      command: () => void this.bulkExport(),
+    });
     items.push({
       label: t('ADMIN.CATALOG_PAGE.BULK.MANAGE_INVENTORY'),
       icon: 'pi pi-box',
@@ -296,7 +313,10 @@ export class ProductCatalogPageComponent implements OnInit {
     void this.facade.refreshCollectionOptions();
   }
 
-  protected async onCollectionsEdit(event: { product: Product; collectionIds: readonly string[] }): Promise<void> {
+  protected async onCollectionsEdit(event: {
+    product: Product;
+    collectionIds: readonly string[];
+  }): Promise<void> {
     await this.onFieldEdit({ product: event.product, collectionIds: event.collectionIds });
   }
 
@@ -307,7 +327,9 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
-        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', { name: product.nameEn }),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', {
+          name: product.nameEn,
+        }),
         life: 3000,
       });
     } else {
@@ -326,7 +348,9 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
-        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', { name: edit.product.nameEn }),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', {
+          name: edit.product.nameEn,
+        }),
         life: 3000,
       });
     }
@@ -358,18 +382,29 @@ export class ProductCatalogPageComponent implements OnInit {
     if (success) {
       const detail =
         status === 'Active'
-          ? this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.PUBLISHED_DETAIL', { name: product.nameEn })
-          : this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', { name: product.nameEn });
+          ? this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.PUBLISHED_DETAIL', {
+              name: product.nameEn,
+            })
+          : this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', {
+              name: product.nameEn,
+            });
 
       this.messageService.add({
         severity: 'success',
-        summary: status === 'Active'
-          ? this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.PUBLISHED_TITLE')
-          : this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
+        summary:
+          status === 'Active'
+            ? this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.PUBLISHED_TITLE')
+            : this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
         detail,
         life: 4000,
       });
     }
+  }
+
+  protected onManageMarketingPage(product: Product): void {
+    void this.router.navigate(['/admin/page-builder'], {
+      queryParams: { scope: 'product', targetId: product.id, targetName: product.nameEn },
+    });
   }
 
   protected onPreviewProduct(product: Product): void {
@@ -392,7 +427,9 @@ export class ProductCatalogPageComponent implements OnInit {
     }
 
     this.actionTarget.set(product);
-    this.duplicateNameSuffix.set(this.translate.instant('ADMIN.CATALOG_PAGE.DUPLICATE.DEFAULT_SUFFIX'));
+    this.duplicateNameSuffix.set(
+      this.translate.instant('ADMIN.CATALOG_PAGE.DUPLICATE.DEFAULT_SUFFIX'),
+    );
     this.duplicateDialogOpen.set(true);
   }
 
@@ -402,7 +439,10 @@ export class ProductCatalogPageComponent implements OnInit {
       return;
     }
 
-    const newId = await this.facade.duplicateProduct(product.id, this.duplicateNameSuffix().trim() || null);
+    const newId = await this.facade.duplicateProduct(
+      product.id,
+      this.duplicateNameSuffix().trim() || null,
+    );
     if (newId) {
       this.messageService.add({
         severity: 'success',
@@ -433,7 +473,9 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.DELETED_TITLE'),
-        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.DELETED_DETAIL', { name: product.nameEn }),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.DELETED_DETAIL', {
+          name: product.nameEn,
+        }),
         life: 4000,
       });
       this.deleteDialogOpen.set(false);
@@ -453,7 +495,9 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_TITLE'),
-        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', { name: product.nameEn }),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UPDATED_DETAIL', {
+          name: product.nameEn,
+        }),
         life: 4000,
       });
     }
@@ -478,7 +522,10 @@ export class ProductCatalogPageComponent implements OnInit {
   @HostListener('keydown.meta.a', ['$event'])
   protected onSelectAllShortcut(event: Event): void {
     const target = event.target as HTMLElement | null;
-    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+    if (
+      target &&
+      (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    ) {
       return;
     }
 
@@ -536,7 +583,10 @@ export class ProductCatalogPageComponent implements OnInit {
   }
 
   protected async confirmBulkDuplicate(): Promise<void> {
-    await this.runBulkAction(() => this.facade.bulkDuplicate(this.bulkDuplicateSuffix().trim() || null), 'Duplicated');
+    await this.runBulkAction(
+      () => this.facade.bulkDuplicate(this.bulkDuplicateSuffix().trim() || null),
+      'Duplicated',
+    );
     this.bulkDuplicateDialogOpen.set(false);
   }
 
@@ -556,7 +606,10 @@ export class ProductCatalogPageComponent implements OnInit {
       return;
     }
 
-    await this.runBulkAction(() => this.facade.bulkAssignCollection(collectionId), 'Collection assigned');
+    await this.runBulkAction(
+      () => this.facade.bulkAssignCollection(collectionId),
+      'Collection assigned',
+    );
     this.bulkAssignCollectionDialogOpen.set(false);
   }
 
@@ -566,7 +619,10 @@ export class ProductCatalogPageComponent implements OnInit {
       return;
     }
 
-    await this.runBulkAction(() => this.facade.bulkRemoveCollection(collectionId), 'Collection removed');
+    await this.runBulkAction(
+      () => this.facade.bulkRemoveCollection(collectionId),
+      'Collection removed',
+    );
     this.bulkRemoveCollectionDialogOpen.set(false);
   }
 
@@ -576,7 +632,10 @@ export class ProductCatalogPageComponent implements OnInit {
       return;
     }
 
-    await this.runBulkAction(() => this.facade.createCollectionFromSelectionAndAssign(name), 'Collection created');
+    await this.runBulkAction(
+      () => this.facade.createCollectionFromSelectionAndAssign(name),
+      'Collection created',
+    );
     this.bulkCreateCollectionDialogOpen.set(false);
     this.bulkNewCollectionName.set('');
   }
@@ -587,7 +646,10 @@ export class ProductCatalogPageComponent implements OnInit {
       return;
     }
 
-    await this.runBulkAction(() => this.facade.bulkAdjustPrice(this.bulkPriceMode(), value), 'Prices updated');
+    await this.runBulkAction(
+      () => this.facade.bulkAdjustPrice(this.bulkPriceMode(), value),
+      'Prices updated',
+    );
     this.bulkPriceDialogOpen.set(false);
   }
 
@@ -634,7 +696,11 @@ export class ProductCatalogPageComponent implements OnInit {
   }
 
   private async runBulkAction(
-    action: () => Promise<{ successCount: number; errorCount: number; errors: readonly string[] } | null>,
+    action: () => Promise<{
+      successCount: number;
+      errorCount: number;
+      errors: readonly string[];
+    } | null>,
     verb: string,
   ): Promise<void> {
     const result = await action();

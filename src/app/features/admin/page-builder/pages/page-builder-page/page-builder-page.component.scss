@@ -2,6 +2,36 @@
   display: block;
 }
 
+.page-builder-page__scope-tabs {
+  display: flex;
+  gap: 0.375rem;
+  margin-block-end: var(--admin-section-gap, 2rem);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-builder-page__scope-tab {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &--active {
+    color: var(--ui-primary);
+    border-bottom-color: var(--ui-primary);
+  }
+}
+
 .page-builder-page__preview-card {
   display: block;
   margin-block-end: var(--admin-section-gap, 2rem);
@@ -23,7 +53,7 @@
 
 .page-builder-page__layout {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(280px, 340px);
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(360px, 460px);
   gap: var(--admin-section-gap, 2rem);
   align-items: start;
   /* Leaves room for the sticky save bar so it never overlaps the last section row. */
@@ -66,7 +96,9 @@
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 
   &:hover {
     border-color: var(--ui-primary);
@@ -80,6 +112,7 @@
 
 .page-builder-page__template-main {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 0.3rem;
   min-width: 0;
@@ -209,4 +242,25 @@
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 1.5rem;
+}
+
+.page-builder-page__target-confirm {
+  margin: 0;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--admin-radius-md, 10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.page-builder-page__seo {
+  display: block;
+  margin-block-start: var(--admin-section-gap, 2rem);
+}
+
+.page-builder-page__seo-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-form-gap, 1.5rem);
 }

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
@@ -79,6 +87,7 @@ export class ProductCatalogCardsComponent {
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
+  readonly manageMarketingPage = output<Product>();
   readonly bulkToggle = output<{ productId: string; shiftKey: boolean }>();
   /** Emitted when the collections bottom sheet is saved — the page maps this into the same
    * partial-update path as the desktop table's collection popover. */
@@ -231,7 +240,11 @@ export class ProductCatalogCardsComponent {
 
     try {
       const id = await firstValueFrom(this.collectionApi.createCollection(request));
-      this.newlyCreatedCollectionState.set({ id, label: request.name, parentId: request.parentId ?? null });
+      this.newlyCreatedCollectionState.set({
+        id,
+        label: request.name,
+        parentId: request.parentId ?? null,
+      });
       this.collectionDraftIdsState.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
       this.collectionDialogOpen.set(false);
       this.collectionCreated.emit();
@@ -280,6 +293,14 @@ export class ProductCatalogCardsComponent {
         label: t('ADMIN.CATALOG_PAGE.ACTIONS.ARCHIVE'),
         icon: 'pi pi-inbox',
         command: () => this.archiveProduct.emit(product),
+      });
+    }
+
+    if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Edit)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.MARKETING_PAGE'),
+        icon: 'pi pi-megaphone',
+        command: () => this.manageMarketingPage.emit(product),
       });
     }
 

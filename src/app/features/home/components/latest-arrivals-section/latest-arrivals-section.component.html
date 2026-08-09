@@ -15,13 +15,15 @@
 
     @if (featured(); as featuredDeal) {
       <div class="latest-arrivals__layout">
-        <div class="latest-arrivals__featured">
+        <div class="latest-arrivals__featured motion-scale" hamboxReveal>
           <app-flash-deal-card [deal]="featuredDeal" [featured]="true" />
         </div>
 
         <div class="latest-arrivals__grid">
-          @for (deal of gridItems(); track deal.id) {
-            <app-flash-deal-card [deal]="deal" />
+          @for (deal of gridItems(); track deal.id; let i = $index) {
+            <div hamboxReveal [hamboxRevealDelay]="i * 60" class="motion-fade-up">
+              <app-flash-deal-card [deal]="deal" />
+            </div>
           }
         </div>
       </div>

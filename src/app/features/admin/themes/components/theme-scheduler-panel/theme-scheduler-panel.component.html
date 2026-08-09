@@ -12,6 +12,10 @@
       <span>{{ 'ADMIN.THEMES.SCHEDULE.RECURRENCE' | translate }}</span>
       <input pInputText [ngModel]="recurrenceRule()" (ngModelChange)="recurrenceRule.set($event)" name="recurrenceRule" [placeholder]="'ADMIN.THEMES.SCHEDULE.RECURRENCE_PLACEHOLDER' | translate" />
     </label>
+    <label>
+      <span>{{ 'ADMIN.THEMES.SCHEDULE.PRIORITY' | translate }}</span>
+      <p-inputNumber [ngModel]="priority()" (ngModelChange)="priority.set($event ?? 0)" name="priority" [showButtons]="true" [min]="0" />
+    </label>
     <button
       *hamboxHasPermission="permissions.Themes.Schedule"
       pButton
@@ -26,6 +30,12 @@
   @if (schedules().length === 0) {
     <app-admin-empty-state [title]="'ADMIN.THEMES.SCHEDULE.EMPTY' | translate" />
   } @else {
+    @if (hasOverlapWarning()) {
+      <p class="theme-scheduler-panel__overlap-banner">
+        <i class="pi pi-exclamation-triangle"></i>
+        {{ 'ADMIN.THEMES.SCHEDULE.OVERLAP_BANNER' | translate }}
+      </p>
+    }
     <ul class="theme-scheduler-panel__list">
       @for (item of schedules(); track item.id) {
         <li>
@@ -35,6 +45,13 @@
           }
           @if (item.recurrenceRule) {
             <span class="theme-scheduler-panel__recurrence">{{ item.recurrenceRule }}</span>
+          }
+          <span class="theme-scheduler-panel__priority">{{ 'ADMIN.THEMES.SCHEDULE.PRIORITY' | translate }}: {{ item.priority }}</span>
+          @if (item.hasOverlap) {
+            <span class="theme-scheduler-panel__overlap" [pTooltip]="'ADMIN.THEMES.SCHEDULE.OVERLAP_ITEM_HINT' | translate">
+              <i class="pi pi-exclamation-triangle"></i>
+              {{ 'ADMIN.THEMES.SCHEDULE.OVERLAP' | translate }}
+            </span>
           }
           <span class="theme-scheduler-panel__status" [class.is-active]="item.isActive">
             {{ item.isActive ? ('ADMIN.THEMES.SCHEDULE.ACTIVE' | translate) : ('ADMIN.THEMES.SCHEDULE.INACTIVE' | translate) }}

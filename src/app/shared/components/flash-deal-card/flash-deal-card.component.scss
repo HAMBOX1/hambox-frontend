@@ -11,6 +11,14 @@
   border: 1px solid var(--sf-border-subtle);
   border-radius: var(--sf-radius-xl);
   background: var(--sf-bg-card);
+  transition: border-color 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--sf-accent-border);
+    box-shadow: var(--sf-shadow-accent-md);
+    transform: translate3d(0, -4px, 0);
+  }
 }
 
 .flash-card__link {
@@ -35,6 +43,57 @@
     height: 177.77%;
     max-width: none;
     object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+.flash-card:hover .flash-card__media img,
+.flash-card:focus-within .flash-card__media img {
+  transform: scale(1.06);
+}
+
+.flash-card__favorite {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  inset-inline-end: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-favorite-bg);
+  color: var(--color-text-secondary);
+  box-shadow: var(--color-shadow-sm);
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  svg {
+    width: 55%;
+    height: 55%;
+  }
+
+  &:hover {
+    color: var(--accent);
+    border-color: var(--color-accent-border);
+    transform: scale(1.04);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  &--active {
+    color: var(--color-danger, var(--accent));
+    border-color: var(--color-accent-border);
+
+    svg path {
+      fill: currentColor;
+    }
   }
 }
 
@@ -57,7 +116,7 @@
 :host ::ng-deep .flash-card__badge.p-tag {
   position: absolute;
   top: 16px;
-  left: 16px;
+  inset-inline-start: 16px;
   margin: 0;
   padding: 4px 12px;
   border-radius: var(--sf-radius-pill);
@@ -132,26 +191,12 @@
   }
 }
 
-:host ::ng-deep .flash-card__buy.p-button {
-  position: relative;
-  overflow: hidden;
-  padding: 12px 24px;
-  border: 0;
-  border-radius: var(--sf-radius-md);
-  background: var(--sf-bg-icon);
-  color: var(--sf-text-primary);
-  font-family: var(--sf-font-body);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
-  letter-spacing: 0.7px;
-}
-
 .flash-card__buy--featured {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
+  border: 0;
   border-radius: var(--sf-radius-md);
   background: var(--color-text-primary);
   color: var(--color-background);
@@ -160,8 +205,44 @@
   font-weight: 700;
   line-height: 20px;
   letter-spacing: 0.7px;
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 
   .pi {
     font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .flash-card__media {
+    height: 160px;
+  }
+
+  .flash-card--featured .flash-card__media {
+    height: 220px;
+  }
+
+  .flash-card__body {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .flash-card--featured .flash-card__title {
+    font-size: 19px;
+    line-height: 26px;
+  }
+
+  .flash-card__sale {
+    font-size: 20px;
+    line-height: 28px;
   }
 }

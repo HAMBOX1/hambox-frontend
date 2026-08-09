@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { UiButtonComponent } from '../../../../shared/components/ui/ui-button/ui-button.component';
 import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
@@ -11,7 +12,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 @Component({
   selector: 'app-community-newsletter-section',
   standalone: true,
-  imports: [RouterLink, FormsModule, UiInputComponent, UiButtonComponent],
+  imports: [RouterLink, FormsModule, UiInputComponent, UiButtonComponent, TranslatePipe],
   templateUrl: './community-newsletter-section.component.html',
   styleUrl: './community-newsletter-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

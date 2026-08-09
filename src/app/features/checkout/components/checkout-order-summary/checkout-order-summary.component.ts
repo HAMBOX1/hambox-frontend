@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { CartFacade } from '../../../cart/services/cart.facade';
@@ -7,7 +8,7 @@ import { CartFacade } from '../../../cart/services/cart.facade';
 @Component({
   selector: 'app-checkout-order-summary',
   standalone: true,
-  imports: [HamboxCurrencyPipe],
+  imports: [HamboxCurrencyPipe, TranslatePipe],
   templateUrl: './checkout-order-summary.component.html',
   styleUrl: './checkout-order-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,6 +17,7 @@ export class CheckoutOrderSummaryComponent {
   private readonly checkout = inject(CheckoutFacade);
   private readonly cartFacade = inject(CartFacade);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   protected readonly items = this.checkout.orderItems;
   protected readonly summary = this.checkout.summary;
@@ -43,13 +45,13 @@ export class CheckoutOrderSummaryComponent {
     this.actionError.set(null);
 
     if (this.cartFacade.isEmpty()) {
-      this.actionError.set('Your cart is empty.');
+      this.actionError.set(this.translate.instant('CHECKOUT.CART_EMPTY_ERROR'));
       return;
     }
 
     const billing = this.checkout.billingDetails();
     if (!billing.email.trim()) {
-      this.actionError.set('Email is required to complete checkout.');
+      this.actionError.set(this.translate.instant('CHECKOUT.EMAIL_REQUIRED_ERROR'));
       return;
     }
 

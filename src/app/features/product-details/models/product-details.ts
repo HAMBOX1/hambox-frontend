@@ -16,11 +16,12 @@ export interface ProductDetailsItem {
   imageUrl: string;
   thumbnailUrl: string;
   galleryImages: readonly string[];
-  rating: number;
-  reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
   priceUsd: number;
   originalPriceUsd: number;
   discountLabel: string;
+  categoryId: string;
   categoryName?: string;
   trustFeatures: readonly ProductDetailsTrustFeature[];
   redeemSteps: readonly ProductDetailsRedeemStep[];

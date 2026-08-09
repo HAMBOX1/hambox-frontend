@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CartNavWidgetComponent } from '../../../cart/components/cart-nav-widget/cart-nav-widget.component';
@@ -35,7 +35,6 @@ export class TopNavGuestComponent {
   elevated = input(false);
 
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
-  protected readonly menuOpen = signal(false);
 
   protected isLinkActive(link: NavLink): boolean {
     const tree = this.router.parseUrl(this.router.url);
@@ -46,13 +45,5 @@ export class TopNavGuestComponent {
 
   protected linkQueryParams(link: NavLink): Record<string, string> | null {
     return navLinkQueryParams(link) ?? null;
-  }
-
-  protected closeMenu(): void {
-    this.menuOpen.set(false);
-  }
-
-  protected toggleMenu(): void {
-    this.menuOpen.update((open) => !open);
   }
 }

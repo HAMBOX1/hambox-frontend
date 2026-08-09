@@ -133,12 +133,6 @@
   width: 100%;
   max-width: 36rem;
   margin: 0 auto;
-
-  &--mobile {
-    display: none;
-    max-width: none;
-    margin: 0;
-  }
 }
 
 .storefront-nav__actions {
@@ -152,7 +146,6 @@
 
 .storefront-nav__locale-btn,
 .storefront-nav__cart,
-.storefront-nav__menu-button,
 .storefront-nav__profile-btn {
   border: 0;
   background: transparent;
@@ -278,11 +271,6 @@
   }
 }
 
-.storefront-nav__menu-button,
-.storefront-nav__mobile-panel {
-  display: none;
-}
-
 @media (max-width: 1120px) {
   .storefront-nav__container {
     padding: 0 var(--sf-container-px-tablet);
@@ -331,82 +319,3 @@
   }
 }
 
-@media (max-width: 767px) {
-  .storefront-nav__container {
-    padding: 0 var(--sf-container-px-mobile);
-  }
-
-  .storefront-nav--checkout .storefront-nav__checkout-label {
-    display: none;
-  }
-
-  .storefront-nav__grid {
-    grid-template-areas: 'logo actions menu';
-    grid-template-columns: auto 1fr auto;
-  }
-
-  .storefront-nav__search-host {
-    display: none;
-  }
-
-  .storefront-nav__search-host--mobile {
-    display: block;
-    width: 100%;
-  }
-
-  .storefront-nav__actions {
-    display: none;
-  }
-
-  .storefront-nav__menu-button {
-    grid-area: menu;
-    display: inline-flex;
-    flex-direction: column;
-    gap: 5px;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--storefront-nav-border);
-    border-radius: var(--sf-radius-md);
-    background: var(--color-btn-secondary-bg);
-
-    span {
-      display: block;
-      width: 18px;
-      height: 2px;
-      border-radius: var(--sf-radius-pill);
-      background: var(--storefront-nav-text);
-    }
-  }
-
-  .storefront-nav__mobile-panel {
-    display: flex;
-    flex-direction: column;
-    gap: var(--hambox-spacing-4);
-    padding: var(--hambox-spacing-4) 0 var(--hambox-spacing-5);
-    border-top: 1px solid var(--storefront-nav-soft-border);
-    background: var(--color-mobile-nav-bg);
-    box-shadow: var(--color-shadow-md);
-  }
-
-  .storefront-nav__mobile-links,
-  .storefront-nav__mobile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--hambox-spacing-3);
-  }
-
-  .storefront-nav__mobile-link {
-    padding: var(--hambox-spacing-2) 0;
-    color: var(--storefront-nav-text);
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: color 0.15s ease;
-
-    &--active {
-      color: var(--storefront-nav-accent);
-    }
-  }
-}

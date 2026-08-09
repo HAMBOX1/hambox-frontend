@@ -11,7 +11,6 @@
           <span class="community-newsletter__avatar"></span>
           <span class="community-newsletter__avatar"></span>
           <span class="community-newsletter__avatar"></span>
-          <span class="community-newsletter__avatar-count">+423</span>
         </div>
 
         <a class="community-newsletter__discord-link" [routerLink]="config().discordButtonUrl">
@@ -38,7 +37,7 @@
       </form>
 
       @if (emailInvalid) {
-        <p class="community-newsletter__error">Enter a valid email address.</p>
+        <p class="community-newsletter__error">{{ 'VALIDATION.EMAIL' | translate }}</p>
       }
 
       @if (config().newsletterPrivacyText) {

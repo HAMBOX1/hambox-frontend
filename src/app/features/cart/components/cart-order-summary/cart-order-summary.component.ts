@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { CartSummary } from '../../models/cart';
 import { CartFacade } from '../../services/cart.facade';
@@ -14,6 +16,8 @@ import { CartFacade } from '../../services/cart.facade';
 })
 export class CartOrderSummaryComponent {
   private readonly cartFacade = inject(CartFacade);
+  private readonly translate = inject(TranslateService);
+  private readonly messageService = inject(MessageService);
 
   summary = input.required<CartSummary>();
 
@@ -39,8 +43,16 @@ export class CartOrderSummaryComponent {
     try {
       await this.cartFacade.applyCoupon(code);
       this.promoCode.set('');
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('CART.COUPON_APPLIED'),
+        detail: code,
+        life: 3000,
+      });
     } catch {
-      this.promoError.set(this.cartFacade.error() ?? 'Unable to apply this promo code.');
+      const message = this.cartFacade.error() ?? this.translate.instant('CART.COUPON_ERROR');
+      this.promoError.set(message);
+      this.messageService.add({ severity: 'error', summary: message, life: 4000 });
     }
   }
 }

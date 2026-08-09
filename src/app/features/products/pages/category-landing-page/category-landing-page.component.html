@@ -1,0 +1,21 @@
+<div class="category-landing">
+  <app-storefront-nav [links]="navLinks" />
+
+  <main class="category-landing__main">
+    @if (loading()) {
+      <app-loading-skeleton type="detail" [count]="1" />
+    } @else if (notFound()) {
+      <div class="category-landing__not-found">
+        <h1>{{ 'PRODUCT.CATEGORY_NOT_FOUND_TITLE' | translate }}</h1>
+        <p>{{ 'PRODUCT.CATEGORY_NOT_FOUND_TEXT' | translate }}</p>
+        <a routerLink="/products">{{ 'PRODUCT.BACK_TO_STORE' | translate }}</a>
+      </div>
+    } @else if (marketingContext(); as ctx) {
+      @for (section of marketingSections(); track section.instanceId; let first = $first) {
+        <app-section-renderer [entry]="section" [context]="ctx" [isFirst]="first" />
+      }
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

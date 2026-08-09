@@ -3,13 +3,27 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiError } from '../../../../core/models/api-error.model';
-import { LandingPageSectionEntry, LandingPageTemplateDetail, LandingPageTemplateSummary } from '../models/page-builder.model';
+import { LandingPageScope } from '../../../home/models/landing-page-section.model';
+import {
+  LandingPageSectionEntry,
+  LandingPageTemplateDetail,
+  LandingPageTemplateSummary,
+} from '../models/page-builder.model';
 import { PageBuilderApiService } from './page-builder-api.service';
+
+export interface SeoOverrides {
+  readonly seoTitle: string | null;
+  readonly seoDescription: string | null;
+  readonly seoOgImageUrl: string | null;
+}
+
+const EMPTY_SEO: SeoOverrides = { seoTitle: null, seoDescription: null, seoOgImageUrl: null };
 
 @Injectable()
 export class PageBuilderFacade {
   private readonly api = inject(PageBuilderApiService);
 
+  private readonly scopeState = signal<LandingPageScope>('Homepage');
   private readonly templatesState = signal<readonly LandingPageTemplateSummary[]>([]);
   private readonly loadingState = signal(false);
   private readonly errorState = signal<string | null>(null);
@@ -28,6 +42,11 @@ export class PageBuilderFacade {
   /** Snapshot of sections as last returned by the backend — the baseline `dirty` compares against. */
   private readonly savedSectionsState = signal<readonly LandingPageSectionEntry[]>([]);
 
+  /** Working copy of the selected template's optional SEO overrides — same draft/save split as sections. */
+  private readonly draftSeoState = signal<SeoOverrides>(EMPTY_SEO);
+  private readonly savedSeoState = signal<SeoOverrides>(EMPTY_SEO);
+
+  readonly scope = this.scopeState.asReadonly();
   readonly templates = this.templatesState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
   readonly error = this.errorState.asReadonly();
@@ -42,18 +61,36 @@ export class PageBuilderFacade {
   readonly deletingId = this.deletingIdState.asReadonly();
 
   readonly draftSections = this.draftSectionsState.asReadonly();
+  readonly draftSeo = this.draftSeoState.asReadonly();
 
-  /** True when local, unsaved edits diverge from the last saved/published sections. */
+  /** True when local, unsaved edits diverge from the last saved/published sections or SEO overrides. */
   readonly dirty = computed(
-    () => JSON.stringify(this.draftSectionsState()) !== JSON.stringify(this.savedSectionsState()),
+    () =>
+      JSON.stringify(this.draftSectionsState()) !== JSON.stringify(this.savedSectionsState()) ||
+      JSON.stringify(this.draftSeoState()) !== JSON.stringify(this.savedSeoState()),
   );
 
+  updateSeo(seo: Partial<SeoOverrides>): void {
+    this.draftSeoState.set({ ...this.draftSeoState(), ...seo });
+  }
+
+  /** Switches the active scope tab (Homepage/Product/Category) and reloads the list filtered to it. */
+  async setScope(scope: LandingPageScope): Promise<void> {
+    if (this.scopeState() === scope) {
+      return;
+    }
+    this.scopeState.set(scope);
+    this.clearSelection();
+    await this.loadTemplates();
+  }
+
+  /** Reloads the list for the currently selected scope — every internal refresh (after create/delete/activate/…) stays filtered correctly by always reading `scopeState()` rather than taking a param. */
   async loadTemplates(): Promise<void> {
     this.loadingState.set(true);
     this.errorState.set(null);
 
     try {
-      const templates = await firstValueFrom(this.api.listTemplates());
+      const templates = await firstValueFrom(this.api.listTemplates(this.scopeState()));
       this.templatesState.set(templates ?? []);
     } catch (error) {
       this.templatesState.set([]);
@@ -71,21 +108,25 @@ export class PageBuilderFacade {
       const detail = await firstValueFrom(this.api.getTemplate(id));
       this.applyDetail(detail);
     } catch (error) {
-      this.selectedTemplateState.set(null);
-      this.draftSectionsState.set([]);
-      this.savedSectionsState.set([]);
+      this.clearSelection();
       this.errorState.set(this.toErrorMessage(error, 'Failed to load template details.'));
     } finally {
       this.selectedLoadingState.set(false);
     }
   }
 
-  async createTemplate(name: string, cloneFromTemplateId?: string): Promise<string | null> {
+  async createTemplate(
+    name: string,
+    cloneFromTemplateId?: string,
+    targetId?: string,
+  ): Promise<string | null> {
     this.creatingState.set(true);
     this.errorState.set(null);
 
     try {
-      const detail = await firstValueFrom(this.api.createTemplate(name, cloneFromTemplateId));
+      const detail = await firstValueFrom(
+        this.api.createTemplate(name, cloneFromTemplateId, this.scopeState(), targetId),
+      );
       await this.loadTemplates();
       this.applyDetail(detail);
       return detail.id;
@@ -106,9 +147,7 @@ export class PageBuilderFacade {
       await this.loadTemplates();
 
       if (this.selectedTemplateState()?.id === id) {
-        this.selectedTemplateState.set(null);
-        this.draftSectionsState.set([]);
-        this.savedSectionsState.set([]);
+        this.clearSelection();
       }
 
       return true;
@@ -219,7 +258,9 @@ export class PageBuilderFacade {
   }
 
   removeSection(instanceId: string): void {
-    const remaining = this.draftSectionsState().filter((section) => section.instanceId !== instanceId);
+    const remaining = this.draftSectionsState().filter(
+      (section) => section.instanceId !== instanceId,
+    );
     this.draftSectionsState.set(this.renumber(remaining));
   }
 
@@ -277,7 +318,9 @@ export class PageBuilderFacade {
     }
 
     try {
-      const detail = await firstValueFrom(this.api.saveDraft(id, this.draftSectionsState()));
+      const detail = await firstValueFrom(
+        this.api.saveDraft(id, this.draftSectionsState(), this.draftSeoState()),
+      );
       this.applyDetail(detail);
       await this.loadTemplates();
       return true;
@@ -296,11 +339,29 @@ export class PageBuilderFacade {
     this.selectedTemplateState.set(detail);
     this.draftSectionsState.set(sorted);
     this.savedSectionsState.set(sorted);
+
+    const seo: SeoOverrides = {
+      seoTitle: detail.seoTitle,
+      seoDescription: detail.seoDescription,
+      seoOgImageUrl: detail.seoOgImageUrl,
+    };
+    this.draftSeoState.set(seo);
+    this.savedSeoState.set(seo);
+  }
+
+  private clearSelection(): void {
+    this.selectedTemplateState.set(null);
+    this.draftSectionsState.set([]);
+    this.savedSectionsState.set([]);
+    this.draftSeoState.set(EMPTY_SEO);
+    this.savedSeoState.set(EMPTY_SEO);
   }
 
   /** Keeps `sortOrder` equal to array index — the invariant every mutation method relies on. */
   private renumber(sections: readonly LandingPageSectionEntry[]): LandingPageSectionEntry[] {
-    return sections.map((section, index) => (section.sortOrder === index ? section : { ...section, sortOrder: index }));
+    return sections.map((section, index) =>
+      section.sortOrder === index ? section : { ...section, sortOrder: index },
+    );
   }
 
   private toErrorMessage(error: unknown, fallback: string): string {

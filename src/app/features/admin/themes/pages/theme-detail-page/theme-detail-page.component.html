@@ -15,6 +15,23 @@
       @if (theme.isDefault) {
         <span adminHeaderMeta class="theme-detail-page__default">{{ 'ADMIN.THEMES.LIST.DEFAULT' | translate }}</span>
       }
+      @if (activeResolutionLabel(); as resolutionLabel) {
+        <span adminHeaderMeta class="theme-detail-page__active-now" [pTooltip]="'ADMIN.THEMES.DETAIL.RESOLUTION.HINT' | translate">
+          <i class="pi pi-bolt"></i>
+          {{ 'ADMIN.THEMES.DETAIL.RESOLUTION.LIVE_VIA' | translate: { source: resolutionLabel } }}
+        </span>
+      }
+      @if (previewMode()) {
+        <button
+          adminHeaderActions
+          pButton
+          type="button"
+          class="p-button-outlined"
+          [label]="'ADMIN.THEMES.ACTIONS.EXIT_PREVIEW' | translate"
+          icon="pi pi-eye-slash"
+          (click)="exitPreview()"
+        ></button>
+      }
 
       @if (latestVersion()?.isPublished === false && permissionServicePublic.hasPermission(permissions.Themes.Publish)) {
         <button
@@ -85,16 +102,18 @@
                         <p>{{ version.notes }}</p>
                       }
                     </div>
-                    <button
-                      *hamboxHasPermission="permissions.Themes.Rollback"
-                      pButton
-                      type="button"
-                      class="p-button-text p-button-sm"
-                      [label]="'ADMIN.THEMES.ACTIONS.ROLLBACK' | translate"
-                      icon="pi pi-replay"
-                      [disabled]="actionLoading()"
-                      (click)="rollback(version.id)"
-                    ></button>
+                    @if (version.hasEverBeenPublished && !version.isPublished) {
+                      <button
+                        *hamboxHasPermission="permissions.Themes.Rollback"
+                        pButton
+                        type="button"
+                        class="p-button-text p-button-sm"
+                        [label]="'ADMIN.THEMES.ACTIONS.ROLLBACK' | translate"
+                        icon="pi pi-replay"
+                        [disabled]="actionLoading()"
+                        (click)="rollback(version.id)"
+                      ></button>
+                    }
                   </li>
                 }
               </ul>

@@ -16,6 +16,7 @@ export interface CategoryTreeCallbacks {
   dropZoneFor(id: string): DropZone | null;
   editCategory(node: CategoryTreeNode): void;
   deleteCategory(node: CategoryTreeNode): void;
+  manageMarketingPage(node: CategoryTreeNode): void;
   addChild(parentId: string): void;
   onRowDragMoved(id: string, pointerPosition: { x: number; y: number }): void;
   onRowDragEnded(id: string, pointerPosition: { x: number; y: number }): void;

@@ -26,6 +26,8 @@ export interface StoreProduct {
   listIndex?: number;
   requiresOptionSelection?: boolean;
   directVariantId?: string | null;
+  /** True only when a published Product-scoped marketing page exists — drives the card's "discover" icon. */
+  hasMarketingPage?: boolean;
   /** Exclusive Products membership benefit — restricted regardless of whether the viewer qualifies. */
   isMembersOnly?: boolean;
   /** Early Access membership benefit — publicReleaseOnUtc is in the future and the viewer isn't within their lead window. */

@@ -20,5 +20,24 @@ export class HeroVariantKineticGlassComponent {
   // this component is mounted at all (server-side filter on the storefront, `visibleSections` filter
   // in the admin preview), so the leaf `HeroSectionComponent`'s (unused-in-practice) `visible` flag
   // is a fixed pass-through rather than a second, redundant setting.
-  protected readonly hero = computed<StorefrontHeroContent>(() => ({ ...this.config(), visible: true }));
+  //
+  // On a Product/Category marketing page, any field the admin left blank falls back to the real
+  // target's own title/description/image/link — never overriding a field the admin actually set.
+  protected readonly hero = computed<StorefrontHeroContent>(() => {
+    const config = this.config();
+    const { targetProduct, targetCategory } = this.context();
+    const fallbackTitle = targetProduct?.title ?? targetCategory?.title ?? '';
+    const fallbackSubtitle = targetProduct?.description ?? targetCategory?.subtitle ?? '';
+    const fallbackImage = targetProduct?.imageUrl ?? targetCategory?.imageUrl ?? '';
+    const fallbackUrl = targetProduct?.route ?? targetCategory?.route ?? '';
+
+    return {
+      ...config,
+      title: config.title || fallbackTitle,
+      subtitle: config.subtitle || fallbackSubtitle,
+      backgroundImageUrl: config.backgroundImageUrl || fallbackImage,
+      primaryButtonUrl: config.primaryButtonUrl || fallbackUrl,
+      visible: true,
+    };
+  });
 }

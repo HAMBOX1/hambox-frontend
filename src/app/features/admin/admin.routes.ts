@@ -139,6 +139,11 @@ export const routes: Routes = [
       import('./themes/admin-themes.routes').then((m) => m.routes),
   },
   {
+    path: 'campaigns',
+    loadChildren: () =>
+      import('./campaigns/admin-campaigns.routes').then((m) => m.routes),
+  },
+  {
     path: 'page-builder',
     loadChildren: () =>
       import('./page-builder/admin-page-builder.routes').then((m) => m.routes),

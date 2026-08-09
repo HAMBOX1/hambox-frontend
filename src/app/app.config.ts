@@ -16,6 +16,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
+import { MessageService } from 'primeng/api';
 
 import {
   HAMBOX_PRIME_DARK_MODE_SELECTOR,
@@ -62,6 +63,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
 
     provideBrowserGlobalErrorListeners(),
+
+    MessageService,
 
     provideRouter(routes),
 

@@ -60,13 +60,19 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'platform-selector',
     displayName: 'Platform Selector',
     renderComponent: PlatformSelectorVariantDefaultComponent,
-    description: 'A row of platform icons (PC, PlayStation, Xbox, Mobile) linking into the catalog.',
+    description:
+      'A row of platform icons (PC, PlayStation, Xbox, Mobile) linking into the catalog.',
     tags: ['navigation', 'icons', 'platforms'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
       items: [
         { id: 'pc', label: 'PC Gaming', iconClass: 'pi pi-desktop', linkUrl: '/products' },
-        { id: 'playstation', label: 'PlayStation', iconClass: 'pi pi-github', linkUrl: '/products' },
+        {
+          id: 'playstation',
+          label: 'PlayStation',
+          iconClass: 'pi pi-github',
+          linkUrl: '/products',
+        },
         { id: 'xbox', label: 'Xbox Series', iconClass: 'pi pi-box', linkUrl: '/products' },
         { id: 'mobile', label: 'Mobile', iconClass: 'pi pi-mobile', linkUrl: '/products' },
       ],
@@ -77,7 +83,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'kinetic-glass',
     displayName: 'Hero — Kinetic Glass',
     renderComponent: HeroVariantKineticGlassComponent,
-    description: 'Full-width glass hero banner with a title, subtitle, badge, and two call-to-action buttons.',
+    description:
+      'Full-width glass hero banner with a title, subtitle, badge, and two call-to-action buttons.',
     tags: ['hero', 'banner', 'glass'],
     badge: 'popular',
     supportedBreakpoints: ALL_BREAKPOINTS,
@@ -100,7 +107,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'grid-showcase',
     displayName: 'Hero — Grid Showcase',
     renderComponent: HeroVariantGridShowcaseComponent,
-    description: 'Two-tone headline hero with a background image, for a bold seasonal or franchise campaign.',
+    description:
+      'Two-tone headline hero with a background image, for a bold seasonal or franchise campaign.',
     tags: ['hero', 'banner', 'campaign'],
     badge: 'new',
     supportedBreakpoints: ALL_BREAKPOINTS,
@@ -123,7 +131,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'editorial-spotlight',
     displayName: 'Hero — Editorial Spotlight',
     renderComponent: HeroVariantEditorialSpotlightComponent,
-    description: 'One large featured card plus two stacked side cards — magazine-style hero layout.',
+    description:
+      'One large featured card plus two stacked side cards — magazine-style hero layout.',
     tags: ['hero', 'editorial', 'spotlight'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -148,14 +157,33 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'trust-bar',
     displayName: 'Trust Bar',
     renderComponent: TrustBarVariantDefaultComponent,
-    description: 'A horizontal row of trust badges — secure checkout, instant delivery, and support.',
+    description:
+      'A horizontal row of trust badges — secure checkout, instant delivery, and support.',
     tags: ['trust', 'features', 'badges'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
       items: [
-        { id: 'trust-1', iconUrl: 'pi pi-shield', title: 'Secure Checkout', description: 'Encrypted payments', sortOrder: 0 },
-        { id: 'trust-2', iconUrl: 'pi pi-bolt', title: 'Instant Delivery', description: 'Keys delivered instantly', sortOrder: 1 },
-        { id: 'trust-3', iconUrl: 'pi pi-headphones', title: '24/7 Support', description: 'Always here to help', sortOrder: 2 },
+        {
+          id: 'trust-1',
+          iconUrl: 'pi pi-shield',
+          title: 'Secure Checkout',
+          description: 'Encrypted payments',
+          sortOrder: 0,
+        },
+        {
+          id: 'trust-2',
+          iconUrl: 'pi pi-bolt',
+          title: 'Instant Delivery',
+          description: 'Keys delivered instantly',
+          sortOrder: 1,
+        },
+        {
+          id: 'trust-3',
+          iconUrl: 'pi pi-headphones',
+          title: '24/7 Support',
+          description: 'Always here to help',
+          sortOrder: 2,
+        },
       ],
     } satisfies TrustBarSectionConfig,
   },
@@ -169,9 +197,27 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
       items: [
-        { id: 'trust-1', iconUrl: 'pi pi-shield', title: 'Secure Checkout', description: 'Encrypted payments', sortOrder: 0 },
-        { id: 'trust-2', iconUrl: 'pi pi-bolt', title: 'Instant Delivery', description: 'Keys delivered instantly', sortOrder: 1 },
-        { id: 'trust-3', iconUrl: 'pi pi-headphones', title: '24/7 Support', description: 'Always here to help', sortOrder: 2 },
+        {
+          id: 'trust-1',
+          iconUrl: 'pi pi-shield',
+          title: 'Secure Checkout',
+          description: 'Encrypted payments',
+          sortOrder: 0,
+        },
+        {
+          id: 'trust-2',
+          iconUrl: 'pi pi-bolt',
+          title: 'Instant Delivery',
+          description: 'Keys delivered instantly',
+          sortOrder: 1,
+        },
+        {
+          id: 'trust-3',
+          iconUrl: 'pi pi-headphones',
+          title: '24/7 Support',
+          description: 'Always here to help',
+          sortOrder: 2,
+        },
       ],
     } satisfies TrustBarSectionConfig,
   },
@@ -180,7 +226,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'promo-banner',
     displayName: 'Promo Banner',
     renderComponent: PromoBannerVariantDefaultComponent,
-    description: 'A single promotional banner with a countdown timer and one call-to-action button.',
+    description:
+      'A single promotional banner with a countdown timer and one call-to-action button.',
     tags: ['promotion', 'banner', 'countdown'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -199,7 +246,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'seasonal-campaign',
     displayName: 'Promotions — Seasonal Campaign',
     renderComponent: PromoBannerVariantSeasonalCampaignComponent,
-    description: 'A two-tone campaign banner with an eyebrow label, for seasonal or holiday promotions.',
+    description:
+      'A two-tone campaign banner with an eyebrow label, for seasonal or holiday promotions.',
     tags: ['promotion', 'banner', 'seasonal', 'campaign'],
     badge: 'new',
     supportedBreakpoints: ALL_BREAKPOINTS,
@@ -220,7 +268,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'popular-categories',
     displayName: 'Popular Categories',
     renderComponent: PopularCategoriesVariantDefaultComponent,
-    description: 'A grid of the storefront’s active catalog categories, driven by live data at runtime.',
+    description:
+      'A grid of the storefront’s active catalog categories, driven by live data at runtime.',
     tags: ['categories', 'grid', 'catalog'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -253,7 +302,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'latest-arrivals',
     displayName: 'Latest Arrivals',
     renderComponent: LatestArrivalsVariantDefaultComponent,
-    description: 'One spotlighted product plus a grid of the rest — for newly published catalog items.',
+    description:
+      'One spotlighted product plus a grid of the rest — for newly published catalog items.',
     tags: ['products', 'new', 'grid'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -284,7 +334,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'editorial-showcase',
     displayName: 'Collections — Editorial Showcase',
     renderComponent: CollectionVariantEditorialShowcaseComponent,
-    description: 'A curator-authored row of collection cards, each linking to a themed catalog view.',
+    description:
+      'A curator-authored row of collection cards, each linking to a themed catalog view.',
     tags: ['collections', 'editorial', 'cards'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -292,8 +343,22 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
       titleAccent: 'Collections',
       subtitle: 'Hand-picked bundles worth checking out.',
       cards: [
-        { id: 'card-1', imageUrl: placeholderImage('Collection A', 700, 420), title: 'RPG Essentials', subtitle: '12 titles', buttonText: 'Browse', buttonUrl: '/products' },
-        { id: 'card-2', imageUrl: placeholderImage('Collection B', 700, 420), title: 'Indie Gems', subtitle: '20 titles', buttonText: 'Browse', buttonUrl: '/products' },
+        {
+          id: 'card-1',
+          imageUrl: placeholderImage('Collection A', 700, 420),
+          title: 'RPG Essentials',
+          subtitle: '12 titles',
+          buttonText: 'Browse',
+          buttonUrl: '/products',
+        },
+        {
+          id: 'card-2',
+          imageUrl: placeholderImage('Collection B', 700, 420),
+          title: 'Indie Gems',
+          subtitle: '20 titles',
+          buttonText: 'Browse',
+          buttonUrl: '/products',
+        },
       ],
     } satisfies CollectionShowcaseSectionConfig,
   },
@@ -309,8 +374,24 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
       title: 'Latest',
       titleAccent: 'Updates',
       items: [
-        { id: 'pulse-1', tagText: 'Update', tagTone: 'info', timestampText: '2h ago', title: 'New platform launch', description: 'Now live on mobile.', linkUrl: '/products' },
-        { id: 'pulse-2', tagText: 'Sale', tagTone: 'success', timestampText: '5h ago', title: 'Weekend deals are live', description: 'Up to 40% off.', linkUrl: '/products' },
+        {
+          id: 'pulse-1',
+          tagText: 'Update',
+          tagTone: 'info',
+          timestampText: '2h ago',
+          title: 'New platform launch',
+          description: 'Now live on mobile.',
+          linkUrl: '/products',
+        },
+        {
+          id: 'pulse-2',
+          tagText: 'Sale',
+          tagTone: 'success',
+          timestampText: '5h ago',
+          title: 'Weekend deals are live',
+          description: 'Up to 40% off.',
+          linkUrl: '/products',
+        },
       ],
     } satisfies PulseFeedSectionConfig,
   },
@@ -331,8 +412,20 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
       featuredButtonText: 'Read More',
       featuredButtonUrl: '/products',
       sideItems: [
-        { id: 'side-1', tagText: 'News', title: 'New tournament announced', imageUrl: placeholderImage('Side 1', 400, 260), linkUrl: '/products' },
-        { id: 'side-2', tagText: 'Guide', title: 'Best starter builds', imageUrl: placeholderImage('Side 2', 400, 260), linkUrl: '/products' },
+        {
+          id: 'side-1',
+          tagText: 'News',
+          title: 'New tournament announced',
+          imageUrl: placeholderImage('Side 1', 400, 260),
+          linkUrl: '/products',
+        },
+        {
+          id: 'side-2',
+          tagText: 'Guide',
+          title: 'Best starter builds',
+          imageUrl: placeholderImage('Side 2', 400, 260),
+          linkUrl: '/products',
+        },
       ],
     } satisfies ArenaBriefingsSectionConfig,
   },
@@ -361,14 +454,76 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'console-favorites',
     displayName: 'Console Favorites',
     renderComponent: ConsoleFavoritesVariantDefaultComponent,
-    description: 'A horizontally scrollable row of game-cover cards, with one visually featured.',
+    description:
+      'A horizontal collectible-card showcase of game artwork, with one visually featured.',
     tags: ['showcase', 'console', 'carousel'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
       title: 'Console Favorites',
+      subtitle: 'Discover the games everyone is playing.',
+      viewAllText: 'View All',
+      viewAllUrl: '/products',
       cards: [
-        { id: 'console-1', imageUrl: placeholderImage('Console 1', 400, 560), title: 'Starfall Chronicles', tags: ['RPG', 'Open World'], badgeText: 'Top Rated', buttonText: 'View', buttonUrl: '/products', featured: true },
-        { id: 'console-2', imageUrl: placeholderImage('Console 2', 400, 560), title: 'Neon Drift', tags: ['Racing'], badgeText: '', buttonText: 'View', buttonUrl: '/products', featured: false },
+        {
+          id: 'console-1',
+          imageUrl: placeholderImage('Sonic Shift', 960, 540),
+          title: 'Sonic Shift',
+          platform: 'PS5',
+          genre: 'Racing',
+          price: '$59.99',
+          badgeText: '',
+          buttonText: 'View Details',
+          buttonUrl: '/products',
+          featured: false,
+        },
+        {
+          id: 'console-2',
+          imageUrl: placeholderImage('Echoes of Aethelgard', 960, 540),
+          title: 'Echoes of Aethelgard',
+          platform: 'PC',
+          genre: 'RPG',
+          price: '$49.99',
+          badgeText: 'Top Rated',
+          buttonText: 'View Details',
+          buttonUrl: '/products',
+          featured: true,
+        },
+        {
+          id: 'console-3',
+          imageUrl: placeholderImage('Ghost Protocol', 960, 540),
+          title: 'Ghost Protocol',
+          platform: 'Xbox',
+          genre: 'Stealth',
+          price: '$44.99',
+          badgeText: '',
+          buttonText: 'View Details',
+          buttonUrl: '/products',
+          featured: false,
+        },
+        {
+          id: 'console-4',
+          imageUrl: placeholderImage('Neon Vendetta', 960, 540),
+          title: 'Neon Vendetta',
+          platform: 'PC',
+          genre: 'Action',
+          price: '$39.99',
+          badgeText: 'New',
+          buttonText: 'View Details',
+          buttonUrl: '/products',
+          featured: false,
+        },
+        {
+          id: 'console-5',
+          imageUrl: placeholderImage('Apex Circuit', 960, 540),
+          title: 'Apex Circuit',
+          platform: 'Xbox',
+          genre: 'Racing',
+          price: '$54.99',
+          badgeText: '',
+          buttonText: 'View Details',
+          buttonUrl: '/products',
+          featured: false,
+        },
       ],
     } satisfies ConsoleFavoritesSectionConfig,
   },
@@ -377,7 +532,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'hardware-spotlight',
     displayName: 'Showcase — Hardware Spotlight',
     renderComponent: HardwareShowcaseVariantDefaultComponent,
-    description: 'A two-column image-plus-copy showcase, typically used to promote a membership tier.',
+    description:
+      'A two-column image-plus-copy showcase, typically used to promote a membership tier.',
     tags: ['showcase', 'hardware', 'membership'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -415,7 +571,8 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'storefront-footer',
     displayName: 'Storefront Footer',
     renderComponent: FooterVariantDefaultComponent,
-    description: 'The storefront’s global footer — company info, contact details, and social links.',
+    description:
+      'The storefront’s global footer — company info, contact details, and social links.',
     tags: ['footer', 'navigation', 'contact'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -438,12 +595,26 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
 ];
 
 const registryByKey = new Map(
-  SECTION_VARIANT_REGISTRY.map((definition) => [`${definition.category}:${definition.variantKey}`, definition]),
+  SECTION_VARIANT_REGISTRY.map((definition) => [
+    `${definition.category}:${definition.variantKey}`,
+    definition,
+  ]),
 );
 
-export function resolveSectionVariant(category: string, variantKey: string): SectionVariantDefinition | undefined {
+export function resolveSectionVariant(
+  category: string,
+  variantKey: string,
+): SectionVariantDefinition | undefined {
   return registryByKey.get(`${category}:${variantKey}`);
 }
+
+/**
+ * Site-wide chrome, not per-page content: `Footer` renders via a separate hardcoded
+ * `<app-storefront-footer>` on every storefront page regardless of which page-builder template is
+ * active, and `Navigation` is the homepage's platform-selector browsing widget. Product/Category
+ * marketing pages exclude these from their Section Library — see `SectionLibraryDrawerComponent`.
+ */
+export const HOMEPAGE_ONLY_SECTION_CATEGORIES: readonly string[] = ['Footer', 'Navigation'];
 
 /** Groups variants by category, preserving registry order. Used by the admin Section Library. */
 export function groupSectionVariantsByCategory(

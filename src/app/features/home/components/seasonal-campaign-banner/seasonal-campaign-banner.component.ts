@@ -13,6 +13,7 @@ import { RouterLink } from '@angular/router';
 import { interval } from 'rxjs';
 
 import { SeasonalCampaignBannerConfig } from '../../section-registry/models/section-config.model';
+import { computeRemainingSeconds } from '../../../../shared/utils/countdown.util';
 
 @Component({
   selector: 'app-seasonal-campaign-banner',
@@ -44,11 +45,17 @@ export class SeasonalCampaignBannerComponent implements OnInit {
   protected readonly seconds = computed(() => (this.countdownSeconds() % 60).toString().padStart(2, '0'));
 
   ngOnInit(): void {
-    this.countdownSeconds.set(this.banner().countdownSeconds);
+    const deadline = this.banner().countdownEndsAtUtc;
+    this.countdownSeconds.set(computeRemainingSeconds(deadline, this.banner().countdownSeconds));
 
     interval(1000)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        if (deadline) {
+          this.countdownSeconds.set(computeRemainingSeconds(deadline, 0));
+          return;
+        }
+
         const next = this.countdownSeconds();
         if (next > 0) {
           this.countdownSeconds.set(next - 1);

@@ -63,6 +63,11 @@ export class CategoryTreeNodeComponent {
         icon: 'pi pi-plus',
         command: () => callbacks.addChild(node.id),
       },
+      {
+        label: 'Marketing page',
+        icon: 'pi pi-megaphone',
+        command: () => callbacks.manageMarketingPage(node),
+      },
       { separator: true },
       {
         label: 'Delete category',

@@ -2,7 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, output, input, signal } f
 import { TranslatePipe } from '@ngx-translate/core';
 import { DrawerModule } from 'primeng/drawer';
 
-import { AdminEmptyStateComponent, AdminSearchBarComponent } from '../../../../../shared/components/admin';
+import {
+  AdminEmptyStateComponent,
+  AdminSearchBarComponent,
+} from '../../../../../shared/components/admin';
 import { SectionVariantDefinition } from '../../../../home/section-registry/models/section-variant.model';
 import { SECTION_VARIANT_REGISTRY } from '../../../../home/section-registry/section-variant-registry';
 import { SectionFullPreviewDialogComponent } from '../section-full-preview-dialog/section-full-preview-dialog.component';
@@ -67,6 +70,8 @@ function saveKeys(key: string, values: Iterable<string>): void {
 })
 export class SectionLibraryDrawerComponent {
   readonly visible = input(false);
+  /** Category names to hide entirely (e.g. `HOMEPAGE_ONLY_SECTION_CATEGORIES` for a Product/Category page). */
+  readonly excludedCategories = input<readonly string[]>([]);
   readonly visibleChange = output<boolean>();
   readonly variantSelected = output<SectionVariantDefinition>();
 
@@ -79,15 +84,44 @@ export class SectionLibraryDrawerComponent {
   private readonly recentKeys = signal(loadKeyList(RECENT_KEY));
   private lastSelectionAt = 0;
 
-  protected readonly filters: readonly { readonly value: LibraryFilter; readonly labelKey: string; readonly icon: string }[] = [
+  protected readonly filters: readonly {
+    readonly value: LibraryFilter;
+    readonly labelKey: string;
+    readonly icon: string;
+  }[] = [
     { value: 'all', labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_ALL', icon: 'pi pi-th-large' },
-    { value: 'favorites', labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_FAVORITES', icon: 'pi pi-star' },
-    { value: 'recent', labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_RECENT', icon: 'pi pi-history' },
-    { value: 'popular', labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_POPULAR', icon: 'pi pi-chart-line' },
-    { value: 'newest', labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_NEWEST', icon: 'pi pi-sparkles' },
+    {
+      value: 'favorites',
+      labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_FAVORITES',
+      icon: 'pi pi-star',
+    },
+    {
+      value: 'recent',
+      labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_RECENT',
+      icon: 'pi pi-history',
+    },
+    {
+      value: 'popular',
+      labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_POPULAR',
+      icon: 'pi pi-chart-line',
+    },
+    {
+      value: 'newest',
+      labelKey: 'ADMIN.PAGE_BUILDER.LIBRARY.FILTER_NEWEST',
+      icon: 'pi pi-sparkles',
+    },
   ];
 
-  protected readonly categories = computed(() => [...new Set(SECTION_VARIANT_REGISTRY.map((v) => v.category))]);
+  private readonly availableVariants = computed(() => {
+    const excluded = new Set(this.excludedCategories());
+    return excluded.size
+      ? SECTION_VARIANT_REGISTRY.filter((v) => !excluded.has(v.category))
+      : SECTION_VARIANT_REGISTRY;
+  });
+
+  protected readonly categories = computed(() => [
+    ...new Set(this.availableVariants().map((v) => v.category)),
+  ]);
 
   /** Filtered variants paired with their memoized favorite state — computed once per dependency
    * change rather than calling a lookup method per card on every change-detection pass. */
@@ -122,21 +156,22 @@ export class SectionLibraryDrawerComponent {
     const category = this.activeCategory();
     const filter = this.activeFilter();
 
+    const available = this.availableVariants();
     let source: readonly SectionVariantDefinition[];
     if (filter === 'recent') {
-      const byKey = new Map(SECTION_VARIANT_REGISTRY.map((v) => [variantKeyOf(v), v]));
+      const byKey = new Map(available.map((v) => [variantKeyOf(v), v]));
       source = this.recentKeys()
         .map((key) => byKey.get(key))
         .filter((v): v is SectionVariantDefinition => v !== undefined);
     } else if (filter === 'favorites') {
       const favorites = this.favoriteKeys();
-      source = SECTION_VARIANT_REGISTRY.filter((v) => favorites.has(variantKeyOf(v)));
+      source = available.filter((v) => favorites.has(variantKeyOf(v)));
     } else if (filter === 'popular') {
-      source = SECTION_VARIANT_REGISTRY.filter((v) => v.badge === 'popular');
+      source = available.filter((v) => v.badge === 'popular');
     } else if (filter === 'newest') {
-      source = SECTION_VARIANT_REGISTRY.filter((v) => v.badge === 'new');
+      source = available.filter((v) => v.badge === 'new');
     } else {
-      source = SECTION_VARIANT_REGISTRY;
+      source = available;
     }
 
     return source.filter((v) => {

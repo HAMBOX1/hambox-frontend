@@ -20,8 +20,6 @@ import { sectionFieldKeys } from './section-field-keys.util';
 
 const KEY = (path: string) => sectionFieldKeys('CONSOLE_FAVORITES', path);
 
-/** `tags` is stored as a string array but edited as one comma-separated text field — a full nested
- * array-of-arrays editor would be overkill for a short tag list. */
 @Component({
   selector: 'app-console-favorites-settings-form',
   standalone: true,
@@ -49,6 +47,12 @@ export class ConsoleFavoritesSettingsFormComponent {
 
   protected readonly headingFields: SettingsFieldConfig[] = [
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
+    { key: 'subtitle', control: 'text', ...KEY('SUBTITLE') },
+  ];
+
+  protected readonly viewAllFields: SettingsFieldConfig[] = [
+    { key: 'viewAllText', control: 'text', ...KEY('VIEW_ALL_TEXT') },
+    { key: 'viewAllUrl', control: 'text', ...KEY('VIEW_ALL_URL') },
   ];
 
   protected fieldValue(key: string): unknown {
@@ -61,10 +65,6 @@ export class ConsoleFavoritesSettingsFormComponent {
     this.configChange.emit(updated);
   }
 
-  protected tagsText(card: ConsoleFavoriteCardConfig): string {
-    return card.tags.join(', ');
-  }
-
   protected updateCard(index: number, patch: Partial<ConsoleFavoriteCardConfig>): void {
     if (this.disabled()) {
       return;
@@ -73,14 +73,6 @@ export class ConsoleFavoritesSettingsFormComponent {
     const updated = { ...this.localConfig(), cards };
     this.localConfig.set(updated);
     this.configChange.emit(updated);
-  }
-
-  protected updateTags(index: number, value: string): void {
-    const tags = value
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
-    this.updateCard(index, { tags });
   }
 
   protected addCard(): void {
@@ -93,7 +85,9 @@ export class ConsoleFavoritesSettingsFormComponent {
         id: crypto.randomUUID(),
         imageUrl: '',
         title: '',
-        tags: [],
+        platform: '',
+        genre: '',
+        price: '',
         badgeText: '',
         buttonText: '',
         buttonUrl: '',

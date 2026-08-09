@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TrendingFeatureCardComponent } from '../../../../shared/components/trending-feature-card/trending-feature-card.component';
 import { TrendingRankCardComponent } from '../../../../shared/components/trending-rank-card/trending-rank-card.component';
 import { TrendingValueCardComponent } from '../../../../shared/components/trending-value-card/trending-value-card.component';
+import { ScrollRevealDirective } from '../../../../shared/directives/scroll-reveal.directive';
 import {
   StorefrontFeaturedProduct,
   TrendingRankItem,
@@ -11,7 +12,12 @@ import {
 @Component({
   selector: 'app-trending-section',
   standalone: true,
-  imports: [TrendingFeatureCardComponent, TrendingRankCardComponent, TrendingValueCardComponent],
+  imports: [
+    TrendingFeatureCardComponent,
+    TrendingRankCardComponent,
+    TrendingValueCardComponent,
+    ScrollRevealDirective,
+  ],
   templateUrl: './trending-section.component.html',
   styleUrl: './trending-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

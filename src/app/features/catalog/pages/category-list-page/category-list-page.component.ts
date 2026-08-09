@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { DrawerModule } from 'primeng/drawer';
@@ -7,7 +8,11 @@ import { ToastModule } from 'primeng/toast';
 
 import { CategoryCreateFormComponent } from '../../components/category-create-form/category-create-form.component';
 import { CategoryTreeComponent } from '../../components/category-tree/category-tree.component';
-import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
+import {
+  Category,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from '../../models/category.model';
 import { CategoryListFacade } from '../../services/category-list.facade';
 import { exportCategoriesToCsv } from '../../utils/category-export.util';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
@@ -46,6 +51,7 @@ import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-brea
 export class CategoryListPageComponent implements OnInit {
   private readonly facade = inject(CategoryListFacade);
   private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
 
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Categories' });
@@ -107,6 +113,12 @@ export class CategoryListPageComponent implements OnInit {
 
   protected openEditDialog(category: Category): void {
     this.facade.openEditDialog(category);
+  }
+
+  protected onManageMarketingPage(category: Category): void {
+    void this.router.navigate(['/admin/page-builder'], {
+      queryParams: { scope: 'category', targetId: category.id, targetName: category.nameEn },
+    });
   }
 
   protected onCreateDialogVisibleChange(visible: boolean): void {

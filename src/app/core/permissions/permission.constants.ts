@@ -100,6 +100,13 @@ export const PERMISSIONS = {
     Import: 'Themes.Import',
     Rollback: 'Themes.Rollback',
   },
+  Campaigns: {
+    View: 'Campaigns.View',
+    Create: 'Campaigns.Create',
+    Edit: 'Campaigns.Edit',
+    Publish: 'Campaigns.Publish',
+    Delete: 'Campaigns.Delete',
+  },
   PageBuilder: {
     View: 'PageBuilder.View',
     Edit: 'PageBuilder.Edit',

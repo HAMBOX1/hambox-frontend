@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { FlashDealCardComponent } from '../../../../shared/components/flash-deal-card/flash-deal-card.component';
+import { ScrollRevealDirective } from '../../../../shared/directives/scroll-reveal.directive';
 import { FlashDeal } from '../../models/storefront-home';
 
 @Component({
   selector: 'app-latest-arrivals-section',
   standalone: true,
-  imports: [FlashDealCardComponent],
+  imports: [FlashDealCardComponent, ScrollRevealDirective],
   templateUrl: './latest-arrivals-section.component.html',
   styleUrl: './latest-arrivals-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

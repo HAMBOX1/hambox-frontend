@@ -10,6 +10,17 @@
     }
   </div>
 
+  <div class="console-favorites-form__heading">
+    @for (field of viewAllFields; track field.key) {
+      <app-settings-field
+        [field]="field"
+        [value]="fieldValue(field.key)"
+        [disabled]="disabled()"
+        (valueChange)="setField(field.key, $event)"
+      />
+    }
+  </div>
+
   @if (!localConfig().cards.length) {
     <p class="console-favorites-form__empty">
       {{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.CONSOLE_FAVORITES.EMPTY' | translate }}
@@ -54,19 +65,44 @@
             <app-media-picker
               [value]="card.imageUrl"
               [disabled]="disabled()"
-              recommendedSize="600×600px, JPG/WebP"
+              recommendedSize="1280×720px (16:9), JPG/WebP"
               (valueChange)="updateCard(i, { imageUrl: $event ?? '' })"
             />
           </label>
 
-          <label class="console-favorites-form__field console-favorites-form__field--wide">
-            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.CONSOLE_FAVORITES.TAGS' | translate }}</span>
+          <label class="console-favorites-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.CONSOLE_FAVORITES.PLATFORM' | translate }}</span>
             <input
               pInputText
               type="text"
-              [ngModel]="tagsText(card)"
+              placeholder="PS5"
+              [ngModel]="card.platform"
               [disabled]="disabled()"
-              (ngModelChange)="updateTags(i, $event)"
+              (ngModelChange)="updateCard(i, { platform: $event })"
+            />
+          </label>
+
+          <label class="console-favorites-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.CONSOLE_FAVORITES.GENRE' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              placeholder="Racing"
+              [ngModel]="card.genre"
+              [disabled]="disabled()"
+              (ngModelChange)="updateCard(i, { genre: $event })"
+            />
+          </label>
+
+          <label class="console-favorites-form__field">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.CONSOLE_FAVORITES.PRICE' | translate }}</span>
+            <input
+              pInputText
+              type="text"
+              placeholder="$59.99"
+              [ngModel]="card.price"
+              [disabled]="disabled()"
+              (ngModelChange)="updateCard(i, { price: $event })"
             />
           </label>
 

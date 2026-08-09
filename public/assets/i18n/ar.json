@@ -168,6 +168,8 @@
   "PRODUCT": {
     "ADD_TO_CART": "أضف إلى السلة",
     "BUY_NOW": "اشترِ الآن",
+    "EXPLORE_PRODUCT": "استكشف هذا المنتج",
+    "VIEW_DETAILS": "عرض التفاصيل",
     "NOTIFY_ME": "أبلغني",
     "INSTANT_DIGITAL": "تسليم رقمي فوري",
     "FEATURED": "مميز",
@@ -177,7 +179,35 @@
     "LOAD_MORE": "تحميل المزيد من المنتجات",
     "ADD_TO_WISHLIST": "أضف إلى قائمة الرغبات",
     "WISHLIST_ADDED": "أُضيف إلى قائمة الرغبات",
-    "RESULT_COUNT": "{{count}} نتيجة"
+    "WISHLIST_ERROR": "تعذر حفظ هذا المنتج في قائمتك.",
+    "RESULT_COUNT": "{{count}} نتيجة",
+    "MORE_FROM_CATEGORY": "المزيد من هذه الفئة",
+    "PREVIEW_BANNER": "وضع المعاينة — هكذا سيظهر المنتج بعد نشره. الشراء معطل.",
+    "UNAVAILABLE_TITLE": "المنتج غير متاح",
+    "UNAVAILABLE_TEXT": "تعذر العثور على هذا المنتج.",
+    "CATEGORY_NOT_FOUND_TITLE": "الفئة غير موجودة",
+    "CATEGORY_NOT_FOUND_TEXT": "تعذر العثور على هذه الفئة.",
+    "BACK_TO_STORE": "العودة إلى المتجر",
+    "BREADCRUMB_ARIA": "مسار التصفح",
+    "BREADCRUMB_HOME": "الرئيسية",
+    "BREADCRUMB_PRODUCTS": "المنتجات",
+    "GALLERY_ARIA": "صور المنتج",
+    "INSTANT_DELIVERY_BADGE": "تسليم فوري",
+    "GALLERY_IMAGE_ARIA": "صورة المنتج {{index}}",
+    "STOCK_AVAILABLE": "متوفر",
+    "STOCK_SELECT_OPTIONS": "اختر الخيارات",
+    "STOCK_ALL_IN_CART": "جميع الكمية ({{count}}) في سلتك",
+    "STOCK_LOW_WITH_CART": "كمية محدودة ({{remaining}} متاحة إضافية، {{inCart}} في السلة)",
+    "STOCK_LOW_COUNT": "كمية محدودة (تبقّى {{count}})",
+    "STOCK_IN_WITH_CART": "متوفر ({{remaining}} متاحة إضافية، {{inCart}} في السلة)",
+    "STOCK_IN_COUNT": "متوفر ({{count}} متاح)",
+    "SKU_LABEL": "رمز المنتج: {{sku}}",
+    "DELIVERY_ESTIMATE": "التسليم المتوقع: فوري بعد الدفع",
+    "VARIANTS_CONFIGURING": "جارٍ إعداد خيارات هذا المنتج. يرجى العودة لاحقاً.",
+    "HOW_TO_REDEEM": "كيفية الاستخدام",
+    "REDEEM_SUBTITLE": "اتبع هذه الخطوات البسيطة للوصول إلى مشترياتك الرقمية بعد الدفع.",
+    "PURCHASE_ACTIONS_ARIA": "إجراءات الشراء",
+    "PRICE_LABEL": "السعر"
   },
   "PRODUCTS": {
     "HERO": {
@@ -235,7 +265,20 @@
     "DECREASE_QUANTITY": "تقليل الكمية",
     "INCREASE_QUANTITY": "زيادة الكمية",
     "QUANTITY": "الكمية",
-    "ADD_ERROR": "تعذر الإضافة إلى السلة."
+    "ADDED": "أُضيف إلى السلة",
+    "ADD_ERROR": "تعذر الإضافة إلى السلة.",
+    "COUPON_APPLIED": "تم تطبيق الرمز الترويجي",
+    "COUPON_ERROR": "تعذر تطبيق هذا الرمز الترويجي.",
+    "LOAD_ERROR_TITLE": "تعذر تحميل السلة",
+    "TRY_AGAIN": "أعد المحاولة",
+    "ITEM_COUNT": "{{count}} عناصر",
+    "ITEM_REMOVED": "تمت إزالة “{{title}}” من سلتك",
+    "UNDO": "تراجع",
+    "UNDO_ERROR": "تعذر التراجع. يرجى إضافة المنتج مرة أخرى.",
+    "NAV_LABEL": "السلة",
+    "MINI_CART_ARIA": "سلة مصغرة",
+    "QTY_LABEL": "الكمية {{count}}",
+    "VIEW_CART": "عرض السلة"
   },
   "CHECKOUT": {
     "TITLE": "دفع آمن",
@@ -248,7 +291,32 @@
       "TITLE": "شارك الفرحة!",
       "TEXT": "ادعُ أصدقاءك واكسب نقاط إحالة عند إتمامهم أول عملية شراء.",
       "CTA": "دعوة الأصدقاء"
-    }
+    },
+    "RECOMMENDATIONS_TITLE": "قد يعجبك أيضاً",
+    "RECOMMENDATIONS_PREV": "التوصيات السابقة",
+    "RECOMMENDATIONS_NEXT": "التوصيات التالية",
+    "TAX": "الضريبة",
+    "DISCOUNT_CODE_PLACEHOLDER": "رمز الخصم",
+    "APPLYING": "جارٍ التطبيق…",
+    "COMPLETE_PURCHASE": "إتمام الشراء",
+    "COMPLETE_PURCHASE_DEV": "إتمام الشراء (بيئة التطوير)",
+    "DELIVERY_REASSURANCE": "سيتم تسليم الكود فوراً إلى بريدك الإلكتروني بعد الدفع. يرجى التحقق من مجلد الرسائل غير المرغوب فيها إذا لم تجده خلال بضع دقائق.",
+    "SSL_SECURE": "اتصال آمن SSL",
+    "PCI_COMPLIANT": "متوافق مع PCI",
+    "ENCRYPTION_BADGE": "تشفير 256-بت",
+    "CART_EMPTY_ERROR": "سلتك فارغة.",
+    "EMAIL_REQUIRED_ERROR": "البريد الإلكتروني مطلوب لإتمام الشراء.",
+    "SECURITY_BADGES_ARIA": "شارات الأمان",
+    "METHOD_CARD": "بطاقة",
+    "METHOD_PAYPAL": "باي بال",
+    "METHOD_CRYPTO": "عملات رقمية",
+    "METHOD_APPLE_PAY": "آبل باي",
+    "METHOD_DEVELOPMENT": "بيئة التطوير",
+    "DEV_NOTE": "تم تفعيل الدفع التجريبي. لا حاجة لبطاقة أو مزود دفع خارجي.",
+    "CARDHOLDER_NAME": "اسم حامل البطاقة",
+    "CARD_NUMBER": "رقم البطاقة",
+    "EXPIRY_DATE": "تاريخ الانتهاء",
+    "CVC": "رمز التحقق CVC"
   },
   "ACCOUNT": {
     "DASHBOARD": "لوحة التحكم",
@@ -423,7 +491,8 @@
       "STATUS": "الحالة",
       "VALUE": "القيمة",
       "COMPLETED": "مكتمل",
-      "EMPTY_ACTIVITY": "لا يوجد نشاط حديث بعد."
+      "EMPTY_ACTIVITY": "لا يوجد نشاط حديث بعد.",
+      "TYPE": "النوع"
     },
     "WALLET": {
       "TITLE": "مكافآت HAMBOX",
@@ -804,7 +873,8 @@
         "PREVIEW": "معاينة",
         "DUPLICATE": "نسخ",
         "ARCHIVE": "أرشفة",
-        "DELETE": "حذف"
+        "DELETE": "حذف",
+        "MARKETING_PAGE": "صفحة تسويقية"
       },
       "BULK": {
         "PUBLISH": "نشر",
@@ -990,6 +1060,7 @@
       "PROMOTIONS": "العروض",
       "MEMBERSHIPS": "العضويات",
       "THEMES": "السمات",
+      "CAMPAIGNS": "الحملات",
       "PAGE_BUILDER": "منشئ الصفحات",
       "LEGAL": "المركز القانوني",
       "ORDERS": "الطلبات",
@@ -3343,7 +3414,17 @@
         "ASSIGNMENTS": "التعيينات",
         "CURRENT_VERSION": "الإصدار الحالي",
         "PUBLISHED": "منشور",
-        "VERSIONS_LIST": "سجل الإصدارات"
+        "VERSIONS_LIST": "سجل الإصدارات",
+        "RESOLUTION": {
+          "LIVE_VIA": "نشطة الآن — عبر {{source}}",
+          "HINT": "هذه هي السمة التي يعرضها المتجر فعليًا الآن، وسبب ذلك.",
+          "CAMPAIGN": "حملة",
+          "SCHEDULE": "سمة مجدولة",
+          "MEMBERSHIP": "العضوية",
+          "STORE": "الافتراضي للمتجر",
+          "DEFAULT": "الافتراضي للمتجر (احتياطي)",
+          "PREVIEW": "معاينة"
+        }
       },
       "PREVIEW": {
         "TITLE": "معاينة مباشرة",
@@ -3402,10 +3483,14 @@
         "ENDS": "ينتهي في",
         "RECURRENCE": "قاعدة التكرار",
         "RECURRENCE_PLACEHOLDER": "RRULE اختياري",
+        "PRIORITY": "الأولوية",
         "ADD": "إضافة جدول",
         "EMPTY": "لا توجد جداول لهذه السمة.",
         "ACTIVE": "نشط",
-        "INACTIVE": "غير نشط"
+        "INACTIVE": "غير نشط",
+        "OVERLAP": "تداخل",
+        "OVERLAP_ITEM_HINT": "يتداخل هذا الجدول مع جدول نشط آخر. يفوز صاحب الأولوية الأعلى، وعند التعادل يُفضَّل الأحدث بدءًا.",
+        "OVERLAP_BANNER": "بعض الجداول أدناه متداخلة زمنيًا — سيُفضَّل الحل صاحب الأولوية الأعلى، ثم وقت البدء الأحدث. راجعها قبل الاعتماد على هذا التوقيت."
       },
       "ASSIGNMENTS": {
         "TITLE": "التعيينات",
@@ -3490,7 +3575,9 @@
         "SCHEDULED": "تمت إضافة الجدول",
         "ASSIGNED": "تمت إضافة التعيين",
         "ROLLED_BACK": "تم التراجع عن الإصدار",
-        "PREVIEW_STARTED": "بدأت جلسة المعاينة"
+        "ROLLBACK_FAILED": "فشل التراجع",
+        "PREVIEW_STARTED": "بدأت جلسة المعاينة",
+        "PREVIEW_EXITED": "تم الخروج من المعاينة"
       },
       "ACTIONS": {
         "SAVE": "حفظ",
@@ -3503,21 +3590,129 @@
         "ARCHIVE": "أرشفة",
         "EXPORT": "تصدير",
         "PREVIEW": "معاينة",
+        "EXIT_PREVIEW": "الخروج من المعاينة",
         "ROLLBACK": "تراجع"
+      }
+    },
+    "CAMPAIGNS": {
+      "LIST": {
+        "TITLE": "الحملات",
+        "SUBTITLE": "تجاوزات سمة تسويقية محدودة زمنيًا لكامل المتجر — الجمعة السوداء، رمضان، العيد، وغيرها من المناسبات.",
+        "NEW": "حملة جديدة",
+        "SEARCH_PLACEHOLDER": "ابحث في الحملات بالاسم…",
+        "FILTER_STATUS": "الحالة",
+        "LIVE_NOW": "نشطة الآن — {{name}} ({{theme}})",
+        "NO_LIVE_CAMPAIGN": "لا توجد حملة نشطة الآن.",
+        "NEXT_UP": "التالية — {{name}} تبدأ {{date}}",
+        "OVERLAP_BANNER": "بعض الحملات أدناه متداخلة زمنيًا — سيُفضَّل الحل صاحب الأولوية الأعلى، ثم وقت البدء الأحدث، ثم الأقدم إنشاءً.",
+        "OVERLAP_ROW_HINT": "تتداخل هذه الحملة مع نافذة حملة نشطة أخرى.",
+        "EMPTY": "لا توجد حملات بعد. أنشئ أول حملة موسمية أو حملة تخفيضات.",
+        "COLUMNS": {
+          "NAME": "الاسم",
+          "THEME": "السمة",
+          "SCHEDULE": "الجدولة",
+          "PRIORITY": "الأولوية",
+          "STATUS": "الحالة"
+        }
+      },
+      "PHASE": {
+        "DRAFT": "مسودة",
+        "SCHEDULED": "مجدولة",
+        "ACTIVE": "نشطة",
+        "ENDED": "منتهية",
+        "PAUSED": "متوقفة مؤقتًا",
+        "ARCHIVED": "مؤرشفة",
+        "LIVE_NOW": "نشطة الآن",
+        "ACTIVE_OVERRIDDEN": "نشطة — لكن مُتجاوَزة",
+        "OVERRIDDEN_BY": "تم تجاوزها بواسطة: {{name}}"
+      },
+      "FORM": {
+        "CREATE_TITLE": "إنشاء حملة",
+        "EDIT_TITLE": "تعديل الحملة",
+        "SUBTITLE": "اختر سمة، حدد النافذة الزمنية، عاينها، ثم انشرها عند الجاهزية.",
+        "DETAILS": "التفاصيل",
+        "NAME": "الاسم",
+        "DESCRIPTION": "الوصف",
+        "THEME": "السمة",
+        "SELECTED_THEME_STATUS": "حالة السمة المختارة: {{status}}",
+        "THEME_NOT_PUBLISHABLE": "يجب نشر السمة المختارة قبل أن يتسنى نشر هذه الحملة.",
+        "SCHEDULE": "الجدولة",
+        "STARTS": "تبدأ في",
+        "ENDS": "تنتهي في",
+        "PRIORITY": "الأولوية",
+        "HISTORY": "السجل",
+        "NO_HISTORY": "لا يوجد سجل بعد.",
+        "OVERLAP_HINT": "تتداخل هذه الحملة مع حملة نشطة أخرى — سيُفضَّل الحل صاحب الأولوية الأعلى، ثم وقت البدء الأحدث.",
+        "LIVE_VIA": "نشطة الآن — هذه هي السمة النشطة عبر الحملة: {{name}}",
+        "OVERRIDDEN_VIA": "نشطة، لكنها مُتجاوَزة بواسطة حملة أعلى أولوية: {{name}}"
+      },
+      "HISTORY_ACTION": {
+        "CREATED": "أُنشئت",
+        "UPDATED": "تم التحديث",
+        "THEMECHANGED": "تم تغيير السمة",
+        "SCHEDULECHANGED": "تم تغيير الجدولة",
+        "PUBLISHED": "تم النشر",
+        "ENABLED": "تم التفعيل",
+        "DISABLED": "تم التعطيل",
+        "ARCHIVED": "تمت الأرشفة",
+        "DELETED": "تم الحذف"
+      },
+      "CONFIRM": {
+        "DELETE_TITLE": "حذف الحملة؟",
+        "DELETE": "حذف الحملة \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+      },
+      "MESSAGES": {
+        "CREATED": "تم إنشاء الحملة",
+        "CREATE_FAILED": "فشل إنشاء الحملة",
+        "SAVED": "تم حفظ الحملة",
+        "SAVE_FAILED": "فشل حفظ الحملة",
+        "PUBLISHED": "تم نشر الحملة",
+        "PUBLISH_FAILED": "فشل النشر",
+        "ENABLED": "تم تفعيل الحملة",
+        "DISABLED": "تم تعطيل الحملة",
+        "ARCHIVED": "تمت أرشفة الحملة",
+        "DELETED": "تم حذف الحملة",
+        "DELETE_FAILED": "فشل الحذف",
+        "ACTION_FAILED": "فشل الإجراء",
+        "PREVIEW_STARTED": "بدأت جلسة المعاينة"
+      },
+      "ACTIONS": {
+        "SAVE": "حفظ",
+        "CANCEL": "إلغاء",
+        "EDIT": "تعديل",
+        "ENABLE": "تفعيل",
+        "DISABLE": "تعطيل",
+        "ARCHIVE": "أرشفة",
+        "DELETE": "حذف",
+        "PREVIEW": "معاينة",
+        "EXIT_PREVIEW": "الخروج من المعاينة",
+        "PUBLISH": "نشر"
       }
     },
     "PAGE_BUILDER": {
       "TITLE": "منشئ الصفحات",
       "SUBTITLE": "إدارة قوالب صفحة الهبوط والتحكم في القالب المفعل حالياً على الصفحة الرئيسية للمتجر.",
+      "SCOPE": {
+        "HOMEPAGE": "الصفحة الرئيسية",
+        "PRODUCT": "صفحات المنتجات",
+        "CATEGORY": "صفحات الفئات"
+      },
       "TEMPLATES": {
         "TITLE": "القوالب",
+        "TITLE_SCOPED": "الصفحات",
         "LIVE": "مفعل",
         "UNPUBLISHED_CHANGES": "تغييرات غير منشورة",
         "SET_ACTIVE": "تفعيل",
         "UPDATED": "آخر تحديث",
         "EMPTY": "لا توجد قوالب صفحة هبوط بعد.",
+        "EMPTY_SCOPED": "لا توجد صفحات بعد.",
         "NEW": "قالب جديد",
+        "NEW_SCOPED": "صفحة جديدة",
+        "VIEW": "عرض الصفحة",
         "NAME": "الاسم",
+        "TARGET": "الهدف",
+        "TARGET_PRODUCT": "المنتج",
+        "TARGET_CATEGORY": "الفئة",
         "CLONE_FROM": "نسخ من (اختياري)",
         "CLONE_FROM_NONE": "ابدأ فارغاً",
         "CREATE": "إنشاء",
@@ -3525,12 +3720,22 @@
         "DELETE": "حذف",
         "COPY_SUFFIX": "(نسخة)",
         "DELETE_CONFIRM_TITLE": "حذف القالب",
-        "DELETE_CONFIRM_MESSAGE": "سيتم حذف هذا القالب وأقسامه نهائياً. لا يمكن التراجع عن هذا الإجراء."
+        "DELETE_CONFIRM_TITLE_SCOPED": "حذف الصفحة",
+        "DELETE_CONFIRM_MESSAGE": "سيتم حذف هذا القالب وأقسامه نهائياً. لا يمكن التراجع عن هذا الإجراء.",
+        "DELETE_CONFIRM_MESSAGE_SCOPED": "سيتم حذف هذه الصفحة وأقسامها نهائياً. لا يمكن التراجع عن هذا الإجراء."
+      },
+      "SEO": {
+        "TITLE": "تحسين محركات البحث للصفحة",
+        "SUBTITLE": "تجاوزات اختيارية تظهر عند نشر صفحة التسويق هذه. اتركها فارغة لاستخدام اسم ووصف المنتج/الفئة نفسها.",
+        "META_TITLE": "عنوان الميتا",
+        "META_DESCRIPTION": "وصف الميتا",
+        "OG_IMAGE": "رابط صورة المشاركة الاجتماعية"
       },
       "SECTIONS": {
         "TITLE": "الأقسام",
         "SUBTITLE": "أضف الأقسام وأعد ترتيبها واضبط إعداداتها ضمن هذا القالب.",
         "EMPTY": "اختر قالباً لتحرير أقسامه.",
+        "EMPTY_SCOPED": "اختر صفحة لتحرير أقسامها.",
         "EMPTY_SECTIONS": "لا يحتوي هذا القالب على أقسام بعد.",
         "VISIBLE": "ظاهر",
         "HIDDEN": "مخفي",
@@ -4001,11 +4206,25 @@
               "LABEL": "العنوان",
               "HELP": "عنوان القسم."
             },
+            "SUBTITLE": {
+              "LABEL": "العنوان الفرعي",
+              "HELP": "سطر داعم صغير أسفل العنوان."
+            },
+            "VIEW_ALL_TEXT": {
+              "LABEL": "نص رابط \"عرض الكل\"",
+              "HELP": "اتركه فارغًا لإخفاء الرابط."
+            },
+            "VIEW_ALL_URL": {
+              "LABEL": "رابط \"عرض الكل\"",
+              "HELP": "الوجهة التي يشير إليها الرابط، مثل /products."
+            },
             "EMPTY": "لا توجد بطاقات بعد — أضف واحدة أدناه.",
             "CARD_TITLE": "العنوان",
             "BADGE_TEXT": "نص الشارة",
             "IMAGE_URL": "رابط الصورة",
-            "TAGS": "الوسوم (مفصولة بفواصل)",
+            "PLATFORM": "المنصة (مثل PS5، Xbox، PC)",
+            "GENRE": "النوع (مثل سباق، تقمص أدوار)",
+            "PRICE": "السعر (اتركه فارغًا لإخفائه)",
             "BUTTON_TEXT": "نص الزر",
             "BUTTON_URL": "رابط الزر",
             "FEATURED": "مميزة (بطاقة أكبر وبارزة)",
@@ -4223,7 +4442,8 @@
         "PUBLISHED": "تم نشر القالب.",
         "PUBLISH_FAILED": "فشل نشر القالب.",
         "DISCARDED": "تم تجاهل المسودة.",
-        "DISCARD_FAILED": "فشل تجاهل المسودة."
+        "DISCARD_FAILED": "فشل تجاهل المسودة.",
+        "VIEW_FAILED": "تعذر فتح هذه الصفحة."
       }
     },
     "LEGAL": {

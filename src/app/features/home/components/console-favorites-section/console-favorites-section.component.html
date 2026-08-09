@@ -1,65 +1,117 @@
-<section
-  class="console-favorites"
-  [class.console-favorites--visible]="visible()"
-  aria-labelledby="console-favorites-title"
->
+<section class="console-favorites" hamboxReveal aria-labelledby="console-favorites-title">
+  <div class="console-favorites__glow" aria-hidden="true"></div>
+  <div class="console-favorites__vignette" aria-hidden="true"></div>
+
   <div class="console-favorites__inner">
     <div class="console-favorites__header">
-      <h2 id="console-favorites-title" class="console-favorites__title">{{ config().title }}</h2>
+      <div class="console-favorites__heading">
+        <h2 id="console-favorites-title" class="console-favorites__title">{{ config().title }}</h2>
+        @if (config().subtitle) {
+          <p class="console-favorites__subtitle">{{ config().subtitle }}</p>
+        }
+      </div>
 
-      @if (config().cards.length > 1) {
-        <div class="console-favorites__nav">
-          <button
-            type="button"
-            class="console-favorites__nav-button"
-            (click)="scrollByDirection(-1)"
-            aria-label="Scroll favorites left"
-          >
-            <i class="pi pi-chevron-left" aria-hidden="true"></i>
-          </button>
-          <button
-            type="button"
-            class="console-favorites__nav-button"
-            (click)="scrollByDirection(1)"
-            aria-label="Scroll favorites right"
-          >
-            <i class="pi pi-chevron-right" aria-hidden="true"></i>
-          </button>
-        </div>
-      }
-    </div>
+      <div class="console-favorites__controls">
+        @if (config().viewAllText && config().viewAllUrl) {
+          <a class="console-favorites__view-all" [routerLink]="config().viewAllUrl">{{ config().viewAllText }}</a>
+        }
 
-    <div class="console-favorites__track" #track>
-      @for (card of config().cards; track card.id; let i = $index) {
-        <article
-          class="console-favorites__card"
-          [class.console-favorites__card--featured]="card.featured"
-          [style.transition-delay.ms]="i * 70"
-        >
-          <img class="console-favorites__card-image" [src]="card.imageUrl" alt="" />
-          <div class="console-favorites__card-shade"></div>
-
-          @if (card.badgeText) {
-            <span class="console-favorites__card-badge">{{ card.badgeText }}</span>
-          }
-
-          <div class="console-favorites__card-copy">
-            <h3 class="console-favorites__card-title">{{ card.title }}</h3>
-
-            @if (card.tags.length) {
-              <div class="console-favorites__card-tags">
-                @for (tag of card.tags; track tag) {
-                  <span class="console-favorites__card-tag">{{ tag }}</span>
-                }
-              </div>
-            }
-
-            @if (card.featured && card.buttonText) {
-              <a class="console-favorites__card-button" [routerLink]="card.buttonUrl">{{ card.buttonText }}</a>
-            }
+        @if (config().cards.length > 1) {
+          <div class="console-favorites__nav">
+            <button
+              type="button"
+              class="console-favorites__nav-button"
+              (click)="prev()"
+              aria-label="Previous game"
+            >
+              <i class="pi pi-chevron-left" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              class="console-favorites__nav-button"
+              (click)="next()"
+              aria-label="Next game"
+            >
+              <i class="pi pi-chevron-right" aria-hidden="true"></i>
+            </button>
           </div>
-        </article>
+        }
+      </div>
+    </div>
+
+    <div
+      class="console-favorites__stack"
+      (pointerdown)="onPointerDown($event)"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerCancel()"
+    >
+      @for (card of config().cards; track card.id; let i = $index) {
+        <a
+          class="console-card"
+          [class.console-card--active]="cardDelta(i) === 0"
+          [style.--tx]="cardState(i).tx"
+          [style.--rot]="cardState(i).rot"
+          [style.--scale]="cardState(i).scale"
+          [style.--op]="cardState(i).opacity"
+          [style.z-index]="cardState(i).zIndex"
+          [attr.tabindex]="cardState(i).interactive ? null : -1"
+          [attr.aria-hidden]="!cardState(i).interactive"
+          [routerLink]="card.buttonUrl"
+          (click)="onCardClick($event)"
+        >
+          <span class="console-card__corner console-card__corner--start" aria-hidden="true"></span>
+          <span class="console-card__corner console-card__corner--end" aria-hidden="true"></span>
+
+          <img class="console-card__image" [src]="card.imageUrl" [alt]="card.title" loading="lazy" />
+          <span class="console-card__shade" aria-hidden="true"></span>
+
+          <span class="console-card__top">
+            @if (card.platform) {
+              <span class="console-card__platform">{{ card.platform }}</span>
+            }
+            @if (card.badgeText) {
+              <span class="console-card__badge">{{ card.badgeText }}</span>
+            }
+          </span>
+
+          <span class="console-card__bottom">
+            <span class="console-card__title">{{ card.title }}</span>
+            @if (card.platform || card.genre) {
+              <span class="console-card__meta">
+                {{ card.platform }}{{ card.platform && card.genre ? ' • ' : '' }}{{ card.genre }}
+              </span>
+            }
+
+            <span class="console-card__divider" aria-hidden="true"></span>
+
+            <span class="console-card__foot">
+              @if (card.price) {
+                <span class="console-card__price">{{ card.price }}</span>
+              }
+              <span class="console-card__action">
+                {{ card.buttonText || ('PRODUCT.VIEW_DETAILS' | translate) }}
+                <i class="pi pi-arrow-right" aria-hidden="true"></i>
+              </span>
+            </span>
+          </span>
+        </a>
       }
     </div>
+
+    @if (config().cards.length > 1) {
+      <div class="console-favorites__dots" role="tablist" aria-label="Games">
+        @for (card of config().cards; track card.id; let i = $index) {
+          <button
+            type="button"
+            class="console-favorites__dot"
+            [class.console-favorites__dot--active]="cardDelta(i) === 0"
+            role="tab"
+            [attr.aria-selected]="cardDelta(i) === 0"
+            [attr.aria-label]="card.title"
+            (click)="goTo(i)"
+          ></button>
+        }
+      </div>
+    }
   </div>
 </section>

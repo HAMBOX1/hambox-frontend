@@ -7,7 +7,10 @@ $mobile: 767px;
 .fab-wrap {
   position: fixed;
   inset-inline-end: 40px;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  // `--hambox-buy-bar-inset` is set by whichever page has a persistent fixed-bottom purchase bar
+  // (currently the product details page's buy bar) — 0px everywhere else, so this only shifts up
+  // when there's actually something underneath to clear.
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px) + var(--hambox-buy-bar-inset, 0px));
   z-index: 200;
   display: flex;
   align-items: center;
@@ -19,7 +22,7 @@ $mobile: 767px;
 
   @media (max-width: $mobile) {
     inset-inline-end: 16px;
-    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px) + var(--hambox-buy-bar-inset, 0px));
   }
 }
 

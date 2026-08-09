@@ -11,12 +11,27 @@
       adminHeaderActions
       *hamboxHasPermission="permissions.PageBuilder.Edit"
       icon="pi pi-plus"
-      [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.NEW' | translate"
+      [label]="scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.NEW') | translate"
       severity="primary"
       [loading]="facade.creating()"
       (pressed)="openNewTemplateDialog()"
     />
   </app-admin-page-header>
+
+  <div class="page-builder-page__scope-tabs" role="tablist">
+    @for (tab of scopeTabs; track tab.value) {
+      <button
+        type="button"
+        role="tab"
+        class="page-builder-page__scope-tab"
+        [class.page-builder-page__scope-tab--active]="scope() === tab.value"
+        [attr.aria-selected]="scope() === tab.value"
+        (click)="changeScope(tab.value)"
+      >
+        {{ tab.labelKey | translate }}
+      </button>
+    }
+  </div>
 
   @if (error()) {
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
@@ -27,8 +42,10 @@
   } @else if (!templates().length) {
     <app-admin-empty-state
       icon="pi pi-objects-column"
-      [title]="'ADMIN.PAGE_BUILDER.TEMPLATES.EMPTY' | translate"
-      [primaryLabel]="canEdit() ? ('ADMIN.PAGE_BUILDER.TEMPLATES.NEW' | translate) : null"
+      [title]="scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.EMPTY') | translate"
+      [primaryLabel]="
+        canEdit() ? (scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.NEW') | translate) : null
+      "
       (primaryAction)="openNewTemplateDialog()"
     />
   } @else {
@@ -45,14 +62,18 @@
           [selected]="previewDevice()"
           (selectedChange)="previewDevice.set($event)"
         />
-        <app-builder-preview-pane [sections]="draftSections()" [device]="previewDevice()" />
+        <app-builder-preview-pane
+          [sections]="draftSections()"
+          [device]="previewDevice()"
+          [target]="previewTarget()"
+        />
       </app-admin-section-card>
     }
 
     <div class="page-builder-page__layout">
       <app-admin-section-card
         class="page-builder-page__templates"
-        [title]="'ADMIN.PAGE_BUILDER.TEMPLATES.TITLE' | translate"
+        [title]="scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.TITLE') | translate"
       >
         <ul class="page-builder-page__template-list">
           @for (template of templates(); track template.id) {
@@ -85,6 +106,14 @@
               </div>
 
               <div class="page-builder-page__template-actions" (click)="$event.stopPropagation()">
+                @if (template.scope !== 'Homepage') {
+                  <app-admin-icon-button
+                    icon="pi pi-external-link"
+                    [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.VIEW' | translate"
+                    [loading]="viewingId() === template.id"
+                    (pressed)="viewLivePage(template)"
+                  />
+                }
                 @if (!template.isActive) {
                   <app-admin-icon-button
                     icon="pi pi-check-circle"
@@ -110,16 +139,8 @@
         [title]="'ADMIN.PAGE_BUILDER.SECTIONS.TITLE' | translate"
         [description]="'ADMIN.PAGE_BUILDER.SECTIONS.SUBTITLE' | translate"
       >
-        @if (selectedLoading()) {
-          <app-admin-loading-skeleton variant="table" [rows]="3" />
-        } @else if (!selectedTemplate()) {
-          <app-admin-empty-state
-            icon="pi pi-list"
-            [title]="'ADMIN.PAGE_BUILDER.SECTIONS.EMPTY' | translate"
-            [compact]="true"
-          />
-        } @else {
-          <div class="page-builder-page__section-toolbar">
+        @if (selectedTemplate() && !selectedLoading()) {
+          <div adminSectionActions class="page-builder-page__section-toolbar">
             <app-admin-icon-button
               class="page-builder-page__add-section"
               *hamboxHasPermission="permissions.PageBuilder.Edit"
@@ -129,7 +150,10 @@
               (pressed)="libraryOpen.set(true)"
             />
 
-            <div class="page-builder-page__undo-redo" *hamboxHasPermission="permissions.PageBuilder.Edit">
+            <div
+              class="page-builder-page__undo-redo"
+              *hamboxHasPermission="permissions.PageBuilder.Edit"
+            >
               <app-admin-icon-button
                 icon="pi pi-undo"
                 [label]="'ADMIN.PAGE_BUILDER.SECTIONS.UNDO' | translate"
@@ -144,7 +168,17 @@
               />
             </div>
           </div>
+        }
 
+        @if (selectedLoading()) {
+          <app-admin-loading-skeleton variant="table" [rows]="3" />
+        } @else if (!selectedTemplate()) {
+          <app-admin-empty-state
+            icon="pi pi-list"
+            [title]="scopedKey('ADMIN.PAGE_BUILDER.SECTIONS.EMPTY') | translate"
+            [compact]="true"
+          />
+        } @else {
           @if (!draftSections().length) {
             <app-admin-empty-state
               icon="pi pi-list"
@@ -161,7 +195,9 @@
               @for (section of draftSections(); track section.instanceId; let i = $index) {
                 <li
                   class="page-builder-page__section-row"
-                  [class.page-builder-page__section-row--selected]="selectedInstanceId() === section.instanceId"
+                  [class.page-builder-page__section-row--selected]="
+                    selectedInstanceId() === section.instanceId
+                  "
                   cdkDrag
                   [cdkDragDisabled]="!canEdit()"
                   (click)="selectSection(section.instanceId)"
@@ -174,7 +210,9 @@
                   <span class="page-builder-page__section-order">{{ i + 1 }}</span>
                   <div class="page-builder-page__section-info">
                     <span class="page-builder-page__section-category">{{ section.category }}</span>
-                    <span class="page-builder-page__section-variant">{{ variantLabel(section) }}</span>
+                    <span class="page-builder-page__section-variant">{{
+                      variantLabel(section)
+                    }}</span>
                   </div>
                   <app-admin-status-badge
                     [label]="
@@ -185,7 +223,10 @@
                     "
                     [tone]="section.isVisible ? 'success' : 'neutral'"
                   />
-                  <div class="page-builder-page__section-actions" (click)="$event.stopPropagation()">
+                  <div
+                    class="page-builder-page__section-actions"
+                    (click)="$event.stopPropagation()"
+                  >
                     <app-admin-icon-button
                       [icon]="section.isVisible ? 'pi pi-eye' : 'pi pi-eye-slash'"
                       [label]="'ADMIN.PAGE_BUILDER.SECTIONS.TOGGLE_VISIBILITY' | translate"
@@ -221,11 +262,69 @@
         (configChange)="onConfigChange($event)"
       />
     </div>
+
+    @if (selectedTemplate() && scope() !== 'Homepage') {
+      <app-admin-section-card
+        class="page-builder-page__seo"
+        [title]="'ADMIN.PAGE_BUILDER.SEO.TITLE' | translate"
+        [description]="'ADMIN.PAGE_BUILDER.SEO.SUBTITLE' | translate"
+        [collapsible]="true"
+        [collapsed]="true"
+      >
+        <div class="page-builder-page__seo-form">
+          <label class="admin-field">
+            <span class="admin-field__label">{{
+              'ADMIN.PAGE_BUILDER.SEO.META_TITLE' | translate
+            }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [disabled]="!canEdit()"
+              [ngModel]="draftSeo().seoTitle ?? ''"
+              (ngModelChange)="onSeoTitleChange($event)"
+              name="seoTitle"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{
+              'ADMIN.PAGE_BUILDER.SEO.META_DESCRIPTION' | translate
+            }}</span>
+            <textarea
+              pTextarea
+              rows="2"
+              class="admin-field__input"
+              [disabled]="!canEdit()"
+              [ngModel]="draftSeo().seoDescription ?? ''"
+              (ngModelChange)="onSeoDescriptionChange($event)"
+              name="seoDescription"
+            ></textarea>
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{
+              'ADMIN.PAGE_BUILDER.SEO.OG_IMAGE' | translate
+            }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [disabled]="!canEdit()"
+              [ngModel]="draftSeo().seoOgImageUrl ?? ''"
+              (ngModelChange)="onSeoOgImageChange($event)"
+              name="seoOgImageUrl"
+            />
+          </label>
+        </div>
+      </app-admin-section-card>
+    }
   }
 </section>
 
 <app-section-library-drawer
   [visible]="libraryOpen()"
+  [excludedCategories]="scope() === 'Homepage' ? [] : homepageOnlySectionCategories"
   (visibleChange)="libraryOpen.set($event)"
   (variantSelected)="onVariantSelected($event)"
 />
@@ -262,7 +361,7 @@
 </app-admin-sticky-save-bar>
 
 <p-dialog
-  [header]="'ADMIN.PAGE_BUILDER.TEMPLATES.NEW' | translate"
+  [header]="scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.NEW') | translate"
   [visible]="newTemplateDialogOpen()"
   (visibleChange)="newTemplateDialogOpen.set($event)"
   [modal]="true"
@@ -272,6 +371,38 @@
   styleClass="admin-dialog"
 >
   <div class="page-builder-page__new-template-form">
+    @if (scope() !== 'Homepage') {
+      @if (newTemplateTargetName()) {
+        <div class="admin-field">
+          <span class="admin-field__label">{{
+            'ADMIN.PAGE_BUILDER.TEMPLATES.TARGET' | translate
+          }}</span>
+          <p class="page-builder-page__target-confirm">{{ newTemplateTargetName() }}</p>
+        </div>
+      } @else if (scope() === 'Product') {
+        <div class="admin-field">
+          <span class="admin-field__label">{{
+            'ADMIN.PAGE_BUILDER.TEMPLATES.TARGET_PRODUCT' | translate
+          }}</span>
+          <app-product-picker
+            [value]="newTemplateTargetIds()"
+            [maxItems]="1"
+            (valueChange)="onTargetPicked($event)"
+          />
+        </div>
+      } @else {
+        <div class="admin-field">
+          <span class="admin-field__label">{{
+            'ADMIN.PAGE_BUILDER.TEMPLATES.TARGET_CATEGORY' | translate
+          }}</span>
+          <app-category-picker
+            [value]="newTemplateTargetIds()"
+            (valueChange)="onTargetPicked($event)"
+          />
+        </div>
+      }
+    }
+
     <label class="admin-field">
       <span class="admin-field__label">{{ 'ADMIN.PAGE_BUILDER.TEMPLATES.NAME' | translate }}</span>
       <input
@@ -285,7 +416,9 @@
     </label>
 
     <label class="admin-field">
-      <span class="admin-field__label">{{ 'ADMIN.PAGE_BUILDER.TEMPLATES.CLONE_FROM' | translate }}</span>
+      <span class="admin-field__label">{{
+        'ADMIN.PAGE_BUILDER.TEMPLATES.CLONE_FROM' | translate
+      }}</span>
       <p-select
         [options]="cloneOptions()"
         optionLabel="label"
@@ -310,7 +443,7 @@
       [label]="'ADMIN.PAGE_BUILDER.TEMPLATES.CREATE' | translate"
       severity="primary"
       [loading]="facade.creating()"
-      [disabled]="!newTemplateName().trim()"
+      [disabled]="!canCreateTemplate()"
       (onClick)="confirmCreateTemplate()"
     />
   </div>
@@ -327,8 +460,8 @@
 
 <app-admin-confirm-dialog
   [visible]="pendingDeleteTemplate() !== null"
-  [title]="'ADMIN.PAGE_BUILDER.TEMPLATES.DELETE_CONFIRM_TITLE' | translate"
-  [message]="'ADMIN.PAGE_BUILDER.TEMPLATES.DELETE_CONFIRM_MESSAGE' | translate"
+  [title]="scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.DELETE_CONFIRM_TITLE') | translate"
+  [message]="scopedKey('ADMIN.PAGE_BUILDER.TEMPLATES.DELETE_CONFIRM_MESSAGE') | translate"
   [destructive]="true"
   (visibleChange)="pendingDeleteTemplate.set(null)"
   (confirmed)="confirmDeleteTemplate()"

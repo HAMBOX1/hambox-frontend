@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
+import { ParallaxDirective } from '../../../../shared/directives/parallax.directive';
 import { StorefrontHeroContent } from '../../models/storefront-content.model';
 
 @Component({
   selector: 'app-hero-section',
   standalone: true,
-  imports: [ButtonModule, RouterLink],
+  imports: [ButtonModule, RouterLink, ParallaxDirective],
   templateUrl: './hero-section.component.html',
   styleUrl: './hero-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

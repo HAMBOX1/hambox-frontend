@@ -7,28 +7,39 @@
     } @else if (error()) {
       <app-empty-state
         icon="pi pi-exclamation-triangle"
-        title="Unable to load cart"
+        [title]="'CART.LOAD_ERROR_TITLE' | translate"
         [description]="error()!"
-        actionLabel="Try again"
+        [actionLabel]="'CART.TRY_AGAIN' | translate"
         actionIcon="pi pi-refresh"
         (action)="retry()"
       />
     } @else if (isEmpty()) {
-      <section class="storefront-cart__empty" aria-label="Empty cart">
-        <h1 class="storefront-cart__empty-title">Your Cart</h1>
-        <p class="storefront-cart__empty-text">Your cart is empty. Browse the marketplace to add digital goods.</p>
-        <a routerLink="/products" class="storefront-cart__empty-cta">Browse Products</a>
+      <section class="storefront-cart__empty" [attr.aria-label]="'CART.EMPTY_TITLE' | translate">
+        <h1 class="storefront-cart__empty-title">{{ 'CART.EMPTY_TITLE' | translate }}</h1>
+        <p class="storefront-cart__empty-text">{{ 'CART.EMPTY_TEXT' | translate }}</p>
+        <a routerLink="/products" class="storefront-cart__empty-cta">{{ 'CART.CONTINUE_SHOPPING' | translate }}</a>
       </section>
     } @else {
       <div class="storefront-cart__layout">
-        <section class="storefront-cart__items" aria-label="Cart items">
+        <section class="storefront-cart__items" [attr.aria-label]="'CART.TITLE' | translate">
           <header class="storefront-cart__header">
-            <h1 class="storefront-cart__title">Your Cart</h1>
-            <span class="storefront-cart__count">{{ summary().itemCount }} Items</span>
+            <h1 class="storefront-cart__title">{{ 'CART.TITLE' | translate }}</h1>
+            <span class="storefront-cart__count">{{ 'CART.ITEM_COUNT' | translate: { count: summary().itemCount } }}</span>
           </header>
 
           @if (error()) {
             <p class="storefront-cart__error" role="alert">{{ error() }}</p>
+          }
+
+          @if (recentlyRemoved(); as removed) {
+            <div class="storefront-cart__undo" role="status">
+              <span class="storefront-cart__undo-text">
+                {{ 'CART.ITEM_REMOVED' | translate: { title: removed.title } }}
+              </span>
+              <button type="button" class="storefront-cart__undo-btn" (click)="undoRemove()">
+                {{ 'CART.UNDO' | translate }}
+              </button>
+            </div>
           }
 
           <div class="storefront-cart__list" [class.storefront-cart__list--busy]="mutating()">
@@ -50,12 +61,12 @@
     }
 
     @if (!isEmpty()) {
-      <footer class="storefront-cart__mobile-checkout" aria-label="Cart checkout">
+      <footer class="storefront-cart__mobile-checkout" [attr.aria-label]="'CART.TITLE' | translate">
         <div class="storefront-cart__mobile-subtotal">
-          <span>Subtotal</span>
+          <span>{{ 'CART.SUBTOTAL' | translate }}</span>
           <strong>{{ summary().subtotal | hamboxCurrency }}</strong>
         </div>
-        <a routerLink="/checkout" class="storefront-cart__mobile-checkout-btn">Checkout</a>
+        <a routerLink="/checkout" class="storefront-cart__mobile-checkout-btn">{{ 'CART.CHECKOUT' | translate }}</a>
       </footer>
     }
   </main>

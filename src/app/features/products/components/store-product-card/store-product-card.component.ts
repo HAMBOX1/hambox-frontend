@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angu
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 import { StoreProduct } from '../../models/product';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { addStoreProductToCart } from '../../utils/storefront-add-to-cart.util';
@@ -12,7 +14,7 @@ import { AccountWishlistFacade } from '../../../account/services/account-wishlis
 @Component({
   selector: 'app-store-product-card',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, HamboxCurrencyPipe],
+  imports: [RouterLink, TranslatePipe, HamboxCurrencyPipe, TooltipModule],
   templateUrl: './store-product-card.component.html',
   styleUrl: './store-product-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +26,7 @@ export class StoreProductCardComponent {
   private readonly translate = inject(TranslateService);
   private readonly authSession = inject(AuthSessionService);
   private readonly wishlistFacade = inject(AccountWishlistFacade);
+  private readonly messageService = inject(MessageService);
 
   product = input.required<StoreProduct>();
   compact = input(false);
@@ -50,6 +53,17 @@ export class StoreProductCardComponent {
     const added = await this.wishlistFacade.add(this.product().id);
     if (added) {
       this.wishlistAdded.set(true);
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('PRODUCT.WISHLIST_ADDED'),
+        life: 3000,
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('PRODUCT.WISHLIST_ERROR'),
+        life: 4000,
+      });
     }
   }
 
@@ -79,7 +93,7 @@ export class StoreProductCardComponent {
     const configuration = this.enrichment.getConfiguration(product.id);
 
     try {
-      await addStoreProductToCart(
+      const result = await addStoreProductToCart(
         this.cartFacade,
         this.router,
         product.id,
@@ -87,8 +101,31 @@ export class StoreProductCardComponent {
         product.requiresOptionSelection,
         product.directVariantId ?? null,
       );
+
+      if (result === 'added') {
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('CART.ADDED'),
+          detail: product.title,
+          life: 3000,
+        });
+      }
     } catch {
-      this.addError.set(this.translate.instant('CART.ADD_ERROR'));
+      const message = this.translate.instant('CART.ADD_ERROR');
+      this.addError.set(message);
+      this.messageService.add({ severity: 'error', summary: message, life: 4000 });
     }
+  }
+
+  /** Opens the product's published marketing page (same PDP route, gated by a query param so plain
+   * product clicks always stay on the classic PDP). Never triggered for products without one — the
+   * template only renders this button when `product().hasMarketingPage` is true. */
+  protected openMarketingPage(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    void this.router.navigate(['/products', this.product().id], {
+      queryParams: { view: 'marketing' },
+    });
   }
 }

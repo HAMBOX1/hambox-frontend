@@ -1,0 +1,101 @@
+.campaign-form-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.campaign-form-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.campaign-form-page__field--wide {
+  grid-column: 1 / -1;
+}
+
+.campaign-form-page__theme-status {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.campaign-form-page__theme-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--admin-radius-md, 10px);
+  background: var(--color-warning-muted, rgba(251, 191, 36, 0.12));
+  border: 1px solid var(--color-warning-border, rgba(251, 191, 36, 0.35));
+  color: var(--color-warning, #b45309);
+  font-size: 0.8125rem;
+}
+
+.campaign-form-page__overlap-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--admin-radius-md, 10px);
+  background: var(--color-warning-muted, rgba(251, 191, 36, 0.12));
+  border: 1px solid var(--color-warning-border, rgba(251, 191, 36, 0.35));
+  color: var(--color-warning, #b45309);
+  font-size: 0.8125rem;
+}
+
+.campaign-form-page__live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--theme-success);
+}
+
+.campaign-form-page__overridden-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-warning, #b45309);
+}
+
+.campaign-form-page__empty-history {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.campaign-form-page__history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.campaign-form-page__history li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--hambox-radius-sm);
+  font-size: 0.8125rem;
+}
+
+.campaign-form-page__history-date {
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .campaign-form-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

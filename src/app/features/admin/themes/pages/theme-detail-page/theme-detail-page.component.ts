@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
@@ -12,6 +13,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ThemeEngineService } from '../../../../../core/theme/theme-engine.service';
 import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
@@ -44,6 +46,7 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
     ButtonModule,
     TabsModule,
     ToastModule,
+    TooltipModule,
     AdminPageHeaderComponent,
     AdminErrorAlertComponent,
     AdminLoadingSkeletonComponent,
@@ -63,7 +66,7 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
   styleUrl: './theme-detail-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ThemeDetailPageComponent implements OnInit {
+export class ThemeDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
@@ -98,6 +101,30 @@ export class ThemeDetailPageComponent implements OnInit {
 
   protected readonly latestVersion = computed(() => latestThemeVersion(this.detail()));
 
+  protected readonly previewMode = this.themeEngine.previewMode;
+  protected readonly activeResolution = this.facade.activeResolution;
+
+  /** Human label for the storefront's real resolution source — never recomputed here, just
+   *  translated from the same `resolutionSource` value the backend resolver already returns. */
+  protected readonly activeResolutionLabel = computed(() => {
+    const resolution = this.activeResolution();
+    const theme = this.detail();
+    if (!resolution || !theme || resolution.themeId !== theme.id) {
+      return null;
+    }
+
+    const labels: Record<string, string> = {
+      campaign: this.translate.instant('ADMIN.THEMES.DETAIL.RESOLUTION.CAMPAIGN'),
+      schedule: this.translate.instant('ADMIN.THEMES.DETAIL.RESOLUTION.SCHEDULE'),
+      membership: this.translate.instant('ADMIN.THEMES.DETAIL.RESOLUTION.MEMBERSHIP'),
+      store: this.translate.instant('ADMIN.THEMES.DETAIL.RESOLUTION.STORE'),
+      default: this.translate.instant('ADMIN.THEMES.DETAIL.RESOLUTION.DEFAULT'),
+      preview: this.translate.instant('ADMIN.THEMES.DETAIL.RESOLUTION.PREVIEW'),
+    };
+
+    return labels[resolution.resolutionSource] ?? resolution.resolutionSource;
+  });
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -108,6 +135,17 @@ export class ThemeDetailPageComponent implements OnInit {
     this.facade.loadThemes();
     void this.facade.loadDetail(id);
     void this.facade.loadHistory(id);
+    void this.facade.loadActiveResolution();
+  }
+
+  ngOnDestroy(): void {
+    if (this.themeEngine.previewMode()) {
+      this.themeEngine.deactivatePreview();
+    }
+  }
+
+  protected exitPreview(): void {
+    this.themeEngine.deactivatePreview();
   }
 
   protected onTabChange(value: string | number | undefined): void {
@@ -155,7 +193,17 @@ export class ThemeDetailPageComponent implements OnInit {
         summary: this.translate.instant('ADMIN.THEMES.MESSAGES.PUBLISHED'),
         life: 4000,
       });
+      return;
     }
+
+    // Reload so a concurrency conflict (someone else published in the meantime) shows the
+    // now-current server state instead of the stale one this admin was looking at.
+    await this.facade.loadDetail(id);
+    this.messageService.add({
+      severity: 'error',
+      summary: this.facade.themesError() ?? this.translate.instant('ADMIN.THEMES.MESSAGES.PUBLISH_FAILED'),
+      life: 6000,
+    });
   }
 
   protected async archive(): Promise<void> {
@@ -188,7 +236,14 @@ export class ThemeDetailPageComponent implements OnInit {
         summary: this.translate.instant('ADMIN.THEMES.MESSAGES.ROLLED_BACK'),
         life: 4000,
       });
+      return;
     }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: this.facade.themesError() ?? this.translate.instant('ADMIN.THEMES.MESSAGES.ROLLBACK_FAILED'),
+      life: 6000,
+    });
   }
 
   protected async scheduleTheme(request: {
@@ -240,6 +295,7 @@ export class ThemeDetailPageComponent implements OnInit {
     const session = await this.facade.createPreviewSession(id, this.latestVersion()?.id);
     if (session) {
       await this.themeEngine.activatePreview(session.token);
+      window.open(`/?themePreview=${session.token}`, '_blank', 'noopener');
       this.messageService.add({
         severity: 'info',
         summary: this.translate.instant('ADMIN.THEMES.MESSAGES.PREVIEW_STARTED'),

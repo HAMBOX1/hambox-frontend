@@ -2,7 +2,7 @@
   <button
     type="button"
     class="cart-nav__trigger"
-    aria-label="Cart"
+    [attr.aria-label]="'CART.NAV_LABEL' | translate"
     [attr.aria-expanded]="panelOpen()"
     (click)="togglePanel($event)"
   >
@@ -26,14 +26,14 @@
       }
     </span>
     @if (!compact()) {
-      <span class="cart-nav__label">Cart</span>
+      <span class="cart-nav__label">{{ 'CART.NAV_LABEL' | translate }}</span>
     }
   </button>
 
   @if (panelOpen()) {
-    <div class="cart-nav__panel" role="dialog" aria-label="Mini cart">
+    <div class="cart-nav__panel" role="dialog" [attr.aria-label]="'CART.MINI_CART_ARIA' | translate">
       @if (items().length === 0) {
-        <p class="cart-nav__empty">Your cart is empty.</p>
+        <p class="cart-nav__empty">{{ 'CART.EMPTY_TITLE' | translate }}</p>
       } @else {
         <ul class="cart-nav__items">
           @for (item of items(); track item.id) {
@@ -41,7 +41,7 @@
               <img class="cart-nav__thumb" [src]="item.imageUrl" [alt]="" />
               <div class="cart-nav__item-body">
                 <span class="cart-nav__item-title">{{ item.title }}</span>
-                <span class="cart-nav__item-meta">Qty {{ item.quantity }}</span>
+                <span class="cart-nav__item-meta">{{ 'CART.QTY_LABEL' | translate: { count: item.quantity } }}</span>
               </div>
               <span class="cart-nav__item-price">{{ item.price * item.quantity | hamboxCurrency }}</span>
             </li>
@@ -49,15 +49,15 @@
         </ul>
 
         <div class="cart-nav__total">
-          <span>Total</span>
+          <span>{{ 'CART.TOTAL' | translate }}</span>
           <span>{{ summary().total | hamboxCurrency }}</span>
         </div>
       }
 
       <div class="cart-nav__actions">
-        <a routerLink="/cart" class="cart-nav__link" (click)="closePanel()">View Cart</a>
+        <a routerLink="/cart" class="cart-nav__link" (click)="closePanel()">{{ 'CART.VIEW_CART' | translate }}</a>
         <a routerLink="/checkout" class="cart-nav__link cart-nav__link--primary" (click)="closePanel()">
-          Checkout
+          {{ 'CART.CHECKOUT' | translate }}
         </a>
       </div>
     </div>

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 
 import { MobileViewportService } from '../../../../shared/services/mobile-viewport.service';
 import {
@@ -32,6 +39,7 @@ export class CategoryTreeComponent {
   readonly editCategory = output<Category>();
   readonly deleteCategory = output<Category>();
   readonly addChildCategory = output<string>();
+  readonly manageMarketingPage = output<Category>();
 
   protected readonly tree = this.facade.tree;
   protected readonly loading = this.facade.loading;
@@ -58,6 +66,7 @@ export class CategoryTreeComponent {
     },
     editCategory: (node) => this.editCategory.emit(node),
     deleteCategory: (node) => this.deleteCategory.emit(node),
+    manageMarketingPage: (node) => this.manageMarketingPage.emit(node),
     addChild: (parentId) => this.addChildCategory.emit(parentId),
     onRowDragMoved: (id, pointerPosition) => this.onRowDragMoved(id, pointerPosition),
     onRowDragEnded: (id, pointerPosition) => void this.onRowDragEnded(id, pointerPosition),
@@ -72,7 +81,10 @@ export class CategoryTreeComponent {
     this.dropTargetState.set(this.resolveDropTarget(id, pointerPosition));
   }
 
-  private async onRowDragEnded(id: string, pointerPosition: { x: number; y: number }): Promise<void> {
+  private async onRowDragEnded(
+    id: string,
+    pointerPosition: { x: number; y: number },
+  ): Promise<void> {
     const target = this.resolveDropTarget(id, pointerPosition);
     this.draggingIdState.set(null);
     this.dropTargetState.set(null);
@@ -81,7 +93,12 @@ export class CategoryTreeComponent {
       return;
     }
 
-    const entries = computeReorderEntries(this.facade.flatItems(), id, target.targetId, target.zone);
+    const entries = computeReorderEntries(
+      this.facade.flatItems(),
+      id,
+      target.targetId,
+      target.zone,
+    );
     if (entries.length === 0) {
       return;
     }

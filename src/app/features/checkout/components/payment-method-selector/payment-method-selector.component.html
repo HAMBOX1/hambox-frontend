@@ -1,7 +1,7 @@
-<section class="payment-panel" aria-label="Payment method">
-  <h2 class="payment-panel__title">Payment Method</h2>
+<section class="payment-panel" [attr.aria-label]="'CHECKOUT.PAYMENT' | translate">
+  <h2 class="payment-panel__title">{{ 'CHECKOUT.PAYMENT' | translate }}</h2>
 
-  <div class="payment-panel__methods" role="tablist" aria-label="Payment methods">
+  <div class="payment-panel__methods" role="tablist" [attr.aria-label]="'CHECKOUT.PAYMENT' | translate">
     @for (method of methods(); track method.id) {
       <button
         type="button"
@@ -39,14 +39,14 @@
             </svg>
           }
         }
-        <span>{{ method.label }}</span>
+        <span>{{ method.label | translate }}</span>
       </button>
     }
   </div>
 
   @if (selectedMethod() === 'development') {
     <p class="payment-panel__dev-note">
-      Development checkout is enabled. No card or external payment provider is required.
+      {{ 'CHECKOUT.DEV_NOTE' | translate }}
     </p>
   }
 

@@ -59,8 +59,13 @@ export class MembershipCheckoutFacade {
   readonly submitting = this.submittingState.asReadonly();
   readonly error = this.errorState.asReadonly();
 
+  /**
+   * Only "card" is offered — PayPal/crypto/Apple Pay have no backend integration and would silently
+   * fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real payment.
+   * Do not re-add them here until a real provider exists for each.
+   */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
-    const methods: PaymentMethodId[] = ['card', 'paypal', 'crypto', 'apple-pay'];
+    const methods: PaymentMethodId[] = ['card'];
     if (this.developmentCheckoutEnabledState()) {
       return ['development', ...methods];
     }

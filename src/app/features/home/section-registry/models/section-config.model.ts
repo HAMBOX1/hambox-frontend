@@ -216,14 +216,19 @@ export interface HardwareShowcaseSectionConfig {
   readonly secondaryButtonUrl: string;
 }
 
-/** Figma "Console Favorites" homepage section — a horizontally scrollable row of game-cover cards,
- * one of which can be visually featured (larger, glowing border, visible CTA). Reuses the same
+/** "Console Favorites" homepage section — a horizontal collectible-card showcase of game-cover
+ * artwork, one of which can be visually featured (larger, glowing border). Reuses the same
  * scroll-track + nav-arrow mechanism as `CollectionShowcaseComponent`. */
 export interface ConsoleFavoriteCardConfig {
   readonly id: string;
   readonly imageUrl: string;
   readonly title: string;
-  readonly tags: readonly string[];
+  /** e.g. "PS5" / "Xbox" / "PC" — shown as a small chip over the artwork and in the metadata line. */
+  readonly platform: string;
+  /** e.g. "Racing" / "RPG" — paired with platform as "PS5 • Racing". */
+  readonly genre: string;
+  /** Admin-authored display string (e.g. "$59.99"); blank hides the price, same convention as badgeText. */
+  readonly price: string;
   readonly badgeText: string;
   readonly buttonText: string;
   readonly buttonUrl: string;
@@ -232,6 +237,9 @@ export interface ConsoleFavoriteCardConfig {
 
 export interface ConsoleFavoritesSectionConfig {
   readonly title: string;
+  readonly subtitle: string;
+  readonly viewAllText: string;
+  readonly viewAllUrl: string;
   readonly cards: readonly ConsoleFavoriteCardConfig[];
 }
 

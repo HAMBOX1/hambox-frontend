@@ -4,6 +4,7 @@ import { ProductFacetGroup, ProductSortBy } from '../../catalog/models/product.m
 import { ApiError } from '../../../core/models/api-error.model';
 import { StoreCategoryPill, StoreProduct, StoreSortOption } from '../models/product';
 import { STOREFRONT_SORT_OPTIONS } from '../services/storefront-products-data';
+import { ProductMarketingPageAvailabilityService } from '../services/product-marketing-page-availability.service';
 import { StorefrontProductEnrichmentService } from '../services/storefront-product-enrichment.service';
 import { mapProductToStoreProduct } from '../utils/storefront-product.mapper';
 import { TranslationService } from '../../../core/i18n/translation.service';
@@ -51,7 +52,9 @@ function attributesEqual(
 }
 
 const DEFAULT_PAGE_SIZE = 24;
-const DEFAULT_SECTION = 'games';
+// Must match `ALL_SECTIONS` in `shared/utils/storefront-nav.utils.ts` — "no section chosen" means
+// "show every product," not one of the curated nav tabs' filters (see `matchesSection`).
+const DEFAULT_SECTION = 'all';
 
 export interface StorefrontClientFilters {
   readonly minPrice: number | null;
@@ -79,6 +82,7 @@ export interface StorefrontAppliedFilterChip {
 export class ProductsFacade {
   private readonly productsService = inject(Products);
   private readonly enrichment = inject(StorefrontProductEnrichmentService);
+  private readonly marketingAvailability = inject(ProductMarketingPageAvailabilityService);
   private readonly translation = inject(TranslationService);
 
   private readonly itemsState = signal<readonly StoreProduct[]>([]);
@@ -119,6 +123,7 @@ export class ProductsFacade {
 
   readonly enrichedItems = computed(() => {
     const configurations = this.enrichment.configurations();
+    const marketingAvailable = this.marketingAvailability.available();
 
     return this.itemsState().map((product) => {
       const configuration = configurations[product.id];
@@ -136,6 +141,7 @@ export class ProductsFacade {
         cta: inStock ? product.cta : 'notify-me',
         requiresOptionSelection: productRequiresOptionSelection(configuration),
         directVariantId: resolveDirectCartVariantId(configuration),
+        hasMarketingPage: marketingAvailable.has(product.id),
       };
     });
   });
@@ -244,7 +250,10 @@ export class ProductsFacade {
   }
 
   setClientFilters(filters: StorefrontClientFilters): void {
-    const attributesChanged = !attributesEqual(this.clientFiltersState().attributes, filters.attributes);
+    const attributesChanged = !attributesEqual(
+      this.clientFiltersState().attributes,
+      filters.attributes,
+    );
     this.clientFiltersState.set(filters);
 
     if (attributesChanged) {
@@ -359,6 +368,7 @@ export class ProductsFacade {
       }
 
       void this.enrichment.ensureLoaded(nextItems.map((product) => product.id));
+      void this.marketingAvailability.ensureLoaded(nextItems.map((product) => product.id));
     } catch (error) {
       if (!append) {
         this.itemsState.set([]);
@@ -454,12 +464,21 @@ export class ProductsFacade {
       case 'gift-cards':
         return text.includes('gift');
       case 'subscriptions':
-        return text.includes('subscription') || text.includes('membership') || text.includes('plus');
+        return (
+          text.includes('subscription') || text.includes('membership') || text.includes('plus')
+        );
       case 'deals':
         return Boolean(product.discountLabel);
       case 'games':
+        return (
+          !text.includes('gift') && !text.includes('subscription') && !text.includes('membership')
+        );
+      case DEFAULT_SECTION:
       default:
-        return !text.includes('gift') && !text.includes('subscription') && !text.includes('membership');
+        // No section filter — every generic entry point into /products (breadcrumbs, "back to
+        // store", related products, footer links, …) must show the full catalog, not silently
+        // reuse one nav tab's filter. Unrecognized section values fail open for the same reason.
+        return true;
     }
   }
 

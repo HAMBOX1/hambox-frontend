@@ -142,7 +142,7 @@
   position: absolute;
   z-index: 3;
   top: var(--store-card-media-inset);
-  left: var(--store-card-media-inset);
+  inset-inline-start: var(--store-card-media-inset);
   padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
   border-radius: var(--sf-radius-sm);
   font-family: var(--sf-font-body);
@@ -181,7 +181,7 @@
   position: absolute;
   z-index: 3;
   bottom: calc(var(--store-card-media-inset) + var(--store-card-badge-stack-offset) + 2px);
-  left: var(--store-card-media-inset);
+  inset-inline-start: var(--store-card-media-inset);
   padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
   border-radius: var(--sf-radius-sm);
   background: var(--color-platform-badge-bg);
@@ -211,7 +211,7 @@
   position: absolute;
   z-index: 3;
   top: var(--store-card-media-inset);
-  right: var(--store-card-media-inset);
+  inset-inline-end: var(--store-card-media-inset);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,7 +286,7 @@
   position: absolute;
   z-index: 2;
   bottom: var(--store-card-media-inset);
-  left: var(--store-card-media-inset);
+  inset-inline-start: var(--store-card-media-inset);
   padding: var(--store-card-badge-pad-y) var(--store-card-badge-pad-x);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--sf-radius-sm);
@@ -303,7 +303,7 @@
 .store-card__rating {
   position: absolute;
   z-index: 2;
-  right: var(--store-card-media-inset);
+  inset-inline-end: var(--store-card-media-inset);
   bottom: var(--store-card-media-inset);
   display: inline-flex;
   align-items: center;
@@ -336,7 +336,16 @@
   margin-top: var(--store-card-gap-after-media);
 }
 
+.store-card__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .store-card__title {
+  flex: 1;
+  min-width: 0;
   margin: 0;
   color: var(--color-text-primary);
   font-family: var(--sf-font-heading);
@@ -349,6 +358,38 @@
   -webkit-line-clamp: var(--store-card-title-lines);
   overflow: hidden;
   transition: font-size 0.2s ease;
+}
+
+// Deliberately subtle — a hint that a richer experience exists, not a competing CTA. Sits inline
+// next to the title rather than over the media (already claimed by the wishlist button/badges) or
+// in the footer (already claimed by Buy Now/Add to Cart).
+.store-card__discover {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // Smaller than the wishlist favorite button (--store-card-favorite-size, 38px) on purpose — this
+  // is a quiet secondary hint, not a primary action — while staying a comfortably tappable target.
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--sf-radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  cursor: pointer;
+  transition: var(--hambox-transition-theme);
+
+  &:hover {
+    color: var(--accent);
+    background: var(--color-accent-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
 }
 
 .store-card--out-of-stock .store-card__title {
@@ -443,6 +484,11 @@
   line-height: 1;
   transition: var(--hambox-transition-theme);
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
   &--icon {
     display: flex;
     align-items: center;
@@ -472,7 +518,11 @@
     padding: 0 16px;
     border: 1px solid var(--color-primary-border);
     border-radius: var(--sf-radius-md);
-    background: linear-gradient(180deg, var(--color-cta-cart-bg) 0%, var(--color-cta-gradient-end) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--color-cta-cart-bg) 0%,
+      var(--color-cta-gradient-end) 100%
+    );
     box-shadow: var(--color-cta-cart-shadow);
     color: var(--color-cta-cart-text);
     font-weight: 700;

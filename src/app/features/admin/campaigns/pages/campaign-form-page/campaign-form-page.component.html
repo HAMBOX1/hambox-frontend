@@ -1,0 +1,193 @@
+<p-toast position="top-right" />
+
+<section class="admin-page campaign-form-page">
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton [rows]="6" />
+  } @else if (detailError() && !isCreateMode() && !detail()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  } @else {
+    <app-admin-page-header
+      [title]="isCreateMode() ? ('ADMIN.CAMPAIGNS.FORM.CREATE_TITLE' | translate) : name()"
+      [subtitle]="'ADMIN.CAMPAIGNS.FORM.SUBTITLE' | translate"
+      [breadcrumbs]="breadcrumbs()"
+    >
+      @if (!isCreateMode() && detail(); as d) {
+        <ng-container adminHeaderMeta>
+          <app-admin-status-badge [label]="d.status" [tone]="d.status === 'Published' ? 'success' : d.status === 'Archived' ? 'neutral' : 'info'" />
+          @if (d.phase === 'Active' && d.isResolvedWinner) {
+            <span class="campaign-form-page__live-badge">
+              <i class="pi pi-bolt"></i>
+              {{ 'ADMIN.CAMPAIGNS.FORM.LIVE_VIA' | translate: { name: d.name } }}
+            </span>
+          } @else if (d.phase === 'Active' && d.overriddenByCampaignName) {
+            <span class="campaign-form-page__overridden-badge">
+              <i class="pi pi-eye-slash"></i>
+              {{ 'ADMIN.CAMPAIGNS.FORM.OVERRIDDEN_VIA' | translate: { name: d.overriddenByCampaignName } }}
+            </span>
+          }
+        </ng-container>
+      }
+
+      @if (previewMode()) {
+        <button
+          adminHeaderActions
+          pButton
+          type="button"
+          class="p-button-outlined"
+          [label]="'ADMIN.CAMPAIGNS.ACTIONS.EXIT_PREVIEW' | translate"
+          icon="pi pi-eye-slash"
+          (click)="exitPreview()"
+        ></button>
+      }
+    </app-admin-page-header>
+
+    @if (!isCreateMode() && detail(); as d) {
+      @if (d.hasOverlap) {
+        <p class="campaign-form-page__overlap-banner">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ 'ADMIN.CAMPAIGNS.FORM.OVERLAP_HINT' | translate }}
+        </p>
+      }
+    }
+
+    <app-admin-section-card [title]="'ADMIN.CAMPAIGNS.FORM.DETAILS' | translate">
+      <div class="campaign-form-page__grid">
+        <label class="campaign-form-page__field">
+          <span>{{ 'ADMIN.CAMPAIGNS.FORM.NAME' | translate }}</span>
+          <input pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required />
+        </label>
+        <label class="campaign-form-page__field campaign-form-page__field--wide">
+          <span>{{ 'ADMIN.CAMPAIGNS.FORM.DESCRIPTION' | translate }}</span>
+          <textarea pTextarea rows="2" [ngModel]="description()" (ngModelChange)="description.set($event)" name="description"></textarea>
+        </label>
+      </div>
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.CAMPAIGNS.FORM.THEME' | translate">
+      <app-theme-picker [value]="selectedThemeIds()" (valueChange)="onThemeSelectionChange($event)" />
+      @if (!isCreateMode() && detail(); as d) {
+        <p class="campaign-form-page__theme-status">
+          {{ 'ADMIN.CAMPAIGNS.FORM.SELECTED_THEME_STATUS' | translate: { status: d.themeStatus } }}
+        </p>
+        @if (themeNotPublishable()) {
+          <p class="campaign-form-page__theme-warning">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ 'ADMIN.CAMPAIGNS.FORM.THEME_NOT_PUBLISHABLE' | translate }}
+          </p>
+        }
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.CAMPAIGNS.FORM.SCHEDULE' | translate">
+      <div class="campaign-form-page__grid">
+        <label class="campaign-form-page__field">
+          <span>{{ 'ADMIN.CAMPAIGNS.FORM.STARTS' | translate }}</span>
+          <input pInputText type="datetime-local" [ngModel]="startsAt()" (ngModelChange)="startsAt.set($event)" name="startsAt" required />
+        </label>
+        <label class="campaign-form-page__field">
+          <span>{{ 'ADMIN.CAMPAIGNS.FORM.ENDS' | translate }}</span>
+          <input pInputText type="datetime-local" [ngModel]="endsAt()" (ngModelChange)="endsAt.set($event)" name="endsAt" required />
+        </label>
+        <label class="campaign-form-page__field">
+          <span>{{ 'ADMIN.CAMPAIGNS.FORM.PRIORITY' | translate }}</span>
+          <p-inputNumber [ngModel]="priority()" (ngModelChange)="priority.set($event ?? 0)" name="priority" [showButtons]="true" [min]="0" />
+        </label>
+      </div>
+    </app-admin-section-card>
+
+    @if (!isCreateMode()) {
+      <app-admin-section-card [title]="'ADMIN.CAMPAIGNS.FORM.HISTORY' | translate">
+        @if (history().length === 0) {
+          <p class="campaign-form-page__empty-history">{{ 'ADMIN.CAMPAIGNS.FORM.NO_HISTORY' | translate }}</p>
+        } @else {
+          <ul class="campaign-form-page__history">
+            @for (entry of history(); track entry.id) {
+              <li>
+                <strong>{{ ('ADMIN.CAMPAIGNS.HISTORY_ACTION.' + entry.action.toUpperCase()) | translate }}</strong>
+                <span class="campaign-form-page__history-date">{{ entry.createdOnUtc | date: 'medium' }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </app-admin-section-card>
+    }
+
+    <app-admin-sticky-save-bar>
+      <a pButton class="p-button-text" routerLink="/admin/campaigns" [label]="'ADMIN.CAMPAIGNS.ACTIONS.CANCEL' | translate"></a>
+
+      @if (!isCreateMode()) {
+        <button
+          *hamboxHasPermission="permissions.Campaigns.View"
+          pButton
+          type="button"
+          class="p-button-outlined"
+          [label]="'ADMIN.CAMPAIGNS.ACTIONS.PREVIEW' | translate"
+          icon="pi pi-eye"
+          [disabled]="actionLoading()"
+          (click)="startPreview()"
+        ></button>
+
+        @if (detail()?.isEnabled) {
+          <button
+            *hamboxHasPermission="permissions.Campaigns.Edit"
+            pButton
+            type="button"
+            class="p-button-outlined"
+            [label]="'ADMIN.CAMPAIGNS.ACTIONS.DISABLE' | translate"
+            icon="pi pi-pause"
+            [disabled]="actionLoading()"
+            (click)="disable()"
+          ></button>
+        } @else {
+          <button
+            *hamboxHasPermission="permissions.Campaigns.Edit"
+            pButton
+            type="button"
+            class="p-button-outlined"
+            [label]="'ADMIN.CAMPAIGNS.ACTIONS.ENABLE' | translate"
+            icon="pi pi-play"
+            [disabled]="actionLoading()"
+            (click)="enable()"
+          ></button>
+        }
+
+        @if (detail()?.status !== 'Archived') {
+          <button
+            *hamboxHasPermission="permissions.Campaigns.Edit"
+            pButton
+            type="button"
+            class="p-button-outlined"
+            [label]="'ADMIN.CAMPAIGNS.ACTIONS.ARCHIVE' | translate"
+            icon="pi pi-inbox"
+            [disabled]="actionLoading()"
+            (click)="archive()"
+          ></button>
+        }
+      }
+
+      <button
+        pButton
+        type="button"
+        class="p-button-outlined"
+        [label]="'ADMIN.CAMPAIGNS.ACTIONS.SAVE' | translate"
+        icon="pi pi-check"
+        [loading]="detailSaving()"
+        (click)="save()"
+      ></button>
+
+      @if (canPublish()) {
+        <button
+          *hamboxHasPermission="permissions.Campaigns.Publish"
+          pButton
+          type="button"
+          class="admin-btn-primary"
+          [label]="'ADMIN.CAMPAIGNS.ACTIONS.PUBLISH' | translate"
+          icon="pi pi-send"
+          [pTooltip]="themeNotPublishable() ? ('ADMIN.CAMPAIGNS.FORM.THEME_NOT_PUBLISHABLE' | translate) : ''"
+          [disabled]="actionLoading() || detailSaving() || themeNotPublishable()"
+          (click)="publish()"
+        ></button>
+      }
+    </app-admin-sticky-save-bar>
+  }
+</section>

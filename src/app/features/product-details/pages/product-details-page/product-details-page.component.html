@@ -4,175 +4,248 @@
   @if (isPreview()) {
     <div class="pdp__preview-banner" role="status">
       <i class="pi pi-eye" aria-hidden="true"></i>
-      Preview mode — this is how the product will look once published. Purchasing is disabled.
+      {{ 'PRODUCT.PREVIEW_BANNER' | translate }}
     </div>
   }
 
-  <main class="pdp__main">
-    @if (loading()) {
-      <app-loading-skeleton type="detail" [count]="1" />
-    } @else if (error() || !product()) {
-      <app-empty-state
-        icon="pi pi-exclamation-triangle"
-        title="Product unavailable"
-        [description]="error() ?? 'This product could not be found.'"
-        actionLabel="Back to store"
-        actionIcon="pi pi-arrow-left"
-        (action)="backToStore()"
-      />
-    } @else {
-      <nav class="pdp__breadcrumb" aria-label="Breadcrumb">
-        <a routerLink="/home" class="pdp__crumb pdp__crumb--link">Home</a>
-        <span class="pdp__crumb-sep" aria-hidden="true">›</span>
-        <a routerLink="/products" class="pdp__crumb pdp__crumb--link">Products</a>
-        <span class="pdp__crumb-sep" aria-hidden="true">›</span>
-        <span class="pdp__crumb pdp__crumb--current" aria-current="page">{{ product()!.title }}</span>
-      </nav>
+  @if (marketingContext(); as ctx) {
+    <!-- Published Product Marketing Page — full-width sections, same renderer/container pattern as
+         the homepage (no PDP-style boxed panel). Purchasing happens via the sections' own CTAs
+         (Hero/Promo buttons fall back to this product's real PDP URL when left blank by the admin —
+         see targetProduct fallback in the Hero variants) or the always-available mobile buy bar. -->
+    <main class="pdp__main pdp__main--marketing">
+      @for (section of marketingSections(); track section.instanceId; let first = $first) {
+        <app-section-renderer [entry]="section" [context]="ctx" [isFirst]="first" />
+      }
+    </main>
+  } @else {
+    <main class="pdp__main">
+      @if (loading()) {
+        <app-loading-skeleton type="detail" [count]="1" />
+      } @else if (error() || !product()) {
+        <app-empty-state
+          icon="pi pi-exclamation-triangle"
+          [title]="'PRODUCT.UNAVAILABLE_TITLE' | translate"
+          [description]="error() ?? ('PRODUCT.UNAVAILABLE_TEXT' | translate)"
+          [actionLabel]="'PRODUCT.BACK_TO_STORE' | translate"
+          actionIcon="pi pi-arrow-left"
+          (action)="backToStore()"
+        />
+      } @else {
+        <nav class="pdp__breadcrumb" [attr.aria-label]="'PRODUCT.BREADCRUMB_ARIA' | translate">
+          <a routerLink="/home" class="pdp__crumb pdp__crumb--link">{{
+            'PRODUCT.BREADCRUMB_HOME' | translate
+          }}</a>
+          <span class="pdp__crumb-sep" aria-hidden="true">›</span>
+          <a routerLink="/products" class="pdp__crumb pdp__crumb--link">{{
+            'PRODUCT.BREADCRUMB_PRODUCTS' | translate
+          }}</a>
+          <span class="pdp__crumb-sep" aria-hidden="true">›</span>
+          <span class="pdp__crumb pdp__crumb--current" aria-current="page">{{
+            product()!.title
+          }}</span>
+        </nav>
 
-      <div class="pdp__product">
-        <section class="pdp__gallery" aria-label="Product images">
-          <div class="pdp__hero-image">
-            <img [src]="activeGalleryImage()" [alt]="product()!.title" />
-            <span class="pdp__badge">INSTANT DELIVERY</span>
-          </div>
-          @if (product()!.galleryImages.length > 1) {
-            <div class="pdp__thumbs">
-              @for (image of product()!.galleryImages; track image; let i = $index) {
-                <button
-                  type="button"
-                  class="pdp__thumb"
-                  [class.pdp__thumb--active]="selectedImageIndex() === i"
-                  [attr.aria-label]="'Product image ' + (i + 1)"
-                  (click)="selectGalleryImage(i)"
-                >
-                  <img [src]="image" alt="" />
-                </button>
+        <div class="pdp__product">
+          <section class="pdp__gallery" [attr.aria-label]="'PRODUCT.GALLERY_ARIA' | translate">
+            <div class="pdp__hero-image">
+              <img [src]="activeGalleryImage()" [alt]="product()!.title" />
+              <span class="pdp__badge">{{ 'PRODUCT.INSTANT_DELIVERY_BADGE' | translate }}</span>
+            </div>
+            @if (product()!.galleryImages.length > 1) {
+              <div class="pdp__thumbs">
+                @for (image of product()!.galleryImages; track image; let i = $index) {
+                  <button
+                    type="button"
+                    class="pdp__thumb"
+                    [class.pdp__thumb--active]="selectedImageIndex() === i"
+                    [attr.aria-label]="'PRODUCT.GALLERY_IMAGE_ARIA' | translate: { index: i + 1 }"
+                    (click)="selectGalleryImage(i)"
+                  >
+                    <img [src]="image" alt="" />
+                  </button>
+                }
+              </div>
+            }
+          </section>
+
+          <section class="pdp__details" aria-labelledby="pdp-title">
+            <div class="pdp__title-row">
+              <h1 id="pdp-title" class="pdp__title">{{ product()!.title }}</h1>
+              @if (product()!.rating !== undefined) {
+                <div class="pdp__rating">
+                  <span class="pdp__rating-value">{{ product()!.rating }}</span>
+                  <span class="pdp__rating-count">({{ product()!.reviewCount }})</span>
+                </div>
               }
             </div>
-          }
-        </section>
 
-        <section class="pdp__details" aria-labelledby="pdp-title">
-          <div class="pdp__title-row">
-            <h1 id="pdp-title" class="pdp__title">{{ product()!.title }}</h1>
-            <div class="pdp__rating">
-              <span class="pdp__rating-value">{{ product()!.rating }}</span>
-              <span class="pdp__rating-count">({{ product()!.reviewCount }})</span>
-            </div>
-          </div>
+            <p class="pdp__description">{{ product()!.description }}</p>
 
-          <p class="pdp__description">{{ product()!.description }}</p>
+            <ng-container [ngTemplateOutlet]="purchaseCore" />
 
-          <div class="pdp__pricing">
-            <span class="pdp__price">{{ displayPrice() | hamboxCurrency }}</span>
-            @if (displayComparePrice() > displayPrice()) {
-              <span class="pdp__original">{{ displayComparePrice() | hamboxCurrency }}</span>
-            }
-            @if (product()!.discountLabel && !hasVariants()) {
-              <span class="pdp__discount">{{ product()!.discountLabel }}</span>
-            }
-          </div>
-
-          <p class="pdp__stock" [class.pdp__stock--danger]="stockLabel() === 'Out of Stock'">
-            {{ stockLabel() }}
-            @if (resolvedVariant().sku) {
-              <span class="pdp__sku">SKU: {{ resolvedVariant().sku }}</span>
-            }
-          </p>
-
-          <p class="pdp__delivery">
-            <i class="pi pi-bolt" aria-hidden="true"></i>
-            Estimated delivery: <strong>Instant</strong> after payment
-          </p>
-
-          <div class="pdp__options">
-            @if (variantConfigLoading()) {
-              <app-loading-skeleton type="detail" [count]="2" />
-            } @else if (variantConfigError()) {
-              <p class="pdp__config-error" role="alert">{{ variantConfigError() }}</p>
-            } @else if (hasVariants() && configuration()) {
-              @for (group of variantFacade.visibleGroups(); track group.id) {
-                <app-variant-option-group
-                  [groupLabel]="group.displayName"
-                  [options]="variantFacade.optionsForGroup(group)"
-                  [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
-                  (optionSelected)="onOptionChange(group.id, $event)"
-                />
+            <ul class="pdp__trust">
+              @for (feature of product()!.trustFeatures; track feature.label) {
+                <li class="pdp__trust-item">
+                  <img [src]="feature.iconSrc" alt="" aria-hidden="true" />
+                  <span>{{ feature.label }}</span>
+                </li>
               }
-            } @else if (variantFacade.hasOptionGroups()) {
-              <p class="pdp__config-hint">Variants for this product are being configured. Check back soon.</p>
-            }
-          </div>
+            </ul>
+          </section>
+        </div>
 
-          @if (product()?.isMembersOnly && !canPurchase()) {
-            <div class="pdp__membership-gate">
-              <i class="pi pi-lock" aria-hidden="true"></i>
-              <span>{{ 'PRODUCT.UPGRADE_TO_UNLOCK' | translate: { plans: product()!.requiredPlanNames.join(' / ') } }}</span>
-              <a routerLink="/checkout/membership" class="pdp__membership-gate-cta">{{ 'PRODUCT.UPGRADE_CTA' | translate }}</a>
-            </div>
-          } @else if (product()?.publicReleaseOnUtc && !canPurchase()) {
-            <div class="pdp__membership-gate">
-              <i class="pi pi-clock" aria-hidden="true"></i>
-              <span>{{ 'PRODUCT.AVAILABLE_ON' | translate: { date: (product()!.publicReleaseOnUtc | date: 'mediumDate') } }}</span>
-            </div>
-          } @else if (product()?.publicReleaseOnUtc && canPurchase()) {
-            <div class="pdp__membership-gate pdp__membership-gate--positive">
-              <i class="pi pi-verified" aria-hidden="true"></i>
-              <span>{{ 'PRODUCT.EARLY_ACCESS_AVAILABLE' | translate }}</span>
-            </div>
-          }
-
-          <div class="pdp__actions">
-            <button type="button" class="pdp__cta pdp__cta--cart" [disabled]="!canPurchase()" (click)="addToCart()">
-              <img [src]="cartIconSrc" alt="" aria-hidden="true" />
-              Add to Cart
-            </button>
-            <button type="button" class="pdp__cta pdp__cta--buy" [disabled]="!canPurchase()" (click)="buyNow()">Buy Now</button>
-            <button type="button" class="pdp__cta pdp__cta--wishlist" [disabled]="isPreview()" (click)="addToWishlist()">
-              <i class="pi pi-heart" aria-hidden="true"></i>
-              Save to Vault
-            </button>
-          </div>
-          @if (wishlistActionMessage()) {
-            <p class="pdp__action-message">{{ wishlistActionMessage() }}</p>
-          }
-
-          @if (cartActionError()) {
-            <p class="pdp__cart-error" role="alert">{{ cartActionError() }}</p>
-          }
-
-          <ul class="pdp__trust">
-            @for (feature of product()!.trustFeatures; track feature.label) {
-              <li class="pdp__trust-item">
-                <img [src]="feature.iconSrc" alt="" aria-hidden="true" />
-                <span>{{ feature.label }}</span>
+        <section class="pdp__redeem" aria-labelledby="pdp-redeem-title">
+          <h2 id="pdp-redeem-title" class="pdp__redeem-title">
+            {{ 'PRODUCT.HOW_TO_REDEEM' | translate }}
+          </h2>
+          <p class="pdp__redeem-subtitle">
+            {{ 'PRODUCT.REDEEM_SUBTITLE' | translate }}
+          </p>
+          <ol class="pdp__steps">
+            @for (step of product()!.redeemSteps; track step.id) {
+              <li class="pdp__step">
+                <h3 class="pdp__step-title">{{ step.title }}</h3>
+                <p class="pdp__step-text">{{ step.description }}</p>
               </li>
             }
-          </ul>
+          </ol>
         </section>
-      </div>
+      }
+    </main>
 
-      <section class="pdp__redeem" aria-labelledby="pdp-redeem-title">
-        <h2 id="pdp-redeem-title" class="pdp__redeem-title">How to Redeem</h2>
-        <p class="pdp__redeem-subtitle">
-          Follow these simple steps to access your digital purchase after checkout.
-        </p>
-        <ol class="pdp__steps">
-          @for (step of product()!.redeemSteps; track step.id) {
-            <li class="pdp__step">
-              <h3 class="pdp__step-title">{{ step.title }}</h3>
-              <p class="pdp__step-text">{{ step.description }}</p>
-            </li>
+    @if (relatedProducts().length > 0) {
+      <section class="pdp__related" aria-labelledby="pdp-related-title">
+        <h2 id="pdp-related-title" class="pdp__related-title">
+          {{ 'PRODUCT.MORE_FROM_CATEGORY' | translate }}
+        </h2>
+        <div class="pdp__related-grid">
+          @for (related of relatedProducts(); track related.id) {
+            <app-store-product-card [product]="related" />
           }
-        </ol>
+        </div>
       </section>
     }
-  </main>
+  }
 
+  <!-- Purchase controls (price, variant picker, buy buttons) — shared by the normal PDP and the
+       Product Marketing Page's buy panel above, so there is exactly one purchase implementation. -->
+  <ng-template #purchaseCore>
+    <div class="pdp__pricing">
+      <span class="pdp__price">{{ displayPrice() | hamboxCurrency }}</span>
+      @if (displayComparePrice() > displayPrice()) {
+        <span class="pdp__original">{{ displayComparePrice() | hamboxCurrency }}</span>
+      }
+      @if (product()!.discountLabel && !hasVariants()) {
+        <span class="pdp__discount">{{ product()!.discountLabel }}</span>
+      }
+    </div>
+
+    @let stock = stockLabel();
+    <p class="pdp__stock" [class.pdp__stock--danger]="stock.isOutOfStock">
+      {{ stock.key | translate: stock.params }}
+      @if (resolvedVariant().sku) {
+        <span class="pdp__sku">{{
+          'PRODUCT.SKU_LABEL' | translate: { sku: resolvedVariant().sku }
+        }}</span>
+      }
+    </p>
+
+    <p class="pdp__delivery">
+      <i class="pi pi-bolt" aria-hidden="true"></i>
+      {{ 'PRODUCT.DELIVERY_ESTIMATE' | translate }}
+    </p>
+
+    <div class="pdp__options">
+      @if (variantConfigLoading()) {
+        <app-loading-skeleton type="detail" [count]="2" />
+      } @else if (variantConfigError()) {
+        <p class="pdp__config-error" role="alert">{{ variantConfigError() }}</p>
+      } @else if (hasVariants() && configuration()) {
+        @for (group of variantFacade.visibleGroups(); track group.id) {
+          <app-variant-option-group
+            [groupLabel]="group.displayName"
+            [options]="variantFacade.optionsForGroup(group)"
+            [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
+            (optionSelected)="onOptionChange(group.id, $event)"
+          />
+        }
+      } @else if (variantFacade.hasOptionGroups()) {
+        <p class="pdp__config-hint">{{ 'PRODUCT.VARIANTS_CONFIGURING' | translate }}</p>
+      }
+    </div>
+
+    @if (product()?.isMembersOnly && !canPurchase()) {
+      <div class="pdp__membership-gate">
+        <i class="pi pi-lock" aria-hidden="true"></i>
+        <span>{{
+          'PRODUCT.UPGRADE_TO_UNLOCK'
+            | translate: { plans: product()!.requiredPlanNames.join(' / ') }
+        }}</span>
+        <a routerLink="/checkout/membership" class="pdp__membership-gate-cta">{{
+          'PRODUCT.UPGRADE_CTA' | translate
+        }}</a>
+      </div>
+    } @else if (product()?.publicReleaseOnUtc && !canPurchase()) {
+      <div class="pdp__membership-gate">
+        <i class="pi pi-clock" aria-hidden="true"></i>
+        <span>{{
+          'PRODUCT.AVAILABLE_ON'
+            | translate: { date: (product()!.publicReleaseOnUtc | date: 'mediumDate') }
+        }}</span>
+      </div>
+    } @else if (product()?.publicReleaseOnUtc && canPurchase()) {
+      <div class="pdp__membership-gate pdp__membership-gate--positive">
+        <i class="pi pi-verified" aria-hidden="true"></i>
+        <span>{{ 'PRODUCT.EARLY_ACCESS_AVAILABLE' | translate }}</span>
+      </div>
+    }
+
+    <div class="pdp__actions">
+      <button
+        type="button"
+        class="pdp__cta pdp__cta--cart"
+        [disabled]="!canPurchase()"
+        (click)="addToCart()"
+      >
+        <img [src]="cartIconSrc" alt="" aria-hidden="true" />
+        {{ 'PRODUCT.ADD_TO_CART' | translate }}
+      </button>
+      <button
+        type="button"
+        class="pdp__cta pdp__cta--buy"
+        [disabled]="!canPurchase()"
+        (click)="buyNow()"
+      >
+        {{ 'PRODUCT.BUY_NOW' | translate }}
+      </button>
+      <button
+        type="button"
+        class="pdp__cta pdp__cta--wishlist"
+        [disabled]="isPreview()"
+        (click)="addToWishlist()"
+      >
+        <i class="pi pi-heart" aria-hidden="true"></i>
+        {{ 'PRODUCT.ADD_TO_WISHLIST' | translate }}
+      </button>
+    </div>
+    @if (wishlistActionMessage()) {
+      <p class="pdp__action-message">{{ wishlistActionMessage() }}</p>
+    }
+
+    @if (cartActionError()) {
+      <p class="pdp__cart-error" role="alert">{{ cartActionError() }}</p>
+    }
+  </ng-template>
+
+  <!-- Persistent buy bar — desktop and mobile alike, so purchasing never requires scrolling back up
+       (marketing pages have no other always-visible purchase control). Add to Cart only: with most
+       products requiring variant selection, a "fast" Buy Now here would just redirect to this same
+       page, same as any other click — see the product card's own Buy Now removal for the same reason. -->
   @if (product() && !loading() && !error()) {
-    <aside class="pdp__mobile-bar" aria-label="Purchase actions">
+    <aside class="pdp__mobile-bar" [attr.aria-label]="'PRODUCT.PURCHASE_ACTIONS_ARIA' | translate">
       <div class="pdp__mobile-bar-price">
-        <span class="pdp__mobile-bar-label">Price</span>
+        <span class="pdp__mobile-bar-label">{{ 'PRODUCT.PRICE_LABEL' | translate }}</span>
         <strong>{{ displayPrice() | hamboxCurrency }}</strong>
       </div>
       <div class="pdp__mobile-bar-actions">
@@ -182,15 +255,7 @@
           [disabled]="!canPurchase()"
           (click)="addToCart()"
         >
-          Add to Cart
-        </button>
-        <button
-          type="button"
-          class="pdp__mobile-bar-btn pdp__mobile-bar-btn--buy"
-          [disabled]="!canPurchase()"
-          (click)="buyNow()"
-        >
-          Buy Now
+          {{ 'PRODUCT.ADD_TO_CART' | translate }}
         </button>
       </div>
     </aside>

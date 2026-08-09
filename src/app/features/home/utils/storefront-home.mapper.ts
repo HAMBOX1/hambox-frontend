@@ -98,7 +98,9 @@ export function mapProductToTrendingRank(
 export function mapProductToTrendingValue(product: Product, lang: SupportedLanguageId): TrendingValueItem {
   return {
     id: product.id,
-    badge: 'BEST VALUE',
+    // Sourced from the newest-arrivals query, not a real "best value" comparison — keep this
+    // badge to a claim the data actually backs (see CLAUDE.md's never-invent-savings/popularity rule).
+    badge: 'NEW',
     title: resolveLocalizedText(product.nameEn, product.nameAr, lang),
     subtitle: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     priceUsd: product.price,
@@ -110,7 +112,7 @@ export function mapProductToFeaturedProduct(
   product: Product,
   lang: SupportedLanguageId,
   index = 0,
-  badge = "EDITOR'S CHOICE",
+  badge = 'FEATURED',
   ctaLabel = 'View Product',
 ): StorefrontFeaturedProduct {
   return {

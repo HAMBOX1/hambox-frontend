@@ -45,6 +45,10 @@ export class CategoryApiService {
     return this.api.get<Category>(CATALOG_API.category(id));
   }
 
+  getCategoryBySlug(slug: string): Observable<Category> {
+    return this.api.get<Category>(CATALOG_API.categoryBySlug(slug));
+  }
+
   getCategoryTree(): Observable<readonly CategoryTreeItem[]> {
     return this.api.get<readonly CategoryTreeItem[]>(CATALOG_API.categoriesTree);
   }
@@ -73,7 +77,10 @@ export class CategoryApiService {
     const formData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post<{ imageUrl: string }>(this.resolveUrl(CATALOG_API.categoryImage(categoryId)), formData);
+    return this.http.post<{ imageUrl: string }>(
+      this.resolveUrl(CATALOG_API.categoryImage(categoryId)),
+      formData,
+    );
   }
 
   removeCategoryImage(categoryId: string): Observable<void> {

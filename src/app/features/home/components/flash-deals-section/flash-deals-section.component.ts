@@ -12,12 +12,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { interval } from 'rxjs';
 import { FlashDealCardComponent } from '../../../../shared/components/flash-deal-card/flash-deal-card.component';
+import { ScrollRevealDirective } from '../../../../shared/directives/scroll-reveal.directive';
 import { FlashDeal } from '../../models/storefront-home';
+import { computeRemainingSeconds } from '../../../../shared/utils/countdown.util';
 
 @Component({
   selector: 'app-flash-deals-section',
   standalone: true,
-  imports: [FlashDealCardComponent, RouterLink],
+  imports: [FlashDealCardComponent, RouterLink, ScrollRevealDirective],
   templateUrl: './flash-deals-section.component.html',
   styleUrl: './flash-deals-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +29,7 @@ export class FlashDealsSectionComponent implements OnInit {
 
   deals = input.required<readonly FlashDeal[]>();
   initialCountdownSeconds = input.required<number>();
+  countdownDateUtc = input<string | null>(null);
   sectionTitle = input('Flash Deals');
   sectionSubtitle = input('');
   countdownEnabled = input(true);
@@ -49,11 +52,17 @@ export class FlashDealsSectionComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.countdownSeconds.set(this.initialCountdownSeconds());
+    const deadline = this.countdownDateUtc();
+    this.countdownSeconds.set(computeRemainingSeconds(deadline, this.initialCountdownSeconds()));
 
     interval(1000)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        if (deadline) {
+          this.countdownSeconds.set(computeRemainingSeconds(deadline, 0));
+          return;
+        }
+
         const next = this.countdownSeconds();
         if (next > 0) {
           this.countdownSeconds.set(next - 1);

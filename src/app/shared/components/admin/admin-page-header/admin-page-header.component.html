@@ -1,19 +1,20 @@
 <header class="admin-page-header">
-  @if (breadcrumbs().length > 0) {
-    <app-admin-breadcrumb class="admin-page-header__breadcrumb" [items]="breadcrumbs()" />
-  }
-
   <div
     class="admin-page-header__row"
     [class.admin-page-header__row--compact]="compactActions()"
     [class.admin-page-header__row--stacked]="stackedActions()"
   >
-    @if (backLink()) {
-      <a class="admin-page-header__back" [routerLink]="backLink()!">
-        <i class="pi pi-arrow-left" aria-hidden="true"></i>
-        <span>{{ backLabel() }}</span>
-      </a>
-    }
+    <div class="admin-page-header__start">
+      @if (breadcrumbs().length > 0) {
+        <app-admin-breadcrumb class="admin-page-header__breadcrumb" [items]="breadcrumbs()" />
+      }
+      @if (backLink()) {
+        <a class="admin-page-header__back" [routerLink]="backLink()!">
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+          <span>{{ backLabel() }}</span>
+        </a>
+      }
+    </div>
 
     <div class="admin-page-header__actions">
       <ng-content select="[adminHeaderActions]" />

@@ -24,8 +24,8 @@
 
     <main class="storefront-home__main">
       @if (renderContext(); as ctx) {
-        @for (entry of sections(); track entry.instanceId) {
-          <app-section-renderer [entry]="entry" [context]="ctx" />
+        @for (entry of sections(); track entry.instanceId; let first = $first) {
+          <app-section-renderer [entry]="entry" [context]="ctx" [isFirst]="first" />
         }
       }
     </main>

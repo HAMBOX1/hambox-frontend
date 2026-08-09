@@ -111,8 +111,7 @@
           <div class="activity-table__head">
             <span>{{ 'ACCOUNT.DASHBOARD_UI.TRANSACTION' | translate }}</span>
             <span>{{ 'ACCOUNT.DASHBOARD_UI.DATE' | translate }}</span>
-            <span>{{ 'ACCOUNT.DASHBOARD_UI.STATUS' | translate }}</span>
-            <span>{{ 'ACCOUNT.DASHBOARD_UI.VALUE' | translate }}</span>
+            <span>{{ 'ACCOUNT.DASHBOARD_UI.TYPE' | translate }}</span>
           </div>
           @for (item of recentActivity(); track item.title + item.occurredOnUtc) {
             <div class="activity-table__row">
@@ -121,7 +120,6 @@
                 <p>{{ item.description }}</p>
               </div>
               <span>{{ item.occurredOnUtc | hamboxDate:'MMM d, y' }}</span>
-              <span class="activity-table__status">{{ 'ACCOUNT.DASHBOARD_UI.COMPLETED' | translate }}</span>
               <span>{{ activityTypeLabel(item.type) }}</span>
             </div>
           }

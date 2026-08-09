@@ -9,7 +9,7 @@ import { ThemeService } from '../../../core/theme/theme.service';
   standalone: true,
   imports: [TranslatePipe],
   template: `
-    @if (!themeEngine.hasActiveMembershipTheme()) {
+    @if (!themeEngine.hasActiveTokenOverride()) {
       <button
         type="button"
         class="theme-toggle"

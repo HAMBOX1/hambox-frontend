@@ -3,6 +3,7 @@ export const CATALOG_API = {
   categoriesTree: '/api/v1/categories/tree',
   categoriesReorder: '/api/v1/categories/reorder',
   category: (id: string) => `/api/v1/categories/${id}`,
+  categoryBySlug: (slug: string) => `/api/v1/categories/by-slug/${slug}`,
   categoryRestore: (id: string) => `/api/v1/categories/${id}/restore`,
   categoryImage: (id: string) => `/api/v1/categories/${id}/image`,
   collections: '/api/v1/collections',
@@ -25,14 +26,18 @@ export const CATALOG_API = {
   productsBulkDuplicate: '/api/v1/products/bulk-duplicate',
   productsBulkExport: '/api/v1/products/bulk-export',
   productImages: (productId: string) => `/api/v1/products/${productId}/images`,
-  productImage: (productId: string, imageId: string) => `/api/v1/products/${productId}/images/${imageId}`,
+  productImage: (productId: string, imageId: string) =>
+    `/api/v1/products/${productId}/images/${imageId}`,
   productImagePrimary: (productId: string, imageId: string) =>
     `/api/v1/products/${productId}/images/${imageId}/primary`,
   productImagesReorder: (productId: string) => `/api/v1/products/${productId}/images/reorder`,
   productInstructions: (productId: string) => `/api/v1/products/${productId}/instructions`,
-  productInstructionsPublish: (productId: string) => `/api/v1/products/${productId}/instructions/publish`,
-  productInstructionsUnpublish: (productId: string) => `/api/v1/products/${productId}/instructions/unpublish`,
-  productInstructionsImages: (productId: string) => `/api/v1/products/${productId}/instructions/images`,
+  productInstructionsPublish: (productId: string) =>
+    `/api/v1/products/${productId}/instructions/publish`,
+  productInstructionsUnpublish: (productId: string) =>
+    `/api/v1/products/${productId}/instructions/unpublish`,
+  productInstructionsImages: (productId: string) =>
+    `/api/v1/products/${productId}/instructions/images`,
   storefrontContent: '/api/v1/storefront/content',
   storefrontProductConfiguration: (productId: string) =>
     `/api/v1/storefront/products/${productId}/configuration`,
@@ -43,6 +48,10 @@ export const CATALOG_API = {
 export const PAGE_BUILDER_API = {
   published: '/api/v1/page-builder/published',
   publishedFooter: '/api/v1/page-builder/published/footer',
+  publishedForProduct: (productId: string) => `/api/v1/page-builder/published/product/${productId}`,
+  publishedForCategory: (categoryId: string) =>
+    `/api/v1/page-builder/published/category/${categoryId}`,
+  productAvailability: '/api/v1/page-builder/published/product/availability',
   templates: '/api/v1/page-builder/templates',
   template: (id: string) => `/api/v1/page-builder/templates/${id}`,
   templateDraft: (id: string) => `/api/v1/page-builder/templates/${id}/draft`,
@@ -71,7 +80,8 @@ export const INVENTORY_API = {
     `/api/v1/inventory/products/${productId}/variants/generate`,
   bulkUpdateProductVariants: (productId: string) =>
     `/api/v1/inventory/products/${productId}/variants/bulk-update`,
-  activateProductVariants: (productId: string) => `/api/v1/inventory/products/${productId}/variants/activate`,
+  activateProductVariants: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/variants/activate`,
   bulkDeleteProductVariants: (productId: string) =>
     `/api/v1/inventory/products/${productId}/variants/bulk-delete`,
   bulkDuplicateProductVariants: (productId: string) =>
@@ -82,7 +92,8 @@ export const INVENTORY_API = {
   variantDuplicate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/duplicate`,
   variantActivate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/activate`,
   variantDeactivate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/deactivate`,
-  productOptionGroups: (productId: string) => `/api/v1/inventory/products/${productId}/option-groups`,
+  productOptionGroups: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/option-groups`,
   productOptionGroupsReorder: (productId: string) =>
     `/api/v1/inventory/products/${productId}/option-groups/reorder`,
   optionGroup: (groupId: string) => `/api/v1/inventory/option-groups/${groupId}`,
@@ -183,7 +194,8 @@ export const ACCOUNT_API = {
   membershipSubscribe: '/api/v1/account/membership/subscribe',
   library: '/api/v1/account/library',
   revealLibraryKey: (id: string) => `/api/v1/account/library/${id}/reveal`,
-  libraryItemInstructions: (orderItemId: string) => `/api/v1/account/library/${orderItemId}/instructions`,
+  libraryItemInstructions: (orderItemId: string) =>
+    `/api/v1/account/library/${orderItemId}/instructions`,
   wallet: '/api/v1/account/wallet',
 } as const;
 
@@ -206,6 +218,16 @@ export const THEMES_API = {
   compare: '/api/v1/themes/compare',
   export: (themeId: string) => `/api/v1/themes/${themeId}/export`,
   import: '/api/v1/themes/import',
+} as const;
+
+export const CAMPAIGNS_API = {
+  campaigns: '/api/v1/campaigns',
+  campaign: (id: string) => `/api/v1/campaigns/${id}`,
+  publish: (id: string) => `/api/v1/campaigns/${id}/publish`,
+  enable: (id: string) => `/api/v1/campaigns/${id}/enable`,
+  disable: (id: string) => `/api/v1/campaigns/${id}/disable`,
+  archive: (id: string) => `/api/v1/campaigns/${id}/archive`,
+  history: (id: string) => `/api/v1/campaigns/${id}/history`,
 } as const;
 
 export const DASHBOARD_API = {
@@ -359,7 +381,8 @@ export const SUPPLIERS_API = {
   disable: (id: string) => `/api/v1/suppliers/${id}/disable`,
   testConnection: (id: string) => `/api/v1/suppliers/${id}/test-connection`,
   mappings: (supplierId: string) => `/api/v1/suppliers/${supplierId}/mappings`,
-  mapping: (supplierId: string, mappingId: string) => `/api/v1/suppliers/${supplierId}/mappings/${mappingId}`,
+  mapping: (supplierId: string, mappingId: string) =>
+    `/api/v1/suppliers/${supplierId}/mappings/${mappingId}`,
 } as const;
 
 export const COMMUNICATION_API = {
@@ -399,7 +422,8 @@ export const SUPPORT_API = {
   adminTicketReopen: (id: string) => `/api/v1/support/admin/tickets/${id}/reopen`,
   adminTicketMerge: (id: string) => `/api/v1/support/admin/tickets/${id}/merge`,
   adminTicketAttachments: (id: string) => `/api/v1/support/admin/tickets/${id}/attachments`,
-  adminTicketTag: (id: string, tagId: string) => `/api/v1/support/admin/tickets/${id}/tags/${tagId}`,
+  adminTicketTag: (id: string, tagId: string) =>
+    `/api/v1/support/admin/tickets/${id}/tags/${tagId}`,
 
   // Lookups (any authenticated user)
   categories: '/api/v1/support/categories',
@@ -420,8 +444,10 @@ export const SUPPORT_API = {
   kbArticle: (id: string) => `/api/v1/knowledge-base/articles/${id}`,
   adminKbArticles: '/api/v1/support/admin/knowledge-base/articles',
   adminKbArticle: (id: string) => `/api/v1/support/admin/knowledge-base/articles/${id}`,
-  adminKbArticlePublish: (id: string) => `/api/v1/support/admin/knowledge-base/articles/${id}/publish`,
-  adminKbArticleUnpublish: (id: string) => `/api/v1/support/admin/knowledge-base/articles/${id}/unpublish`,
+  adminKbArticlePublish: (id: string) =>
+    `/api/v1/support/admin/knowledge-base/articles/${id}/publish`,
+  adminKbArticleUnpublish: (id: string) =>
+    `/api/v1/support/admin/knowledge-base/articles/${id}/unpublish`,
   adminKbCategories: '/api/v1/support/admin/knowledge-base/categories',
   adminKbCategory: (id: string) => `/api/v1/support/admin/knowledge-base/categories/${id}`,
 

@@ -54,13 +54,14 @@ export const routes: Routes = [
   {
     path: 'auth',
     canActivate: [maintenanceGuard],
-    loadComponent: () => import('./layouts/auth-layout/auth-layout.component').then(c => c.AuthLayoutComponent),
+    loadComponent: () =>
+      import('./layouts/auth-layout/auth-layout.component').then((c) => c.AuthLayoutComponent),
     children: [
       {
         path: '',
-        loadChildren: () => import('./features/auth/auth.routes').then(m => m.routes)
-      }
-    ]
+        loadChildren: () => import('./features/auth/auth.routes').then((m) => m.routes),
+      },
+    ],
   },
   {
     path: 'access-denied',
@@ -80,15 +81,23 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [maintenanceGuard, customerGuard],
-    loadComponent: () => import('./layouts/main-layout/main-layout.component').then(c => c.MainLayoutComponent),
+    loadComponent: () =>
+      import('./layouts/main-layout/main-layout.component').then((c) => c.MainLayoutComponent),
     children: [
       {
         path: 'home',
-        loadChildren: () => import('./features/home/home.routes').then(m => m.routes)
+        loadChildren: () => import('./features/home/home.routes').then((m) => m.routes),
       },
       {
         path: 'products',
-        loadChildren: () => import('./features/products/products.routes').then(m => m.routes)
+        loadChildren: () => import('./features/products/products.routes').then((m) => m.routes),
+      },
+      {
+        path: 'categories/:slug',
+        loadComponent: () =>
+          import('./features/products/pages/category-landing-page/category-landing-page.component').then(
+            (c) => c.CategoryLandingPageComponent,
+          ),
       },
       {
         path: 'product-details',
@@ -101,16 +110,16 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
-        loadChildren: () => import('./features/cart/cart.routes').then(m => m.routes)
+        loadChildren: () => import('./features/cart/cart.routes').then((m) => m.routes),
       },
       {
         path: 'legal',
-        loadChildren: () => import('./features/legal/legal.routes').then(m => m.routes)
+        loadChildren: () => import('./features/legal/legal.routes').then((m) => m.routes),
       },
       {
         path: 'checkout',
         canActivate: [authGuard],
-        loadChildren: () => import('./features/checkout/checkout.routes').then(m => m.routes)
+        loadChildren: () => import('./features/checkout/checkout.routes').then((m) => m.routes),
       },
       {
         path: 'favorites',
@@ -134,18 +143,15 @@ export const routes: Routes = [
       },
       {
         path: 'support-chat',
-        loadChildren: () => import('./features/support-chat/support-chat.routes').then(m => m.routes)
-      },
-      {
-        path: 'customers',
-        loadChildren: () => import('./features/customers/customers.routes').then(m => m.routes)
+        loadChildren: () =>
+          import('./features/support-chat/support-chat.routes').then((m) => m.routes),
       },
       {
         path: '',
         redirectTo: 'home',
-        pathMatch: 'full'
-      }
-    ]
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: 'page-builder/preview-section',
@@ -173,6 +179,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];

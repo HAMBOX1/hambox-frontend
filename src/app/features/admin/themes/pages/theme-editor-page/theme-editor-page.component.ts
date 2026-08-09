@@ -342,6 +342,7 @@ export class ThemeEditorPageComponent implements OnInit, OnDestroy {
     const session = await this.facade.createPreviewSession(id);
     if (session) {
       await this.themeEngine.activatePreview(session.token);
+      window.open(`/?themePreview=${session.token}`, '_blank', 'noopener');
       this.messageService.add({
         severity: 'info',
         summary: this.translate.instant('ADMIN.THEMES.MESSAGES.PREVIEW_STARTED'),

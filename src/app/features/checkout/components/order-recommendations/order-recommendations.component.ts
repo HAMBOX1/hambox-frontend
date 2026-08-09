@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { OrderRecommendation } from '../../models/order-success';
 
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
@@ -7,7 +8,7 @@ import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pip
 @Component({
   selector: 'app-order-recommendations',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe],
+  imports: [RouterLink, HamboxCurrencyPipe, TranslatePipe],
   templateUrl: './order-recommendations.component.html',
   styleUrl: './order-recommendations.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

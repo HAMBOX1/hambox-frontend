@@ -10,6 +10,7 @@ export type AdminNavId =
   | 'promotions'
   | 'memberships'
   | 'themes'
+  | 'campaigns'
   | 'page-builder'
   | 'legal'
   | 'suppliers'
@@ -92,6 +93,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/themes',
     icon: 'pi pi-palette',
     permission: PERMISSIONS.Themes.View,
+  },
+  {
+    id: 'campaigns',
+    labelKey: 'ADMIN.NAV.CAMPAIGNS',
+    route: '/admin/campaigns',
+    icon: 'pi pi-megaphone',
+    permission: PERMISSIONS.Campaigns.View,
   },
   {
     id: 'page-builder',

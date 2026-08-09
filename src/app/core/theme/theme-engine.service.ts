@@ -66,6 +66,19 @@ const ACTIVE_THEME_CACHE_KEY = 'hambox.theme.active';
 
 const PREVIEW_TOKEN_CACHE_KEY = 'hambox.theme.preview.token';
 
+/**
+ * Resolution sources whose `tokens` are a real themed override to apply as live CSS custom
+ * properties on the storefront. `schedule` is the same kind of time-boxed override as `campaign`
+ * (see ThemeEngine.ResolveScheduledThemeIdAsync) and must apply tokens too — omitting it here
+ * silently discarded a resolved scheduled theme, the same class of bug the Campaign Phase 2 audit
+ * already fixed for `campaign`. `store`/`default`/`preview` (preview has its own unconditional
+ * `activatePreview` path and never reaches this check) mean "this is just the site's normal
+ * look", so no override applies for those. Centralized here so the decision is made once — see
+ * `hasThemedOverride` — instead of duplicated per call site, which is exactly how
+ * `resolutionSource === 'membership'` and `'campaign'` drifted apart before.
+ */
+const TOKEN_OVERRIDE_SOURCES = new Set(['membership', 'campaign', 'schedule']);
+
 
 
 const PUBLIC_HTTP_CONTEXT = new HttpContext().set(SKIP_AUTH_INTERCEPTOR, true);
@@ -111,25 +124,47 @@ export class ThemeEngineService {
 
   readonly baseTheme = computed(() => this.themeService.theme());
 
-  /** True while a membership perk's colors are driving the page — the site-wide dark/light
-   *  toggle conflicts with those (mode-specific) tokens, so callers should hide it. */
-  readonly hasActiveMembershipTheme = computed(
-    () => this.activeThemeState()?.resolutionSource === 'membership',
+  /** True while a themed override (membership perk or active campaign) is driving the page's
+   *  colors — the site-wide dark/light toggle conflicts with those (mode-specific) tokens, so
+   *  callers should hide it. Was membership-only; a campaign is exactly the same kind of
+   *  conflict and must be included here too, not just in `loadActiveTheme`'s apply/clear branch. */
+  readonly hasActiveTokenOverride = computed(
+    () => this.hasThemedOverride(this.activeThemeState()?.resolutionSource),
   );
 
   /** Initialize theme metadata without overriding SCSS base themes on the storefront. */
 
   async init(membershipPlanSlug?: string): Promise<void> {
 
+    // A `?themePreview=<token>` URL param is an explicit, one-time preview request (the admin
+    // just opened this tab from the theme/campaign editor's "Preview" action) — activate it
+    // unconditionally, unlike the cached-token path below which deliberately refuses to reapply
+    // outside `/admin` to avoid a forgotten session bleeding into real storefront traffic.
+    const urlPreviewToken = this.readPreviewTokenFromUrl();
+    if (urlPreviewToken && (await this.activatePreview(urlPreviewToken))) {
+      return;
+    }
+
     const previewToken = this.readPreviewTokenCache();
 
     if (previewToken) {
 
-      const activated = await this.activatePreview(previewToken);
+      // A cached preview token must never reapply outside an admin route — otherwise a preview
+      // session an admin forgot to exit would silently override real storefront traffic the next
+      // time this tab loads any non-admin page.
+      if (this.isAdminRoute()) {
 
-      if (activated) {
+        const activated = await this.activatePreview(previewToken);
 
-        return;
+        if (activated) {
+
+          return;
+
+        }
+
+      } else {
+
+        this.clearPreviewTokenCache();
 
       }
 
@@ -172,12 +207,12 @@ export class ThemeEngineService {
 
     const sequence = ++this.loadSequence;
 
-    try {
+    // This call must skip the interceptor's route-based auth-context guess (it would attach the
+    // Admin token while browsing /admin routes) but still identify a signed-in customer server-side
+    // so membership-linked themes resolve — so the Customer token, if any, is attached explicitly.
+    const customerToken = this.authSession.getAccessToken(AUTH_CONTEXT.Customer);
 
-      // This call must skip the interceptor's route-based auth-context guess (it would attach the
-      // Admin token while browsing /admin routes) but still identify a signed-in customer server-side
-      // so membership-linked themes resolve — so the Customer token, if any, is attached explicitly.
-      const customerToken = this.authSession.getAccessToken(AUTH_CONTEXT.Customer);
+    try {
 
       const active = await firstValueFrom(
 
@@ -218,10 +253,11 @@ export class ThemeEngineService {
 
 
       // Base mode (light/dark) always stays under the user's own toggle; only design tokens
-      // (accent/primary/etc.) come from a resolved membership theme, and only when one applies.
-      // A membership perk is a storefront concept — never let it bleed into the admin dashboard
-      // (e.g. an admin who still has a stale customer session/token from earlier storefront use).
-      if (active.resolutionSource === 'membership' && !this.isAdminRoute()) {
+      // (accent/primary/etc.) come from a resolved membership theme or active campaign, and only
+      // when one applies. Both are storefront concepts — never let either bleed into the admin
+      // dashboard (e.g. an admin who still has a stale customer session/token from earlier
+      // storefront use).
+      if (this.hasThemedOverride(active.resolutionSource) && !this.isAdminRoute()) {
 
         this.applyTokenOverrides(active.tokens, true);
 
@@ -233,7 +269,27 @@ export class ThemeEngineService {
 
     } catch {
 
-      // Keep local base theme when API is unavailable.
+      if (sequence !== this.loadSequence) {
+
+        return;
+
+      }
+
+      // An anonymous re-resolution (no customer token — this is exactly what logout looks like,
+      // since the session is cleared before this call fires) that fails must never leave a
+      // previous session's theme applied: drop the stale state, clear the cached payload, and let
+      // the base SCSS light/dark theme take over. An authenticated re-resolution that fails keeps
+      // whatever was already applied instead — that's normally a transient blip mid-session, not a
+      // session boundary, and clearing it would cause a jarring flash back to the unbranded theme.
+      if (!customerToken && !this.previewModeState()) {
+
+        this.activeThemeState.set(null);
+
+        this.clearActiveThemeCache();
+
+        this.clearOverrides();
+
+      }
 
     }
 
@@ -448,6 +504,23 @@ export class ThemeEngineService {
     return (this.document.defaultView?.location.pathname ?? '').startsWith('/admin');
   }
 
+  private readPreviewTokenFromUrl(): string | null {
+    const search = this.document.defaultView?.location.search;
+    if (!search) {
+      return null;
+    }
+
+    const token = new URLSearchParams(search).get('themePreview');
+    return token?.trim() ? token : null;
+  }
+
+  /** The single "does this resolution source carry themed tokens to apply" decision — see
+   *  `TOKEN_OVERRIDE_SOURCES`. Never duplicate this check inline; both `loadActiveTheme` and
+   *  `hasActiveTokenOverride` must always agree on the same answer. */
+  private hasThemedOverride(source: string | undefined): boolean {
+    return !!source && TOKEN_OVERRIDE_SOURCES.has(source);
+  }
+
 
 
   private mapBaseModeToThemeId(baseMode: string): ThemeId {
@@ -515,6 +588,22 @@ export class ThemeEngineService {
 
 
     sessionStorage.setItem(ACTIVE_THEME_CACHE_KEY, JSON.stringify(payload));
+
+  }
+
+
+
+  private clearActiveThemeCache(): void {
+
+    if (typeof sessionStorage === 'undefined') {
+
+      return;
+
+    }
+
+
+
+    sessionStorage.removeItem(ACTIVE_THEME_CACHE_KEY);
 
   }
 

@@ -45,3 +45,35 @@
 .theme-scheduler-panel__status.is-active {
   color: var(--theme-success);
 }
+
+.theme-scheduler-panel__priority {
+  display: inline-block;
+  margin-top: 0.35rem;
+  margin-inline-end: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.theme-scheduler-panel__overlap-banner,
+.theme-scheduler-panel__overlap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-warning, #b45309);
+}
+
+.theme-scheduler-panel__overlap-banner {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: var(--admin-radius-md, 10px);
+  background: var(--color-warning-muted, rgba(251, 191, 36, 0.12));
+  border: 1px solid var(--color-warning-border, rgba(251, 191, 36, 0.35));
+  font-size: 0.8125rem;
+}
+
+.theme-scheduler-panel__overlap {
+  display: inline-flex;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}

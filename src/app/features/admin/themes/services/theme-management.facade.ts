@@ -1,9 +1,12 @@
+import { HttpContext } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { THEMES_API } from '../../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../../core/api/api-client.service';
 import { ApiError } from '../../../../core/models/api-error.model';
+import { SKIP_AUTH_INTERCEPTOR } from '../../../../core/tokens/http-context.tokens';
+import { ActiveThemePayload } from '../../../../core/theme/theme-engine.service';
 import {
   AssignThemeRequest,
   CreateThemeRequest,
@@ -26,6 +29,10 @@ import {
 
 const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
+
+// The site's true anonymous/default resolution — deliberately bypasses auth so an admin's own
+// token never skews "why is this theme active" toward their personal membership context.
+const RESOLUTION_HTTP_CONTEXT = new HttpContext().set(SKIP_AUTH_INTERCEPTOR, true);
 
 @Injectable()
 export class ThemeManagementFacade {
@@ -64,6 +71,8 @@ export class ThemeManagementFacade {
   private readonly templatesLoadingState = signal(false);
   private readonly templatesErrorState = signal<string | null>(null);
 
+  private readonly activeResolutionState = signal<ActiveThemePayload | null>(null);
+
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly themes = this.themesState.asReadonly();
@@ -97,6 +106,11 @@ export class ThemeManagementFacade {
   readonly templates = this.templatesState.asReadonly();
   readonly templatesLoading = this.templatesLoadingState.asReadonly();
   readonly templatesError = this.templatesErrorState.asReadonly();
+
+  /** Whichever theme the storefront's own Store/Membership/Schedule/Default resolution is
+   *  currently serving, and why — reuses the same public endpoint and resolution logic the
+   *  storefront itself consumes, so this never duplicates the resolver. */
+  readonly activeResolution = this.activeResolutionState.asReadonly();
 
   readonly hasActiveFilters = computed(
     () => this.searchTermState().trim().length > 0 || this.statusFilterState() !== 'all',
@@ -132,6 +146,17 @@ export class ThemeManagementFacade {
 
   loadStatistics(): void {
     void this.fetchStatistics();
+  }
+
+  async loadActiveResolution(): Promise<void> {
+    try {
+      const active = await firstValueFrom(
+        this.api.get<ActiveThemePayload>(THEMES_API.active, { context: RESOLUTION_HTTP_CONTEXT }),
+      );
+      this.activeResolutionState.set(active);
+    } catch {
+      this.activeResolutionState.set(null);
+    }
   }
 
   async loadTemplates(): Promise<void> {

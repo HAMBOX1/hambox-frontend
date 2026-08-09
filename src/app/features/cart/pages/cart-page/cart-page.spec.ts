@@ -24,7 +24,7 @@ describe('CartPageComponent', () => {
 
   it('should render cart items', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.storefront-cart__title')?.textContent).toContain('Your Cart');
+    expect(compiled.querySelector('.storefront-cart__title')?.textContent).toContain('Your cart');
     expect(compiled.querySelectorAll('app-cart-line-item').length).toBe(2);
   });
 });

@@ -3,8 +3,10 @@
     <h2 id="popular-categories-title" class="categories__title">{{ sectionTitle() }}</h2>
 
     <div class="categories__grid">
-      @for (category of categories(); track category.id) {
-        <app-storefront-category-card [category]="category" />
+      @for (category of categories(); track category.id; let i = $index) {
+        <div hamboxReveal [hamboxRevealDelay]="i * 70" class="motion-fade-up">
+          <app-storefront-category-card [category]="category" />
+        </div>
       }
     </div>
   </div>

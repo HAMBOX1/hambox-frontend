@@ -6,8 +6,28 @@
     (click)="preview.emit()"
     (dblclick)="quickAdd.emit()"
   >
-    <span class="section-library-card__thumb">
-      <img [src]="thumbnail()" [alt]="''" loading="lazy" />
+    <span class="section-library-card__thumb" #thumb>
+      <img
+        class="section-library-card__thumb-fallback"
+        [class.section-library-card__thumb-fallback--hidden]="iframeLoaded()"
+        [src]="fallbackThumbnail()"
+        [alt]="''"
+        loading="lazy"
+      />
+      @if (inView() && scale() > 0) {
+        <iframe
+          class="section-library-card__thumb-frame"
+          [class.section-library-card__thumb-frame--loaded]="iframeLoaded()"
+          [src]="previewUrl()"
+          [width]="thumbWidth"
+          [height]="thumbHeight"
+          [style.transform]="'scale(' + scale() + ')'"
+          scrolling="no"
+          tabindex="-1"
+          aria-hidden="true"
+          (load)="onIframeLoad()"
+        ></iframe>
+      }
     </span>
 
     <span class="section-library-card__body">
