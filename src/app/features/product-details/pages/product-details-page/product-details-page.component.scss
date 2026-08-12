@@ -655,6 +655,43 @@
   }
 }
 
+.pdp__instructions-dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.pdp__instructions-dialog-group {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.pdp__instructions-dialog-option {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.pdp__instructions-dialog-body {
+  line-height: 1.7;
+  max-height: 60vh;
+  overflow-y: auto;
+  color: var(--color-text-secondary);
+
+  // Sanitized server-side (no inline styles ever survive), but stay defensive against any stray
+  // inline color surviving a future sanitizer allow-list change — same pattern as the legal dialog.
+  ::ng-deep * {
+    color: inherit !important;
+  }
+
+  ::ng-deep a {
+    color: var(--color-primary) !important;
+  }
+}
+
 @keyframes pdp-mobile-bar-in {
   from {
     transform: translateY(100%);

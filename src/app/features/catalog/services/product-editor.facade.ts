@@ -58,11 +58,23 @@ import {
 
   InventorySupplierDto,
 
+  ImportConflictResolution,
+
+  ImportOptionGroupTemplateRequest,
+
+  OptionGroupTemplateDto,
+
+  OptionGroupTemplateSummaryDto,
+
   ProductOptionGroupDto,
 
   ProductVariantDto,
 
+  SaveOptionGroupAsTemplateRequest,
+
   UpdateOptionGroupRequest,
+
+  UpdateOptionGroupTemplateRequest,
 
   UpdateOptionRequest,
 
@@ -176,6 +188,12 @@ export class ProductEditorFacade {
 
   private readonly submitErrorState = signal<string | null>(null);
 
+  /** Scoped to the "reusable option group template" dialogs (save/edit/delete/import) —
+   * deliberately NOT `errorState`, which `product-edit-page` treats as fatal and replaces the
+   * entire page with a full-page error alert for. A duplicate-name rejection is a recoverable,
+   * dialog-local validation message, not a page-load failure. */
+  private readonly templateActionErrorState = signal<string | null>(null);
+
 
 
   readonly product = this.productState.asReadonly();
@@ -217,6 +235,8 @@ export class ProductEditorFacade {
   readonly error = this.errorState.asReadonly();
 
   readonly submitting = this.submittingState.asReadonly();
+
+  readonly templateActionError = this.templateActionErrorState.asReadonly();
 
   readonly submitError = this.submitErrorState.asReadonly();
 
@@ -1108,7 +1128,76 @@ export class ProductEditorFacade {
 
   }
 
+  async searchOptionGroupTemplates(search: string): Promise<OptionGroupTemplateSummaryDto[]> {
+    try {
+      return await firstValueFrom(this.inventoryApi.searchOptionGroupTemplates(search));
+    } catch {
+      return [];
+    }
+  }
 
+  async getOptionGroupTemplate(templateId: string): Promise<OptionGroupTemplateDto | null> {
+    this.templateActionErrorState.set(null);
+    try {
+      return await firstValueFrom(this.inventoryApi.getOptionGroupTemplate(templateId));
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to load saved option group.'));
+      return null;
+    }
+  }
+
+  async saveOptionGroupAsTemplate(groupId: string, request: SaveOptionGroupAsTemplateRequest): Promise<boolean> {
+    this.templateActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.saveOptionGroupAsTemplate(groupId, request));
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to save as a reusable group.'));
+      return false;
+    }
+  }
+
+  async updateOptionGroupTemplate(templateId: string, request: UpdateOptionGroupTemplateRequest): Promise<boolean> {
+    this.templateActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.updateOptionGroupTemplate(templateId, request));
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to update the saved option group.'));
+      return false;
+    }
+  }
+
+  async deleteOptionGroupTemplate(templateId: string): Promise<boolean> {
+    this.templateActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.deleteOptionGroupTemplate(templateId));
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to delete the saved option group.'));
+      return false;
+    }
+  }
+
+  /** Imports a saved reusable group into the current product as independent option-group/option
+   * records, then syncs variants once — a single round trip, not one create call per value. */
+  async importOptionGroupTemplate(templateId: string, resolution: ImportConflictResolution): Promise<boolean> {
+    const productId = this.productId();
+    if (!productId) {
+      return false;
+    }
+
+    this.templateActionErrorState.set(null);
+    try {
+      const request: ImportOptionGroupTemplateRequest = { templateId, resolution };
+      await firstValueFrom(this.inventoryApi.importOptionGroupTemplate(productId, request));
+      await this.syncVariants(productId);
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to import the saved option group.'));
+      return false;
+    }
+  }
 
   async createVariant(request: CreateVariantRequest): Promise<boolean> {
 

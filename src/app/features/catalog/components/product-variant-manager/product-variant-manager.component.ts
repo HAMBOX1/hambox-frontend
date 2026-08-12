@@ -62,7 +62,7 @@ const STATUS_FILTER_OPTIONS = [
   ...VARIANT_STATUS_OPTIONS,
 ];
 
-type VariantFilter = 'all' | 'out-of-stock' | 'draft';
+type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
 
 
 @Component({
@@ -186,8 +186,8 @@ export class ProductVariantManagerComponent {
   protected readonly creatingDefaultVariant = signal(false);
   protected readonly editDialogVisible = signal(false);
 
-  /** Single "open chain" key (e.g. "steamId/globalId") — only one branch per level is ever expanded, matching a file-explorer accordion rather than free-for-all multi-expand. Keys are inherently hierarchical (child keys are prefixed with their parent's), so prefix matching alone tells us the whole open path. */
-  private readonly expandedPath = signal<string | null>(null);
+  /** Branches start expanded; this tracks only the ones an admin explicitly collapsed. Collapsing a parent hides its children from the render tree entirely, so no prefix/ancestor bookkeeping is needed here. */
+  private readonly collapsedKeys = signal<ReadonlySet<string>>(new Set());
 
   /** Any active search/status/quick filter narrows the result set enough that branches should auto-expand instead of requiring manual clicks. */
   private readonly filtersActive = computed(
@@ -227,20 +227,16 @@ export class ProductVariantManagerComponent {
 
   /** Stable reference passed to every recursive tree row so OnPush doesn't re-diff it each cycle. */
   protected readonly treeCallbacks: VariantTreeCallbacks = {
-    isExpanded: (key) => {
-      if (this.filtersActive()) {
-        return true;
-      }
-      const path = this.expandedPath();
-      return path !== null && (path === key || path.startsWith(`${key}/`));
-    },
+    isExpanded: (key) => this.filtersActive() || !this.collapsedKeys().has(key),
     toggleExpand: (key) => {
-      this.expandedPath.update((current) => {
-        if (current !== null && (current === key || current.startsWith(`${key}/`))) {
-          const lastSlash = key.lastIndexOf('/');
-          return lastSlash === -1 ? null : key.slice(0, lastSlash);
+      this.collapsedKeys.update((current) => {
+        const next = new Set(current);
+        if (next.has(key)) {
+          next.delete(key);
+        } else {
+          next.add(key);
         }
-        return key;
+        return next;
       });
     },
     isSelected: (variantId) => this.isVariantSelected(variantId),
@@ -301,6 +297,10 @@ export class ProductVariantManagerComponent {
         }
 
         if (quick === 'out-of-stock' && !variant.isOutOfStock) {
+          return false;
+        }
+
+        if (quick === 'in-stock' && variant.isOutOfStock) {
           return false;
         }
 

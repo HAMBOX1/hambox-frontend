@@ -35,14 +35,28 @@
       <div class="option-groups-panel__new-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
         @if (productId()) {
           <div class="option-groups-panel__inline-form">
-            <input
-              pInputText
-              placeholder="Option group name (e.g. Platform)"
-              [ngModel]="newGroupLabel()"
-              (ngModelChange)="newGroupLabel.set($event)"
+            <p-autoComplete
+              class="option-groups-panel__autocomplete"
+              [style]="{ width: '100%' }"
+              [inputStyle]="{ width: '100%' }"
+              [ngModel]="groupNameInput()"
+              (ngModelChange)="groupNameInput.set($event)"
+              [suggestions]="[...templateSuggestions()]"
+              (completeMethod)="searchTemplates($event)"
+              (onSelect)="onTemplateSelected($event)"
+              optionLabel="name"
+              [dropdown]="false"
+              [forceSelection]="false"
+              placeholder="Option group name (e.g. Platform) — type to search saved groups"
             />
-            <button pButton type="button" label="Add Option Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="createOptionGroup()"></button>
+            <button pButton type="button" label="Add Option Group" icon="pi pi-plus" [loading]="creatingGroup() || importingTemplate()" (click)="createOptionGroup()"></button>
           </div>
+          @if (importError() && !conflictDialogOpen()) {
+            <p class="option-groups-panel__import-error">{{ importError() }}</p>
+          }
+          <button type="button" class="option-groups-panel__manage-templates" (click)="templateManagerOpen.set(true)">
+            <i class="pi pi-cog"></i> Manage saved groups
+          </button>
         } @else {
           <p class="option-groups-panel__hint">Enter a product name and category above to begin.</p>
         }
@@ -50,3 +64,46 @@
     }
   </app-admin-section-card>
 }
+
+<p-dialog
+  header="An option group named &quot;{{ conflictTemplate()?.name }}&quot; already exists on this product"
+  [visible]="conflictDialogOpen()"
+  (visibleChange)="conflictDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="option-groups-panel__conflict-message">
+    Choose whether to add this saved group as a separate group, or replace the existing one (its current values and any variants built from them will be removed).
+  </p>
+  @if (importError()) {
+    <p class="option-groups-panel__import-error">{{ importError() }}</p>
+  }
+  <div class="admin-dialog__actions option-groups-panel__conflict-actions">
+    <button pButton type="button" label="Cancel" severity="secondary" [disabled]="importingTemplate()" (click)="cancelConflict()"></button>
+    <button
+      pButton
+      type="button"
+      label="Add as separate group"
+      severity="secondary"
+      [loading]="importingTemplate()"
+      (click)="importTemplate(conflictTemplate()!, 'AddSeparate')"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Replace existing"
+      severity="danger"
+      [loading]="importingTemplate()"
+      (click)="importTemplate(conflictTemplate()!, 'Replace')"
+    ></button>
+  </div>
+</p-dialog>
+
+<app-option-group-template-manager
+  [visible]="templateManagerOpen()"
+  (visibleChange)="templateManagerOpen.set($event)"
+/>

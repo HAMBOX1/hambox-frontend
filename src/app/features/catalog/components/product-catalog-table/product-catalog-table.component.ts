@@ -654,7 +654,7 @@ export class ProductCatalogTableComponent {
       this.collectionDialogOpen.set(false);
       this.collectionCreated.emit();
     } catch (error) {
-      this.collectionCreateError.set(this.toErrorMessage(error, 'Failed to create collection.'));
+      this.collectionCreateError.set(this.toErrorMessage(error, 'Failed to create internal category.'));
     } finally {
       this.collectionCreating.set(false);
     }

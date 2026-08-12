@@ -31,7 +31,7 @@
           <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
           <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
           <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
-          <th>Collections</th>
+          <th>Internal Categories</th>
           <th pSortableColumn="price" class="product-catalog-table__price-head">
             Price <p-sortIcon field="price" />
           </th>
@@ -322,6 +322,7 @@
       [submitting]="categoryCreating()"
       [serverError]="categoryCreateError()"
       [resetToken]="categoryFormResetToken()"
+      [parentOptions]="categoryPopoverOptions()"
       (submitted)="onCategorySubmitted($event)"
       (cancelled)="closeCategoryCreateDialog()"
     />
@@ -329,16 +330,16 @@
 
   <p-popover #collectionPopover appendTo="body" styleClass="product-catalog-table__category-popover">
     <div class="product-catalog-table__category-popover-content" (click)="$event.stopPropagation()">
-      <h4 class="product-catalog-table__category-popover-title">Collections</h4>
+      <h4 class="product-catalog-table__category-popover-title">Internal Categories</h4>
 
       <app-admin-search-bar
         [value]="collectionSearchTerm()"
         placeholder="Search..."
-        ariaLabel="Search collections"
+        ariaLabel="Search internal categories"
         (searchChange)="collectionSearchTerm.set($event)"
       />
 
-      <ul class="product-catalog-table__category-list" role="listbox" aria-label="Collections">
+      <ul class="product-catalog-table__category-list" role="listbox" aria-label="Internal Categories">
         @for (option of filteredCollectionPopoverOptions(); track option.id) {
           <li class="product-catalog-table__category-list-item">
             <p-checkbox
@@ -352,7 +353,7 @@
             }}</label>
           </li>
         } @empty {
-          <li class="product-catalog-table__category-list-empty">No collections match your search.</li>
+          <li class="product-catalog-table__category-list-empty">No internal categories match your search.</li>
         }
       </ul>
 
@@ -363,7 +364,7 @@
       <button
         pButton
         type="button"
-        label="+ New Collection"
+        label="+ New Internal Category"
         icon="pi pi-plus"
         severity="secondary"
         text
@@ -388,7 +389,7 @@
   </p-popover>
 
   <p-dialog
-    header="Create Collection"
+    header="Create Internal Category"
     [visible]="collectionDialogOpen()"
     (visibleChange)="onCollectionCreateDialogVisibleChange($event)"
     [modal]="true"

@@ -61,7 +61,7 @@ export function getAvailableOptionsForGroup(
   configuration: StorefrontProductConfigurationDto,
   groupId: string,
   selectedByGroup: Readonly<Record<string, string>>,
-): readonly { id: string; label: string; disabled: boolean }[] {
+): readonly { id: string; label: string; disabled: boolean; descriptionHtml?: string | null }[] {
   const group = configuration.optionGroups.find((entry) => entry.id === groupId);
   if (!group) {
     return [];
@@ -71,6 +71,7 @@ export function getAvailableOptionsForGroup(
     id: option.id,
     label: option.label,
     disabled: !isOptionCompatible(configuration, groupId, option.id, selectedByGroup),
+    descriptionHtml: option.descriptionHtml,
   }));
 }
 

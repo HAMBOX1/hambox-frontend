@@ -608,7 +608,7 @@ export class ProductCatalogPageComponent implements OnInit {
 
     await this.runBulkAction(
       () => this.facade.bulkAssignCollection(collectionId),
-      'Collection assigned',
+      'Internal category assigned',
     );
     this.bulkAssignCollectionDialogOpen.set(false);
   }
@@ -621,7 +621,7 @@ export class ProductCatalogPageComponent implements OnInit {
 
     await this.runBulkAction(
       () => this.facade.bulkRemoveCollection(collectionId),
-      'Collection removed',
+      'Internal category removed',
     );
     this.bulkRemoveCollectionDialogOpen.set(false);
   }
@@ -634,7 +634,7 @@ export class ProductCatalogPageComponent implements OnInit {
 
     await this.runBulkAction(
       () => this.facade.createCollectionFromSelectionAndAssign(name),
-      'Collection created',
+      'Internal category created',
     );
     this.bulkCreateCollectionDialogOpen.set(false);
     this.bulkNewCollectionName.set('');

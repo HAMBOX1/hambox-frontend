@@ -3,13 +3,13 @@
 } @else if (isEmpty()) {
   <app-admin-empty-state
     icon="pi pi-folder"
-    [title]="hasActiveSearch() ? 'No matching collections' : 'No collections yet'"
+    [title]="hasActiveSearch() ? 'No matching internal categories' : 'No internal categories yet'"
     [description]="
       hasActiveSearch()
         ? 'Try a different search term or clear the search to see the full tree.'
-        : 'Create your first collection to start organizing products internally.'
+        : 'Create your first internal category to start organizing products internally.'
     "
-    [primaryLabel]="hasActiveSearch() ? null : 'Create Collection'"
+    [primaryLabel]="hasActiveSearch() ? null : 'Create Internal Category'"
     [primaryIcon]="hasActiveSearch() ? null : 'pi pi-plus'"
     (primaryAction)="onCreateRequested()"
   />

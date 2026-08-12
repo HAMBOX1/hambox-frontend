@@ -437,7 +437,7 @@ export class ProductCatalogFacade {
       await this.refreshCollectionOptions();
       return await this.bulkAssignCollection(collectionId);
     } catch (error) {
-      this.bulkErrorState.set(this.toErrorMessage(error, 'Failed to create collection.'));
+      this.bulkErrorState.set(this.toErrorMessage(error, 'Failed to create internal category.'));
       return null;
     }
   }

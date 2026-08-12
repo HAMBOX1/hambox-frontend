@@ -46,6 +46,14 @@
             <button
               type="button"
               class="admin-filter-chip"
+              [class.admin-filter-chip--active]="quickFilter() === 'in-stock'"
+              (click)="quickFilter.set('in-stock')"
+            >
+              In stock
+            </button>
+            <button
+              type="button"
+              class="admin-filter-chip"
               [class.admin-filter-chip--active]="quickFilter() === 'draft'"
               (click)="quickFilter.set('draft')"
             >

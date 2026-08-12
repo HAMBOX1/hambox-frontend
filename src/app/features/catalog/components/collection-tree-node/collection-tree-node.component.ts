@@ -40,12 +40,12 @@ export class CollectionTreeNodeComponent {
         command: () => callbacks.viewProducts(node),
       },
       {
-        label: 'Edit collection',
+        label: 'Edit internal category',
         icon: 'pi pi-pencil',
         command: () => callbacks.editCollection(node),
       },
       {
-        label: 'Add child collection',
+        label: 'Add child internal category',
         icon: 'pi pi-plus',
         command: () => callbacks.addChild(node.id),
       },
@@ -55,7 +55,7 @@ export class CollectionTreeNodeComponent {
       items.push(
         { separator: true },
         {
-          label: 'Delete collection',
+          label: 'Delete internal category',
           icon: 'pi pi-trash',
           styleClass: 'collection-tree-node__menu-item--danger',
           command: () => callbacks.deleteCollection(node),

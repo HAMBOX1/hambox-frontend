@@ -37,6 +37,12 @@
         <app-admin-icon-button icon="pi pi-check" label="Save" [loading]="saving()" (pressed)="saveEditGroup()" />
         <app-admin-icon-button icon="pi pi-times" label="Cancel" (pressed)="cancelEditGroup()" />
       } @else {
+        <app-admin-icon-button
+          icon="pi pi-bookmark"
+          label="Save as reusable group"
+          [disabled]="hasAnyFollowUps()"
+          (pressed)="openSaveTemplateDialog()"
+        />
         <app-admin-icon-button icon="pi pi-pencil" label="Edit option group" (pressed)="startEditGroup()" />
         <app-admin-icon-button icon="pi pi-trash" label="Delete option group" severity="danger" [loading]="saving()" (pressed)="requestDeleteGroup()" />
       }
@@ -52,6 +58,59 @@
     (visibleChange)="deleteDialogOpen.set($event)"
     (confirmed)="confirmDeleteGroup()"
   />
+
+  <p-dialog
+    header="Save as reusable group"
+    [visible]="saveTemplateDialogOpen()"
+    (visibleChange)="saveTemplateDialogOpen.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(26rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <div class="admin-field">
+      <label class="admin-field__label" for="save-template-name">Name</label>
+      <input
+        pInputText
+        id="save-template-name"
+        class="admin-field__input"
+        [ngModel]="saveTemplateName()"
+        (ngModelChange)="saveTemplateName.set($event)"
+        (keyup.enter)="confirmSaveTemplate()"
+      />
+    </div>
+    @if (saveTemplateError()) {
+      <p class="question-card__save-template-error">{{ saveTemplateError() }}</p>
+    }
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingTemplate()" (click)="saveTemplateDialogOpen.set(false)"></button>
+      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingTemplate()" (click)="confirmSaveTemplate()"></button>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    [header]="group().displayName + ' — ' + (instructionsOptionLabel() ?? '')"
+    [visible]="instructionsOptionId() !== null"
+    (visibleChange)="!$event && closeInstructions()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(32rem, 94vw)' }"
+    styleClass="admin-dialog"
+  >
+    <p-editor
+      [ngModel]="instructionsDraft()"
+      (ngModelChange)="instructionsDraft.set($event)"
+      [style]="{ height: '180px' }"
+    />
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
+      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>
+    </div>
+  </p-dialog>
 
   @if (editingGroup() && group().parentOptionId !== null) {
     <label class="question-card__required-toggle">
@@ -108,6 +167,16 @@
               }
 
               <div class="answer-row__actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
+                <button
+                  type="button"
+                  class="answer-row__icon-btn"
+                  [class.answer-row__icon-btn--active]="option.descriptionHtml"
+                  (click)="openInstructions(option)"
+                  [attr.aria-label]="option.descriptionHtml ? 'Edit instructions' : 'Add instructions'"
+                  [title]="option.descriptionHtml ? 'Edit instructions' : 'Add instructions'"
+                >
+                  <i class="pi pi-info-circle"></i>
+                </button>
                 <button type="button" class="answer-row__icon-btn" (click)="moveOption(option, -1)" aria-label="Move option up">
                   <i class="pi pi-chevron-up"></i>
                 </button>

@@ -4,6 +4,7 @@ export interface ProductOptionDto {
   readonly value: string;
   readonly label: string;
   readonly sortOrder: number;
+  readonly descriptionHtml?: string | null;
 }
 
 export interface ProductOptionGroupDto {
@@ -186,6 +187,7 @@ export interface CreateOptionRequest {
   readonly value: string;
   readonly label: string;
   readonly sortOrder: number;
+  readonly descriptionHtml?: string | null;
 }
 
 export interface CreateSupplierRequest {
@@ -254,6 +256,52 @@ export interface UpdateOptionGroupRequest {
 export interface UpdateOptionRequest {
   readonly label: string;
   readonly sortOrder: number;
+  readonly descriptionHtml?: string | null;
+}
+
+export interface OptionGroupTemplateSummaryDto {
+  readonly id: string;
+  readonly name: string;
+  readonly optionCount: number;
+}
+
+export interface OptionGroupTemplateOptionDto {
+  readonly id: string;
+  readonly value: string;
+  readonly label: string;
+  readonly sortOrder: number;
+  readonly descriptionHtml: string | null;
+}
+
+export interface OptionGroupTemplateDto {
+  readonly id: string;
+  readonly name: string;
+  readonly isRequiredDefault: boolean;
+  readonly options: readonly OptionGroupTemplateOptionDto[];
+}
+
+export interface OptionGroupTemplateOptionInput {
+  readonly value: string;
+  readonly label: string;
+  readonly sortOrder: number;
+  readonly descriptionHtml?: string | null;
+}
+
+export interface SaveOptionGroupAsTemplateRequest {
+  readonly name: string;
+}
+
+export interface UpdateOptionGroupTemplateRequest {
+  readonly name: string;
+  readonly isRequiredDefault: boolean;
+  readonly options: readonly OptionGroupTemplateOptionInput[];
+}
+
+export type ImportConflictResolution = 'AddSeparate' | 'Replace';
+
+export interface ImportOptionGroupTemplateRequest {
+  readonly templateId: string;
+  readonly resolution: ImportConflictResolution;
 }
 
 export interface ReorderIdsRequest {

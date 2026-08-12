@@ -249,7 +249,7 @@ export class ProductCatalogCardsComponent {
       this.collectionDialogOpen.set(false);
       this.collectionCreated.emit();
     } catch (error) {
-      this.collectionCreateError.set(this.toErrorMessage(error, 'Failed to create collection.'));
+      this.collectionCreateError.set(this.toErrorMessage(error, 'Failed to create internal category.'));
     } finally {
       this.collectionCreating.set(false);
     }
@@ -258,7 +258,7 @@ export class ProductCatalogCardsComponent {
   private toErrorMessage(error: unknown, fallback: string): string {
     if (error instanceof ApiError) {
       if (error.status === 401 || error.status === 403) {
-        return 'You do not have permission to manage collections. Sign in with an admin account (admin@hambox.local in development).';
+        return 'You do not have permission to manage internal categories. Sign in with an admin account (admin@hambox.local in development).';
       }
 
       return error.message;

@@ -55,7 +55,7 @@ export class CollectionListPageComponent implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Collections' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Internal Categories' });
 
   protected readonly totalCount = this.facade.totalCount;
   protected readonly loading = this.facade.loading;
@@ -132,7 +132,7 @@ export class CollectionListPageComponent implements OnInit {
     if (created) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Collection created',
+        summary: 'Internal category created',
         detail: `"${request.name}" was added.`,
         life: 4000,
       });
@@ -142,7 +142,7 @@ export class CollectionListPageComponent implements OnInit {
     this.messageService.add({
       severity: 'error',
       summary: 'Create failed',
-      detail: this.facade.createError() ?? 'Unable to create collection.',
+      detail: this.facade.createError() ?? 'Unable to create internal category.',
       life: 5000,
     });
   }
@@ -153,7 +153,7 @@ export class CollectionListPageComponent implements OnInit {
     if (updated) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Collection updated',
+        summary: 'Internal category updated',
         detail: `"${request.name}" was saved.`,
         life: 4000,
       });
@@ -163,7 +163,7 @@ export class CollectionListPageComponent implements OnInit {
     this.messageService.add({
       severity: 'error',
       summary: 'Update failed',
-      detail: this.facade.updateError() ?? 'Unable to update collection.',
+      detail: this.facade.updateError() ?? 'Unable to update internal category.',
       life: 5000,
     });
   }
@@ -183,7 +183,7 @@ export class CollectionListPageComponent implements OnInit {
     if (success) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Collection deleted',
+        summary: 'Internal category deleted',
         detail: `"${collection.name}" was removed.`,
         life: 4000,
       });
@@ -193,7 +193,7 @@ export class CollectionListPageComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Delete failed',
-        detail: this.facade.error() ?? 'Unable to delete collection.',
+        detail: this.facade.error() ?? 'Unable to delete internal category.',
         life: 5000,
       });
     }
@@ -202,7 +202,7 @@ export class CollectionListPageComponent implements OnInit {
   protected deleteDialogMessage(): string {
     const collection = this.deleteTarget();
     return collection
-      ? `Delete "${collection.name}"? Products stay untouched — they simply lose this collection tag. Collections with children can't be deleted — remove those first.`
+      ? `Delete "${collection.name}"? Products stay untouched — they simply lose this internal category tag. Internal categories with children can't be deleted — remove those first.`
       : '';
   }
 

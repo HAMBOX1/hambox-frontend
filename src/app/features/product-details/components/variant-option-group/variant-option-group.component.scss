@@ -49,3 +49,21 @@
     text-decoration: line-through;
   }
 }
+
+.variant-option-group__instructions {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-danger);
+  font-family: var(--sf-font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.variant-option-group__instructions:hover {
+  color: var(--color-danger-hover, var(--color-danger));
+}

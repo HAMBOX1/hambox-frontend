@@ -133,7 +133,7 @@ export class CollectionCreateFormComponent {
   }
 
   protected submitLabel(): string {
-    return this.mode() === 'edit' ? 'Save Changes' : 'Create Collection';
+    return this.mode() === 'edit' ? 'Save Changes' : 'Create Internal Category';
   }
 
   protected submit(): void {

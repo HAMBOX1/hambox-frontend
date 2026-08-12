@@ -232,7 +232,7 @@ export class StorefrontVariantFacade {
 
 
 
-  optionsForGroup(group: ProductOptionGroupDto): readonly { id: string; label: string; disabled: boolean }[] {
+  optionsForGroup(group: ProductOptionGroupDto): readonly { id: string; label: string; disabled: boolean; descriptionHtml?: string | null }[] {
 
     const configuration = this.configurationState();
 

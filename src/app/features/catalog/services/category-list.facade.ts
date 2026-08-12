@@ -184,10 +184,16 @@ export class CategoryListFacade {
     this.createErrorState.set(null);
 
     try {
-      await createCategoryWithHierarchy(this.api, request);
+      const createdId = await createCategoryWithHierarchy(this.api, request);
       this.createDialogOpenState.set(false);
       this.createParentIdState.set(null);
       await this.loadTree();
+      // Reveal the new row without a manual expand: ancestor nodes default to
+      // collapsed, so a child created under a collapsed parent would otherwise
+      // be present in the data but invisible until someone expands that row.
+      for (const ancestorId of findAncestorIds(createdId, this.parentMap())) {
+        this.expand(ancestorId);
+      }
       return true;
     } catch (error) {
       this.createErrorState.set(this.toErrorMessage(error, 'Failed to create category.'));

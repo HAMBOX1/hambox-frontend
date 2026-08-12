@@ -53,11 +53,11 @@ const STEP_LABELS: readonly AdminStepperStep[] = [
 // Inventory (variants) and Digital codes are deliberately not offered here — variants are
 // generated after a Products import via the existing "Generate Variants" action in the product
 // editor, and codes are added per-variant in the catalog admin UI, not bulk-imported.
-const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityType }[] = [
+const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityType; hint?: string }[] = [
   { label: 'Full catalog package (.hambox)', value: 'FullPackage' },
   { label: 'Products', value: 'Products' },
   { label: 'Categories', value: 'Categories' },
-  { label: 'Collections', value: 'Collections' },
+  { label: 'Internal Categories', value: 'Collections', hint: 'Import/export column: Collections' },
 ];
 
 @Component({
@@ -106,14 +106,19 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
                   [ngModel]="state().entityType"
                   (ngModelChange)="facade.setEntityType($event)"
                 />
-                <label [for]="'entity-' + option.value">{{ option.label }}</label>
+                <label [for]="'entity-' + option.value">
+                  {{ option.label }}
+                  @if (option.hint) {
+                    <span class="wizard__entity-hint">{{ option.hint }}</span>
+                  }
+                </label>
               </div>
             }
           </div>
 
           @if (state().entityType !== 'FullPackage') {
             <button type="button" class="wizard__link-button" (click)="downloadTemplate()">
-              Download {{ state().entityType }} template
+              Download {{ entityTypeDisplayLabel(state().entityType) }} template
             </button>
           }
 
@@ -398,6 +403,11 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
       align-items: flex-start;
       gap: 0.625rem;
     }
+    .wizard__entity-hint {
+      display: block;
+      font-size: var(--admin-type-caption, 0.75rem);
+      color: var(--admin-text-secondary);
+    }
     .wizard__password-row {
       margin-bottom: 1rem;
     }
@@ -633,6 +643,11 @@ export class CatalogImportWizardPageComponent {
     return entityType === 'FullPackage' ? '.hambox' : '.xlsx,.xlsm,.csv';
   }
 
+  /** Admin-facing name for an entity type — only "Collections" differs from its file/column name (kept as-is in the actual template/contract). */
+  protected entityTypeDisplayLabel(entityType: CatalogImportEntityType): string {
+    return entityType === 'Collections' ? 'Internal Categories' : entityType;
+  }
+
   protected toneFor(status: CatalogImportRowStatus): 'success' | 'info' | 'neutral' | 'danger' {
     switch (status) {
       case 'New':
@@ -651,7 +666,7 @@ export class CatalogImportWizardPageComponent {
       case 'UnknownCategory':
         return 'Unknown category';
       case 'UnknownCollection':
-        return 'Unknown collection';
+        return 'Unknown internal category';
       case 'UnknownSupplier':
         return 'Unknown supplier';
       case 'UnknownProduct':

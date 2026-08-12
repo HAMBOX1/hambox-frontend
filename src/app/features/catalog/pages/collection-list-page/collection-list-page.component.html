@@ -2,7 +2,7 @@
 
 <section class="admin-page collection-list-page">
   <app-admin-page-header
-    title="Collections"
+    title="Internal Categories"
     [subtitle]="subtitle()"
     [breadcrumbs]="breadcrumbs"
     [compactActions]="true"
@@ -11,7 +11,7 @@
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Collections.Create"
       icon="pi pi-plus"
-      label="Create Collection"
+      label="Create Internal Category"
       severity="primary"
       (pressed)="openCreateDialog()"
     />
@@ -20,7 +20,7 @@
   <app-admin-search-bar
     class="collection-list-page__search"
     [value]="searchTerm()"
-    placeholder="Search collections..."
+    placeholder="Search internal categories..."
     (searchChange)="onSearchChange($event)"
   />
 
@@ -38,7 +38,7 @@
 </section>
 
 <p-dialog
-  header="Create Collection"
+  header="Create Internal Category"
   [visible]="createDialogOpen()"
   (visibleChange)="onCreateDialogVisibleChange($event)"
   [modal]="true"
@@ -63,7 +63,7 @@
 <p-drawer
   [visible]="editDialogOpen()"
   (visibleChange)="onEditDialogVisibleChange($event)"
-  header="Edit Collection"
+  header="Edit Internal Category"
   position="right"
   [modal]="true"
   [dismissible]="true"
@@ -85,7 +85,7 @@
 
 <app-admin-confirm-dialog
   [visible]="deleteDialogOpen()"
-  title="Delete collection"
+  title="Delete internal category"
   [message]="deleteDialogMessage()"
   [destructive]="true"
   [loading]="deleting()"

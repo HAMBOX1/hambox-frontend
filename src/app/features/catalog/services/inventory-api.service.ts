@@ -26,12 +26,17 @@ import {
   InventoryReservationDto,
   InventoryStatisticsDto,
   InventorySupplierDto,
+  ImportOptionGroupTemplateRequest,
+  OptionGroupTemplateDto,
+  OptionGroupTemplateSummaryDto,
   ProductOptionGroupDto,
   ProductVariantDto,
   ReorderIdsRequest,
   RevealInventoryCodeDto,
+  SaveOptionGroupAsTemplateRequest,
   StorefrontProductConfigurationDto,
   UpdateOptionGroupRequest,
+  UpdateOptionGroupTemplateRequest,
   UpdateOptionRequest,
   UpdateVariantRequest,
   VariantUsageDto,
@@ -169,6 +174,32 @@ export class InventoryApiService {
 
   reorderOptions(groupId: string, request: ReorderIdsRequest): Observable<void> {
     return this.api.put<void>(INVENTORY_API.optionGroupOptionsReorder(groupId), request);
+  }
+
+  searchOptionGroupTemplates(search: string): Observable<OptionGroupTemplateSummaryDto[]> {
+    return this.api.get<OptionGroupTemplateSummaryDto[]>(INVENTORY_API.optionGroupTemplates, {
+      params: search ? { search } : undefined,
+    });
+  }
+
+  getOptionGroupTemplate(templateId: string): Observable<OptionGroupTemplateDto> {
+    return this.api.get<OptionGroupTemplateDto>(INVENTORY_API.optionGroupTemplate(templateId));
+  }
+
+  saveOptionGroupAsTemplate(groupId: string, request: SaveOptionGroupAsTemplateRequest): Observable<string> {
+    return this.api.post<string>(INVENTORY_API.saveOptionGroupAsTemplate(groupId), request);
+  }
+
+  updateOptionGroupTemplate(templateId: string, request: UpdateOptionGroupTemplateRequest): Observable<void> {
+    return this.api.put<void>(INVENTORY_API.optionGroupTemplate(templateId), request);
+  }
+
+  deleteOptionGroupTemplate(templateId: string): Observable<void> {
+    return this.api.delete<void>(INVENTORY_API.optionGroupTemplate(templateId));
+  }
+
+  importOptionGroupTemplate(productId: string, request: ImportOptionGroupTemplateRequest): Observable<string> {
+    return this.api.post<string>(INVENTORY_API.importOptionGroupTemplate(productId), request);
   }
 
   getSuppliers(pageNumber = 1, pageSize = 50, searchTerm?: string): Observable<readonly InventorySupplierDto[]> {

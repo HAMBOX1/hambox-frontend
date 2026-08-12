@@ -117,6 +117,12 @@ export const INVENTORY_API = {
   optionGroupOptionsReorder: (groupId: string) =>
     `/api/v1/inventory/option-groups/${groupId}/options/reorder`,
   option: (optionId: string) => `/api/v1/inventory/options/${optionId}`,
+  optionGroupTemplates: '/api/v1/inventory/option-group-templates',
+  optionGroupTemplate: (templateId: string) => `/api/v1/inventory/option-group-templates/${templateId}`,
+  saveOptionGroupAsTemplate: (groupId: string) =>
+    `/api/v1/inventory/option-groups/${groupId}/save-as-template`,
+  importOptionGroupTemplate: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/option-groups/import-template`,
   suppliers: '/api/v1/inventory/suppliers',
   variantBatches: (variantId: string) => `/api/v1/inventory/variants/${variantId}/batches`,
   batchImport: (variantId: string, batchId: string) =>

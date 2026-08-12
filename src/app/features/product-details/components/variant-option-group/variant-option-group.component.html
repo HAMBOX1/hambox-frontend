@@ -16,4 +16,10 @@
       </button>
     }
   </div>
+
+  @if (selectedOption()?.descriptionHtml) {
+    <button type="button" class="variant-option-group__instructions" (click)="openInstructions()">
+      {{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}
+    </button>
+  }
 </div>

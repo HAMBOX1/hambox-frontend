@@ -22,7 +22,7 @@
     (click)="onRowActivate($event)"
   >
     <div class="collection-tree-node__actions" (click)="$event.stopPropagation()">
-      <app-admin-action-menu [items]="menuItems()" label="Collection actions" />
+      <app-admin-action-menu [items]="menuItems()" label="Internal category actions" />
     </div>
 
     <div class="collection-tree-node__primary">
@@ -59,7 +59,7 @@
         <span class="collection-tree-node__system-badge">System</span>
       }
       @if (node().childrenCount > 0) {
-        <span class="collection-tree-node__count collection-tree-node__count--children" title="{{ node().childrenCount }} child collections">
+        <span class="collection-tree-node__count collection-tree-node__count--children" title="{{ node().childrenCount }} child internal categories">
           {{ node().childrenCount }}
         </span>
       }

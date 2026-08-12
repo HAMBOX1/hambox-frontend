@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
 
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
@@ -24,7 +25,7 @@ import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storef
 import { ProductDetailsItem } from '../../models/product-details';
 import { ProductDetails } from '../../services/product-details';
 import { StorefrontVariantFacade } from '../../services/storefront-variant.facade';
-import { VariantOptionGroupComponent } from '../../components/variant-option-group/variant-option-group.component';
+import { VariantOptionGroupComponent, VariantOptionInstructionsRequest } from '../../components/variant-option-group/variant-option-group.component';
 import { ApiError } from '../../../../core/models/api-error.model';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
@@ -67,6 +68,7 @@ const BUY_BAR_INSET_PX = 76;
     TranslatePipe,
     StoreProductCardComponent,
     SectionRendererComponent,
+    DialogModule,
   ],
   templateUrl: './product-details-page.component.html',
   styleUrl: './product-details-page.component.scss',
@@ -344,6 +346,17 @@ export class ProductDetailsPageComponent {
 
   protected onOptionChange(groupId: string, optionId: string): void {
     this.variantFacade.setGroupSelection(groupId, optionId);
+  }
+
+  /** Purely informational popup — never touches option selection, variant resolution, or pricing. */
+  protected readonly instructionsDialog = signal<VariantOptionInstructionsRequest | null>(null);
+
+  protected openInstructions(request: VariantOptionInstructionsRequest): void {
+    this.instructionsDialog.set(request);
+  }
+
+  protected closeInstructions(): void {
+    this.instructionsDialog.set(null);
   }
 
   private toCartErrorMessage(error: unknown): string {

@@ -153,7 +153,7 @@ export class ProductBasicInfoFormComponent {
   /** Selected collections rendered as chips — flat tags, no primary concept unlike categories. */
   protected readonly selectedCollectionChips = computed(() => {
     const labelById = new Map(this.collectionOptionsMerged().map((option) => [option.id, option.label]));
-    return this.selectedCollectionIdsState().map((id) => ({ id, label: labelById.get(id) ?? 'Unknown collection' }));
+    return this.selectedCollectionIdsState().map((id) => ({ id, label: labelById.get(id) ?? 'Unknown internal category' }));
   });
 
   protected readonly form = this.fb.nonNullable.group({
@@ -445,7 +445,7 @@ export class ProductBasicInfoFormComponent {
       this.collectionDialogOpenState.set(false);
       this.collectionCreated.emit();
     } catch (error) {
-      this.collectionCreateErrorState.set(this.toErrorMessage(error, 'Failed to create collection.'));
+      this.collectionCreateErrorState.set(this.toErrorMessage(error, 'Failed to create internal category.'));
     } finally {
       this.collectionCreatingState.set(false);
     }

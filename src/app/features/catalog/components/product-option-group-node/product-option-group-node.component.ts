@@ -9,6 +9,8 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
+import { EditorModule } from 'primeng/editor';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
@@ -32,6 +34,8 @@ import { slugify } from '../../utils/product-display.utils';
     FormsModule,
     ButtonModule,
     CheckboxModule,
+    DialogModule,
+    EditorModule,
     InputTextModule,
     DragDropModule,
     HasPermissionDirective,
@@ -68,6 +72,15 @@ export class ProductOptionGroupNodeComponent {
   protected readonly collapsed = signal(false);
   protected readonly collapsedFollowUps = signal<ReadonlySet<string>>(new Set());
   protected readonly deleteDialogOpen = signal(false);
+
+  protected readonly saveTemplateDialogOpen = signal(false);
+  protected readonly saveTemplateName = signal('');
+  protected readonly savingTemplate = signal(false);
+  protected readonly saveTemplateError = signal<string | null>(null);
+
+  protected readonly instructionsOptionId = signal<string | null>(null);
+  protected readonly instructionsDraft = signal('');
+  protected readonly savingInstructions = signal(false);
 
   private canEdit(): boolean {
     return (
@@ -159,6 +172,78 @@ export class ProductOptionGroupNodeComponent {
       this.deleteDialogOpen.set(false);
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  /** Follow-up (nested) groups can't be represented in a flat template snapshot yet — matches the
+   * backend's OptionGroupHasChildGroups guard. */
+  protected hasAnyFollowUps(): boolean {
+    return this.group().options.some((option) => this.hasFollowUps(option.id));
+  }
+
+  protected openSaveTemplateDialog(): void {
+    this.saveTemplateError.set(null);
+    this.saveTemplateName.set(this.group().displayName);
+    this.saveTemplateDialogOpen.set(true);
+  }
+
+  protected async confirmSaveTemplate(): Promise<void> {
+    const name = this.saveTemplateName().trim();
+    if (!name) {
+      return;
+    }
+
+    this.savingTemplate.set(true);
+    this.saveTemplateError.set(null);
+    try {
+      const success = await this.facade.saveOptionGroupAsTemplate(this.group().id, { name });
+      if (success) {
+        this.saveTemplateDialogOpen.set(false);
+      } else {
+        // Surfaces the backend's actual reason (e.g. "A saved option group with this name
+        // already exists") so the admin knows to change the name — the dialog stays open with
+        // the name field still editable, nothing is lost, they can just retype and save again.
+        // Deliberately templateActionError, not facade.error() — the latter is treated as a
+        // fatal page-load failure by product-edit-page and would blow away the whole editor.
+        this.saveTemplateError.set(this.facade.templateActionError() ?? 'Unable to save this group as reusable.');
+      }
+    } finally {
+      this.savingTemplate.set(false);
+    }
+  }
+
+  protected instructionsOptionLabel(): string | null {
+    const optionId = this.instructionsOptionId();
+    return this.group().options.find((option) => option.id === optionId)?.label ?? null;
+  }
+
+  protected openInstructions(option: ProductOptionDto): void {
+    this.instructionsOptionId.set(option.id);
+    this.instructionsDraft.set(option.descriptionHtml ?? '');
+  }
+
+  protected closeInstructions(): void {
+    this.instructionsOptionId.set(null);
+    this.instructionsDraft.set('');
+  }
+
+  protected async saveInstructions(): Promise<void> {
+    const optionId = this.instructionsOptionId();
+    const option = this.group().options.find((candidate) => candidate.id === optionId);
+    if (!option) {
+      return;
+    }
+
+    this.savingInstructions.set(true);
+    try {
+      await this.facade.updateOption(option.id, {
+        label: option.label,
+        sortOrder: option.sortOrder,
+        descriptionHtml: this.instructionsDraft().trim() || null,
+      });
+      this.closeInstructions();
+    } finally {
+      this.savingInstructions.set(false);
     }
   }
 

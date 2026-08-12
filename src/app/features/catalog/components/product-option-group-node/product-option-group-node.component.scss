@@ -234,6 +234,16 @@
   color: var(--admin-text-primary);
 }
 
+.answer-row__icon-btn--active {
+  color: var(--admin-accent-green, var(--admin-text-primary));
+}
+
+.question-card__save-template-error {
+  margin: 0 0 0.75rem;
+  color: var(--admin-danger, #dc2626);
+  font-size: var(--admin-type-caption, 0.8125rem);
+}
+
 // Follow-up panel — tinted + indented so a nested Question -> Answer chain reads as a subtree at
 // a glance, never mistaken for a sibling of the answer it hangs off.
 .followup-panel {

@@ -168,6 +168,7 @@
             [options]="variantFacade.optionsForGroup(group)"
             [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
             (optionSelected)="onOptionChange(group.id, $event)"
+            (instructionsRequested)="openInstructions($event)"
           />
         }
       } @else if (variantFacade.hasOptionGroups()) {
@@ -262,4 +263,25 @@
   }
 
   <app-storefront-footer />
+
+  <p-dialog
+    [visible]="instructionsDialog() !== null"
+    (visibleChange)="!$event && closeInstructions()"
+    [modal]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    appendTo="body"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    styleClass="pdp__instructions-dialog"
+  >
+    <ng-template pTemplate="header">
+      <div class="pdp__instructions-dialog-header">
+        <span class="pdp__instructions-dialog-group">{{ instructionsDialog()?.groupLabel }}</span>
+        <span class="pdp__instructions-dialog-option">{{ instructionsDialog()?.optionLabel }}</span>
+      </div>
+    </ng-template>
+    <div class="pdp__instructions-dialog-body" [innerHTML]="instructionsDialog()?.descriptionHtml"></div>
+  </p-dialog>
 </div>

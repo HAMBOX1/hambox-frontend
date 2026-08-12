@@ -71,7 +71,7 @@
             (click)="openCollectionSheet(product, $event)"
           >
             <i class="pi pi-folder" aria-hidden="true"></i>
-            {{ collectionCount(product) }} Collections
+            {{ collectionCount(product) }} Internal Categories
           </button>
         </div>
 
@@ -104,18 +104,18 @@
 
 <app-hambox-bottom-sheet
   [open]="collectionSheetOpen()"
-  title="Assign Collections"
+  title="Assign Internal Categories"
   [heightVh]="70"
   (closed)="closeCollectionSheet()"
 >
   <app-admin-search-bar
     [value]="collectionSheetSearchTerm()"
     placeholder="Search..."
-    ariaLabel="Search collections"
+    ariaLabel="Search internal categories"
     (searchChange)="collectionSheetSearchTerm.set($event)"
   />
 
-  <ul class="product-catalog-cards__collection-list" role="listbox" aria-label="Collections">
+  <ul class="product-catalog-cards__collection-list" role="listbox" aria-label="Internal Categories">
     @for (option of filteredCollectionSheetOptions(); track option.id) {
       <li class="product-catalog-cards__collection-list-item">
         <p-checkbox
@@ -129,7 +129,7 @@
         }}</label>
       </li>
     } @empty {
-      <li class="product-catalog-cards__collection-list-empty">No collections match your search.</li>
+      <li class="product-catalog-cards__collection-list-empty">No internal categories match your search.</li>
     }
   </ul>
 
@@ -140,7 +140,7 @@
   <button
     pButton
     type="button"
-    label="+ New Collection"
+    label="+ New Internal Category"
     icon="pi pi-plus"
     severity="secondary"
     text
@@ -156,7 +156,7 @@
 </app-hambox-bottom-sheet>
 
 <p-dialog
-  header="Create Collection"
+  header="Create Internal Category"
   [visible]="collectionDialogOpen()"
   (visibleChange)="onCollectionCreateDialogVisibleChange($event)"
   [modal]="true"

@@ -118,7 +118,7 @@ export class CollectionListFacade {
 
   readonly subtitle = computed(() => {
     const count = this.totalCount();
-    const noun = count === 1 ? 'collection' : 'collections';
+    const noun = count === 1 ? 'internal category' : 'internal categories';
     return `${count} ${noun}`;
   });
 
@@ -188,7 +188,7 @@ export class CollectionListFacade {
       await this.loadTree();
       return id;
     } catch (error) {
-      this.createErrorState.set(this.toErrorMessage(error, 'Failed to create collection.'));
+      this.createErrorState.set(this.toErrorMessage(error, 'Failed to create internal category.'));
       return null;
     } finally {
       this.creatingState.set(false);
@@ -211,7 +211,7 @@ export class CollectionListFacade {
       await this.loadTree();
       return true;
     } catch (error) {
-      this.updateErrorState.set(this.toErrorMessage(error, 'Failed to update collection.'));
+      this.updateErrorState.set(this.toErrorMessage(error, 'Failed to update internal category.'));
       return false;
     } finally {
       this.updatingState.set(false);
@@ -226,7 +226,7 @@ export class CollectionListFacade {
       await this.loadTree();
       return true;
     } catch (error) {
-      this.errorState.set(this.toErrorMessage(error, 'Failed to delete collection.'));
+      this.errorState.set(this.toErrorMessage(error, 'Failed to delete internal category.'));
       return false;
     } finally {
       this.deletingState.set(false);
@@ -253,7 +253,7 @@ export class CollectionListFacade {
       return true;
     } catch (error) {
       this.flatItemsState.set(snapshot);
-      this.errorState.set(this.toErrorMessage(error, 'Failed to reorder collections.'));
+      this.errorState.set(this.toErrorMessage(error, 'Failed to reorder internal categories.'));
       return false;
     }
   }
@@ -267,7 +267,7 @@ export class CollectionListFacade {
       this.flatItemsState.set(items ?? []);
     } catch (error) {
       this.flatItemsState.set([]);
-      this.errorState.set(this.toErrorMessage(error, 'Failed to load collections.'));
+      this.errorState.set(this.toErrorMessage(error, 'Failed to load internal categories.'));
     } finally {
       this.loadingState.set(false);
     }
@@ -276,7 +276,7 @@ export class CollectionListFacade {
   private toErrorMessage(error: unknown, fallback: string): string {
     if (error instanceof ApiError) {
       if (error.status === 401 || error.status === 403) {
-        return 'You do not have permission to manage collections. Sign in with an admin account (admin@hambox.local in development).';
+        return 'You do not have permission to manage internal categories. Sign in with an admin account (admin@hambox.local in development).';
       }
 
       return error.message;
