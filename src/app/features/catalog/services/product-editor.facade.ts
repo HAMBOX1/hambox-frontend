@@ -50,6 +50,8 @@ import {
 
   BulkUpdateVariantsRequest,
 
+  BulkVariantsResultDto,
+
   InventoryBatchDto,
 
   InventoryStatisticsDto,
@@ -65,6 +67,8 @@ import {
   UpdateOptionRequest,
 
   UpdateVariantRequest,
+
+  VariantUsageDto,
 
 } from '../models/inventory-api.model';
 
@@ -1172,19 +1176,25 @@ export class ProductEditorFacade {
 
 
 
-  async bulkDeleteVariants(variantIds: readonly string[]): Promise<number> {
+  /**
+   * Returns the full per-item result (not just a count) — every id is attempted independently
+   * with the same protected-history/permission checks as a single delete, so a bulk request can
+   * legitimately partially succeed and callers must be able to tell the admin which ones were
+   * blocked, not just report a single deleted-count as if nothing else happened.
+   */
+  async bulkDeleteVariants(variantIds: readonly string[]): Promise<BulkVariantsResultDto | null> {
     const productId = this.productId();
     if (!productId || variantIds.length === 0) {
-      return 0;
+      return null;
     }
 
     try {
       const result = await firstValueFrom(this.inventoryApi.bulkDeleteVariants(productId, { variantIds }));
       await this.reloadInventory(productId);
-      return result.successCount;
+      return result;
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Failed to delete variants.'));
-      return 0;
+      return null;
     }
   }
 
@@ -1398,6 +1408,41 @@ export class ProductEditorFacade {
 
     }
 
+  }
+
+  async archiveVariant(variantId: string): Promise<boolean> {
+    const productId = this.productId();
+    if (!productId) {
+      return false;
+    }
+
+    try {
+      await firstValueFrom(this.inventoryApi.archiveVariant(variantId));
+      await this.reloadInventory(productId);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to archive variant.'));
+      return false;
+    }
+  }
+
+  /** Always re-fetches fresh from the server — never assume a previous usage snapshot is still current. */
+  async getVariantUsage(variantId: string): Promise<VariantUsageDto | null> {
+    try {
+      return await firstValueFrom(this.inventoryApi.getVariantUsage(variantId));
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to load variant usage.'));
+      return null;
+    }
+  }
+
+  async cleanupVariant(variantId: string): Promise<VariantUsageDto | null> {
+    try {
+      return await firstValueFrom(this.inventoryApi.cleanupVariant(variantId));
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to clean up variant.'));
+      return null;
+    }
   }
 
 

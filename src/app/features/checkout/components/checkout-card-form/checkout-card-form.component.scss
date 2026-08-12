@@ -63,13 +63,13 @@
 }
 
 .card-form__input-wrap .card-form__input {
-  padding-right: 48px;
+  padding-inline-end: 48px;
 }
 
 .card-form__card-icon {
   position: absolute;
   top: 50%;
-  right: 17px;
+  inset-inline-end: 17px;
   color: var(--color-text-muted);
   transform: translateY(-50%);
 }

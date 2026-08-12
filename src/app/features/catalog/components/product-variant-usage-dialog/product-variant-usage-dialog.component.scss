@@ -1,0 +1,39 @@
+.variant-usage-dialog__subtitle {
+  margin: 0 0 var(--admin-field-gap);
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-type-body);
+  font-weight: 600;
+}
+
+.variant-usage-dialog__section {
+  margin-bottom: var(--admin-field-gap);
+}
+
+.variant-usage-dialog__section-header {
+  margin-bottom: 0.375rem;
+}
+
+.variant-usage-dialog__section-explanation {
+  margin: 0 0 0.5rem;
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-type-caption);
+  line-height: 1.5;
+}
+
+.variant-usage-dialog__list {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+  color: var(--admin-text-primary);
+  font-size: var(--admin-type-body);
+  line-height: 1.6;
+}
+
+.variant-usage-dialog__guidance {
+  margin: var(--admin-field-gap) 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--hambox-radius-md);
+  background: var(--color-warning-muted);
+  color: var(--admin-text-primary);
+  font-size: var(--admin-type-caption);
+  line-height: 1.5;
+}

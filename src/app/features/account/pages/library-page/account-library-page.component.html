@@ -116,9 +116,18 @@
       <header class="library-card__header">
         <h3>{{ item.productNameEn }}</h3>
         <span class="library-card__status" [class.is-delivered]="item.deliveryStatus === 'Delivered'">
-          {{ item.deliveryStatus }}
+          {{ deliveryStatusLabel(item) }}
         </span>
       </header>
+
+      @if (isDeliveryPending(item)) {
+        <p class="library-card__processing-note">
+          {{ 'ACCOUNT.LIBRARY_UI.PROCESSING_NOTE' | translate }}
+          @if (item.supportUrl) {
+            <a [href]="item.supportUrl">{{ 'ACCOUNT.LIBRARY_UI.SUPPORT' | translate }}</a>
+          }
+        </p>
+      }
 
       <dl class="library-card__meta">
         <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_PLATFORM' | translate }}</dt><dd>{{ metaValue(item.platform) }}</dd></div>

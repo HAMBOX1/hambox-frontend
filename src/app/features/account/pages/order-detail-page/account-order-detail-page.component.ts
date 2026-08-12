@@ -57,6 +57,12 @@ export class AccountOrderDetailPageComponent implements OnInit {
     return translated === key ? status : translated;
   }
 
+  /** Order is paid and being fulfilled, but no keys are ready yet — a normal, temporary state,
+   * not a sign anything is wrong (see ACCOUNT.ORDER_DETAIL_UI.PROCESSING_NOTE). */
+  protected isProcessingStatus(status: string): boolean {
+    return status === 'Pending' || status === 'Processing';
+  }
+
   protected timelineEventLabel(eventType: string): string {
     const key = `ACCOUNT.TIMELINE_EVENT.${eventType.toUpperCase().replace(/\s+/g, '_')}`;
     const translated = this.i18n.instant(key);

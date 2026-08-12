@@ -1,0 +1,126 @@
+<p-dialog
+  [header]="'ADMIN.VARIANT_USAGE.TITLE' | translate"
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!anyLoading()"
+  appendTo="body"
+  [style]="{ width: 'min(38rem, 94vw)' }"
+  styleClass="admin-dialog variant-usage-dialog"
+  (onHide)="onHide()"
+>
+  @if (variantSku()) {
+    <p class="variant-usage-dialog__subtitle">{{ variantSku() }}</p>
+  }
+
+  @if (safeToRemoveItems().length > 0) {
+    <section class="variant-usage-dialog__section">
+      <div class="variant-usage-dialog__section-header">
+        <app-admin-status-badge
+          [label]="'ADMIN.VARIANT_USAGE.SAFE_TO_REMOVE_TITLE' | translate"
+          tone="success"
+        />
+      </div>
+      <p class="variant-usage-dialog__section-explanation">
+        {{ 'ADMIN.VARIANT_USAGE.SAFE_TO_REMOVE_EXPLANATION' | translate }}
+      </p>
+      <ul class="variant-usage-dialog__list">
+        @for (item of safeToRemoveItems(); track item.key) {
+          <li>{{ translationKeyFor(item.key) | translate: { count: item.count } }}</li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (safeToDetachItems().length > 0) {
+    <section class="variant-usage-dialog__section">
+      <div class="variant-usage-dialog__section-header">
+        <app-admin-status-badge
+          [label]="'ADMIN.VARIANT_USAGE.SAFE_TO_DETACH_TITLE' | translate"
+          tone="info"
+        />
+      </div>
+      <p class="variant-usage-dialog__section-explanation">
+        {{ 'ADMIN.VARIANT_USAGE.SAFE_TO_DETACH_EXPLANATION' | translate }}
+      </p>
+      <ul class="variant-usage-dialog__list">
+        @for (item of safeToDetachItems(); track item.key) {
+          <li>{{ translationKeyFor(item.key) | translate: { count: item.count } }}</li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (protectedHistoryItems().length > 0) {
+    <section class="variant-usage-dialog__section">
+      <div class="variant-usage-dialog__section-header">
+        <app-admin-status-badge
+          [label]="'ADMIN.VARIANT_USAGE.PROTECTED_HISTORY_TITLE' | translate"
+          tone="danger"
+        />
+      </div>
+      <p class="variant-usage-dialog__section-explanation">
+        {{ 'ADMIN.VARIANT_USAGE.PROTECTED_HISTORY_EXPLANATION' | translate }}
+      </p>
+      <ul class="variant-usage-dialog__list">
+        @for (item of protectedHistoryItems(); track item.key) {
+          <li>{{ translationKeyFor(item.key) | translate: { count: item.count } }}</li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (hasProtectedUsage()) {
+    <p class="variant-usage-dialog__guidance">
+      {{ 'ADMIN.VARIANT_USAGE.GUIDANCE_ARCHIVE' | translate }}
+    </p>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.VARIANT_USAGE.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      [disabled]="anyLoading()"
+      (click)="visibleChange.emit(false)"
+    ></button>
+
+    @if (hasRemovableUsage()) {
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.VARIANT_USAGE.CLEANUP' | translate"
+        severity="secondary"
+        [loading]="cleanupLoading()"
+        [disabled]="anyLoading() && !cleanupLoading()"
+        (click)="cleanupRequested.emit()"
+      ></button>
+    }
+
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.VARIANT_USAGE.ARCHIVE' | translate"
+      severity="warn"
+      [loading]="archiveLoading()"
+      [disabled]="anyLoading() && !archiveLoading()"
+      (click)="archiveRequested.emit()"
+    ></button>
+
+    @if (canDeletePermanently()) {
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.VARIANT_USAGE.DELETE_PERMANENTLY' | translate"
+        severity="danger"
+        [loading]="deleteLoading()"
+        [disabled]="anyLoading() && !deleteLoading()"
+        (click)="deleteRequested.emit()"
+      ></button>
+    }
+  </ng-template>
+</p-dialog>

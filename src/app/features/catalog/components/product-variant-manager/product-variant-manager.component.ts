@@ -25,6 +25,7 @@ import {
   AdminBulkBarComponent,
   AdminConfirmDialogComponent,
   AdminEmptyStateComponent,
+  AdminErrorAlertComponent,
   AdminIconButtonComponent,
   AdminLoadingSkeletonComponent,
   AdminSearchBarComponent,
@@ -34,7 +35,7 @@ import {
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { MobileViewportService } from '../../../../shared/services/mobile-viewport.service';
 import { computeRangeIds } from '../../../../shared/utils/selection.utils';
-import { CreateVariantRequest, ProductVariantDto } from '../../models/inventory-api.model';
+import { CreateVariantRequest, ProductVariantDto, VariantUsageDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import {
   breadcrumbForVariant,
@@ -46,6 +47,7 @@ import {
 } from '../../utils/variant-tree.utils';
 import { ProductVariantLeafListComponent } from '../product-variant-leaf-list/product-variant-leaf-list.component';
 import { ProductVariantTreeNodeComponent } from '../product-variant-tree-node/product-variant-tree-node.component';
+import { ProductVariantUsageDialogComponent } from '../product-variant-usage-dialog/product-variant-usage-dialog.component';
 import { VariantInventoryPanelComponent } from '../variant-inventory-panel/variant-inventory-panel.component';
 
 const VARIANT_STATUS_OPTIONS = [
@@ -80,6 +82,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'draft';
     AdminToolbarComponent,
     AdminSearchBarComponent,
     AdminEmptyStateComponent,
+    AdminErrorAlertComponent,
     AdminLoadingSkeletonComponent,
     AdminConfirmDialogComponent,
     AdminIconButtonComponent,
@@ -87,6 +90,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'draft';
     AdminBulkBarComponent,
     ProductVariantTreeNodeComponent,
     ProductVariantLeafListComponent,
+    ProductVariantUsageDialogComponent,
     VariantInventoryPanelComponent,
   ],
   providers: [MessageService],
@@ -111,9 +115,26 @@ export class ProductVariantManagerComponent {
   protected readonly statusFilterOptions = STATUS_FILTER_OPTIONS;
   protected readonly variantGenerationResult = this.facade.variantGenerationResult;
 
+  /**
+   * Informational only — no blocking rule is invented here. A product with variants but none
+   * Active+visible simply can't be bought yet (already enforced storefront-side by the existing
+   * Status/IsVisible filters); this just surfaces that state to the admin instead of leaving them
+   * to discover it by checking the storefront themselves.
+   */
+  protected readonly hasNoPurchasableVariant = computed(
+    () => this.variants().length > 0 && !this.variants().some((v) => v.status === 'Active' && v.isVisible),
+  );
+
   protected readonly saving = signal(false);
   protected readonly deleteDialogOpen = signal(false);
   protected readonly deleteTarget = signal<ProductVariantDto | null>(null);
+  protected readonly usageDialogOpen = signal(false);
+  protected readonly usageTarget = signal<ProductVariantDto | null>(null);
+  protected readonly variantUsage = signal<VariantUsageDto | null>(null);
+  protected readonly usageLoading = signal(false);
+  protected readonly usageCleanupLoading = signal(false);
+  protected readonly usageArchiveLoading = signal(false);
+  protected readonly usageDeleteLoading = signal(false);
   protected readonly editTarget = signal<ProductVariantDto | null>(null);
   protected readonly editSku = signal('');
   protected readonly editPriceOverride = signal<number | null>(null);
@@ -133,6 +154,9 @@ export class ProductVariantManagerComponent {
   protected readonly bulkActionLoading = signal(false);
   protected readonly bulkDeleteDialogOpen = signal(false);
   protected readonly bulkPriceStatusDialogOpen = signal(false);
+  /** Variants a bulk delete just blocked — lets the admin jump straight to "why" for each one
+   * instead of guessing from a summary toast. */
+  protected readonly bulkBlockedVariants = signal<readonly ProductVariantDto[]>([]);
 
   protected readonly bulkSelectedCount = computed(() => this.selectedVariantIds().size);
 
@@ -349,9 +373,150 @@ export class ProductVariantManagerComponent {
     }
   }
 
-  protected requestDelete(variant: ProductVariantDto): void {
-    this.deleteTarget.set(variant);
-    this.deleteDialogOpen.set(true);
+  /**
+   * "Delete" always inspects usage first. A variant with nothing referencing it goes straight to
+   * the plain confirm dialog; anything else opens the categorized usage dialog instead of
+   * pretending a permanent delete is possible.
+   */
+  protected async requestDelete(variant: ProductVariantDto): Promise<void> {
+    if (this.usageLoading()) {
+      return; // already checking usage for a previous click — ignore the double-submit
+    }
+
+    this.usageLoading.set(true);
+    try {
+      const usage = await this.facade.getVariantUsage(variant.id);
+      if (!usage) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Could not check variant usage',
+          detail: this.facade.error() ?? 'Please try again.',
+        });
+        return;
+      }
+
+      const totalUsage =
+        usage.safeToRemove.totalCount + usage.safeToDetach.totalCount + usage.protectedHistory.totalCount;
+
+      if (totalUsage === 0) {
+        this.deleteTarget.set(variant);
+        this.deleteDialogOpen.set(true);
+        return;
+      }
+
+      this.usageTarget.set(variant);
+      this.variantUsage.set(usage);
+      this.usageDialogOpen.set(true);
+    } finally {
+      this.usageLoading.set(false);
+    }
+  }
+
+  protected closeUsageDialog(): void {
+    this.usageDialogOpen.set(false);
+    this.usageTarget.set(null);
+    this.variantUsage.set(null);
+  }
+
+  protected async onUsageCleanup(): Promise<void> {
+    const variant = this.usageTarget();
+    if (!variant) {
+      return;
+    }
+
+    this.usageCleanupLoading.set(true);
+    try {
+      const usage = await this.facade.cleanupVariant(variant.id);
+      if (!usage) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Cleanup failed',
+          detail: this.facade.error() ?? 'Please try again.',
+        });
+        return;
+      }
+
+      // Never assume cleanup removed everything shown before — the dialog re-renders from
+      // whatever the backend reports right now.
+      this.variantUsage.set(usage);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Cleaned up',
+        detail: 'Removable data cleared. Usage has been refreshed.',
+      });
+    } finally {
+      this.usageCleanupLoading.set(false);
+    }
+  }
+
+  protected async onUsageArchive(): Promise<void> {
+    const variant = this.usageTarget();
+    if (!variant) {
+      return;
+    }
+
+    this.usageArchiveLoading.set(true);
+    try {
+      const archived = await this.facade.archiveVariant(variant.id);
+      if (!archived) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Could not archive variant',
+          detail: this.facade.error() ?? 'Please try again.',
+        });
+        return;
+      }
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Archived',
+        detail: `Variant "${variant.sku}" archived.`,
+      });
+      this.closeUsageDialog();
+    } finally {
+      this.usageArchiveLoading.set(false);
+    }
+  }
+
+  protected async onUsageDeletePermanently(): Promise<void> {
+    const variant = this.usageTarget();
+    if (!variant) {
+      return;
+    }
+
+    this.usageDeleteLoading.set(true);
+    try {
+      const deleted = await this.facade.deleteVariant(variant.id);
+      if (!deleted) {
+        // The backend re-checks usage fresh on every delete attempt — a concurrent purchase,
+        // reservation, or cart add since we last looked can make this fail even though the
+        // dialog showed zero blocking usage a moment ago. Refresh rather than assume anything.
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Could not delete variant',
+          detail: this.facade.error() ?? 'This variant is now in use.',
+        });
+        const refreshed = await this.facade.getVariantUsage(variant.id);
+        if (refreshed) {
+          this.variantUsage.set(refreshed);
+        }
+        return;
+      }
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: `Variant "${variant.sku}" deleted.`,
+      });
+      this.selectedVariantIds.update((ids) => {
+        const next = new Set(ids);
+        next.delete(variant.id);
+        return next;
+      });
+      this.closeUsageDialog();
+    } finally {
+      this.usageDeleteLoading.set(false);
+    }
   }
 
   protected async confirmDelete(): Promise<void> {
@@ -362,13 +527,27 @@ export class ProductVariantManagerComponent {
 
     this.saving.set(true);
     try {
-      await this.facade.deleteVariant(variant.id);
+      const deleted = await this.facade.deleteVariant(variant.id);
+      if (!deleted) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Could not delete variant',
+          detail: this.facade.error() ?? 'Please try again.',
+        });
+        return;
+      }
+
       this.deleteDialogOpen.set(false);
       this.deleteTarget.set(null);
       this.selectedVariantIds.update((ids) => {
         const next = new Set(ids);
         next.delete(variant.id);
         return next;
+      });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: `Variant "${variant.sku}" deleted.`,
       });
     } finally {
       this.saving.set(false);
@@ -518,6 +697,10 @@ export class ProductVariantManagerComponent {
     await this.runBulkStatusUpdate('Inactive', 'Deactivated');
   }
 
+  protected async bulkArchive(): Promise<void> {
+    await this.runBulkStatusUpdate('Archived', 'Archived');
+  }
+
   private async runBulkStatusUpdate(status: string, verb: string): Promise<void> {
     const variantIds = [...this.selectedVariantIds()];
     if (!variantIds.length) {
@@ -545,13 +728,59 @@ export class ProductVariantManagerComponent {
 
     this.bulkActionLoading.set(true);
     try {
-      const deleted = await this.facade.bulkDeleteVariants(variantIds);
-      this.messageService.add({ severity: 'success', summary: 'Deleted', detail: `${deleted} variant(s) deleted.` });
+      const result = await this.facade.bulkDeleteVariants(variantIds);
+      if (!result) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Bulk delete failed',
+          detail: this.facade.error() ?? 'Please try again.',
+        });
+        return;
+      }
+
+      // Every id was attempted independently with the same protection a single delete gets — some
+      // may legitimately be blocked (order history, sold codes, ...) while others succeed. Report
+      // that honestly instead of a single count that would hide the blocked ones.
+      if (result.errorCount === 0) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: `${result.successCount} variant(s) deleted.`,
+        });
+      } else if (result.successCount === 0) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Bulk delete blocked',
+          detail: `None of the ${result.errorCount} selected variant(s) could be deleted — they're still in use.`,
+        });
+      } else {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Partially deleted',
+          detail: `${result.successCount} variant(s) deleted. ${result.errorCount} could not be deleted — they're still in use.`,
+        });
+      }
+
+      // Surface exactly which ones were blocked and let the admin jump straight to "why" instead
+      // of re-selecting them one by one to find out.
+      const blockedIds = new Set(result.blockedVariantIds);
+      this.bulkBlockedVariants.set(this.variants().filter((v) => blockedIds.has(v.id)));
+
       this.clearBulkSelection();
       this.bulkDeleteDialogOpen.set(false);
     } finally {
       this.bulkActionLoading.set(false);
     }
+  }
+
+  /** Opens the usual usage-inspection flow for one variant a bulk delete just blocked. */
+  protected async inspectBulkBlockedVariant(variant: ProductVariantDto): Promise<void> {
+    this.bulkBlockedVariants.update((list) => list.filter((v) => v.id !== variant.id));
+    await this.requestDelete(variant);
+  }
+
+  protected closeBulkBlockedDialog(): void {
+    this.bulkBlockedVariants.set([]);
   }
 
   protected async bulkDuplicateVariants(): Promise<void> {

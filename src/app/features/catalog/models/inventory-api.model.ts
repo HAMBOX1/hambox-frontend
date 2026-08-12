@@ -159,6 +159,8 @@ export interface BulkVariantsResultDto {
   readonly successCount: number;
   readonly errorCount: number;
   readonly errors: readonly string[];
+  /** Populated only by bulk delete (empty for bulk duplicate) — the ids that were blocked. */
+  readonly blockedVariantIds: readonly string[];
 }
 
 export interface CreateVariantRequest {
@@ -268,4 +270,23 @@ export interface BulkCodeActionResultDto {
 
 export interface RevealInventoryCodeDto {
   readonly digitalCode: string;
+}
+
+/** `type` is a stable machine key (e.g. "SoldInventoryCodes") mapped to i18n copy on the frontend. */
+export interface VariantUsageItemDto {
+  readonly type: string;
+  readonly count: number;
+}
+
+export interface VariantUsageCategoryDto {
+  readonly items: readonly VariantUsageItemDto[];
+  readonly totalCount: number;
+}
+
+export interface VariantUsageDto {
+  readonly variantId: string;
+  readonly safeToRemove: VariantUsageCategoryDto;
+  readonly safeToDetach: VariantUsageCategoryDto;
+  readonly protectedHistory: VariantUsageCategoryDto;
+  readonly canPermanentlyDelete: boolean;
 }

@@ -222,6 +222,23 @@
   line-height: 1.5;
 }
 
+.library-card__processing-note {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+
+  a {
+    margin-inline-start: 0.25rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
+
 .library-card__actions {
   display: flex;
   flex-wrap: wrap;

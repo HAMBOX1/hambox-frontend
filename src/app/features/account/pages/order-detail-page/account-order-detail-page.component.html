@@ -47,6 +47,14 @@
           </ul>
         } @else {
           <p class="order-detail-page__empty">{{ 'ACCOUNT.ORDER_DETAIL_UI.NO_KEYS' | translate }}</p>
+          @if (isProcessingStatus(current.status)) {
+            <p class="order-detail-page__processing-note">
+              {{ 'ACCOUNT.ORDER_DETAIL_UI.PROCESSING_NOTE' | translate }}
+              @if (current.supportUrl) {
+                <a [href]="current.supportUrl">{{ 'ACCOUNT.ORDER_DETAIL_UI.CONTACT_SUPPORT' | translate }}</a>
+              }
+            </p>
+          }
         }
       </section>
     </div>

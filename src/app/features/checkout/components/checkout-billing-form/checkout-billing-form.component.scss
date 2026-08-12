@@ -62,14 +62,14 @@
 
 .billing-panel__select {
   appearance: none;
-  padding-right: 48px;
+  padding-inline-end: 48px;
   cursor: pointer;
 }
 
 .billing-panel__chevron {
   position: absolute;
   top: 50%;
-  right: 17px;
+  inset-inline-end: 17px;
   color: var(--color-text-secondary);
   pointer-events: none;
   transform: translateY(-50%);

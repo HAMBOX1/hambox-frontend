@@ -22,32 +22,28 @@ export class StorefrontProductEnrichmentService {
   }
 
   async ensureLoaded(productIds: readonly string[]): Promise<void> {
-    const missing = productIds.filter((id) => !this.configurationsState()[id]);
+    const missing = [...new Set(productIds)].filter((id) => !this.configurationsState()[id]);
     if (!missing.length) {
       return;
     }
 
     this.loadingIdsState.update((current) => new Set([...current, ...missing]));
 
-    const results = await Promise.allSettled(
-      missing.map(async (productId) => {
-        const configuration = await firstValueFrom(this.api.getStorefrontConfiguration(productId));
-        return { productId, configuration };
-      }),
-    );
+    try {
+      const configurations = await firstValueFrom(this.api.getStorefrontConfigurations(missing));
 
-    const next = { ...this.configurationsState() };
-    for (const result of results) {
-      if (result.status === 'fulfilled') {
-        next[result.value.productId] = result.value.configuration;
+      const next = { ...this.configurationsState() };
+      for (const configuration of configurations) {
+        next[configuration.productId] = configuration;
       }
-    }
 
-    this.configurationsState.set(next);
-    this.loadingIdsState.update((current) => {
-      const updated = new Set(current);
-      missing.forEach((id) => updated.delete(id));
-      return updated;
-    });
+      this.configurationsState.set(next);
+    } finally {
+      this.loadingIdsState.update((current) => {
+        const updated = new Set(current);
+        missing.forEach((id) => updated.delete(id));
+        return updated;
+      });
+    }
   }
 }

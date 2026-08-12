@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { CATALOG_API, INVENTORY_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
@@ -34,6 +34,7 @@ import {
   UpdateOptionGroupRequest,
   UpdateOptionRequest,
   UpdateVariantRequest,
+  VariantUsageDto,
 } from '../models/inventory-api.model';
 
 @Injectable({
@@ -93,6 +94,18 @@ export class InventoryApiService {
 
   deactivateVariant(variantId: string): Observable<void> {
     return this.api.post<void>(INVENTORY_API.variantDeactivate(variantId), {});
+  }
+
+  archiveVariant(variantId: string): Observable<void> {
+    return this.api.post<void>(INVENTORY_API.variantArchive(variantId), {});
+  }
+
+  getVariantUsage(variantId: string): Observable<VariantUsageDto> {
+    return this.api.get<VariantUsageDto>(INVENTORY_API.variantUsage(variantId));
+  }
+
+  cleanupVariant(variantId: string): Observable<VariantUsageDto> {
+    return this.api.post<VariantUsageDto>(INVENTORY_API.variantCleanup(variantId), {});
   }
 
   activateProductVariants(productId: string): Observable<number> {
@@ -260,6 +273,25 @@ export class InventoryApiService {
       ? CATALOG_API.storefrontProductConfigurationPreview(productId)
       : CATALOG_API.storefrontProductConfiguration(productId);
     return this.api.get<StorefrontProductConfigurationDto>(path);
+  }
+
+  /** Bulk form for product listing pages — one request for the whole page of cards. */
+  getStorefrontConfigurations(
+    productIds: readonly string[],
+  ): Observable<readonly StorefrontProductConfigurationDto[]> {
+    if (!productIds.length) {
+      return of([]);
+    }
+
+    let params = new HttpParams();
+    for (const id of productIds) {
+      params = params.append('ids', id);
+    }
+
+    return this.api.get<readonly StorefrontProductConfigurationDto[]>(
+      CATALOG_API.storefrontProductConfigurations,
+      { params },
+    );
   }
 
   private resolveUrl(path: string): string {

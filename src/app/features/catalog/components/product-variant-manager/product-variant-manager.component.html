@@ -92,6 +92,17 @@
           (click)="bulkDeactivate()"
         ></button>
         <button
+          *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+          pButton
+          type="button"
+          label="Archive"
+          icon="pi pi-inbox"
+          severity="warn"
+          size="small"
+          [disabled]="bulkActionLoading()"
+          (click)="bulkArchive()"
+        ></button>
+        <button
           *hamboxHasPermission="permissions.Catalog.Inventory.Export"
           pButton
           type="button"
@@ -115,6 +126,13 @@
         ></button>
         <app-admin-action-menu label="More" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
       </app-admin-bulk-bar>
+
+      @if (hasNoPurchasableVariant()) {
+        <app-admin-error-alert
+          message="This product currently has no Active, visible variant — it cannot be purchased on the storefront until one is activated."
+          [showRetry]="false"
+        />
+      }
 
       @if (variantTree().length || unassignedVariants().length) {
         <div class="variant-manager__tree-toolbar">
@@ -202,6 +220,8 @@
               label="Delete variant"
               severity="danger"
               *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+              [loading]="usageLoading()"
+              [disabled]="usageLoading()"
               (pressed)="requestDelete(selectedVariantForCodes()!)"
             />
           </div>
@@ -243,6 +263,8 @@
               label="Delete variant"
               severity="danger"
               *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
+              [loading]="usageLoading()"
+              [disabled]="usageLoading()"
               (pressed)="requestDelete(selectedVariantForCodes()!)"
             />
           </div>
@@ -330,6 +352,19 @@
     (confirmed)="confirmDelete()"
   />
 
+  <app-product-variant-usage-dialog
+    [visible]="usageDialogOpen()"
+    [variantSku]="usageTarget()?.sku ?? ''"
+    [usage]="variantUsage()"
+    [cleanupLoading]="usageCleanupLoading()"
+    [archiveLoading]="usageArchiveLoading()"
+    [deleteLoading]="usageDeleteLoading()"
+    (visibleChange)="closeUsageDialog()"
+    (cleanupRequested)="onUsageCleanup()"
+    (archiveRequested)="onUsageArchive()"
+    (deleteRequested)="onUsageDeletePermanently()"
+  />
+
   <app-admin-confirm-dialog
     [visible]="bulkDeleteDialogOpen()"
     title="Delete selected variants"
@@ -339,6 +374,43 @@
     (visibleChange)="bulkDeleteDialogOpen.set($event)"
     (confirmed)="confirmBulkDelete()"
   />
+
+  <p-dialog
+    [visible]="bulkBlockedVariants().length > 0"
+    (visibleChange)="!$event && closeBulkBlockedDialog()"
+    header="These variants are still in use"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <p class="variant-manager__bulk-blocked-hint">
+      They were skipped by the bulk delete. Open one to see exactly what's referencing it — clean up,
+      archive, or wait until it's safe to delete permanently.
+    </p>
+    <ul class="variant-manager__bulk-blocked-list">
+      @for (variant of bulkBlockedVariants(); track variant.id) {
+        <li>
+          <span>{{ variant.sku }}</span>
+          <button
+            pButton
+            type="button"
+            label="View usage"
+            severity="secondary"
+            size="small"
+            [text]="true"
+            (click)="inspectBulkBlockedVariant(variant)"
+          ></button>
+        </li>
+      }
+    </ul>
+
+    <ng-template pTemplate="footer">
+      <button pButton type="button" label="Close" severity="secondary" [text]="true" (click)="closeBulkBlockedDialog()"></button>
+    </ng-template>
+  </p-dialog>
 
   <p-dialog
     [visible]="bulkPriceStatusDialogOpen()"

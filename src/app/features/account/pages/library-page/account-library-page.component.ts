@@ -204,6 +204,18 @@ export class AccountLibraryPageComponent implements OnInit {
     return value?.trim() ? value : '—';
   }
 
+  protected deliveryStatusLabel(item: CustomerLibraryItemApiDto): string {
+    const key =
+      item.deliveryStatus === 'Delivered'
+        ? 'ACCOUNT.LIBRARY_UI.DELIVERY_DELIVERED'
+        : 'ACCOUNT.LIBRARY_UI.DELIVERY_PENDING';
+    return this.translate.instant(key);
+  }
+
+  protected isDeliveryPending(item: CustomerLibraryItemApiDto): boolean {
+    return item.deliveryStatus !== 'Delivered';
+  }
+
   protected totalPages(): number {
     return Math.max(1, Math.ceil(this.totalCount() / this.facade.pageSize()));
   }
