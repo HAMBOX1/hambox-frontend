@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+
+  --admin-row-min-height: 2.5rem;
+  --admin-cell-padding-y: 0.5rem;
+}
+
+.faq-list-page {
+  flex: 1;
+  min-height: 0;
+}
+
+.faq-list-page__filter {
+  min-width: 11rem;
+}
+
+.faq-list-page__row:hover {
+  background: var(--admin-bg-elevated);
+}
+
+.faq-list-page__reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.faq-list-page__target-hint {
+  display: block;
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+a.admin-cell-primary {
+  text-decoration: none;
+
+  &:hover {
+    color: var(--admin-accent-green);
+  }
+}

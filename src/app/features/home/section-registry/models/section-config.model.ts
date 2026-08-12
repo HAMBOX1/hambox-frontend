@@ -286,6 +286,11 @@ export interface FooterSectionConfig {
   readonly whatsAppUrl: string | null;
 }
 
+/** Config for the FAQ section — data itself is always live (`context().targetFaqs`), never stored here. */
+export interface FaqSectionConfig {
+  readonly sectionTitle: string;
+}
+
 export type SectionConfig =
   | PlatformSelectorSectionConfig
   | HeroSectionConfig
@@ -305,4 +310,5 @@ export type SectionConfig =
   | HardwareShowcaseSectionConfig
   | AiAssistantSectionConfig
   | CommunityNewsletterSectionConfig
-  | FooterSectionConfig;
+  | FooterSectionConfig
+  | FaqSectionConfig;

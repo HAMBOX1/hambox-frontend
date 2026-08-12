@@ -1,0 +1,209 @@
+<p-toast position="top-right" />
+
+<section class="admin-page faq-edit-page">
+  <app-admin-page-header
+    [backLink]="'/admin/faqs'"
+    [backLabel]="'ADMIN.FAQ.EDIT.BACK' | translate"
+    [title]="(isCreateMode() ? 'ADMIN.FAQ.EDIT.CREATE_TITLE' : 'ADMIN.FAQ.EDIT.EDIT_TITLE') | translate"
+    [breadcrumbs]="breadcrumbs()"
+  />
+
+  @if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  }
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="form" />
+  } @else {
+    <div class="faq-edit-page__body">
+      <app-admin-section-card [title]="'ADMIN.FAQ.EDIT.SECTION_QUESTION' | translate">
+        <div class="admin-form-grid">
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.QUESTION_EN' | translate }}*</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              [ngModel]="questionEn()"
+              (ngModelChange)="questionEn.set($event)"
+              name="questionEn"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.QUESTION_AR' | translate }}</span>
+            <input
+              pInputText
+              class="admin-field__input"
+              type="text"
+              dir="rtl"
+              [ngModel]="questionAr()"
+              (ngModelChange)="questionAr.set($event)"
+              name="questionAr"
+            />
+          </label>
+        </div>
+
+        <div class="admin-form-grid admin-form-grid--single">
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.ANSWER_EN' | translate }}*</span>
+            <p-editor
+              [ngModel]="answerEn()"
+              (ngModelChange)="answerEn.set($event)"
+              name="answerEn"
+              [style]="{ height: '220px' }"
+            />
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.ANSWER_AR' | translate }}</span>
+            <p-editor
+              [ngModel]="answerAr()"
+              (ngModelChange)="answerAr.set($event)"
+              name="answerAr"
+              [style]="{ height: '220px', direction: 'rtl' }"
+            />
+          </label>
+        </div>
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="'ADMIN.FAQ.EDIT.SECTION_ORGANIZATION' | translate">
+        <div class="admin-form-grid">
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.CATEGORY' | translate }}*</span>
+            <div class="faq-edit-page__category-row">
+              <p-select
+                class="faq-edit-page__category-select"
+                [options]="categoryOptions()"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="categoryId()"
+                (ngModelChange)="categoryId.set($event)"
+                name="categoryId"
+                [placeholder]="'ADMIN.FAQ.EDIT.CATEGORY_PLACEHOLDER' | translate"
+              />
+              <button
+                pButton
+                type="button"
+                icon="pi pi-plus"
+                severity="secondary"
+                [text]="true"
+                [attr.aria-label]="'ADMIN.FAQ.EDIT.ADD_CATEGORY' | translate"
+                (click)="openQuickAddCategory()"
+              ></button>
+            </div>
+          </label>
+
+          <label class="admin-field">
+            <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.SCOPE' | translate }}*</span>
+            <p-select
+              [options]="scopeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="scope()"
+              (ngModelChange)="onScopeChange($event)"
+              name="scope"
+            />
+          </label>
+        </div>
+
+        @if (showTargetPicker()) {
+          <div class="admin-form-grid admin-form-grid--single">
+            @if (scope() === 'Product') {
+              <label class="admin-field">
+                <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.TARGET_PRODUCT' | translate }}*</span>
+                <app-product-picker
+                  [value]="targetIds()"
+                  [maxItems]="1"
+                  (valueChange)="targetIds.set($event)"
+                />
+                @if (targetIds().length === 0) {
+                  <span class="faq-edit-page__field-error">{{ 'ADMIN.FAQ.EDIT.TARGET_REQUIRED' | translate }}</span>
+                }
+              </label>
+            }
+
+            @if (scope() === 'Category') {
+              <label class="admin-field">
+                <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.TARGET_CATEGORY' | translate }}*</span>
+                <app-category-picker [value]="targetIds()" (valueChange)="onCategoryTargetChange($event)" />
+                @if (targetIds().length === 0) {
+                  <span class="faq-edit-page__field-error">{{ 'ADMIN.FAQ.EDIT.TARGET_REQUIRED' | translate }}</span>
+                }
+              </label>
+            }
+          </div>
+        }
+      </app-admin-section-card>
+    </div>
+
+    <app-admin-sticky-save-bar [dirty]="hasUnsavedChanges()">
+      <a
+        pButton
+        routerLink="/admin/faqs"
+        [label]="'ADMIN.FAQ.EDIT.CANCEL' | translate"
+        severity="secondary"
+        [text]="true"
+      ></a>
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.FAQ.EDIT.SAVE' | translate"
+        icon="pi pi-check"
+        [disabled]="!canSubmit() || detailSaving()"
+        [loading]="detailSaving()"
+        (click)="save()"
+      ></button>
+    </app-admin-sticky-save-bar>
+  }
+</section>
+
+<app-admin-unsaved-changes-dialog
+  [visible]="unsavedDialogOpen()"
+  [saving]="detailSaving()"
+  (visibleChange)="onUnsavedDialogVisibleChange($event)"
+  (save)="onUnsavedSave()"
+  (discard)="onUnsavedDiscard()"
+/>
+
+<p-dialog
+  [header]="'ADMIN.FAQ.EDIT.ADD_CATEGORY' | translate"
+  [visible]="quickAddCategoryOpen()"
+  (visibleChange)="quickAddCategoryOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(24rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <label class="admin-field">
+    <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.CATEGORY_NAME' | translate }}</span>
+    <input
+      pInputText
+      class="admin-field__input"
+      type="text"
+      [ngModel]="quickAddCategoryName()"
+      (ngModelChange)="quickAddCategoryName.set($event)"
+      name="quickAddCategoryName"
+    />
+  </label>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.FAQ.EDIT.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      (click)="quickAddCategoryOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.FAQ.EDIT.ADD_CATEGORY' | translate"
+      [disabled]="!quickAddCategoryName().trim() || quickAddCategorySaving()"
+      [loading]="quickAddCategorySaving()"
+      (click)="confirmQuickAddCategory()"
+    ></button>
+  </ng-template>
+</p-dialog>

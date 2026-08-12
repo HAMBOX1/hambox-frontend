@@ -1,0 +1,112 @@
+:host {
+  display: block;
+}
+
+.faq-page__main {
+  max-width: min(var(--sf-container-max), 960px);
+  margin: 0 auto;
+  padding: var(--sf-section-gap) var(--sf-container-px);
+  min-height: 60vh;
+
+  @media (max-width: 991px) {
+    padding: var(--sf-section-gap) var(--sf-container-px-tablet);
+  }
+
+  @media (max-width: 767px) {
+    padding: var(--hambox-spacing-6) var(--sf-container-px-mobile);
+  }
+}
+
+.faq-page__hero {
+  text-align: center;
+  margin-bottom: var(--hambox-spacing-8);
+}
+
+.faq-page__title {
+  font-family: var(--sf-font-heading, inherit);
+  font-size: var(--hambox-font-size-3xl);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--hambox-spacing-2);
+}
+
+.faq-page__subtitle {
+  color: var(--color-text-muted);
+  font-size: var(--hambox-font-size-base);
+  margin: 0 0 var(--hambox-spacing-6);
+}
+
+.faq-page__search {
+  position: relative;
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.faq-page__search-icon {
+  position: absolute;
+  inset-inline-start: var(--hambox-spacing-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.faq-page__search-input {
+  width: 100%;
+  padding-inline-start: var(--hambox-spacing-10, 2.5rem);
+}
+
+.faq-page__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hambox-spacing-2);
+  justify-content: center;
+  margin-bottom: var(--hambox-spacing-8);
+}
+
+.faq-page__category-chip {
+  border: 1px solid var(--color-border, var(--color-text-muted));
+  background: var(--color-surface, transparent);
+  color: var(--color-text-secondary, var(--color-text-primary));
+  border-radius: 9999px;
+  padding: var(--hambox-spacing-2) var(--hambox-spacing-4);
+  font-size: var(--hambox-font-size-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.faq-page__category-chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-text-on);
+}
+
+// `[innerHTML]`-inserted content isn't part of the compiled template, so emulated encapsulation's
+// scoping attribute never reaches it — `::ng-deep` is required to style it from here.
+.faq-page__answer {
+  color: var(--color-text-secondary, var(--color-text-primary));
+  line-height: 1.6;
+
+  ::ng-deep p {
+    margin: 0 0 var(--hambox-spacing-3);
+  }
+}
+
+// Respects the OS-level reduced-motion preference — PrimeNG's accordion expand/collapse uses its
+// internal Motion component, which isn't reduced-motion-aware on its own.
+@media (prefers-reduced-motion: reduce) {
+  :host ::ng-deep .p-accordioncontent,
+  :host ::ng-deep .p-motion,
+  .faq-page__category-chip {
+    transition: none !important;
+    animation: none !important;
+  }
+}

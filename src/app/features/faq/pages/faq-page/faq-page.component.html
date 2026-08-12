@@ -1,0 +1,73 @@
+<div class="faq-page">
+  <app-storefront-nav [links]="navLinks" />
+
+  <main class="faq-page__main">
+    <header class="faq-page__hero">
+      <h1 class="faq-page__title">{{ 'FAQ.PAGE_TITLE' | translate }}</h1>
+      <p class="faq-page__subtitle">{{ 'FAQ.PAGE_SUBTITLE' | translate }}</p>
+
+      <div class="faq-page__search">
+        <i class="pi pi-search faq-page__search-icon" aria-hidden="true"></i>
+        <input
+          pInputText
+          type="search"
+          class="faq-page__search-input"
+          [attr.aria-label]="'FAQ.SEARCH_PLACEHOLDER' | translate"
+          [placeholder]="'FAQ.SEARCH_PLACEHOLDER' | translate"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </div>
+    </header>
+
+    @if (categories().length > 0) {
+      <div class="faq-page__categories" role="tablist" [attr.aria-label]="'FAQ.CATEGORY_FILTER_LABEL' | translate">
+        <button
+          type="button"
+          role="tab"
+          class="faq-page__category-chip"
+          [class.faq-page__category-chip--active]="activeCategoryId() === 'all'"
+          [attr.aria-selected]="activeCategoryId() === 'all'"
+          (click)="selectCategory('all')"
+        >
+          {{ 'FAQ.ALL_CATEGORIES' | translate }}
+        </button>
+        @for (category of categories(); track category.id) {
+          <button
+            type="button"
+            role="tab"
+            class="faq-page__category-chip"
+            [class.faq-page__category-chip--active]="activeCategoryId() === category.id"
+            [attr.aria-selected]="activeCategoryId() === category.id"
+            (click)="selectCategory(category.id)"
+          >
+            {{ categoryLabel(category) }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (loading()) {
+      <app-loading-skeleton type="list" [count]="6" />
+    } @else if (filteredFaqs().length === 0) {
+      <app-empty-state
+        icon="pi pi-question-circle"
+        [title]="'FAQ.EMPTY_TITLE' | translate"
+        [description]="'FAQ.EMPTY_DESCRIPTION' | translate"
+      />
+    } @else {
+      <p-accordion [multiple]="true" styleClass="faq-page__accordion">
+        @for (faq of filteredFaqs(); track faq.id) {
+          <p-accordion-panel [value]="faq.id">
+            <p-accordion-header>{{ questionFor(faq) }}</p-accordion-header>
+            <p-accordion-content>
+              <div class="faq-page__answer" [innerHTML]="sanitizedAnswerFor(faq)"></div>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

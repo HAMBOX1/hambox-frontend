@@ -12,6 +12,7 @@ export type AdminNavId =
   | 'themes'
   | 'campaigns'
   | 'page-builder'
+  | 'faqs'
   | 'legal'
   | 'suppliers'
   | 'communication'
@@ -107,6 +108,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/page-builder',
     icon: 'pi pi-objects-column',
     permission: PERMISSIONS.PageBuilder.View,
+  },
+  {
+    id: 'faqs',
+    labelKey: 'ADMIN.NAV.FAQS',
+    route: '/admin/faqs',
+    icon: 'pi pi-question-circle',
+    permission: PERMISSIONS.Faq.View,
   },
   {
     id: 'legal',

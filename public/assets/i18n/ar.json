@@ -165,6 +165,15 @@
       "UNCATEGORIZED": "عام"
     }
   },
+  "FAQ": {
+    "PAGE_TITLE": "الأسئلة الشائعة",
+    "PAGE_SUBTITLE": "إجابات عن الأسئلة الشائعة حول الطلبات والتسليم والدفع وحسابك.",
+    "SEARCH_PLACEHOLDER": "ابحث في الأسئلة الشائعة...",
+    "CATEGORY_FILTER_LABEL": "التصفية حسب الفئة",
+    "ALL_CATEGORIES": "الكل",
+    "EMPTY_TITLE": "لا توجد أسئلة شائعة",
+    "EMPTY_DESCRIPTION": "جرّب كلمة بحث أو فئة مختلفة."
+  },
   "PRODUCT": {
     "ADD_TO_CART": "أضف إلى السلة",
     "BUY_NOW": "اشترِ الآن",
@@ -395,6 +404,7 @@
       "VIEW_DETAILS": "عرض التفاصيل",
       "DOWNLOAD_INVOICE": "تحميل الفاتورة",
       "SUPPORT": "الدعم",
+      "PROCESSING_NOTE": "تمت عملية الدفع وطلبك لم يُفقد — التسليم لا يزال قيد التجهيز. إذا استمر الانتظار لفترة طويلة، تواصل مع",
       "REVEAL_MODAL_TITLE": "إظهار كود التفعيل؟",
       "REVEAL_MODAL_BODY": "سيبقى كود {{product}} مرئياً لمدة 30 ثانية ثم يُخفى تلقائياً.",
       "REVEAL_FAILED_TITLE": "فشل الإظهار",
@@ -529,6 +539,7 @@
       "LICENSE_KEYS": "مفاتيح التفعيل",
       "REVEAL_IN_LIBRARY": "إظهار في المكتبة",
       "NO_KEYS": "ستظهر مفاتيح التفعيل بعد اكتمال التسليم.",
+      "PROCESSING_NOTE": "تمت عملية الدفع وطلبك لم يُفقد — التسليم لا يزال قيد التجهيز. إذا استمر الانتظار لفترة طويلة، تواصل معنا:",
       "ITEMS_REVIEWS": "العناصر والتقييمات",
       "REVIEW_SUBMITTED": "تم إرسال التقييم",
       "ELIGIBLE_REVIEW": "مؤهل للتقييم",
@@ -927,6 +938,32 @@
         "PREVIEW_BLOCKED_DETAIL": "يجب أن يكون المنتج نشطاً لمعاينته في المتجر."
       }
     },
+    "VARIANT_USAGE": {
+      "TITLE": "هذا المتغير قيد الاستخدام حالياً",
+      "SAFE_TO_REMOVE_TITLE": "آمن للإزالة",
+      "SAFE_TO_REMOVE_EXPLANATION": "هذه سجلات مؤقتة أو غير مستخدمة. التنظيف يزيلها نهائياً.",
+      "SAFE_TO_DETACH_TITLE": "آمن للفصل",
+      "SAFE_TO_DETACH_EXPLANATION": "تشير هذه السجلات إلى هذا المتغير لكنها لا تتغير أو تُحذف أبداً — تحتفظ بمعرّف المتغير كمرجع تاريخي.",
+      "PROTECTED_HISTORY_TITLE": "سجل محمي",
+      "PROTECTED_HISTORY_EXPLANATION": "يتم الاحتفاظ بهذه السجلات لأنها جزء من سجل العميل/الطلب.",
+      "GUIDANCE_ARCHIVE": "الحذف النهائي غير متاح ما دام هناك سجل محمي أو بيانات قابلة للإزالة. الأرشفة تحافظ على جميع السجلات ويمكن التراجع عنها لاحقاً بإعادة تفعيل المتغير.",
+      "CLEANUP": "تنظيف البيانات القابلة للإزالة",
+      "ARCHIVE": "أرشفة المتغير",
+      "DELETE_PERMANENTLY": "حذف نهائي",
+      "CANCEL": "إلغاء",
+      "ITEMS": {
+        "ACTIVE_RESERVATIONS": "{{count}} حجز نشط",
+        "AVAILABLE_INVENTORY_CODES": "{{count}} كود مخزون متاح",
+        "DISABLED_INVENTORY_CODES": "{{count}} كود مخزون معطل",
+        "CART_ITEMS": "{{count}} عنصر في السلة",
+        "INVENTORY_BATCHES": "{{count}} دفعة مخزون",
+        "INVENTORY_AUDIT_LOG_REFERENCES": "{{count}} سجل تدقيق",
+        "SOLD_INVENTORY_CODES": "{{count}} كود مخزون مباع",
+        "OTHER_PROTECTED_INVENTORY_CODES": "{{count}} كود مخزون محمي آخر",
+        "ORDER_ITEMS": "{{count}} طلب",
+        "ORDER_LICENSE_KEYS": "{{count}} سجل ترخيص عميل"
+      }
+    },
     "CATALOG_IMPORT_EXPORT_JOBS": {
       "TITLE": "مهام الاستيراد والتصدير",
       "SUBTITLE": "تتبّع مهام استيراد وتصدير الكتالوج في الخلفية.",
@@ -1062,6 +1099,7 @@
       "THEMES": "السمات",
       "CAMPAIGNS": "الحملات",
       "PAGE_BUILDER": "منشئ الصفحات",
+      "FAQS": "الأسئلة الشائعة",
       "LEGAL": "المركز القانوني",
       "ORDERS": "الطلبات",
       "OPERATIONS": "العمليات",
@@ -1174,6 +1212,59 @@
         "MESSAGES": {
           "UPDATE_FAILED": "فشل تحديث مزود الخدمة."
         }
+      }
+    },
+    "FAQ": {
+      "LIST": {
+        "TITLE": "الأسئلة الشائعة",
+        "SUBTITLE": "إدارة الأسئلة الشائعة المعروضة في المتجر.",
+        "SEARCH_PLACEHOLDER": "ابحث عن سؤال...",
+        "FILTER_SCOPE": "النطاق",
+        "FILTER_CATEGORY": "الفئة",
+        "FILTER_STATUS": "الحالة",
+        "NEW": "سؤال جديد",
+        "EDIT": "تعديل",
+        "DELETE": "حذف",
+        "EMPTY": "لا توجد أسئلة شائعة بعد",
+        "EMPTY_SEARCH": "لا توجد نتائج مطابقة لبحثك",
+        "COLUMNS": {
+          "ORDER": "الترتيب",
+          "QUESTION": "السؤال",
+          "CATEGORY": "الفئة",
+          "SCOPE": "النطاق",
+          "STATUS": "الحالة",
+          "UPDATED": "آخر تحديث"
+        },
+        "MOVE_UP": "تحريك لأعلى",
+        "MOVE_DOWN": "تحريك لأسفل"
+      },
+      "STATUS": {
+        "PUBLISHED": "منشور",
+        "DRAFT": "مسودة"
+      },
+      "CONFIRM": {
+        "DELETE_TITLE": "حذف السؤال"
+      },
+      "EDIT": {
+        "BACK": "العودة إلى الأسئلة الشائعة",
+        "CREATE_TITLE": "سؤال جديد",
+        "EDIT_TITLE": "تعديل السؤال",
+        "SECTION_QUESTION": "السؤال والإجابة",
+        "QUESTION_EN": "السؤال (الإنجليزية)",
+        "QUESTION_AR": "السؤال (العربية)",
+        "ANSWER_EN": "الإجابة (الإنجليزية)",
+        "ANSWER_AR": "الإجابة (العربية)",
+        "SECTION_ORGANIZATION": "التصنيف",
+        "CATEGORY": "الفئة",
+        "CATEGORY_PLACEHOLDER": "اختر فئة",
+        "ADD_CATEGORY": "إضافة فئة",
+        "CATEGORY_NAME": "اسم الفئة",
+        "SCOPE": "النطاق",
+        "TARGET_PRODUCT": "منتج",
+        "TARGET_CATEGORY": "فئة",
+        "TARGET_REQUIRED": "الرجاء اختيار هدف للمتابعة.",
+        "CANCEL": "إلغاء",
+        "SAVE": "حفظ"
       }
     },
     "OPERATIONS": {
@@ -4420,6 +4511,12 @@
             "WHATSAPP_URL": {
               "LABEL": "رابط واتساب",
               "HELP": "رابط التواصل عبر واتساب."
+            }
+          },
+          "FAQ": {
+            "SECTION_TITLE": {
+              "LABEL": "عنوان القسم",
+              "HELP": "العنوان المعروض أعلى الأسئلة الشائعة."
             }
           }
         }

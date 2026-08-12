@@ -6,6 +6,7 @@ import {
   CollectionShowcaseSectionConfig,
   CommunityNewsletterSectionConfig,
   ConsoleFavoritesSectionConfig,
+  FaqSectionConfig,
   FeaturedCollectionsSectionConfig,
   FlashDealsSectionConfig,
   FooterSectionConfig,
@@ -26,6 +27,7 @@ import { ArenaBriefingsVariantDefaultComponent } from './variants/arena-briefing
 import { CollectionVariantEditorialShowcaseComponent } from './variants/collection-variant-editorial-showcase.component';
 import { CommunityNewsletterVariantDefaultComponent } from './variants/community-newsletter-variant-default.component';
 import { ConsoleFavoritesVariantDefaultComponent } from './variants/console-favorites-variant-default.component';
+import { FaqVariantDefaultComponent } from './variants/faq-variant-default.component';
 import { FlashDealsVariantDefaultComponent } from './variants/flash-deals-variant-default.component';
 import { FooterVariantDefaultComponent } from './variants/footer-variant-default.component';
 import { HardwareShowcaseVariantDefaultComponent } from './variants/hardware-showcase-variant-default.component';
@@ -43,6 +45,11 @@ import { TrustBarVariantCenteredComponent } from './variants/trust-bar-variant-c
 import { TrustBarVariantDefaultComponent } from './variants/trust-bar-variant-default.component';
 
 const ALL_BREAKPOINTS = ['desktop', 'tablet', 'mobile'] as const;
+
+/** Single source of truth for the FAQ section's registry key — also used by `pageHasFaqSection`
+ * so page components can skip the FAQ fetch entirely when the page has no FAQ section. */
+const FAQ_SECTION_CATEGORY = 'Support';
+const FAQ_SECTION_VARIANT_KEY = 'faq-accordion';
 
 /**
  * Must mirror the seeded "Default" template's category/variantKey pairs exactly (backend Content
@@ -567,6 +574,19 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     } satisfies AiAssistantSectionConfig,
   },
   {
+    category: FAQ_SECTION_CATEGORY,
+    variantKey: FAQ_SECTION_VARIANT_KEY,
+    displayName: 'FAQ',
+    renderComponent: FaqVariantDefaultComponent,
+    description:
+      'A searchable-free FAQ accordion driven by real FAQ entries for this page (Global, plus Product/Category FAQs when applicable). Renders nothing if there are none.',
+    tags: ['faq', 'questions', 'support', 'accordion'],
+    supportedBreakpoints: ALL_BREAKPOINTS,
+    previewConfig: {
+      sectionTitle: 'Frequently Asked Questions',
+    } satisfies FaqSectionConfig,
+  },
+  {
     category: 'Footer',
     variantKey: 'storefront-footer',
     displayName: 'Storefront Footer',
@@ -606,6 +626,16 @@ export function resolveSectionVariant(
   variantKey: string,
 ): SectionVariantDefinition | undefined {
   return registryByKey.get(`${category}:${variantKey}`);
+}
+
+/** Whether a page's section list includes the FAQ section — lets callers skip the FAQ fetch
+ * entirely (an extra network round trip) for the common case of a page with no FAQ section. */
+export function pageHasFaqSection(
+  sections: readonly { category: string; variantKey: string }[],
+): boolean {
+  return sections.some(
+    (s) => s.category === FAQ_SECTION_CATEGORY && s.variantKey === FAQ_SECTION_VARIANT_KEY,
+  );
 }
 
 /**

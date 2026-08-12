@@ -1,0 +1,193 @@
+<p-toast position="top-right" />
+
+<section class="admin-page faq-list-page">
+  <app-admin-page-header
+    [title]="'ADMIN.FAQ.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.FAQ.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.FAQ.LIST.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="faq-list-page__filter"
+      [options]="scopeOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="scopeFilter()"
+      (ngModelChange)="onScopeChange($event)"
+      [placeholder]="'ADMIN.FAQ.LIST.FILTER_SCOPE' | translate"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="faq-list-page__filter"
+      [options]="categoryOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="categoryFilter()"
+      (ngModelChange)="onCategoryChange($event)"
+      [placeholder]="'ADMIN.FAQ.LIST.FILTER_CATEGORY' | translate"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="faq-list-page__filter"
+      [options]="publishedOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="publishedFilter()"
+      (ngModelChange)="onPublishedChange($event)"
+      [placeholder]="'ADMIN.FAQ.LIST.FILTER_STATUS' | translate"
+    />
+
+    <div adminToolbarActions>
+      <app-admin-icon-button
+        *hamboxHasPermission="permissions.Faq.Create"
+        icon="pi pi-plus"
+        severity="primary"
+        [label]="'ADMIN.FAQ.LIST.NEW' | translate"
+        routerLink="/admin/faqs/new"
+      />
+    </div>
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table"
+      [value]="[...faqs()]"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="totalCount() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first} - {last} of {totalRecords} FAQs"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 5.5rem">{{ 'ADMIN.FAQ.LIST.COLUMNS.ORDER' | translate }}</th>
+          <th>{{ 'ADMIN.FAQ.LIST.COLUMNS.QUESTION' | translate }}</th>
+          <th>{{ 'ADMIN.FAQ.LIST.COLUMNS.CATEGORY' | translate }}</th>
+          <th>{{ 'ADMIN.FAQ.LIST.COLUMNS.SCOPE' | translate }}</th>
+          <th>{{ 'ADMIN.FAQ.LIST.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.FAQ.LIST.COLUMNS.UPDATED' | translate }}</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-faq>
+        <tr class="faq-list-page__row">
+          <td>
+            <div class="faq-list-page__reorder">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-chevron-up"
+                [text]="true"
+                size="small"
+                [attr.aria-label]="'ADMIN.FAQ.LIST.MOVE_UP' | translate"
+                [disabled]="!canMoveUp(faq) || actionLoading()"
+                (click)="moveUp(faq)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-chevron-down"
+                [text]="true"
+                size="small"
+                [attr.aria-label]="'ADMIN.FAQ.LIST.MOVE_DOWN' | translate"
+                [disabled]="!canMoveDown(faq) || actionLoading()"
+                (click)="moveDown(faq)"
+              ></button>
+            </div>
+          </td>
+          <td>
+            <a class="admin-cell-primary" [routerLink]="['/admin/faqs', faq.id, 'edit']">
+              {{ faq.questionEn }}
+            </a>
+          </td>
+          <td>
+            <span class="admin-cell-secondary">{{ faq.categoryNameEn }}</span>
+          </td>
+          <td>
+            <app-admin-status-badge [label]="faq.scope" [tone]="scopeTone(faq.scope)" />
+            @if (faq.targetLabel) {
+              <span class="faq-list-page__target-hint">{{ faq.targetLabel }}</span>
+            }
+          </td>
+          <td>
+            <app-admin-status-badge
+              [label]="(faq.isPublished ? 'ADMIN.FAQ.STATUS.PUBLISHED' : 'ADMIN.FAQ.STATUS.DRAFT') | translate"
+              [tone]="publishedTone(faq.isPublished)"
+            />
+          </td>
+          <td>
+            <span class="admin-cell-secondary">{{ faq.modifiedOnUtc | hamboxDate: 'mediumDate' }}</span>
+          </td>
+          <td>
+            @let menuItems = faqActionMenuItems(faq);
+            <div class="admin-actions-row">
+              <app-admin-icon-button
+                *hamboxHasPermission="permissions.Faq.Edit"
+                icon="pi pi-pencil"
+                [label]="'ADMIN.FAQ.LIST.EDIT' | translate"
+                [routerLink]="'/admin/faqs/' + faq.id + '/edit'"
+              />
+              @if (menuItems.length > 0) {
+                <app-admin-action-menu [items]="menuItems" [disabled]="actionLoading()" />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <app-admin-empty-state
+              icon="pi pi-question-circle"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.FAQ.LIST.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.FAQ.LIST.EMPTY' | translate)
+              "
+              [primaryLabel]="'ADMIN.FAQ.LIST.NEW' | translate"
+              primaryIcon="pi pi-plus"
+              (primaryAction)="navigateToNew()"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  (visibleChange)="onDeleteDialogVisibleChange($event)"
+  [title]="'ADMIN.FAQ.CONFIRM.DELETE_TITLE' | translate"
+  [message]="deleteDialogMessage()"
+  [confirmLabel]="'ADMIN.FAQ.LIST.DELETE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmDelete()"
+/>

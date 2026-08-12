@@ -57,6 +57,7 @@ export class HomePageComponent implements OnInit {
       trendingValue: this.facade.trendingValue(),
       trustFeatures: this.facade.trustFeatures(),
       flashCountdownSeconds: this.facade.flashCountdownSeconds(),
+      targetFaqs: this.facade.faqs(),
     };
   });
 

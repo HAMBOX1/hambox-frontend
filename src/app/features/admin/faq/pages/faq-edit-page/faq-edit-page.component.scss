@@ -1,0 +1,20 @@
+.faq-edit-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-section-gap, 2rem);
+}
+
+.faq-edit-page__category-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.faq-edit-page__category-select {
+  flex: 1;
+}
+
+.faq-edit-page__field-error {
+  color: var(--color-danger, #e5484d);
+  font-size: 0.8125rem;
+}

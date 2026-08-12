@@ -165,6 +165,15 @@
       "UNCATEGORIZED": "General"
     }
   },
+  "FAQ": {
+    "PAGE_TITLE": "Frequently Asked Questions",
+    "PAGE_SUBTITLE": "Answers to common questions about orders, delivery, payments, and your account.",
+    "SEARCH_PLACEHOLDER": "Search FAQs...",
+    "CATEGORY_FILTER_LABEL": "Filter by category",
+    "ALL_CATEGORIES": "All",
+    "EMPTY_TITLE": "No FAQs found",
+    "EMPTY_DESCRIPTION": "Try a different search term or category."
+  },
   "PRODUCT": {
     "ADD_TO_CART": "Add to cart",
     "BUY_NOW": "Buy now",
@@ -401,6 +410,7 @@
       "VIEW_DETAILS": "View Details",
       "DOWNLOAD_INVOICE": "Download Invoice",
       "SUPPORT": "Support",
+      "PROCESSING_NOTE": "Your payment went through and this purchase isn't lost — delivery is still being prepared. If it's still pending after a while, reach out to",
       "REVEAL_MODAL_TITLE": "Reveal your activation code?",
       "REVEAL_MODAL_BODY": "Your code for {{product}} will stay visible for 30 seconds, then hide automatically.",
       "REVEAL_FAILED_TITLE": "Reveal failed",
@@ -536,6 +546,7 @@
       "LICENSE_KEYS": "License Keys",
       "REVEAL_IN_LIBRARY": "Reveal in library",
       "NO_KEYS": "License keys will appear once delivery completes.",
+      "PROCESSING_NOTE": "Your payment went through and this purchase isn't lost — delivery is still being prepared. If it's still pending after a while, let us know:",
       "ITEMS_REVIEWS": "Items & Reviews",
       "REVIEW_SUBMITTED": "Review submitted",
       "ELIGIBLE_REVIEW": "Eligible for review",
@@ -934,6 +945,32 @@
         "PREVIEW_BLOCKED_DETAIL": "The product must be Active to preview it on the storefront."
       }
     },
+    "VARIANT_USAGE": {
+      "TITLE": "This variant is currently in use",
+      "SAFE_TO_REMOVE_TITLE": "Safe to remove",
+      "SAFE_TO_REMOVE_EXPLANATION": "These are temporary or unused records. Cleaning up removes them permanently.",
+      "SAFE_TO_DETACH_TITLE": "Safe to detach",
+      "SAFE_TO_DETACH_EXPLANATION": "These records reference this variant but are never changed or removed — they keep the variant's ID as a historical reference.",
+      "PROTECTED_HISTORY_TITLE": "Protected history",
+      "PROTECTED_HISTORY_EXPLANATION": "These records are preserved because they are part of customer/order history.",
+      "GUIDANCE_ARCHIVE": "Delete Permanently isn't available while protected history or removable data remains. Archive keeps every record intact and can be undone later by reactivating the variant.",
+      "CLEANUP": "Clean Up Removable Data",
+      "ARCHIVE": "Archive Variant",
+      "DELETE_PERMANENTLY": "Delete Permanently",
+      "CANCEL": "Cancel",
+      "ITEMS": {
+        "ACTIVE_RESERVATIONS": "{{count}} active reservation(s)",
+        "AVAILABLE_INVENTORY_CODES": "{{count}} available inventory code(s)",
+        "DISABLED_INVENTORY_CODES": "{{count}} disabled inventory code(s)",
+        "CART_ITEMS": "{{count}} cart item(s)",
+        "INVENTORY_BATCHES": "{{count}} inventory batch(es)",
+        "INVENTORY_AUDIT_LOG_REFERENCES": "{{count}} audit log record(s)",
+        "SOLD_INVENTORY_CODES": "{{count}} sold inventory code(s)",
+        "OTHER_PROTECTED_INVENTORY_CODES": "{{count}} other protected inventory code(s)",
+        "ORDER_ITEMS": "{{count}} order(s)",
+        "ORDER_LICENSE_KEYS": "{{count}} customer license record(s)"
+      }
+    },
     "CATALOG_IMPORT_EXPORT_JOBS": {
       "TITLE": "Import/Export Jobs",
       "SUBTITLE": "Track catalog import and export background jobs.",
@@ -1079,6 +1116,7 @@
       "THEMES": "Themes",
       "CAMPAIGNS": "Campaigns",
       "PAGE_BUILDER": "Page Builder",
+      "FAQS": "FAQ",
       "LEGAL": "Legal Center",
       "ORDERS": "Orders",
       "OPERATIONS": "Operations",
@@ -1191,6 +1229,59 @@
         "MESSAGES": {
           "UPDATE_FAILED": "Failed to update provider."
         }
+      }
+    },
+    "FAQ": {
+      "LIST": {
+        "TITLE": "FAQ",
+        "SUBTITLE": "Manage frequently asked questions shown on the storefront.",
+        "SEARCH_PLACEHOLDER": "Search questions...",
+        "FILTER_SCOPE": "Scope",
+        "FILTER_CATEGORY": "Category",
+        "FILTER_STATUS": "Status",
+        "NEW": "New FAQ",
+        "EDIT": "Edit",
+        "DELETE": "Delete",
+        "EMPTY": "No FAQs yet",
+        "EMPTY_SEARCH": "No FAQs match your search",
+        "COLUMNS": {
+          "ORDER": "Order",
+          "QUESTION": "Question",
+          "CATEGORY": "Category",
+          "SCOPE": "Scope",
+          "STATUS": "Status",
+          "UPDATED": "Updated"
+        },
+        "MOVE_UP": "Move up",
+        "MOVE_DOWN": "Move down"
+      },
+      "STATUS": {
+        "PUBLISHED": "Published",
+        "DRAFT": "Draft"
+      },
+      "CONFIRM": {
+        "DELETE_TITLE": "Delete FAQ"
+      },
+      "EDIT": {
+        "BACK": "Back to FAQ",
+        "CREATE_TITLE": "New FAQ",
+        "EDIT_TITLE": "Edit FAQ",
+        "SECTION_QUESTION": "Question & Answer",
+        "QUESTION_EN": "Question (English)",
+        "QUESTION_AR": "Question (Arabic)",
+        "ANSWER_EN": "Answer (English)",
+        "ANSWER_AR": "Answer (Arabic)",
+        "SECTION_ORGANIZATION": "Organization",
+        "CATEGORY": "Category",
+        "CATEGORY_PLACEHOLDER": "Select a category",
+        "ADD_CATEGORY": "Add category",
+        "CATEGORY_NAME": "Category name",
+        "SCOPE": "Scope",
+        "TARGET_PRODUCT": "Product",
+        "TARGET_CATEGORY": "Category",
+        "TARGET_REQUIRED": "Select a target to continue.",
+        "CANCEL": "Cancel",
+        "SAVE": "Save"
       }
     },
     "OPERATIONS": {
@@ -4437,6 +4528,12 @@
             "WHATSAPP_URL": {
               "LABEL": "WhatsApp URL",
               "HELP": "Link to WhatsApp contact/chat."
+            }
+          },
+          "FAQ": {
+            "SECTION_TITLE": {
+              "LABEL": "Section title",
+              "HELP": "Heading shown above the FAQ accordion."
             }
           }
         }

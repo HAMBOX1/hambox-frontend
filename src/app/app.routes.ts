@@ -117,6 +117,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/legal/legal.routes').then((m) => m.routes),
       },
       {
+        path: 'faq',
+        loadChildren: () => import('./features/faq/faq.routes').then((m) => m.routes),
+      },
+      {
         path: 'checkout',
         canActivate: [authGuard],
         loadChildren: () => import('./features/checkout/checkout.routes').then((m) => m.routes),

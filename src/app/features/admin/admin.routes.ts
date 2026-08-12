@@ -149,6 +149,11 @@ export const routes: Routes = [
       import('./page-builder/admin-page-builder.routes').then((m) => m.routes),
   },
   {
+    path: 'faqs',
+    loadChildren: () =>
+      import('./faq/admin-faq.routes').then((m) => m.routes),
+  },
+  {
     path: 'legal',
     loadChildren: () =>
       import('./legal/admin-legal.routes').then((m) => m.routes),

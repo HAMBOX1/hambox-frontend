@@ -43,6 +43,7 @@ export const CATALOG_API = {
     `/api/v1/storefront/products/${productId}/configuration`,
   storefrontProductConfigurationPreview: (productId: string) =>
     `/api/v1/storefront/products/${productId}/configuration/preview`,
+  storefrontProductConfigurations: '/api/v1/storefront/products/configuration',
 } as const;
 
 export const PAGE_BUILDER_API = {
@@ -59,6 +60,18 @@ export const PAGE_BUILDER_API = {
   templateDiscardDraft: (id: string) => `/api/v1/page-builder/templates/${id}/discard-draft`,
   templateActivate: (id: string) => `/api/v1/page-builder/templates/${id}/activate`,
   templateImages: '/api/v1/page-builder/templates/images',
+} as const;
+
+export const FAQ_API = {
+  faqs: '/api/v1/faqs',
+  faq: (id: string) => `/api/v1/faqs/${id}`,
+  publish: (id: string) => `/api/v1/faqs/${id}/publish`,
+  unpublish: (id: string) => `/api/v1/faqs/${id}/unpublish`,
+  duplicate: (id: string) => `/api/v1/faqs/${id}/duplicate`,
+  reorder: '/api/v1/faqs/reorder',
+  categories: '/api/v1/faqs/categories',
+  published: '/api/v1/faq/published',
+  publicCategories: '/api/v1/faq/categories',
 } as const;
 
 export const CATALOG_IMPORT_EXPORT_API = {
@@ -92,6 +105,9 @@ export const INVENTORY_API = {
   variantDuplicate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/duplicate`,
   variantActivate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/activate`,
   variantDeactivate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/deactivate`,
+  variantArchive: (variantId: string) => `/api/v1/inventory/variants/${variantId}/archive`,
+  variantUsage: (variantId: string) => `/api/v1/inventory/variants/${variantId}/usage`,
+  variantCleanup: (variantId: string) => `/api/v1/inventory/variants/${variantId}/cleanup`,
   productOptionGroups: (productId: string) =>
     `/api/v1/inventory/products/${productId}/option-groups`,
   productOptionGroupsReorder: (productId: string) =>

@@ -201,6 +201,13 @@ export const PERMISSIONS = {
     ManageTemplates: 'Communication.ManageTemplates',
     ManageProviders: 'Communication.ManageProviders',
   },
+  Faq: {
+    View: 'Faq.View',
+    Create: 'Faq.Create',
+    Edit: 'Faq.Edit',
+    Delete: 'Faq.Delete',
+    Publish: 'Faq.Publish',
+  },
 } as const;
 
 export const ALL_PERMISSIONS: readonly string[] = [
@@ -329,6 +336,11 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Communication.Send,
   PERMISSIONS.Communication.ManageTemplates,
   PERMISSIONS.Communication.ManageProviders,
+  PERMISSIONS.Faq.View,
+  PERMISSIONS.Faq.Create,
+  PERMISSIONS.Faq.Edit,
+  PERMISSIONS.Faq.Delete,
+  PERMISSIONS.Faq.Publish,
 ] as const;
 
 export const OWNER_ROLE_NAMES = ['Owner', 'SuperAdmin', 'Admin', 'Administrator'] as const;
@@ -360,6 +372,7 @@ export const ADMIN_AREA_PREFIXES = [
   'Operations.',
   'Analytics.',
   'Communication.',
+  'Faq.',
 ] as const;
 
 export function isAdminAccessPermission(permission: string): boolean {

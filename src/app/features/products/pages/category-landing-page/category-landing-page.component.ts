@@ -18,6 +18,9 @@ import { SectionRendererComponent } from '../../../home/section-registry/render/
 import { mapCategoryToStorefrontCategory } from '../../../home/utils/storefront-home.mapper';
 import { mapProductToStoreProduct } from '../../utils/storefront-product.mapper';
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { FaqPublicService } from '../../../../core/faq/faq-public.service';
+import { PublicFaqDto } from '../../../../core/faq/faq-public.model';
+import { pageHasFaqSection } from '../../../home/section-registry/section-variant-registry';
 import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../services/storefront-products-data';
 
 /**
@@ -50,6 +53,7 @@ export class CategoryLandingPageComponent {
   private readonly pageBuilderPublicApi = inject(PageBuilderPublicApiService);
   private readonly home = inject(Home);
   private readonly translation = inject(TranslationService);
+  private readonly faqService = inject(FaqPublicService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
@@ -105,11 +109,14 @@ export class CategoryLandingPageComponent {
 
     this.marketingPage.set(page);
 
-    const [home, productsPage] = await Promise.all([
+    const [home, productsPage, targetFaqs] = await Promise.all([
       this.home.loadHomeData(),
       firstValueFrom(
         this.productApi.getProducts({ pageNumber: 1, pageSize: 12, categoryId: category.id }),
       ),
+      pageHasFaqSection(page.sections)
+        ? this.faqService.getPublished('Category', category.id)
+        : Promise.resolve<readonly PublicFaqDto[]>([]),
     ]);
     const lang = this.translation.language();
 
@@ -122,6 +129,7 @@ export class CategoryLandingPageComponent {
       trendingValue: home.trendingValue,
       trustFeatures: home.trustFeatures,
       flashCountdownSeconds: home.content.flashDeals.countdownSeconds ?? 0,
+      targetFaqs,
       targetCategory: mapCategoryToStorefrontCategory(category, lang),
       targetCategoryProducts: productsPage.items.map((product, index) =>
         mapProductToStoreProduct(product, lang, index),

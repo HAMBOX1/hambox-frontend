@@ -4,6 +4,7 @@ import { ArenaBriefingsSettingsFormComponent } from './components/section-settin
 import { CollectionShowcaseSettingsFormComponent } from './components/section-settings-forms/collection-showcase-settings-form.component';
 import { ConsoleFavoritesSettingsFormComponent } from './components/section-settings-forms/console-favorites-settings-form.component';
 import { CommunityNewsletterSettingsFormComponent } from './components/section-settings-forms/community-newsletter-settings-form.component';
+import { FaqSettingsFormComponent } from './components/section-settings-forms/faq-settings-form.component';
 import { FeaturedCollectionsSettingsFormComponent } from './components/section-settings-forms/featured-collections-settings-form.component';
 import { FlashDealsSettingsFormComponent } from './components/section-settings-forms/flash-deals-settings-form.component';
 import { FooterSettingsFormComponent } from './components/section-settings-forms/footer-settings-form.component';
@@ -50,6 +51,7 @@ const SECTION_SETTINGS_FORM_REGISTRY: Readonly<Record<string, SectionSettingsFor
   'Showcase:hardware-spotlight': HardwareShowcaseSettingsFormComponent,
   'Assistant:ai-assistant': AiAssistantSettingsFormComponent,
   'Footer:storefront-footer': FooterSettingsFormComponent,
+  'Support:faq-accordion': FaqSettingsFormComponent,
 };
 
 export function resolveSectionSettingsForm(category: string, variantKey: string): SectionSettingsFormType | null {

@@ -1,7 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
+import { FaqPublicService } from '../../../core/faq/faq-public.service';
+import { PublicFaqDto } from '../../../core/faq/faq-public.model';
 import { ApiError } from '../../../core/models/api-error.model';
 import { LandingPageSectionEntry } from '../models/landing-page-section.model';
+import { pageHasFaqSection } from '../section-registry/section-variant-registry';
 import { StorefrontContent } from '../models/storefront-content.model';
 import {
   FlashDeal,
@@ -16,6 +19,7 @@ import { Home } from './home';
 @Injectable()
 export class HomeFacade {
   private readonly home = inject(Home);
+  private readonly faqService = inject(FaqPublicService);
 
   private readonly loadingState = signal(true);
   private readonly errorState = signal<string | null>(null);
@@ -27,6 +31,7 @@ export class HomeFacade {
   private readonly trendingRanksState = signal<readonly TrendingRankItem[]>([]);
   private readonly trendingValueState = signal<TrendingValueItem | null>(null);
   private readonly trustFeaturesState = signal<readonly TrustFeature[]>([]);
+  private readonly faqsState = signal<readonly PublicFaqDto[]>([]);
 
   readonly loading = this.loadingState.asReadonly();
   readonly error = this.errorState.asReadonly();
@@ -38,6 +43,7 @@ export class HomeFacade {
   readonly trendingRanks = this.trendingRanksState.asReadonly();
   readonly trendingValue = this.trendingValueState.asReadonly();
   readonly trustFeatures = this.trustFeaturesState.asReadonly();
+  readonly faqs = this.faqsState.asReadonly();
   readonly flashCountdownSeconds = computed(
     () => this.contentState()?.flashDeals.countdownSeconds ?? 0,
   );
@@ -57,6 +63,8 @@ export class HomeFacade {
 
     try {
       const data = await this.home.loadHomeData();
+      // Skip the extra round trip entirely when the active homepage template has no FAQ section.
+      const faqs = pageHasFaqSection(data.sections) ? await this.faqService.getPublished('Global') : [];
 
       this.contentState.set(data.content);
       this.sectionsState.set(data.sections);
@@ -66,6 +74,7 @@ export class HomeFacade {
       this.trendingRanksState.set(data.trendingRanks);
       this.trendingValueState.set(data.trendingValue);
       this.trustFeaturesState.set(data.trustFeatures);
+      this.faqsState.set(faqs);
     } catch (error) {
       this.contentState.set(null);
       this.sectionsState.set([]);
@@ -75,6 +84,7 @@ export class HomeFacade {
       this.trendingRanksState.set([]);
       this.trendingValueState.set(null);
       this.trustFeaturesState.set([]);
+      this.faqsState.set([]);
       this.errorState.set(this.toErrorMessage(error, 'Failed to load the storefront home page.'));
     } finally {
       this.loadingState.set(false);

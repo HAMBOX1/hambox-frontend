@@ -1,5 +1,6 @@
 import { InputSignal, OutputEmitterRef, Type } from '@angular/core';
 
+import { PublicFaqDto } from '../../../../core/faq/faq-public.model';
 import { StoreProduct } from '../../../products/models/product';
 import { StorefrontContent } from '../../models/storefront-content.model';
 import {
@@ -33,6 +34,10 @@ export interface SectionRenderContext {
   readonly targetProduct?: StorefrontFeaturedProduct | null;
   readonly targetCategory?: StorefrontCategory | null;
   readonly targetCategoryProducts?: readonly StoreProduct[];
+  /** Published FAQs for the current page: Global FAQs plus (on a Product/Category marketing page)
+   * that target's own FAQs — see `FaqPublicService.getPublished`. Populated on every page type
+   * (homepage too, Global-only) so the FAQ section variant is usable everywhere. */
+  readonly targetFaqs?: readonly PublicFaqDto[];
 }
 
 /**

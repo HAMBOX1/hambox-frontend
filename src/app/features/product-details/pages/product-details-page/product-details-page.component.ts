@@ -37,6 +37,9 @@ import { ProductMarketingPageAvailabilityService } from '../../../products/servi
 import { mapProductToStoreProduct } from '../../../products/utils/storefront-product.mapper';
 import { StoreProductCardComponent } from '../../../products/components/store-product-card/store-product-card.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { FaqPublicService } from '../../../../core/faq/faq-public.service';
+import { PublicFaqDto } from '../../../../core/faq/faq-public.model';
+import { pageHasFaqSection } from '../../../home/section-registry/section-variant-registry';
 import { PublishedLandingPageResponse } from '../../../home/models/landing-page-section.model';
 import { Home } from '../../../home/services/home';
 import { PageBuilderPublicApiService } from '../../../home/services/page-builder-public-api.service';
@@ -86,6 +89,7 @@ export class ProductDetailsPageComponent {
   private readonly translation = inject(TranslationService);
   private readonly pageBuilderPublicApi = inject(PageBuilderPublicApiService);
   private readonly home = inject(Home);
+  private readonly faqService = inject(FaqPublicService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
@@ -131,8 +135,11 @@ export class ProductDetailsPageComponent {
   });
 
   protected readonly remainingStock = computed(() => {
+    // A product with no active, visible variant has no inventory-backed deliverable at all
+    // (see AddCartItemCommandHandler/CheckoutCommandHandler) — it can never be purchased, so it
+    // must never be reported as having stock, let alone "unlimited" stock.
     if (!this.hasVariants()) {
-      return Number.MAX_SAFE_INTEGER;
+      return 0;
     }
 
     const resolved = this.resolvedVariant();
@@ -160,8 +167,10 @@ export class ProductDetailsPageComponent {
   });
 
   protected readonly stockLabel = computed(() => {
+    // Mirrors the storefront list/card status (computeProductStockStatus): a product with no
+    // purchasable variant is out of stock, matching the backend's rejection of the same case.
     if (!this.hasVariants()) {
-      return { key: 'PRODUCT.STOCK_AVAILABLE', params: {}, isOutOfStock: false };
+      return { key: 'PRODUCT.OUT_OF_STOCK', params: {}, isOutOfStock: true };
     }
 
     const resolved = this.resolvedVariant();
@@ -225,7 +234,7 @@ export class ProductDetailsPageComponent {
     }
 
     if (!this.hasVariants()) {
-      return true;
+      return false;
     }
 
     const resolved = this.resolvedVariant();
@@ -413,7 +422,12 @@ export class ProductDetailsPageComponent {
 
     this.marketingPage.set(page);
 
-    const home = await this.home.loadHomeData();
+    const [home, targetFaqs] = await Promise.all([
+      this.home.loadHomeData(),
+      pageHasFaqSection(page.sections)
+        ? this.faqService.getPublished('Product', details.id)
+        : Promise.resolve<readonly PublicFaqDto[]>([]),
+    ]);
     this.marketingContext.set({
       content: home.content,
       categories: home.categories,
@@ -423,6 +437,7 @@ export class ProductDetailsPageComponent {
       trendingValue: home.trendingValue,
       trustFeatures: home.trustFeatures,
       flashCountdownSeconds: home.content.flashDeals.countdownSeconds ?? 0,
+      targetFaqs,
       targetProduct: {
         id: details.id,
         badge: '',
