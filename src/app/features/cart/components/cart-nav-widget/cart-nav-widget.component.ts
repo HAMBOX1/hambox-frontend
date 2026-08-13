@@ -31,4 +31,19 @@ export class CartNavWidgetComponent {
   protected closePanel(): void {
     this.panelOpen.set(false);
   }
+
+  protected onIncrement(id: string, event: Event): void {
+    event.stopPropagation();
+    void this.cartFacade.incrementQuantity(id);
+  }
+
+  protected onDecrement(id: string, event: Event): void {
+    event.stopPropagation();
+    void this.cartFacade.decrementQuantity(id);
+  }
+
+  protected onRemove(id: string, event: Event): void {
+    event.stopPropagation();
+    void this.cartFacade.removeItem(id);
+  }
 }

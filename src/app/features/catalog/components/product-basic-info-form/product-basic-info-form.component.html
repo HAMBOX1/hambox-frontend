@@ -297,6 +297,7 @@
     [submitting]="collectionCreating()"
     [serverError]="collectionCreateError()"
     [resetToken]="collectionFormResetToken()"
+    [parentOptions]="collectionOptionsMerged()"
     (submitted)="onCollectionSubmitted($event)"
     (cancelled)="closeCollectionDialog()"
   />

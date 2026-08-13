@@ -41,9 +41,45 @@
               <img class="cart-nav__thumb" [src]="item.imageUrl" [alt]="" />
               <div class="cart-nav__item-body">
                 <span class="cart-nav__item-title">{{ item.title }}</span>
-                <span class="cart-nav__item-meta">{{ 'CART.QTY_LABEL' | translate: { count: item.quantity } }}</span>
+                <div class="cart-nav__item-stepper">
+                  <button
+                    type="button"
+                    class="cart-nav__stepper-btn"
+                    [attr.aria-label]="'CART.DECREASE_QUANTITY' | translate"
+                    (click)="onDecrement(item.id, $event)"
+                  >
+                    −
+                  </button>
+                  <span class="cart-nav__item-qty">{{ item.quantity }}</span>
+                  <button
+                    type="button"
+                    class="cart-nav__stepper-btn"
+                    [attr.aria-label]="'CART.INCREASE_QUANTITY' | translate"
+                    (click)="onIncrement(item.id, $event)"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-              <span class="cart-nav__item-price">{{ item.price * item.quantity | hamboxCurrency }}</span>
+              <div class="cart-nav__item-end">
+                <span class="cart-nav__item-price">{{ item.price * item.quantity | hamboxCurrency }}</span>
+                <button
+                  type="button"
+                  class="cart-nav__remove"
+                  [attr.aria-label]="'CART.REMOVE' | translate"
+                  (click)="onRemove(item.id, $event)"
+                >
+                  <svg width="13" height="15" viewBox="0 0 16 18" fill="none" aria-hidden="true">
+                    <path
+                      d="M2 4.5h12M6 4.5V3a1 1 0 011-1h2a1 1 0 011 1v1.5M13 4.5v11a2 2 0 01-2 2H5a2 2 0 01-2-2v-11M6.5 8v5M9.5 8v5"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
             </li>
           }
         </ul>

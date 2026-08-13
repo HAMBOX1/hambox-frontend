@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -21,11 +20,11 @@ const FIELD_LABELS = {
 
 /** Simplified sibling of `CategoryCreateFormComponent` — Collections are internal-only tags
  * with no bilingual name/slug/subcategory-nesting flow, just the fields the spec calls for:
- * Name, Description, Parent, Color, Icon, Sort Order. */
+ * Name, Description, Parent, Color, Icon. Sort order is set via drag-and-drop reorder only. */
 @Component({
   selector: 'app-collection-create-form',
   standalone: true,
-  imports: [ReactiveFormsModule, InputTextModule, TextareaModule, SelectModule, InputNumberModule, ButtonModule, AdminErrorAlertComponent],
+  imports: [ReactiveFormsModule, InputTextModule, TextareaModule, SelectModule, ButtonModule, AdminErrorAlertComponent],
   templateUrl: './collection-create-form.component.html',
   styleUrl: './collection-create-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,7 +55,6 @@ export class CollectionCreateFormComponent {
     parentId: this.fb.control<string | null>(null),
     color: this.fb.control<string | null>(null),
     icon: this.fb.control<string | null>(null),
-    sortOrder: [0, [Validators.min(0)]],
   });
 
   constructor() {
@@ -79,7 +77,6 @@ export class CollectionCreateFormComponent {
           parentId: editing ? collection.parentId : this.initialParentId(),
           color: editing ? collection.color : null,
           icon: editing ? collection.icon : null,
-          sortOrder: editing ? collection.sortOrder : 0,
         },
         { emitEvent: false },
       );
@@ -152,7 +149,7 @@ export class CollectionCreateFormComponent {
         color: value.color,
         icon: value.icon,
         parentId: value.parentId,
-        sortOrder: value.sortOrder,
+        sortOrder: this.initialCollection()?.sortOrder ?? 0,
       });
       return;
     }
@@ -163,7 +160,6 @@ export class CollectionCreateFormComponent {
       color: value.color,
       icon: value.icon,
       parentId: value.parentId,
-      sortOrder: value.sortOrder,
     });
   }
 
