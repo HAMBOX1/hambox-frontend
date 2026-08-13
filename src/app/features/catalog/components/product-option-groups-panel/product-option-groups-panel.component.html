@@ -107,3 +107,8 @@
   [visible]="templateManagerOpen()"
   (visibleChange)="templateManagerOpen.set($event)"
 />
+
+<app-option-description-template-manager
+  [visible]="facade.descriptionTemplateManagerOpen()"
+  (visibleChange)="facade.setDescriptionTemplateManagerOpen($event)"
+/>

@@ -1,0 +1,84 @@
+<p-dialog
+  [header]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.TITLE' | translate"
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(32rem, 94vw)' }"
+  styleClass="admin-dialog template-manager"
+>
+  @if (editingTemplateId()) {
+    <div class="admin-field">
+      <label class="admin-field__label" for="description-template-manager-name">{{ 'ADMIN.OPTION_DESCRIPTION_TEMPLATES.NAME_LABEL' | translate }}</label>
+      <input
+        pInputText
+        id="description-template-manager-name"
+        class="admin-field__input"
+        [ngModel]="editName()"
+        (ngModelChange)="editName.set($event)"
+      />
+    </div>
+
+    <div class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.OPTION_DESCRIPTION_TEMPLATES.CONTENT_LABEL' | translate }}</span>
+      <p-editor
+        [ngModel]="editDescriptionHtml()"
+        (ngModelChange)="editDescriptionHtml.set($event)"
+        [style]="{ height: '160px' }"
+      />
+    </div>
+
+    @if (saveError()) {
+      <p class="template-manager__error">{{ saveError() }}</p>
+    }
+
+    <div class="admin-dialog__actions">
+      <button pButton type="button" [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.CANCEL' | translate" severity="secondary" [disabled]="saving()" (click)="cancelEdit()"></button>
+      <button pButton type="button" [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.SAVE_CHANGES' | translate" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
+    </div>
+  } @else {
+    <app-admin-search-bar
+      class="template-manager__search"
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    @if (loading()) {
+      <app-admin-loading-skeleton variant="table" [rows]="4" />
+    } @else if (templates().length === 0) {
+      <app-admin-empty-state
+        icon="pi pi-bookmark"
+        [title]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.EMPTY_TITLE' | translate"
+        [description]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.EMPTY_DESCRIPTION' | translate"
+      />
+    } @else {
+      <ul class="template-manager__list">
+        @for (template of templates(); track template.id) {
+          <li class="template-manager__list-item">
+            <div class="template-manager__list-item-info">
+              <span class="template-manager__list-item-name">{{ template.name }}</span>
+              <span class="template-manager__list-item-count">{{ previewText(template.descriptionHtml) }}</span>
+            </div>
+            <div class="template-manager__list-item-actions">
+              <app-admin-icon-button icon="pi pi-pencil" [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.EDIT' | translate" (pressed)="startEdit(template)" />
+              <app-admin-icon-button icon="pi pi-trash" [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.DELETE' | translate" severity="danger" (pressed)="requestDelete(template)" />
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deleteDialogOpen()"
+  [title]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.DELETE_CONFIRM_TITLE' | translate"
+  [message]="('ADMIN.OPTION_DESCRIPTION_TEMPLATES.DELETE_CONFIRM_MESSAGE' | translate: { name: deleteTarget()?.name ?? '' })"
+  [destructive]="true"
+  [loading]="deleting()"
+  (visibleChange)="deleteDialogOpen.set($event)"
+  (confirmed)="confirmDelete()"
+/>

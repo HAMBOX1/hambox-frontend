@@ -972,6 +972,28 @@
         "ORDER_LICENSE_KEYS": "{{count}} customer license record(s)"
       }
     },
+    "OPTION_DESCRIPTION_TEMPLATES": {
+      "TITLE": "Saved Descriptions",
+      "AUTOCOMPLETE_PLACEHOLDER": "Search or type a saved description...",
+      "NO_MATCHES": "No saved descriptions found",
+      "SAVE_AS_REUSABLE": "Save as reusable description",
+      "MANAGE_LINK": "Manage saved descriptions",
+      "SAVE_DIALOG_TITLE": "Save Description",
+      "NAME_LABEL": "Name",
+      "SAVE_DIALOG_NAME_PLACEHOLDER": "e.g. Global Activation Instructions",
+      "CONTENT_PREVIEW_LABEL": "Content preview",
+      "CONTENT_LABEL": "Content",
+      "SEARCH_PLACEHOLDER": "Search saved descriptions...",
+      "EMPTY_TITLE": "No saved descriptions yet",
+      "EMPTY_DESCRIPTION": "Save a description as reusable from the instructions editor to see it here.",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "DELETE_CONFIRM_TITLE": "Delete saved description",
+      "DELETE_CONFIRM_MESSAGE": "Delete '{{name}}'? Product options that already copied it keep their own copy — only future selections of this saved description are affected.",
+      "CANCEL": "Cancel",
+      "SAVE": "Save",
+      "SAVE_CHANGES": "Save Changes"
+    },
     "CATALOG_IMPORT_EXPORT_JOBS": {
       "TITLE": "Import/Export Jobs",
       "SUBTITLE": "Track catalog import and export background jobs.",

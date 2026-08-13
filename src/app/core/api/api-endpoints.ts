@@ -123,6 +123,9 @@ export const INVENTORY_API = {
     `/api/v1/inventory/option-groups/${groupId}/save-as-template`,
   importOptionGroupTemplate: (productId: string) =>
     `/api/v1/inventory/products/${productId}/option-groups/import-template`,
+  optionDescriptionTemplates: '/api/v1/inventory/option-description-templates',
+  optionDescriptionTemplate: (templateId: string) =>
+    `/api/v1/inventory/option-description-templates/${templateId}`,
   suppliers: '/api/v1/inventory/suppliers',
   variantBatches: (variantId: string) => `/api/v1/inventory/variants/${variantId}/batches`,
   batchImport: (variantId: string, batchId: string) =>

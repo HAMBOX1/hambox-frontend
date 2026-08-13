@@ -7,10 +7,14 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { EditorModule } from 'primeng/editor';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
@@ -18,7 +22,7 @@ import { PermissionService } from '../../../../core/permissions/permission.servi
 import { AdminConfirmDialogComponent, AdminIconButtonComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { LongPressDirective } from '../../../../shared/directives/long-press.directive';
-import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
+import { OptionDescriptionTemplateDto, ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
 
@@ -32,10 +36,14 @@ import { slugify } from '../../utils/product-display.utils';
   standalone: true,
   imports: [
     FormsModule,
+    TranslatePipe,
+    AutoCompleteModule,
     ButtonModule,
     CheckboxModule,
     DialogModule,
     EditorModule,
+    IconFieldModule,
+    InputIconModule,
     InputTextModule,
     DragDropModule,
     HasPermissionDirective,
@@ -72,6 +80,10 @@ export class ProductOptionGroupNodeComponent {
   protected readonly collapsed = signal(false);
   protected readonly collapsedFollowUps = signal<ReadonlySet<string>>(new Set());
   protected readonly deleteDialogOpen = signal(false);
+  protected readonly deleteGroupError = signal<string | null>(null);
+  protected readonly deleteOptionDialogOpen = signal(false);
+  protected readonly deleteOptionTarget = signal<ProductOptionDto | null>(null);
+  protected readonly deleteOptionError = signal<string | null>(null);
 
   protected readonly saveTemplateDialogOpen = signal(false);
   protected readonly saveTemplateName = signal('');
@@ -81,6 +93,14 @@ export class ProductOptionGroupNodeComponent {
   protected readonly instructionsOptionId = signal<string | null>(null);
   protected readonly instructionsDraft = signal('');
   protected readonly savingInstructions = signal(false);
+
+  protected readonly descriptionTemplateQuery = signal<string | OptionDescriptionTemplateDto>('');
+  protected readonly descriptionTemplateSuggestions = signal<readonly OptionDescriptionTemplateDto[]>([]);
+
+  protected readonly saveDescriptionDialogOpen = signal(false);
+  protected readonly saveDescriptionName = signal('');
+  protected readonly savingDescriptionTemplate = signal(false);
+  protected readonly saveDescriptionError = signal<string | null>(null);
 
   private canEdit(): boolean {
     return (
@@ -162,14 +182,21 @@ export class ProductOptionGroupNodeComponent {
   }
 
   protected requestDeleteGroup(): void {
+    this.deleteGroupError.set(null);
     this.deleteDialogOpen.set(true);
   }
 
   protected async confirmDeleteGroup(): Promise<void> {
     this.saving.set(true);
     try {
-      await this.facade.deleteOptionGroup(this.group().id, true);
-      this.deleteDialogOpen.set(false);
+      const success = await this.facade.deleteOptionGroup(this.group().id, true);
+      if (success) {
+        this.deleteDialogOpen.set(false);
+      } else {
+        // Stay open with the specific backend reason (e.g. "still in use, clean up or archive
+        // first") — closing silently on failure would look like the delete succeeded.
+        this.deleteGroupError.set(this.facade.optionActionError() ?? 'Unable to delete this option group.');
+      }
     } finally {
       this.saving.set(false);
     }
@@ -220,11 +247,55 @@ export class ProductOptionGroupNodeComponent {
   protected openInstructions(option: ProductOptionDto): void {
     this.instructionsOptionId.set(option.id);
     this.instructionsDraft.set(option.descriptionHtml ?? '');
+    this.descriptionTemplateQuery.set('');
+    this.descriptionTemplateSuggestions.set([]);
   }
 
   protected closeInstructions(): void {
     this.instructionsOptionId.set(null);
     this.instructionsDraft.set('');
+    this.descriptionTemplateQuery.set('');
+  }
+
+  protected async searchDescriptionTemplates(event: AutoCompleteCompleteEvent): Promise<void> {
+    this.descriptionTemplateSuggestions.set(await this.facade.searchOptionDescriptionTemplates(event.query));
+  }
+
+  protected onDescriptionTemplateSelected(event: AutoCompleteSelectEvent): void {
+    const template = event.value as OptionDescriptionTemplateDto;
+    this.instructionsDraft.set(template.descriptionHtml);
+    this.descriptionTemplateQuery.set('');
+  }
+
+  protected openDescriptionTemplateManager(): void {
+    this.facade.openDescriptionTemplateManager();
+  }
+
+  protected openSaveDescriptionDialog(): void {
+    this.saveDescriptionError.set(null);
+    this.saveDescriptionName.set('');
+    this.saveDescriptionDialogOpen.set(true);
+  }
+
+  protected async confirmSaveDescription(): Promise<void> {
+    const name = this.saveDescriptionName().trim();
+    const descriptionHtml = this.instructionsDraft().trim();
+    if (!name || !descriptionHtml) {
+      return;
+    }
+
+    this.savingDescriptionTemplate.set(true);
+    this.saveDescriptionError.set(null);
+    try {
+      const success = await this.facade.createOptionDescriptionTemplate({ name, descriptionHtml });
+      if (success) {
+        this.saveDescriptionDialogOpen.set(false);
+      } else {
+        this.saveDescriptionError.set(this.facade.templateActionError() ?? 'Unable to save this description as reusable.');
+      }
+    } finally {
+      this.savingDescriptionTemplate.set(false);
+    }
   }
 
   protected async saveInstructions(): Promise<void> {
@@ -275,10 +346,31 @@ export class ProductOptionGroupNodeComponent {
     }
   }
 
-  protected async deleteOption(optionId: string): Promise<void> {
+  protected requestDeleteOption(option: ProductOptionDto): void {
+    this.deleteOptionError.set(null);
+    this.deleteOptionTarget.set(option);
+    this.deleteOptionDialogOpen.set(true);
+  }
+
+  protected async confirmDeleteOption(): Promise<void> {
+    const option = this.deleteOptionTarget();
+    if (!option) {
+      return;
+    }
+
     this.saving.set(true);
     try {
-      await this.facade.deleteOption(optionId);
+      // Force: an option value in use by a variant is a normal, expected case once the product
+      // has generated combinations — the backend cleans up any removable inventory data (unsold
+      // codes, reservations, cart items) automatically and only blocks on genuine sold/order
+      // history, matching the "Delete Permanently" gate used everywhere else in Inventory.
+      const success = await this.facade.deleteOption(option.id, true);
+      if (success) {
+        this.deleteOptionDialogOpen.set(false);
+        this.deleteOptionTarget.set(null);
+      } else {
+        this.deleteOptionError.set(this.facade.optionActionError() ?? 'Unable to delete this option value.');
+      }
     } finally {
       this.saving.set(false);
     }

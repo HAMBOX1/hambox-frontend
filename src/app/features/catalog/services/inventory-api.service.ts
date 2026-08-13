@@ -26,7 +26,9 @@ import {
   InventoryReservationDto,
   InventoryStatisticsDto,
   InventorySupplierDto,
+  CreateOptionDescriptionTemplateRequest,
   ImportOptionGroupTemplateRequest,
+  OptionDescriptionTemplateDto,
   OptionGroupTemplateDto,
   OptionGroupTemplateSummaryDto,
   ProductOptionGroupDto,
@@ -35,6 +37,7 @@ import {
   RevealInventoryCodeDto,
   SaveOptionGroupAsTemplateRequest,
   StorefrontProductConfigurationDto,
+  UpdateOptionDescriptionTemplateRequest,
   UpdateOptionGroupRequest,
   UpdateOptionGroupTemplateRequest,
   UpdateOptionRequest,
@@ -168,8 +171,8 @@ export class InventoryApiService {
     return this.api.put<void>(INVENTORY_API.option(optionId), request);
   }
 
-  deleteOption(optionId: string): Observable<void> {
-    return this.api.delete<void>(INVENTORY_API.option(optionId));
+  deleteOption(optionId: string, force = false): Observable<void> {
+    return this.api.delete<void>(INVENTORY_API.option(optionId), { params: { force } });
   }
 
   reorderOptions(groupId: string, request: ReorderIdsRequest): Observable<void> {
@@ -200,6 +203,28 @@ export class InventoryApiService {
 
   importOptionGroupTemplate(productId: string, request: ImportOptionGroupTemplateRequest): Observable<string> {
     return this.api.post<string>(INVENTORY_API.importOptionGroupTemplate(productId), request);
+  }
+
+  searchOptionDescriptionTemplates(search: string): Observable<OptionDescriptionTemplateDto[]> {
+    return this.api.get<OptionDescriptionTemplateDto[]>(INVENTORY_API.optionDescriptionTemplates, {
+      params: search ? { search } : undefined,
+    });
+  }
+
+  getOptionDescriptionTemplate(templateId: string): Observable<OptionDescriptionTemplateDto> {
+    return this.api.get<OptionDescriptionTemplateDto>(INVENTORY_API.optionDescriptionTemplate(templateId));
+  }
+
+  createOptionDescriptionTemplate(request: CreateOptionDescriptionTemplateRequest): Observable<string> {
+    return this.api.post<string>(INVENTORY_API.optionDescriptionTemplates, request);
+  }
+
+  updateOptionDescriptionTemplate(templateId: string, request: UpdateOptionDescriptionTemplateRequest): Observable<void> {
+    return this.api.put<void>(INVENTORY_API.optionDescriptionTemplate(templateId), request);
+  }
+
+  deleteOptionDescriptionTemplate(templateId: string): Observable<void> {
+    return this.api.delete<void>(INVENTORY_API.optionDescriptionTemplate(templateId));
   }
 
   getSuppliers(pageNumber = 1, pageSize = 50, searchTerm?: string): Observable<readonly InventorySupplierDto[]> {

@@ -304,6 +304,22 @@ export interface ImportOptionGroupTemplateRequest {
   readonly resolution: ImportConflictResolution;
 }
 
+export interface OptionDescriptionTemplateDto {
+  readonly id: string;
+  readonly name: string;
+  readonly descriptionHtml: string;
+}
+
+export interface CreateOptionDescriptionTemplateRequest {
+  readonly name: string;
+  readonly descriptionHtml: string;
+}
+
+export interface UpdateOptionDescriptionTemplateRequest {
+  readonly name: string;
+  readonly descriptionHtml: string;
+}
+
 export interface ReorderIdsRequest {
   readonly orderedIds: readonly string[];
 }

@@ -965,6 +965,28 @@
         "ORDER_LICENSE_KEYS": "{{count}} سجل ترخيص عميل"
       }
     },
+    "OPTION_DESCRIPTION_TEMPLATES": {
+      "TITLE": "الأوصاف المحفوظة",
+      "AUTOCOMPLETE_PLACEHOLDER": "ابحث أو اكتب وصفًا محفوظًا...",
+      "NO_MATCHES": "لم يتم العثور على أوصاف محفوظة",
+      "SAVE_AS_REUSABLE": "حفظ كوصف قابل لإعادة الاستخدام",
+      "MANAGE_LINK": "إدارة الأوصاف المحفوظة",
+      "SAVE_DIALOG_TITLE": "حفظ الوصف",
+      "NAME_LABEL": "الاسم",
+      "SAVE_DIALOG_NAME_PLACEHOLDER": "مثال: تعليمات التفعيل العالمية",
+      "CONTENT_PREVIEW_LABEL": "معاينة المحتوى",
+      "CONTENT_LABEL": "المحتوى",
+      "SEARCH_PLACEHOLDER": "ابحث في الأوصاف المحفوظة...",
+      "EMPTY_TITLE": "لا توجد أوصاف محفوظة بعد",
+      "EMPTY_DESCRIPTION": "احفظ وصفًا كقابل لإعادة الاستخدام من محرر التعليمات ليظهر هنا.",
+      "EDIT": "تعديل",
+      "DELETE": "حذف",
+      "DELETE_CONFIRM_TITLE": "حذف الوصف المحفوظ",
+      "DELETE_CONFIRM_MESSAGE": "هل تريد حذف '{{name}}'؟ ستحتفظ خيارات المنتج التي نسخته سابقًا بنسختها الخاصة — سيتأثر فقط الاختيار المستقبلي لهذا الوصف المحفوظ.",
+      "CANCEL": "إلغاء",
+      "SAVE": "حفظ",
+      "SAVE_CHANGES": "حفظ التغييرات"
+    },
     "CATALOG_IMPORT_EXPORT_JOBS": {
       "TITLE": "مهام الاستيراد والتصدير",
       "SUBTITLE": "تتبّع مهام استيراد وتصدير الكتالوج في الخلفية.",

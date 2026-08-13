@@ -60,7 +60,11 @@ import {
 
   ImportConflictResolution,
 
+  CreateOptionDescriptionTemplateRequest,
+
   ImportOptionGroupTemplateRequest,
+
+  OptionDescriptionTemplateDto,
 
   OptionGroupTemplateDto,
 
@@ -71,6 +75,8 @@ import {
   ProductVariantDto,
 
   SaveOptionGroupAsTemplateRequest,
+
+  UpdateOptionDescriptionTemplateRequest,
 
   UpdateOptionGroupRequest,
 
@@ -194,6 +200,19 @@ export class ProductEditorFacade {
    * dialog-local validation message, not a page-load failure. */
   private readonly templateActionErrorState = signal<string | null>(null);
 
+  /** The "Manage saved descriptions" dialog is triggered from deep inside the recursive
+   * `ProductOptionGroupNodeComponent` tree but rendered once at the panel level (like
+   * `OptionGroupTemplateManagerComponent`) — the facade is the shared coordination point so every
+   * node's trigger opens the same single dialog instance instead of each spawning its own. */
+  private readonly descriptionTemplateManagerOpenState = signal(false);
+
+  /** Scoped to option-group/option delete failures (e.g. "still in use, clean up or archive
+   * first") — deliberately NOT `errorState`, which `product-edit-page` treats as fatal and
+   * replaces the entire editor with a full-page error for. Rejecting a delete because a variant
+   * still has removable/protected data is an expected, recoverable outcome, not a page-load
+   * failure. */
+  private readonly optionActionErrorState = signal<string | null>(null);
+
 
 
   readonly product = this.productState.asReadonly();
@@ -237,6 +256,10 @@ export class ProductEditorFacade {
   readonly submitting = this.submittingState.asReadonly();
 
   readonly templateActionError = this.templateActionErrorState.asReadonly();
+
+  readonly descriptionTemplateManagerOpen = this.descriptionTemplateManagerOpenState.asReadonly();
+
+  readonly optionActionError = this.optionActionErrorState.asReadonly();
 
   readonly submitError = this.submitErrorState.asReadonly();
 
@@ -948,7 +971,7 @@ export class ProductEditorFacade {
 
     }
 
-
+    this.optionActionErrorState.set(null);
 
     try {
 
@@ -960,7 +983,7 @@ export class ProductEditorFacade {
 
     } catch (error) {
 
-      this.errorState.set(this.toErrorMessage(error, 'Failed to delete option group.'));
+      this.optionActionErrorState.set(this.toErrorMessage(error, 'Failed to delete option group.'));
 
       return false;
 
@@ -1066,7 +1089,7 @@ export class ProductEditorFacade {
 
 
 
-  async deleteOption(optionId: string): Promise<boolean> {
+  async deleteOption(optionId: string, force = false): Promise<boolean> {
 
     const productId = this.productId();
 
@@ -1076,11 +1099,11 @@ export class ProductEditorFacade {
 
     }
 
-
+    this.optionActionErrorState.set(null);
 
     try {
 
-      await firstValueFrom(this.inventoryApi.deleteOption(optionId));
+      await firstValueFrom(this.inventoryApi.deleteOption(optionId, force));
 
       await this.syncVariants(productId);
 
@@ -1088,7 +1111,7 @@ export class ProductEditorFacade {
 
     } catch (error) {
 
-      this.errorState.set(this.toErrorMessage(error, 'Failed to delete option.'));
+      this.optionActionErrorState.set(this.toErrorMessage(error, 'Failed to delete option.'));
 
       return false;
 
@@ -1195,6 +1218,55 @@ export class ProductEditorFacade {
       return true;
     } catch (error) {
       this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to import the saved option group.'));
+      return false;
+    }
+  }
+
+  openDescriptionTemplateManager(): void {
+    this.descriptionTemplateManagerOpenState.set(true);
+  }
+
+  setDescriptionTemplateManagerOpen(open: boolean): void {
+    this.descriptionTemplateManagerOpenState.set(open);
+  }
+
+  async searchOptionDescriptionTemplates(search: string): Promise<OptionDescriptionTemplateDto[]> {
+    try {
+      return await firstValueFrom(this.inventoryApi.searchOptionDescriptionTemplates(search));
+    } catch {
+      return [];
+    }
+  }
+
+  async createOptionDescriptionTemplate(request: CreateOptionDescriptionTemplateRequest): Promise<boolean> {
+    this.templateActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.createOptionDescriptionTemplate(request));
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to save the reusable description.'));
+      return false;
+    }
+  }
+
+  async updateOptionDescriptionTemplate(templateId: string, request: UpdateOptionDescriptionTemplateRequest): Promise<boolean> {
+    this.templateActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.updateOptionDescriptionTemplate(templateId, request));
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to update the saved description.'));
+      return false;
+    }
+  }
+
+  async deleteOptionDescriptionTemplate(templateId: string): Promise<boolean> {
+    this.templateActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.deleteOptionDescriptionTemplate(templateId));
+      return true;
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to delete the saved description.'));
       return false;
     }
   }

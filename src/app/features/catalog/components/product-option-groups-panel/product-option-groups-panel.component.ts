@@ -18,6 +18,7 @@ import { MobileViewportService } from '../../../../shared/services/mobile-viewpo
 import { ImportConflictResolution, OptionGroupTemplateSummaryDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
+import { OptionDescriptionTemplateManagerComponent } from '../option-description-template-manager/option-description-template-manager.component';
 import { OptionGroupTemplateManagerComponent } from '../option-group-template-manager/option-group-template-manager.component';
 import { ProductOptionGroupNodeComponent } from '../product-option-group-node/product-option-group-node.component';
 import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/product-option-mobile-nav.component';
@@ -42,6 +43,7 @@ import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/pr
     AdminSectionCardComponent,
     AdminEmptyStateComponent,
     AdminLoadingSkeletonComponent,
+    OptionDescriptionTemplateManagerComponent,
     OptionGroupTemplateManagerComponent,
     ProductOptionGroupNodeComponent,
     ProductOptionMobileNavComponent,
@@ -51,7 +53,7 @@ import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/pr
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductOptionGroupsPanelComponent {
-  private readonly facade = inject(ProductEditorFacade);
+  protected readonly facade = inject(ProductEditorFacade);
   protected readonly viewport = inject(MobileViewportService);
 
   readonly compact = input(false);

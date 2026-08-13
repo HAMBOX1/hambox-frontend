@@ -52,11 +52,21 @@
   <app-admin-confirm-dialog
     [visible]="deleteDialogOpen()"
     title="Delete option group"
-    message="Delete '{{ group().displayName }}' and all its options? Any variants using these options will also be removed, along with their inventory codes. This cannot be undone."
+    [message]="deleteGroupError() ?? ('Delete \'' + group().displayName + '\' and all its options? Any variants using these options will also be removed, along with their inventory codes. This cannot be undone.')"
     [destructive]="true"
     [loading]="saving()"
     (visibleChange)="deleteDialogOpen.set($event)"
     (confirmed)="confirmDeleteGroup()"
+  />
+
+  <app-admin-confirm-dialog
+    [visible]="deleteOptionDialogOpen()"
+    title="Delete option value"
+    [message]="deleteOptionError() ?? ('Delete \'' + (deleteOptionTarget()?.label ?? '') + '\'? Any variants using this value will also be removed, along with their inventory codes. This cannot be undone.')"
+    [destructive]="true"
+    [loading]="saving()"
+    (visibleChange)="deleteOptionDialogOpen.set($event)"
+    (confirmed)="confirmDeleteOption()"
   />
 
   <p-dialog
@@ -101,6 +111,42 @@
     [style]="{ width: 'min(32rem, 94vw)' }"
     styleClass="admin-dialog"
   >
+    <div class="admin-field instructions-dialog__saved-description">
+      <div class="instructions-dialog__saved-description-row">
+        <p-iconField iconPosition="right" class="instructions-dialog__saved-description-field">
+          <p-inputIcon styleClass="pi pi-search" />
+          <p-autoComplete
+            inputId="instructions-saved-description"
+            [ngModel]="descriptionTemplateQuery()"
+            (ngModelChange)="descriptionTemplateQuery.set($event)"
+            [suggestions]="[...descriptionTemplateSuggestions()]"
+            (completeMethod)="searchDescriptionTemplates($event)"
+            (onSelect)="onDescriptionTemplateSelected($event)"
+            optionLabel="name"
+            [dropdown]="false"
+            [forceSelection]="false"
+            [placeholder]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.AUTOCOMPLETE_PLACEHOLDER' | translate"
+            [emptyMessage]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.NO_MATCHES' | translate"
+            styleClass="instructions-dialog__saved-description-input"
+          />
+        </p-iconField>
+        <app-admin-icon-button
+          icon="pi pi-cog"
+          [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.MANAGE_LINK' | translate"
+          (pressed)="openDescriptionTemplateManager()"
+        />
+      </div>
+    </div>
+
+    <div class="instructions-dialog__field-header">
+      <span class="admin-field__label">{{ 'ADMIN.OPTION_DESCRIPTION_TEMPLATES.CONTENT_LABEL' | translate }}</span>
+      <app-admin-icon-button
+        icon="pi pi-bookmark"
+        [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.SAVE_AS_REUSABLE' | translate"
+        [disabled]="!instructionsDraft().trim()"
+        (pressed)="openSaveDescriptionDialog()"
+      />
+    </div>
     <p-editor
       [ngModel]="instructionsDraft()"
       (ngModelChange)="instructionsDraft.set($event)"
@@ -109,6 +155,50 @@
     <div class="admin-dialog__actions">
       <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
       <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    [header]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.SAVE_DIALOG_TITLE' | translate"
+    [visible]="saveDescriptionDialogOpen()"
+    (visibleChange)="saveDescriptionDialogOpen.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(26rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <div class="admin-field">
+      <label class="admin-field__label" for="save-description-name">{{ 'ADMIN.OPTION_DESCRIPTION_TEMPLATES.NAME_LABEL' | translate }}</label>
+      <input
+        pInputText
+        id="save-description-name"
+        class="admin-field__input"
+        [ngModel]="saveDescriptionName()"
+        (ngModelChange)="saveDescriptionName.set($event)"
+        [placeholder]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.SAVE_DIALOG_NAME_PLACEHOLDER' | translate"
+        (keyup.enter)="confirmSaveDescription()"
+      />
+    </div>
+    <div class="admin-field">
+      <span class="admin-field__label">{{ 'ADMIN.OPTION_DESCRIPTION_TEMPLATES.CONTENT_PREVIEW_LABEL' | translate }}</span>
+      <div class="instructions-dialog__content-preview" [innerHTML]="instructionsDraft()"></div>
+    </div>
+    @if (saveDescriptionError()) {
+      <p class="question-card__save-template-error">{{ saveDescriptionError() }}</p>
+    }
+    <div class="admin-dialog__actions">
+      <button pButton type="button" [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.CANCEL' | translate" severity="secondary" [disabled]="savingDescriptionTemplate()" (click)="saveDescriptionDialogOpen.set(false)"></button>
+      <button
+        pButton
+        type="button"
+        [label]="'ADMIN.OPTION_DESCRIPTION_TEMPLATES.SAVE' | translate"
+        icon="pi pi-check"
+        [loading]="savingDescriptionTemplate()"
+        [disabled]="!saveDescriptionName().trim()"
+        (click)="confirmSaveDescription()"
+      ></button>
     </div>
   </p-dialog>
 
@@ -186,7 +276,7 @@
                 <button type="button" class="answer-row__icon-btn" (click)="startEditOption(option)" aria-label="Edit option">
                   <i class="pi pi-pencil"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="deleteOption(option.id)" aria-label="Delete option">
+                <button type="button" class="answer-row__icon-btn" (click)="requestDeleteOption(option)" aria-label="Delete option">
                   <i class="pi pi-trash"></i>
                 </button>
               </div>
