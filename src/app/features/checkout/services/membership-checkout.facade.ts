@@ -180,6 +180,9 @@ export class MembershipCheckoutFacade {
       clearIdempotencyKey(IDEMPOTENCY_SCOPE);
       return order;
     } catch (error) {
+      // A failed attempt must not leave a stale key behind — otherwise retrying with any changed
+      // field gets rejected as a payload mismatch instead of actually retrying.
+      clearIdempotencyKey(IDEMPOTENCY_SCOPE);
       this.errorState.set(this.toErrorMessage(error, 'Membership checkout failed.'));
       throw error;
     } finally {

@@ -248,6 +248,10 @@ export class CheckoutFacade {
       await this.cartFacade.load();
       return order;
     } catch (error) {
+      // A failed attempt (validation, out of stock, etc.) must not leave a stale key behind —
+      // otherwise retrying with any changed field (coupon, cart) gets rejected as a payload
+      // mismatch instead of actually retrying.
+      clearIdempotencyKey(IDEMPOTENCY_SCOPE);
       this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
       throw error;
     } finally {
@@ -282,6 +286,7 @@ export class CheckoutFacade {
       clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
       return initiation;
     } catch (error) {
+      clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
       this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
       throw error;
     } finally {
@@ -328,6 +333,7 @@ export class CheckoutFacade {
       clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
       return initiation;
     } catch (error) {
+      clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
       this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
       throw error;
     } finally {
