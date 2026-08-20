@@ -75,9 +75,11 @@ export class MembershipCheckoutFacade {
   });
 
   async initialize(planId: string, action: string): Promise<void> {
-    if (this.planIdState() !== planId || this.actionState() !== action) {
-      clearIdempotencyKey(IDEMPOTENCY_SCOPE);
-    }
+    // A page mount is always the start of a new attempt — discard any key left over from a
+    // previous visit (even to the same plan/action) so a retry never replays or collides with a
+    // stale cached response. See CheckoutFacade.clearStaleIdempotencyKeys for the same fix on the
+    // main checkout page.
+    clearIdempotencyKey(IDEMPOTENCY_SCOPE);
 
     this.planIdState.set(planId);
     this.actionState.set(action);

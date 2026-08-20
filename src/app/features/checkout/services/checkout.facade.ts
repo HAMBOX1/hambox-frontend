@@ -139,6 +139,21 @@ export class CheckoutFacade {
     void this.loadConfiguration();
   }
 
+  /**
+   * Discards any idempotency key left over from a previous visit. `reset()` never runs on a plain
+   * checkout page load (only on an explicit full reset), so without this a key that outlived its
+   * attempt — the customer navigated away before retrying, or came back much later in the same
+   * tab/session — sits in sessionStorage indefinitely. Reusing it on the next attempt either throws
+   * "already used with a different request" (if anything changed) or silently replays the old
+   * cached response (if nothing did) instead of actually submitting. A fresh page visit is always
+   * the start of a new attempt, so it's safe to discard here.
+   */
+  clearStaleIdempotencyKeys(): void {
+    clearIdempotencyKey(IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
+  }
+
   async loadConfiguration(): Promise<void> {
     this.configurationLoadingState.set(true);
 

@@ -38,6 +38,7 @@ export class CheckoutPageComponent implements OnInit {
   protected readonly isEmpty = this.cartFacade.isEmpty;
 
   ngOnInit(): void {
+    this.checkoutFacade.clearStaleIdempotencyKeys();
     this.checkoutFacade.initialize();
     void this.initializeCheckout();
   }
