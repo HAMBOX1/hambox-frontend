@@ -3,6 +3,7 @@ import {
   StorefrontProductConfigurationDto,
   StorefrontVariantDto,
 } from '../../catalog/models/inventory-api.model';
+import { isPurchasableVariant } from '../../products/utils/storefront-product-stock.util';
 
 export interface ResolvedStorefrontVariant {
   readonly variant: StorefrontVariantDto | null;
@@ -141,10 +142,6 @@ export function defaultSelections(
   }
 
   return selections;
-}
-
-function isPurchasableVariant(variant: StorefrontVariantDto): boolean {
-  return variant.availableStock > 0 && !variant.isOutOfStock;
 }
 
 function pickImplicitVariant(

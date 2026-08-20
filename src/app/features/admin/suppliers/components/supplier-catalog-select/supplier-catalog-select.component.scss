@@ -1,0 +1,144 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.supplier-catalog-select {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.supplier-catalog-select__card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.04));
+}
+
+.supplier-catalog-select__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.supplier-catalog-select__card-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.supplier-catalog-select__card-meta {
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.supplier-catalog-select__card-technical {
+  font-size: 0.7rem;
+  opacity: 0.45;
+  font-family: var(--font-mono, monospace);
+  margin-top: 0.15rem;
+}
+
+.supplier-catalog-select__availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--color-success, #22c55e);
+}
+
+.supplier-catalog-select__availability--unavailable {
+  color: var(--admin-accent-red);
+}
+
+.supplier-catalog-select__card-clear {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  display: inline-flex;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.supplier-catalog-select__results {
+  display: grid;
+  gap: 0.15rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  padding: 0.3rem;
+}
+
+.supplier-catalog-select__status {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.supplier-catalog-select__status--error {
+  opacity: 1;
+  color: var(--admin-accent-red);
+}
+
+.supplier-catalog-select__retry {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.supplier-catalog-select__result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: start;
+  width: 100%;
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.supplier-catalog-select__result-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.supplier-catalog-select__result-meta {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}

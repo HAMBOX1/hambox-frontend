@@ -3,6 +3,8 @@ import { PagedResult } from '../../../catalog/models/category.model';
 export type SupplierStatus = 'Active' | 'Inactive' | 'Suspended';
 export type SupplierAuthenticationType = 'None' | 'ApiKey' | 'BasicAuth' | 'BearerToken' | 'OAuth2';
 export type SupplierMappingStatus = 'Active' | 'Inactive';
+/** Mirrors backend `SupplierAvailabilityState` (Suppliers.Domain) — Unknown covers both "never synced" and "sync failed". */
+export type SupplierAvailabilityState = 'Available' | 'Unavailable' | 'Unknown';
 
 export interface SupplierListItemDto {
   readonly id: string;
@@ -90,6 +92,8 @@ export interface SupplierMappingDto {
   readonly id: string;
   readonly supplierId: string;
   readonly internalProductId: string;
+  /** Null = product-wide mapping (applies to every variant without a more specific mapping). */
+  readonly internalProductVariantId: string | null;
   readonly externalProductId: string;
   readonly externalSku: string | null;
   readonly externalName: string | null;
@@ -98,6 +102,33 @@ export interface SupplierMappingDto {
   readonly priority: number;
   readonly status: SupplierMappingStatus;
   readonly createdOnUtc: string;
+  /** Display-only enrichment resolved server-side from Catalog — null if the product/variant can no longer be found. */
+  readonly internalProductName: string | null;
+  readonly internalVariantSku: string | null;
+  /** Null means the same as 'Unknown' — either the provider has no availability signal (e.g. Manual) or this mapping hasn't been synced yet. */
+  readonly availabilityState: SupplierAvailabilityState | null;
+  readonly availableQuantity: number | null;
+  readonly availabilityLastCheckedAtUtc: string | null;
+}
+
+/** Counts for the supplier detail page's availability status section, from `GET /suppliers/{id}/availability-summary`. */
+export interface SupplierAvailabilitySummaryDto {
+  readonly mappedCount: number;
+  readonly availableCount: number;
+  readonly unavailableCount: number;
+  readonly unknownCount: number;
+  readonly lastSyncedAtUtc: string | null;
+}
+
+/** Result of a "Sync now" action, from `POST /suppliers/{id}/availability/sync`. */
+export interface SupplierAvailabilitySyncResultDto {
+  readonly supplierId: string;
+  readonly isSuccess: boolean;
+  readonly mappingsChecked: number;
+  readonly availableCount: number;
+  readonly unavailableCount: number;
+  readonly unknownCount: number;
+  readonly message: string | null;
 }
 
 export interface CreateSupplierMappingRequest {
@@ -108,6 +139,29 @@ export interface CreateSupplierMappingRequest {
   buyingPrice: number;
   currency: string;
   priority: number;
+  internalProductVariantId?: string | null;
+}
+
+/** Mapping scope, matching backend `SupplierFulfillmentChainCandidateDto.Scope`. */
+export type FulfillmentMappingScope = 'VariantSpecific' | 'ProductWide';
+
+/**
+ * One entry in a product/variant's fulfillment chain — safe metadata only, from
+ * `GET /suppliers/fulfillment-chain`. Never contains credential values.
+ */
+export interface SupplierFulfillmentChainCandidateDto {
+  readonly mappingId: string;
+  readonly supplierId: string;
+  readonly supplierName: string;
+  readonly providerType: string;
+  readonly scope: FulfillmentMappingScope;
+  readonly externalProductId: string;
+  readonly priority: number;
+  readonly mappingStatus: SupplierMappingStatus;
+  readonly supplierEnabled: boolean;
+  readonly credentialsConfigured: boolean;
+  readonly providerRegistered: boolean;
+  readonly isReady: boolean;
 }
 
 export interface UpdateSupplierMappingRequest {
@@ -120,6 +174,23 @@ export interface UpdateSupplierMappingRequest {
   status: SupplierMappingStatus;
 }
 
+/** One selectable supplier catalog product/denomination — safe display fields only, from `GET /suppliers/{id}/catalog`. */
+export interface SupplierCatalogItemDto {
+  readonly externalProductId: string;
+  readonly name: string;
+  readonly brandName: string | null;
+  readonly currency: string;
+  readonly minFaceValue: number | null;
+  readonly maxFaceValue: number | null;
+  readonly available: boolean;
+}
+
+export interface SupplierCatalogSearchResultDto {
+  readonly isSuccess: boolean;
+  readonly items: readonly SupplierCatalogItemDto[];
+  readonly message: string | null;
+}
+
 export type SupplierListResult = PagedResult<SupplierListItemDto>;
 
 export const SUPPLIER_STATUS_OPTIONS: readonly { label: string; value: SupplierStatus | 'all' }[] = [
@@ -129,10 +200,22 @@ export const SUPPLIER_STATUS_OPTIONS: readonly { label: string; value: SupplierS
   { label: 'Suspended', value: 'Suspended' },
 ];
 
+/**
+ * `BasicAuth` here means exactly what HTTP Basic Auth actually sends — an identifier and a secret,
+ * base64-encoded — never a literal "Username"/"Password" pair. That's also what the backend's own
+ * `Supplier.HasCredentialsConfigured` readiness check already assumes for `BasicAuth` (it reads
+ * `ApiKey`/`ApiSecret`, not `Username`/`Password`), so the label matches the real semantics for every
+ * provider that uses this type today (e.g. Bamboo's Client ID / Client Secret), not just one of them.
+ */
 export const SUPPLIER_AUTH_TYPE_OPTIONS: readonly { label: string; value: SupplierAuthenticationType }[] = [
   { label: 'None', value: 'None' },
   { label: 'API Key', value: 'ApiKey' },
-  { label: 'Basic Auth (Username/Password)', value: 'BasicAuth' },
+  { label: 'Basic Auth (Client ID / Client Secret)', value: 'BasicAuth' },
   { label: 'Bearer Token', value: 'BearerToken' },
   { label: 'OAuth 2.0', value: 'OAuth2' },
 ];
+
+/** Providers with a fixed, non-editable HTTP endpoint — the Base URL field is locked to this display value in the UI; the backend independently enforces the real endpoint regardless of what's submitted. */
+export const SUPPLIER_FIXED_BASE_URLS: Readonly<Record<string, string>> = {
+  Bamboo: 'https://api.bamboocardportal.com',
+};

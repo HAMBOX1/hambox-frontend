@@ -1,0 +1,58 @@
+<div class="hambox-product-select">
+  @if (selected(); as product) {
+    <div class="hambox-product-select__card">
+      <div class="hambox-product-select__card-body">
+        <span class="hambox-product-select__card-name">{{ productName(product) }}</span>
+        @if (product.categoryName) {
+          <span class="hambox-product-select__card-meta">{{ product.categoryName }}</span>
+        }
+      </div>
+      <button
+        type="button"
+        class="hambox-product-select__card-clear"
+        [disabled]="disabled()"
+        [attr.aria-label]="'ADMIN.PICKERS.CLEAR_ALL' | translate"
+        (click)="clear()"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  } @else {
+    <input
+      pInputText
+      [id]="fieldId"
+      class="w-full"
+      type="text"
+      [placeholder]="'ADMIN.SUPPLIERS.MAPPINGS.SEARCH_HAMBOX_PRODUCT' | translate"
+      [value]="query()"
+      [disabled]="disabled()"
+      (input)="onQueryChange($any($event.target).value)"
+    />
+
+    @if (query()) {
+      <div class="hambox-product-select__results">
+        @if (loading()) {
+          <p class="hambox-product-select__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.LOADING' | translate }}</p>
+        } @else if (error()) {
+          <div class="hambox-product-select__status hambox-product-select__status--error">
+            <span>{{ 'ADMIN.PICKERS.SEARCH_FAILED' | translate }}</span>
+            <button type="button" class="hambox-product-select__retry" (click)="retry()">
+              {{ 'ADMIN.SUPPLIERS.MAPPINGS.RETRY' | translate }}
+            </button>
+          </div>
+        } @else if (!results().length) {
+          <p class="hambox-product-select__status">{{ 'ADMIN.SUPPLIERS.MAPPINGS.NO_PRODUCTS_FOUND' | translate }}</p>
+        } @else {
+          @for (product of results(); track product.id) {
+            <button type="button" class="hambox-product-select__result" (click)="select(product)">
+              <span class="hambox-product-select__result-name">{{ productName(product) }}</span>
+              @if (product.categoryName) {
+                <span class="hambox-product-select__result-meta">{{ product.categoryName }}</span>
+              }
+            </button>
+          }
+        }
+      </div>
+    }
+  }
+</div>

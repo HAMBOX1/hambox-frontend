@@ -144,18 +144,48 @@
   }
 }
 
+.notification-bell__icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+
+  i {
+    font-size: 0.9375rem;
+  }
+
+  &[data-semantic='success'] {
+    background: var(--color-success-muted);
+    color: var(--color-success);
+  }
+
+  &[data-semantic='warning'] {
+    background: var(--color-warning-muted);
+    color: var(--color-warning);
+  }
+
+  &[data-semantic='danger'] {
+    background: var(--color-danger-muted);
+    color: var(--color-danger);
+  }
+
+  &[data-semantic='info'] {
+    background: var(--color-info-muted);
+    color: var(--color-info);
+  }
+}
+
 .notification-bell__indicator {
   flex-shrink: 0;
+  align-self: center;
   width: 8px;
   height: 8px;
-  margin-top: 6px;
   border-radius: 999px;
   background: var(--color-primary);
-
-  &--read {
-    background: transparent;
-    border: 1px solid var(--color-text-muted);
-  }
 }
 
 .notification-bell__item-copy {
@@ -186,14 +216,6 @@
 
 .notification-bell__title--unread {
   font-weight: 700 !important;
-}
-
-.notification-bell__category {
-  color: var(--color-primary);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .notification-bell__item-actions {
@@ -354,10 +376,30 @@
   height: 40px;
   border-radius: var(--sf-radius-sm);
   background: var(--color-surface);
-  color: var(--color-primary);
+  color: var(--color-text-secondary);
 
   i {
     font-size: 1rem;
+  }
+
+  &[data-semantic='success'] {
+    background: var(--color-success-muted);
+    color: var(--color-success);
+  }
+
+  &[data-semantic='warning'] {
+    background: var(--color-warning-muted);
+    color: var(--color-warning);
+  }
+
+  &[data-semantic='danger'] {
+    background: var(--color-danger-muted);
+    color: var(--color-danger);
+  }
+
+  &[data-semantic='info'] {
+    background: var(--color-info-muted);
+    color: var(--color-info);
   }
 }
 
@@ -434,11 +476,6 @@ html:not([data-theme='hambox-light']) {
   .notification-sheet__item--unread {
     background: #1b221c;
   }
-
-  .notification-sheet__icon {
-    background: #1f1f1f;
-    color: #86efac;
-  }
 }
 
 @keyframes notification-pop {
@@ -484,10 +521,6 @@ html:not([data-theme='hambox-light']) {
 
   :host .notification-bell__item-copy time {
     color: #8a8a8a;
-  }
-
-  :host .notification-bell__category {
-    color: #86efac;
   }
 
   :host .notification-bell__trigger {

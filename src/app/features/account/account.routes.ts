@@ -40,6 +40,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'alerts',
+        loadComponent: () =>
+          import('./pages/alerts-page/account-alerts-page.component').then(
+            (c) => c.AccountAlertsPageComponent,
+          ),
+      },
+      {
         path: 'orders',
         loadComponent: () =>
           import('./pages/orders-page/account-orders-page.component').then(

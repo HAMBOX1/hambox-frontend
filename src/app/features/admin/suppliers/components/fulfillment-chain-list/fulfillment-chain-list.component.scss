@@ -1,0 +1,113 @@
+.fulfillment-chain__hint {
+  margin: 0 0 0.75rem;
+  color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  font-size: 0.8125rem;
+}
+
+.fulfillment-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fulfillment-chain__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--admin-color-border, var(--color-panel-border));
+  border-radius: var(--admin-radius-sm, var(--sf-radius-sm));
+  background: var(--admin-color-surface, var(--color-surface));
+
+  &--not-ready {
+    border-color: color-mix(in srgb, var(--color-warning, #f59e0b) 45%, transparent);
+    background: color-mix(in srgb, var(--color-warning, #f59e0b) 6%, transparent);
+  }
+
+  &.cdk-drag-preview {
+    box-shadow: var(--admin-shadow-md, 0 8px 24px rgb(0 0 0 / 0.18));
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.4;
+  }
+}
+
+.fulfillment-chain__position {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--admin-color-surface-muted, var(--color-surface-muted));
+  color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.fulfillment-chain__drag-handle {
+  flex: none;
+  color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  cursor: grab;
+  touch-action: none;
+}
+
+.fulfillment-chain__main {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fulfillment-chain__supplier-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fulfillment-chain__supplier-name {
+  font-weight: 700;
+  color: var(--admin-color-text-primary, var(--color-text-primary));
+}
+
+.fulfillment-chain__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  font-size: 0.8125rem;
+}
+
+.fulfillment-chain__readiness {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  text-align: end;
+}
+
+.fulfillment-chain__reason {
+  max-inline-size: 12rem;
+  color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .fulfillment-chain__row {
+    flex-wrap: wrap;
+  }
+
+  .fulfillment-chain__readiness {
+    align-items: flex-start;
+    text-align: start;
+    inset-inline-start: 2.5rem;
+  }
+}

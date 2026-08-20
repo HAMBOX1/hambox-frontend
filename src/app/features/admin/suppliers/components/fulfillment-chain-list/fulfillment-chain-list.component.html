@@ -1,0 +1,57 @@
+@if (loading()) {
+  <app-admin-loading-skeleton [rows]="3" />
+} @else if (!hasCandidates()) {
+  <app-admin-empty-state
+    icon="pi pi-sitemap"
+    [title]="'ADMIN.FULFILLMENT.CHAIN.EMPTY_TITLE' | translate"
+    [description]="'ADMIN.FULFILLMENT.CHAIN.EMPTY_DESCRIPTION' | translate"
+  />
+} @else {
+  @if (reorderable()) {
+    <p class="fulfillment-chain__hint">{{ 'ADMIN.FULFILLMENT.CHAIN.REORDER_HINT' | translate }}</p>
+  }
+
+  <ul
+    class="fulfillment-chain"
+    cdkDropList
+    [cdkDropListDisabled]="!reorderable() || saving()"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    @for (candidate of candidates(); track candidate.mappingId; let i = $index) {
+      <li class="fulfillment-chain__row" [class.fulfillment-chain__row--not-ready]="!candidate.isReady" cdkDrag [cdkDragDisabled]="!reorderable() || saving()">
+        <span class="fulfillment-chain__position">{{ i + 1 }}</span>
+
+        @if (reorderable()) {
+          <i class="pi pi-bars fulfillment-chain__drag-handle" cdkDragHandle aria-hidden="true"></i>
+        }
+
+        <div class="fulfillment-chain__main">
+          <div class="fulfillment-chain__supplier-row">
+            <span class="fulfillment-chain__supplier-name">{{ candidate.supplierName }}</span>
+            <app-admin-status-badge [label]="candidate.providerType" tone="neutral" [outlined]="true" />
+            <app-admin-status-badge
+              [label]="(candidate.scope === 'VariantSpecific' ? 'ADMIN.FULFILLMENT.CHAIN.SCOPE_VARIANT' : 'ADMIN.FULFILLMENT.CHAIN.SCOPE_PRODUCT') | translate"
+              [tone]="scopeTone(candidate.scope)"
+            />
+          </div>
+
+          <div class="fulfillment-chain__meta-row">
+            <span>{{ 'ADMIN.FULFILLMENT.CHAIN.EXTERNAL_PRODUCT_ID' | translate }}: {{ candidate.externalProductId }}</span>
+            <span>{{ 'ADMIN.FULFILLMENT.CHAIN.PRIORITY' | translate }}: {{ candidate.priority }}</span>
+            <span>{{ 'ADMIN.FULFILLMENT.CHAIN.STATUS' | translate }}: {{ candidate.mappingStatus }}</span>
+          </div>
+        </div>
+
+        <div class="fulfillment-chain__readiness">
+          <app-admin-status-badge
+            [label]="(candidate.isReady ? 'ADMIN.FULFILLMENT.CHAIN.READY' : 'ADMIN.FULFILLMENT.CHAIN.NOT_READY') | translate"
+            [tone]="readinessTone(candidate.isReady)"
+          />
+          @if (!candidate.isReady) {
+            <span class="fulfillment-chain__reason">{{ notReadyReasonKey(candidate) | translate }}</span>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+}

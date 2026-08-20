@@ -42,6 +42,8 @@ import {
 
   DigitalInventoryCodeDto,
 
+  FulfillmentMode,
+
   GenerateProductVariantsResultDto,
 
   ImportCodesResultDto,
@@ -1422,6 +1424,23 @@ export class ProductEditorFacade {
   }
 
 
+
+  async setVariantFulfillmentMode(variantId: string, mode: FulfillmentMode): Promise<boolean> {
+    const productId = this.productId();
+    if (!productId) {
+      return false;
+    }
+
+    try {
+      await firstValueFrom(this.inventoryApi.setVariantFulfillmentMode(variantId, { fulfillmentMode: mode }));
+      await this.reloadInventory(productId);
+      await this.selectVariant(variantId);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to update fulfillment mode.'));
+      return false;
+    }
+  }
 
   async deleteVariant(variantId: string): Promise<boolean> {
 

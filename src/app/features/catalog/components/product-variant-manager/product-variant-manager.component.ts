@@ -48,6 +48,7 @@ import {
 import { ProductVariantLeafListComponent } from '../product-variant-leaf-list/product-variant-leaf-list.component';
 import { ProductVariantTreeNodeComponent } from '../product-variant-tree-node/product-variant-tree-node.component';
 import { ProductVariantUsageDialogComponent } from '../product-variant-usage-dialog/product-variant-usage-dialog.component';
+import { VariantFulfillmentPanelComponent } from '../variant-fulfillment-panel/variant-fulfillment-panel.component';
 import { VariantInventoryPanelComponent } from '../variant-inventory-panel/variant-inventory-panel.component';
 
 const VARIANT_STATUS_OPTIONS = [
@@ -92,6 +93,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
     ProductVariantLeafListComponent,
     ProductVariantUsageDialogComponent,
     VariantInventoryPanelComponent,
+    VariantFulfillmentPanelComponent,
   ],
   providers: [MessageService],
   templateUrl: './product-variant-manager.component.html',

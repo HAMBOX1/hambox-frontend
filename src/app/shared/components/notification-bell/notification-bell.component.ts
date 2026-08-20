@@ -34,23 +34,15 @@ import { AccountNotificationsFacade } from '../../../features/account/services/a
 
 import { UserNotificationApiDto } from '../../../features/account/models/account-api.model';
 
-import { HamboxDatePipe } from '../../pipes/hambox-date.pipe';
-
 import { HamboxTranslateRefreshDirective } from '../../directives/hambox-translate-refresh.directive';
 
 import { HamboxBottomSheetComponent } from '../hambox-bottom-sheet/hambox-bottom-sheet.component';
 
 import { MobileViewportService } from '../../services/mobile-viewport.service';
 
+import { getNotificationTypeMeta, groupNotificationsByDate } from '../../utils/notification-type.util';
 
-
-interface NotificationGroup {
-
-  readonly labelKey: string;
-
-  readonly items: readonly UserNotificationApiDto[];
-
-}
+import { HamboxRelativeTimePipe } from '../../pipes/hambox-relative-time.pipe';
 
 
 
@@ -60,7 +52,7 @@ interface NotificationGroup {
 
   standalone: true,
 
-  imports: [RouterLink, NgTemplateOutlet, TranslatePipe, HamboxDatePipe, HamboxTranslateRefreshDirective, HamboxBottomSheetComponent],
+  imports: [RouterLink, NgTemplateOutlet, TranslatePipe, HamboxRelativeTimePipe, HamboxTranslateRefreshDirective, HamboxBottomSheetComponent],
 
   templateUrl: './notification-bell.component.html',
 
@@ -100,57 +92,7 @@ export class NotificationBellComponent implements OnInit {
 
 
 
-  protected readonly groups = computed((): readonly NotificationGroup[] => {
-
-    const today: UserNotificationApiDto[] = [];
-
-    const yesterday: UserNotificationApiDto[] = [];
-
-    const earlier: UserNotificationApiDto[] = [];
-
-
-
-    const now = new Date();
-
-    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-    const startYesterday = startToday - 86_400_000;
-
-
-
-    for (const item of this.items()) {
-
-      const stamp = new Date(item.createdOnUtc).getTime();
-
-      if (stamp >= startToday) {
-
-        today.push(item);
-
-      } else if (stamp >= startYesterday) {
-
-        yesterday.push(item);
-
-      } else {
-
-        earlier.push(item);
-
-      }
-
-    }
-
-
-
-    return [
-
-      { labelKey: 'ACCOUNT.NOTIFICATIONS_UI.TODAY', items: today },
-
-      { labelKey: 'ACCOUNT.NOTIFICATIONS_UI.YESTERDAY', items: yesterday },
-
-      { labelKey: 'ACCOUNT.NOTIFICATIONS_UI.EARLIER', items: earlier },
-
-    ].filter((group) => group.items.length > 0);
-
-  });
+  protected readonly groups = computed(() => groupNotificationsByDate(this.items()));
 
 
 
@@ -287,43 +229,17 @@ export class NotificationBellComponent implements OnInit {
 
 
   protected notificationIcon(item: UserNotificationApiDto): string {
-
     const url = item.actionUrl?.toLowerCase() ?? '';
-
-    const category = item.category?.toLowerCase() ?? '';
-
-
-
-    if (url.includes('/orders') || category.includes('order')) {
-
-      return 'pi pi-shopping-bag';
-
-    }
-
-    if (url.includes('/library') || category.includes('library') || category.includes('key')) {
-
+    if (url.includes('/library')) {
       return 'pi pi-key';
-
     }
 
-    if (category.includes('membership')) {
-
-      return 'pi pi-star';
-
-    }
-
-    if (category.includes('promo') || category.includes('deal')) {
-
-      return 'pi pi-tag';
-
-    }
-
-
-
-    return 'pi pi-bell';
-
+    return getNotificationTypeMeta(item.category).icon;
   }
 
+  protected notificationSemantic(item: UserNotificationApiDto): string {
+    return getNotificationTypeMeta(item.category).semantic;
+  }
 }
 
 

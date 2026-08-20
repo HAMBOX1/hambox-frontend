@@ -7,22 +7,14 @@ import { STOREFRONT_SORT_OPTIONS } from '../services/storefront-products-data';
 import { ProductMarketingPageAvailabilityService } from '../services/product-marketing-page-availability.service';
 import { StorefrontProductEnrichmentService } from '../services/storefront-product-enrichment.service';
 import { mapProductToStoreProduct } from '../utils/storefront-product.mapper';
+import { applyStorefrontEnrichment } from '../utils/storefront-product-enrichment.util';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import {
   countActiveAttributeFilters,
   DynamicFilterGroup,
-  lowestPurchasablePrice,
   matchesEnhancedSearch,
   productPassesStockFilter,
 } from '../utils/storefront-filter.util';
-import {
-  computeProductStockStatus,
-  hasPurchasableInventory,
-} from '../utils/storefront-product-stock.util';
-import {
-  productRequiresOptionSelection,
-  resolveDirectCartVariantId,
-} from '../utils/storefront-add-to-cart.util';
 import { Products } from './products';
 
 function mapFacetGroups(groups: readonly ProductFacetGroup[]): readonly DynamicFilterGroup[] {
@@ -125,25 +117,10 @@ export class ProductsFacade {
     const configurations = this.enrichment.configurations();
     const marketingAvailable = this.marketingAvailability.available();
 
-    return this.itemsState().map((product) => {
-      const configuration = configurations[product.id];
-      const stockStatus = computeProductStockStatus(configuration, !product.outOfStock);
-      const inStock = hasPurchasableInventory(configuration, !product.outOfStock);
-      const displayPrice = configuration
-        ? lowestPurchasablePrice(configuration, product.priceUsd)
-        : product.priceUsd;
-
-      return {
-        ...product,
-        priceUsd: displayPrice,
-        stockStatus,
-        outOfStock: stockStatus === 'out-of-stock',
-        cta: inStock ? product.cta : 'notify-me',
-        requiresOptionSelection: productRequiresOptionSelection(configuration),
-        directVariantId: resolveDirectCartVariantId(configuration),
-        hasMarketingPage: marketingAvailable.has(product.id),
-      };
-    });
+    return this.itemsState().map((product) => ({
+      ...applyStorefrontEnrichment(product, configurations[product.id]),
+      hasMarketingPage: marketingAvailable.has(product.id),
+    }));
   });
 
   readonly dynamicFilterGroups = this.facetGroupsState.asReadonly();

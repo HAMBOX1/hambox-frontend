@@ -1,0 +1,31 @@
+<div class="hambox-variant-select">
+  @if (loading()) {
+    <p class="hambox-variant-select__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.LOADING' | translate }}</p>
+  } @else if (error()) {
+    <div class="hambox-variant-select__status hambox-variant-select__status--error">
+      <span>{{ 'ADMIN.PICKERS.SEARCH_FAILED' | translate }}</span>
+      <button type="button" class="hambox-variant-select__retry" (click)="retry()">
+        {{ 'ADMIN.SUPPLIERS.MAPPINGS.RETRY' | translate }}
+      </button>
+    </div>
+  } @else if (!variants().length) {
+    <p class="hambox-variant-select__status">{{ 'ADMIN.SUPPLIERS.MAPPINGS.NO_VARIANTS' | translate }}</p>
+  } @else {
+    <div class="hambox-variant-select__list">
+      @for (variant of variants(); track variant.id) {
+        <button
+          type="button"
+          class="hambox-variant-select__result"
+          [class.hambox-variant-select__result--selected]="selectedVariantId() === variant.id"
+          [disabled]="disabled()"
+          (click)="select(variant)"
+        >
+          <span class="hambox-variant-select__result-sku">{{ variant.sku }}</span>
+          @if (variant.priceOverride !== null) {
+            <span class="hambox-variant-select__result-price">{{ variant.priceOverride | number: '1.2-2' }}</span>
+          }
+        </button>
+      }
+    </div>
+  }
+</div>

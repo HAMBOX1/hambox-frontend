@@ -107,6 +107,7 @@ export const INVENTORY_API = {
   variantDeactivate: (variantId: string) => `/api/v1/inventory/variants/${variantId}/deactivate`,
   variantArchive: (variantId: string) => `/api/v1/inventory/variants/${variantId}/archive`,
   variantUsage: (variantId: string) => `/api/v1/inventory/variants/${variantId}/usage`,
+  variantFulfillmentMode: (variantId: string) => `/api/v1/inventory/variants/${variantId}/fulfillment-mode`,
   variantCleanup: (variantId: string) => `/api/v1/inventory/variants/${variantId}/cleanup`,
   productOptionGroups: (productId: string) =>
     `/api/v1/inventory/products/${productId}/option-groups`,
@@ -157,12 +158,22 @@ export const COMMERCE_API = {
   membershipCheckoutPreview: '/api/v1/checkout/membership/preview',
   membershipCheckout: '/api/v1/checkout/membership',
   checkoutConfiguration: '/api/v1/checkout/configuration',
+  checkoutDot: '/api/v1/checkout/dot',
+  dotPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/dot/${paymentAttemptId}/status`,
+  checkoutDotFawry: '/api/v1/checkout/dot-fawry',
+  dotFawryPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/dot-fawry/${paymentAttemptId}/status`,
   order: (orderId: string) => `/api/v1/orders/${orderId}`,
   cartPromotionsApply: '/api/v1/cart/promotions/apply',
   cartPromotions: '/api/v1/cart/promotions',
 } as const;
 
 export const GUEST_CART_HEADER = 'X-Guest-Cart-Id';
+
+export const CUSTOMER_ALERTS_API = {
+  base: '/api/v1/customer-alerts',
+  item: (id: string) => `/api/v1/customer-alerts/${id}`,
+  claim: '/api/v1/customer-alerts/claim',
+} as const;
 
 export const LOCALIZATION_API = {
   currencies: '/api/v1/localization/currencies',
@@ -405,9 +416,15 @@ export const SUPPLIERS_API = {
   enable: (id: string) => `/api/v1/suppliers/${id}/enable`,
   disable: (id: string) => `/api/v1/suppliers/${id}/disable`,
   testConnection: (id: string) => `/api/v1/suppliers/${id}/test-connection`,
+  catalog: (id: string) => `/api/v1/suppliers/${id}/catalog`,
+  availabilitySummary: (id: string) => `/api/v1/suppliers/${id}/availability-summary`,
+  availabilitySync: (id: string) => `/api/v1/suppliers/${id}/availability/sync`,
   mappings: (supplierId: string) => `/api/v1/suppliers/${supplierId}/mappings`,
   mapping: (supplierId: string, mappingId: string) =>
     `/api/v1/suppliers/${supplierId}/mappings/${mappingId}`,
+  mappingPriority: (supplierId: string, mappingId: string) =>
+    `/api/v1/suppliers/${supplierId}/mappings/${mappingId}/priority`,
+  fulfillmentChain: '/api/v1/suppliers/fulfillment-chain',
 } as const;
 
 export const COMMUNICATION_API = {
@@ -491,6 +508,10 @@ export const SUPPORT_API = {
 
   // SignalR hub (not an HTTP endpoint — base path for the hub connection)
   hub: '/hubs/support',
+} as const;
+
+export const WHATSAPP_API = {
+  config: '/api/v1/whatsapp/config',
 } as const;
 
 export const SECURITY_API = {

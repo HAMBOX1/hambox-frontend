@@ -10,6 +10,8 @@ const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   crypto: 'CHECKOUT.METHOD_CRYPTO',
   'apple-pay': 'CHECKOUT.METHOD_APPLE_PAY',
   development: 'CHECKOUT.METHOD_DEVELOPMENT',
+  dot: 'CHECKOUT.METHOD_DOT',
+  'dot-fawry': 'CHECKOUT.METHOD_DOT_FAWRY',
 };
 
 @Component({

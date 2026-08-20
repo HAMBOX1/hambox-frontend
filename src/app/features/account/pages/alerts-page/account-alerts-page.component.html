@@ -1,0 +1,60 @@
+<section class="alerts-page" hamboxTranslateRefresh>
+  <header class="alerts-page__header">
+    <h1>{{ 'ACCOUNT.ALERTS_UI.TITLE' | translate }}</h1>
+    <p>{{ 'ACCOUNT.ALERTS_UI.SUBTITLE' | translate }}</p>
+  </header>
+
+  @if (actionError()) {
+    <p class="alerts-page__alert">{{ actionError() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="alerts-page__state">{{ 'ACCOUNT.ALERTS_UI.LOADING' | translate }}</p>
+  } @else if (error()) {
+    <p class="alerts-page__state">{{ error() }}</p>
+  } @else if (!items().length) {
+    <div class="alerts-page__empty">
+      <p>{{ 'ACCOUNT.ALERTS_UI.EMPTY' | translate }}</p>
+      <a routerLink="/products">{{ 'ACCOUNT.ALERTS_UI.BROWSE' | translate }}</a>
+    </div>
+  } @else {
+    <div class="alerts-page__grid">
+      @for (item of items(); track item.id; let i = $index) {
+        <article class="alerts-page__card">
+          <img
+            [src]="itemImageUrl(item.productImageUrl, i)"
+            [alt]="item.productNameEn"
+            loading="lazy"
+          />
+          <div class="alerts-page__body">
+            <span
+              class="alerts-page__badge"
+              [class.alerts-page__badge--price]="item.alertType === 'PriceDrop'"
+            >
+              {{
+                (item.alertType === 'BackInStock'
+                  ? 'ACCOUNT.ALERTS_UI.TYPE_BACK_IN_STOCK'
+                  : 'ACCOUNT.ALERTS_UI.TYPE_PRICE_DROP'
+                ) | translate
+              }}
+            </span>
+            <h2>{{ item.productNameEn }}</h2>
+            @if (item.alertType === 'PriceDrop' && item.lastObservedPrice !== null) {
+              <p>
+                {{
+                  'ACCOUNT.ALERTS_UI.WATCHING_PRICE'
+                    | translate: { price: (item.lastObservedPrice | hamboxCurrency) }
+                }}
+              </p>
+            }
+            <div class="alerts-page__actions">
+              <button type="button" class="alerts-page__remove" (click)="remove(item.id)">
+                {{ 'ACCOUNT.ALERTS_UI.REMOVE' | translate }}
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

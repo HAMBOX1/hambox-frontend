@@ -293,6 +293,16 @@
   margin-bottom: 20px;
 }
 
+// Deliberately outside `.pdp__actions`: that block is hidden below 767px in favor of the persistent
+// mobile buy bar (which only carries Add to Cart), but there is no mobile equivalent for these
+// actions, so they must stay reachable at every breakpoint.
+.pdp__notify-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
 .pdp__membership-gate {
   display: flex;
   align-items: center;
@@ -390,6 +400,22 @@
     &:hover {
       color: var(--color-text-primary);
       background: var(--color-btn-ghost-hover);
+    }
+  }
+
+  &--notify {
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+
+    &:hover:not(:disabled) {
+      color: var(--color-text-primary);
+      background: var(--color-btn-ghost-hover);
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.7;
     }
   }
 }

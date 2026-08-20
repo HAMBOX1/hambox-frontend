@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.hambox-variant-select__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.hambox-variant-select__result {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.82rem;
+
+  &:hover {
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.06));
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.hambox-variant-select__result--selected {
+  background: var(--color-primary-muted, rgba(99, 102, 241, 0.12));
+  border-color: var(--color-primary, currentColor);
+}
+
+.hambox-variant-select__result-sku {
+  font-weight: 600;
+}
+
+.hambox-variant-select__result-price {
+  opacity: 0.65;
+}
+
+.hambox-variant-select__status {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.hambox-variant-select__status--error {
+  opacity: 1;
+  color: var(--admin-accent-red);
+}
+
+.hambox-variant-select__retry {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.8rem;
+}

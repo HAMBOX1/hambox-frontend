@@ -234,6 +234,41 @@
       <p class="pdp__action-message">{{ wishlistActionMessage() }}</p>
     }
 
+    @if (showBackInStockCta() || showPriceDropCta()) {
+      <div class="pdp__notify-actions">
+        @if (showBackInStockCta()) {
+          <button
+            type="button"
+            class="pdp__cta pdp__cta--notify"
+            [disabled]="backInStockBusy() || backInStockSubscribed()"
+            (click)="notifyBackInStock()"
+          >
+            <i class="pi pi-bell" aria-hidden="true"></i>
+            {{
+              (backInStockSubscribed() ? 'PRODUCT.NOTIFY_ME_SUBSCRIBED' : 'PRODUCT.NOTIFY_ME')
+                | translate
+            }}
+          </button>
+        }
+        @if (showPriceDropCta()) {
+          <button
+            type="button"
+            class="pdp__cta pdp__cta--notify"
+            [disabled]="priceDropBusy() || priceDropSubscribed()"
+            (click)="notifyPriceDrop()"
+          >
+            <i class="pi pi-tag" aria-hidden="true"></i>
+            {{
+              (priceDropSubscribed()
+                ? 'PRODUCT.NOTIFY_PRICE_DROP_SUBSCRIBED'
+                : 'PRODUCT.NOTIFY_PRICE_DROP')
+                | translate
+            }}
+          </button>
+        }
+      </div>
+    }
+
     @if (cartActionError()) {
       <p class="pdp__cart-error" role="alert">{{ cartActionError() }}</p>
     }

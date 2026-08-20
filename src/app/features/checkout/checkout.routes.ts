@@ -21,6 +21,20 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'dot/result',
+    loadComponent: () =>
+      import('./pages/dot-payment-result-page/dot-payment-result-page.component').then(
+        (c) => c.DotPaymentResultPageComponent,
+      ),
+  },
+  {
+    path: 'dot-fawry/result',
+    loadComponent: () =>
+      import('./pages/dot-fawry-payment-result-page/dot-fawry-payment-result-page.component').then(
+        (c) => c.DotFawryPaymentResultPageComponent,
+      ),
+  },
+  {
     path: 'success/:orderId',
     loadComponent: () =>
       import('./pages/order-success-page/order-success-page.component').then(

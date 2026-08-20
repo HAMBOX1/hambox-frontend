@@ -202,4 +202,13 @@ export const routes: Routes = [
         (c) => c.AdminSettingsPageComponent,
       ),
   },
+  {
+    path: 'whatsapp',
+    canActivate: [permissionGuard([PERMISSIONS.WhatsAppBot.View])],
+    canDeactivate: [unsavedChangesGuard],
+    loadComponent: () =>
+      import('./whatsapp/pages/admin-whatsapp-page/admin-whatsapp-page.component').then(
+        (c) => c.AdminWhatsAppPageComponent,
+      ),
+  },
 ];

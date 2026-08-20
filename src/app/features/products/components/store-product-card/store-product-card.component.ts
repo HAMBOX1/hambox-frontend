@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -35,6 +35,19 @@ export class StoreProductCardComponent {
   protected readonly addError = signal<string | null>(null);
   protected readonly wishlistAdded = signal(false);
 
+  /** Why the icon-only cart button is disabled — the badge on the image explains this visually,
+   * but the button itself had no text/tooltip, so a disabled icon looked broken with no reason. */
+  protected readonly cartDisabledReasonKey = computed(() => {
+    const product = this.product();
+    if (product.isMembersOnly) {
+      return 'PRODUCT.MEMBERS_ONLY';
+    }
+    if (product.isComingSoon) {
+      return 'PRODUCT.COMING_SOON';
+    }
+    return null;
+  });
+
   protected async toggleWishlist(event: Event): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
@@ -65,6 +78,26 @@ export class StoreProductCardComponent {
         life: 4000,
       });
     }
+  }
+
+  protected notifyMe(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const product = this.product();
+
+    if (!this.authSession.isAuthenticated()) {
+      void this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: `/products/${product.id}` },
+      });
+      return;
+    }
+
+    // The card's `directVariantId` only ever resolves a *purchasable* variant (see
+    // resolveDirectCartVariantId), while this button only renders when the product has none — so a
+    // card-level inline subscribe is never actually reachable. Send the customer to the PDP, where
+    // the real (possibly out-of-stock) variant gets resolved and the subscribe action lives.
+    void this.router.navigate(['/products', product.id]);
   }
 
   protected stockLabelKey(product: StoreProduct): string {

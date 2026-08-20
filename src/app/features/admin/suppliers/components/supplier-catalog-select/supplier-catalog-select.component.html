@@ -1,0 +1,88 @@
+<div class="supplier-catalog-select">
+  @if (selected(); as item) {
+    <div class="supplier-catalog-select__card">
+      <div class="supplier-catalog-select__card-body">
+        <span class="supplier-catalog-select__card-name">{{ item.name }}</span>
+        @if (item.brandName) {
+          <span class="supplier-catalog-select__card-meta">{{ item.brandName }}</span>
+        }
+        <span class="supplier-catalog-select__card-meta">
+          {{ item.currency }}
+          @if (item.minFaceValue !== null) {
+            · {{ item.minFaceValue | number: '1.0-2' }}
+            @if (item.maxFaceValue !== null && item.maxFaceValue !== item.minFaceValue) {
+              – {{ item.maxFaceValue | number: '1.0-2' }}
+            }
+          }
+        </span>
+        <span
+          class="supplier-catalog-select__availability"
+          [class.supplier-catalog-select__availability--unavailable]="!item.available"
+        >
+          <i class="pi" [class.pi-check-circle]="item.available" [class.pi-times-circle]="!item.available" aria-hidden="true"></i>
+          {{ (item.available ? 'ADMIN.SUPPLIERS.MAPPINGS.AVAILABLE' : 'ADMIN.SUPPLIERS.MAPPINGS.UNAVAILABLE') | translate }}
+        </span>
+        <span class="supplier-catalog-select__card-technical">
+          {{ 'ADMIN.SUPPLIERS.MAPPINGS.EXTERNAL_PRODUCT_ID' | translate }}: {{ item.externalProductId }}
+        </span>
+      </div>
+      <button
+        type="button"
+        class="supplier-catalog-select__card-clear"
+        [disabled]="disabled()"
+        [attr.aria-label]="'ADMIN.PICKERS.CLEAR_ALL' | translate"
+        (click)="clear()"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  } @else {
+    <input
+      pInputText
+      [id]="fieldId"
+      class="w-full"
+      type="text"
+      [placeholder]="'ADMIN.SUPPLIERS.MAPPINGS.SEARCH_SUPPLIER_CATALOG' | translate"
+      [value]="query()"
+      [disabled]="disabled()"
+      (input)="onQueryChange($any($event.target).value)"
+    />
+
+    @if (query()) {
+      <div class="supplier-catalog-select__results">
+        @if (loading()) {
+          <p class="supplier-catalog-select__status">{{ 'ADMIN.PICKERS.CATEGORY_PICKER.LOADING' | translate }}</p>
+        } @else if (error()) {
+          <div class="supplier-catalog-select__status supplier-catalog-select__status--error">
+            <span>{{ 'ADMIN.SUPPLIERS.MAPPINGS.CATALOG_UNAVAILABLE' | translate }}</span>
+            <button type="button" class="supplier-catalog-select__retry" (click)="retry()">
+              {{ 'ADMIN.SUPPLIERS.MAPPINGS.RETRY' | translate }}
+            </button>
+          </div>
+        } @else if (unsupportedMessage()) {
+          <p class="supplier-catalog-select__status">{{ unsupportedMessage() }}</p>
+        } @else if (!results().length) {
+          <p class="supplier-catalog-select__status">{{ 'ADMIN.SUPPLIERS.MAPPINGS.NO_SUPPLIER_PRODUCTS_FOUND' | translate }}</p>
+        } @else {
+          @for (item of results(); track item.externalProductId) {
+            <button type="button" class="supplier-catalog-select__result" [disabled]="!item.available" (click)="select(item)">
+              <span class="supplier-catalog-select__result-name">{{ item.name }}</span>
+              <span class="supplier-catalog-select__result-meta">
+                @if (item.brandName) {
+                  {{ item.brandName }} ·
+                }
+                {{ item.currency }}
+                @if (item.minFaceValue !== null) {
+                  · {{ item.minFaceValue | number: '1.0-2' }}
+                }
+                @if (!item.available) {
+                  · {{ 'ADMIN.SUPPLIERS.MAPPINGS.UNAVAILABLE' | translate }}
+                }
+              </span>
+            </button>
+          }
+        }
+      </div>
+    }
+  }
+</div>

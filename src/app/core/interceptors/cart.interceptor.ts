@@ -9,7 +9,11 @@ function isCommerceRequest(url: string): boolean {
     url.includes(COMMERCE_API.cart) ||
     url.includes(COMMERCE_API.checkout) ||
     url.includes('/api/v1/orders/') ||
-    url.includes('/cart/promotions')
+    url.includes('/cart/promotions') ||
+    // Customer alert subscriptions reuse the same guest identity as the cart — the header name is
+    // shared deliberately (see api-endpoints.ts GUEST_CART_HEADER), not a second anonymous-identity
+    // mechanism.
+    url.includes('/api/v1/customer-alerts')
   );
 }
 

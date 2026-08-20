@@ -208,6 +208,10 @@ export const PERMISSIONS = {
     Delete: 'Faq.Delete',
     Publish: 'Faq.Publish',
   },
+  WhatsAppBot: {
+    View: 'WhatsAppBot.View',
+    Edit: 'WhatsAppBot.Edit',
+  },
 } as const;
 
 export const ALL_PERMISSIONS: readonly string[] = [
@@ -341,6 +345,8 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Faq.Edit,
   PERMISSIONS.Faq.Delete,
   PERMISSIONS.Faq.Publish,
+  PERMISSIONS.WhatsAppBot.View,
+  PERMISSIONS.WhatsAppBot.Edit,
 ] as const;
 
 export const OWNER_ROLE_NAMES = ['Owner', 'SuperAdmin', 'Admin', 'Administrator'] as const;
@@ -373,6 +379,7 @@ export const ADMIN_AREA_PREFIXES = [
   'Analytics.',
   'Communication.',
   'Faq.',
+  'WhatsAppBot.',
 ] as const;
 
 export function isAdminAccessPermission(permission: string): boolean {

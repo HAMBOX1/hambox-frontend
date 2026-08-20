@@ -71,11 +71,17 @@
         <label class="supplier-detail-page__field">
           <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.AUTH_TYPE' | translate }}</span>
           <p-select formControlName="authenticationType" [options]="authTypeOptions" optionLabel="label" optionValue="value" />
+          @if (isBambooProvider()) {
+            <span class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.AUTH_TYPE_LOCKED_HINT' | translate }}</span>
+          }
         </label>
 
         <label class="supplier-detail-page__field">
           <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.BASE_URL' | translate }}</span>
           <input pInputText formControlName="baseUrl" placeholder="https://api.example.com" />
+          @if (fixedBaseUrl()) {
+            <span class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.BASE_URL_LOCKED_HINT' | translate }}</span>
+          }
         </label>
 
         <label class="supplier-detail-page__field">
@@ -86,6 +92,9 @@
 
       <div class="supplier-detail-page__capabilities">
         <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.CAPABILITIES' | translate }}</span>
+        @if (isBambooProvider()) {
+          <span class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.CAPABILITIES_LOCKED_HINT' | translate }}</span>
+        }
         <div class="supplier-detail-page__checkbox-grid" [formGroup]="form">
           <label class="supplier-detail-page__checkbox">
             <p-checkbox formControlName="supportsInventorySync" [binary]="true" />
@@ -110,7 +119,19 @@
         </div>
       </div>
 
-      @if (!isCreateMode()) {
+      @if (isBambooProvider()) {
+        <!-- Rendered in BOTH create and edit mode — Bamboo purchases fail closed without an Account ID,
+             so it must be collectible (and validated) as part of the initial Create Supplier submit,
+             not only after the supplier already exists. -->
+        <label class="supplier-detail-page__field">
+          <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.ACCOUNT_ID' | translate }}</span>
+          <p-inputnumber [formControl]="bambooAccountIdControl" [min]="1" [useGrouping]="false" (onBlur)="validateSettingsJson()" />
+          <span class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.ACCOUNT_ID_HINT' | translate }}</span>
+          @if (settingsJsonError()) {
+            <span class="supplier-detail-page__field-error">{{ settingsJsonError() }}</span>
+          }
+        </label>
+      } @else if (!isCreateMode()) {
         <label class="supplier-detail-page__field supplier-detail-page__field--full" [formGroup]="form">
           <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.SETTINGS_JSON' | translate }}</span>
           <textarea pTextarea rows="6" formControlName="settingsJson" (blur)="validateSettingsJson()"></textarea>
@@ -136,50 +157,55 @@
     @if (!isCreateMode()) {
       <app-admin-section-card [title]="'ADMIN.SUPPLIERS.DETAIL.CREDENTIALS' | translate">
         <form class="admin-form-grid" [formGroup]="credentialsForm">
-          <label class="supplier-detail-page__field">
-            <span class="supplier-detail-page__field-label">
-              {{ 'ADMIN.SUPPLIERS.DETAIL.API_KEY' | translate }}
-              @if (detail()?.hasApiKey) {
-                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
-              }
-            </span>
-            <p-password formControlName="apiKey" [feedback]="false" [toggleMask]="true" />
-          </label>
+          @if (showsApiKeyPair()) {
+            <label class="supplier-detail-page__field">
+              <span class="supplier-detail-page__field-label">
+                {{ (authenticationType() === 'BasicAuth' ? 'ADMIN.SUPPLIERS.DETAIL.CLIENT_ID' : 'ADMIN.SUPPLIERS.DETAIL.API_KEY') | translate }}
+                @if (detail()?.hasApiKey) {
+                  <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+                }
+              </span>
+              <p-password formControlName="apiKey" [feedback]="false" [toggleMask]="true" />
+            </label>
 
-          <label class="supplier-detail-page__field">
-            <span class="supplier-detail-page__field-label">
-              {{ 'ADMIN.SUPPLIERS.DETAIL.API_SECRET' | translate }}
-              @if (detail()?.hasApiSecret) {
-                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
-              }
-            </span>
-            <p-password formControlName="apiSecret" [feedback]="false" [toggleMask]="true" />
-          </label>
+            <label class="supplier-detail-page__field">
+              <span class="supplier-detail-page__field-label">
+                {{ (authenticationType() === 'BasicAuth' ? 'ADMIN.SUPPLIERS.DETAIL.CLIENT_SECRET' : 'ADMIN.SUPPLIERS.DETAIL.API_SECRET') | translate }}
+                @if (detail()?.hasApiSecret) {
+                  <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+                }
+              </span>
+              <p-password formControlName="apiSecret" [feedback]="false" [toggleMask]="true" />
+            </label>
+          }
 
-          <label class="supplier-detail-page__field">
-            <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.USERNAME' | translate }}</span>
-            <input pInputText formControlName="username" />
-          </label>
+          @if (showsBearerToken()) {
+            <label class="supplier-detail-page__field">
+              <span class="supplier-detail-page__field-label">
+                {{ 'ADMIN.SUPPLIERS.DETAIL.BEARER_TOKEN' | translate }}
+                @if (detail()?.hasBearerToken) {
+                  <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+                }
+              </span>
+              <p-password formControlName="bearerToken" [feedback]="false" [toggleMask]="true" />
+            </label>
+          }
 
-          <label class="supplier-detail-page__field">
-            <span class="supplier-detail-page__field-label">
-              {{ 'ADMIN.SUPPLIERS.DETAIL.PASSWORD' | translate }}
-              @if (detail()?.hasPassword) {
-                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
-              }
-            </span>
-            <p-password formControlName="password" [feedback]="false" [toggleMask]="true" />
-          </label>
+          @if (showsOAuthSettings()) {
+            <label class="supplier-detail-page__field supplier-detail-page__field--full">
+              <span class="supplier-detail-page__field-label">
+                {{ 'ADMIN.SUPPLIERS.DETAIL.OAUTH_SETTINGS' | translate }}
+                @if (detail()?.hasOAuthSettings) {
+                  <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
+                }
+              </span>
+              <textarea pTextarea rows="4" formControlName="oAuthSettingsJson"></textarea>
+            </label>
+          }
 
-          <label class="supplier-detail-page__field">
-            <span class="supplier-detail-page__field-label">
-              {{ 'ADMIN.SUPPLIERS.DETAIL.BEARER_TOKEN' | translate }}
-              @if (detail()?.hasBearerToken) {
-                <span class="supplier-detail-page__set-flag">{{ 'ADMIN.SUPPLIERS.DETAIL.STORED' | translate }}</span>
-              }
-            </span>
-            <p-password formControlName="bearerToken" [feedback]="false" [toggleMask]="true" />
-          </label>
+          @if (showsNoCredentials()) {
+            <p class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.NO_CREDENTIALS_REQUIRED' | translate }}</p>
+          }
         </form>
 
         <p class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.CREDENTIALS_HINT' | translate }}</p>
@@ -214,6 +240,39 @@
             [tone]="result.isSuccess ? 'success' : 'warning'"
           />
         }
+      </app-admin-section-card>
+
+      <app-admin-section-card [title]="'ADMIN.SUPPLIERS.AVAILABILITY.TITLE' | translate">
+        @if (availabilitySummaryLoading()) {
+          <p class="supplier-detail-page__hint">{{ 'COMMON.LOADING' | translate }}</p>
+        } @else if (availabilitySummary(); as summary) {
+          <app-admin-stat-grid>
+            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.MAPPED' | translate" [value]="summary.mappedCount" />
+            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.AVAILABLE' | translate" [value]="summary.availableCount" tone="success" />
+            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.UNAVAILABLE' | translate" [value]="summary.unavailableCount" tone="warning" />
+            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.UNKNOWN' | translate" [value]="summary.unknownCount" tone="info" />
+          </app-admin-stat-grid>
+          <p class="supplier-detail-page__hint">
+            @if (summary.lastSyncedAtUtc) {
+              {{ 'ADMIN.SUPPLIERS.AVAILABILITY.LAST_SYNCED' | translate: { time: summary.lastSyncedAtUtc | hamboxDate: 'short' } }}
+            } @else {
+              {{ 'ADMIN.SUPPLIERS.AVAILABILITY.NEVER_SYNCED' | translate }}
+            }
+          </p>
+        }
+
+        <div class="supplier-detail-page__actions">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [disabled]="availabilitySyncing()"
+            [loading]="availabilitySyncing()"
+            (click)="syncAvailabilityNow()"
+          >
+            {{ 'ADMIN.SUPPLIERS.AVAILABILITY.SYNC_NOW' | translate }}
+          </button>
+        </div>
       </app-admin-section-card>
     }
   }

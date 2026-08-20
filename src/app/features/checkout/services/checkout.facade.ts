@@ -13,6 +13,10 @@ import {
   CardPaymentDetails,
   CheckoutOrderItem,
   CheckoutSummary,
+  DotCheckoutInitiationDto,
+  DotFawryCheckoutInitiationDto,
+  DotFawryPaymentStatusDto,
+  DotPaymentStatusDto,
   PaymentMethodId,
 } from '../models/checkout';
 import { mapOrderToSuccessDetails } from '../utils/checkout.mapper';
@@ -27,9 +31,13 @@ const INITIAL_CARD: CardPaymentDetails = {
 const INITIAL_BILLING: BillingDetails = {
   email: '',
   country: 'US',
+  phoneNumber: '',
+  customerName: '',
 };
 
 const IDEMPOTENCY_SCOPE = 'checkout';
+const DOT_IDEMPOTENCY_SCOPE = 'checkout-dot';
+const DOT_FAWRY_IDEMPOTENCY_SCOPE = 'checkout-dot-fawry';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +58,8 @@ export class CheckoutFacade {
   private readonly errorState = signal<string | null>(null);
   private readonly lastOrderState = signal<OrderApiDto | null>(null);
   private readonly developmentCheckoutEnabledState = signal(false);
+  private readonly dotCheckoutEnabledState = signal(false);
+  private readonly dotFawryCheckoutEnabledState = signal(false);
   private readonly configurationLoadingState = signal(false);
 
   readonly paymentMethod = this.paymentMethodState.asReadonly();
@@ -67,10 +77,18 @@ export class CheckoutFacade {
   /**
    * Only "card" is offered — PayPal/crypto/Apple Pay have no backend integration and would silently
    * fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real payment.
-   * Do not re-add them here until a real provider exists for each.
+   * Do not re-add them here until a real provider exists for each. "dot" only appears once the
+   * backend reports it's actually usable (see CheckoutConfigurationDto.dotCheckoutEnabled) — DOT's
+   * pricing model isn't confirmed yet, so it stays hidden until the backend flips that flag.
    */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
     const methods: PaymentMethodId[] = ['card'];
+    if (this.dotCheckoutEnabledState()) {
+      methods.push('dot');
+    }
+    if (this.dotFawryCheckoutEnabledState()) {
+      methods.push('dot-fawry');
+    }
     if (this.developmentCheckoutEnabledState()) {
       return ['development', ...methods];
     }
@@ -127,11 +145,15 @@ export class CheckoutFacade {
     try {
       const configuration = await firstValueFrom(this.checkoutService.getConfiguration());
       this.developmentCheckoutEnabledState.set(configuration.developmentCheckoutEnabled);
+      this.dotCheckoutEnabledState.set(configuration.dotCheckoutEnabled);
+      this.dotFawryCheckoutEnabledState.set(configuration.dotFawryCheckoutEnabled);
       if (configuration.developmentCheckoutEnabled) {
         this.paymentMethodState.set('development');
       }
     } catch {
       this.developmentCheckoutEnabledState.set(false);
+      this.dotCheckoutEnabledState.set(false);
+      this.dotFawryCheckoutEnabledState.set(false);
     } finally {
       this.configurationLoadingState.set(false);
     }
@@ -233,6 +255,90 @@ export class CheckoutFacade {
     }
   }
 
+  /**
+   * Initiates DOT checkout and returns the redirect target — callers must navigate the browser to
+   * `otpLandingPageUrl` themselves (a full page navigation, not an in-app route). Unlike
+   * {@link submitOrder}, this never resolves to a finished order: the order stays Pending until the
+   * customer completes OTP with DOT and HAMBOX verifies the charge server-to-server.
+   */
+  async initiateDotCheckout(): Promise<DotCheckoutInitiationDto> {
+    const billing = this.billingDetailsState();
+    if (!billing.email.trim()) {
+      throw new Error('Email is required to complete checkout.');
+    }
+
+    this.submittingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const idempotencyKey = getOrCreateIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
+      const initiation = await firstValueFrom(
+        this.checkoutService.initiateDotCheckout(
+          { email: billing.email.trim(), country: billing.country },
+          idempotencyKey,
+        ),
+      );
+
+      clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
+      return initiation;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
+      throw error;
+    } finally {
+      this.submittingState.set(false);
+    }
+  }
+
+  async getDotPaymentStatus(paymentAttemptId: string): Promise<DotPaymentStatusDto> {
+    return firstValueFrom(this.checkoutService.getDotPaymentStatus(paymentAttemptId));
+  }
+
+  /**
+   * Initiates a DOT Fawry checkout. Unlike {@link initiateDotCheckout}, there is no browser
+   * redirect — the returned {@link DotFawryCheckoutInitiationDto.fawryReferenceNumber} is shown
+   * directly to the customer to complete payment in their Fawry wallet, and the caller navigates
+   * to the in-app result page to poll status.
+   */
+  async initiateDotFawryCheckout(): Promise<DotFawryCheckoutInitiationDto> {
+    const billing = this.billingDetailsState();
+    if (!billing.email.trim()) {
+      throw new Error('Email is required to complete checkout.');
+    }
+    if (!billing.phoneNumber.trim()) {
+      throw new Error('A mobile number is required to pay with Fawry.');
+    }
+
+    this.submittingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const idempotencyKey = getOrCreateIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
+      const initiation = await firstValueFrom(
+        this.checkoutService.initiateDotFawryCheckout(
+          {
+            email: billing.email.trim(),
+            country: billing.country,
+            phoneNumber: billing.phoneNumber.trim(),
+            customerName: billing.customerName.trim() || null,
+          },
+          idempotencyKey,
+        ),
+      );
+
+      clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
+      return initiation;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
+      throw error;
+    } finally {
+      this.submittingState.set(false);
+    }
+  }
+
+  async getDotFawryPaymentStatus(paymentAttemptId: string): Promise<DotFawryPaymentStatusDto> {
+    return firstValueFrom(this.checkoutService.getDotFawryPaymentStatus(paymentAttemptId));
+  }
+
   async loadOrder(orderId: string): Promise<ReturnType<typeof mapOrderToSuccessDetails>> {
     const order = await firstValueFrom(this.checkoutService.getOrder(orderId));
     const details = mapOrderToSuccessDetails(order);
@@ -256,6 +362,8 @@ export class CheckoutFacade {
     this.errorState.set(null);
     this.lastOrderState.set(null);
     clearIdempotencyKey(IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
     this.initialize();
   }
 

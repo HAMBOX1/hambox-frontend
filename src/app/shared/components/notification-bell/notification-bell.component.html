@@ -148,7 +148,7 @@
 
             >
 
-              <span class="notification-sheet__icon" aria-hidden="true">
+              <span class="notification-sheet__icon" [attr.data-semantic]="notificationSemantic(item)" aria-hidden="true">
 
                 <i [class]="notificationIcon(item)"></i>
 
@@ -164,7 +164,7 @@
 
                 <span class="notification-sheet__item-body">{{ item.body }}</span>
 
-                <time class="notification-sheet__item-time">{{ item.createdOnUtc | hamboxDate: 'shortTime' }}</time>
+                <time class="notification-sheet__item-time">{{ item.createdOnUtc | hamboxRelativeTime }}</time>
 
               </span>
 
@@ -266,19 +266,27 @@
 
               <button type="button" class="notification-bell__item-main" (click)="openNotification(item)">
 
-                <span class="notification-bell__indicator" [class.notification-bell__indicator--read]="item.isRead"></span>
+                <span class="notification-bell__icon" [attr.data-semantic]="notificationSemantic(item)" aria-hidden="true">
+
+                  <i [class]="notificationIcon(item)"></i>
+
+                </span>
 
                 <div class="notification-bell__item-copy">
-
-                  <span class="notification-bell__category">{{ item.category }}</span>
 
                   <strong [class.notification-bell__title--unread]="!item.isRead">{{ item.title }}</strong>
 
                   <p>{{ item.body }}</p>
 
-                  <time>{{ item.createdOnUtc | hamboxDate: 'shortTime' }}</time>
+                  <time>{{ item.createdOnUtc | hamboxRelativeTime }}</time>
 
                 </div>
+
+                @if (!item.isRead) {
+
+                  <span class="notification-bell__indicator" aria-hidden="true"></span>
+
+                }
 
               </button>
 

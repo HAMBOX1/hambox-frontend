@@ -100,6 +100,16 @@ export class PaymentProcessingPageComponent implements OnInit {
       return;
     }
 
+    if (this.checkout.paymentMethod() === 'dot') {
+      void this.runDotCheckoutFlow();
+      return;
+    }
+
+    if (this.checkout.paymentMethod() === 'dot-fawry') {
+      void this.runDotFawryCheckoutFlow();
+      return;
+    }
+
     let stageIndex = 0;
     const stageTimer = interval(700)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -119,6 +129,48 @@ export class PaymentProcessingPageComponent implements OnInit {
       await this.router.navigate(['/checkout/success', order.id]);
     } catch (error) {
       stageTimer.unsubscribe();
+      const message =
+        error instanceof Error ? error.message : 'Checkout failed. Please try again.';
+      this.error.set(message);
+      this.stageLabel.set('Payment failed');
+    }
+  }
+
+  private async runDotCheckoutFlow(): Promise<void> {
+    this.stageLabel.set('Preparing secure payment');
+    this.progress.set(20);
+
+    try {
+      const initiation = await this.checkout.initiateDotCheckout();
+      this.stageLabel.set('Redirecting to your carrier');
+      this.progress.set(90);
+      // Full page navigation — DOT's OTP flow is an external, off-app experience. There is
+      // nothing further for this Angular page to do; the browser leaves the app entirely until
+      // DOT redirects back to the backend callback, which lands on /checkout/dot/result.
+      window.location.href = initiation.otpLandingPageUrl;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Checkout failed. Please try again.';
+      this.error.set(message);
+      this.stageLabel.set('Payment failed');
+    }
+  }
+
+  private async runDotFawryCheckoutFlow(): Promise<void> {
+    this.stageLabel.set('Preparing secure payment');
+    this.progress.set(20);
+
+    try {
+      const initiation = await this.checkout.initiateDotFawryCheckout();
+      this.stageLabel.set('Awaiting Fawry payment');
+      this.progress.set(90);
+      // In-app navigation — unlike DOT's OTP flow, Fawry Direct Billing is server-to-server: there
+      // is nothing to redirect the browser to. The result page shows the Fawry reference number
+      // and polls status until the customer completes payment and DOT's webhook confirms it.
+      await this.router.navigate(['/checkout/dot-fawry/result'], {
+        queryParams: { paymentAttemptId: initiation.paymentAttemptId },
+      });
+    } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Checkout failed. Please try again.';
       this.error.set(message);

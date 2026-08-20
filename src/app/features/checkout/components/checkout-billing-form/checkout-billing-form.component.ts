@@ -14,6 +14,7 @@ export class CheckoutBillingFormComponent {
 
   protected readonly billing = this.checkout.billingDetails;
   protected readonly countries = CHECKOUT_COUNTRIES;
+  protected readonly paymentMethod = this.checkout.paymentMethod;
 
   protected updateEmail(event: Event): void {
     this.checkout.updateBillingField('email', (event.target as HTMLInputElement).value);
@@ -21,5 +22,13 @@ export class CheckoutBillingFormComponent {
 
   protected updateCountry(event: Event): void {
     this.checkout.updateBillingField('country', (event.target as HTMLSelectElement).value);
+  }
+
+  protected updatePhoneNumber(event: Event): void {
+    this.checkout.updateBillingField('phoneNumber', (event.target as HTMLInputElement).value);
+  }
+
+  protected updateCustomerName(event: Event): void {
+    this.checkout.updateBillingField('customerName', (event.target as HTMLInputElement).value);
   }
 }

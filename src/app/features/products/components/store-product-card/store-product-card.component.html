@@ -128,15 +128,22 @@
         <button
           type="button"
           class="store-card__cta store-card__cta--icon"
-          [attr.aria-label]="'PRODUCT.ADD_TO_CART' | translate"
-          [disabled]="product().isMembersOnly || product().isComingSoon"
+          [attr.aria-label]="(cartDisabledReasonKey() ?? 'PRODUCT.ADD_TO_CART') | translate"
+          [pTooltip]="(cartDisabledReasonKey() | translate)"
+          [tooltipDisabled]="!cartDisabledReasonKey()"
+          tooltipPosition="top"
+          [disabled]="!!cartDisabledReasonKey()"
           (click)="addToCart($event)"
         >
           <img [src]="cartIconSrc" alt="" aria-hidden="true" />
         </button>
       }
       @case ('notify-me') {
-        <button type="button" class="store-card__cta store-card__cta--notify" disabled>
+        <button
+          type="button"
+          class="store-card__cta store-card__cta--notify"
+          (click)="notifyMe($event)"
+        >
           {{ 'PRODUCT.NOTIFY_ME' | translate }}
         </button>
       }

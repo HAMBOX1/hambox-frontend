@@ -26,29 +26,66 @@
     <p-table class="admin-data-table" [value]="[...mappings()]" [loading]="loading()" dataKey="id">
       <ng-template pTemplate="header">
         <tr>
-          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.INTERNAL_PRODUCT' | translate }}</th>
-          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.EXTERNAL_PRODUCT' | translate }}</th>
-          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SKU' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.HAMBOX_PRODUCT' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SCOPE' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SUPPLIER_PRODUCT' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.BUYING_PRICE' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.PRIORITY' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.AVAILABILITY.TITLE' | translate }}</th>
           <th style="width: 6rem"></th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-mapping>
         <tr>
-          <td class="supplier-mappings-page__mono">{{ mapping.internalProductId }}</td>
           <td>
-            {{ mapping.externalProductId }}
-            @if (mapping.externalName) {
-              <span class="admin-cell-secondary">{{ mapping.externalName }}</span>
-            }
+            <div class="supplier-mappings-page__cell">
+              <span class="supplier-mappings-page__cell-primary">{{ mapping.internalProductName ?? mapping.internalProductId }}</span>
+              @if (mapping.internalVariantSku) {
+                <span class="admin-cell-secondary">{{ 'ADMIN.SUPPLIERS.MAPPINGS.SKU' | translate }}: {{ mapping.internalVariantSku }}</span>
+              }
+              <span class="supplier-mappings-page__technical" [title]="mapping.internalProductId">
+                {{ mapping.internalProductId }}
+              </span>
+            </div>
           </td>
-          <td>{{ mapping.externalSku ?? '—' }}</td>
+          <td>
+            <app-admin-status-badge
+              [label]="(mapping.internalProductVariantId ? 'ADMIN.FULFILLMENT.CHAIN.SCOPE_VARIANT' : 'ADMIN.FULFILLMENT.CHAIN.SCOPE_PRODUCT') | translate"
+              [tone]="mapping.internalProductVariantId ? 'info' : 'neutral'"
+            />
+          </td>
+          <td>
+            <div class="supplier-mappings-page__cell">
+              <span class="supplier-mappings-page__cell-primary">{{ mapping.externalName ?? mapping.externalProductId }}</span>
+              <span class="supplier-mappings-page__technical" [title]="mapping.externalProductId">
+                {{ 'ADMIN.SUPPLIERS.MAPPINGS.EXTERNAL_PRODUCT_ID' | translate }}: {{ mapping.externalProductId }}
+              </span>
+            </div>
+          </td>
           <td>{{ mapping.buyingPrice }} {{ mapping.currency }}</td>
           <td>{{ mapping.priority }}</td>
-          <td>{{ mapping.status }}</td>
+          <td>
+            <app-admin-status-badge
+              [label]="('ADMIN.SUPPLIERS.MAPPINGS.STATUS_' + mapping.status.toUpperCase()) | translate"
+              [tone]="mapping.status === 'Active' ? 'success' : 'neutral'"
+            />
+          </td>
+          <td>
+            <div class="supplier-mappings-page__cell">
+              <app-admin-status-badge
+                [label]="('ADMIN.SUPPLIERS.AVAILABILITY.' + (mapping.availabilityState ?? 'UNKNOWN').toUpperCase()) | translate"
+                [tone]="mapping.availabilityState === 'Available' ? 'success' : mapping.availabilityState === 'Unavailable' ? 'warning' : 'neutral'"
+              />
+              <span class="admin-cell-secondary">
+                {{
+                  (mapping.availabilityLastCheckedAtUtc ? 'ADMIN.SUPPLIERS.AVAILABILITY.LAST_CHECKED' : 'ADMIN.SUPPLIERS.AVAILABILITY.NOT_CHECKED_YET')
+                    | translate: { time: mapping.availabilityLastCheckedAtUtc | hamboxDate: 'short' }
+                }}
+              </span>
+            </div>
+          </td>
           <td>
             <div class="admin-actions-row">
               <app-admin-icon-button
@@ -70,7 +107,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7">
+          <td colspan="8">
             <app-admin-empty-state
               icon="pi pi-sitemap"
               [title]="'ADMIN.SUPPLIERS.MAPPINGS.EMPTY' | translate"
@@ -86,61 +123,116 @@
 </section>
 
 <p-dialog
-  [header]="(editingMappingId() ? 'ADMIN.SUPPLIERS.MAPPINGS.EDIT_TITLE' : 'ADMIN.SUPPLIERS.MAPPINGS.NEW') | translate"
+  [header]="(editingMapping() ? 'ADMIN.SUPPLIERS.MAPPINGS.EDIT_TITLE' : 'ADMIN.SUPPLIERS.MAPPINGS.NEW') | translate"
   [visible]="dialogOpen()"
   (visibleChange)="dialogOpen.set($event)"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: 'min(32rem, 92vw)' }"
+  [style]="{ width: 'min(34rem, 92vw)' }"
   styleClass="admin-dialog"
   (onHide)="closeDialog()"
 >
-  <form class="admin-form-grid admin-form-grid--single" [formGroup]="form">
-    @if (!editingMappingId()) {
+  <div class="supplier-mappings-page__dialog-body">
+    @if (!editingMapping()) {
       <label class="supplier-mappings-page__field">
-        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.INTERNAL_PRODUCT_ID' | translate }}</span>
-        <input pInputText formControlName="internalProductId" placeholder="00000000-0000-0000-0000-000000000000" />
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.HAMBOX_PRODUCT' | translate }}</span>
+        <app-hambox-product-select [selected]="selectedProduct()" (selectedChange)="onProductSelected($event)" />
+      </label>
+
+      @if (selectedProduct()) {
+        <div class="supplier-mappings-page__field">
+          <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.MAPPING_SCOPE' | translate }}</span>
+          <div class="supplier-mappings-page__scope">
+            <label class="supplier-mappings-page__radio">
+              <p-radiobutton name="scope" value="product" [ngModel]="scope()" (ngModelChange)="onScopeChange($event)" />
+              {{ 'ADMIN.SUPPLIERS.MAPPINGS.ENTIRE_PRODUCT' | translate }}
+            </label>
+            <label class="supplier-mappings-page__radio">
+              <p-radiobutton name="scope" value="variant" [ngModel]="scope()" (ngModelChange)="onScopeChange($event)" />
+              {{ 'ADMIN.SUPPLIERS.MAPPINGS.SPECIFIC_VARIANT' | translate }}
+            </label>
+          </div>
+        </div>
+
+        @if (scope() === 'variant') {
+          <label class="supplier-mappings-page__field">
+            <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.SELECT_VARIANT' | translate }}</span>
+            <app-hambox-variant-select
+              [productId]="selectedProduct()!.id"
+              [selectedVariantId]="selectedVariant()?.id ?? null"
+              (selectedChange)="onVariantSelected($event)"
+            />
+          </label>
+        }
+      }
+    } @else {
+      <div class="supplier-mappings-page__readonly-summary">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.HAMBOX_PRODUCT' | translate }}</span>
+        <span class="supplier-mappings-page__cell-primary">
+          {{ selectedProduct() ? (selectedProduct()!.nameEn || selectedProduct()!.nameAr) : (editingMapping()!.internalProductName ?? editingMapping()!.internalProductId) }}
+        </span>
+        @if (editingMapping()!.internalVariantSku) {
+          <span class="admin-cell-secondary">{{ 'ADMIN.SUPPLIERS.MAPPINGS.SKU' | translate }}: {{ editingMapping()!.internalVariantSku }}</span>
+        }
+        <span class="supplier-mappings-page__field-hint">{{ 'ADMIN.SUPPLIERS.MAPPINGS.INTERNAL_PRODUCT_LOCKED_HINT' | translate }}</span>
+      </div>
+    }
+
+    @if (editingMapping() || selectedProduct()) {
+      <label class="supplier-mappings-page__field">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.SUPPLIER_PRODUCT' | translate }}</span>
+        <app-supplier-catalog-select
+          [supplierId]="supplierId()"
+          [selected]="selectedCatalogItem()"
+          (selectedChange)="onCatalogItemSelected($event)"
+        />
       </label>
     }
 
-    <label class="supplier-mappings-page__field">
-      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.EXTERNAL_PRODUCT_ID' | translate }}</span>
-      <input pInputText formControlName="externalProductId" />
-    </label>
-
-    <label class="supplier-mappings-page__field">
-      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.SKU' | translate }}</span>
-      <input pInputText formControlName="externalSku" />
-    </label>
-
-    <label class="supplier-mappings-page__field">
-      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.NAME' | translate }}</span>
-      <input pInputText formControlName="externalName" />
-    </label>
-
-    <label class="supplier-mappings-page__field">
-      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.BUYING_PRICE' | translate }}</span>
-      <p-inputnumber formControlName="buyingPrice" mode="decimal" [minFractionDigits]="2" [min]="0" />
-    </label>
-
-    <label class="supplier-mappings-page__field">
-      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.CURRENCY' | translate }}</span>
-      <input pInputText formControlName="currency" maxlength="3" />
-    </label>
-
-    <label class="supplier-mappings-page__field">
-      <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.PRIORITY' | translate }}</span>
-      <p-inputnumber formControlName="priority" [min]="0" [showButtons]="true" />
-    </label>
-
-    @if (editingMappingId()) {
+    <form class="admin-form-grid" [formGroup]="form">
       <label class="supplier-mappings-page__field">
-        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.STATUS' | translate }}</span>
-        <p-select formControlName="status" [options]="statusOptions" optionLabel="label" optionValue="value" />
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.BUYING_PRICE' | translate }}</span>
+        <p-inputnumber formControlName="buyingPrice" mode="decimal" [minFractionDigits]="2" [min]="0" (onInput)="onBuyingPriceInput()" />
+        <span class="supplier-mappings-page__field-hint">{{ 'ADMIN.SUPPLIERS.MAPPINGS.BUYING_PRICE_HINT' | translate }}</span>
       </label>
+
+      <label class="supplier-mappings-page__field">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.CURRENCY' | translate }}</span>
+        <input pInputText [value]="currency()" disabled />
+      </label>
+
+      <label class="supplier-mappings-page__field">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.PRIORITY' | translate }}</span>
+        <p-inputnumber formControlName="priority" [min]="0" [showButtons]="true" />
+      </label>
+
+      @if (editingMapping()) {
+        <label class="supplier-mappings-page__field">
+          <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.STATUS' | translate }}</span>
+          <p-select formControlName="status" [options]="statusOptions" optionLabel="label" optionValue="value" />
+        </label>
+      }
+    </form>
+
+    @if ((selectedProduct() || editingMapping()) && selectedCatalogItem()) {
+      <div class="supplier-mappings-page__preview">
+        <span class="supplier-mappings-page__preview-title">{{ 'ADMIN.SUPPLIERS.MAPPINGS.MAPPING_PREVIEW' | translate }}</span>
+        <div class="supplier-mappings-page__preview-row">
+          <span class="supplier-mappings-page__preview-source">
+            {{ selectedProduct() ? (selectedProduct()!.nameEn || selectedProduct()!.nameAr) : (editingMapping()?.internalProductName ?? '') }}
+          </span>
+          <i class="pi pi-arrow-down" aria-hidden="true"></i>
+          <span class="supplier-mappings-page__preview-target">{{ selectedCatalogItem()!.name }}</span>
+        </div>
+        <div class="supplier-mappings-page__preview-meta">
+          <span>{{ 'ADMIN.SUPPLIERS.MAPPINGS.MAPPING_SCOPE' | translate }}: {{ (scope() === 'variant' ? 'ADMIN.SUPPLIERS.MAPPINGS.SPECIFIC_VARIANT' : 'ADMIN.SUPPLIERS.MAPPINGS.ENTIRE_PRODUCT') | translate }}</span>
+          <span>{{ 'ADMIN.SUPPLIERS.MAPPINGS.CURRENCY' | translate }}: {{ currency() }}</span>
+          <span>{{ 'ADMIN.SUPPLIERS.MAPPINGS.PRIORITY' | translate }}: {{ form.controls.priority.value }}</span>
+        </div>
+      </div>
     }
-  </form>
+  </div>
 
   <ng-template pTemplate="footer">
     <button
@@ -154,8 +246,9 @@
     <button
       pButton
       type="button"
-      [label]="'ADMIN.SUPPLIERS.ACTIONS.SAVE' | translate"
-      [disabled]="form.invalid"
+      [label]="(editingMapping() ? 'ADMIN.SUPPLIERS.ACTIONS.SAVE' : 'ADMIN.SUPPLIERS.MAPPINGS.CREATE_MAPPING') | translate"
+      [disabled]="!canSave() || saving()"
+      [loading]="saving()"
       (click)="saveMapping()"
     ></button>
   </ng-template>

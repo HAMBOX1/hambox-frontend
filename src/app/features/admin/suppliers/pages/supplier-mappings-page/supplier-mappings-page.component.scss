@@ -8,9 +8,105 @@
     display: flex;
     flex-direction: column;
     gap: var(--hambox-spacing-1);
+    margin-bottom: var(--hambox-spacing-3);
   }
 
   &__field-label {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &__field-hint {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__dialog-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  &__cell-primary {
+    font-weight: 600;
+  }
+
+  // Technical id — present but deliberately de-emphasized (Phase 10: "should not dominate the UI").
+  &__technical {
+    font-family: monospace;
+    font-size: 0.68rem;
+    opacity: 0.4;
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__scope {
+    display: flex;
+    gap: var(--hambox-spacing-4);
+  }
+
+  &__radio {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    cursor: pointer;
+  }
+
+  &__readonly-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-1);
+    padding: var(--hambox-spacing-3);
+    border-radius: 10px;
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+    background: var(--color-surface-hover, rgba(255, 255, 255, 0.04));
+    margin-bottom: var(--hambox-spacing-3);
+  }
+
+  &__preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-2);
+    padding: var(--hambox-spacing-3);
+    border-radius: 10px;
+    background: var(--color-primary-muted, rgba(99, 102, 241, 0.08));
+    border: 1px solid var(--color-primary, rgba(99, 102, 241, 0.3));
+    margin-top: var(--hambox-spacing-2);
+  }
+
+  &__preview-title {
+    font-size: var(--hambox-font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+  }
+
+  &__preview-row {
+    display: flex;
+    align-items: center;
+    gap: var(--hambox-spacing-3);
+    font-weight: 600;
+  }
+
+  &__preview-source,
+  &__preview-target {
+    flex: 1;
+  }
+
+  &__preview-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hambox-spacing-3);
     font-size: var(--hambox-font-size-xs);
     color: var(--color-text-muted);
   }

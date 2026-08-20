@@ -18,6 +18,16 @@ export interface ProductOptionGroupDto {
   readonly options: readonly ProductOptionDto[];
 }
 
+/** Matches backend `HAMBOX.Modules.Catalog.Domain.Enums.FulfillmentMode`. */
+export type FulfillmentMode = 'ManualOnly' | 'ManualFirst' | 'SupplierFirst' | 'SupplierOnly';
+
+export const FULFILLMENT_MODES: readonly FulfillmentMode[] = [
+  'ManualOnly',
+  'ManualFirst',
+  'SupplierFirst',
+  'SupplierOnly',
+];
+
 export interface ProductVariantDto {
   readonly id: string;
   readonly productId: string;
@@ -37,6 +47,11 @@ export interface ProductVariantDto {
   readonly isLowStock: boolean;
   readonly isOutOfStock: boolean;
   readonly optionIds: readonly string[];
+  readonly fulfillmentMode: FulfillmentMode;
+}
+
+export interface SetVariantFulfillmentModeRequest {
+  readonly fulfillmentMode: FulfillmentMode;
 }
 
 export interface InventorySupplierDto {
@@ -131,6 +146,7 @@ export interface StorefrontVariantDto {
   readonly isLowStock: boolean;
   readonly isOutOfStock: boolean;
   readonly optionIds: readonly string[];
+  readonly isCompleteCombination: boolean;
 }
 
 export interface StorefrontProductConfigurationDto {

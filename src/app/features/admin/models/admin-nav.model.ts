@@ -21,7 +21,8 @@ export type AdminNavId =
   | 'support'
   | 'analytics'
   | 'reports'
-  | 'settings';
+  | 'settings'
+  | 'whatsapp';
 
 export interface AdminNavItem {
   readonly id: AdminNavId;
@@ -178,5 +179,12 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/settings',
     icon: 'pi pi-cog',
     permission: PERMISSIONS.Settings.View,
+  },
+  {
+    id: 'whatsapp',
+    labelKey: 'ADMIN.NAV.WHATSAPP',
+    route: '/admin/whatsapp',
+    icon: 'pi pi-whatsapp',
+    permission: PERMISSIONS.WhatsAppBot.View,
   },
 ] as const;

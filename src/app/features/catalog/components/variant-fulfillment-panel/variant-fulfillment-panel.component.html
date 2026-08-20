@@ -1,0 +1,83 @@
+@if (selectedVariant(); as variant) {
+  <app-admin-section-card
+    [title]="'ADMIN.FULFILLMENT.TITLE' | translate"
+    [description]="'ADMIN.FULFILLMENT.SUBTITLE' | translate"
+  >
+    <div class="variant-fulfillment">
+      <div class="variant-fulfillment__summary">
+        <app-admin-status-badge
+          [label]="(overallReadiness() === 'success' ? 'ADMIN.FULFILLMENT.READY' : 'ADMIN.FULFILLMENT.NOT_READY') | translate"
+          [tone]="overallReadiness()"
+        />
+      </div>
+
+      <div
+        class="variant-fulfillment__modes"
+        role="radiogroup"
+        [attr.aria-label]="'ADMIN.FULFILLMENT.MODE_LABEL' | translate"
+      >
+        @for (option of modeOptions; track option.mode) {
+          @if (permissions.Catalog.Inventory.Edit | hamboxHasPermission) {
+            <button
+              type="button"
+              class="variant-fulfillment__mode-card"
+              [class.is-selected]="isSelected(option.mode)"
+              role="radio"
+              [attr.aria-checked]="isSelected(option.mode)"
+              [disabled]="saving()"
+              (click)="onSelectMode(option.mode)"
+            >
+              <ng-container *ngTemplateOutlet="cardContent; context: { $implicit: option }" />
+            </button>
+          } @else {
+            <div
+              class="variant-fulfillment__mode-card variant-fulfillment__mode-card--readonly"
+              [class.is-selected]="isSelected(option.mode)"
+              role="radio"
+              [attr.aria-checked]="isSelected(option.mode)"
+            >
+              <ng-container *ngTemplateOutlet="cardContent; context: { $implicit: option }" />
+            </div>
+          }
+
+          <ng-template #cardContent let-option>
+            <i [class]="option.icon" aria-hidden="true"></i>
+            <span class="variant-fulfillment__mode-title">{{ option.titleKey | translate }}</span>
+            <span class="variant-fulfillment__mode-description">{{ option.descriptionKey | translate }}</span>
+            @if (isSelected(option.mode)) {
+              <i class="pi pi-check-circle variant-fulfillment__mode-check" aria-hidden="true"></i>
+            }
+          </ng-template>
+        }
+      </div>
+
+      @if (supplierChainRequired()) {
+        <div class="variant-fulfillment__chain">
+          <h3 class="variant-fulfillment__chain-title">{{ 'ADMIN.FULFILLMENT.CHAIN.TITLE' | translate }}</h3>
+
+          @if (chainError(); as error) {
+            <app-admin-error-alert [message]="error" [showRetry]="false" />
+          } @else {
+            <app-fulfillment-chain-list
+              [candidates]="chain()"
+              [loading]="chainLoading()"
+              [reorderable]="permissions.Suppliers.ManageMappings | hamboxHasPermission"
+              [saving]="chainLoading()"
+              (reordered)="onChainReordered($event)"
+            />
+          }
+        </div>
+      }
+    </div>
+  </app-admin-section-card>
+
+  <app-admin-confirm-dialog
+    [visible]="confirmDialogOpen()"
+    [title]="'ADMIN.FULFILLMENT.CONFIRM.TITLE' | translate"
+    [message]="confirmMessage()"
+    [destructive]="true"
+    [loading]="saving()"
+    (visibleChange)="!$event && onCancelModeChange()"
+    (confirmed)="onConfirmModeChange()"
+  />
+}

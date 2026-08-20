@@ -7,6 +7,7 @@ import {
   effect,
   inject,
   signal,
+  WritableSignal,
 } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -32,10 +33,13 @@ import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { AUTH_CONTEXT } from '../../../../core/auth/auth-context';
 import { AdminAuth } from '../../../auth/services/admin-auth';
 import { AccountWishlistFacade } from '../../../account/services/account-wishlist.facade';
+import { CustomerAlertsFacade } from '../../../account/services/customer-alerts.facade';
 import { Products } from '../../../products/services/products';
 import { StoreProduct } from '../../../products/models/product';
 import { ProductMarketingPageAvailabilityService } from '../../../products/services/product-marketing-page-availability.service';
+import { StorefrontProductEnrichmentService } from '../../../products/services/storefront-product-enrichment.service';
 import { mapProductToStoreProduct } from '../../../products/utils/storefront-product.mapper';
+import { applyStorefrontEnrichment } from '../../../products/utils/storefront-product-enrichment.util';
 import { StoreProductCardComponent } from '../../../products/components/store-product-card/store-product-card.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { FaqPublicService } from '../../../../core/faq/faq-public.service';
@@ -84,10 +88,12 @@ export class ProductDetailsPageComponent {
   private readonly authSession = inject(AuthSessionService);
   private readonly adminAuth = inject(AdminAuth);
   private readonly wishlistFacade = inject(AccountWishlistFacade);
+  private readonly alertsFacade = inject(CustomerAlertsFacade);
   private readonly translate = inject(TranslateService);
   private readonly messageService = inject(MessageService);
   private readonly products = inject(Products);
   private readonly marketingAvailability = inject(ProductMarketingPageAvailabilityService);
+  private readonly enrichment = inject(StorefrontProductEnrichmentService);
   private readonly translation = inject(TranslationService);
   private readonly pageBuilderPublicApi = inject(PageBuilderPublicApiService);
   private readonly home = inject(Home);
@@ -102,6 +108,10 @@ export class ProductDetailsPageComponent {
   protected readonly error = signal<string | null>(null);
   protected readonly cartActionError = signal<string | null>(null);
   protected readonly wishlistActionMessage = signal<string | null>(null);
+  protected readonly backInStockBusy = signal(false);
+  protected readonly backInStockSubscribed = signal(false);
+  protected readonly priceDropBusy = signal(false);
+  protected readonly priceDropSubscribed = signal(false);
   protected readonly isAuthenticated = this.authSession.isAuthenticated;
   protected readonly isPreview = signal(false);
   protected readonly relatedProducts = signal<readonly StoreProduct[]>([]);
@@ -183,6 +193,14 @@ export class ProductDetailsPageComponent {
     const inCart = this.quantityInCart();
     const remaining = this.remainingStock();
 
+    // Purchasable but not manually stocked (SupplierOnly/SupplierFirst fulfilled by a READY
+    // automated supplier) — there's no manual count to report and, like the backend's own
+    // checkout gate, no quantity cap for this path, so show a plain "available" label rather
+    // than falling into the manual-count-oriented branches below.
+    if (!resolved.isOutOfStock && resolved.availableStock <= 0) {
+      return { key: 'PRODUCT.STOCK_AVAILABLE', params: {}, isOutOfStock: false };
+    }
+
     if (resolved.isOutOfStock || remaining <= 0) {
       if (inCart > 0 && resolved.availableStock > 0) {
         return {
@@ -240,7 +258,35 @@ export class ProductDetailsPageComponent {
     }
 
     const resolved = this.resolvedVariant();
-    return resolved.variant !== null && !resolved.isOutOfStock && this.remainingStock() > 0;
+    if (resolved.variant === null || resolved.isOutOfStock || !resolved.variant.isCompleteCombination) {
+      return false;
+    }
+
+    // A manually-stocked variant must still respect what's actually left after the cart; a
+    // supplier-fulfilled variant (0 manual stock, purchasable via a READY automated route) has no
+    // such manual cap — the backend itself doesn't check quantity for that path either (see
+    // FulfillmentAvailability), so gating on remainingStock here would wrongly block quantity=1 for
+    // every SupplierOnly/SupplierFirst item.
+    return resolved.availableStock <= 0 || this.remainingStock() > 0;
+  });
+
+  // "Genuinely unavailable due to stock" — a specific variant is resolved (so we know exactly what
+  // to subscribe to) and it's out of stock, as opposed to no-selection-yet or membership/pre-release
+  // gating, which aren't stock problems and must not offer this CTA.
+  protected readonly showBackInStockCta = computed(() => {
+    if (this.isPreview()) {
+      return false;
+    }
+    const resolved = this.resolvedVariant();
+    return resolved.variant !== null && resolved.isOutOfStock;
+  });
+
+  // Independent of stock — a customer may want a price-drop alert on a variant they can buy today.
+  protected readonly showPriceDropCta = computed(() => {
+    if (this.isPreview()) {
+      return false;
+    }
+    return this.resolvedVariant().variant !== null;
   });
 
   constructor() {
@@ -262,6 +308,18 @@ export class ProductDetailsPageComponent {
       );
     });
     this.destroyRef.onDestroy(() => document.body.style.removeProperty('--hambox-buy-bar-inset'));
+
+    // Subscribed-state reflects one specific variant — switching option selection must not carry a
+    // stale "subscribed" badge over onto a different variant the customer hasn't subscribed to.
+    let lastVariantId: string | null | undefined;
+    effect(() => {
+      const variantId = this.resolvedVariant().variant?.id ?? null;
+      if (variantId !== lastVariantId) {
+        lastVariantId = variantId;
+        this.backInStockSubscribed.set(false);
+        this.priceDropSubscribed.set(false);
+      }
+    });
   }
 
   protected readonly cartIconSrc = 'assets/images/top-nav/cart-icon.svg';
@@ -325,6 +383,52 @@ export class ProductDetailsPageComponent {
       summary: message,
       life: 3000,
     });
+  }
+
+  protected async notifyBackInStock(): Promise<void> {
+    await this.subscribeToAlert('BackInStock', this.backInStockBusy, this.backInStockSubscribed);
+  }
+
+  protected async notifyPriceDrop(): Promise<void> {
+    await this.subscribeToAlert('PriceDrop', this.priceDropBusy, this.priceDropSubscribed);
+  }
+
+  private async subscribeToAlert(
+    alertType: 'BackInStock' | 'PriceDrop',
+    busy: WritableSignal<boolean>,
+    subscribed: WritableSignal<boolean>,
+  ): Promise<void> {
+    const current = this.product();
+    const variantId = this.resolvedVariant().variant?.id;
+    if (!current || !variantId || this.isPreview() || busy() || subscribed()) {
+      return;
+    }
+
+    if (!this.isAuthenticated()) {
+      void this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: `/products/${current.id}` },
+      });
+      return;
+    }
+
+    busy.set(true);
+    try {
+      const ok = await this.alertsFacade.subscribe(variantId, alertType);
+      subscribed.set(ok);
+      this.messageService.add({
+        severity: ok ? 'success' : 'error',
+        summary: this.translate.instant(
+          ok
+            ? alertType === 'BackInStock'
+              ? 'PRODUCT.NOTIFY_ME_SUBSCRIBED'
+              : 'PRODUCT.NOTIFY_PRICE_DROP_SUBSCRIBED'
+            : 'PRODUCT.NOTIFY_ME_ERROR',
+        ),
+        life: 3000,
+      });
+    } finally {
+      busy.set(false);
+    }
   }
 
   protected backToStore(): void {
@@ -511,10 +615,18 @@ export class ProductDetailsPageComponent {
         .slice(0, 8)
         .map((product, index) => mapProductToStoreProduct(product, lang, index));
 
-      await this.marketingAvailability.ensureLoaded(related.map((product) => product.id));
+      const relatedIds = related.map((product) => product.id);
+      await Promise.all([
+        this.marketingAvailability.ensureLoaded(relatedIds),
+        this.enrichment.ensureLoaded(relatedIds),
+      ]);
+
+      // The raw mapper above only guesses cta/stock from the product's publish status, not real
+      // per-variant inventory — apply the same enrichment the main storefront grid uses before
+      // showing it as a card (see ProductsFacade.enrichedItems for the equivalent).
       this.relatedProducts.set(
         related.map((product) => ({
-          ...product,
+          ...applyStorefrontEnrichment(product, this.enrichment.getConfiguration(product.id)),
           hasMarketingPage: this.marketingAvailability.hasMarketingPage(product.id),
         })),
       );

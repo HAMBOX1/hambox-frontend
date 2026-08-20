@@ -33,6 +33,7 @@ export class AccountSidebarComponent {
     { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_SUPPORT', route: '/account/support', icon: 'pi-ticket' },
     { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_MEMBERSHIP', route: '/account/membership', icon: 'pi-id-card' },
     { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_WISHLIST', route: '/account/wishlist', icon: 'pi-heart' },
+    { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_ALERTS', route: '/account/alerts', icon: 'pi-bell' },
     { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_REFERRAL', route: '/account/referral', icon: 'pi-users' },
     { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_NOTIFICATIONS', route: '/account/notifications', icon: 'pi-bell' },
     { labelKey: 'ACCOUNT.SIDEBAR_UI.NAV_MARKETPLACE', route: '/products', icon: 'pi-shopping-bag' },

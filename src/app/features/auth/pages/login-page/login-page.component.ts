@@ -12,6 +12,7 @@ import { GoogleIdentityService } from '../../../../core/auth/google-identity.ser
 import { LegalAcceptanceDialogComponent } from '../../../../shared/components/legal-acceptance-dialog/legal-acceptance-dialog.component';
 import { Auth } from '../../services/auth';
 import { CartFacade } from '../../../cart/services/cart.facade';
+import { CustomerAlertsFacade } from '../../../account/services/customer-alerts.facade';
 import {
   applyServerValidationErrors,
   getControlErrorMessage,
@@ -39,6 +40,7 @@ export class LoginPageComponent {
   private readonly auth = inject(Auth);
   private readonly googleIdentity = inject(GoogleIdentityService);
   private readonly cartFacade = inject(CartFacade);
+  private readonly alertsFacade = inject(CustomerAlertsFacade);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -157,7 +159,10 @@ export class LoginPageComponent {
   }
 
   private completeLogin(): Promise<void> {
-    return this.cartFacade.mergeGuestCartIfNeeded().then(() => {
+    return Promise.all([
+      this.cartFacade.mergeGuestCartIfNeeded(),
+      this.alertsFacade.claimGuestAlertsIfNeeded(),
+    ]).then(() => {
       const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/home';
       void this.router.navigateByUrl(returnUrl);
     });

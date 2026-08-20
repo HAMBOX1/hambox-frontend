@@ -1,127 +1,222 @@
 <section class="notifications-page" hamboxTranslateRefresh>
   <header class="notifications-page__header">
-    <div>
-      <h1>{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</h1>
+    <div class="notifications-page__heading">
+      <div class="notifications-page__title-row">
+        <h1>{{ 'ACCOUNT.NOTIFICATIONS_UI.TITLE' | translate }}</h1>
+        @if (unreadCount() > 0) {
+          <span class="notifications-page__unread-badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+        }
+      </div>
       <p>{{ 'ACCOUNT.NOTIFICATIONS_UI.SUBTITLE' | translate }}</p>
     </div>
     <div class="notifications-page__header-actions">
-      <button type="button" (click)="togglePreferences()">{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFERENCES' | translate }}</button>
-      <button type="button" (click)="markAllRead()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}</button>
+      <button type="button" class="notifications-page__btn" (click)="togglePreferences()" [attr.aria-expanded]="preferencesOpen()">
+        <i class="pi pi-cog" aria-hidden="true"></i>
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFERENCES' | translate }}
+      </button>
+      <button
+        type="button"
+        class="notifications-page__btn notifications-page__btn--primary"
+        [disabled]="markingAllRead() || unreadCount() === 0"
+        (click)="markAllRead()"
+      >
+        @if (markingAllRead()) {
+          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        } @else {
+          <i class="pi pi-check-circle" aria-hidden="true"></i>
+        }
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_ALL_READ' | translate }}
+      </button>
     </div>
   </header>
 
   @if (preferencesOpen()) {
     <div class="notifications-page__preferences">
       @if (preferencesLoading()) {
-        <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
+        <p class="notifications-page__prefs-state">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
       } @else if (preferencesError()) {
-        <p class="notifications-page__state">{{ preferencesError() }}</p>
+        <p class="notifications-page__prefs-state notifications-page__prefs-state--error">{{ preferencesError() }}</p>
       } @else if (preferences(); as prefs) {
-        <label>
-          <input
-            type="checkbox"
-            [checked]="prefs.emailEnabled"
-            [disabled]="preferencesSaving()"
-            (change)="togglePreference('emailEnabled', !prefs.emailEnabled)"
-          />
-          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.EMAIL' | translate }}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            [checked]="prefs.inAppEnabled"
-            [disabled]="preferencesSaving()"
-            (change)="togglePreference('inAppEnabled', !prefs.inAppEnabled)"
-          />
-          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.IN_APP' | translate }}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            [checked]="prefs.orderEnabled"
-            [disabled]="preferencesSaving()"
-            (change)="togglePreference('orderEnabled', !prefs.orderEnabled)"
-          />
-          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.ORDER' | translate }}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            [checked]="prefs.membershipEnabled"
-            [disabled]="preferencesSaving()"
-            (change)="togglePreference('membershipEnabled', !prefs.membershipEnabled)"
-          />
-          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.MEMBERSHIP' | translate }}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            [checked]="prefs.marketingEnabled"
-            [disabled]="preferencesSaving()"
-            (change)="togglePreference('marketingEnabled', !prefs.marketingEnabled)"
-          />
-          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.MARKETING' | translate }}
-        </label>
-        <label class="notifications-page__preferences-disabled">
-          <input type="checkbox" [checked]="prefs.securityEnabled" disabled />
-          {{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.SECURITY' | translate }}
-        </label>
+        <div class="notifications-page__pref-row">
+          <div class="notifications-page__pref-copy">
+            <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.EMAIL' | translate }}</strong>
+          </div>
+          <p-toggleswitch [ngModel]="prefs.emailEnabled" [disabled]="preferencesSaving()" (ngModelChange)="togglePreference('emailEnabled', $event)" />
+        </div>
+        <div class="notifications-page__pref-row">
+          <div class="notifications-page__pref-copy">
+            <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.IN_APP' | translate }}</strong>
+          </div>
+          <p-toggleswitch [ngModel]="prefs.inAppEnabled" [disabled]="preferencesSaving()" (ngModelChange)="togglePreference('inAppEnabled', $event)" />
+        </div>
+        <div class="notifications-page__pref-row">
+          <div class="notifications-page__pref-copy">
+            <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.ORDER' | translate }}</strong>
+          </div>
+          <p-toggleswitch [ngModel]="prefs.orderEnabled" [disabled]="preferencesSaving()" (ngModelChange)="togglePreference('orderEnabled', $event)" />
+        </div>
+        <div class="notifications-page__pref-row">
+          <div class="notifications-page__pref-copy">
+            <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.MEMBERSHIP' | translate }}</strong>
+          </div>
+          <p-toggleswitch [ngModel]="prefs.membershipEnabled" [disabled]="preferencesSaving()" (ngModelChange)="togglePreference('membershipEnabled', $event)" />
+        </div>
+        <div class="notifications-page__pref-row">
+          <div class="notifications-page__pref-copy">
+            <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.MARKETING' | translate }}</strong>
+          </div>
+          <p-toggleswitch [ngModel]="prefs.marketingEnabled" [disabled]="preferencesSaving()" (ngModelChange)="togglePreference('marketingEnabled', $event)" />
+        </div>
+        <div class="notifications-page__pref-row notifications-page__pref-row--disabled">
+          <div class="notifications-page__pref-copy">
+            <strong>{{ 'ACCOUNT.NOTIFICATIONS_UI.PREFS.SECURITY' | translate }}</strong>
+          </div>
+          <p-toggleswitch [ngModel]="prefs.securityEnabled" [disabled]="true" />
+        </div>
       }
     </div>
   }
 
   <div class="notifications-page__toolbar">
-    <input
-      type="search"
-      [ngModel]="searchTerm()"
-      (ngModelChange)="onSearchChange($event)"
-      [placeholder]="'ACCOUNT.NOTIFICATIONS_UI.SEARCH_PLACEHOLDER' | translate"
-    />
-    <select [ngModel]="categoryFilter()" (ngModelChange)="onCategoryChange($event)">
-      <option value="all">{{ 'ACCOUNT.NOTIFICATIONS_UI.ALL_CATEGORIES' | translate }}</option>
-      @for (category of categories(); track category) {
-        <option [value]="category">{{ category }}</option>
-      }
-    </select>
-    <label>
-      <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="onShowArchivedChange($event)" />
-      {{ 'ACCOUNT.NOTIFICATIONS_UI.SHOW_ARCHIVED' | translate }}
-    </label>
+    <div class="notifications-page__tabs" role="tablist">
+      <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'all'" class="notifications-page__tab" [class.notifications-page__tab--active]="activeTab() === 'all'" (click)="setTab('all')">
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.FILTERS.ALL' | translate }}
+      </button>
+      <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'unread'" class="notifications-page__tab" [class.notifications-page__tab--active]="activeTab() === 'unread'" (click)="setTab('unread')">
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.FILTERS.UNREAD' | translate }}
+        @if (unreadCount() > 0) {
+          <span class="notifications-page__tab-count">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+        }
+      </button>
+      <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'important'" class="notifications-page__tab" [class.notifications-page__tab--active]="activeTab() === 'important'" (click)="setTab('important')">
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.FILTERS.IMPORTANT' | translate }}
+        @if (importantUnreadCount() > 0) {
+          <span class="notifications-page__tab-count">{{ importantUnreadCount() > 99 ? '99+' : importantUnreadCount() }}</span>
+        }
+      </button>
+    </div>
+
+    <div class="notifications-page__filters">
+      <div class="notifications-page__search">
+        <i class="pi pi-search" aria-hidden="true"></i>
+        <input
+          type="search"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+          [placeholder]="'ACCOUNT.NOTIFICATIONS_UI.SEARCH_PLACEHOLDER' | translate"
+        />
+      </div>
+      <select
+        class="notifications-page__select"
+        [ngModel]="categoryFilter()"
+        (ngModelChange)="onCategoryChange($event)"
+        [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.ALL_CATEGORIES' | translate"
+      >
+        <option value="all">{{ 'ACCOUNT.NOTIFICATIONS_UI.ALL_CATEGORIES' | translate }}</option>
+        @for (category of categories(); track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+      <label class="notifications-page__archived-toggle">
+        <p-toggleswitch [ngModel]="showArchived()" (ngModelChange)="onShowArchivedChange($event)" />
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.SHOW_ARCHIVED' | translate }}
+      </label>
+    </div>
   </div>
 
   @if (loading()) {
-    <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.LOADING' | translate }}</p>
+    <app-loading-skeleton type="list" [count]="6" />
   } @else if (error()) {
-    <p class="notifications-page__state">{{ error() }}</p>
+    <div class="notifications-page__error">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <h3>{{ 'ACCOUNT.NOTIFICATIONS_UI.ERROR_TITLE' | translate }}</h3>
+      <p>{{ error() }}</p>
+      <button type="button" class="notifications-page__btn" (click)="reload()">
+        <i class="pi pi-refresh" aria-hidden="true"></i>
+        {{ 'ACCOUNT.NOTIFICATIONS_UI.RETRY' | translate }}
+      </button>
+    </div>
   } @else if (!items().length) {
-    <p class="notifications-page__state">{{ 'ACCOUNT.NOTIFICATIONS_UI.EMPTY' | translate }}</p>
+    <app-empty-state
+      [icon]="isFiltered() ? 'pi pi-filter-slash' : 'pi pi-check-circle'"
+      [title]="(isFiltered() ? 'ACCOUNT.NOTIFICATIONS_UI.NO_RESULTS_TITLE' : 'ACCOUNT.NOTIFICATIONS_UI.EMPTY') | translate"
+      [description]="(isFiltered() ? 'ACCOUNT.NOTIFICATIONS_UI.NO_RESULTS_SUBTITLE' : 'ACCOUNT.NOTIFICATIONS_UI.EMPTY_SUBTITLE') | translate"
+      [actionLabel]="isFiltered() ? ('ACCOUNT.NOTIFICATIONS_UI.CLEAR_FILTERS' | translate) : undefined"
+      (action)="clearFilters()"
+    />
+  } @else if (!tabFilteredItems().length) {
+    <app-empty-state
+      icon="pi pi-filter-slash"
+      [title]="'ACCOUNT.NOTIFICATIONS_UI.NO_RESULTS_TITLE' | translate"
+      [description]="'ACCOUNT.NOTIFICATIONS_UI.NO_RESULTS_SUBTITLE' | translate"
+      [actionLabel]="'ACCOUNT.NOTIFICATIONS_UI.CLEAR_FILTERS' | translate"
+      (action)="clearFilters()"
+    />
   } @else {
     <div class="notifications-page__list">
-      @for (item of items(); track item.id) {
-        <article
-          class="notifications-page__item"
-          [class.notifications-page__item--unread]="!item.isRead"
-          [class.notifications-page__item--clickable]="true"
-          role="button"
-          tabindex="0"
-          (click)="openItem(item)"
-          (keydown.enter)="openItem(item)"
-          (keydown.space)="openItem(item); $event.preventDefault()"
-        >
-          <div>
-            <span class="notifications-page__category">{{ item.category }}</span>
-            <h2>{{ item.title }}</h2>
-            <p>{{ item.body }}</p>
-            <time>{{ item.createdOnUtc | hamboxDate:'medium' }}</time>
-          </div>
-          <div class="notifications-page__item-actions">
-            @if (!item.isRead) {
-              <button type="button" (click)="markRead(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate }}</button>
+      @for (group of groups(); track group.labelKey) {
+        <section class="notifications-page__group">
+          <h2 class="notifications-page__group-label">{{ group.labelKey | translate }}</h2>
+          <div class="notifications-page__group-items">
+            @for (item of group.items; track item.id) {
+              <article class="notification-card" [class.notification-card--unread]="!item.isRead">
+                <button type="button" class="notification-card__main" (click)="openItem(item)">
+                  <span class="notification-card__icon" [attr.data-semantic]="typeSemantic(item)" aria-hidden="true">
+                    <i [class]="typeIcon(item)"></i>
+                  </span>
+                  <span class="notification-card__body">
+                    <span class="notification-card__title-row">
+                      <span class="notification-card__title" [class.notification-card__title--unread]="!item.isRead">{{ item.title }}</span>
+                      @if (!item.isRead) {
+                        <span class="notification-card__dot" aria-hidden="true"></span>
+                        <span class="notification-card__sr-only">{{ 'ACCOUNT.NOTIFICATIONS_UI.UNREAD_SR' | translate }}</span>
+                      }
+                    </span>
+                    <span class="notification-card__message">{{ item.body }}</span>
+                    <span class="notification-card__meta">
+                      <span class="notification-card__type">{{ typeLabelKey(item) | translate }}</span>
+                      <time>{{ item.createdOnUtc | hamboxRelativeTime }}</time>
+                      @if (item.actionUrl) {
+                        <span class="notification-card__view">{{ 'ACCOUNT.NOTIFICATIONS_UI.VIEW_DETAILS' | translate }}</span>
+                      }
+                    </span>
+                  </span>
+                </button>
+                <div class="notification-card__actions">
+                  @if (!item.isRead) {
+                    <button
+                      type="button"
+                      class="notification-card__icon-btn"
+                      [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate"
+                      [title]="'ACCOUNT.NOTIFICATIONS_UI.MARK_READ' | translate"
+                      (click)="markRead(item.id); $event.stopPropagation()"
+                    >
+                      <i class="pi pi-check" aria-hidden="true"></i>
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="notification-card__icon-btn"
+                    [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.ARCHIVE' | translate"
+                    [title]="'ACCOUNT.NOTIFICATIONS_UI.ARCHIVE' | translate"
+                    (click)="archive(item.id); $event.stopPropagation()"
+                  >
+                    <i class="pi pi-inbox" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="notification-card__icon-btn notification-card__icon-btn--danger"
+                    [attr.aria-label]="'ACCOUNT.NOTIFICATIONS_UI.DELETE' | translate"
+                    [title]="'ACCOUNT.NOTIFICATIONS_UI.DELETE' | translate"
+                    (click)="deleteNotification(item.id); $event.stopPropagation()"
+                  >
+                    <i class="pi pi-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </article>
             }
-            <button type="button" (click)="archive(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.ARCHIVE' | translate }}</button>
-            <button type="button" (click)="deleteNotification(item.id); $event.stopPropagation()">{{ 'ACCOUNT.NOTIFICATIONS_UI.DELETE' | translate }}</button>
           </div>
-        </article>
+        </section>
       }
     </div>
   }

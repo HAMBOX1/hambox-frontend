@@ -1,0 +1,40 @@
+<div class="payment-processing">
+  <div class="payment-processing__backdrop" aria-hidden="true">
+    <div class="payment-processing__glow payment-processing__glow--green"></div>
+    <div class="payment-processing__glow payment-processing__glow--blue"></div>
+    <div class="payment-processing__grid"></div>
+  </div>
+
+  <app-storefront-nav [links]="navLinks()" mode="checkout" />
+
+  <main class="payment-processing__main">
+    @switch (status()) {
+      @case ('Pending') {
+        <app-payment-processing-card
+          [progress]="60"
+          [stageLabel]="'CHECKOUT.DOT_VERIFYING' | translate"
+        />
+      }
+      @case ('Failed') {
+        <div class="payment-processing__error" role="alert">
+          <p>{{ 'CHECKOUT.DOT_FAILED' | translate }}</p>
+          <a routerLink="/checkout">{{ 'CHECKOUT.RETURN_TO_CHECKOUT' | translate }}</a>
+        </div>
+      }
+      @case ('Expired') {
+        <div class="payment-processing__error" role="alert">
+          <p>{{ 'CHECKOUT.DOT_EXPIRED' | translate }}</p>
+          <a routerLink="/checkout">{{ 'CHECKOUT.RETURN_TO_CHECKOUT' | translate }}</a>
+        </div>
+      }
+      @case ('Invalid') {
+        <div class="payment-processing__error" role="alert">
+          <p>{{ errorMessage() }}</p>
+          <a routerLink="/checkout">{{ 'CHECKOUT.RETURN_TO_CHECKOUT' | translate }}</a>
+        </div>
+      }
+    }
+  </main>
+
+  <app-storefront-footer />
+</div>

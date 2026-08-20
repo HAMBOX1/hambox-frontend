@@ -49,12 +49,41 @@
   position: relative;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 24px;
   min-height: calc(100vh - var(--sf-nav-height) - 126px - 320px);
   max-width: var(--sf-container-max);
   margin: 0 auto;
   padding: 80px var(--sf-container-px) 64px;
+}
+
+.payment-processing__fawry-reference {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 512px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-panel-bg);
+
+  p {
+    margin: 0;
+    color: var(--sf-text-secondary);
+    font-size: var(--hambox-font-size-sm);
+  }
+
+  strong {
+    font-family: var(--hambox-font-family);
+    font-size: var(--hambox-font-size-2xl);
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+  }
 }
 
 @media (max-width: 991px) {

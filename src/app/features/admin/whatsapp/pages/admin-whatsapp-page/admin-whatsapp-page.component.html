@@ -1,0 +1,189 @@
+<p-toast />
+
+<app-admin-page-header
+  [title]="'ADMIN.WHATSAPP.TITLE' | translate"
+  [subtitle]="'ADMIN.WHATSAPP.SUBTITLE' | translate"
+  [breadcrumbs]="breadcrumbs"
+/>
+
+@if (facade.loading()) {
+  <app-admin-loading-skeleton [rows]="6" />
+} @else if (facade.error()) {
+  <app-admin-error-alert [message]="facade.error()!" (retry)="facade.load()" />
+} @else if (draftConfig(); as config) {
+  <div class="whatsapp-page">
+    <app-admin-section-card
+      [title]="'ADMIN.WHATSAPP.SECTIONS.WELCOME' | translate"
+    >
+      <div class="whatsapp-page__field-grid">
+        <label class="whatsapp-page__field">
+          <span class="whatsapp-page__field-label">{{ 'ADMIN.WHATSAPP.WELCOME_EN' | translate }}</span>
+          <textarea
+            pTextarea
+            rows="2"
+            class="w-full"
+            [disabled]="!canEdit()"
+            [ngModel]="config.welcomeMessageEn"
+            (ngModelChange)="setWelcome('welcomeMessageEn', $event)"
+          ></textarea>
+        </label>
+        <label class="whatsapp-page__field">
+          <span class="whatsapp-page__field-label">{{ 'ADMIN.WHATSAPP.WELCOME_AR' | translate }}</span>
+          <textarea
+            pTextarea
+            rows="2"
+            dir="rtl"
+            class="w-full"
+            [disabled]="!canEdit()"
+            [ngModel]="config.welcomeMessageAr"
+            (ngModelChange)="setWelcome('welcomeMessageAr', $event)"
+          ></textarea>
+        </label>
+      </div>
+    </app-admin-section-card>
+
+    <app-admin-section-card
+      [title]="'ADMIN.WHATSAPP.SECTIONS.MENU' | translate"
+      [description]="'ADMIN.WHATSAPP.MENU_HINT' | translate"
+    >
+      @if (!atLeastOneEnabled()) {
+        <p class="whatsapp-page__validation">{{ 'ADMIN.WHATSAPP.VALIDATION.AT_LEAST_ONE_ENABLED' | translate }}</p>
+      }
+      @if (!allLabelsFilled()) {
+        <p class="whatsapp-page__validation">{{ 'ADMIN.WHATSAPP.VALIDATION.LABELS_REQUIRED' | translate }}</p>
+      }
+
+      <div
+        class="whatsapp-page__menu-list"
+        cdkDropList
+        [cdkDropListDisabled]="!canEdit()"
+        (cdkDropListDropped)="onItemDrop($event)"
+      >
+        @for (item of items(); track item.action) {
+          <div class="whatsapp-page__menu-row" cdkDrag [cdkDragDisabled]="!canEdit()">
+            <button
+              type="button"
+              class="whatsapp-page__drag-handle"
+              cdkDragHandle
+              [attr.aria-label]="'ADMIN.WHATSAPP.REORDER' | translate"
+              [disabled]="!canEdit()"
+            >
+              <i class="pi pi-bars" aria-hidden="true"></i>
+            </button>
+
+            <span class="whatsapp-page__order">{{ item.sortOrder + 1 }}</span>
+
+            <p-toggleswitch
+              [ngModel]="item.isEnabled"
+              [disabled]="!canEdit()"
+              (ngModelChange)="toggleItem(item.action, $event)"
+            />
+
+            <span class="whatsapp-page__action-name">{{ actionLabelKeys[item.action] | translate }}</span>
+
+            <input
+              pInputText
+              class="whatsapp-page__label-input"
+              [disabled]="!canEdit()"
+              [ngModel]="item.labelEn"
+              [placeholder]="'ADMIN.WHATSAPP.LABEL_EN' | translate"
+              (ngModelChange)="setLabel(item.action, 'labelEn', $event)"
+            />
+
+            <input
+              pInputText
+              dir="rtl"
+              class="whatsapp-page__label-input"
+              [disabled]="!canEdit()"
+              [ngModel]="item.labelAr"
+              [placeholder]="'ADMIN.WHATSAPP.LABEL_AR' | translate"
+              (ngModelChange)="setLabel(item.action, 'labelAr', $event)"
+            />
+          </div>
+        }
+      </div>
+    </app-admin-section-card>
+
+    <app-admin-section-card
+      [title]="'ADMIN.WHATSAPP.SECTIONS.FALLBACK' | translate"
+      [description]="'ADMIN.WHATSAPP.FALLBACK_HINT' | translate"
+    >
+      <div class="whatsapp-page__field-grid">
+        <label class="whatsapp-page__field">
+          <span class="whatsapp-page__field-label">{{ 'ADMIN.WHATSAPP.WELCOME_EN' | translate }}</span>
+          <textarea
+            pTextarea
+            rows="2"
+            class="w-full"
+            [disabled]="!canEdit()"
+            [ngModel]="config.fallbackMessageEn"
+            (ngModelChange)="setFallback('fallbackMessageEn', $event)"
+          ></textarea>
+        </label>
+        <label class="whatsapp-page__field">
+          <span class="whatsapp-page__field-label">{{ 'ADMIN.WHATSAPP.WELCOME_AR' | translate }}</span>
+          <textarea
+            pTextarea
+            rows="2"
+            dir="rtl"
+            class="w-full"
+            [disabled]="!canEdit()"
+            [ngModel]="config.fallbackMessageAr"
+            (ngModelChange)="setFallback('fallbackMessageAr', $event)"
+          ></textarea>
+        </label>
+      </div>
+    </app-admin-section-card>
+
+    <app-admin-section-card
+      [title]="'ADMIN.WHATSAPP.SECTIONS.SUPPORT' | translate"
+      [description]="'ADMIN.WHATSAPP.SUPPORT_NOTE' | translate"
+    >
+      @if (supportItem(); as support) {
+        <p class="whatsapp-page__support-status">
+          <i class="pi" [class.pi-check-circle]="support.isEnabled" [class.pi-times-circle]="!support.isEnabled" aria-hidden="true"></i>
+          {{ support.isEnabled ? ('ADMIN.WHATSAPP.ENABLED' | translate) : ('ADMIN.WHATSAPP.DISABLED' | translate) }}
+          — {{ support.labelEn }}
+        </p>
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.WHATSAPP.SECTIONS.PREVIEW' | translate">
+      <div class="whatsapp-page__preview-controls">
+        <span class="whatsapp-page__field-label">{{ 'ADMIN.WHATSAPP.PREVIEW_LANGUAGE' | translate }}</span>
+        <p-selectbutton
+          [options]="previewLanguageOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="previewLanguage()"
+          (ngModelChange)="previewLanguage.set($event)"
+        />
+      </div>
+      <pre class="whatsapp-page__preview">{{ previewText() }}</pre>
+    </app-admin-section-card>
+
+    <app-admin-sticky-save-bar
+      [dirty]="dirty()"
+      [visible]="canEdit()"
+      [hint]="hasValidationErrors() ? ('ADMIN.WHATSAPP.VALIDATION.BLOCKED' | translate) : ''"
+    >
+      @if (canEdit()) {
+        <p-button
+          [label]="'ADMIN.WHATSAPP.SAVE_CHANGES' | translate"
+          icon="pi pi-check"
+          [loading]="facade.saving()"
+          [disabled]="!dirty() || hasValidationErrors()"
+          (onClick)="save()"
+        />
+      }
+    </app-admin-sticky-save-bar>
+  </div>
+}
+
+<app-admin-unsaved-changes-dialog
+  [visible]="unsavedDialogOpen()"
+  [saving]="facade.saving()"
+  (visibleChange)="onUnsavedDialogVisibleChange($event)"
+  (save)="onUnsavedSave()"
+  (discard)="onUnsavedDiscard()"
+/>

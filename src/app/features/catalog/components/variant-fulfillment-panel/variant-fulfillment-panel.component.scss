@@ -1,0 +1,85 @@
+.variant-fulfillment {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.variant-fulfillment__summary {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.variant-fulfillment__modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem;
+}
+
+.variant-fulfillment__mode-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  padding: 1rem;
+  border: 1.5px solid var(--admin-color-border, var(--color-panel-border));
+  border-radius: var(--admin-radius-md, var(--sf-radius-md));
+  background: var(--admin-color-surface, var(--color-surface));
+  color: var(--admin-color-text-primary, var(--color-text-primary));
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-primary, var(--admin-color-primary));
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  &.is-selected {
+    border-color: var(--color-primary, var(--admin-color-primary));
+    background: color-mix(in srgb, var(--color-primary, var(--admin-color-primary)) 8%, var(--admin-color-surface, var(--color-surface)));
+  }
+
+  &--readonly {
+    cursor: default;
+  }
+
+  > i:first-child {
+    font-size: 1.25rem;
+    color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  }
+
+  &.is-selected > i:first-child {
+    color: var(--color-primary, var(--admin-color-primary));
+  }
+}
+
+.variant-fulfillment__mode-title {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.variant-fulfillment__mode-description {
+  color: var(--admin-color-text-secondary, var(--color-text-secondary));
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.variant-fulfillment__mode-check {
+  position: absolute;
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+  color: var(--color-primary, var(--admin-color-primary));
+}
+
+.variant-fulfillment__chain-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--admin-color-text-primary, var(--color-text-primary));
+}

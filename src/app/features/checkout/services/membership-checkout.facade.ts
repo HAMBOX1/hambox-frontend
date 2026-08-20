@@ -26,6 +26,8 @@ const INITIAL_CARD: CardPaymentDetails = {
 const INITIAL_BILLING: BillingDetails = {
   email: '',
   country: 'US',
+  phoneNumber: '',
+  customerName: '',
 };
 
 const IDEMPOTENCY_SCOPE = 'membership-checkout';
