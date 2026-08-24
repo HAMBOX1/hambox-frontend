@@ -11,7 +11,9 @@ const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   'apple-pay': 'CHECKOUT.METHOD_APPLE_PAY',
   development: 'CHECKOUT.METHOD_DEVELOPMENT',
   dot: 'CHECKOUT.METHOD_DOT',
-  'dot-fawry': 'CHECKOUT.METHOD_DOT_FAWRY',
+  fawry: 'CHECKOUT.METHOD_FAWRY',
+  'orange-cash': 'CHECKOUT.METHOD_ORANGE_CASH',
+  'vodafone-cash': 'CHECKOUT.METHOD_VODAFONE_CASH',
 };
 
 @Component({

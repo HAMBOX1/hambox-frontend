@@ -17,6 +17,7 @@ import { CheckoutFacade } from '../../services/checkout.facade';
 import { MembershipCheckoutFacade } from '../../services/membership-checkout.facade';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { ThemeEngineService } from '../../../../core/theme/theme-engine.service';
+import { isDotFawryWallet } from '../../models/checkout';
 
 const CHECKOUT_STAGES = [
   'Authorizing payment',
@@ -105,7 +106,7 @@ export class PaymentProcessingPageComponent implements OnInit {
       return;
     }
 
-    if (this.checkout.paymentMethod() === 'dot-fawry') {
+    if (isDotFawryWallet(this.checkout.paymentMethod())) {
       void this.runDotFawryCheckoutFlow();
       return;
     }
@@ -162,11 +163,11 @@ export class PaymentProcessingPageComponent implements OnInit {
 
     try {
       const initiation = await this.checkout.initiateDotFawryCheckout();
-      this.stageLabel.set('Awaiting Fawry payment');
+      this.stageLabel.set('Awaiting wallet payment');
       this.progress.set(90);
-      // In-app navigation — unlike DOT's OTP flow, Fawry Direct Billing is server-to-server: there
-      // is nothing to redirect the browser to. The result page shows the Fawry reference number
-      // and polls status until the customer completes payment and DOT's webhook confirms it.
+      // In-app navigation — unlike DOT's OTP flow, Direct Billing is server-to-server: there is
+      // nothing to redirect the browser to. The result page shows the payment reference and polls
+      // status until the customer completes payment and DOT's webhook confirms it.
       await this.router.navigate(['/checkout/dot-fawry/result'], {
         queryParams: { paymentAttemptId: initiation.paymentAttemptId },
       });

@@ -22,6 +22,7 @@ interface InitiateDotFawryCheckoutRequest {
   country: string;
   phoneNumber: string;
   customerName: string | null;
+  wallet: string;
 }
 
 @Injectable({

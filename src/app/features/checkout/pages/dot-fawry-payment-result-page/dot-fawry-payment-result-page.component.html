@@ -12,25 +12,25 @@
       @case ('AwaitingPayment') {
         <app-payment-processing-card
           [progress]="60"
-          [stageLabel]="'CHECKOUT.DOT_FAWRY_AWAITING' | translate"
+          [stageLabel]="'CHECKOUT.DOT_FAWRY_AWAITING' | translate: { wallet: walletLabel() }"
         />
         @if (fawryReferenceNumber()) {
           <div class="payment-processing__fawry-reference" role="status">
-            <p>{{ 'CHECKOUT.DOT_FAWRY_REFERENCE_LABEL' | translate }}</p>
+            <p>{{ 'CHECKOUT.DOT_FAWRY_REFERENCE_LABEL' | translate: { wallet: walletLabel() } }}</p>
             <strong>{{ fawryReferenceNumber() }}</strong>
-            <p>{{ 'CHECKOUT.DOT_FAWRY_REFERENCE_HINT' | translate }}</p>
+            <p>{{ 'CHECKOUT.DOT_FAWRY_REFERENCE_HINT' | translate: { wallet: walletLabel() } }}</p>
           </div>
         }
       }
       @case ('Failed') {
         <div class="payment-processing__error" role="alert">
-          <p>{{ 'CHECKOUT.DOT_FAWRY_FAILED' | translate }}</p>
+          <p>{{ 'CHECKOUT.DOT_FAWRY_FAILED' | translate: { wallet: walletLabel() } }}</p>
           <a routerLink="/checkout">{{ 'CHECKOUT.RETURN_TO_CHECKOUT' | translate }}</a>
         </div>
       }
       @case ('Expired') {
         <div class="payment-processing__error" role="alert">
-          <p>{{ 'CHECKOUT.DOT_FAWRY_EXPIRED' | translate }}</p>
+          <p>{{ 'CHECKOUT.DOT_FAWRY_EXPIRED' | translate: { wallet: walletLabel() } }}</p>
           <a routerLink="/checkout">{{ 'CHECKOUT.RETURN_TO_CHECKOUT' | translate }}</a>
         </div>
       }

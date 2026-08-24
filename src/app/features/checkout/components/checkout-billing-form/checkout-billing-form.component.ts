@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { CHECKOUT_COUNTRIES } from '../../services/checkout.constants';
+import { isDotFawryWallet } from '../../models/checkout';
 
 @Component({
   selector: 'app-checkout-billing-form',
@@ -15,6 +16,7 @@ export class CheckoutBillingFormComponent {
   protected readonly billing = this.checkout.billingDetails;
   protected readonly countries = CHECKOUT_COUNTRIES;
   protected readonly paymentMethod = this.checkout.paymentMethod;
+  protected readonly isDotFawryWallet = isDotFawryWallet;
 
   protected updateEmail(event: Event): void {
     this.checkout.updateBillingField('email', (event.target as HTMLInputElement).value);

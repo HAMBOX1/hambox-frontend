@@ -13,10 +13,13 @@ import {
   CardPaymentDetails,
   CheckoutOrderItem,
   CheckoutSummary,
+  DOT_FAWRY_WALLET_IDS,
+  DOT_FAWRY_WALLET_OPERATOR,
   DotCheckoutInitiationDto,
   DotFawryCheckoutInitiationDto,
   DotFawryPaymentStatusDto,
   DotPaymentStatusDto,
+  isDotFawryWallet,
   PaymentMethodId,
 } from '../models/checkout';
 import { mapOrderToSuccessDetails } from '../utils/checkout.mapper';
@@ -79,7 +82,10 @@ export class CheckoutFacade {
    * fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real payment.
    * Do not re-add them here until a real provider exists for each. "dot" only appears once the
    * backend reports it's actually usable (see CheckoutConfigurationDto.dotCheckoutEnabled) — DOT's
-   * pricing model isn't confirmed yet, so it stays hidden until the backend flips that flag.
+   * pricing model isn't confirmed yet, so it stays hidden until the backend flips that flag. The
+   * three mobile wallets (Fawry/Orange Cash/Vodafone Cash) share one backend gate
+   * (dotFawryCheckoutEnabled) since they share the same DOT partner credentials — only the opId
+   * sent at initiation differs, see DOT_FAWRY_WALLET_OPERATOR.
    */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
     const methods: PaymentMethodId[] = ['card'];
@@ -87,7 +93,7 @@ export class CheckoutFacade {
       methods.push('dot');
     }
     if (this.dotFawryCheckoutEnabledState()) {
-      methods.push('dot-fawry');
+      methods.push(...DOT_FAWRY_WALLET_IDS);
     }
     if (this.developmentCheckoutEnabledState()) {
       return ['development', ...methods];
@@ -314,10 +320,12 @@ export class CheckoutFacade {
   }
 
   /**
-   * Initiates a DOT Fawry checkout. Unlike {@link initiateDotCheckout}, there is no browser
-   * redirect — the returned {@link DotFawryCheckoutInitiationDto.fawryReferenceNumber} is shown
-   * directly to the customer to complete payment in their Fawry wallet, and the caller navigates
-   * to the in-app result page to poll status.
+   * Initiates a DOT Fawry Direct Billing checkout for whichever of the three mobile wallets
+   * (Fawry/Orange Cash/Vodafone Cash) is currently selected in {@link paymentMethod}. Unlike
+   * {@link initiateDotCheckout}, there is no browser redirect — the returned
+   * {@link DotFawryCheckoutInitiationDto.fawryReferenceNumber} is shown directly to the customer to
+   * complete payment in their wallet, and the caller navigates to the in-app result page to poll
+   * status.
    */
   async initiateDotFawryCheckout(): Promise<DotFawryCheckoutInitiationDto> {
     const billing = this.billingDetailsState();
@@ -332,6 +340,8 @@ export class CheckoutFacade {
     this.errorState.set(null);
 
     try {
+      const method = this.paymentMethodState();
+      const wallet = isDotFawryWallet(method) ? DOT_FAWRY_WALLET_OPERATOR[method] : 'Fawry';
       const idempotencyKey = getOrCreateIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
       const initiation = await firstValueFrom(
         this.checkoutService.initiateDotFawryCheckout(
@@ -340,6 +350,7 @@ export class CheckoutFacade {
             country: billing.country,
             phoneNumber: billing.phoneNumber.trim(),
             customerName: billing.customerName.trim() || null,
+            wallet,
           },
           idempotencyKey,
         ),

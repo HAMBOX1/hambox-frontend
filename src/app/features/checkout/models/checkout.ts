@@ -1,6 +1,31 @@
 import type { AppliedPromotion } from '../../cart/models/cart';
 
-export type PaymentMethodId = 'card' | 'paypal' | 'crypto' | 'apple-pay' | 'development' | 'dot' | 'dot-fawry';
+export type PaymentMethodId =
+  | 'card'
+  | 'paypal'
+  | 'crypto'
+  | 'apple-pay'
+  | 'development'
+  | 'dot'
+  | 'fawry'
+  | 'orange-cash'
+  | 'vodafone-cash';
+
+/** The three Egyptian mobile wallets served by the DOT Fawry Direct Billing checkout flow. */
+export type DotFawryWalletId = 'fawry' | 'orange-cash' | 'vodafone-cash';
+
+export const DOT_FAWRY_WALLET_IDS: readonly DotFawryWalletId[] = ['fawry', 'orange-cash', 'vodafone-cash'];
+
+export function isDotFawryWallet(method: PaymentMethodId): method is DotFawryWalletId {
+  return (DOT_FAWRY_WALLET_IDS as readonly PaymentMethodId[]).includes(method);
+}
+
+/** Maps a frontend wallet id to the backend's `DotFawryWalletOperator` member name, sent as `wallet` on initiate. */
+export const DOT_FAWRY_WALLET_OPERATOR: Record<DotFawryWalletId, string> = {
+  fawry: 'Fawry',
+  'orange-cash': 'OrangeCash',
+  'vodafone-cash': 'VodafoneCash',
+};
 
 export interface PaymentMethodOption {
   id: PaymentMethodId;
@@ -67,6 +92,7 @@ export interface DotFawryCheckoutInitiationDto {
   readonly orderId: string;
   readonly fawryReferenceNumber: string | null;
   readonly expiresOnUtc: string;
+  readonly operator: string;
 }
 
 export type DotFawryPaymentStatus = 'AwaitingPayment' | 'Succeeded' | 'Failed' | 'Expired';
@@ -77,6 +103,7 @@ export interface DotFawryPaymentStatusDto {
   readonly status: DotFawryPaymentStatus;
   readonly fawryReferenceNumber: string | null;
   readonly completedOrderId: string | null;
+  readonly operator: string;
 }
 
 export interface CountryOption {

@@ -26,11 +26,11 @@
       </svg>
     </div>
 
-    @if (paymentMethod() === 'dot-fawry') {
+    @if (isDotFawryWallet(paymentMethod())) {
       <input
         class="billing-panel__input"
         type="tel"
-        placeholder="Mobile Number (for your Fawry reference SMS)"
+        placeholder="Mobile Number (for your payment confirmation SMS)"
         autocomplete="tel"
         [value]="billing().phoneNumber"
         (input)="updatePhoneNumber($event)"
