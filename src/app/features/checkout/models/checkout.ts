@@ -11,10 +11,15 @@ export type PaymentMethodId =
   | 'orange-cash'
   | 'vodafone-cash';
 
-/** The three Egyptian mobile wallets served by the DOT Fawry Direct Billing checkout flow. */
-export type DotFawryWalletId = 'fawry' | 'orange-cash' | 'vodafone-cash';
+/**
+ * The Fawry wallet, served by the DOT Fawry Direct Billing checkout flow (in-app, server-to-server —
+ * no browser redirect). Confirmed working directly against DOT. Orange Cash and Vodafone Cash are
+ * NOT part of this product — DOT confirmed they go through the separate OTP redirect flow instead,
+ * see {@link DotWalletId} below.
+ */
+export type DotFawryWalletId = 'fawry';
 
-export const DOT_FAWRY_WALLET_IDS: readonly DotFawryWalletId[] = ['fawry', 'orange-cash', 'vodafone-cash'];
+export const DOT_FAWRY_WALLET_IDS: readonly DotFawryWalletId[] = ['fawry'];
 
 export function isDotFawryWallet(method: PaymentMethodId): method is DotFawryWalletId {
   return (DOT_FAWRY_WALLET_IDS as readonly PaymentMethodId[]).includes(method);
@@ -23,6 +28,23 @@ export function isDotFawryWallet(method: PaymentMethodId): method is DotFawryWal
 /** Maps a frontend wallet id to the backend's `DotFawryWalletOperator` member name, sent as `wallet` on initiate. */
 export const DOT_FAWRY_WALLET_OPERATOR: Record<DotFawryWalletId, string> = {
   fawry: 'Fawry',
+};
+
+/**
+ * Orange Cash and Vodafone Cash — served by DOT's Partners OTP Landing Page API (browser redirect;
+ * the customer enters their MSISDN and an SMS OTP on DOT's own page), a different DOT product from
+ * DotFawry's Direct Billing. Same in-app flow shape as the generic 'dot' carrier-billing method.
+ */
+export type DotWalletId = 'orange-cash' | 'vodafone-cash';
+
+export const DOT_WALLET_IDS: readonly DotWalletId[] = ['orange-cash', 'vodafone-cash'];
+
+export function isDotWallet(method: PaymentMethodId): method is DotWalletId {
+  return (DOT_WALLET_IDS as readonly PaymentMethodId[]).includes(method);
+}
+
+/** Maps a frontend wallet id to the backend's `DotWalletOperator` member name, sent as `wallet` on initiate. */
+export const DOT_WALLET_OPERATOR: Record<DotWalletId, string> = {
   'orange-cash': 'OrangeCash',
   'vodafone-cash': 'VodafoneCash',
 };

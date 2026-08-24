@@ -17,7 +17,7 @@ import { CheckoutFacade } from '../../services/checkout.facade';
 import { MembershipCheckoutFacade } from '../../services/membership-checkout.facade';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { ThemeEngineService } from '../../../../core/theme/theme-engine.service';
-import { isDotFawryWallet } from '../../models/checkout';
+import { isDotFawryWallet, isDotWallet } from '../../models/checkout';
 
 const CHECKOUT_STAGES = [
   'Authorizing payment',
@@ -101,7 +101,7 @@ export class PaymentProcessingPageComponent implements OnInit {
       return;
     }
 
-    if (this.checkout.paymentMethod() === 'dot') {
+    if (this.checkout.paymentMethod() === 'dot' || isDotWallet(this.checkout.paymentMethod())) {
       void this.runDotCheckoutFlow();
       return;
     }

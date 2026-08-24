@@ -15,11 +15,14 @@ import {
   CheckoutSummary,
   DOT_FAWRY_WALLET_IDS,
   DOT_FAWRY_WALLET_OPERATOR,
+  DOT_WALLET_IDS,
+  DOT_WALLET_OPERATOR,
   DotCheckoutInitiationDto,
   DotFawryCheckoutInitiationDto,
   DotFawryPaymentStatusDto,
   DotPaymentStatusDto,
   isDotFawryWallet,
+  isDotWallet,
   PaymentMethodId,
 } from '../models/checkout';
 import { mapOrderToSuccessDetails } from '../utils/checkout.mapper';
@@ -80,17 +83,16 @@ export class CheckoutFacade {
   /**
    * Only "card" is offered — PayPal/crypto/Apple Pay have no backend integration and would silently
    * fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real payment.
-   * Do not re-add them here until a real provider exists for each. "dot" only appears once the
-   * backend reports it's actually usable (see CheckoutConfigurationDto.dotCheckoutEnabled) — DOT's
-   * pricing model isn't confirmed yet, so it stays hidden until the backend flips that flag. The
-   * three mobile wallets (Fawry/Orange Cash/Vodafone Cash) share one backend gate
-   * (dotFawryCheckoutEnabled) since they share the same DOT partner credentials — only the opId
-   * sent at initiation differs, see DOT_FAWRY_WALLET_OPERATOR.
+   * Do not re-add them here until a real provider exists for each. Fawry (Direct Billing, in-app,
+   * gated by dotFawryCheckoutEnabled) is confirmed working directly against DOT. Orange Cash and
+   * Vodafone Cash go through a different DOT product — the OTP redirect flow, same shape as the
+   * generic "dot" carrier-billing option — gated by dotCheckoutEnabled instead, since that's the
+   * flag for that product's own price-point/credential configuration.
    */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
     const methods: PaymentMethodId[] = ['card'];
     if (this.dotCheckoutEnabledState()) {
-      methods.push('dot');
+      methods.push('dot', ...DOT_WALLET_IDS);
     }
     if (this.dotFawryCheckoutEnabledState()) {
       methods.push(...DOT_FAWRY_WALLET_IDS);
@@ -296,10 +298,12 @@ export class CheckoutFacade {
     this.errorState.set(null);
 
     try {
+      const method = this.paymentMethodState();
+      const wallet = isDotWallet(method) ? DOT_WALLET_OPERATOR[method] : 'OrangeCash';
       const idempotencyKey = getOrCreateIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
       const initiation = await firstValueFrom(
         this.checkoutService.initiateDotCheckout(
-          { email: billing.email.trim(), country: billing.country },
+          { email: billing.email.trim(), country: billing.country, wallet },
           idempotencyKey,
         ),
       );

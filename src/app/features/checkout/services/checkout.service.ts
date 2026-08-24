@@ -15,6 +15,7 @@ import {
 interface InitiateDotCheckoutRequest {
   email: string;
   country: string;
+  wallet: string;
 }
 
 interface InitiateDotFawryCheckoutRequest {
