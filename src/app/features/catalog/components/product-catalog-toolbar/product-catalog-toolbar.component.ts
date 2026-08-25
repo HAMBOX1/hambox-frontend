@@ -19,6 +19,15 @@ const STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'Archived', value: 'Archived' },
 ];
 
+const SUPPLIER_MAPPING_OPTIONS: { label: string; value: string }[] = [
+  { label: 'All suppliers', value: '' },
+  { label: 'Fully mapped', value: 'FullyMapped' },
+  { label: 'Partially mapped', value: 'PartiallyMapped' },
+  { label: 'Unmapped', value: 'Unmapped' },
+  { label: 'Supplier unavailable', value: 'SupplierUnavailable' },
+  { label: 'Mapping error', value: 'MappingError' },
+];
+
 @Component({
   selector: 'app-product-catalog-toolbar',
   standalone: true,
@@ -38,16 +47,19 @@ export class ProductCatalogToolbarComponent {
   readonly statusFilter = input('');
   readonly collectionFilter = input<string | null>(null);
   readonly collectionOptions = input<readonly CollectionOption[]>([]);
+  readonly supplierMappingFilter = input('');
   readonly searchPlaceholder = input('Search products…');
   readonly hasActiveFilters = input(false);
   readonly viewMode = input<AdminProductsViewMode>('table');
   readonly searchChange = output<string>();
   readonly statusChange = output<ProductStatus | ''>();
   readonly collectionChange = output<string | null>();
+  readonly supplierMappingChange = output<string>();
   readonly clearFilters = output<void>();
   readonly viewModeChange = output<AdminProductsViewMode>();
 
   protected readonly statusOptions = STATUS_OPTIONS;
+  protected readonly supplierMappingOptions = SUPPLIER_MAPPING_OPTIONS;
 
   protected onSearchChange(term: string): void {
     this.searchChange.emit(term);
@@ -59,6 +71,10 @@ export class ProductCatalogToolbarComponent {
 
   protected onCollectionChange(value: string | null): void {
     this.collectionChange.emit(value);
+  }
+
+  protected onSupplierMappingChange(value: string): void {
+    this.supplierMappingChange.emit(value);
   }
 
   protected toggleViewMode(): void {

@@ -15,7 +15,7 @@ export class AdminStatCardComponent {
   readonly value = input.required<string | number>();
   readonly icon = input<string | null>(null);
   readonly hint = input<string | null>(null);
-  readonly tone = input<'default' | 'success' | 'info' | 'warning'>('default');
+  readonly tone = input<'default' | 'success' | 'info' | 'warning' | 'danger'>('default');
   readonly compact = input(false);
   readonly routerLink = input<string | unknown[] | null>(null);
   readonly queryParams = input<Record<string, string> | null>(null);

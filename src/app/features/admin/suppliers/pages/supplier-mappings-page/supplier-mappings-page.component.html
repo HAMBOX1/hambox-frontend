@@ -6,16 +6,27 @@
     [subtitle]="'ADMIN.SUPPLIERS.MAPPINGS.SUBTITLE' | translate"
     [breadcrumbs]="breadcrumbs()"
   >
-    <button
-      adminHeaderActions
-      *hamboxHasPermission="permissions.Suppliers.ManageMappings"
-      pButton
-      type="button"
-      class="admin-btn-primary"
-      icon="pi pi-plus"
-      [label]="'ADMIN.SUPPLIERS.MAPPINGS.NEW' | translate"
-      (click)="openCreateDialog()"
-    ></button>
+    <ng-container adminHeaderActions>
+      <button
+        *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+        pButton
+        type="button"
+        class="admin-btn-secondary"
+        [outlined]="true"
+        icon="pi pi-box"
+        [label]="'ADMIN.SUPPLIERS.MAPPINGS.MAP_HAMBOX_PRODUCT' | translate"
+        (click)="openMappingDrawer()"
+      ></button>
+      <button
+        *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+        pButton
+        type="button"
+        class="admin-btn-primary"
+        icon="pi pi-plus"
+        [label]="'ADMIN.SUPPLIERS.MAPPINGS.NEW' | translate"
+        (click)="openCreateDialog()"
+      ></button>
+    </ng-container>
   </app-admin-page-header>
 
   @if (error()) {
@@ -262,4 +273,10 @@
   [confirmLabel]="'ADMIN.SUPPLIERS.ACTIONS.DELETE'"
   [destructive]="true"
   (confirmed)="confirmDelete()"
+/>
+
+<app-supplier-catalog-search-drawer
+  [target]="mappingDrawerTarget()"
+  (closed)="onMappingDrawerClosed()"
+  (mappingCreated)="onMappingDrawerCreated()"
 />

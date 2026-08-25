@@ -210,13 +210,17 @@
             and Refund Policy.
           </p>
 
+          <div class="register-form__field">
+            <ui-turnstile action="register" (tokenChange)="turnstileToken.set($event)" (expired)="turnstileToken.set(null)" (errored)="turnstileToken.set(null)" />
+          </div>
+
           <button
             pButton
             type="submit"
             class="register-form__submit"
             label="Initialize Commander Profile"
             [loading]="isSubmitting()"
-            [disabled]="isSubmitting()"
+            [disabled]="isSubmitting() || !turnstileToken()"
           ></button>
 
           <div class="register-form__social">

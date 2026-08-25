@@ -1,32 +1,44 @@
-<div class="admin-empty-state" [class.admin-empty-state--compact]="compact()" role="status">
-  <div class="admin-empty-state__visual" aria-hidden="true">
-    <i [class]="icon()"></i>
-  </div>
-  <h3 class="admin-empty-state__title">{{ title() }}</h3>
-  @if (description()) {
-    <p class="admin-empty-state__description">{{ description() }}</p>
-  }
-  @if (primaryLabel() || secondaryLabel()) {
-    <div class="admin-empty-state__actions">
-      @if (primaryLabel()) {
-        <button
-          pButton
-          type="button"
-          [label]="primaryLabel()!"
-          [icon]="primaryIcon() ?? ''"
-          (click)="primaryAction.emit()"
-        ></button>
-      }
-      @if (secondaryLabel()) {
-        <button
-          pButton
-          type="button"
-          [label]="secondaryLabel()!"
-          severity="secondary"
-          [text]="true"
-          (click)="secondaryAction.emit()"
-        ></button>
+@if (dense()) {
+  <div class="admin-empty-state-dense" [class.admin-empty-state-dense--success]="tone() === 'success'" role="status">
+    <i class="admin-empty-state-dense__icon" [class]="icon()" aria-hidden="true"></i>
+    <div class="admin-empty-state-dense__text">
+      <span class="admin-empty-state-dense__title">{{ title() }}</span>
+      @if (description()) {
+        <span class="admin-empty-state-dense__description">{{ description() }}</span>
       }
     </div>
-  }
-</div>
+  </div>
+} @else {
+  <div class="admin-empty-state" [class.admin-empty-state--compact]="compact()" role="status">
+    <div class="admin-empty-state__visual" aria-hidden="true">
+      <i [class]="icon()"></i>
+    </div>
+    <h3 class="admin-empty-state__title">{{ title() }}</h3>
+    @if (description()) {
+      <p class="admin-empty-state__description">{{ description() }}</p>
+    }
+    @if (primaryLabel() || secondaryLabel()) {
+      <div class="admin-empty-state__actions">
+        @if (primaryLabel()) {
+          <button
+            pButton
+            type="button"
+            [label]="primaryLabel()!"
+            [icon]="primaryIcon() ?? ''"
+            (click)="primaryAction.emit()"
+          ></button>
+        }
+        @if (secondaryLabel()) {
+          <button
+            pButton
+            type="button"
+            [label]="secondaryLabel()!"
+            severity="secondary"
+            [text]="true"
+            (click)="secondaryAction.emit()"
+          ></button>
+        }
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,164 @@
+<p-toast position="top-right" />
+
+<section class="admin-page map-products-page">
+  <app-admin-page-header
+    [title]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.TITLE_WITH_SUPPLIER' | translate: { supplier: supplierName() }"
+    [subtitle]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  >
+    <ng-container adminHeaderActions>
+      <button
+        pButton
+        type="button"
+        class="admin-btn-secondary"
+        [disabled]="suggesting()"
+        [loading]="suggesting()"
+        (click)="findMatches()"
+      >
+        {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.FIND_MATCHES' | translate }}
+      </button>
+      <a pButton class="admin-btn-secondary" [routerLink]="['/admin/suppliers', supplierId(), 'mappings']">
+        {{ 'ADMIN.SUPPLIERS.ACTIONS.MAPPINGS' | translate }}
+      </a>
+    </ng-container>
+  </app-admin-page-header>
+
+  @if (summary(); as s) {
+    <app-admin-stat-grid [columns]="4">
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.STATS.ELIGIBLE' | translate" [value]="s.eligibleCount" />
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.STATS.MAPPED' | translate" [value]="s.mappedCount" tone="success" />
+      <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.STATS.NEEDS_MAPPING' | translate" [value]="s.unmappedCount" tone="warning" />
+      <app-admin-stat-card
+        [compact]="true"
+        [label]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.STATS.SUGGESTED' | translate"
+        [value]="suggestions().size"
+        tone="info"
+      />
+    </app-admin-stat-grid>
+  }
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  }
+
+  <div class="map-products-page__toolbar">
+    <app-admin-search-bar
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+    <p-select
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+    />
+  </div>
+
+  @if (confirmableSelection().length > 0) {
+    <app-admin-bulk-bar [selectedCount]="selected().length" (clearSelection)="clearSelection()">
+      <button pButton type="button" [disabled]="bulkMapping()" [loading]="bulkMapping()" (click)="confirmBulk()">
+        {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.CONFIRM_N_MAPPINGS' | translate: { count: confirmableSelection().length } }}
+      </button>
+    </app-admin-bulk-bar>
+  } @else if (selected().length > 0) {
+    <app-admin-bulk-bar [selectedCount]="selected().length" (clearSelection)="clearSelection()">
+      <span class="map-products-page__bulk-hint">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.NO_SUGGESTIONS_YET' | translate }}</span>
+    </app-admin-bulk-bar>
+  }
+
+  <app-admin-data-table-shell>
+    @if (!loading() && candidates().length === 0) {
+      <app-admin-empty-state
+        icon="pi pi-box"
+        [title]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.EMPTY.TITLE' | translate"
+        [description]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.EMPTY.DESCRIPTION' | translate"
+      />
+    } @else {
+      <p-table
+        [value]="[...candidates()]"
+        [loading]="loading()"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalCount()"
+        (onLazyLoad)="onPageChange($event)"
+        [selection]="[...selected()]"
+        (selectionChange)="onSelectionChange($event)"
+        dataKey="variantId"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
+            <th>{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.COLUMNS.PRODUCT' | translate }}</th>
+            <th>{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.COLUMNS.VARIANT' | translate }}</th>
+            <th>{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.COLUMNS.SUPPLIER_MATCH' | translate }}</th>
+            <th>{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.COLUMNS.PRICE' | translate }}</th>
+            <th>{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.COLUMNS.STATUS' | translate }}</th>
+            <th>{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.COLUMNS.ACTION' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-candidate>
+          <tr>
+            <td><p-tableCheckbox [value]="candidate" /></td>
+            <td>
+              <span class="map-products-page__product-name">{{ candidate.productName }}</span>
+              <span class="map-products-page__product-category">{{ candidate.categoryName }}</span>
+            </td>
+            <td>
+              <span class="map-products-page__variant">{{ candidate.variantDisplayName }}</span>
+              <span class="map-products-page__sku">{{ candidate.variantSku }}</span>
+            </td>
+            <td>
+              @if (candidate.existingMappingId) {
+                <span class="map-products-page__match-name">{{ candidate.externalName }}</span>
+                <span class="map-products-page__match-id">{{ candidate.externalProductId }}</span>
+              } @else if (suggestionFor(candidate); as suggestion) {
+                @if (suggestion.bestMatch) {
+                  <span class="map-products-page__match-name">{{ suggestion.bestMatch.name }}</span>
+                  <span class="map-products-page__match-id">
+                    {{ suggestion.confidenceTier === 'High' ? ('ADMIN.SUPPLIERS.MAP_PRODUCTS.HIGH_CONFIDENCE' | translate: { score: suggestion.confidenceScore }) : ('ADMIN.SUPPLIERS.MAP_PRODUCTS.MEDIUM_CONFIDENCE' | translate: { score: suggestion.confidenceScore }) }}
+                  </span>
+                } @else {
+                  <span class="map-products-page__no-match">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.NO_MATCH' | translate }}</span>
+                }
+              } @else {
+                <span class="map-products-page__no-match">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.NOT_CHECKED_YET' | translate }}</span>
+              }
+            </td>
+            <td>
+              @if (candidate.existingMappingId) {
+                {{ candidate.buyingPrice }} {{ candidate.currency }}
+              } @else if (suggestionFor(candidate)?.bestMatch; as match) {
+                {{ match.minFaceValue }} {{ match.currency }}
+              }
+            </td>
+            <td>
+              <app-admin-status-badge [label]="statusLabel(candidate) | translate" [tone]="statusTone(candidate)" />
+            </td>
+            <td>
+              @if (!candidate.existingMappingId) {
+                @if (suggestionFor(candidate)?.confidenceTier === 'High') {
+                  <button pButton type="button" size="small" (click)="confirmHighConfidence(candidate)">
+                    {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.ACTIONS.CONFIRM_MAPPING' | translate }}
+                  </button>
+                } @else if (suggestionFor(candidate)?.confidenceTier === 'Medium') {
+                  <button pButton type="button" severity="secondary" size="small" (click)="openDrawer(candidate, true)">
+                    {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.ACTIONS.REVIEW_MATCH' | translate }}
+                  </button>
+                } @else {
+                  <button pButton type="button" severity="secondary" size="small" (click)="openDrawer(candidate, false)">
+                    {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.ACTIONS.SEARCH_SUPPLIER' | translate }}
+                  </button>
+                }
+              }
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </app-admin-data-table-shell>
+</section>
+
+<app-supplier-catalog-search-drawer [target]="drawerTarget()" (closed)="onDrawerClosed()" (mappingCreated)="onMappingCreated()" />

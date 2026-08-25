@@ -1,9 +1,14 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ButtonModule } from 'primeng/button';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { FulfillmentChainListComponent } from '../../../admin/suppliers/components/fulfillment-chain-list/fulfillment-chain-list.component';
+import {
+  SupplierCatalogSearchDrawerComponent,
+  SupplierCatalogSearchDrawerTarget,
+} from '../../../admin/suppliers/components/supplier-catalog-search-drawer/supplier-catalog-search-drawer.component';
 import { SupplierFulfillmentChainCandidateDto } from '../../../admin/suppliers/models/supplier.model';
 import { SuppliersManagementFacade } from '../../../admin/suppliers/services/suppliers-management.facade';
 import { AdminConfirmDialogComponent, AdminErrorAlertComponent, AdminSectionCardComponent, AdminStatusBadgeComponent } from '../../../../shared/components/admin';
@@ -40,12 +45,14 @@ const MODE_OPTIONS: readonly FulfillmentModeOption[] = [
   imports: [
     NgTemplateOutlet,
     TranslatePipe,
+    ButtonModule,
     HasPermissionPipe,
     AdminSectionCardComponent,
     AdminStatusBadgeComponent,
     AdminErrorAlertComponent,
     AdminConfirmDialogComponent,
     FulfillmentChainListComponent,
+    SupplierCatalogSearchDrawerComponent,
   ],
   providers: [SuppliersManagementFacade],
   templateUrl: './variant-fulfillment-panel.component.html',
@@ -86,6 +93,17 @@ export class VariantFulfillmentPanelComponent {
 
   protected readonly hasReadySupplier = computed(() => this.chain().some((c) => c.isReady));
 
+  protected readonly drawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
+
+  /** The "Find Supplier Product" quick action targets the first enabled supplier not already covered by
+   * this variant's chain — good enough for the common case (one primary automated supplier); an owner
+   * managing several automated suppliers for the same variant still has the full Map Products workspace
+   * and the Mappings page for anything beyond that. */
+  protected readonly unmappedEnabledSupplier = computed(() => {
+    const coveredSupplierIds = new Set(this.chain().map((c) => c.supplierId));
+    return this.suppliersFacade.list()?.items.find((s) => s.isEnabled && !coveredSupplierIds.has(s.id)) ?? null;
+  });
+
   /** Overall readiness for the currently-selected mode — drives the summary badge. */
   protected readonly overallReadiness = computed<'success' | 'warning'>(() => {
     const variant = this.selectedVariant();
@@ -106,6 +124,10 @@ export class VariantFulfillmentPanelComponent {
   });
 
   constructor() {
+    // Needed only to resolve `unmappedEnabledSupplier` above — safe to load once regardless of
+    // permissions the way `fulfillment-chain` already is (see its own endpoint remarks).
+    void this.suppliersFacade.loadSuppliers();
+
     effect(() => {
       const variant = this.selectedVariant();
       const productId = this.productId();
@@ -121,6 +143,36 @@ export class VariantFulfillmentPanelComponent {
         void this.suppliersFacade.loadFulfillmentChain(productId, variant.id);
       }
     });
+  }
+
+  protected openFindSupplierProduct(): void {
+    const supplier = this.unmappedEnabledSupplier();
+    const variant = this.selectedVariant();
+    const productId = this.productId();
+    if (!supplier || !variant || !productId) {
+      return;
+    }
+
+    this.drawerTarget.set({
+      supplierId: supplier.id,
+      supplierName: supplier.name,
+      productId,
+      productName: this.facade.product()?.nameEn ?? '',
+      variantId: variant.id,
+      variantLabel: variant.sku,
+    });
+  }
+
+  protected onDrawerClosed(): void {
+    this.drawerTarget.set(null);
+  }
+
+  protected onMappingCreated(): void {
+    const variant = this.selectedVariant();
+    const productId = this.productId();
+    if (variant && productId) {
+      void this.suppliersFacade.loadFulfillmentChain(productId, variant.id);
+    }
   }
 
   protected isSelected(mode: FulfillmentMode): boolean {

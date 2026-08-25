@@ -1,10 +1,12 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
+import { Menu, MenuModule } from 'primeng/menu';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
@@ -16,7 +18,18 @@ import { AccountLibraryFacade } from '../../services/account-library.facade';
 @Component({
   selector: 'app-account-library-page',
   standalone: true,
-  imports: [FormsModule, NgTemplateOutlet, RouterLink, TranslatePipe, ToastModule, LoadingSkeletonComponent, HamboxDatePipe, HamboxTranslateRefreshDirective],
+  imports: [
+    FormsModule,
+    NgTemplateOutlet,
+    RouterLink,
+    TranslatePipe,
+    ToastModule,
+    MenuModule,
+    TooltipModule,
+    LoadingSkeletonComponent,
+    HamboxDatePipe,
+    HamboxTranslateRefreshDirective,
+  ],
   providers: [MessageService],
   templateUrl: './account-library-page.component.html',
   styleUrl: './account-library-page.component.scss',
@@ -42,9 +55,19 @@ export class AccountLibraryPageComponent implements OnInit {
   protected readonly showGroupedSections = this.facade.showGroupedSections;
   protected readonly highlightItemId = this.facade.highlightItemId;
 
+  // Loading only replaces the grid with skeletons before the first page of
+  // results ever arrives. Any later reload (filter/sort/search/page change)
+  // keeps the existing cards on screen with a small overlay spinner instead —
+  // swapping to skeletons every time caused a jarring layout flash.
+  protected readonly isInitialLoading = computed(() => this.loading() && this.items().length === 0);
+  protected readonly isRefreshing = computed(() => this.loading() && this.items().length > 0);
+
   protected readonly instructionsItemId = signal<string | null>(null);
   protected readonly copyFeedbackId = signal<string | null>(null);
   protected readonly pendingRevealItem = signal<CustomerLibraryItemApiDto | null>(null);
+  protected readonly actionMenuItems = signal<MenuItem[]>([]);
+
+  private readonly actionMenuRef = viewChild<Menu>('actionMenu');
 
   protected readonly deliveryOptions = [
     { labelKey: 'ACCOUNT.LIBRARY_UI.DELIVERY_ALL', value: '' },
@@ -200,8 +223,63 @@ export class AccountLibraryPageComponent implements OnInit {
     return this.instructionsItemId() === itemId;
   }
 
-  protected metaValue(value: string | null): string {
-    return value?.trim() ? value : '—';
+  protected platformRegionLabel(item: CustomerLibraryItemApiDto): string | null {
+    const parts = [item.platform, item.region].filter((value): value is string => !!value?.trim());
+    return parts.length ? parts.join(' · ') : null;
+  }
+
+  protected openActionMenu(event: Event, item: CustomerLibraryItemApiDto): void {
+    this.actionMenuItems.set(this.buildActionMenuItems(item));
+    this.actionMenuRef()?.toggle(event);
+  }
+
+  private buildActionMenuItems(item: CustomerLibraryItemApiDto): MenuItem[] {
+    const items: MenuItem[] = [
+      {
+        label: this.translate.instant('ACCOUNT.LIBRARY_UI.COPY_CODE'),
+        icon: 'pi pi-copy',
+        disabled: !this.isKeyRevealed(item.id),
+        command: () => void this.copyKey(item),
+      },
+      {
+        label: this.translate.instant('ACCOUNT.LIBRARY_UI.HOW_TO_REDEEM'),
+        icon: 'pi pi-question-circle',
+        command: () => this.toggleInstructions(item.id),
+      },
+    ];
+
+    if (item.hasInstructions) {
+      items.push({
+        label: this.translate.instant('ACCOUNT.LIBRARY_UI.INSTRUCTIONS'),
+        icon: 'pi pi-book',
+        routerLink: ['/account/library', item.orderItemId, 'instructions'],
+      });
+    }
+
+    items.push({
+      label: this.translate.instant('ACCOUNT.LIBRARY_UI.VIEW_DETAILS'),
+      icon: 'pi pi-receipt',
+      routerLink: ['/account/orders', item.orderId],
+    });
+
+    if (item.invoiceUrl) {
+      items.push({
+        label: this.translate.instant('ACCOUNT.LIBRARY_UI.DOWNLOAD_INVOICE'),
+        icon: 'pi pi-download',
+        url: item.invoiceUrl,
+        target: '_blank',
+      });
+    }
+
+    if (item.supportUrl) {
+      items.push({
+        label: this.translate.instant('ACCOUNT.LIBRARY_UI.SUPPORT'),
+        icon: 'pi pi-life-ring',
+        url: item.supportUrl,
+      });
+    }
+
+    return items;
   }
 
   protected deliveryStatusLabel(item: CustomerLibraryItemApiDto): string {

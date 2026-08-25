@@ -1,7 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 
+import { ApiClientService } from '../../../core/api/api-client.service';
+import { SUPPLIERS_API } from '../../../core/api/api-endpoints';
 import { ApiError } from '../../../core/models/api-error.model';
+import { ProductSupplierMappingStatusDto } from '../../admin/suppliers/models/supplier.model';
 import { CategoryOption } from '../models/category.model';
 import { CollectionOption } from '../models/collection.model';
 import {
@@ -26,6 +29,7 @@ export class ProductCatalogFacade {
   private readonly api = inject(ProductApiService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly collectionApi = inject(CollectionApiService);
+  private readonly apiClient = inject(ApiClientService);
 
   private readonly itemsState = signal<readonly Product[]>([]);
   private readonly loadingState = signal(false);
@@ -45,6 +49,9 @@ export class ProductCatalogFacade {
   private readonly collectionOptionsState = signal<readonly CollectionOption[]>([]);
   private collectionOptionsLoaded = false;
   private readonly collectionFilterState = signal<string | null>(null);
+  private readonly supplierMappingFilterState = signal('');
+  private readonly supplierMappingFilterProductIdsState = signal<readonly string[] | null>(null);
+  private readonly mappingStatusByProductIdState = signal<ReadonlyMap<string, ProductSupplierMappingStatusDto>>(new Map());
 
   // Bulk multi-select — a Set for O(1) toggle/lookup regardless of catalog size (see the variant
   // manager's array+`.includes()` pattern for the O(n²) shape this avoids). Never cleared by
@@ -66,6 +73,8 @@ export class ProductCatalogFacade {
   readonly categoryOptions = this.categoryOptionsState.asReadonly();
   readonly collectionOptions = this.collectionOptionsState.asReadonly();
   readonly collectionFilter = this.collectionFilterState.asReadonly();
+  readonly supplierMappingFilter = this.supplierMappingFilterState.asReadonly();
+  readonly mappingStatusByProductId = this.mappingStatusByProductIdState.asReadonly();
   readonly error = this.errorState.asReadonly();
   readonly totalCount = this.totalCountState.asReadonly();
   readonly pageNumber = this.pageNumberState.asReadonly();
@@ -144,7 +153,45 @@ export class ProductCatalogFacade {
     this.searchTermState.set('');
     this.statusFilterState.set('');
     this.collectionFilterState.set(null);
+    this.supplierMappingFilterState.set('');
+    this.supplierMappingFilterProductIdsState.set(null);
     this.pageNumberState.set(1);
+    void this.fetchProducts();
+  }
+
+  /**
+   * Resolves the matching product-id set from the Suppliers module first (status is a computed,
+   * cross-supplier value — never a Catalog column), then narrows the existing paged product query to
+   * exactly that id set so pagination stays correct. `status` is `'all' | FullyMapped | PartiallyMapped
+   * | Unmapped | SupplierUnavailable | MappingError`.
+   */
+  async setSupplierMappingFilter(status: string): Promise<void> {
+    this.supplierMappingFilterState.set(status);
+    this.pageNumberState.set(1);
+
+    if (!status || status === 'all') {
+      this.supplierMappingFilterProductIdsState.set(null);
+      void this.fetchProducts();
+      return;
+    }
+
+    this.loadingState.set(true);
+    try {
+      const statusByProductId = await firstValueFrom(
+        this.apiClient.post<Readonly<Record<string, ProductSupplierMappingStatusDto>>>(
+          SUPPLIERS_API.productMappingStatus,
+          { productIds: null },
+        ),
+      );
+      const matchingIds = Object.entries(statusByProductId)
+        .filter(([, value]) => value.status === status)
+        .map(([productId]) => productId);
+      this.supplierMappingFilterProductIdsState.set(matchingIds);
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to filter by supplier mapping status.'));
+      this.supplierMappingFilterProductIdsState.set([]);
+    }
+
     void this.fetchProducts();
   }
 
@@ -518,6 +565,7 @@ export class ProductCatalogFacade {
       const status = this.statusFilterState().trim();
       const sortBy = this.sortByState();
       const collectionId = this.collectionFilterState();
+      const supplierMappingProductIds = this.supplierMappingFilterProductIdsState();
       const result = await firstValueFrom(
         this.api.getProducts({
           pageNumber: this.pageNumberState(),
@@ -526,6 +574,7 @@ export class ProductCatalogFacade {
           ...(status ? { status: status as ProductStatus } : {}),
           ...(sortBy ? { sortBy } : {}),
           ...(collectionId ? { collectionId } : {}),
+          ...(supplierMappingProductIds ? { productIds: supplierMappingProductIds } : {}),
         }),
       );
 
@@ -536,6 +585,7 @@ export class ProductCatalogFacade {
       this.pageSizeState.set(result.pageSize ?? this.pageSizeState());
       this.hasLoaded = true;
       this.syncSelection(items);
+      void this.refreshMappingStatusForVisibleProducts(items);
     } catch (error) {
       this.itemsState.set([]);
       this.totalCountState.set(0);
@@ -543,6 +593,26 @@ export class ProductCatalogFacade {
       this.errorState.set(this.toErrorMessage(error, 'Failed to load products.'));
     } finally {
       this.loadingState.set(false);
+    }
+  }
+
+  /** Per-row Supplier badge data for whatever page is currently on screen — a separate, best-effort
+   * call so a Suppliers-module hiccup never blocks the product list itself from loading. */
+  private async refreshMappingStatusForVisibleProducts(items: readonly Product[]): Promise<void> {
+    if (items.length === 0) {
+      return;
+    }
+
+    try {
+      const statusByProductId = await firstValueFrom(
+        this.apiClient.post<Readonly<Record<string, ProductSupplierMappingStatusDto>>>(
+          SUPPLIERS_API.productMappingStatus,
+          { productIds: items.map((p) => p.id) },
+        ),
+      );
+      this.mappingStatusByProductIdState.set(new Map(Object.entries(statusByProductId)));
+    } catch {
+      // Best-effort enrichment only — the product list itself already loaded successfully.
     }
   }
 

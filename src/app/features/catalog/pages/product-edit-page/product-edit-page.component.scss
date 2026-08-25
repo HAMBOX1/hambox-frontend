@@ -156,3 +156,34 @@ app-product-assets-upload {
     padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
   }
 }
+
+.product-edit-page__fulfillment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.product-edit-page__fulfillment-empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.product-edit-page__fulfillment-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.product-edit-page__fulfillment-supplier {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.product-edit-page__fulfillment-count {
+  color: var(--color-text-secondary);
+}

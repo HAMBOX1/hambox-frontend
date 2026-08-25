@@ -94,4 +94,13 @@ export class AccountOrderDetailPageComponent implements OnInit {
       this.reviewError.set(this.translate.instant('ACCOUNT.ORDER_DETAIL_UI.REVIEW_ERROR'));
     }
   }
+
+  /** Cancellation is staff-mediated only — customers request it via a support ticket, never directly. */
+  protected isCancellable(status: string): boolean {
+    return status === 'Pending';
+  }
+
+  protected cancelRequestSubject(orderNumber: string): string {
+    return this.translate.instant('ACCOUNT.ORDER_DETAIL_UI.CANCEL_REQUEST_SUBJECT', { orderNumber });
+  }
 }

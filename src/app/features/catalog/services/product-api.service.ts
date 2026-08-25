@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -59,6 +59,19 @@ export class ProductApiService {
 
     if (query.collectionId) {
       params['collectionId'] = query.collectionId;
+    }
+
+    if (query.productIds && query.productIds.length > 0) {
+      // Repeated query params (?productIds=a&productIds=b) — the plain Record shape above can't
+      // express an array value, so build HttpParams directly only for this one case.
+      let httpParams = new HttpParams();
+      for (const [key, value] of Object.entries(params)) {
+        httpParams = httpParams.set(key, value);
+      }
+      for (const id of query.productIds) {
+        httpParams = httpParams.append('productIds', id);
+      }
+      return this.api.get<PagedResult<Product>>(CATALOG_API.products, { params: httpParams });
     }
 
     return this.api.get<PagedResult<Product>>(CATALOG_API.products, { params });

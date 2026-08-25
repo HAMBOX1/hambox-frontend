@@ -13,19 +13,13 @@ export interface RegisterRequest {
   readonly password: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly turnstileToken: string;
   readonly referralCode?: string;
-}
-
-export interface RefreshTokenRequest {
-  readonly refreshToken: string;
-}
-
-export interface LogoutRequest {
-  readonly refreshToken: string;
 }
 
 export interface ForgotPasswordRequest {
   readonly email: string;
+  readonly turnstileToken: string;
 }
 
 export interface ResetPasswordRequest {
@@ -35,11 +29,16 @@ export interface ResetPasswordRequest {
 
 export interface ResendVerificationRequest {
   readonly email: string;
+  readonly turnstileToken: string;
 }
 
-export interface AuthTokenResponse {
+/**
+ * The refresh token is never part of this shape — the backend transports it exclusively as a
+ * Secure, HttpOnly cookie (see AuthCookieWriter server-side) and it must never appear in a JSON
+ * response body or anywhere in Angular state.
+ */
+export interface AccessTokenResponse {
   readonly accessToken: string;
-  readonly refreshToken: string;
   readonly expiresAt: string;
 }
 
@@ -52,9 +51,9 @@ export interface AuthUser {
   readonly permissions: readonly string[];
 }
 
+/** In-memory only — never persisted to localStorage/sessionStorage. No refresh token here either. */
 export interface UserSession {
   readonly accessToken: string;
-  readonly refreshToken: string;
   readonly expiresAt: string;
   readonly authContext: 'customer' | 'admin';
   readonly user: AuthUser;
@@ -70,7 +69,7 @@ export interface AdminLoginChallengeResponse {
    * (Authentication.AdminOtpEnabled = false) — the caller is already
    * fully authenticated and should skip the OTP step entirely.
    */
-  readonly token?: AuthTokenResponse | null;
+  readonly token?: AccessTokenResponse | null;
 }
 
 export interface VerifyAdminOtpRequest {

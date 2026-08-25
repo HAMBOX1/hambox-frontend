@@ -3,12 +3,13 @@
 } @else if (facade.dashboardError()) {
   <app-admin-error-alert [message]="facade.dashboardError()!" (retry)="retry()" />
 } @else if (facade.dashboard(); as stats) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid class="overview-panel__metrics" [columns]="4">
     <app-admin-stat-card
       [label]="'ADMIN.SECURITY.STATS.OPEN_ALERTS' | translate"
       [value]="stats.openAlerts"
       icon="pi pi-bell"
-      [tone]="stats.openAlerts > 0 ? 'warning' : 'success'"
+      [tone]="stats.openAlerts > 0 ? 'danger' : 'success'"
+      [compact]="true"
     />
     <app-admin-stat-card
       [label]="'ADMIN.SECURITY.STATS.FAILED_LOGINS_24H' | translate"
@@ -16,62 +17,119 @@
       [hint]="failedLoginTrend() === 0 ? null : (failedLoginTrend() > 0 ? '+' : '') + failedLoginTrend() + ' vs prior 24h'"
       icon="pi pi-exclamation-triangle"
       [tone]="stats.failedLoginsLast24h > 0 ? 'warning' : 'success'"
+      [compact]="true"
     />
     <app-admin-stat-card
       [label]="'ADMIN.SECURITY.STATS.ACTIVE_SESSIONS' | translate"
       [value]="stats.activeSessions"
       icon="pi pi-desktop"
       tone="info"
+      [compact]="true"
     />
     <app-admin-stat-card
       [label]="'ADMIN.SECURITY.STATS.NEW_DEVICES_7D' | translate"
       [value]="stats.newDevicesLast7Days"
       icon="pi pi-verified"
+      [compact]="true"
     />
   </app-admin-stat-grid>
 
-  <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.LOGIN_TREND' | translate">
-    @if (stats.loginTrend.length === 0) {
-      <app-admin-empty-state icon="pi pi-chart-bar" [title]="'ADMIN.SECURITY.EMPTY.CHART' | translate" [compact]="true" />
-    } @else {
-      <apx-chart
-        [series]="loginTrendChart().series"
-        [chart]="loginTrendChart().chart"
-        [xaxis]="loginTrendChart().xaxis"
-        [yaxis]="loginTrendChart().yaxis"
-        [dataLabels]="loginTrendChart().dataLabels"
-        [plotOptions]="loginTrendChart().plotOptions"
-        [tooltip]="loginTrendChart().tooltip"
-      />
-    }
-  </app-admin-section-card>
+  <div class="overview-panel__status-bar" [class.overview-panel__status-bar--attention]="stats.openAlerts > 0">
+    <div class="overview-panel__status-main">
+      <i class="overview-panel__status-icon" [class]="stats.openAlerts > 0 ? 'pi pi-shield' : 'pi pi-verified'" aria-hidden="true"></i>
+      <div class="overview-panel__status-text">
+        <span class="overview-panel__status-title">
+          {{ (stats.openAlerts > 0 ? 'ADMIN.SECURITY.STATUS_BAR.ATTENTION_NEEDED' : 'ADMIN.SECURITY.STATUS_BAR.ALL_CLEAR') | translate }}
+          @if (stats.openAlerts > 0 && highestOpenSeverity(); as severity) {
+            <app-admin-status-badge [label]="severity" [tone]="severityTone(severity)" [outlined]="true" />
+          }
+        </span>
+        <span class="overview-panel__status-activity">
+          {{ 'ADMIN.SECURITY.STATUS_BAR.LAST_ACTIVITY' | translate }}:
+          @if (lastActivity(); as activity) {
+            {{ activity.description }} · {{ activity.occurredOnUtc | date: 'short' }}
+          } @else {
+            {{ 'ADMIN.SECURITY.STATUS_BAR.NO_RECENT_ACTIVITY' | translate }}
+          }
+        </span>
+      </div>
+    </div>
+    <button type="button" class="overview-panel__status-action" (click)="viewAlerts.emit()">
+      {{ 'ADMIN.SECURITY.STATUS_BAR.REVIEW_ALERTS' | translate }}
+      <i class="pi pi-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
 
-  <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.TOP_FAILURE_COUNTRIES' | translate">
-    @if (stats.topFailureCountries.length === 0) {
-      <app-admin-empty-state icon="pi pi-globe" [title]="'ADMIN.SECURITY.EMPTY.CHART' | translate" [compact]="true" />
-    } @else {
-      <apx-chart
-        [series]="topFailureCountriesChart().series"
-        [chart]="topFailureCountriesChart().chart"
-        [xaxis]="topFailureCountriesChart().xaxis"
-        [yaxis]="topFailureCountriesChart().yaxis"
-        [dataLabels]="topFailureCountriesChart().dataLabels"
-        [plotOptions]="topFailureCountriesChart().plotOptions"
-        [tooltip]="topFailureCountriesChart().tooltip"
-      />
-    }
-  </app-admin-section-card>
+  <div class="overview-panel__row">
+    <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.LOGIN_TREND' | translate" [compact]="true" class="overview-panel__chart-card">
+      @if (stats.loginTrend.length === 0) {
+        <app-admin-empty-state icon="pi pi-chart-bar" [title]="'ADMIN.SECURITY.EMPTY.CHART' | translate" [dense]="true" />
+      } @else {
+        <apx-chart
+          [series]="loginTrendChart().series"
+          [chart]="loginTrendChart().chart"
+          [xaxis]="loginTrendChart().xaxis"
+          [yaxis]="loginTrendChart().yaxis"
+          [dataLabels]="loginTrendChart().dataLabels"
+          [plotOptions]="loginTrendChart().plotOptions"
+          [tooltip]="loginTrendChart().tooltip"
+          [legend]="loginTrendChart().legend"
+          [grid]="loginTrendChart().grid"
+        />
+      }
+    </app-admin-section-card>
 
-  <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.OPEN_ALERTS_PREVIEW' | translate">
+    <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.TOP_FAILURE_COUNTRIES' | translate" [compact]="true" class="overview-panel__countries-card">
+      @if (rankedFailureCountries().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-globe"
+          [title]="'ADMIN.SECURITY.FAILED_LOGIN_INTEL.EMPTY_TITLE' | translate"
+          [description]="'ADMIN.SECURITY.FAILED_LOGIN_INTEL.EMPTY_DESCRIPTION' | translate"
+          [dense]="true"
+        />
+      } @else {
+        <ol class="overview-panel__country-list">
+          @for (country of rankedFailureCountries(); track country.countryCode) {
+            <li class="overview-panel__country-row">
+              <span class="overview-panel__country-code">{{ country.countryCode }}</span>
+              <span class="overview-panel__country-bar-track">
+                <span class="overview-panel__country-bar-fill" [style.width.%]="country.sharePercent"></span>
+              </span>
+              <span class="overview-panel__country-count">{{ country.failedLogins }}</span>
+              <span class="overview-panel__country-share">{{ country.sharePercent }}%</span>
+            </li>
+          }
+        </ol>
+      }
+    </app-admin-section-card>
+  </div>
+
+  <app-admin-section-card [title]="'ADMIN.SECURITY.STATS.OPEN_ALERTS_PREVIEW' | translate" [compact]="true">
     @if (stats.openAlertsPreview.length === 0) {
-      <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.ALERTS.EMPTY' | translate" [compact]="true" />
+      <app-admin-empty-state
+        icon="pi pi-shield"
+        [title]="'ADMIN.SECURITY.ALERTS.HEALTHY_TITLE' | translate"
+        [description]="'ADMIN.SECURITY.ALERTS.HEALTHY_DESCRIPTION' | translate"
+        [dense]="true"
+        tone="success"
+      />
     } @else {
       <ul class="overview-panel__alert-list">
         @for (alert of stats.openAlertsPreview; track alert.id) {
-          <li>
+          <li
+            class="overview-panel__alert-row"
+            [class.overview-panel__alert-row--priority]="alert.severity === 'Critical' || alert.severity === 'High'"
+            tabindex="0"
+            (click)="viewAlerts.emit()"
+            (keydown.enter)="viewAlerts.emit()"
+          >
             <app-admin-status-badge [label]="alert.severity" [tone]="severityTone(alert.severity)" />
-            <span class="overview-panel__alert-desc">{{ alert.description }}</span>
+            <div class="overview-panel__alert-body">
+              <span class="overview-panel__alert-desc">{{ alert.description }}</span>
+              <span class="overview-panel__alert-resource">{{ affectedResource(alert) }}</span>
+            </div>
             <span class="overview-panel__alert-date">{{ alert.occurredOnUtc | date: 'short' }}</span>
+            <i class="pi pi-chevron-right overview-panel__alert-chevron" aria-hidden="true"></i>
           </li>
         }
       </ul>

@@ -43,6 +43,10 @@ import {
 } from '../../services/admin-products-view-mode.service';
 import { ProductCatalogFacade } from '../../services/product-catalog.facade';
 import {
+  SupplierCatalogSearchDrawerComponent,
+  SupplierCatalogSearchDrawerTarget,
+} from '../../../admin/suppliers/components/supplier-catalog-search-drawer/supplier-catalog-search-drawer.component';
+import {
   AdminActionMenuComponent,
   AdminBulkBarComponent,
   AdminConfirmDialogComponent,
@@ -93,6 +97,7 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
     ProductCatalogTableComponent,
     ProductCatalogCardsComponent,
     ProductDetailPanelComponent,
+    SupplierCatalogSearchDrawerComponent,
     AdminActionMenuComponent,
     AdminBulkBarComponent,
     AdminPageHeaderComponent,
@@ -136,12 +141,15 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly categoryOptions = this.facade.categoryOptions;
   protected readonly collectionOptions = this.facade.collectionOptions;
   protected readonly collectionFilter = this.facade.collectionFilter;
+  protected readonly supplierMappingFilter = this.facade.supplierMappingFilter;
+  protected readonly mappingStatusByProductId = this.facade.mappingStatusByProductId;
   protected readonly viewMode = this.viewModeService.mode;
 
   protected readonly deleteDialogOpen = signal(false);
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateNameSuffix = signal(' Copy');
   protected readonly actionTarget = signal<Product | null>(null);
+  protected readonly mappingDrawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
 
   // Bulk selection (product list)
   protected readonly bulkSelectedIds = this.facade.bulkSelectedIds;
@@ -270,6 +278,22 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onCollectionFilterChange(collectionId: string | null): void {
     this.facade.setCollectionFilter(collectionId);
+  }
+
+  protected onSupplierMappingFilterChange(status: string): void {
+    void this.facade.setSupplierMappingFilter(status);
+  }
+
+  protected onMappingOpenRequested(product: Product): void {
+    this.mappingDrawerTarget.set({ productId: product.id, productName: product.nameEn || product.nameAr });
+  }
+
+  protected onMappingDrawerClosed(): void {
+    this.mappingDrawerTarget.set(null);
+  }
+
+  protected onMappingCreated(): void {
+    void this.facade.reload();
   }
 
   protected onClearFilters(): void {

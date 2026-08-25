@@ -49,7 +49,7 @@
       <app-admin-action-menu adminHeaderActions [items]="overflowMenuItems(theme)" />
     </app-admin-page-header>
 
-    <app-admin-stat-grid>
+    <app-admin-stat-grid [columns]="4">
       <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.BASE_MODE' | translate" [value]="theme.baseMode" icon="pi-moon" />
       <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.VERSIONS' | translate" [value]="theme.versionCounter" icon="pi-history" />
       <app-admin-stat-card [label]="'ADMIN.THEMES.DETAIL.SCHEDULES' | translate" [value]="theme.schedules.length" icon="pi-calendar" />

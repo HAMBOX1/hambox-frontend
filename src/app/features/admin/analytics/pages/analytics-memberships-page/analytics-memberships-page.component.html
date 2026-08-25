@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as memberships) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="8">
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.ACTIVE_MEMBERSHIPS' | translate" [value]="memberships.activeCount" icon="pi-id-card" tone="success" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.NEW_MEMBERSHIPS' | translate" [value]="memberships.newInPeriod" icon="pi-plus" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.RENEWALS' | translate" [value]="memberships.renewalsInPeriod" icon="pi-refresh" />

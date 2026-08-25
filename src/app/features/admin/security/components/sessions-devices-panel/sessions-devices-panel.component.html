@@ -1,4 +1,4 @@
-<app-admin-section-card [title]="'ADMIN.SECURITY.DEVICES.TITLE' | translate">
+<app-admin-section-card [title]="'ADMIN.SECURITY.DEVICES.TITLE' | translate" [compact]="true">
   <app-admin-toolbar>
     <app-admin-search-bar
       adminToolbarSearch
@@ -67,7 +67,7 @@
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="7">
-            <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.DEVICES.EMPTY' | translate" />
+            <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.DEVICES.EMPTY' | translate" [dense]="true" />
           </td>
         </tr>
       </ng-template>
@@ -76,7 +76,7 @@
 </app-admin-section-card>
 
 @if (selectedUserId(); as userId) {
-  <app-admin-section-card [title]="('ADMIN.SECURITY.SESSIONS.TITLE' | translate) + (selectedUserEmail() ? ' — ' + selectedUserEmail() : '')">
+  <app-admin-section-card [title]="('ADMIN.SECURITY.SESSIONS.TITLE' | translate) + (selectedUserEmail() ? ' — ' + selectedUserEmail() : '')" [compact]="true">
     @if (facade.userSessionsError()) {
       <app-admin-error-alert [message]="facade.userSessionsError()!" />
     }
@@ -132,7 +132,7 @@
         <ng-template pTemplate="emptymessage">
           <tr>
             <td colspan="6">
-              <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.SESSIONS.EMPTY' | translate" />
+              <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.SESSIONS.EMPTY' | translate" [dense]="true" />
             </td>
           </tr>
         </ng-template>

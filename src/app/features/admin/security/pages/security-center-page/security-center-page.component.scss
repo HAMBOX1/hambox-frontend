@@ -1,4 +1,15 @@
 .security-center-page {
+  &__tabs {
+    .p-tablist-tab-list {
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .p-tab {
+      white-space: nowrap;
+    }
+  }
+
   &__event-list {
     display: flex;
     flex-direction: column;

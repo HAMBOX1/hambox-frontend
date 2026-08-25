@@ -26,7 +26,7 @@
     <app-admin-error-alert [message]="detailError()!" />
   } @else if (detail(); as plan) {
 <section class="admin-detail-hero">
-      <app-admin-stat-grid>
+      <app-admin-stat-grid [columns]="4">
         <app-admin-stat-card
           [label]="'ADMIN.MEMBERSHIPS.EDIT.PRICE' | translate"
           [value]="plan.price | hamboxCurrency"
@@ -131,7 +131,7 @@
           @if (statisticsLoading()) {
             <app-admin-loading-skeleton variant="detail" [rows]="3" />
           } @else if (statistics(); as stats) {
-            <app-admin-stat-grid>
+            <app-admin-stat-grid [columns]="5">
               <app-admin-stat-card
                 [label]="'ADMIN.MEMBERSHIPS.STATS.TOTAL' | translate"
                 [value]="stats.totalPlans"

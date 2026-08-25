@@ -10,41 +10,72 @@
   </header>
 
   <div class="library-page__toolbar">
-    <input
-      class="library-page__search"
-      type="search"
-      [value]="searchTerm()"
-      [placeholder]="'ACCOUNT.LIBRARY.SEARCH_PLACEHOLDER' | translate"
-      (input)="onSearchInput($event)"
-    />
+    <div class="library-page__search-field">
+      <i class="pi pi-search" aria-hidden="true"></i>
+      <input
+        class="library-page__search"
+        type="search"
+        [value]="searchTerm()"
+        [attr.aria-label]="'ACCOUNT.LIBRARY.SEARCH_PLACEHOLDER' | translate"
+        [placeholder]="'ACCOUNT.LIBRARY.SEARCH_PLACEHOLDER' | translate"
+        (input)="onSearchInput($event)"
+      />
+    </div>
 
-    <select class="library-page__select" [value]="deliveryFilter()" (change)="onDeliveryChange($event)">
-      @for (option of deliveryOptions; track option.value) {
-        <option [value]="option.value">{{ option.labelKey | translate }}</option>
-      }
-    </select>
+    <div class="library-page__filters">
+      <select
+        class="library-page__select"
+        [value]="deliveryFilter()"
+        [attr.aria-label]="'ACCOUNT.LIBRARY_UI.DELIVERY_ALL' | translate"
+        (change)="onDeliveryChange($event)"
+      >
+        @for (option of deliveryOptions; track option.value) {
+          <option [value]="option.value">{{ option.labelKey | translate }}</option>
+        }
+      </select>
 
-    <select class="library-page__select" [value]="sort()" (change)="onSortChange($event)">
-      @for (option of sortOptions; track option.value) {
-        <option [value]="option.value">{{ option.labelKey | translate }}</option>
-      }
-    </select>
+      <select
+        class="library-page__select"
+        [value]="sort()"
+        [attr.aria-label]="'ACCOUNT.LIBRARY_UI.SORT_RECENT' | translate"
+        (change)="onSortChange($event)"
+      >
+        @for (option of sortOptions; track option.value) {
+          <option [value]="option.value">{{ option.labelKey | translate }}</option>
+        }
+      </select>
+    </div>
 
-    <div class="library-page__group-tabs" role="tablist" [attr.aria-label]="'ACCOUNT.LIBRARY_UI.GROUPS_ARIA' | translate">
-      <button type="button" [class.is-active]="!groupFilter()" (click)="setGroup('')">{{ 'ACCOUNT.LIBRARY_UI.GROUP_ALL' | translate }}</button>
-      <button type="button" [class.is-active]="groupFilter() === 'recent'" (click)="setGroup('recent')">
+    <div class="library-page__segmented" role="tablist" [attr.aria-label]="'ACCOUNT.LIBRARY_UI.GROUPS_ARIA' | translate">
+      <button type="button" role="tab" [attr.aria-selected]="!groupFilter()" [class.is-active]="!groupFilter()" (click)="setGroup('')">
+        {{ 'ACCOUNT.LIBRARY_UI.GROUP_ALL' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="groupFilter() === 'recent'"
+        [class.is-active]="groupFilter() === 'recent'"
+        (click)="setGroup('recent')"
+      >
         {{ 'ACCOUNT.LIBRARY.RECENT' | translate }}
       </button>
-      <button type="button" [class.is-active]="groupFilter() === 'older'" (click)="setGroup('older')">
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="groupFilter() === 'older'"
+        [class.is-active]="groupFilter() === 'older'"
+        (click)="setGroup('older')"
+      >
         {{ 'ACCOUNT.LIBRARY.OLDER' | translate }}
       </button>
     </div>
   </div>
 
-  @if (loading()) {
+  @if (isInitialLoading()) {
     <app-loading-skeleton type="card" [count]="6" />
   } @else if (error()) {
     <div class="library-page__state">
+      <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
       <p>{{ error() }}</p>
       <button type="button" (click)="retry()">{{ 'ACCOUNT.LIBRARY.RETRY' | translate }}</button>
     </div>
@@ -55,37 +86,49 @@
       <p>{{ 'ACCOUNT.LIBRARY.EMPTY_HINT' | translate }}</p>
       <a routerLink="/products">{{ 'ACCOUNT.LIBRARY.BROWSE' | translate }}</a>
     </div>
-  } @else if (showGroupedSections()) {
-    @if (recentItems().length) {
-      <section class="library-page__section">
-        <h2>{{ 'ACCOUNT.LIBRARY.RECENT_PURCHASES' | translate }}</h2>
-        <div class="library-page__grid">
-          @for (item of recentItems(); track item.id; let i = $index) {
-            <ng-container
-              *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i }"
-            ></ng-container>
-          }
-        </div>
-      </section>
-    }
-
-    @if (olderItems().length) {
-      <section class="library-page__section">
-        <h2>{{ 'ACCOUNT.LIBRARY.OLDER_PURCHASES' | translate }}</h2>
-        <div class="library-page__grid">
-          @for (item of olderItems(); track item.id; let i = $index) {
-            <ng-container
-              *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i + recentItems().length }"
-            ></ng-container>
-          }
-        </div>
-      </section>
-    }
   } @else {
-    <div class="library-page__grid">
-      @for (item of items(); track item.id; let i = $index) {
-        <ng-container *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i }"></ng-container>
+    <div class="library-page__results">
+      @if (isRefreshing()) {
+        <div class="library-page__refresh-overlay" aria-hidden="true">
+          <i class="pi pi-spin pi-spinner"></i>
+        </div>
       }
+
+      <div class="library-page__results-content" [class.is-dimmed]="isRefreshing()">
+        @if (showGroupedSections()) {
+          @if (recentItems().length) {
+            <section class="library-page__section">
+              <h2>{{ 'ACCOUNT.LIBRARY.RECENT_PURCHASES' | translate }}</h2>
+              <div class="library-page__grid">
+                @for (item of recentItems(); track item.id; let i = $index) {
+                  <ng-container
+                    *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i }"
+                  ></ng-container>
+                }
+              </div>
+            </section>
+          }
+
+          @if (olderItems().length) {
+            <section class="library-page__section">
+              <h2>{{ 'ACCOUNT.LIBRARY.OLDER_PURCHASES' | translate }}</h2>
+              <div class="library-page__grid">
+                @for (item of olderItems(); track item.id; let i = $index) {
+                  <ng-container
+                    *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i + recentItems().length }"
+                  ></ng-container>
+                }
+              </div>
+            </section>
+          }
+        } @else {
+          <div class="library-page__grid">
+            @for (item of items(); track item.id; let i = $index) {
+              <ng-container *ngTemplateOutlet="libraryCard; context: { $implicit: item, index: i }"></ng-container>
+            }
+          </div>
+        }
+      </div>
     </div>
   }
 
@@ -104,80 +147,111 @@
   }
 </section>
 
+<p-menu #actionMenu [popup]="true" [model]="actionMenuItems()" appendTo="body" />
+
 <ng-template #libraryCard let-item let-index="index">
   <article
     class="library-card"
     [id]="'library-item-' + item.id"
     [class.library-card--highlighted]="highlightItemId() === item.id"
   >
-    <img class="library-card__image" [src]="imageUrl(item, index)" [alt]="item.productNameEn" loading="lazy" />
+    <div class="library-card__head">
+      <img class="library-card__image" [src]="imageUrl(item, index)" [alt]="item.productNameEn" loading="lazy" />
 
-    <div class="library-card__body">
-      <header class="library-card__header">
-        <h3>{{ item.productNameEn }}</h3>
-        <span class="library-card__status" [class.is-delivered]="item.deliveryStatus === 'Delivered'">
-          {{ deliveryStatusLabel(item) }}
-        </span>
-      </header>
+      <div class="library-card__headline">
+        <div class="library-card__title-row">
+          <h3>{{ item.productNameEn }}</h3>
+          <span class="library-card__status" [class.is-delivered]="item.deliveryStatus === 'Delivered'">
+            {{ deliveryStatusLabel(item) }}
+          </span>
+        </div>
 
-      @if (isDeliveryPending(item)) {
-        <p class="library-card__processing-note">
-          {{ 'ACCOUNT.LIBRARY_UI.PROCESSING_NOTE' | translate }}
-          @if (item.supportUrl) {
-            <a [href]="item.supportUrl">{{ 'ACCOUNT.LIBRARY_UI.SUPPORT' | translate }}</a>
+        <p class="library-card__submeta">
+          @if (platformRegionLabel(item); as platformRegion) {
+            <span>{{ platformRegion }}</span>
+            <span class="library-card__dot" aria-hidden="true">·</span>
           }
+          <span>{{ item.purchaseDate | hamboxDate: 'mediumDate' }}</span>
+          <span class="library-card__dot" aria-hidden="true">·</span>
+          <span class="library-card__order-number">{{ item.orderNumber }}</span>
         </p>
-      }
-
-      <dl class="library-card__meta">
-        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_PLATFORM' | translate }}</dt><dd>{{ metaValue(item.platform) }}</dd></div>
-        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_EDITION' | translate }}</dt><dd>{{ metaValue(item.edition) }}</dd></div>
-        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_REGION' | translate }}</dt><dd>{{ metaValue(item.region) }}</dd></div>
-        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_PURCHASED' | translate }}</dt><dd>{{ item.purchaseDate | hamboxDate: 'mediumDate' }}</dd></div>
-        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_ORDER' | translate }}</dt><dd>{{ item.orderNumber }}</dd></div>
-        <div><dt>{{ 'ACCOUNT.LIBRARY_UI.META_STATUS' | translate }}</dt><dd>{{ item.orderStatus }}</dd></div>
-      </dl>
-
-      <div class="library-card__key" [class.library-card__key--revealed]="isKeyRevealed(item.id)">
-        <code>{{ displayKey(item) }}</code>
-        @if (isKeyRevealed(item.id)) {
-          <span class="library-card__reveal-hint">{{ 'ACCOUNT.LIBRARY_UI.AUTO_HIDE' | translate }}</span>
-        }
       </div>
+    </div>
 
-      @if (instructionsOpen(item.id) && item.redeemInstructions) {
-        <p class="library-card__instructions">{{ item.redeemInstructions }}</p>
-      }
-
-      <div class="library-card__actions">
-        <button
-          type="button"
-          [disabled]="!item.canReveal || isRevealing(item.id)"
-          (click)="requestReveal(item)"
-        >
-          {{
-            isKeyRevealed(item.id)
-              ? ('ACCOUNT.LIBRARY_UI.HIDE_CODE' | translate)
-              : isRevealing(item.id)
-                ? ('ACCOUNT.LIBRARY_UI.REVEALING' | translate)
-                : ('ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate)
-          }}
-        </button>
-        <button type="button" [disabled]="!isKeyRevealed(item.id)" (click)="copyKey(item)">
-          {{ copyFeedbackId() === item.id ? ('ACCOUNT.LIBRARY_UI.COPIED' | translate) : ('ACCOUNT.LIBRARY_UI.COPY_CODE' | translate) }}
-        </button>
-        <button type="button" (click)="toggleInstructions(item.id)">{{ 'ACCOUNT.LIBRARY_UI.HOW_TO_REDEEM' | translate }}</button>
-        @if (item.hasInstructions) {
-          <a [routerLink]="['/account/library', item.orderItemId, 'instructions']">{{ 'ACCOUNT.LIBRARY_UI.INSTRUCTIONS' | translate }}</a>
-        }
-        <a [routerLink]="['/account/orders', item.orderId]">{{ 'ACCOUNT.LIBRARY_UI.VIEW_DETAILS' | translate }}</a>
-        @if (item.invoiceUrl) {
-          <a [href]="item.invoiceUrl" target="_blank" rel="noopener">{{ 'ACCOUNT.LIBRARY_UI.DOWNLOAD_INVOICE' | translate }}</a>
-        }
+    @if (isDeliveryPending(item)) {
+      <p class="library-card__processing-note">
+        {{ 'ACCOUNT.LIBRARY_UI.PROCESSING_NOTE' | translate }}
         @if (item.supportUrl) {
           <a [href]="item.supportUrl">{{ 'ACCOUNT.LIBRARY_UI.SUPPORT' | translate }}</a>
         }
-      </div>
+      </p>
+    }
+
+    <div class="library-card__code" [class.library-card__code--revealed]="isKeyRevealed(item.id)">
+      <i class="pi pi-shield" aria-hidden="true"></i>
+      <code [title]="displayKey(item)">{{ displayKey(item) }}</code>
+      <button
+        type="button"
+        class="library-card__eye"
+        [disabled]="!item.canReveal || isRevealing(item.id)"
+        [attr.aria-label]="
+          isKeyRevealed(item.id) ? ('ACCOUNT.LIBRARY_UI.HIDE_CODE' | translate) : ('ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate)
+        "
+        [pTooltip]="isKeyRevealed(item.id) ? ('ACCOUNT.LIBRARY_UI.HIDE_CODE' | translate) : ('ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate)"
+        tooltipPosition="top"
+        (click)="requestReveal(item)"
+      >
+        <i class="pi" [class.pi-eye]="!isKeyRevealed(item.id)" [class.pi-eye-slash]="isKeyRevealed(item.id)" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    @if (isKeyRevealed(item.id)) {
+      <span class="library-card__reveal-hint">{{ 'ACCOUNT.LIBRARY_UI.AUTO_HIDE' | translate }}</span>
+    }
+
+    @if (instructionsOpen(item.id) && item.redeemInstructions) {
+      <p class="library-card__instructions">{{ item.redeemInstructions }}</p>
+    }
+
+    <div class="library-card__footer">
+      <button
+        type="button"
+        class="library-card__cta"
+        [disabled]="!item.canReveal || isRevealing(item.id)"
+        (click)="requestReveal(item)"
+      >
+        {{
+          isKeyRevealed(item.id)
+            ? ('ACCOUNT.LIBRARY_UI.HIDE_CODE' | translate)
+            : isRevealing(item.id)
+              ? ('ACCOUNT.LIBRARY_UI.REVEALING' | translate)
+              : ('ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate)
+        }}
+      </button>
+
+      <button
+        type="button"
+        class="library-card__icon-btn"
+        [disabled]="!isKeyRevealed(item.id)"
+        [attr.aria-label]="copyFeedbackId() === item.id ? ('ACCOUNT.LIBRARY_UI.COPIED' | translate) : ('ACCOUNT.LIBRARY_UI.COPY_CODE' | translate)"
+        [pTooltip]="'ACCOUNT.LIBRARY_UI.COPY_CODE' | translate"
+        tooltipPosition="top"
+        (click)="copyKey(item)"
+      >
+        <i class="pi" [class.pi-check]="copyFeedbackId() === item.id" [class.pi-copy]="copyFeedbackId() !== item.id" aria-hidden="true"></i>
+      </button>
+
+      <button
+        type="button"
+        class="library-card__icon-btn"
+        [attr.aria-label]="'ACCOUNT.LIBRARY_UI.MORE_ACTIONS' | translate"
+        [pTooltip]="'ACCOUNT.LIBRARY_UI.MORE_ACTIONS' | translate"
+        tooltipPosition="top"
+        aria-haspopup="true"
+        (click)="openActionMenu($event, item)"
+      >
+        <i class="pi pi-ellipsis-h" aria-hidden="true"></i>
+      </button>
     </div>
   </article>
 </ng-template>

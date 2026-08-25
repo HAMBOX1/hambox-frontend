@@ -145,6 +145,17 @@
         "Privacy": "سياسة الخصوصية",
         "Refund": "سياسة الاسترداد"
       }
+    },
+    "TURNSTILE": {
+      "LOAD_ERROR": "تعذّر تحميل التحقق الأمني. يرجى تحديث الصفحة والمحاولة مرة أخرى."
+    },
+    "ACCESS_DENIED": {
+      "TITLE": "الوصول مرفوض",
+      "ADMIN_ON_CUSTOMER": "لا يمكن لجلسات الإدارة الوصول إلى ميزات العملاء في المتجر. سجّل الخروج من لوحة الإدارة أو استخدم حساب عميل.",
+      "PERMISSION": "ليس لديك صلاحية للوصول إلى هذه الصفحة. إذا كنت تعتقد أن هذا خطأ، تواصل مع أحد المسؤولين.",
+      "GENERIC": "ليس لديك صلاحية لعرض هذه الصفحة.",
+      "GO_TO_ADMIN": "الذهاب إلى لوحة الإدارة",
+      "GO_TO_STOREFRONT": "الذهاب إلى المتجر"
     }
   },
   "LEGAL": {
@@ -386,7 +397,8 @@
       "UPGRADE": "ترقية",
       "DOWNGRADE": "تخفيض",
       "SUBSCRIBE": "اشتراك",
-      "COMPARE_PLANS": "قارن الخطط المتاحة",
+      "PLANS_TITLE": "الخطط",
+      "BILLING_ACTIVITY": "الفواتير والنشاط",
       "HISTORY_TAB": "السجل",
       "TRANSACTIONS_TAB": "المعاملات",
       "NO_HISTORY": "لا يوجد سجل عضوية بعد.",
@@ -422,6 +434,7 @@
       "VIEW_DETAILS": "عرض التفاصيل",
       "DOWNLOAD_INVOICE": "تحميل الفاتورة",
       "SUPPORT": "الدعم",
+      "MORE_ACTIONS": "مزيد من الخيارات",
       "PROCESSING_NOTE": "تمت عملية الدفع وطلبك لم يُفقد — التسليم لا يزال قيد التجهيز. إذا استمر الانتظار لفترة طويلة، تواصل مع",
       "REVEAL_MODAL_TITLE": "إظهار كود التفعيل؟",
       "REVEAL_MODAL_BODY": "سيبقى كود {{product}} مرئياً لمدة 30 ثانية ثم يُخفى تلقائياً.",
@@ -591,7 +604,9 @@
       "WRITE_REVIEW": "اكتب تقييماً",
       "DOWNLOAD_INVOICE": "تحميل الفاتورة",
       "CONTACT_SUPPORT": "التواصل مع الدعم",
-      "REVIEW_ERROR": "تعذر إرسال تقييمك. يرجى المحاولة مرة أخرى."
+      "REVIEW_ERROR": "تعذر إرسال تقييمك. يرجى المحاولة مرة أخرى.",
+      "REQUEST_CANCELLATION": "طلب الإلغاء",
+      "CANCEL_REQUEST_SUBJECT": "طلب إلغاء للطلب {{orderNumber}}"
     },
     "WISHLIST_UI": {
       "TITLE": "خزنتك",
@@ -684,6 +699,8 @@
       "TRANSACTION_AMOUNT": "المبلغ",
       "TRANSACTION_STATUS": "الحالة",
       "TRANSACTION_DATE": "التاريخ",
+      "MORE_BENEFITS": "+{{count}} أخرى",
+      "ACTIVITY_ARIA": "نشاط الفواتير",
       "NA": "—",
       "TOAST": {
         "RENEW_SUCCESS": "تم تجديد العضوية",
@@ -923,6 +940,17 @@
         "PUBLISHED": "منشور",
         "DRAFTS": "مسودات",
         "NEEDS_ATTENTION": "تحتاج متابعة"
+      },
+      "SUPPLIER_MAPPING": {
+        "ADD": "إضافة ربط مورد",
+        "VARIANTS_MAPPED": "متغيّرات مرتبطة"
+      },
+      "SUPPLIER_FULFILLMENT": {
+        "SUBTITLE": "المورد الذي يوفر كل متغيّر من هذا المنتج.",
+        "EMPTY": "لا يوجد ربط مورد لهذا المنتج.",
+        "FULLY_CONFIGURED": "مكتمل الإعداد",
+        "PARTIALLY_CONFIGURED": "إعداد جزئي",
+        "MANAGE": "إدارة الربط"
       },
       "DUPLICATE": {
         "TITLE": "نسخ المنتج",
@@ -1174,6 +1202,7 @@
       "ROLES": "الأدوار",
       "PROMOTIONS": "العروض",
       "MEMBERSHIPS": "العضويات",
+      "REFERRALS": "الإحالات",
       "THEMES": "السمات",
       "CAMPAIGNS": "الحملات",
       "PAGE_BUILDER": "منشئ الصفحات",
@@ -3245,7 +3274,8 @@
           "PURCHASE_DATE": "تاريخ الشراء",
           "DELIVERY": "التسليم",
           "MEMBERSHIP": "خصم العضوية",
-          "COUPON": "الكوبون"
+          "COUPON": "الكوبون",
+          "LAST_EDITED": "آخر تعديل"
         }
       },
       "STATS": {
@@ -3279,6 +3309,7 @@
         "SUMMARY": "ملخص الطلب",
         "CUSTOMER": "معلومات العميل",
         "COUPON": "معلومات الكوبون",
+        "LAST_EDITED_BY": "بواسطة {{name}}",
         "TIMELINE": "الجدول الزمني للطلب",
         "PRODUCTS": "المنتجات المشتراة",
         "DIGITAL_CODES": "الأكواد الرقمية المسلَّمة",
@@ -3553,6 +3584,57 @@
       },
       "PREVIEW": {
         "TARGETS_COUNT": "هدف/أهداف محددة"
+      }
+    },
+    "REFERRALS": {
+      "LIST": {
+        "TITLE": "الإحالات",
+        "SUBTITLE": "ابحث عن روابط الإحالة وتتبع حالتها وتدخّل يدويًا عند الحاجة.",
+        "SEARCH_PLACEHOLDER": "ابحث برمز الإحالة أو بريد المُحال إليه…",
+        "FILTER_STATUS": "الحالة",
+        "COLUMNS": {
+          "CODE": "الرمز",
+          "REFERRED": "المُحال إليه",
+          "STATUS": "الحالة",
+          "POINTS": "النقاط",
+          "CREATED": "تاريخ الإنشاء"
+        },
+        "EMPTY": "لا توجد إحالات بعد.",
+        "EMPTY_SEARCH": "لا توجد إحالات مطابقة لعوامل التصفية."
+      },
+      "ACTIONS": {
+        "VIEW": "عرض التفاصيل",
+        "VOID": "إبطال الإحالة",
+        "REVERSE": "عكس الإحالة",
+        "CONFIRM_REVERSE": "تأكيد",
+        "RETRY": "إعادة المحاولة"
+      },
+      "CONFIRM": {
+        "TITLE": "هل أنت متأكد؟",
+        "VOID_MESSAGE": "سيؤدي هذا إلى إبطال الإحالة {{code}} — لن تتمكن بعد الآن من التأهل للحصول على مكافأة. لا يمكن التراجع عن هذا الإجراء.",
+        "REVERSE_MESSAGE": "سيؤدي هذا إلى عكس الإحالة {{code}} واسترداد أي نقاط سبق منحها للمُحيل. لا يمكن التراجع عن هذا الإجراء."
+      },
+      "TOAST": {
+        "REVERSED": "تم تحديث الإحالة.",
+        "REVERSE_FAILED": "تعذر تحديث هذه الإحالة."
+      },
+      "DETAIL": {
+        "TITLE": "تفاصيل الإحالة",
+        "CODE": "رمز الإحالة",
+        "REFERRER_ID": "معرّف المُحيل",
+        "REFERRED": "المُحال إليه",
+        "STATUS": "الحالة",
+        "POINTS": "النقاط المكتسبة",
+        "AUDIT_TRAIL": "سجل التدقيق",
+        "NO_AUDIT": "لا توجد أحداث مسجلة."
+      },
+      "AUDIT_ACTION": {
+        "REDEEMED": "تم استخدام الرمز",
+        "QUALIFIED": "مؤهّلة",
+        "REWARDED": "تم منح النقاط",
+        "EXPIRED": "منتهية",
+        "REVERSED": "معكوسة",
+        "REJECTED": "مرفوضة"
       }
     },
     "THEMES": {
@@ -4852,6 +4934,7 @@
         "TITLE": "ربط المنتجات",
         "SUBTITLE": "قم بربط منتجات HAMBOX بمنتجات هذا المورد الخارجية.",
         "NEW": "ربط جديد",
+        "MAP_HAMBOX_PRODUCT": "ربط منتج HAMBOX",
         "EDIT_TITLE": "تعديل الربط",
         "EMPTY": "لا توجد روابط منتجات بعد.",
         "INTERNAL_PRODUCT_ID": "معرف المنتج الداخلي",
@@ -4904,10 +4987,78 @@
         "CREATE": "إنشاء مورد",
         "SAVE_CREDENTIALS": "حفظ بيانات الاعتماد",
         "TEST_CONNECTION": "اختبار الاتصال",
-        "MAPPINGS": "الروابط",
+        "MAP_PRODUCTS": "ربط المنتجات",
+        "MAPPINGS": "عرض الروابط",
         "ENABLE": "تفعيل",
         "DISABLE": "تعطيل",
         "DELETE": "حذف"
+      },
+      "MAP_PRODUCTS": {
+        "TITLE": "ربط المنتجات",
+        "TITLE_WITH_SUPPLIER": "ربط المنتجات بـ {{supplier}}",
+        "SUBTITLE": "اربط منتجات HAMBOX بالمنتجات المتوفرة لدى هذا المورد.",
+        "FIND_MATCHES": "البحث عن تطابقات",
+        "SEARCH_PLACEHOLDER": "البحث عن منتجات...",
+        "STATS": {
+          "ELIGIBLE": "المنتجات المؤهلة",
+          "MAPPED": "مرتبطة",
+          "NEEDS_MAPPING": "بحاجة إلى ربط",
+          "SUGGESTED": "مقترحة (تم فحصها حتى الآن)"
+        },
+        "FILTERS": {
+          "ALL": "الكل",
+          "MAPPED": "مرتبطة",
+          "UNMAPPED": "بحاجة إلى ربط"
+        },
+        "COLUMNS": {
+          "PRODUCT": "منتج HAMBOX",
+          "VARIANT": "المتغيّر",
+          "SUPPLIER_MATCH": "تطابق المورد",
+          "PRICE": "السعر",
+          "AVAILABILITY": "التوفر",
+          "STATUS": "الحالة",
+          "ACTION": "إجراء"
+        },
+        "STATUS": {
+          "MAPPED": "مرتبط",
+          "SUGGESTED": "مقترح",
+          "NEEDS_MAPPING": "بحاجة إلى ربط",
+          "UNAVAILABLE": "غير متوفر"
+        },
+        "ACTIONS": {
+          "CONFIRM_MAPPING": "تأكيد الربط",
+          "REVIEW_MATCH": "مراجعة التطابق",
+          "SEARCH_SUPPLIER": "البحث في Bamboo"
+        },
+        "HIGH_CONFIDENCE": "ثقة عالية · {{score}}٪",
+        "MEDIUM_CONFIDENCE": "ثقة متوسطة · {{score}}٪",
+        "NO_MATCH": "لا يوجد تطابق موثوق",
+        "NOT_CHECKED_YET": "لم يتم الفحص بعد",
+        "CONFIRM_N_MAPPINGS": "تأكيد {{count}} روابط",
+        "NO_SUGGESTIONS_YET": "شغّل \"البحث عن تطابقات\" للحصول على اقتراحات ربط للمنتجات المحددة.",
+        "BULK_RESULT": "تم إنشاء {{created}} من {{total}} روابط.",
+        "EMPTY": {
+          "TITLE": "لا توجد منتجات مؤهلة",
+          "DESCRIPTION": "كل منتج نشط بمتغيّر ظاهر مؤهل للربط — جرّب مسح البحث أو الفلتر."
+        },
+        "DRAWER": {
+          "TITLE": "تنفيذ المورد",
+          "HAMBOX_PRODUCT": "منتج HAMBOX",
+          "SUPPLIER": "المورد",
+          "SELECT_SUPPLIER": "اختر موردًا",
+          "ORDER_STATUS_SUPPORTED": "دعم حالة الطلب",
+          "SUPPLIER_PRODUCT": "منتج المورد",
+          "BUYING_PRICE": "سعر الشراء",
+          "PRIORITY": "الأولوية",
+          "VARIANTS": "المتغيّرات",
+          "MAPPED_TO": "مرتبط بـ {{supplier}}",
+          "NOT_MAPPED": "غير مرتبط",
+          "MAP": "ربط",
+          "EDIT": "تعديل",
+          "CREATE_MAPPING": "إنشاء الربط",
+          "SAVE_MAPPING": "حفظ الربط",
+          "SAVE_FAILED": "فشل حفظ الربط."
+        }
       },
       "MESSAGES": {
         "CREATED": "تم إنشاء المورد.",
@@ -4924,7 +5075,9 @@
       },
       "AVAILABILITY": {
         "TITLE": "التوفر",
+        "FULFILLMENT_HEALTH": "سلامة التنفيذ",
         "MAPPED": "المنتجات المرتبطة",
+        "UNMAPPED": "المنتجات غير المرتبطة",
         "AVAILABLE": "متوفر",
         "UNAVAILABLE": "غير متوفر",
         "UNKNOWN": "غير معروف",
@@ -4961,6 +5114,17 @@
         "OPEN_ALERTS_PREVIEW": "التنبيهات المفتوحة",
         "VIEW_ALL_ALERTS": "عرض كل التنبيهات"
       },
+      "STATUS_BAR": {
+        "ALL_CLEAR": "كل الأنظمة آمنة",
+        "ATTENTION_NEEDED": "يلزم الانتباه الأمني",
+        "LAST_ACTIVITY": "آخر نشاط",
+        "NO_RECENT_ACTIVITY": "لا يوجد نشاط أمني حديث",
+        "REVIEW_ALERTS": "مراجعة التنبيهات"
+      },
+      "FAILED_LOGIN_INTEL": {
+        "EMPTY_TITLE": "لا تتوفر بيانات جغرافية لمحاولات الدخول الفاشلة بعد",
+        "EMPTY_DESCRIPTION": "ستظهر بيانات الدول عند وجود محاولات فاشلة كافية للتحليل."
+      },
       "EMPTY": {
         "CHART": "لا توجد بيانات كافية بعد."
       },
@@ -4992,6 +5156,8 @@
       },
       "ALERTS": {
         "EMPTY": "لا توجد تنبيهات مفتوحة.",
+        "HEALTHY_TITLE": "لا توجد تنبيهات أمنية مفتوحة",
+        "HEALTHY_DESCRIPTION": "كل شيء يبدو طبيعيًا — لا توجد تنبيهات غير محلولة الآن.",
         "ACTIONS": {
           "ACKNOWLEDGE": "الإقرار",
           "RESOLVE": "حل",
@@ -5220,7 +5386,8 @@
         "NOT_READY_DISABLED": "المورد معطّل.",
         "NOT_READY_PROVIDER": "المزوّد غير مسجَّل.",
         "NOT_READY_CREDENTIALS": "بيانات الاعتماد غير مهيأة.",
-        "NOT_READY_OTHER": "غير مؤهل حاليًا."
+        "NOT_READY_OTHER": "غير مؤهل حاليًا.",
+        "FIND_SUPPLIER_PRODUCT": "البحث عن منتج المورد ({{supplier}})"
       },
       "CONFIRM": {
         "TITLE": "تغيير وضع التنفيذ؟",

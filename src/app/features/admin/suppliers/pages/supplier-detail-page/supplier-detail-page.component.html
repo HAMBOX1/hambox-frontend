@@ -12,6 +12,14 @@
           [label]="d.isEnabled ? d.status : ('ADMIN.SUPPLIERS.DISABLED' | translate)"
           [tone]="d.isEnabled ? 'success' : 'neutral'"
         />
+        <a
+          *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+          pButton
+          class="admin-btn-primary"
+          [routerLink]="['/admin/suppliers', d.id, 'map-products']"
+        >
+          {{ 'ADMIN.SUPPLIERS.ACTIONS.MAP_PRODUCTS' | translate }}
+        </a>
         <a pButton class="admin-btn-secondary" [routerLink]="['/admin/suppliers', d.id, 'mappings']">
           {{ 'ADMIN.SUPPLIERS.ACTIONS.MAPPINGS' | translate }}
         </a>
@@ -242,12 +250,20 @@
         }
       </app-admin-section-card>
 
-      <app-admin-section-card [title]="'ADMIN.SUPPLIERS.AVAILABILITY.TITLE' | translate">
+      <app-admin-section-card [title]="'ADMIN.SUPPLIERS.AVAILABILITY.FULFILLMENT_HEALTH' | translate">
+        @if (candidatesSummaryLoading()) {
+          <p class="supplier-detail-page__hint">{{ 'COMMON.LOADING' | translate }}</p>
+        } @else if (candidatesSummary(); as mapping) {
+          <app-admin-stat-grid [columns]="2">
+            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.MAPPED' | translate" [value]="mapping.mappedCount" tone="success" />
+            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.UNMAPPED' | translate" [value]="mapping.unmappedCount" tone="warning" />
+          </app-admin-stat-grid>
+        }
+
         @if (availabilitySummaryLoading()) {
           <p class="supplier-detail-page__hint">{{ 'COMMON.LOADING' | translate }}</p>
         } @else if (availabilitySummary(); as summary) {
-          <app-admin-stat-grid>
-            <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.MAPPED' | translate" [value]="summary.mappedCount" />
+          <app-admin-stat-grid [columns]="3">
             <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.AVAILABLE' | translate" [value]="summary.availableCount" tone="success" />
             <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.UNAVAILABLE' | translate" [value]="summary.unavailableCount" tone="warning" />
             <app-admin-stat-card [compact]="true" [label]="'ADMIN.SUPPLIERS.AVAILABILITY.UNKNOWN' | translate" [value]="summary.unknownCount" tone="info" />

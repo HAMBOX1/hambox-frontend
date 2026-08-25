@@ -92,7 +92,12 @@
     <ng-template pTemplate="emptymessage">
       <tr>
         <td [attr.colspan]="isAlerts() ? 8 : 7">
-          <app-admin-empty-state icon="pi pi-shield" [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate" />
+          <app-admin-empty-state
+            icon="pi pi-shield"
+            [title]="'ADMIN.SECURITY.EVENTS.EMPTY' | translate"
+            [dense]="true"
+            [tone]="isAlerts() ? 'success' : 'neutral'"
+          />
         </td>
       </tr>
     </ng-template>

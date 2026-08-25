@@ -1,0 +1,171 @@
+<p-toast position="top-right" />
+
+<section class="admin-page admin-referrals-list-page">
+  <app-admin-page-header
+    [title]="'ADMIN.REFERRALS.LIST.TITLE' | translate"
+    [subtitle]="'ADMIN.REFERRALS.LIST.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-toolbar>
+    <app-admin-search-bar
+      adminToolbarSearch
+      [value]="searchTerm()"
+      [placeholder]="'ADMIN.REFERRALS.LIST.SEARCH_PLACEHOLDER' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+
+    <p-select
+      adminToolbarFilters
+      class="admin-referrals-list-page__filter"
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      [placeholder]="'ADMIN.REFERRALS.LIST.FILTER_STATUS' | translate"
+    />
+  </app-admin-toolbar>
+
+  @if (error()) {
+    <app-admin-error-alert
+      [message]="error()!"
+      [retryLabel]="'ADMIN.REFERRALS.ACTIONS.RETRY' | translate"
+      (retry)="retryLoad()"
+    />
+  }
+
+  <app-admin-data-table-shell>
+    <p-table
+      class="admin-data-table"
+      [value]="[...referrals()]"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="totalCount() > 0"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [first]="tableFirst()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      (onLazyLoad)="onPageChange($event)"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.REFERRALS.LIST.COLUMNS.CODE' | translate }}</th>
+          <th>{{ 'ADMIN.REFERRALS.LIST.COLUMNS.REFERRED' | translate }}</th>
+          <th>{{ 'ADMIN.REFERRALS.LIST.COLUMNS.STATUS' | translate }}</th>
+          <th>{{ 'ADMIN.REFERRALS.LIST.COLUMNS.POINTS' | translate }}</th>
+          <th>{{ 'ADMIN.REFERRALS.LIST.COLUMNS.CREATED' | translate }}</th>
+          <th style="width: 4rem"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-referral>
+        <tr>
+          <td>
+            <a class="admin-cell-primary" (click)="openDetail(referral)">{{ referral.referralCode }}</a>
+          </td>
+          <td>
+            <span>{{ referral.referredDisplayName }}</span>
+            <span class="admin-cell-secondary">{{ referral.referredEmail }}</span>
+          </td>
+          <td>
+            <app-admin-status-badge [label]="referral.status" [tone]="statusTone(referral.status)" />
+          </td>
+          <td>{{ referral.pointsEarned }}</td>
+          <td>{{ referral.createdOnUtc | hamboxDate:'short' }}</td>
+          <td>
+            @let menuItems = actionMenuItems(referral);
+            <div class="admin-actions-row">
+              <app-admin-action-menu [items]="menuItems" [disabled]="actionLoading()" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            <app-admin-empty-state
+              icon="pi pi-users"
+              [title]="
+                hasActiveFilters()
+                  ? ('ADMIN.REFERRALS.LIST.EMPTY_SEARCH' | translate)
+                  : ('ADMIN.REFERRALS.LIST.EMPTY' | translate)
+              "
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </app-admin-data-table-shell>
+</section>
+
+<p-dialog
+  [header]="'ADMIN.REFERRALS.DETAIL.TITLE' | translate"
+  [visible]="detail() !== null || detailLoading()"
+  (visibleChange)="!$event && closeDetail()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(36rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton variant="table" [rows]="3" />
+  } @else if (detail(); as d) {
+    <div class="admin-referrals-list-page__detail">
+      <dl class="admin-referrals-list-page__detail-grid">
+        <dt>{{ 'ADMIN.REFERRALS.DETAIL.CODE' | translate }}</dt>
+        <dd>{{ d.referral.referralCode }}</dd>
+
+        <dt>{{ 'ADMIN.REFERRALS.DETAIL.REFERRER_ID' | translate }}</dt>
+        <dd>{{ d.referral.referrerUserId }}</dd>
+
+        <dt>{{ 'ADMIN.REFERRALS.DETAIL.REFERRED' | translate }}</dt>
+        <dd>{{ d.referral.referredDisplayName }} ({{ d.referral.referredEmail }})</dd>
+
+        <dt>{{ 'ADMIN.REFERRALS.DETAIL.STATUS' | translate }}</dt>
+        <dd><app-admin-status-badge [label]="d.referral.status" [tone]="statusTone(d.referral.status)" /></dd>
+
+        <dt>{{ 'ADMIN.REFERRALS.DETAIL.POINTS' | translate }}</dt>
+        <dd>{{ d.referral.pointsEarned }}</dd>
+      </dl>
+
+      <h3>{{ 'ADMIN.REFERRALS.DETAIL.AUDIT_TRAIL' | translate }}</h3>
+      @if (d.auditTrail.length) {
+        <ul class="admin-referrals-list-page__audit">
+          @for (entry of d.auditTrail; track entry.id) {
+            <li>
+              <strong>{{ auditActionLabel(entry) }}</strong>
+              @if (entry.points) {
+                <span class="admin-referrals-list-page__audit-points" [class.admin-referrals-list-page__audit-points--negative]="entry.points < 0">
+                  {{ entry.points > 0 ? '+' : '' }}{{ entry.points }}
+                </span>
+              }
+              <p>{{ entry.details }}</p>
+              <span class="admin-referrals-list-page__audit-time">{{ entry.occurredOnUtc | hamboxDate:'medium' }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="admin-referrals-list-page__empty">{{ 'ADMIN.REFERRALS.DETAIL.NO_AUDIT' | translate }}</p>
+      }
+    </div>
+  }
+</p-dialog>
+
+<app-admin-confirm-dialog
+  *hamboxHasPermission="permissions.Referral.Manage"
+  [visible]="reverseDialogOpen"
+  (visibleChange)="onReverseDialogVisibleChange($event)"
+  [title]="'ADMIN.REFERRALS.CONFIRM.TITLE' | translate"
+  [message]="reverseDialogMessage()"
+  [confirmLabel]="'ADMIN.REFERRALS.ACTIONS.CONFIRM_REVERSE'"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (confirmed)="confirmReverse()"
+/>

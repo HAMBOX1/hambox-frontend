@@ -5,7 +5,7 @@
     @for (item of items(); track item.id) {
       <article class="order-item">
         <div class="order-item__thumb">
-          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" hamboxImgFallback />
         </div>
         <div class="order-item__body">
           <h3 class="order-item__title">{{ item.title }}</h3>

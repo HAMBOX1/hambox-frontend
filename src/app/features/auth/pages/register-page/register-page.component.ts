@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -6,6 +13,7 @@ import { finalize } from 'rxjs';
 
 import { ApiError } from '../../../../core/models/api-error.model';
 import { LegalAcceptanceDialogComponent } from '../../../../shared/components/legal-acceptance-dialog/legal-acceptance-dialog.component';
+import { UiTurnstileComponent } from '../../../../shared/components/ui';
 import { LegalService } from '../../../legal/services/legal.service';
 import { Auth } from '../../services/auth';
 import {
@@ -26,7 +34,7 @@ const FIELD_LABELS = {
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, ButtonModule, LegalAcceptanceDialogComponent],
+  imports: [ReactiveFormsModule, RouterLink, ButtonModule, LegalAcceptanceDialogComponent, UiTurnstileComponent],
   templateUrl: './register-page.component.html',
   styleUrl: './register-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +54,9 @@ export class RegisterPageComponent {
   protected readonly requiredLegalSlugs = computed(() =>
     this.legal.documents().filter((d) => d.requireAcceptance).map((d) => d.slug),
   );
+
+  private readonly turnstileWidget = viewChild.required(UiTurnstileComponent);
+  protected readonly turnstileToken = signal<string | null>(null);
 
   constructor() {
     void this.legal.loadDocuments();
@@ -120,7 +131,7 @@ export class RegisterPageComponent {
     this.successMessage.set(null);
     this.form.markAllAsTouched();
 
-    if (this.form.invalid || this.isSubmitting()) {
+    if (this.form.invalid || this.isSubmitting() || !this.turnstileToken()) {
       return;
     }
 
@@ -132,6 +143,11 @@ export class RegisterPageComponent {
     const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
     const firstName = nameParts[0] ?? '';
     const lastName = nameParts.slice(1).join(' ') || firstName;
+    const turnstileToken = this.turnstileToken();
+
+    if (!turnstileToken) {
+      return;
+    }
 
     this.isSubmitting.set(true);
 
@@ -141,6 +157,7 @@ export class RegisterPageComponent {
         lastName,
         email,
         password,
+        turnstileToken,
         referralCode: referralCode.trim() || undefined,
       })
       .pipe(finalize(() => this.isSubmitting.set(false)))
@@ -150,8 +167,13 @@ export class RegisterPageComponent {
             'Commander profile initialized. Check your inbox for a verification link before signing in.',
           );
           this.form.reset();
+          this.turnstileToken.set(null);
+          this.turnstileWidget().reset();
         },
         error: (error: unknown) => {
+          this.turnstileToken.set(null);
+          this.turnstileWidget().reset();
+
           if (error instanceof ApiError) {
             applyServerValidationErrors(this.form, error);
             this.errorMessage.set(error.message);

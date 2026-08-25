@@ -14,7 +14,18 @@
         <h1>{{ current.orderNumber }}</h1>
         <p>{{ current.createdOnUtc | hamboxDate:'fullDate' }} · {{ statusLabel(current.status) }}</p>
       </div>
-      <strong>{{ current.totalAmount | hamboxCurrency }}</strong>
+      <div class="order-detail-page__header-actions">
+        <strong>{{ current.totalAmount | hamboxCurrency }}</strong>
+        @if (isCancellable(current.status)) {
+          <a
+            class="order-detail-page__cancel-btn"
+            [routerLink]="['/account/support/tickets/new']"
+            [queryParams]="{ orderNumber: current.orderNumber, subject: cancelRequestSubject(current.orderNumber) }"
+          >
+            {{ 'ACCOUNT.ORDER_DETAIL_UI.REQUEST_CANCELLATION' | translate }}
+          </a>
+        }
+      </div>
     </header>
 
     <div class="order-detail-page__grid">

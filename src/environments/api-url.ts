@@ -10,3 +10,6 @@ export const HAMBOX_API_BASE_URL = apiUrlConfig.baseUrl;
 
 /** Google OAuth client ID for production builds — set via `HAMBOX_GOOGLE_CLIENT_ID` at build time. */
 export const HAMBOX_GOOGLE_CLIENT_ID = apiUrlConfig.googleClientId;
+
+/** Cloudflare Turnstile site key for production builds — set via `HAMBOX_TURNSTILE_SITE_KEY` at build time. Not secret. */
+export const HAMBOX_TURNSTILE_SITE_KEY = apiUrlConfig.turnstileSiteKey;

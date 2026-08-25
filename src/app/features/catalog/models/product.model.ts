@@ -60,6 +60,10 @@ export interface Product {
   readonly canPurchase?: boolean;
   /** When isMembersOnly is true, the plan(s) that grant access — drives the upgrade CTA copy. */
   readonly requiredPlanNames?: readonly string[] | null;
+  /** Admin-only (null for anonymous/storefront callers): who last edited this product's own fields. */
+  readonly lastEditedByName?: string | null;
+  /** Admin-only (null for anonymous/storefront callers): when the product was last edited. */
+  readonly lastEditedOnUtc?: string | null;
 }
 
 export interface CreateProductRequest {
@@ -119,6 +123,9 @@ export interface ProductListQuery {
   readonly sortBy?: ProductSortBy;
   readonly attributes?: Readonly<Record<string, readonly string[]>>;
   readonly collectionId?: string;
+  /** Narrows to exactly this id set — populated only by the Supplier Mapping filter, which resolves
+   * matching ids from the Suppliers module first (see `ProductCatalogFacade.setSupplierMappingFilter`). */
+  readonly productIds?: readonly string[];
 }
 
 export interface ProductFacetQuery {

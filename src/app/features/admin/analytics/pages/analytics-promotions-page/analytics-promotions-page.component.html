@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as promotions) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="5">
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.REDEMPTIONS' | translate" [value]="promotions.redemptions" icon="pi-ticket" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.DISCOUNT_TOTAL' | translate" [value]="(promotions.discountTotal | number: '1.0-2') ?? '—'" icon="pi-percentage" tone="warning" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.PROMO_REVENUE' | translate" [value]="(promotions.revenueOnPromoOrders | number: '1.0-2') ?? '—'" icon="pi-wallet" tone="success" />

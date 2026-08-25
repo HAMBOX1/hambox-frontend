@@ -1,7 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 
 import {
-  AuthTokenResponse,
+  AccessTokenResponse,
   AuthUser,
   HamboxJwtPayload,
   UserSession,
@@ -77,14 +77,13 @@ export function isOtpVerified(accessToken: string): boolean {
 }
 
 export function mapTokenResponseToSession(
-  tokens: AuthTokenResponse,
+  tokens: AccessTokenResponse,
   context: AuthContextType,
 ): UserSession {
   const payload = decodeAccessToken(tokens.accessToken);
 
   return {
     accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
     expiresAt: tokens.expiresAt,
     authContext: context,
     user: mapPayloadToUser(payload),

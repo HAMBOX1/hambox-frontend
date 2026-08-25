@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.ui-turnstile {
+  display: flex;
+  justify-content: flex-start;
+  min-height: 65px;
+}
+
+.ui-turnstile__error {
+  margin: var(--ui-space-2) 0 0;
+  color: var(--ui-danger);
+  font-size: var(--ui-font-caption);
+  line-height: 1.45;
+}

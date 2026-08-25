@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as search) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="4">
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.SEARCH_QUERIES' | translate" [value]="search.totalQueries" icon="pi-search" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.ZERO_RESULTS' | translate" [value]="search.zeroResultQueries" icon="pi-filter-slash" tone="warning" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.ZERO_RESULT_RATE' | translate" [value]="(search.zeroResultRate | number: '1.0-1') + '%'" icon="pi-percentage" />

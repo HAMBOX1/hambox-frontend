@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  height: 100%;
   padding: 1.125rem;
   border: 1px solid var(--admin-border-subtle);
   border-radius: var(--admin-radius-card);
@@ -104,4 +105,17 @@
 .admin-stat-card--warning .admin-stat-card__icon-wrap {
   background: color-mix(in srgb, var(--admin-accent-amber) 18%, transparent);
   color: var(--admin-accent-amber);
+}
+
+.admin-stat-card--danger {
+  border-color: color-mix(in srgb, var(--admin-accent-red) 35%, var(--admin-border-subtle));
+}
+
+.admin-stat-card--danger .admin-stat-card__icon-wrap {
+  background: color-mix(in srgb, var(--admin-accent-red) 16%, transparent);
+  color: var(--admin-accent-red);
+}
+
+.admin-stat-card--danger .admin-stat-card__value {
+  color: var(--admin-accent-red);
 }

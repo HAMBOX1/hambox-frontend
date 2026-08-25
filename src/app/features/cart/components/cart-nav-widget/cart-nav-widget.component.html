@@ -38,7 +38,7 @@
         <ul class="cart-nav__items">
           @for (item of items(); track item.id) {
             <li class="cart-nav__item">
-              <img class="cart-nav__thumb" [src]="item.imageUrl" [alt]="" />
+              <img class="cart-nav__thumb" [src]="item.imageUrl" [alt]="" hamboxImgFallback />
               <div class="cart-nav__item-body">
                 <span class="cart-nav__item-title">{{ item.title }}</span>
                 <div class="cart-nav__item-stepper">

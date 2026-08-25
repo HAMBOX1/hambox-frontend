@@ -336,6 +336,12 @@ export const ORDERS_API = {
     `/api/v1/orders/${orderId}/license-keys/${licenseKeyId}/reveal`,
 } as const;
 
+export const ADMIN_REFERRALS_API = {
+  referrals: '/api/v1/admin/referrals',
+  referral: (id: string) => `/api/v1/admin/referrals/${id}`,
+  reverse: (id: string) => `/api/v1/admin/referrals/${id}/reverse`,
+} as const;
+
 export const PROMOTIONS_API = {
   promotions: '/api/v1/promotions',
   promotion: (promotionId: string) => `/api/v1/promotions/${promotionId}`,
@@ -425,6 +431,13 @@ export const SUPPLIERS_API = {
   mappingPriority: (supplierId: string, mappingId: string) =>
     `/api/v1/suppliers/${supplierId}/mappings/${mappingId}/priority`,
   fulfillmentChain: '/api/v1/suppliers/fulfillment-chain',
+  mappingCandidates: (supplierId: string) => `/api/v1/suppliers/${supplierId}/mapping-candidates`,
+  mappingCandidatesSummary: (supplierId: string) =>
+    `/api/v1/suppliers/${supplierId}/mapping-candidates/summary`,
+  suggestMappings: (supplierId: string) => `/api/v1/suppliers/${supplierId}/mappings/suggest`,
+  bulkMappings: (supplierId: string) => `/api/v1/suppliers/${supplierId}/mappings/bulk`,
+  productMappingStatus: '/api/v1/suppliers/product-mapping-status',
+  productMappings: '/api/v1/suppliers/product-mappings',
 } as const;
 
 export const COMMUNICATION_API = {

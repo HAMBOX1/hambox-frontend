@@ -73,6 +73,28 @@
             <i class="pi pi-folder" aria-hidden="true"></i>
             {{ collectionCount(product) }} Internal Categories
           </button>
+          @if (mappingStatusFor(product.id); as mapping) {
+            @if (mapping.status === 'Unmapped') {
+              <button
+                type="button"
+                class="product-catalog-cards__mapping-cell product-catalog-cards__mapping-cell--unmapped"
+                (click)="mappingOpenRequested.emit(product); $event.stopPropagation()"
+              >
+                + {{ 'ADMIN.CATALOG_PAGE.SUPPLIER_MAPPING.ADD' | translate }}
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="product-catalog-cards__mapping-cell"
+                (click)="mappingOpenRequested.emit(product); $event.stopPropagation()"
+              >
+                <app-admin-status-badge
+                  [label]="mapping.primarySupplierName ? (mapping.primarySupplierName + ' · ' + mapping.mappedVariantCount + '/' + mapping.totalVariantCount + ' ' + ('ADMIN.CATALOG_PAGE.SUPPLIER_MAPPING.VARIANTS_MAPPED' | translate)) : mapping.status"
+                  [tone]="mappingStatusTone(mapping.status)"
+                />
+              </button>
+            }
+          }
         </div>
 
         <div class="product-catalog-cards__actions" (click)="$event.stopPropagation()">

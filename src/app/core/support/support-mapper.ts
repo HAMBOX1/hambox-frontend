@@ -158,6 +158,7 @@ export function mapDetailToTicket(dto: TicketDetailApiDto): Ticket {
     context: {
       membershipPlanName: dto.context.membershipPlanName,
       membershipStatus: dto.context.membershipStatus,
+      relatedOrderId: dto.context.relatedOrderId,
       recentOrders: dto.context.recentOrders.map((order) => ({
         orderId: order.orderId,
         orderNumber: order.orderNumber,

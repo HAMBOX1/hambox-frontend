@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as referrals) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="4">
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.INVITES' | translate" [value]="referrals.invites" icon="pi-send" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.SUCCESSFUL_REFERRALS' | translate" [value]="referrals.successful" icon="pi-check" tone="success" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.CONVERSION_RATE' | translate" [value]="(referrals.conversionRate | number: '1.0-1') + '%'" icon="pi-percentage" />

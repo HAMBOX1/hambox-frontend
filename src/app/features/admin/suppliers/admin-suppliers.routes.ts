@@ -23,6 +23,14 @@ export const routes: Routes = [
     canDeactivate: [unsavedChangesGuard],
   },
   {
+    path: ':id/map-products',
+    loadComponent: () =>
+      import('./pages/map-products-page/map-products-page.component').then(
+        (c) => c.MapProductsPageComponent,
+      ),
+    canActivate: [permissionGuard([PERMISSIONS.Suppliers.ManageMappings])],
+  },
+  {
     path: ':id/mappings',
     loadComponent: () =>
       import('./pages/supplier-mappings-page/supplier-mappings-page.component').then(

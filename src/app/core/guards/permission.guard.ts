@@ -32,6 +32,8 @@ export function permissionGuard(
       return true;
     }
 
-    return router.createUrlTree(['/admin/dashboard']);
+    return router.createUrlTree(['/access-denied'], {
+      queryParams: { context: 'permission' },
+    });
   };
 }

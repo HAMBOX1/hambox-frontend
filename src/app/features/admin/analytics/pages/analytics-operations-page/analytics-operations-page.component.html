@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as operations) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="7">
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_QUEUE' | translate" [value]="formatSeconds(operations.averageQueueSeconds)" icon="pi-clock" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.AVG_DELIVERY' | translate" [value]="formatSeconds(operations.averageDeliverySeconds)" icon="pi-send" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.FAILED_JOBS' | translate" [value]="operations.failedJobs" icon="pi-times-circle" tone="warning" />

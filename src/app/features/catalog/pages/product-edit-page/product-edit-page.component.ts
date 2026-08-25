@@ -16,6 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
@@ -30,6 +31,11 @@ import {
   AdminStatusBadgeComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import {
+  SupplierCatalogSearchDrawerComponent,
+  SupplierCatalogSearchDrawerTarget,
+} from '../../../admin/suppliers/components/supplier-catalog-search-drawer/supplier-catalog-search-drawer.component';
+import { SuppliersManagementFacade } from '../../../admin/suppliers/services/suppliers-management.facade';
 import { ProductAssetsUploadComponent } from '../../components/product-assets-upload/product-assets-upload.component';
 import { ProductBasicInfoFormComponent } from '../../components/product-basic-info-form/product-basic-info-form.component';
 import { ProductInstructionsPanelComponent } from '../../components/product-instructions-panel/product-instructions-panel.component';
@@ -51,6 +57,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
   imports: [
     RouterLink,
     FormsModule,
+    TranslatePipe,
     ToastModule,
     ButtonModule,
     SelectModule,
@@ -64,8 +71,9 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
     ProductOptionGroupsPanelComponent,
     ProductVariantManagerComponent,
     ProductInstructionsPanelComponent,
+    SupplierCatalogSearchDrawerComponent,
   ],
-  providers: [ProductEditorFacade, MessageService],
+  providers: [ProductEditorFacade, SuppliersManagementFacade, MessageService],
   templateUrl: './product-edit-page.component.html',
   styleUrl: './product-edit-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,6 +83,7 @@ export class ProductEditPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly facade = inject(ProductEditorFacade);
+  protected readonly suppliersFacade = inject(SuppliersManagementFacade);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -101,6 +110,21 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly totalVariantCount = this.facade.totalVariantCount;
   protected readonly activeVariantCount = this.facade.activeVariantCount;
 
+  protected readonly variantMappings = this.suppliersFacade.productVariantMappings;
+  protected readonly variantMappingsLoading = this.suppliersFacade.productVariantMappingsLoading;
+  protected readonly mappedVariantCount = computed(() => this.variantMappings().filter((m) => m.mappingId).length);
+  protected readonly hasAnyMapping = computed(() => this.mappedVariantCount() > 0);
+  protected readonly fullyMapped = computed(
+    () => this.hasAnyMapping() && this.mappedVariantCount() === this.variantMappings().length,
+  );
+  /** First mapped variant's supplier — good enough for the summary line; the drawer shows the full
+   * per-variant breakdown when a product is mapped to more than one supplier. */
+  protected readonly primaryMappingSupplierName = computed(
+    () => this.variantMappings().find((m) => m.supplierName)?.supplierName ?? null,
+  );
+  protected readonly mappingDrawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
+  private loadedMappingsForProductId: string | null = null;
+
   /** True once the owner has changed the General form or staged an image change since the last save. Drives the floating save bar. */
   protected readonly dirty = computed(
     () => (this.productForm()?.dirty() ?? false) || (this.assetsUpload()?.dirty() ?? false),
@@ -122,6 +146,13 @@ export class ProductEditPageComponent implements OnInit {
       }
     });
     afterNextRender(() => this.setupAutoDraft());
+    effect(() => {
+      const id = this.productId();
+      if (id && this.loadedMappingsForProductId !== id) {
+        this.loadedMappingsForProductId = id;
+        void this.suppliersFacade.loadProductVariantMappings(id);
+      }
+    });
     effect(() => {
       if (this.hasScrolledToFragment || this.loading() || !this.product()) {
         return;
@@ -340,6 +371,26 @@ export class ProductEditPageComponent implements OnInit {
         detail: 'This product is now active on the storefront.',
         life: 4000,
       });
+    }
+  }
+
+  protected openMappingDrawer(): void {
+    const id = this.productId();
+    if (!id) {
+      return;
+    }
+
+    this.mappingDrawerTarget.set({ productId: id, productName: this.product()?.nameEn ?? '' });
+  }
+
+  protected onMappingDrawerClosed(): void {
+    this.mappingDrawerTarget.set(null);
+  }
+
+  protected onMappingDrawerCreated(): void {
+    const id = this.productId();
+    if (id) {
+      void this.suppliersFacade.loadProductVariantMappings(id);
     }
   }
 }

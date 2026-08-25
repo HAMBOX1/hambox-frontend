@@ -41,7 +41,7 @@
       @if (statisticsLoading()) {
         <app-admin-loading-skeleton variant="detail" [rows]="2" />
       } @else if (statistics(); as stats) {
-        <app-admin-stat-grid>
+        <app-admin-stat-grid [columns]="3">
           <app-admin-stat-card
             [label]="'ADMIN.PROMOTIONS.STATS.REDEMPTIONS' | translate"
             [value]="stats.totalRedemptions"
@@ -61,7 +61,7 @@
           />
         </app-admin-stat-grid>
       } @else {
-        <app-admin-stat-grid>
+        <app-admin-stat-grid [columns]="2">
           <app-admin-stat-card
             [label]="'ADMIN.PROMOTIONS.LIST.COLUMNS.REDEMPTIONS' | translate"
             [value]="promo.totalRedemptions"

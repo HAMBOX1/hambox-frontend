@@ -7,7 +7,7 @@
     [breadcrumbs]="breadcrumbs"
   />
 
-  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+  <p-tabs class="admin-detail-tabs security-center-page__tabs" [value]="activeTab()" (valueChange)="onTabChange($event)">
     <p-tablist>
       <p-tab value="0">{{ 'ADMIN.SECURITY.TABS.OVERVIEW' | translate }}</p-tab>
       <p-tab value="1">{{ 'ADMIN.SECURITY.TABS.LOGIN_EVENTS' | translate }}</p-tab>
@@ -119,7 +119,7 @@
             <ng-template pTemplate="emptymessage">
               <tr>
                 <td colspan="6">
-                  <app-admin-empty-state icon="pi pi-users" [title]="'ADMIN.SECURITY.USERS.EMPTY' | translate" />
+                  <app-admin-empty-state icon="pi pi-users" [title]="'ADMIN.SECURITY.USERS.EMPTY' | translate" [dense]="true" />
                 </td>
               </tr>
             </ng-template>
@@ -195,7 +195,7 @@
             <ng-template pTemplate="emptymessage">
               <tr>
                 <td colspan="4">
-                  <app-admin-empty-state icon="pi pi-envelope" [title]="'ADMIN.SECURITY.EMAILS.EMPTY' | translate" />
+                  <app-admin-empty-state icon="pi pi-envelope" [title]="'ADMIN.SECURITY.EMAILS.EMPTY' | translate" [dense]="true" />
                 </td>
               </tr>
             </ng-template>
@@ -271,7 +271,7 @@
             <ng-template pTemplate="emptymessage">
               <tr>
                 <td colspan="4">
-                  <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.IPS.EMPTY' | translate" />
+                  <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.SECURITY.IPS.EMPTY' | translate" [dense]="true" />
                 </td>
               </tr>
             </ng-template>
@@ -342,7 +342,7 @@
             <ng-template pTemplate="emptymessage">
               <tr>
                 <td colspan="4">
-                  <app-admin-empty-state icon="pi pi-flag" [title]="'ADMIN.SECURITY.COUNTRIES.EMPTY' | translate" />
+                  <app-admin-empty-state icon="pi pi-flag" [title]="'ADMIN.SECURITY.COUNTRIES.EMPTY' | translate" [dense]="true" />
                 </td>
               </tr>
             </ng-template>

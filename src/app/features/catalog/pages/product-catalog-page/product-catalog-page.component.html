@@ -65,11 +65,13 @@
     [statusFilter]="statusFilter()"
     [collectionFilter]="collectionFilter()"
     [collectionOptions]="collectionOptions()"
+    [supplierMappingFilter]="supplierMappingFilter()"
     [hasActiveFilters]="hasActiveFilters()"
     [viewMode]="viewMode()"
     (searchChange)="onSearchChange($event)"
     (statusChange)="onStatusFilterChange($event)"
     (collectionChange)="onCollectionFilterChange($event)"
+    (supplierMappingChange)="onSupplierMappingFilterChange($event)"
     (clearFilters)="onClearFilters()"
     (viewModeChange)="onViewModeChange($event)"
   />
@@ -151,6 +153,7 @@
       [searchActive]="hasActiveSearch()"
       [categoryOptions]="categoryOptions()"
       [collectionOptions]="collectionOptions()"
+      [mappingStatusByProductId]="mappingStatusByProductId()"
       [sortField]="sortField()"
       [sortOrder]="sortOrder()"
       [bulkSelectedIds]="bulkSelectedIds()"
@@ -163,6 +166,7 @@
       (duplicateProduct)="openDuplicateDialog($event)"
       (archiveProduct)="onRowArchive($event)"
       (deleteProduct)="requestDelete($event)"
+      (mappingOpenRequested)="onMappingOpenRequested($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
       (fieldEdit)="onFieldEdit($event)"
@@ -182,6 +186,7 @@
       [searchActive]="hasActiveSearch()"
       [bulkSelectedIds]="bulkSelectedIds()"
       [collectionOptions]="collectionOptions()"
+      [mappingStatusByProductId]="mappingStatusByProductId()"
       (pageChange)="onCardsPageChange($event)"
       (productSelect)="onProductSelect($event)"
       (createProduct)="navigateToCreate()"
@@ -194,6 +199,7 @@
       (bulkToggle)="onBulkToggle($event)"
       (collectionsEdit)="onCollectionsEdit($event)"
       (collectionCreated)="onCollectionCreated()"
+      (mappingOpenRequested)="onMappingOpenRequested($event)"
     />
   }
 
@@ -591,3 +597,9 @@
     ></button>
   </div>
 </p-dialog>
+
+<app-supplier-catalog-search-drawer
+  [target]="mappingDrawerTarget()"
+  (closed)="onMappingDrawerClosed()"
+  (mappingCreated)="onMappingCreated()"
+/>

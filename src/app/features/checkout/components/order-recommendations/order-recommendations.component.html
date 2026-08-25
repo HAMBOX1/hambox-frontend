@@ -31,7 +31,7 @@
     @for (item of visibleItems(); track item.id) {
       <a [routerLink]="['/products', item.id]" class="recommendations__card">
         <div class="recommendations__media">
-          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" hamboxImgFallback />
         </div>
         <div class="recommendations__body">
           <h3 class="recommendations__name">{{ item.title }}</h3>

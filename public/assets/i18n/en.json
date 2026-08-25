@@ -145,6 +145,17 @@
         "Privacy": "Privacy Policy",
         "Refund": "Refund Policy"
       }
+    },
+    "TURNSTILE": {
+      "LOAD_ERROR": "Unable to load the security check. Please refresh the page and try again."
+    },
+    "ACCESS_DENIED": {
+      "TITLE": "Access denied",
+      "ADMIN_ON_CUSTOMER": "Administrative sessions cannot access storefront customer features. Sign out of the admin portal or use a customer account.",
+      "PERMISSION": "You don't have permission to access this page. If you think this is a mistake, contact an administrator.",
+      "GENERIC": "You do not have permission to view this page.",
+      "GO_TO_ADMIN": "Go to Admin",
+      "GO_TO_STOREFRONT": "Go to Storefront"
     }
   },
   "LEGAL": {
@@ -392,7 +403,8 @@
       "UPGRADE": "Upgrade",
       "DOWNGRADE": "Downgrade",
       "SUBSCRIBE": "Subscribe",
-      "COMPARE_PLANS": "Compare available plans",
+      "PLANS_TITLE": "Plans",
+      "BILLING_ACTIVITY": "Billing & Activity",
       "HISTORY_TAB": "History",
       "TRANSACTIONS_TAB": "Transactions",
       "NO_HISTORY": "No membership history yet.",
@@ -428,6 +440,7 @@
       "VIEW_DETAILS": "View Details",
       "DOWNLOAD_INVOICE": "Download Invoice",
       "SUPPORT": "Support",
+      "MORE_ACTIONS": "More actions",
       "PROCESSING_NOTE": "Your payment went through and this purchase isn't lost — delivery is still being prepared. If it's still pending after a while, reach out to",
       "REVEAL_MODAL_TITLE": "Reveal your activation code?",
       "REVEAL_MODAL_BODY": "Your code for {{product}} will stay visible for 30 seconds, then hide automatically.",
@@ -598,7 +611,9 @@
       "WRITE_REVIEW": "Write Review",
       "DOWNLOAD_INVOICE": "Download Invoice",
       "CONTACT_SUPPORT": "Contact Support",
-      "REVIEW_ERROR": "Unable to submit your review. Please try again."
+      "REVIEW_ERROR": "Unable to submit your review. Please try again.",
+      "REQUEST_CANCELLATION": "Request Cancellation",
+      "CANCEL_REQUEST_SUBJECT": "Cancellation request for order {{orderNumber}}"
     },
     "WISHLIST_UI": {
       "TITLE": "Your Vault",
@@ -691,6 +706,8 @@
       "TRANSACTION_AMOUNT": "Amount",
       "TRANSACTION_STATUS": "Status",
       "TRANSACTION_DATE": "Date",
+      "MORE_BENEFITS": "+{{count}} more",
+      "ACTIVITY_ARIA": "Billing activity",
       "NA": "—",
       "TOAST": {
         "RENEW_SUCCESS": "Membership renewed",
@@ -930,6 +947,17 @@
         "PUBLISHED": "Published",
         "DRAFTS": "Drafts",
         "NEEDS_ATTENTION": "Needs Attention"
+      },
+      "SUPPLIER_MAPPING": {
+        "ADD": "Add Supplier Mapping",
+        "VARIANTS_MAPPED": "variants mapped"
+      },
+      "SUPPLIER_FULFILLMENT": {
+        "SUBTITLE": "Which supplier fulfills each variant of this product.",
+        "EMPTY": "No supplier mapping configured.",
+        "FULLY_CONFIGURED": "Fully configured",
+        "PARTIALLY_CONFIGURED": "Partially configured",
+        "MANAGE": "Manage Mapping"
       },
       "DUPLICATE": {
         "TITLE": "Duplicate Product",
@@ -1191,6 +1219,7 @@
       "ROLES": "Roles",
       "PROMOTIONS": "Promotions",
       "MEMBERSHIPS": "Memberships",
+      "REFERRALS": "Referrals",
       "THEMES": "Themes",
       "CAMPAIGNS": "Campaigns",
       "PAGE_BUILDER": "Page Builder",
@@ -3262,7 +3291,8 @@
           "PURCHASE_DATE": "Purchase date",
           "DELIVERY": "Delivery",
           "MEMBERSHIP": "Membership discount",
-          "COUPON": "Coupon"
+          "COUPON": "Coupon",
+          "LAST_EDITED": "Last edited"
         }
       },
       "STATS": {
@@ -3296,6 +3326,7 @@
         "SUMMARY": "Order summary",
         "CUSTOMER": "Customer information",
         "COUPON": "Coupon information",
+        "LAST_EDITED_BY": "by {{name}}",
         "TIMELINE": "Order timeline",
         "PRODUCTS": "Products purchased",
         "DIGITAL_CODES": "Delivered digital codes",
@@ -4808,6 +4839,57 @@
         "CONFIRM_DELETE_TITLE": "Delete legal section"
       }
     },
+    "REFERRALS": {
+      "LIST": {
+        "TITLE": "Referrals",
+        "SUBTITLE": "Look up referral links, track their status, and step in when something needs a manual fix.",
+        "SEARCH_PLACEHOLDER": "Search by referral code or referred email…",
+        "FILTER_STATUS": "Status",
+        "COLUMNS": {
+          "CODE": "Code",
+          "REFERRED": "Referred",
+          "STATUS": "Status",
+          "POINTS": "Points",
+          "CREATED": "Created"
+        },
+        "EMPTY": "No referrals yet.",
+        "EMPTY_SEARCH": "No referrals match your filters."
+      },
+      "ACTIONS": {
+        "VIEW": "View details",
+        "VOID": "Void referral",
+        "REVERSE": "Reverse referral",
+        "CONFIRM_REVERSE": "Confirm",
+        "RETRY": "Retry"
+      },
+      "CONFIRM": {
+        "TITLE": "Are you sure?",
+        "VOID_MESSAGE": "This voids referral {{code}} — it will no longer be able to qualify for a reward. This cannot be undone.",
+        "REVERSE_MESSAGE": "This reverses referral {{code}} and claws back any points already awarded to the referrer. This cannot be undone."
+      },
+      "TOAST": {
+        "REVERSED": "Referral updated.",
+        "REVERSE_FAILED": "Unable to update this referral."
+      },
+      "DETAIL": {
+        "TITLE": "Referral details",
+        "CODE": "Referral code",
+        "REFERRER_ID": "Referrer user ID",
+        "REFERRED": "Referred",
+        "STATUS": "Status",
+        "POINTS": "Points earned",
+        "AUDIT_TRAIL": "Audit trail",
+        "NO_AUDIT": "No audit events recorded."
+      },
+      "AUDIT_ACTION": {
+        "REDEEMED": "Code redeemed",
+        "QUALIFIED": "Qualified",
+        "REWARDED": "Points awarded",
+        "EXPIRED": "Expired",
+        "REVERSED": "Reversed",
+        "REJECTED": "Rejected"
+      }
+    },
     "MEMBERSHIPS": {
       "LIST": {
         "TITLE": "Membership plans",
@@ -4986,6 +5068,7 @@
         "TITLE": "Product Mappings",
         "SUBTITLE": "Map HAMBOX products to this supplier's external products.",
         "NEW": "New Mapping",
+        "MAP_HAMBOX_PRODUCT": "Map HAMBOX Product",
         "EDIT_TITLE": "Edit Mapping",
         "EMPTY": "No product mappings yet.",
         "INTERNAL_PRODUCT_ID": "Internal product ID",
@@ -5038,10 +5121,78 @@
         "CREATE": "Create supplier",
         "SAVE_CREDENTIALS": "Save credentials",
         "TEST_CONNECTION": "Test connection",
-        "MAPPINGS": "Mappings",
+        "MAP_PRODUCTS": "Map Products",
+        "MAPPINGS": "View Mappings",
         "ENABLE": "Enable",
         "DISABLE": "Disable",
         "DELETE": "Delete"
+      },
+      "MAP_PRODUCTS": {
+        "TITLE": "Map Products",
+        "TITLE_WITH_SUPPLIER": "Map Products to {{supplier}}",
+        "SUBTITLE": "Connect your HAMBOX products with products available from this supplier.",
+        "FIND_MATCHES": "Find Matches",
+        "SEARCH_PLACEHOLDER": "Search products...",
+        "STATS": {
+          "ELIGIBLE": "Eligible Products",
+          "MAPPED": "Mapped",
+          "NEEDS_MAPPING": "Needs mapping",
+          "SUGGESTED": "Suggested (checked so far)"
+        },
+        "FILTERS": {
+          "ALL": "All",
+          "MAPPED": "Mapped",
+          "UNMAPPED": "Needs mapping"
+        },
+        "COLUMNS": {
+          "PRODUCT": "HAMBOX Product",
+          "VARIANT": "Variant",
+          "SUPPLIER_MATCH": "Supplier Match",
+          "PRICE": "Price",
+          "AVAILABILITY": "Availability",
+          "STATUS": "Status",
+          "ACTION": "Action"
+        },
+        "STATUS": {
+          "MAPPED": "Mapped",
+          "SUGGESTED": "Suggested",
+          "NEEDS_MAPPING": "Needs mapping",
+          "UNAVAILABLE": "Unavailable"
+        },
+        "ACTIONS": {
+          "CONFIRM_MAPPING": "Confirm Mapping",
+          "REVIEW_MATCH": "Review Match",
+          "SEARCH_SUPPLIER": "Search Bamboo"
+        },
+        "HIGH_CONFIDENCE": "High confidence · {{score}}%",
+        "MEDIUM_CONFIDENCE": "Medium confidence · {{score}}%",
+        "NO_MATCH": "No reliable match",
+        "NOT_CHECKED_YET": "Not checked yet",
+        "CONFIRM_N_MAPPINGS": "Confirm {{count}} Mappings",
+        "NO_SUGGESTIONS_YET": "Run \"Find Matches\" to get suggested mappings for the selected products.",
+        "BULK_RESULT": "Created {{created}} of {{total}} mappings.",
+        "EMPTY": {
+          "TITLE": "No eligible products found",
+          "DESCRIPTION": "Every active product with a visible variant is eligible for mapping — try clearing your search or filter."
+        },
+        "DRAWER": {
+          "TITLE": "Supplier Fulfillment",
+          "HAMBOX_PRODUCT": "HAMBOX Product",
+          "SUPPLIER": "Supplier",
+          "SELECT_SUPPLIER": "Select a supplier",
+          "ORDER_STATUS_SUPPORTED": "Order Status supported",
+          "SUPPLIER_PRODUCT": "Supplier Product",
+          "BUYING_PRICE": "Buying Price",
+          "PRIORITY": "Priority",
+          "VARIANTS": "Variants",
+          "MAPPED_TO": "Mapped to {{supplier}}",
+          "NOT_MAPPED": "Not mapped",
+          "MAP": "Map",
+          "EDIT": "Edit",
+          "CREATE_MAPPING": "Create Mapping",
+          "SAVE_MAPPING": "Save Mapping",
+          "SAVE_FAILED": "Failed to save the mapping."
+        }
       },
       "MESSAGES": {
         "CREATED": "Supplier created.",
@@ -5058,7 +5209,9 @@
       },
       "AVAILABILITY": {
         "TITLE": "Availability",
+        "FULFILLMENT_HEALTH": "Fulfillment Health",
         "MAPPED": "Mapped products",
+        "UNMAPPED": "Unmapped products",
         "AVAILABLE": "Available",
         "UNAVAILABLE": "Unavailable",
         "UNKNOWN": "Unknown",
@@ -5095,6 +5248,17 @@
         "OPEN_ALERTS_PREVIEW": "Open Alerts",
         "VIEW_ALL_ALERTS": "View all alerts"
       },
+      "STATUS_BAR": {
+        "ALL_CLEAR": "All systems clear",
+        "ATTENTION_NEEDED": "Security attention needed",
+        "LAST_ACTIVITY": "Last activity",
+        "NO_RECENT_ACTIVITY": "No recent security activity",
+        "REVIEW_ALERTS": "Review Alerts"
+      },
+      "FAILED_LOGIN_INTEL": {
+        "EMPTY_TITLE": "No failed-login geography available yet",
+        "EMPTY_DESCRIPTION": "Country-level data will appear once there are enough failed attempts to analyze."
+      },
       "EMPTY": {
         "CHART": "Not enough data yet."
       },
@@ -5126,6 +5290,8 @@
       },
       "ALERTS": {
         "EMPTY": "No open alerts.",
+        "HEALTHY_TITLE": "No open security alerts",
+        "HEALTHY_DESCRIPTION": "Everything looks normal — no unresolved alerts right now.",
         "ACTIONS": {
           "ACKNOWLEDGE": "Acknowledge",
           "RESOLVE": "Resolve",
@@ -5359,7 +5525,8 @@
         "NOT_READY_DISABLED": "Supplier is disabled.",
         "NOT_READY_PROVIDER": "Provider is not registered.",
         "NOT_READY_CREDENTIALS": "Credentials are not configured.",
-        "NOT_READY_OTHER": "Not currently eligible."
+        "NOT_READY_OTHER": "Not currently eligible.",
+        "FIND_SUPPLIER_PRODUCT": "Find Supplier Product ({{supplier}})"
       },
       "CONFIRM": {
         "TITLE": "Change fulfillment mode?",

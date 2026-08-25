@@ -66,6 +66,12 @@
               (reordered)="onChainReordered($event)"
             />
           }
+
+          @if ((permissions.Suppliers.ManageMappings | hamboxHasPermission) && unmappedEnabledSupplier(); as supplier) {
+            <button pButton type="button" severity="secondary" size="small" (click)="openFindSupplierProduct()">
+              {{ 'ADMIN.FULFILLMENT.CHAIN.FIND_SUPPLIER_PRODUCT' | translate: { supplier: supplier.name } }}
+            </button>
+          }
         </div>
       }
     </div>
@@ -79,5 +85,11 @@
     [loading]="saving()"
     (visibleChange)="!$event && onCancelModeChange()"
     (confirmed)="onConfirmModeChange()"
+  />
+
+  <app-supplier-catalog-search-drawer
+    [target]="drawerTarget()"
+    (closed)="onDrawerClosed()"
+    (mappingCreated)="onMappingCreated()"
   />
 }

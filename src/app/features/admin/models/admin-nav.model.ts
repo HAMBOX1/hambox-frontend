@@ -9,6 +9,7 @@ export type AdminNavId =
   | 'security'
   | 'promotions'
   | 'memberships'
+  | 'referrals'
   | 'themes'
   | 'campaigns'
   | 'page-builder'
@@ -88,6 +89,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/memberships',
     icon: 'pi pi-id-card',
     permission: PERMISSIONS.Memberships.View,
+  },
+  {
+    id: 'referrals',
+    labelKey: 'ADMIN.NAV.REFERRALS',
+    route: '/admin/referrals',
+    icon: 'pi pi-share-alt',
+    permission: PERMISSIONS.Referral.View,
   },
   {
     id: 'themes',

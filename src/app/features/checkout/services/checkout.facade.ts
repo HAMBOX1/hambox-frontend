@@ -2,7 +2,6 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
-import { ProductImageCacheService } from '../../../core/product/product-image-cache.service';
 import { ApiError } from '../../../core/models/api-error.model';
 import { clearIdempotencyKey, getOrCreateIdempotencyKey } from '../../../shared/utils/idempotency-key.util';
 import { CartFacade } from '../../cart/services/cart.facade';
@@ -52,7 +51,6 @@ export class CheckoutFacade {
   private readonly cartFacade = inject(CartFacade);
   private readonly checkoutService = inject(CheckoutService);
   private readonly authSession = inject(AuthSessionService);
-  private readonly imageCache = inject(ProductImageCacheService);
 
   private readonly paymentMethodState = signal<PaymentMethodId>('card');
   private readonly cardDetailsState = signal<CardPaymentDetails>({ ...INITIAL_CARD });
@@ -377,16 +375,7 @@ export class CheckoutFacade {
 
   async loadOrder(orderId: string): Promise<ReturnType<typeof mapOrderToSuccessDetails>> {
     const order = await firstValueFrom(this.checkoutService.getOrder(orderId));
-    const details = mapOrderToSuccessDetails(order);
-    const imageUrls = await this.imageCache.resolveMany(details.items.map((item) => item.id));
-
-    return {
-      ...details,
-      items: details.items.map((item, index) => ({
-        ...item,
-        imageUrl: imageUrls.get(item.id) ?? item.imageUrl,
-      })),
-    };
+    return mapOrderToSuccessDetails(order);
   }
 
   reset(): void {

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EditorModule } from 'primeng/editor';
 
@@ -31,6 +31,7 @@ export class AccountCreateTicketPageComponent {
   private readonly facade = inject(AccountSupportFacade);
   private readonly store = inject(SupportTicketsStore);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly categories = this.store.categories;
   protected readonly priorities = this.store.priorities;
@@ -52,6 +53,16 @@ export class AccountCreateTicketPageComponent {
 
   constructor() {
     void this.store.loadLookups();
+
+    const params = this.route.snapshot.queryParamMap;
+    const subject = params.get('subject');
+    const orderNumber = params.get('orderNumber');
+    if (subject) {
+      this.subject.set(subject);
+    }
+    if (orderNumber) {
+      this.relatedOrderNumber.set(orderNumber);
+    }
   }
 
   protected onDragOver(event: DragEvent): void {

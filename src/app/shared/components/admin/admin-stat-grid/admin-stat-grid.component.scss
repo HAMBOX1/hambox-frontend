@@ -4,5 +4,15 @@
   // auto-fit so the column count always matches how many cards actually render
   // (fixed repeat(4)/repeat(5) breakpoints left a visibly empty trailing
   // column whenever a page had fewer cards than the viewport's fixed count).
+  // A page can opt out via [columns] (see component) when its card count is
+  // fixed and known, to avoid auto-fit stranding one card alone on its own row.
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+// Only applies to pages that opt into a fixed [columns] count — collapses
+// to 2 columns on narrow screens so the fixed count doesn't get too cramped.
+.admin-stat-grid--fixed {
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }

@@ -31,6 +31,7 @@ import {
 import { HamboxBottomSheetComponent } from '../../../../shared/components/hambox-bottom-sheet/hambox-bottom-sheet.component';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { ProductSupplierMappingStatusDto } from '../../../admin/suppliers/models/supplier.model';
 import { CollectionCreateFormComponent } from '../collection-create-form/collection-create-form.component';
 import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { Product, ProductStatus } from '../../models/product.model';
@@ -78,6 +79,7 @@ export class ProductCatalogCardsComponent {
   readonly searchActive = input(false);
   readonly bulkSelectedIds = input<ReadonlySet<string>>(new Set());
   readonly collectionOptions = input<readonly CollectionOption[]>([]);
+  readonly mappingStatusByProductId = input<ReadonlyMap<string, ProductSupplierMappingStatusDto>>(new Map());
 
   readonly createProduct = output<void>();
   readonly pageChange = output<{ first: number; rows: number }>();
@@ -89,6 +91,9 @@ export class ProductCatalogCardsComponent {
   readonly deleteProduct = output<Product>();
   readonly manageMarketingPage = output<Product>();
   readonly bulkToggle = output<{ productId: string; shiftKey: boolean }>();
+  /** Opens the product-centric supplier mapping drawer for this product — mirrors the desktop
+   * table's Supplier cell (status badge / "+ Add Supplier Mapping" action). */
+  readonly mappingOpenRequested = output<Product>();
   /** Emitted when the collections bottom sheet is saved — the page maps this into the same
    * partial-update path as the desktop table's collection popover. */
   readonly collectionsEdit = output<{ product: Product; collectionIds: readonly string[] }>();
@@ -146,6 +151,26 @@ export class ProductCatalogCardsComponent {
 
   protected collectionCount(product: Product): number {
     return (product.collectionIds ?? []).length;
+  }
+
+  protected mappingStatusFor(productId: string): ProductSupplierMappingStatusDto | undefined {
+    return this.mappingStatusByProductId().get(productId);
+  }
+
+  protected mappingStatusTone(status: ProductSupplierMappingStatusDto['status']): AdminStatusTone {
+    switch (status) {
+      case 'FullyMapped':
+        return 'success';
+      case 'PartiallyMapped':
+        return 'info';
+      case 'Unmapped':
+        return 'warning';
+      case 'SupplierUnavailable':
+      case 'MappingError':
+        return 'danger';
+      default:
+        return 'neutral';
+    }
   }
 
   // --- Collections bottom sheet (mobile equivalent of the desktop table's popover) ---

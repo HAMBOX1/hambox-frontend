@@ -1,7 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import { ProductImageCacheService } from '../../../core/product/product-image-cache.service';
 import { GuestCartSessionService } from '../../../core/cart/guest-cart-session.service';
 import { ApiError } from '../../../core/models/api-error.model';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
@@ -28,7 +27,6 @@ export class CartFacade {
   private readonly cartService = inject(CartService);
   private readonly guestSession = inject(GuestCartSessionService);
   private readonly authSession = inject(AuthSessionService);
-  private readonly imageCache = inject(ProductImageCacheService);
 
   private readonly itemsState = signal<readonly CartLineItem[]>([]);
   private readonly summaryState = signal<CartSummary>(EMPTY_SUMMARY);
@@ -210,16 +208,8 @@ export class CartFacade {
     }
 
     const mapped = mapCartResponse(cart);
-    const imageUrls = await this.imageCache.resolveMany(
-      mapped.items.map((item) => item.productId),
-    );
 
-    const items = mapped.items.map((item, index) => ({
-      ...item,
-      imageUrl: imageUrls.get(item.productId) ?? item.imageUrl,
-    }));
-
-    this.itemsState.set(items);
+    this.itemsState.set(mapped.items);
     this.summaryState.set(mapped.summary);
   }
 

@@ -35,7 +35,7 @@
     </div>
   </app-admin-page-header>
 
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="4">
     <app-admin-stat-card [compact]="true"
       [label]="'ADMIN.ORDERS.STATS.TODAY' | translate"
       [value]="statistics()?.todaysOrders ?? 0"
@@ -340,6 +340,9 @@
             @if (isColumnVisible('coupon')) {
               <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.COUPON' | translate }}</th>
             }
+            @if (isColumnVisible('lastEdited')) {
+              <th>{{ 'ADMIN.ORDERS.LIST.COLUMNS.LAST_EDITED' | translate }}</th>
+            }
             <th style="width: 6rem"></th>
           </tr>
         </ng-template>
@@ -406,6 +409,17 @@
             }
             @if (isColumnVisible('coupon')) {
               <td>{{ order.couponCode || '—' }}</td>
+            }
+            @if (isColumnVisible('lastEdited')) {
+              <td>
+                @if (order.lastEditedOnUtc) {
+                  <span class="admin-cell-primary">{{ order.lastEditedByName || '—' }}</span>
+                  <br />
+                  <span class="admin-cell-secondary">{{ order.lastEditedOnUtc | date: 'medium' }}</span>
+                } @else {
+                  <span class="admin-cell-secondary">—</span>
+                }
+              </td>
             }
             <td>
               @let menuItems = orderActionMenuItems(order);

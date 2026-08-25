@@ -42,6 +42,7 @@ export const PERMISSIONS = {
     View: 'Orders.View',
     Edit: 'Orders.Edit',
     Refund: 'Orders.Refund',
+    RevealLicenseKeys: 'Orders.RevealLicenseKeys',
   },
   Customers: {
     View: 'Customers.View',
@@ -240,6 +241,7 @@ export const ALL_PERMISSIONS: readonly string[] = [
   PERMISSIONS.Orders.View,
   PERMISSIONS.Orders.Edit,
   PERMISSIONS.Orders.Refund,
+  PERMISSIONS.Orders.RevealLicenseKeys,
   PERMISSIONS.Customers.View,
   PERMISSIONS.Customers.Edit,
   PERMISSIONS.Users.View,

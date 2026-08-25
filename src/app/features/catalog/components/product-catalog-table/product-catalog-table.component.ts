@@ -39,6 +39,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { CategoryCreateFormComponent } from '../category-create-form/category-create-form.component';
 import { CollectionCreateFormComponent } from '../collection-create-form/collection-create-form.component';
+import { ProductSupplierMappingStatusDto } from '../../../admin/suppliers/models/supplier.model';
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
 import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { Product, ProductStatus } from '../../models/product.model';
@@ -116,6 +117,7 @@ export class ProductCatalogTableComponent {
   readonly searchActive = input(false);
   readonly categoryOptions = input<readonly CategoryOption[]>([]);
   readonly collectionOptions = input<readonly CollectionOption[]>([]);
+  readonly mappingStatusByProductId = input<ReadonlyMap<string, ProductSupplierMappingStatusDto>>(new Map());
   readonly sortField = input<string | undefined>(undefined);
   readonly sortOrder = input(0);
   readonly bulkSelectedIds = input<ReadonlySet<string>>(new Set());
@@ -135,6 +137,9 @@ export class ProductCatalogTableComponent {
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
+  /** Opens the product-centric supplier mapping drawer for this product — the Supplier cell's status
+   * badge / "+ Add Supplier Mapping" action. */
+  readonly mappingOpenRequested = output<Product>();
   readonly manageMarketingPage = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
   readonly statusEdit = output<ProductStatusEdit>();
@@ -171,6 +176,26 @@ export class ProductCatalogTableComponent {
         return 'danger';
       case 'Archived':
         return 'neutral';
+      default:
+        return 'neutral';
+    }
+  }
+
+  protected mappingStatusFor(productId: string): ProductSupplierMappingStatusDto | undefined {
+    return this.mappingStatusByProductId().get(productId);
+  }
+
+  protected mappingStatusTone(status: ProductSupplierMappingStatusDto['status']): AdminStatusTone {
+    switch (status) {
+      case 'FullyMapped':
+        return 'success';
+      case 'PartiallyMapped':
+        return 'info';
+      case 'Unmapped':
+        return 'warning';
+      case 'SupplierUnavailable':
+      case 'MappingError':
+        return 'danger';
       default:
         return 'neutral';
     }

@@ -4,11 +4,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { OrderRecommendation } from '../../models/order-success';
 
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 
 @Component({
   selector: 'app-order-recommendations',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, TranslatePipe],
+  imports: [RouterLink, HamboxCurrencyPipe, TranslatePipe, ImageFallbackDirective],
   templateUrl: './order-recommendations.component.html',
   styleUrl: './order-recommendations.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

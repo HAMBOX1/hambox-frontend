@@ -5,15 +5,22 @@ import { ApiClientService } from '../../../../core/api/api-client.service';
 import { SUPPLIERS_API } from '../../../../core/api/api-endpoints';
 import { ApiError } from '../../../../core/models/api-error.model';
 import {
+  BulkCreateSupplierMappingsResultDto,
   CreateSupplierMappingRequest,
   CreateSupplierRequest,
+  ProductSupplierMappingStatusDto,
+  ProductVariantSupplierMappingDto,
+  SuggestionCandidate,
   SupplierAvailabilitySummaryDto,
   SupplierAvailabilitySyncResultDto,
   SupplierCatalogSearchResultDto,
   SupplierDetailDto,
   SupplierFulfillmentChainCandidateDto,
   SupplierListResult,
+  SupplierMappingCandidatesResult,
+  SupplierMappingCandidatesSummaryDto,
   SupplierMappingDto,
+  SupplierMappingSuggestionDto,
   SupplierTestConnectionResultDto,
   UpdateSupplierCredentialsRequest,
   UpdateSupplierMappingRequest,
@@ -51,6 +58,22 @@ export class SuppliersManagementFacade {
   private readonly fulfillmentChainLoadingState = signal(false);
   private readonly fulfillmentChainErrorState = signal<string | null>(null);
 
+  private readonly candidatesState = signal<SupplierMappingCandidatesResult | null>(null);
+  private readonly candidatesLoadingState = signal(false);
+  private readonly candidatesErrorState = signal<string | null>(null);
+  private readonly candidatesSummaryState = signal<SupplierMappingCandidatesSummaryDto | null>(null);
+  private readonly candidatesSummaryLoadingState = signal(false);
+  private readonly bulkMappingState = signal(false);
+
+  /** Suggestions computed so far this session, keyed by variantId — populated incrementally as
+   * `suggestMappings` resolves for whatever page/selection is currently in view. Never a precomputed
+   * global map (live matching has no bulk catalog to precompute from). */
+  private readonly suggestionsByVariantIdState = signal<ReadonlyMap<string, SupplierMappingSuggestionDto>>(new Map());
+  private readonly suggestingState = signal(false);
+
+  private readonly productVariantMappingsState = signal<readonly ProductVariantSupplierMappingDto[]>([]);
+  private readonly productVariantMappingsLoadingState = signal(false);
+
   readonly list = this.listState.asReadonly();
   readonly listLoading = this.listLoadingState.asReadonly();
   readonly listError = this.listErrorState.asReadonly();
@@ -76,6 +99,17 @@ export class SuppliersManagementFacade {
   readonly fulfillmentChain = this.fulfillmentChainState.asReadonly();
   readonly fulfillmentChainLoading = this.fulfillmentChainLoadingState.asReadonly();
   readonly fulfillmentChainError = this.fulfillmentChainErrorState.asReadonly();
+
+  readonly candidates = this.candidatesState.asReadonly();
+  readonly candidatesLoading = this.candidatesLoadingState.asReadonly();
+  readonly candidatesError = this.candidatesErrorState.asReadonly();
+  readonly candidatesSummary = this.candidatesSummaryState.asReadonly();
+  readonly candidatesSummaryLoading = this.candidatesSummaryLoadingState.asReadonly();
+  readonly bulkMapping = this.bulkMappingState.asReadonly();
+  readonly suggestionsByVariantId = this.suggestionsByVariantIdState.asReadonly();
+  readonly suggesting = this.suggestingState.asReadonly();
+  readonly productVariantMappings = this.productVariantMappingsState.asReadonly();
+  readonly productVariantMappingsLoading = this.productVariantMappingsLoadingState.asReadonly();
 
   async loadSuppliers(search?: string, status?: string, page = 1, pageSize = 20): Promise<void> {
     this.listLoadingState.set(true);
@@ -350,6 +384,144 @@ export class SuppliersManagementFacade {
 
   async deleteMapping(supplierId: string, mappingId: string): Promise<boolean> {
     return this.runMappingMutation(supplierId, () => this.api.delete<void>(SUPPLIERS_API.mapping(supplierId, mappingId)));
+  }
+
+  /** The Map Products workspace's table data — every eligible product/variant next to this supplier's
+   * own mapping, if any. `status` is `'all' | 'mapped' | 'unmapped'`. */
+  async loadMappingCandidates(supplierId: string, search?: string, status?: string, page = 1, pageSize = 20): Promise<void> {
+    this.candidatesLoadingState.set(true);
+    this.candidatesErrorState.set(null);
+
+    try {
+      const params: Record<string, string | number> = { page, pageSize };
+      if (search) {
+        params['search'] = search;
+      }
+      if (status && status !== 'all') {
+        params['status'] = status;
+      }
+
+      const result = await firstValueFrom(
+        this.api.get<SupplierMappingCandidatesResult>(SUPPLIERS_API.mappingCandidates(supplierId), { params }),
+      );
+      this.candidatesState.set(result);
+    } catch (error) {
+      this.candidatesState.set(null);
+      this.candidatesErrorState.set(this.toErrorMessage(error, 'Failed to load products to map.'));
+    } finally {
+      this.candidatesLoadingState.set(false);
+    }
+  }
+
+  /** Count-only companion to `loadMappingCandidates` — feeds both the Map Products header stat cards and
+   * the supplier detail page's Fulfillment Health block. */
+  async loadMappingCandidatesSummary(supplierId: string): Promise<void> {
+    this.candidatesSummaryLoadingState.set(true);
+
+    try {
+      const summary = await firstValueFrom(
+        this.api.get<SupplierMappingCandidatesSummaryDto>(SUPPLIERS_API.mappingCandidatesSummary(supplierId)),
+      );
+      this.candidatesSummaryState.set(summary);
+    } catch {
+      this.candidatesSummaryState.set(null);
+    } finally {
+      this.candidatesSummaryLoadingState.set(false);
+    }
+  }
+
+  /**
+   * Live, on-demand auto-match for a bounded set of candidates (e.g. the current page's unmapped rows) —
+   * never the whole catalog at once. Merges results into `suggestionsByVariantId` rather than replacing
+   * it, so suggestions computed on an earlier page/selection stay visible.
+   */
+  async suggestMappings(supplierId: string, candidates: readonly SuggestionCandidate[]): Promise<readonly SupplierMappingSuggestionDto[]> {
+    if (candidates.length === 0) {
+      return [];
+    }
+
+    this.suggestingState.set(true);
+
+    try {
+      const suggestions = await firstValueFrom(
+        this.api.post<readonly SupplierMappingSuggestionDto[]>(SUPPLIERS_API.suggestMappings(supplierId), candidates),
+      );
+
+      const next = new Map(this.suggestionsByVariantIdState());
+      for (const suggestion of suggestions ?? []) {
+        next.set(suggestion.variantId, suggestion);
+      }
+      this.suggestionsByVariantIdState.set(next);
+
+      return suggestions ?? [];
+    } catch (error) {
+      this.candidatesErrorState.set(this.toErrorMessage(error, 'Failed to find matches.'));
+      return [];
+    } finally {
+      this.suggestingState.set(false);
+    }
+  }
+
+  clearSuggestions(): void {
+    this.suggestionsByVariantIdState.set(new Map());
+  }
+
+  /** The "Confirm N Mappings" bulk action — one round trip, partial success supported (some rows may
+   * fail e.g. a race with another admin creating the same mapping); refreshes the candidates list and
+   * summary afterward so the table reflects the outcome immediately. */
+  async bulkCreateMappings(
+    supplierId: string,
+    requests: readonly CreateSupplierMappingRequest[],
+  ): Promise<BulkCreateSupplierMappingsResultDto | null> {
+    this.bulkMappingState.set(true);
+    this.candidatesErrorState.set(null);
+
+    try {
+      const result = await firstValueFrom(
+        this.api.post<BulkCreateSupplierMappingsResultDto>(SUPPLIERS_API.bulkMappings(supplierId), requests),
+      );
+      return result;
+    } catch (error) {
+      this.candidatesErrorState.set(this.toErrorMessage(error, 'Failed to create mappings.'));
+      return null;
+    } finally {
+      this.bulkMappingState.set(false);
+    }
+  }
+
+  /** Cross-supplier mapping status for a batch of products (or every eligible product when `productIds`
+   * is omitted) — used by the admin product list's Supplier Mapping column/filter. Stateless: the caller
+   * (the product list facade) owns how the result is used. */
+  async getProductMappingStatus(productIds?: readonly string[]): Promise<Readonly<Record<string, ProductSupplierMappingStatusDto>>> {
+    return firstValueFrom(
+      this.api.post<Readonly<Record<string, ProductSupplierMappingStatusDto>>>(SUPPLIERS_API.productMappingStatus, {
+        productIds: productIds ?? null,
+      }),
+    );
+  }
+
+  /** For one product, every eligible variant next to its resolved mapping across ANY supplier — the
+   * product-centric mapping drawer's and the product edit page's Supplier Fulfillment card's shared
+   * data source, from `GET /suppliers/product-mappings`. */
+  async loadProductVariantMappings(productId: string): Promise<void> {
+    this.productVariantMappingsLoadingState.set(true);
+
+    try {
+      const mappings = await firstValueFrom(
+        this.api.get<readonly ProductVariantSupplierMappingDto[]>(SUPPLIERS_API.productMappings, {
+          params: { productId },
+        }),
+      );
+      this.productVariantMappingsState.set(mappings ?? []);
+    } catch {
+      this.productVariantMappingsState.set([]);
+    } finally {
+      this.productVariantMappingsLoadingState.set(false);
+    }
+  }
+
+  clearProductVariantMappings(): void {
+    this.productVariantMappingsState.set([]);
   }
 
   private async runSave(id: string, action: () => Observable<unknown>): Promise<boolean> {

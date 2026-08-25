@@ -24,6 +24,15 @@
     [ngModel]="collectionFilter()"
     (ngModelChange)="onCollectionChange($event)"
   />
+  <p-select
+    adminToolbarFilters
+    [options]="supplierMappingOptions"
+    optionLabel="label"
+    optionValue="value"
+    placeholder="Supplier mapping"
+    [ngModel]="supplierMappingFilter()"
+    (ngModelChange)="onSupplierMappingChange($event)"
+  />
   <app-admin-icon-button
     adminToolbarActions
     [icon]="viewMode() === 'table' ? 'pi pi-th-large' : 'pi pi-table'"

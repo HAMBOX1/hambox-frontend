@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 import { CartLineItem } from '../../models/cart';
 
 @Component({
   selector: 'app-cart-line-item',
   standalone: true,
-  imports: [HamboxCurrencyPipe, TranslatePipe],
+  imports: [HamboxCurrencyPipe, TranslatePipe, ImageFallbackDirective],
   templateUrl: './cart-line-item.component.html',
   styleUrl: './cart-line-item.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

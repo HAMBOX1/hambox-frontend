@@ -94,6 +94,7 @@ export interface TicketTimelineEntry {
 export interface TicketCustomerContext {
   readonly membershipPlanName: string | null;
   readonly membershipStatus: string | null;
+  readonly relatedOrderId: string | null;
   readonly recentOrders: readonly {
     readonly orderId: string;
     readonly orderNumber: string;

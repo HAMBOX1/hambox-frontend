@@ -1,453 +1,282 @@
 <p-toast position="top-right" />
 
-
-
 <section class="membership-page" hamboxTranslateRefresh>
-
   <header class="membership-page__header">
-
     <h1>{{ 'ACCOUNT.MEMBERSHIP.TITLE' | translate }}</h1>
-
     <p>{{ 'ACCOUNT.MEMBERSHIP.SUBTITLE' | translate }}</p>
-
   </header>
 
-
-
   @if (loading()) {
-
     <p class="membership-page__state">{{ 'ACCOUNT.MEMBERSHIP.LOADING' | translate }}</p>
-
   } @else if (error()) {
-
     <div class="membership-page__error">
-
       <p>{{ error() }}</p>
-
       <button type="button" class="membership-page__retry" (click)="retry()">
-
         {{ 'ACCOUNT.MEMBERSHIP.RETRY' | translate }}
-
       </button>
-
     </div>
-
   } @else {
-
+    <!-- 1. CURRENT MEMBERSHIP -->
     @if (subscription(); as sub) {
-
-      <article class="membership-page__current-card">
-
-        <div class="membership-page__current-head">
-
-          <div>
-
-            <p class="membership-page__label">{{ 'ACCOUNT.MEMBERSHIP.CURRENT_PLAN' | translate }}</p>
-
+      <article class="membership-current">
+        <div class="membership-current__top">
+          <div class="membership-current__identity">
+            <span class="membership-current__label">{{ 'ACCOUNT.MEMBERSHIP.CURRENT_PLAN' | translate }}</span>
             <h2>
-
               {{ sub.planName }}
-
               @if (sub.badgeLabel) {
-
-                <span class="membership-page__badge">{{ sub.badgeLabel }}</span>
-
+                <span class="membership-badge">{{ sub.badgeLabel }}</span>
               }
-
             </h2>
-
+            <p class="membership-current__meta">
+              <p-tag [value]="sub.status" [severity]="statusSeverity(sub.status)" />
+              <span class="membership-current__dot" aria-hidden="true">·</span>
+              {{ 'ACCOUNT.MEMBERSHIP.VALID_UNTIL' | translate }}
+              {{ sub.expiresOnUtc | hamboxDate:'mediumDate' }}
+            </p>
           </div>
 
-          <p-tag [value]="sub.status" [severity]="statusSeverity(sub.status)" />
-
-        </div>
-
-
-
-        <p class="membership-page__meta">
-
-          {{ 'ACCOUNT.MEMBERSHIP.VALID_UNTIL' | translate }}:
-
-          {{ sub.expiresOnUtc | hamboxDate:'mediumDate' }}
-
-        </p>
-
-
-
-        <div class="membership-page__actions">
-
           <button
-
             type="button"
-
             class="membership-page__btn membership-page__btn--primary"
-
             [disabled]="actionLoading()"
-
             (click)="renew()"
-
           >
-
             {{ 'ACCOUNT.MEMBERSHIP.RENEW' | translate }}
-
           </button>
-
         </div>
 
+        @if (currentPlanBenefitsPreview().length) {
+          <div class="membership-current__benefits">
+            <span>{{ 'ACCOUNT.MEMBERSHIP.BENEFITS' | translate }}</span>
+            <ul>
+              @for (benefit of currentPlanBenefitsPreview(); track benefit.displayName + benefit.sortOrder) {
+                <li><i class="pi pi-check-circle" aria-hidden="true"></i>{{ benefit.displayName }}</li>
+              }
+              @if (currentPlanBenefitsMoreCount() > 0) {
+                <li class="membership-current__more">
+                  {{ 'ACCOUNT.MEMBERSHIP_UI.MORE_BENEFITS' | translate:{ count: currentPlanBenefitsMoreCount() } }}
+                </li>
+              }
+            </ul>
+          </div>
+        }
       </article>
-
     } @else {
-
-      <article class="membership-page__current-card membership-page__current-card--empty">
-
+      <article class="membership-current membership-current--empty">
         <h2>{{ 'ACCOUNT.MEMBERSHIP.NO_PLAN' | translate }}</h2>
-
         <p>{{ 'ACCOUNT.MEMBERSHIP.NO_PLAN_HINT' | translate }}</p>
-
       </article>
-
     }
 
-
-
-    <section class="membership-page__benefits">
-
-      <h3>{{ 'ACCOUNT.MEMBERSHIP.BENEFITS' | translate }}</h3>
-
-      @if (benefits().length) {
-
-        <ul class="membership-page__benefit-list">
-
-          @for (benefit of benefits(); track benefit.displayName + benefit.sortOrder) {
-
-            <li>
-
-              <i class="pi pi-check-circle membership-page__benefit-icon" aria-hidden="true"></i>
-
-              <strong>{{ benefit.displayName }}</strong>
-
-            </li>
-
-          }
-
-        </ul>
-
-      } @else {
-
-        <p class="membership-page__empty">{{ 'ACCOUNT.MEMBERSHIP.NO_BENEFITS' | translate }}</p>
-
-      }
-
-    </section>
-
-
-
+    <!-- 2. PLANS -->
     @if (comparablePlans().length) {
+      <section class="membership-page__section">
+        <h3 class="membership-page__section-title">{{ 'ACCOUNT.MEMBERSHIP.PLANS_TITLE' | translate }}</h3>
 
-      <section class="membership-page__compare">
-
-        <h3>{{ 'ACCOUNT.MEMBERSHIP.COMPARE_PLANS' | translate }}</h3>
-
-        <div class="membership-page__compare-grid">
-
+        <div class="membership-plans">
           @for (plan of comparablePlans(); track plan.id) {
-
-            <article
-
-              class="membership-page__compare-card"
-
-              [class.membership-page__compare-card--current]="isCurrentPlan(plan.id)"
-
-            >
-
-              <div class="membership-page__compare-head">
-
+            <article class="plan-card" [class.plan-card--current]="isCurrentPlan(plan.id)">
+              <div class="plan-card__head">
                 <h4>{{ plan.name }}</h4>
-
-                @if (plan.badgeLabel) {
-
-                  <span class="membership-page__badge">{{ plan.badgeLabel }}</span>
-
+                @if (plan.badgeLabel && !isCurrentPlan(plan.id)) {
+                  <span class="membership-badge">{{ plan.badgeLabel }}</span>
                 }
-
               </div>
 
-              <p>{{ plan.price | hamboxCurrency }} · {{ 'ACCOUNT.MEMBERSHIP_UI.DAYS' | translate:{ count: plan.durationDays } }}</p>
+              <p class="plan-card__price">
+                {{ plan.price | hamboxCurrency }}
+                <span>· {{ 'ACCOUNT.MEMBERSHIP_UI.DAYS' | translate:{ count: plan.durationDays } }}</span>
+              </p>
 
-              <ul class="membership-page__compare-features">
-                @for (benefit of plan.benefits; track benefit.displayName + benefit.sortOrder) {
-                  <li>
-                    <i class="pi pi-check-circle membership-page__benefit-icon" aria-hidden="true"></i>
-                    {{ benefit.displayName }}
-                  </li>
+              <ul class="plan-card__benefits">
+                @for (benefit of planBenefitsPreview(plan); track benefit.displayName + benefit.sortOrder) {
+                  <li><i class="pi pi-check-circle" aria-hidden="true"></i>{{ benefit.displayName }}</li>
                 } @empty {
-                  <li>{{ 'ACCOUNT.MEMBERSHIP.NO_BENEFITS' | translate }}</li>
+                  <li class="plan-card__no-benefits">{{ 'ACCOUNT.MEMBERSHIP.NO_BENEFITS' | translate }}</li>
+                }
+                @if (planBenefitsMoreCount(plan) > 0) {
+                  <li class="plan-card__more">
+                    {{ 'ACCOUNT.MEMBERSHIP_UI.MORE_BENEFITS' | translate:{ count: planBenefitsMoreCount(plan) } }}
+                  </li>
                 }
               </ul>
 
-
-
               @switch (planAction(plan)) {
-
                 @case ('current') {
-
-                  <span class="membership-page__current-label">{{ 'ACCOUNT.MEMBERSHIP.CURRENT_PLAN' | translate }}</span>
-
+                  <span class="plan-card__current-label">{{ 'ACCOUNT.MEMBERSHIP.CURRENT_PLAN' | translate }}</span>
                 }
-
-                @case ('upgrade') {
-
-                  <button
-
-                    type="button"
-
-                    class="membership-page__btn membership-page__btn--primary"
-
-                    [disabled]="actionLoading()"
-
-                    (click)="upgrade(plan)"
-
-                  >
-
-                    {{ 'ACCOUNT.MEMBERSHIP.UPGRADE' | translate }}
-
-                  </button>
-
-                }
-
                 @case ('downgrade') {
-
                   <button
-
                     type="button"
-
                     class="membership-page__btn membership-page__btn--secondary"
-
                     [disabled]="actionLoading()"
-
                     (click)="downgrade(plan)"
-
                   >
-
                     {{ 'ACCOUNT.MEMBERSHIP.DOWNGRADE' | translate }}
-
                   </button>
-
                 }
-
                 @case ('subscribe') {
-
                   <button
-
                     type="button"
-
                     class="membership-page__btn membership-page__btn--primary"
-
                     [disabled]="actionLoading()"
-
                     (click)="subscribe(plan)"
-
                   >
-
                     {{ 'ACCOUNT.MEMBERSHIP.SUBSCRIBE' | translate }}
-
                   </button>
-
                 }
-
                 @default {
-
                   <button
-
                     type="button"
-
                     class="membership-page__btn membership-page__btn--primary"
-
                     [disabled]="actionLoading()"
-
                     (click)="upgrade(plan)"
-
                   >
-
                     {{ 'ACCOUNT.MEMBERSHIP.UPGRADE' | translate }}
-
                   </button>
-
                 }
-
               }
-
             </article>
-
           }
-
         </div>
-
       </section>
-
     }
 
+    <!-- 3. BILLING & ACTIVITY -->
+    <section class="membership-page__section">
+      <div class="billing-activity__header">
+        <h3 class="membership-page__section-title">{{ 'ACCOUNT.MEMBERSHIP.BILLING_ACTIVITY' | translate }}</h3>
 
-
-    <section class="membership-page__table-section">
-
-      <div class="membership-page__table-header">
-
-        <h3>{{ 'ACCOUNT.MEMBERSHIP.HISTORY_TAB' | translate }}</h3>
-
+        <div
+          class="billing-activity__tabs"
+          role="tablist"
+          [attr.aria-label]="'ACCOUNT.MEMBERSHIP_UI.ACTIVITY_ARIA' | translate"
+        >
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeBillingTab() === 'history'"
+            [class.is-active]="activeBillingTab() === 'history'"
+            (click)="setBillingTab('history')"
+          >
+            {{ 'ACCOUNT.MEMBERSHIP.HISTORY_TAB' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeBillingTab() === 'transactions'"
+            [class.is-active]="activeBillingTab() === 'transactions'"
+            (click)="setBillingTab('transactions')"
+          >
+            {{ 'ACCOUNT.MEMBERSHIP.TRANSACTIONS_TAB' | translate }}
+          </button>
+        </div>
       </div>
 
-
-
-      @if (history().length) {
-
-        <div class="membership-page__table-wrap">
-
-          <table class="membership-page__table">
-
-            <thead>
-
-              <tr>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_ACTION' | translate }}</th>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_PLAN' | translate }}</th>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_NOTES' | translate }}</th>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_DATE' | translate }}</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              @for (entry of pagedHistory(); track entry.id) {
-
+      @if (activeBillingTab() === 'history') {
+        @if (history().length) {
+          <div class="membership-page__table-wrap">
+            <table class="membership-page__table">
+              <thead>
                 <tr>
-
-                  <td><p-tag [value]="entry.action" [severity]="statusSeverity(entry.action)" /></td>
-
-                  <td>{{ entry.planName }}</td>
-
-                  <td>{{ entry.notes || ('ACCOUNT.MEMBERSHIP_UI.NA' | translate) }}</td>
-
-                  <td>{{ entry.occurredOnUtc | hamboxDate:'medium' }}</td>
-
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_ACTION' | translate }}</th>
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_PLAN' | translate }}</th>
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_NOTES' | translate }}</th>
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.HISTORY_DATE' | translate }}</th>
                 </tr>
-
-              }
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-
-
-        @if (historyPageCount() > 1) {
-
-          <div class="membership-page__pagination">
-
-            <button type="button" class="membership-page__page-btn" [disabled]="historyPage() <= 1" (click)="setHistoryPage(historyPage() - 1)">{{ 'ACCOUNT.LIBRARY_UI.PREVIOUS' | translate }}</button>
-
-            <span>{{ 'ACCOUNT.LIBRARY_UI.PAGE_OF' | translate:{ page: historyPage(), total: historyPageCount() } }}</span>
-
-            <button type="button" class="membership-page__page-btn" [disabled]="historyPage() >= historyPageCount()" (click)="setHistoryPage(historyPage() + 1)">{{ 'ACCOUNT.LIBRARY_UI.NEXT' | translate }}</button>
-
+              </thead>
+              <tbody>
+                @for (entry of pagedHistory(); track entry.id) {
+                  <tr>
+                    <td><p-tag [value]="entry.action" [severity]="statusSeverity(entry.action)" /></td>
+                    <td>{{ entry.planName }}</td>
+                    <td>{{ entry.notes || ('ACCOUNT.MEMBERSHIP_UI.NA' | translate) }}</td>
+                    <td>{{ entry.occurredOnUtc | hamboxDate:'medium' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
 
+          @if (historyPageCount() > 1) {
+            <div class="membership-page__pagination">
+              <button
+                type="button"
+                class="membership-page__page-btn"
+                [disabled]="historyPage() <= 1"
+                (click)="setHistoryPage(historyPage() - 1)"
+              >
+                {{ 'ACCOUNT.LIBRARY_UI.PREVIOUS' | translate }}
+              </button>
+              <span>{{ 'ACCOUNT.LIBRARY_UI.PAGE_OF' | translate:{ page: historyPage(), total: historyPageCount() } }}</span>
+              <button
+                type="button"
+                class="membership-page__page-btn"
+                [disabled]="historyPage() >= historyPageCount()"
+                (click)="setHistoryPage(historyPage() + 1)"
+              >
+                {{ 'ACCOUNT.LIBRARY_UI.NEXT' | translate }}
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="billing-activity__empty">
+            <i class="pi pi-history" aria-hidden="true"></i>
+            <p>{{ 'ACCOUNT.MEMBERSHIP.NO_HISTORY' | translate }}</p>
+          </div>
         }
-
       } @else {
-
-        <p class="membership-page__empty">{{ 'ACCOUNT.MEMBERSHIP.NO_HISTORY' | translate }}</p>
-
-      }
-
-    </section>
-
-
-
-    <section class="membership-page__table-section">
-
-      <div class="membership-page__table-header">
-
-        <h3>{{ 'ACCOUNT.MEMBERSHIP.TRANSACTIONS_TAB' | translate }}</h3>
-
-      </div>
-
-
-
-      @if (transactions().length) {
-
-        <div class="membership-page__table-wrap">
-
-          <table class="membership-page__table">
-
-            <thead>
-
-              <tr>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.TRANSACTION_AMOUNT' | translate }}</th>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.TRANSACTION_STATUS' | translate }}</th>
-
-                <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.TRANSACTION_DATE' | translate }}</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              @for (tx of pagedTransactions(); track tx.id) {
-
+        @if (transactions().length) {
+          <div class="membership-page__table-wrap">
+            <table class="membership-page__table">
+              <thead>
                 <tr>
-
-                  <td>{{ tx.amount | hamboxCurrency }}</td>
-
-                  <td><p-tag [value]="tx.status" [severity]="statusSeverity(tx.status)" /></td>
-
-                  <td>{{ tx.createdOnUtc | hamboxDate:'medium' }}</td>
-
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.TRANSACTION_AMOUNT' | translate }}</th>
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.TRANSACTION_STATUS' | translate }}</th>
+                  <th scope="col">{{ 'ACCOUNT.MEMBERSHIP_UI.TRANSACTION_DATE' | translate }}</th>
                 </tr>
-
-              }
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-
-
-        @if (transactionsPageCount() > 1) {
-
-          <div class="membership-page__pagination">
-
-            <button type="button" class="membership-page__page-btn" [disabled]="transactionsPage() <= 1" (click)="setTransactionsPage(transactionsPage() - 1)">{{ 'ACCOUNT.LIBRARY_UI.PREVIOUS' | translate }}</button>
-
-            <span>{{ 'ACCOUNT.LIBRARY_UI.PAGE_OF' | translate:{ page: transactionsPage(), total: transactionsPageCount() } }}</span>
-
-            <button type="button" class="membership-page__page-btn" [disabled]="transactionsPage() >= transactionsPageCount()" (click)="setTransactionsPage(transactionsPage() + 1)">{{ 'ACCOUNT.LIBRARY_UI.NEXT' | translate }}</button>
-
+              </thead>
+              <tbody>
+                @for (tx of pagedTransactions(); track tx.id) {
+                  <tr>
+                    <td>{{ tx.amount | hamboxCurrency }}</td>
+                    <td><p-tag [value]="tx.status" [severity]="statusSeverity(tx.status)" /></td>
+                    <td>{{ tx.createdOnUtc | hamboxDate:'medium' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
 
+          @if (transactionsPageCount() > 1) {
+            <div class="membership-page__pagination">
+              <button
+                type="button"
+                class="membership-page__page-btn"
+                [disabled]="transactionsPage() <= 1"
+                (click)="setTransactionsPage(transactionsPage() - 1)"
+              >
+                {{ 'ACCOUNT.LIBRARY_UI.PREVIOUS' | translate }}
+              </button>
+              <span>{{ 'ACCOUNT.LIBRARY_UI.PAGE_OF' | translate:{ page: transactionsPage(), total: transactionsPageCount() } }}</span>
+              <button
+                type="button"
+                class="membership-page__page-btn"
+                [disabled]="transactionsPage() >= transactionsPageCount()"
+                (click)="setTransactionsPage(transactionsPage() + 1)"
+              >
+                {{ 'ACCOUNT.LIBRARY_UI.NEXT' | translate }}
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="billing-activity__empty">
+            <i class="pi pi-receipt" aria-hidden="true"></i>
+            <p>{{ 'ACCOUNT.MEMBERSHIP.NO_TRANSACTIONS' | translate }}</p>
+          </div>
         }
-
-      } @else {
-
-        <p class="membership-page__empty">{{ 'ACCOUNT.MEMBERSHIP.NO_TRANSACTIONS' | translate }}</p>
-
       }
-
     </section>
-
   }
-
 </section>
-

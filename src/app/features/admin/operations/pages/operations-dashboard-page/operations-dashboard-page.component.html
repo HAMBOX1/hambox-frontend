@@ -17,7 +17,7 @@
   } @else if (error() && !dashboard()) {
     <app-admin-error-alert [message]="error()!" />
   } @else if (dashboard(); as data) {
-    <app-admin-stat-grid>
+    <app-admin-stat-grid [columns]="4">
       <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.QUEUED' | translate" [value]="data.jobs.queued" icon="pi-list" />
       <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.FAILED_JOBS' | translate" [value]="data.jobs.failed" icon="pi-times-circle" tone="warning" />
       <app-admin-stat-card [compact]="true" [label]="'ADMIN.OPERATIONS.STATS.WAITING_DELIVERY' | translate" [value]="data.orders.waitingDelivery" icon="pi-send" tone="warning" />

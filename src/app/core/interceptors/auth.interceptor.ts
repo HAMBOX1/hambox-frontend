@@ -1,9 +1,4 @@
-import {
-  HttpBackend,
-  HttpClient,
-  HttpErrorResponse,
-  HttpInterceptorFn,
-} from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
@@ -11,10 +6,8 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AUTH_API } from '../api/api-endpoints';
 import { AUTH_CONTEXT, AuthContextType } from '../auth/auth-context';
 import { AuthSessionService } from '../auth/auth-session.service';
-import { TokenStorageService } from '../auth/token-storage.service';
-import { API_BASE_URL } from '../tokens/api-base-url.token';
+import { SessionBootstrapService } from '../auth/session-bootstrap.service';
 import { SKIP_AUTH_INTERCEPTOR } from '../tokens/http-context.tokens';
-import { AuthTokenResponse } from '../../features/auth/models/auth';
 
 function isAuthEndpoint(url: string): boolean {
   return (
@@ -26,12 +19,6 @@ function isAuthEndpoint(url: string): boolean {
     url.includes(AUTH_API.register) ||
     url.includes(AUTH_API.refresh)
   );
-}
-
-function resolveUrl(baseUrl: string, path: string): string {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  const base = baseUrl.replace(/\/$/, '');
-  return `${base}${normalizedPath}`;
 }
 
 function resolveAuthContext(routerUrl: string, requestUrl: string): AuthContextType {
@@ -47,11 +34,8 @@ function resolveAuthContext(routerUrl: string, requestUrl: string): AuthContextT
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const session = inject(AuthSessionService);
-  const tokenStorage = inject(TokenStorageService);
-  const apiBaseUrl = inject(API_BASE_URL);
-  const httpBackend = inject(HttpBackend);
+  const bootstrap = inject(SessionBootstrapService);
   const router = inject(Router);
-  const rawHttp = new HttpClient(httpBackend);
 
   const context = resolveAuthContext(router.url, req.url);
   const skipAuth = req.context.get(SKIP_AUTH_INTERCEPTOR) || isAuthEndpoint(req.url);
@@ -72,32 +56,25 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      const refreshToken =
-        session.getSession(context)?.refreshToken ?? tokenStorage.getRefreshToken(context);
-      if (!refreshToken) {
-        session.clearSession(context);
-        return throwError(() => error);
-      }
-
-      return rawHttp
-        .post<AuthTokenResponse>(resolveUrl(apiBaseUrl, AUTH_API.refresh), {
-          refreshToken,
-        })
-        .pipe(
-          switchMap((tokens) => {
-            session.setSession(context, tokens);
-            const retryReq = req.clone({
-              setHeaders: {
-                Authorization: `Bearer ${tokens.accessToken}`,
-              },
-            });
-            return next(retryReq);
-          }),
-          catchError((refreshError) => {
-            session.clearSession(context);
-            return throwError(() => refreshError);
-          }),
-        );
+      // SessionBootstrapService.refresh() coalesces concurrent 401s into a single POST
+      // /api/auth/refresh call (the HttpOnly cookie is sent automatically) — every request that
+      // 401'd around the same moment shares this one refresh, then each retries with the new token.
+      return bootstrap.refresh().pipe(
+        switchMap((tokens) => {
+          const retryReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${tokens.accessToken}`,
+            },
+          });
+          return next(retryReq);
+        }),
+        catchError((refreshError) => {
+          // Refresh itself failed (cookie missing/expired/reused) — the session is gone; clear it
+          // once here rather than once per failed request, and never retry, avoiding any loop.
+          session.clearSession(context);
+          return throwError(() => refreshError);
+        }),
+      );
     }),
   );
 };

@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 
 import {
 
@@ -79,6 +79,11 @@ export const appConfig: ApplicationConfig = {
         cartInterceptor,
         maintenanceBypassInterceptor,
       ]),
+      // Double-submit CSRF defense for the two cookie-authenticated endpoints (refresh, logout —
+      // see CsrfCookieWriter server-side). Reads the non-HttpOnly XSRF-TOKEN cookie the backend
+      // sets alongside the refresh cookie and echoes it back as X-XSRF-TOKEN automatically; every
+      // other endpoint is Bearer-header-authenticated and ignores this entirely.
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' }),
 
     ),
 

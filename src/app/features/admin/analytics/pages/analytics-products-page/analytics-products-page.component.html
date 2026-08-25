@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as products) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="4">
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.OUT_OF_STOCK' | translate" [value]="products.outOfStockVariants" icon="pi-ban" tone="warning" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.LOW_STOCK' | translate" [value]="products.lowStockVariants" icon="pi-exclamation-triangle" tone="warning" />
     <app-admin-stat-card [label]="'ADMIN.ANALYTICS.STATS.INVENTORY_VALUE' | translate" [value]="(products.inventoryValue | number: '1.0-2') ?? '—'" icon="pi-box" />

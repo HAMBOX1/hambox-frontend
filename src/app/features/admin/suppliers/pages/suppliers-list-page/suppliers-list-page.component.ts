@@ -192,6 +192,14 @@ export class SuppliersListPageComponent implements OnInit {
     const items: MenuItem[] = [];
     const t = (key: string) => this.translate.instant(key);
 
+    if (this.permissionService.hasPermission(this.permissions.Suppliers.ManageMappings)) {
+      items.push({
+        label: t('ADMIN.SUPPLIERS.ACTIONS.MAP_PRODUCTS'),
+        icon: 'pi pi-link',
+        routerLink: ['/admin/suppliers', supplier.id, 'map-products'],
+      });
+    }
+
     items.push({
       label: t('ADMIN.SUPPLIERS.ACTIONS.MAPPINGS'),
       icon: 'pi pi-sitemap',

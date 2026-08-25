@@ -81,6 +81,12 @@
               <dd>{{ selected.createdOnUtc | date: 'mediumDate' }}</dd>
             </div>
           }
+          @if (selected.lastEditedOnUtc) {
+            <div class="detail-panel__fact">
+              <dt>Last edited</dt>
+              <dd>{{ selected.lastEditedOnUtc | date: 'medium' }}@if (selected.lastEditedByName) {<span> by {{ selected.lastEditedByName }}</span>}</dd>
+            </div>
+          }
         </dl>
       </app-admin-section-card>
 

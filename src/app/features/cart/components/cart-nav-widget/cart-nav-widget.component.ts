@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angu
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 import { CartFacade } from '../../services/cart.facade';
 
 @Component({
   selector: 'app-cart-nav-widget',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, TranslatePipe],
+  imports: [RouterLink, HamboxCurrencyPipe, TranslatePipe, ImageFallbackDirective],
   templateUrl: './cart-nav-widget.component.html',
   styleUrl: './cart-nav-widget.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

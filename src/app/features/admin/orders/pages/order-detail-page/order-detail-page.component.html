@@ -52,7 +52,7 @@
     />
   } @else if (detail(); as order) {
     <section class="admin-detail-hero">
-      <app-admin-stat-grid>
+      <app-admin-stat-grid [columns]="4">
         <app-admin-stat-card
           [label]="'ADMIN.ORDERS.DETAIL.TOTAL' | translate"
           [value]="formatMoney(order.totalAmount)"
@@ -86,6 +86,17 @@
             <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PURCHASE_DATE' | translate }}</dt>
             <dd>{{ order.createdOnUtc | date: 'medium' }}</dd>
           </div>
+          @if (order.lastEditedOnUtc) {
+            <div>
+              <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.LAST_EDITED' | translate }}</dt>
+              <dd>
+                {{ order.lastEditedOnUtc | date: 'medium' }}
+                @if (order.lastEditedByName) {
+                  <span>{{ 'ADMIN.ORDERS.DETAIL.LAST_EDITED_BY' | translate: { name: order.lastEditedByName } }}</span>
+                }
+              </dd>
+            </div>
+          }
           <div>
             <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PAYMENT_METHOD' | translate }}</dt>
             <dd>{{ order.paymentMethod }}</dd>
@@ -221,7 +232,7 @@
               <div class="order-detail-page__code-actions">
                 @if (!revealedKeys()[license.id]) {
                   <button
-                    *hamboxHasPermission="permissions.Orders.View"
+                    *hamboxHasPermission="permissions.Orders.RevealLicenseKeys"
                     pButton
                     type="button"
                     size="small"

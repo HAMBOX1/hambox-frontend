@@ -27,6 +27,10 @@
     }
   </div>
 
+  <div class="auth-form__field">
+    <ui-turnstile action="resend-verification" (tokenChange)="turnstileToken.set($event)" (expired)="turnstileToken.set(null)" (errored)="turnstileToken.set(null)" />
+  </div>
+
   <div class="auth-form__actions">
     <button
       pButton
@@ -34,7 +38,7 @@
       class="auth-form__submit"
       label="Resend Email"
       [loading]="isSubmitting()"
-      [disabled]="isSubmitting()"
+      [disabled]="isSubmitting() || !turnstileToken()"
     ></button>
   </div>
 

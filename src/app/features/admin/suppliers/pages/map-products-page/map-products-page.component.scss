@@ -1,0 +1,38 @@
+.map-products-page__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: var(--admin-section-gap, 2rem) 0 1rem;
+}
+
+.map-products-page__bulk-hint {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+}
+
+.map-products-page__product-name,
+.map-products-page__match-name {
+  display: block;
+  color: var(--admin-text-primary);
+  font-weight: 600;
+}
+
+.map-products-page__product-category,
+.map-products-page__sku,
+.map-products-page__match-id {
+  display: block;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.map-products-page__variant {
+  display: block;
+  color: var(--admin-text-primary);
+}
+
+.map-products-page__no-match {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+}

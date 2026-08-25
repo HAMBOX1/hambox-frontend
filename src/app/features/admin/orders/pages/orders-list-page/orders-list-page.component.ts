@@ -153,6 +153,7 @@ export class OrdersListPageComponent implements OnInit {
     deliveryStatus: 'ADMIN.ORDERS.LIST.COLUMNS.DELIVERY',
     membershipDiscount: 'ADMIN.ORDERS.LIST.COLUMNS.MEMBERSHIP',
     coupon: 'ADMIN.ORDERS.LIST.COLUMNS.COUPON',
+    lastEdited: 'ADMIN.ORDERS.LIST.COLUMNS.LAST_EDITED',
   };
 
   protected readonly columnOptions = ORDER_COLUMN_KEYS.map((key) => ({

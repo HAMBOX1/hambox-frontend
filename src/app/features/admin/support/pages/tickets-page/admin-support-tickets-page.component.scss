@@ -470,9 +470,6 @@
   list-style: none;
 
   li {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
     padding-block: var(--hambox-spacing-2);
     border-block-end: 1px solid var(--admin-border-subtle);
     font-size: var(--admin-type-caption);
@@ -480,6 +477,21 @@
     &:last-child {
       border-block-end: none;
     }
+  }
+}
+
+.admin-support-detail__related-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--admin-radius-sm, 4px);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--admin-accent-blue, var(--color-primary));
+    text-decoration: underline;
   }
 }
 

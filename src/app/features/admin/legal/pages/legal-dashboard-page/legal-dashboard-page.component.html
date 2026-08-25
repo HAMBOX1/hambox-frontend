@@ -18,7 +18,7 @@
     ></button>
   </app-admin-page-header>
 
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="4">
     <app-admin-stat-card
       [label]="'ADMIN.LEGAL.DASHBOARD.STATS.TOTAL' | translate"
       [value]="stats().total"

@@ -1,0 +1,7 @@
+@if (isConfigured) {
+  <div class="ui-turnstile" #container></div>
+
+  @if (failedToLoad()) {
+    <p class="ui-turnstile__error" role="alert">{{ 'AUTH.TURNSTILE.LOAD_ERROR' | translate }}</p>
+  }
+}

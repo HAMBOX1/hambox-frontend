@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { CartFacade } from '../../../cart/services/cart.facade';
 
 @Component({
   selector: 'app-checkout-order-summary',
   standalone: true,
-  imports: [HamboxCurrencyPipe, TranslatePipe],
+  imports: [HamboxCurrencyPipe, TranslatePipe, ImageFallbackDirective],
   templateUrl: './checkout-order-summary.component.html',
   styleUrl: './checkout-order-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

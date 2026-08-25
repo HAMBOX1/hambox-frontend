@@ -3,7 +3,7 @@
 } @else if (error() && !data()) {
   <app-admin-error-alert [message]="error()!" />
 } @else if (data(); as overview) {
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="4">
     <app-admin-stat-card [compact]="true"
       [label]="'ADMIN.ANALYTICS.STATS.GROSS_REVENUE' | translate"
       [value]="(overview.grossRevenue | number: '1.0-2') ?? '—'"

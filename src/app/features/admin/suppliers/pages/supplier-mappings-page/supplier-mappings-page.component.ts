@@ -31,6 +31,10 @@ import { HasPermissionDirective } from '../../../../../shared/directives/has-per
 import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { HamboxProductSelectComponent } from '../../components/hambox-product-select/hambox-product-select.component';
 import { HamboxVariantSelectComponent } from '../../components/hambox-variant-select/hambox-variant-select.component';
+import {
+  SupplierCatalogSearchDrawerComponent,
+  SupplierCatalogSearchDrawerTarget,
+} from '../../components/supplier-catalog-search-drawer/supplier-catalog-search-drawer.component';
 import { SupplierCatalogSelectComponent } from '../../components/supplier-catalog-select/supplier-catalog-select.component';
 import { SupplierCatalogItemDto, SupplierMappingDto } from '../../models/supplier.model';
 import { SuppliersManagementFacade } from '../../services/suppliers-management.facade';
@@ -63,6 +67,7 @@ type MappingScope = 'product' | 'variant';
     HamboxProductSelectComponent,
     HamboxVariantSelectComponent,
     SupplierCatalogSelectComponent,
+    SupplierCatalogSearchDrawerComponent,
     HamboxDatePipe,
   ],
   providers: [SuppliersManagementFacade, MessageService],
@@ -94,6 +99,9 @@ export class SupplierMappingsPageComponent implements OnInit {
 
   protected readonly dialogOpen = signal(false);
   protected readonly editingMapping = signal<SupplierMappingDto | null>(null);
+  /** The task-first product-centric drawer, reused here so this supplier-centric page and the product
+   * catalog/edit pages never grow two different mapping implementations — see its own doc comment. */
+  protected readonly mappingDrawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
   protected readonly deleteDialogOpen = signal(false);
   protected readonly deleteTarget = signal<SupplierMappingDto | null>(null);
   protected readonly saving = signal(false);
@@ -289,6 +297,18 @@ export class SupplierMappingsPageComponent implements OnInit {
   }
 
   protected retryLoad(): void {
+    void this.facade.loadMappings(this.supplierId());
+  }
+
+  protected openMappingDrawer(): void {
+    this.mappingDrawerTarget.set({ supplierId: this.supplierId(), supplierName: this.facade.detail()?.name ?? '' });
+  }
+
+  protected onMappingDrawerClosed(): void {
+    this.mappingDrawerTarget.set(null);
+  }
+
+  protected onMappingDrawerCreated(): void {
     void this.facade.loadMappings(this.supplierId());
   }
 

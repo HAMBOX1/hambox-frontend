@@ -16,13 +16,14 @@ import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/h
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 
-import { MembershipPlanSummaryApiDto } from '../../models/account-membership-api.model';
+import { MembershipBenefitApiDto, MembershipPlanSummaryApiDto } from '../../models/account-membership-api.model';
 
 import { AccountMembershipFacade } from '../../services/account-membership.facade';
 
 
 
 const HISTORY_PAGE_SIZE = 8;
+const BENEFIT_PREVIEW_COUNT = 3;
 
 
 
@@ -88,6 +89,8 @@ export class AccountMembershipPageComponent implements OnInit {
 
   protected readonly transactionsPage = signal(1);
 
+  protected readonly activeBillingTab = signal<'history' | 'transactions'>('history');
+
 
 
   protected readonly currentPlanId = computed(() => this.subscription()?.planId ?? null);
@@ -98,6 +101,16 @@ export class AccountMembershipPageComponent implements OnInit {
 
     this.availablePlans().filter((plan) => plan.status === 'Active'),
 
+  );
+
+
+
+  protected readonly currentPlanBenefitsPreview = computed(() =>
+    this.benefits().slice(0, BENEFIT_PREVIEW_COUNT),
+  );
+
+  protected readonly currentPlanBenefitsMoreCount = computed(() =>
+    Math.max(0, this.benefits().length - BENEFIT_PREVIEW_COUNT),
   );
 
 
@@ -162,6 +175,20 @@ export class AccountMembershipPageComponent implements OnInit {
 
     return this.currentPlanId() === planId;
 
+  }
+
+
+
+  protected planBenefitsPreview(plan: MembershipPlanSummaryApiDto): readonly MembershipBenefitApiDto[] {
+    return plan.benefits.slice(0, BENEFIT_PREVIEW_COUNT);
+  }
+
+  protected planBenefitsMoreCount(plan: MembershipPlanSummaryApiDto): number {
+    return Math.max(0, plan.benefits.length - BENEFIT_PREVIEW_COUNT);
+  }
+
+  protected setBillingTab(tab: 'history' | 'transactions'): void {
+    this.activeBillingTab.set(tab);
   }
 
 

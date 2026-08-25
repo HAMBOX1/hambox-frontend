@@ -16,6 +16,7 @@ export interface SupplierListItemDto {
   readonly isEnabled: boolean;
   readonly baseUrl: string | null;
   readonly createdOnUtc: string;
+  readonly supportsOrderStatus: boolean;
 }
 
 export interface SupplierDetailDto {
@@ -193,6 +194,107 @@ export interface SupplierCatalogSearchResultDto {
 
 export type SupplierListResult = PagedResult<SupplierListItemDto>;
 
+// ─── Map Products workspace ─────────────────────────────────────
+
+/** One eligible HAMBOX product variant, alongside this supplier's own mapping for it (if any) — the Map
+ * Products table's row shape. `existingMappingId` null means unmapped. */
+export interface SupplierMappingCandidateDto {
+  readonly productId: string;
+  readonly productName: string;
+  readonly categoryName: string;
+  readonly variantId: string;
+  readonly variantDisplayName: string;
+  readonly variantSku: string;
+  readonly existingMappingId: string | null;
+  readonly externalProductId: string | null;
+  readonly externalName: string | null;
+  readonly buyingPrice: number | null;
+  readonly currency: string | null;
+  readonly availabilityState: SupplierAvailabilityState | null;
+}
+
+export type SupplierMappingCandidatesResult = PagedResult<SupplierMappingCandidateDto>;
+
+/** Stat-card counts for the Map Products header and the supplier detail page's Fulfillment Health block. */
+export interface SupplierMappingCandidatesSummaryDto {
+  readonly eligibleCount: number;
+  readonly mappedCount: number;
+  readonly unmappedCount: number;
+}
+
+export interface SuggestionCandidate {
+  readonly productId: string;
+  readonly variantId: string;
+}
+
+export type MatchConfidenceTier = 'High' | 'Medium' | 'None';
+
+/** Live auto-match result for one candidate. `bestMatch` is null exactly when `confidenceTier` is
+ * `'None'` — never auto-created as a mapping, only ever a suggestion the admin reviews or confirms. */
+export interface SupplierMappingSuggestionDto {
+  readonly productId: string;
+  readonly variantId: string;
+  readonly bestMatch: SupplierCatalogItemDto | null;
+  readonly confidenceScore: number;
+  readonly confidenceTier: MatchConfidenceTier;
+}
+
+export interface BulkMappingFailureDto {
+  readonly productId: string;
+  readonly variantId: string | null;
+  readonly errorCode: string;
+  readonly errorMessage: string;
+}
+
+/** Result of the "Confirm N Mappings" bulk action — partial success is expected and normal. */
+export interface BulkCreateSupplierMappingsResultDto {
+  readonly createdMappingIds: readonly string[];
+  readonly failures: readonly BulkMappingFailureDto[];
+}
+
+/** Cross-supplier, business-friendly mapping status for one product on the admin product list. */
+export type ProductSupplierMappingStatus =
+  | 'FullyMapped'
+  | 'PartiallyMapped'
+  | 'Unmapped'
+  | 'SupplierUnavailable'
+  | 'MappingError';
+
+export interface ProductSupplierMappingStatusDto {
+  readonly status: ProductSupplierMappingStatus;
+  readonly mappedVariantCount: number;
+  readonly totalVariantCount: number;
+  readonly primarySupplierName: string | null;
+}
+
+export const SUPPLIER_MAPPING_STATUS_OPTIONS: readonly { label: string; value: ProductSupplierMappingStatus | 'all' }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Fully mapped', value: 'FullyMapped' },
+  { label: 'Partially mapped', value: 'PartiallyMapped' },
+  { label: 'Unmapped', value: 'Unmapped' },
+  { label: 'Supplier unavailable', value: 'SupplierUnavailable' },
+  { label: 'Mapping error', value: 'MappingError' },
+];
+
+/** One variant's resolved mapping (if any), across every supplier — the product-centric counterpart to
+ * `SupplierFulfillmentChainCandidateDto`. Backs the product-centric mapping drawer's per-variant list
+ * and the product edit page's Supplier Fulfillment summary, from `GET /suppliers/product-mappings`. */
+export interface ProductVariantSupplierMappingDto {
+  readonly variantId: string;
+  readonly variantDisplayName: string;
+  readonly variantSku: string;
+  readonly mappingId: string | null;
+  readonly supplierId: string | null;
+  readonly supplierName: string | null;
+  readonly externalProductId: string | null;
+  readonly externalName: string | null;
+  readonly buyingPrice: number | null;
+  readonly currency: string | null;
+  readonly priority: number | null;
+  readonly availabilityState: SupplierAvailabilityState | null;
+  readonly mappingStatus: 'Mapped' | 'Unmapped';
+}
+
 export const SUPPLIER_STATUS_OPTIONS: readonly { label: string; value: SupplierStatus | 'all' }[] = [
   { label: 'All statuses', value: 'all' },
   { label: 'Active', value: 'Active' },
@@ -218,4 +320,5 @@ export const SUPPLIER_AUTH_TYPE_OPTIONS: readonly { label: string; value: Suppli
 /** Providers with a fixed, non-editable HTTP endpoint — the Base URL field is locked to this display value in the UI; the backend independently enforces the real endpoint regardless of what's submitted. */
 export const SUPPLIER_FIXED_BASE_URLS: Readonly<Record<string, string>> = {
   Bamboo: 'https://api.bamboocardportal.com',
+  Visoria: 'https://api.visoria.digital',
 };

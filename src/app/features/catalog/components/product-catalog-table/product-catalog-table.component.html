@@ -36,6 +36,7 @@
             Price <p-sortIcon field="price" />
           </th>
           <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+          <th>Supplier</th>
           <th style="width: 5.5rem"></th>
         </tr>
       </ng-template>
@@ -209,6 +210,22 @@
               </ng-template>
             </p-select>
           </td>
+          <td (click)="$event.stopPropagation()">
+            @if (mappingStatusFor(product.id); as mapping) {
+              @if (mapping.status === 'Unmapped') {
+                <button type="button" class="product-catalog-table__mapping-cell product-catalog-table__mapping-cell--unmapped" (click)="mappingOpenRequested.emit(product)">
+                  + {{ 'ADMIN.CATALOG_PAGE.SUPPLIER_MAPPING.ADD' | translate }}
+                </button>
+              } @else {
+                <button type="button" class="product-catalog-table__mapping-cell" (click)="mappingOpenRequested.emit(product)">
+                  <app-admin-status-badge
+                    [label]="mapping.primarySupplierName ? (mapping.primarySupplierName + ' · ' + mapping.mappedVariantCount + '/' + mapping.totalVariantCount + ' ' + ('ADMIN.CATALOG_PAGE.SUPPLIER_MAPPING.VARIANTS_MAPPED' | translate)) : mapping.status"
+                    [tone]="mappingStatusTone(mapping.status)"
+                  />
+                </button>
+              }
+            }
+          </td>
           <td (click)="onActionsCellClick($event)">
             <div class="admin-actions-row">
               @let menuItems = productActionMenuItems(product);
@@ -228,7 +245,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="8">
+          <td colspan="9">
             <app-admin-empty-state
               icon="pi pi-inbox"
               [title]="searchActive() ? 'No matching products' : 'No products yet'"

@@ -11,9 +11,14 @@ import {
   AdminStatGridComponent,
   AdminStatusBadgeComponent,
 } from '../../../../../shared/components/admin';
+import { CountryFailureCountDto, SecurityEventDto } from '../../models/security.model';
 import { SecurityManagementFacade } from '../../services/security-management.facade';
 import { activateOnceWhenTrue } from '../../utils/lazy-tab-activation';
-import { buildLoginTrendChart, buildTopFailureCountriesChart } from '../../utils/security-chart.util';
+import { buildLoginTrendChart } from '../../utils/security-chart.util';
+
+export interface RankedCountryFailure extends CountryFailureCountDto {
+  readonly sharePercent: number;
+}
 
 @Component({
   selector: 'app-security-overview-panel',
@@ -48,9 +53,30 @@ export class OverviewPanelComponent {
   });
 
   protected readonly loginTrendChart = computed(() => buildLoginTrendChart(this.facade.dashboard()?.loginTrend ?? []));
-  protected readonly topFailureCountriesChart = computed(() =>
-    buildTopFailureCountriesChart(this.facade.dashboard()?.topFailureCountries ?? []),
-  );
+
+  /** Same `topFailureCountries` data as before, just ranked with a computed share-of-total —
+   * a compact list reads faster than a chart for the typical 3-5 rows this shows. */
+  protected readonly rankedFailureCountries = computed<readonly RankedCountryFailure[]>(() => {
+    const items = this.facade.dashboard()?.topFailureCountries ?? [];
+    const total = items.reduce((sum, item) => sum + item.failedLogins, 0);
+    return items.map((item) => ({
+      ...item,
+      sharePercent: total > 0 ? Math.round((item.failedLogins / total) * 100) : 0,
+    }));
+  });
+
+  /** Highest severity present in the open-alerts preview — drives the status bar's tone/wording. */
+  protected readonly highestOpenSeverity = computed(() => {
+    const alerts = this.facade.dashboard()?.openAlertsPreview ?? [];
+    const order: Record<SecurityEventDto['severity'], number> = { Critical: 3, High: 2, Medium: 1, Low: 0 };
+    return alerts.reduce<SecurityEventDto['severity'] | null>(
+      (highest, alert) => (!highest || order[alert.severity] > order[highest] ? alert.severity : highest),
+      null,
+    );
+  });
+
+  /** Most recent open-alert preview row, if any — the status bar's "last activity" line. */
+  protected readonly lastActivity = computed(() => this.facade.dashboard()?.openAlertsPreview[0] ?? null);
 
   constructor() {
     activateOnceWhenTrue(this.active, () => void this.facade.loadDashboard());
@@ -70,5 +96,9 @@ export class OverviewPanelComponent {
       default:
         return 'neutral' as const;
     }
+  }
+
+  protected affectedResource(alert: SecurityEventDto): string {
+    return alert.targetEmail ?? alert.actorEmail ?? alert.ipAddress ?? '—';
   }
 }

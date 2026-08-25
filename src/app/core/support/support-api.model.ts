@@ -99,6 +99,7 @@ export interface TicketCustomerContextApiDto {
   readonly membershipStatus: string | null;
   readonly membershipExpiresOnUtc: string | null;
   readonly recentOrders: readonly TicketContextOrderApiDto[];
+  readonly relatedOrderId: string | null;
   readonly relatedOrderNumber: string | null;
   readonly relatedProductName: string | null;
   readonly customerCountry: string | null;

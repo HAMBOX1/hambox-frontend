@@ -24,6 +24,14 @@ export class AccountNotificationsFacade {
   private readonly preferencesSavingState = signal(false);
   private readonly preferencesErrorState = signal<string | null>(null);
 
+  /** Bumped on every `load()` call. `AccountNotificationsFacade` is a singleton shared by every
+   * concurrently-mounted `NotificationBellComponent` (desktop + mobile chrome render both at once,
+   * CSS-hiding one) plus the dedicated notifications page — so multiple `load()` calls with different
+   * filters are routinely in flight together. A response is only applied if it's still the most
+   * recently *started* request by the time it resolves; an older, slower response is discarded instead
+   * of clobbering whatever a newer call (or a SignalR push that landed in between) already set. */
+  private loadRequestId = 0;
+
   readonly items = this.itemsState.asReadonly();
   readonly unreadCount = this.unreadCountState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
@@ -36,8 +44,12 @@ export class AccountNotificationsFacade {
   readonly preferencesError = this.preferencesErrorState.asReadonly();
 
   /** Loads the caller's notifications. Called with no arguments by the notification bell — keep that
-   * call's behavior (top 50, no filters) unchanged when extending this for the full notifications page. */
+   * call's behavior (top 50, no filters) unchanged when extending this for the full notifications page.
+   * Safe to call concurrently from multiple mounted consumers (see `loadRequestId` above) — a stale
+   * response is discarded rather than overwriting newer state, and a failure never wipes out
+   * previously-loaded data (it only surfaces `error`, leaving `items`/`unreadCount` as last known good). */
   async load(query: NotificationQuery = {}): Promise<void> {
+    const requestId = ++this.loadRequestId;
     this.loadingState.set(true);
     this.errorState.set(null);
     void this.ensureRealtime();
@@ -47,13 +59,23 @@ export class AccountNotificationsFacade {
         firstValueFrom(this.api.getNotifications(1, 50, query)),
         firstValueFrom(this.api.getUnreadNotificationCount()),
       ]);
+
+      if (requestId !== this.loadRequestId) {
+        return;
+      }
+
       this.itemsState.set(page.items ?? []);
       this.unreadCountState.set(count);
     } catch {
-      this.itemsState.set([]);
+      if (requestId !== this.loadRequestId) {
+        return;
+      }
+
       this.errorState.set('Unable to load notifications.');
     } finally {
-      this.loadingState.set(false);
+      if (requestId === this.loadRequestId) {
+        this.loadingState.set(false);
+      }
     }
   }
 

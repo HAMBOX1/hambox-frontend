@@ -4,6 +4,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
+import { ImageFallbackDirective } from '../../../../shared/directives/image-fallback.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 import { AccountOrdersFacade } from '../../services/account-orders.facade';
@@ -16,7 +17,14 @@ type DateRangeFilter = 'all' | '30' | '90' | '365';
 @Component({
   selector: 'app-account-orders-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, TranslatePipe, HamboxTranslateRefreshDirective],
+  imports: [
+    RouterLink,
+    HamboxCurrencyPipe,
+    HamboxDatePipe,
+    TranslatePipe,
+    HamboxTranslateRefreshDirective,
+    ImageFallbackDirective,
+  ],
   templateUrl: './account-orders-page.component.html',
   styleUrl: './account-orders-page.component.scss',
 })

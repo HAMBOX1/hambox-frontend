@@ -5,7 +5,7 @@
     @for (item of items(); track item.id) {
       <li class="purchased-items__row">
         <div class="purchased-items__thumb">
-          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" />
+          <img [src]="item.imageUrl" [alt]="item.title" loading="lazy" hamboxImgFallback />
         </div>
         <div class="purchased-items__info">
           <span class="purchased-items__name">{{ item.title }}</span>

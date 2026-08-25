@@ -233,11 +233,14 @@ export class SupplierDetailPageComponent implements OnInit, HasUnsavedChanges {
     this.supplierId.set(id);
     void this.facade.loadDetail(id).then(() => this.patchForm());
     void this.facade.loadAvailabilitySummary(id);
+    void this.facade.loadMappingCandidatesSummary(id);
   }
 
   protected readonly availabilitySummary = this.facade.availabilitySummary;
   protected readonly availabilitySummaryLoading = this.facade.availabilitySummaryLoading;
   protected readonly availabilitySyncing = this.facade.availabilitySyncing;
+  protected readonly candidatesSummary = this.facade.candidatesSummary;
+  protected readonly candidatesSummaryLoading = this.facade.candidatesSummaryLoading;
 
   protected async syncAvailabilityNow(): Promise<void> {
     const id = this.supplierId();

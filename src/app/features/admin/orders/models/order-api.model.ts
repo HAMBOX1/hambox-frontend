@@ -30,6 +30,8 @@ export interface AdminOrderListItemDto {
   readonly membershipDiscount: number;
   readonly couponCode: string | null;
   readonly purchaseDate: string;
+  readonly lastEditedByName: string | null;
+  readonly lastEditedOnUtc: string | null;
 }
 
 export interface AdminOrderStatisticsDto {
@@ -147,6 +149,8 @@ export interface AdminOrderDetailDto {
   readonly customerOrderHistory: readonly AdminCustomerOrderHistoryItemDto[];
   readonly invoiceUrl: string | null;
   readonly createdOnUtc: string;
+  readonly lastEditedByName: string | null;
+  readonly lastEditedOnUtc: string | null;
 }
 
 export type AdminOrderListResult = PagedResult<AdminOrderListItemDto>;
@@ -222,6 +226,7 @@ export const ORDER_COLUMN_KEYS = [
   'deliveryStatus',
   'membershipDiscount',
   'coupon',
+  'lastEdited',
 ] as const;
 
 export type OrderColumnKey = (typeof ORDER_COLUMN_KEYS)[number];

@@ -9,7 +9,7 @@
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
-  <app-admin-stat-grid>
+  <app-admin-stat-grid [columns]="7">
     <app-admin-stat-card
       [label]="'ADMIN.COMMUNICATION.DASHBOARD.NOTIFICATIONS_TODAY' | translate"
       [value]="loading() ? '—' : (stats()?.notificationsToday ?? 0)"

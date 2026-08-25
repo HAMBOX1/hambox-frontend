@@ -355,7 +355,13 @@
           <dt>{{ 'ADMIN.SUPPORT.DETAIL.MEMBERSHIP' | translate }}</dt>
           <dd>{{ t.context?.membershipPlanName ?? t.membershipTier ?? '—' }}</dd>
           <dt>{{ 'ADMIN.SUPPORT.DETAIL.RELATED_ORDER' | translate }}</dt>
-          <dd>{{ t.relatedOrderNumber ?? '—' }}</dd>
+          <dd>
+            @if (t.context?.relatedOrderId; as relatedOrderId) {
+              <a [routerLink]="['/admin/orders', relatedOrderId]">{{ t.relatedOrderNumber ?? '—' }}</a>
+            } @else {
+              {{ t.relatedOrderNumber ?? '—' }}
+            }
+          </dd>
           <dt>{{ 'ADMIN.SUPPORT.DETAIL.RELATED_PRODUCT' | translate }}</dt>
           <dd>{{ t.relatedProductName ?? '—' }}</dd>
           @if (t.context?.customerCountry) {
@@ -386,13 +392,15 @@
         <ul class="admin-support-detail__related-list">
           @for (order of t.context!.recentOrders; track order.orderId) {
             <li>
-              <span>{{ order.orderNumber }} — {{ order.status }}</span>
-              <span>{{ order.productNames.join(', ') }}</span>
-              @if (order.hasLicenseKeys) {
-                <span class="admin-support-workspace__license-badge">
-                  <i class="pi pi-key" aria-hidden="true"></i> {{ 'ADMIN.SUPPORT.DETAIL.LICENSE_KEYS' | translate }}
-                </span>
-              }
+              <a [routerLink]="['/admin/orders', order.orderId]" class="admin-support-detail__related-link">
+                <span>{{ order.orderNumber }} — {{ order.status }}</span>
+                <span>{{ order.productNames.join(', ') }}</span>
+                @if (order.hasLicenseKeys) {
+                  <span class="admin-support-workspace__license-badge">
+                    <i class="pi pi-key" aria-hidden="true"></i> {{ 'ADMIN.SUPPORT.DETAIL.LICENSE_KEYS' | translate }}
+                  </span>
+                }
+              </a>
             </li>
           }
         </ul>

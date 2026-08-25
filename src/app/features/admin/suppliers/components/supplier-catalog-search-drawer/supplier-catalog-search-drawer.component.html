@@ -1,0 +1,155 @@
+<ng-template #drawerContent>
+  @if (target(); as t) {
+    @if (showProductPicker()) {
+      <div class="supplier-catalog-search-drawer__section">
+        <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.HAMBOX_PRODUCT' | translate }}</span>
+        <app-hambox-product-select [selected]="pickedProduct()" (selectedChange)="onProductPicked($event)" />
+      </div>
+    } @else {
+      <div class="supplier-catalog-search-drawer__section">
+        <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.HAMBOX_PRODUCT' | translate }}</span>
+        <span class="supplier-catalog-search-drawer__product-name">{{ productName() }}</span>
+      </div>
+    }
+
+    @if (showVariantList()) {
+      <div class="supplier-catalog-search-drawer__section">
+        <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.VARIANTS' | translate }}</span>
+        <ul class="supplier-catalog-search-drawer__variant-list">
+          @for (entry of variantMappings(); track entry.variantId) {
+            <li class="supplier-catalog-search-drawer__variant-row" [class.is-active]="variantId() === entry.variantId">
+              <div class="supplier-catalog-search-drawer__variant-info">
+                <span class="supplier-catalog-search-drawer__variant-name">{{ entry.variantDisplayName }}</span>
+                @if (entry.mappingId) {
+                  <span class="supplier-catalog-search-drawer__variant-status supplier-catalog-search-drawer__variant-status--mapped">
+                    ● {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.MAPPED_TO' | translate: { supplier: entry.supplierName } }}
+                  </span>
+                } @else {
+                  <span class="supplier-catalog-search-drawer__variant-status supplier-catalog-search-drawer__variant-status--unmapped">
+                    ⚠ {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.NOT_MAPPED' | translate }}
+                  </span>
+                }
+              </div>
+              <button pButton type="button" severity="secondary" size="small" [outlined]="true" (click)="selectVariantToEdit(entry)">
+                {{ (entry.mappingId ? 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.EDIT' : 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.MAP') | translate }}
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    } @else if (variantMappingsLoading()) {
+      <p class="supplier-catalog-search-drawer__hint">{{ 'COMMON.LOADING' | translate }}</p>
+    }
+
+    @if (variantId()) {
+      @if (showSupplierPicker()) {
+        <div class="supplier-catalog-search-drawer__section">
+          <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.SUPPLIER' | translate }}</span>
+          <p-select
+            [options]="enabledSuppliers()"
+            optionLabel="name"
+            [placeholder]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.SELECT_SUPPLIER' | translate"
+            (onChange)="onSupplierPicked($event.value)"
+          >
+            <ng-template let-supplier #item>
+              <div class="supplier-catalog-search-drawer__supplier-option">
+                <span class="supplier-catalog-search-drawer__supplier-name">{{ supplier.name }}</span>
+                <span class="supplier-catalog-search-drawer__supplier-meta">
+                  {{ supplier.code }} · {{ supplier.status }}
+                  @if (supplier.supportsOrderStatus) {
+                    · {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.ORDER_STATUS_SUPPORTED' | translate }}
+                  }
+                </span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+      } @else if (supplierName()) {
+        <div class="supplier-catalog-search-drawer__section">
+          <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.SUPPLIER' | translate }}</span>
+          <span class="supplier-catalog-search-drawer__supplier-name">{{ supplierName() }}</span>
+        </div>
+      }
+    }
+
+    @if (showMappingForm()) {
+      <div class="supplier-catalog-search-drawer__section">
+        <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.SUPPLIER_PRODUCT' | translate }}</span>
+        <app-supplier-catalog-select
+          [supplierId]="supplierId()!"
+          [selected]="selectedItem()"
+          [disabled]="saving()"
+          (selectedChange)="onSelectedChange($event)"
+        />
+      </div>
+
+      @if (selectedItem(); as item) {
+        <div class="supplier-catalog-search-drawer__fields">
+          <label class="supplier-catalog-search-drawer__field">
+            <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.BUYING_PRICE' | translate }}</span>
+            <p-inputnumber
+              [ngModel]="buyingPrice()"
+              (ngModelChange)="buyingPrice.set($event)"
+              [disabled]="saving()"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              [suffix]="' ' + item.currency"
+            />
+          </label>
+
+          <label class="supplier-catalog-search-drawer__field">
+            <span class="supplier-catalog-search-drawer__label">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.PRIORITY' | translate }}</span>
+            <p-inputnumber [ngModel]="priority()" (ngModelChange)="priority.set($event)" [disabled]="saving()" [min]="0" [showButtons]="true" />
+          </label>
+        </div>
+      }
+
+      @if (errorMessage(); as message) {
+        <p class="supplier-catalog-search-drawer__error">{{ message | translate }}</p>
+      }
+
+      <div class="supplier-catalog-search-drawer__actions">
+        <button pButton type="button" class="admin-btn-secondary" [disabled]="saving()" (click)="cancel()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button pButton type="button" [disabled]="!canConfirm()" [loading]="saving()" (click)="confirm()">
+          {{
+            (editingMappingId() ? 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.SAVE_MAPPING' : 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.CREATE_MAPPING')
+              | translate
+          }}
+        </button>
+      </div>
+    }
+  }
+</ng-template>
+
+@if (mobileViewport.isMobile()) {
+  <app-hambox-bottom-sheet
+    [open]="!!target()"
+    [title]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.TITLE' | translate"
+    [heightVh]="88"
+    [solid]="true"
+    (closed)="onVisibleChange(false)"
+  >
+    <ng-container [ngTemplateOutlet]="drawerContent" />
+  </app-hambox-bottom-sheet>
+} @else {
+  <p-drawer
+    [visible]="!!target()"
+    (visibleChange)="onVisibleChange($event)"
+    position="right"
+    [modal]="true"
+    [dismissible]="true"
+    [closeOnEscape]="true"
+    appendTo="body"
+    [style]="{ width: 'min(28rem, 92vw)' }"
+    [transitionOptions]="'200ms cubic-bezier(0.4, 0, 0.2, 1)'"
+    styleClass="supplier-catalog-search-drawer"
+  >
+    <ng-template #header>
+      <span class="supplier-catalog-search-drawer__header-title">{{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.TITLE' | translate }}</span>
+    </ng-template>
+    <ng-container [ngTemplateOutlet]="drawerContent" />
+  </p-drawer>
+}

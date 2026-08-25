@@ -1,6 +1,6 @@
 <article class="cart-item">
   <div class="cart-item__media">
-    <img class="cart-item__image" [src]="item().imageUrl" [alt]="item().title" loading="lazy" />
+    <img class="cart-item__image" [src]="item().imageUrl" [alt]="item().title" loading="lazy" hamboxImgFallback />
     @if (item().platformIconUrl) {
       <div class="cart-item__platform">
         <img [src]="item().platformIconUrl" alt="" aria-hidden="true" />

@@ -122,6 +122,60 @@
         <app-product-variant-manager [compact]="true" />
       </div>
 
+      @if (product()) {
+        <app-admin-section-card
+          [title]="'ADMIN.SUPPLIERS.MAP_PRODUCTS.DRAWER.TITLE' | translate"
+          [description]="'ADMIN.CATALOG_PAGE.SUPPLIER_FULFILLMENT.SUBTITLE' | translate"
+          [compact]="true"
+        >
+          @if (variantMappingsLoading()) {
+            <p class="product-edit-page__fulfillment-empty">{{ 'COMMON.LOADING' | translate }}</p>
+          } @else if (!hasAnyMapping()) {
+            <div class="product-edit-page__fulfillment">
+              <p class="product-edit-page__fulfillment-empty">{{ 'ADMIN.CATALOG_PAGE.SUPPLIER_FULFILLMENT.EMPTY' | translate }}</p>
+              <button
+                pButton
+                type="button"
+                class="admin-btn-secondary"
+                icon="pi pi-plus"
+                [label]="'ADMIN.CATALOG_PAGE.SUPPLIER_MAPPING.ADD' | translate"
+                *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+                (click)="openMappingDrawer()"
+              ></button>
+            </div>
+          } @else {
+            <div class="product-edit-page__fulfillment">
+              <div class="product-edit-page__fulfillment-summary">
+                @if (primaryMappingSupplierName(); as supplierName) {
+                  <span class="product-edit-page__fulfillment-supplier">{{ supplierName }}</span>
+                }
+                <span class="product-edit-page__fulfillment-count">
+                  {{ mappedVariantCount() }} / {{ variantMappings().length }} {{ 'ADMIN.CATALOG_PAGE.SUPPLIER_MAPPING.VARIANTS_MAPPED' | translate }}
+                </span>
+                <app-admin-status-badge
+                  [label]="
+                    (fullyMapped()
+                      ? 'ADMIN.CATALOG_PAGE.SUPPLIER_FULFILLMENT.FULLY_CONFIGURED'
+                      : 'ADMIN.CATALOG_PAGE.SUPPLIER_FULFILLMENT.PARTIALLY_CONFIGURED'
+                    ) | translate
+                  "
+                  [tone]="fullyMapped() ? 'success' : 'warning'"
+                />
+              </div>
+              <button
+                pButton
+                type="button"
+                class="admin-btn-secondary"
+                [outlined]="true"
+                [label]="'ADMIN.CATALOG_PAGE.SUPPLIER_FULFILLMENT.MANAGE' | translate"
+                *hamboxHasPermission="permissions.Suppliers.ManageMappings"
+                (click)="openMappingDrawer()"
+              ></button>
+            </div>
+          }
+        </app-admin-section-card>
+      }
+
       <app-product-instructions-panel [productId]="productId()" />
     </div>
 
@@ -141,5 +195,11 @@
         }
       </span>
     </div>
+
+    <app-supplier-catalog-search-drawer
+      [target]="mappingDrawerTarget()"
+      (closed)="onMappingDrawerClosed()"
+      (mappingCreated)="onMappingDrawerCreated()"
+    />
   }
 </section>

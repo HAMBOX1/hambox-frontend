@@ -1,0 +1,74 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.admin-referrals-list-page__filter {
+  min-width: 11rem;
+}
+
+a.admin-cell-primary {
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--admin-accent-green);
+  }
+}
+
+.admin-referrals-list-page__detail-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0 0 1.5rem;
+
+  dt {
+    color: var(--admin-text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--admin-text-primary);
+    word-break: break-all;
+  }
+}
+
+.admin-referrals-list-page__audit {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--admin-border-default);
+
+    p {
+      margin: 0.25rem 0;
+      color: var(--admin-text-secondary);
+      font-size: 0.8125rem;
+    }
+  }
+}
+
+.admin-referrals-list-page__audit-points {
+  margin-inline-start: 0.5rem;
+  color: var(--admin-accent-green);
+  font-weight: 700;
+
+  &--negative {
+    color: var(--admin-accent-red);
+  }
+}
+
+.admin-referrals-list-page__audit-time {
+  color: var(--admin-text-secondary);
+  font-size: 0.75rem;
+}
+
+.admin-referrals-list-page__empty {
+  color: var(--admin-text-secondary);
+}
