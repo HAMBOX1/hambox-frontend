@@ -88,7 +88,7 @@
           <span class="supplier-detail-page__field-label">{{ 'ADMIN.SUPPLIERS.DETAIL.BASE_URL' | translate }}</span>
           <input pInputText formControlName="baseUrl" placeholder="https://api.example.com" />
           @if (fixedBaseUrl()) {
-            <span class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.BASE_URL_LOCKED_HINT' | translate }}</span>
+            <span class="supplier-detail-page__hint">{{ 'ADMIN.SUPPLIERS.DETAIL.BASE_URL_LOCKED_HINT' | translate: { provider: providerType() } }}</span>
           }
         </label>
 

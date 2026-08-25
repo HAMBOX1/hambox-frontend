@@ -5037,7 +5037,7 @@
         "AUTH_TYPE": "Authentication type",
         "AUTH_TYPE_LOCKED_HINT": "Bamboo always authenticates with HTTP Basic Auth using its Client ID / Client Secret — this can't be changed.",
         "BASE_URL": "Base URL",
-        "BASE_URL_LOCKED_HINT": "Bamboo's endpoint is fixed and enforced by the backend — this can't be changed.",
+        "BASE_URL_LOCKED_HINT": "{{provider}}'s endpoint is fixed and enforced by the backend — this can't be changed.",
         "PRIORITY": "Priority",
         "CAPABILITIES": "Capabilities",
         "CAPABILITIES_LOCKED_HINT": "Only what Bamboo's integration actually supports today (purchase and order status) can be enabled.",
@@ -5162,7 +5162,7 @@
         "ACTIONS": {
           "CONFIRM_MAPPING": "Confirm Mapping",
           "REVIEW_MATCH": "Review Match",
-          "SEARCH_SUPPLIER": "Search Bamboo"
+          "SEARCH_SUPPLIER": "Search {{supplier}}"
         },
         "HIGH_CONFIDENCE": "High confidence · {{score}}%",
         "MEDIUM_CONFIDENCE": "Medium confidence · {{score}}%",

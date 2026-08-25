@@ -34,7 +34,15 @@
   }
 
   <app-admin-data-table-shell>
-    <p-table class="admin-data-table" [value]="[...mappings()]" [loading]="loading()" dataKey="id">
+    <p-table
+      class="admin-data-table"
+      [value]="[...mappings()]"
+      [loading]="loading()"
+      dataKey="id"
+      scrollable
+      scrollHeight="flex"
+      responsiveLayout="scroll"
+    >
       <ng-template pTemplate="header">
         <tr>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.HAMBOX_PRODUCT' | translate }}</th>

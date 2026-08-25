@@ -77,6 +77,7 @@
       />
     } @else {
       <p-table
+        class="admin-data-table"
         [value]="[...candidates()]"
         [loading]="loading()"
         [lazy]="true"
@@ -87,6 +88,9 @@
         [selection]="[...selected()]"
         (selectionChange)="onSelectionChange($event)"
         dataKey="variantId"
+        scrollable
+        scrollHeight="flex"
+        responsiveLayout="scroll"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -149,7 +153,7 @@
                   </button>
                 } @else {
                   <button pButton type="button" severity="secondary" size="small" (click)="openDrawer(candidate, false)">
-                    {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.ACTIONS.SEARCH_SUPPLIER' | translate }}
+                    {{ 'ADMIN.SUPPLIERS.MAP_PRODUCTS.ACTIONS.SEARCH_SUPPLIER' | translate: { supplier: supplierName() } }}
                   </button>
                 }
               }

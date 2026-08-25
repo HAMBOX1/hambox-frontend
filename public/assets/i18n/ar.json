@@ -4903,7 +4903,7 @@
         "AUTH_TYPE": "نوع المصادقة",
         "AUTH_TYPE_LOCKED_HINT": "تستخدم Bamboo دائمًا مصادقة HTTP الأساسية (Basic Auth) عبر معرّف العميل وسرّ العميل — لا يمكن تغيير ذلك.",
         "BASE_URL": "عنوان URL الأساسي",
-        "BASE_URL_LOCKED_HINT": "عنوان Bamboo الأساسي ثابت ويُفرض من الخادم — لا يمكن تغييره.",
+        "BASE_URL_LOCKED_HINT": "عنوان {{provider}} الأساسي ثابت ويُفرض من الخادم — لا يمكن تغييره.",
         "PRIORITY": "الأولوية",
         "CAPABILITIES": "الإمكانيات",
         "CAPABILITIES_LOCKED_HINT": "لا يمكن تفعيل سوى ما يدعمه تكامل Bamboo فعليًا حاليًا (الشراء وحالة الطلب).",
@@ -5028,7 +5028,7 @@
         "ACTIONS": {
           "CONFIRM_MAPPING": "تأكيد الربط",
           "REVIEW_MATCH": "مراجعة التطابق",
-          "SEARCH_SUPPLIER": "البحث في Bamboo"
+          "SEARCH_SUPPLIER": "البحث في {{supplier}}"
         },
         "HIGH_CONFIDENCE": "ثقة عالية · {{score}}٪",
         "MEDIUM_CONFIDENCE": "ثقة متوسطة · {{score}}٪",
