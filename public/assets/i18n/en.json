@@ -331,6 +331,7 @@
     "APPLYING": "Applying…",
     "COMPLETE_PURCHASE": "Complete Purchase",
     "COMPLETE_PURCHASE_DEV": "Complete Purchase (Development)",
+    "TERMS_NOTE": "By completing this purchase you agree to our Terms of Service, Privacy Policy, and Refund Policy.",
     "DELIVERY_REASSURANCE": "Your code will be delivered instantly to your email after payment. Please check your spam folder if you don't see it within a few minutes.",
     "SSL_SECURE": "SSL Secure",
     "PCI_COMPLIANT": "PCI Compliant",
@@ -2052,10 +2053,6 @@
           "NAME_DESC": "Name (Z–A)",
           "MOST_POPULAR": "Most popular"
         },
-        "ANNOUNCEMENT_POSITION": {
-          "TOP": "Top of page",
-          "BOTTOM": "Bottom of page"
-        },
         "TWITTER_CARD": {
           "SUMMARY": "Summary",
           "SUMMARY_LARGE_IMAGE": "Summary with large image"
@@ -2434,6 +2431,11 @@
             "LABEL": "Invoice Prefix",
             "HELP": "Text shown before the invoice number, e.g. \"INV-\".",
             "TOOLTIP": "Applies to new invoices going forward — existing invoice numbers don't change."
+          },
+          "DEFAULT_SUPPLIER_MARGIN_PERCENT": {
+            "LABEL": "Default Supplier Margin",
+            "HELP": "The default markup applied over a supplier's acquisition cost to compute the storefront price for supplier-fulfilled products.",
+            "TOOLTIP": "Used unless a specific supplier mapping has its own margin override. Changes apply to new pricing calculations, never to existing orders."
           }
         },
         "CHECKOUT": {
@@ -2824,38 +2826,6 @@
           "VISIBLE": {
             "LABEL": "Visible",
             "HELP": "Shows or hides this section on the home page immediately."
-          }
-        },
-        "ANNOUNCEMENT": {
-          "TITLE_CARD": "Announcement Bar",
-          "DESCRIPTION_CARD": "A thin promotional strip shown at the top or bottom of the page.",
-          "TEXT": {
-            "LABEL": "Text",
-            "HELP": "The message shown in the announcement bar."
-          },
-          "LINK": {
-            "LABEL": "Link",
-            "HELP": "Where the announcement bar links to when clicked."
-          },
-          "BUTTON_TEXT": {
-            "LABEL": "Button Text",
-            "HELP": "An optional button label inside the bar."
-          },
-          "BACKGROUND_COLOR": {
-            "LABEL": "Background Color",
-            "HELP": "The announcement bar's background color."
-          },
-          "TEXT_COLOR": {
-            "LABEL": "Text Color",
-            "HELP": "The announcement bar's text color."
-          },
-          "DISPLAY_POSITION": {
-            "LABEL": "Display Position",
-            "HELP": "Where the bar appears on the page."
-          },
-          "VISIBLE": {
-            "LABEL": "Visible",
-            "HELP": "Shows or hides the announcement bar immediately."
           }
         },
         "PROMO_BANNER": {
@@ -3329,6 +3299,12 @@
         "LAST_EDITED_BY": "by {{name}}",
         "TIMELINE": "Order timeline",
         "PRODUCTS": "Products purchased",
+        "SUPPLIER_ROUTING": "Supplier routing",
+        "SUPPLIER": "Supplier",
+        "COST": "Cost",
+        "NO_SUPPLIER_SELECTED": "No eligible supplier was found",
+        "FALLBACK_OCCURRED": "Fallback occurred",
+        "SELECTED": "selected",
         "DIGITAL_CODES": "Delivered digital codes",
         "ADMIN_NOTES": "Internal admin notes",
         "TOTAL": "Order total",
@@ -5035,12 +5011,12 @@
         "PROVIDER_TYPE": "Provider type",
         "PROVIDER_TYPE_HINT": "Select or type a provider key",
         "AUTH_TYPE": "Authentication type",
-        "AUTH_TYPE_LOCKED_HINT": "Bamboo always authenticates with HTTP Basic Auth using its Client ID / Client Secret — this can't be changed.",
+        "AUTH_TYPE_LOCKED_HINT": "{{provider}} always authenticates using {{authType}} — this can't be changed.",
         "BASE_URL": "Base URL",
         "BASE_URL_LOCKED_HINT": "{{provider}}'s endpoint is fixed and enforced by the backend — this can't be changed.",
         "PRIORITY": "Priority",
         "CAPABILITIES": "Capabilities",
-        "CAPABILITIES_LOCKED_HINT": "Only what Bamboo's integration actually supports today (purchase and order status) can be enabled.",
+        "CAPABILITIES_LOCKED_HINT": "Only what {{provider}}'s integration actually supports today can be enabled.",
         "SUPPORTS_INVENTORY_SYNC": "Inventory sync",
         "SUPPORTS_PRICE_SYNC": "Price sync",
         "SUPPORTS_RESERVATIONS": "Reservations",
@@ -5051,6 +5027,8 @@
         "ACCOUNT_ID": "Default Account ID",
         "ACCOUNT_ID_HINT": "The Bamboo account ID used for purchases. Get this from Bamboo's Accounts endpoint / Client Portal.",
         "ACCOUNT_ID_REQUIRED": "A positive Default Account ID is required for Bamboo.",
+        "ENVIRONMENT": "Environment",
+        "ENVIRONMENT_HINT": "Sandbox is used for testing and never charges the real CodesWholesale account balance. Switch to Production only when you're ready to fulfill real orders.",
         "CREDENTIALS": "Credentials",
         "CREDENTIALS_HINT": "Leave a field blank to keep its current stored value.",
         "API_KEY": "API key",
@@ -5061,8 +5039,30 @@
         "PASSWORD": "Password",
         "BEARER_TOKEN": "Bearer token",
         "OAUTH_SETTINGS": "OAuth settings (JSON)",
+        "OAUTH_SETTINGS_ENEBA_HINT": "Eneba expects {\"authId\": \"...\", \"authSecret\": \"...\", \"accountEmail\": \"...\"}. Auth ID/Auth Secret come from the Eneba credentials dashboard (my.eneba.com/api/credentials) and require a Wholesale Buyer account. accountEmail is the Eneba account's login email — not an API credential, but required to decrypt delivered key files.",
         "NO_CREDENTIALS_REQUIRED": "No credentials required for this authentication type.",
-        "STORED": "Stored"
+        "STORED": "Stored",
+        "NOT_SET": "Not set",
+        "UPDATE_CREDENTIALS": "Update credentials",
+        "CONNECTION": "Connection",
+        "CONNECTION_STATUS": "Connection status",
+        "CONNECTED": "Connected",
+        "CONNECTION_ISSUE": "Connection issue",
+        "NOT_TESTED": "Not tested yet",
+        "LAST_TESTED": "Last tested {{time}}",
+        "LAST_SYNC_LABEL": "Last sync",
+        "ADVANCED_CONFIGURATION": "Advanced configuration",
+        "CATALOG_SECTION": "Catalog & Fulfillment Health",
+        "CATALOG_STATUS_HEALTHY": "Healthy",
+        "CATALOG_STATUS_ATTENTION": "Needs attention",
+        "CATALOG_STATUS_UNKNOWN": "Not synced yet",
+        "MORE_ACTIONS": "More actions",
+        "PROVIDER_INFO": "Provider information",
+        "ADMIN_CONFIG": "Admin configuration",
+        "SUMMARY_PRODUCTS_LABEL": "Products",
+        "SUMMARY_PRODUCTS_VALUE": "{{total}} total · {{mapped}} mapped · {{unmapped}} unmapped",
+        "SUMMARY_AVAILABILITY_VALUE": "{{available}} available · {{unavailable}} unavailable",
+        "FULFILLMENT_SUMMARY_LINE": "{{eligible}} eligible · {{mapped}} mapped · {{unmapped}} unmapped · {{unavailable}} unavailable"
       },
       "MAPPINGS": {
         "TITLE": "Product Mappings",
@@ -5082,6 +5082,11 @@
         "STATUS": "Status",
         "STATUS_ACTIVE": "Active",
         "STATUS_INACTIVE": "Inactive",
+        "MARGIN_OVERRIDE": "Margin override",
+        "MARGIN_OVERRIDE_PLACEHOLDER": "Platform default",
+        "MARGIN_OVERRIDE_HINT": "Leave blank to use the platform default margin (Settings → Commerce). Set a value to override it for this mapping only.",
+        "MARGIN_DEFAULT": "default",
+        "SELECTED_FOR_PRICING": "Selected",
         "COLUMNS": {
           "INTERNAL_PRODUCT": "Internal Product",
           "HAMBOX_PRODUCT": "HAMBOX Product",
@@ -5089,6 +5094,8 @@
           "SUPPLIER_PRODUCT": "Supplier Product",
           "SKU": "SKU",
           "BUYING_PRICE": "Buying Price",
+          "MARGIN": "Margin",
+          "SELLING_PRICE": "Selling Price",
           "PRIORITY": "Priority",
           "STATUS": "Status",
           "SCOPE": "Scope"
@@ -5217,6 +5224,7 @@
         "UNKNOWN": "Unknown",
         "LAST_SYNCED": "Last synchronized: {{time}}",
         "NEVER_SYNCED": "Never synchronized yet.",
+        "NEVER": "Never",
         "SYNC_NOW": "Sync now",
         "SYNC_SUCCESS": "Availability synced.",
         "SYNC_FAILED": "Sync failed.",

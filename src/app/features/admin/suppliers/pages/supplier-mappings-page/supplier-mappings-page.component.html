@@ -49,6 +49,8 @@
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SCOPE' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SUPPLIER_PRODUCT' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.BUYING_PRICE' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.MARGIN' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.SELLING_PRICE' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.PRIORITY' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.MAPPINGS.COLUMNS.STATUS' | translate }}</th>
           <th>{{ 'ADMIN.SUPPLIERS.AVAILABILITY.TITLE' | translate }}</th>
@@ -84,6 +86,28 @@
             </div>
           </td>
           <td>{{ mapping.buyingPrice }} {{ mapping.currency }}</td>
+          <td>
+            @if (mapping.effectiveMarginPercent !== null) {
+              {{ mapping.effectiveMarginPercent }}%
+              @if (mapping.marginPercentOverride === null) {
+                <span class="admin-cell-secondary">({{ 'ADMIN.SUPPLIERS.MAPPINGS.MARGIN_DEFAULT' | translate }})</span>
+              }
+            } @else {
+              <span class="admin-cell-secondary">—</span>
+            }
+          </td>
+          <td>
+            <div class="supplier-mappings-page__cell">
+              @if (mapping.sellingPrice !== null) {
+                <span class="supplier-mappings-page__cell-primary">{{ mapping.sellingPrice }} {{ mapping.currency }}</span>
+              } @else {
+                <span class="admin-cell-secondary">—</span>
+              }
+              @if (mapping.isSelectedForPricing) {
+                <app-admin-status-badge [label]="'ADMIN.SUPPLIERS.MAPPINGS.SELECTED_FOR_PRICING' | translate" tone="success" />
+              }
+            </div>
+          </td>
           <td>{{ mapping.priority }}</td>
           <td>
             <app-admin-status-badge
@@ -126,7 +150,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="8">
+          <td colspan="10">
             <app-admin-empty-state
               icon="pi pi-sitemap"
               [title]="'ADMIN.SUPPLIERS.MAPPINGS.EMPTY' | translate"
@@ -224,6 +248,12 @@
       <label class="supplier-mappings-page__field">
         <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.PRIORITY' | translate }}</span>
         <p-inputnumber formControlName="priority" [min]="0" [showButtons]="true" />
+      </label>
+
+      <label class="supplier-mappings-page__field">
+        <span class="supplier-mappings-page__field-label">{{ 'ADMIN.SUPPLIERS.MAPPINGS.MARGIN_OVERRIDE' | translate }}</span>
+        <p-inputnumber formControlName="marginPercentOverride" mode="decimal" [minFractionDigits]="2" [min]="0" suffix="%" [placeholder]="'ADMIN.SUPPLIERS.MAPPINGS.MARGIN_OVERRIDE_PLACEHOLDER' | translate" />
+        <span class="supplier-mappings-page__field-hint">{{ 'ADMIN.SUPPLIERS.MAPPINGS.MARGIN_OVERRIDE_HINT' | translate }}</span>
       </label>
 
       @if (editingMapping()) {

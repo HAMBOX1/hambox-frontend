@@ -75,21 +75,6 @@
               ) | translate
             "
           >
-            @if (activeCategoryKey() === 'branding') {
-              <div class="branding-preview" aria-label="Branding preview">
-                <div class="branding-preview__bar" [style.background]="brandingPreview().primary"></div>
-                <div class="branding-preview__body">
-                  @if (brandingPreview().logoUrl) {
-                    <img [src]="brandingPreview().logoUrl" alt="" class="branding-preview__logo" />
-                  }
-                  <h3 [style.color]="brandingPreview().secondary">{{ brandingPreview().title }}</h3>
-                  <span class="branding-preview__chip" [style.background]="brandingPreview().accent">
-                    {{ 'ADMIN.SETTINGS.BRANDING.ACCENT_PREVIEW' | translate }}
-                  </span>
-                </div>
-              </div>
-            }
-
             <div class="settings-form">
               @for (field of primaryFields(); track field.key) {
                 <app-settings-field
@@ -108,21 +93,6 @@
                 @if (field.key === 'bypassPassword' && readField('hasStoredBypassPassword')) {
                   <small class="settings-form__hint">{{ 'ADMIN.SETTINGS.MAINTENANCE.BYPASS_STORED' | translate }}</small>
                 }
-              }
-
-              @if (isIntegrationsCategory()) {
-                <div class="settings-form__field">
-                  <span class="settings-form__label">{{ 'ADMIN.SETTINGS.INTEGRATIONS.WEBHOOK_SECRET' | translate }}</span>
-                  <app-admin-status-badge
-                    [label]="
-                      (readField('stripeWebhookSecretConfigured')
-                        ? 'ADMIN.SETTINGS.STATUS.CONFIGURED'
-                        : 'ADMIN.SETTINGS.STATUS.NOT_CONFIGURED'
-                      ) | translate
-                    "
-                    [tone]="readField('stripeWebhookSecretConfigured') ? 'success' : 'neutral'"
-                  />
-                </div>
               }
 
               @if (isCurrencyCategory()) {

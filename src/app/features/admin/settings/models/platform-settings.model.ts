@@ -198,11 +198,6 @@ export const CATEGORY_SORT_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CATEGORY_SORT.MOST_POPULAR'), value: 'MostPopular' },
 ];
 
-export const ANNOUNCEMENT_POSITION_OPTIONS: SettingsFieldOption[] = [
-  { label: OPT('ANNOUNCEMENT_POSITION.TOP'), value: 'top' },
-  { label: OPT('ANNOUNCEMENT_POSITION.BOTTOM'), value: 'bottom' },
-];
-
 export const TWITTER_CARD_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('TWITTER_CARD.SUMMARY'), value: 'summary' },
   { label: OPT('TWITTER_CARD.SUMMARY_LARGE_IMAGE'), value: 'summary_large_image' },
@@ -213,11 +208,6 @@ export const ROBOTS_DIRECTIVE_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('ROBOTS_DIRECTIVE.NOINDEX_FOLLOW'), value: 'noindex,follow' },
   { label: OPT('ROBOTS_DIRECTIVE.INDEX_NOFOLLOW'), value: 'index,nofollow' },
   { label: OPT('ROBOTS_DIRECTIVE.NOINDEX_NOFOLLOW'), value: 'noindex,nofollow' },
-];
-
-/** "Development" is deliberately excluded — it's a dev-only bypass provider (CLAUDE.md: production must never depend on it) and shouldn't be selectable from the admin UI. */
-export const PAYMENT_METHOD_OPTIONS: SettingsFieldOption[] = [
-  { label: OPT('PAYMENT_METHOD.CARD'), value: 'Card' },
 ];
 
 export const ALLOWED_CONTENT_TYPE_OPTIONS: SettingsFieldOption[] = [
@@ -262,36 +252,7 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     },
     { key: 'storeStatus', control: 'select', options: STORE_STATUS_OPTIONS, ...fieldKeys('GENERAL.STORE_STATUS') },
   ],
-  branding: [
-    { key: 'logoUrl', control: 'url', validators: { format: 'url' }, ...fieldKeys('BRANDING.LOGO_URL') },
-    { key: 'faviconUrl', control: 'url', validators: { format: 'url' }, ...fieldKeys('BRANDING.FAVICON_URL') },
-    {
-      key: 'adminLogoUrl',
-      control: 'url',
-      validators: { format: 'url' },
-      ...fieldKeys('BRANDING.ADMIN_LOGO_URL'),
-    },
-    { key: 'primaryColor', control: 'color', validators: { format: 'hex' }, ...fieldKeys('BRANDING.PRIMARY_COLOR') },
-    {
-      key: 'secondaryColor',
-      control: 'color',
-      validators: { format: 'hex' },
-      ...fieldKeys('BRANDING.SECONDARY_COLOR'),
-    },
-    { key: 'accentColor', control: 'color', validators: { format: 'hex' }, ...fieldKeys('BRANDING.ACCENT_COLOR') },
-    {
-      key: 'footerLogoUrl',
-      control: 'url',
-      validators: { format: 'url' },
-      ...fieldKeys('BRANDING.FOOTER_LOGO_URL'),
-    },
-    {
-      key: 'browserTitle',
-      control: 'text',
-      validators: { required: true },
-      ...fieldKeys('BRANDING.BROWSER_TITLE'),
-    },
-  ],
+  // `branding` category removed from the settings UI by request — see HIDDEN_CATEGORY_KEYS.
   localization: [
     {
       key: 'defaultLanguage',
@@ -344,7 +305,7 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
   theme: [
     { key: 'defaultThemeId', control: 'select', options: 'themes', ...fieldKeys('THEME.DEFAULT_THEME_ID') },
     { key: 'allowCustomerThemeSwitch', control: 'toggle', ...fieldKeys('THEME.ALLOW_CUSTOMER_THEME_SWITCH') },
-    { key: 'syncWithSystemPreference', control: 'toggle', ...fieldKeys('THEME.SYNC_WITH_SYSTEM_PREFERENCE') },
+    // `syncWithSystemPreference` removed — no backend consumer, not read by the theme engine.
   ],
   email: [
     { key: 'enabled', control: 'toggle', ...fieldKeys('EMAIL.ENABLED') },
@@ -460,12 +421,7 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       control: 'toggle',
       ...fieldKeys('SECURITY.REQUIRE_EMAIL_VERIFICATION'),
     },
-    {
-      key: 'enforceHttps',
-      control: 'toggle',
-      dangerous: true,
-      ...fieldKeys('SECURITY.ENFORCE_HTTPS'),
-    },
+    // `enforceHttps` removed — no backend consumer, HTTPS enforcement isn't conditional on it.
   ],
   otp: [
     {
@@ -512,28 +468,9 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('OTP.LOCKOUT_MINUTES'),
     },
   ],
-  totp: [
-    { key: 'enabled', control: 'toggle', ...fieldKeys('TOTP.ENABLED') },
-    { key: 'architectureReady', control: 'toggle', ...fieldKeys('TOTP.ARCHITECTURE_READY') },
-    { key: 'issuer', control: 'text', ...fieldKeys('TOTP.ISSUER') },
-    {
-      key: 'digits',
-      control: 'stepper',
-      min: 6,
-      max: 8,
-      validators: { min: 6, max: 8 },
-      ...fieldKeys('TOTP.DIGITS'),
-    },
-    {
-      key: 'periodSeconds',
-      control: 'stepper',
-      min: 15,
-      max: 120,
-      unit: 'seconds',
-      validators: { min: 15, max: 120 },
-      ...fieldKeys('TOTP.PERIOD_SECONDS'),
-    },
-  ],
+  // `totp` category removed entirely — the payload round-trips to storage but nothing in the
+  // login/auth flow reads it; authenticator-app TOTP isn't actually wired up (email OTP is the
+  // real second factor, see `otp` below).
   commerce: [
     {
       key: 'taxRatePercent',
@@ -545,7 +482,6 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       validators: { min: 0, max: 100 },
       ...fieldKeys('COMMERCE.TAX_RATE_PERCENT'),
     },
-    { key: 'shippingEnabledFuture', control: 'toggle', ...fieldKeys('COMMERCE.SHIPPING_ENABLED_FUTURE') },
     {
       key: 'reservationTimeoutMinutes',
       control: 'stepper',
@@ -574,16 +510,22 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('COMMERCE.REFUND_WINDOW_DAYS'),
     },
     { key: 'invoicePrefix', control: 'text', ...fieldKeys('COMMERCE.INVOICE_PREFIX') },
+    {
+      key: 'defaultSupplierMarginPercent',
+      control: 'slider',
+      min: 0,
+      max: 200,
+      step: 0.5,
+      unit: '%',
+      validators: { min: 0, max: 200 },
+      ...fieldKeys('COMMERCE.DEFAULT_SUPPLIER_MARGIN_PERCENT'),
+    },
   ],
   checkout: [
     { key: 'guestCheckoutAllowed', control: 'toggle', ...fieldKeys('CHECKOUT.GUEST_CHECKOUT_ALLOWED') },
     { key: 'requirePhoneNumber', control: 'toggle', ...fieldKeys('CHECKOUT.REQUIRE_PHONE_NUMBER') },
-    {
-      key: 'defaultPaymentMethod',
-      control: 'select',
-      options: PAYMENT_METHOD_OPTIONS,
-      ...fieldKeys('CHECKOUT.DEFAULT_PAYMENT_METHOD'),
-    },
+    // `defaultPaymentMethod` removed — checkout doesn't branch on it; the payment provider is
+    // chosen by infra config, not this field.
     {
       key: 'cartAbandonmentMinutes',
       control: 'stepper',
@@ -753,11 +695,8 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
   ],
   notifications: [
     { key: 'emailEnabled', control: 'toggle', ...fieldKeys('NOTIFICATIONS.EMAIL_ENABLED') },
-    { key: 'smsEnabledFuture', control: 'toggle', ...fieldKeys('NOTIFICATIONS.SMS_ENABLED_FUTURE') },
-    { key: 'pushEnabledFuture', control: 'toggle', ...fieldKeys('NOTIFICATIONS.PUSH_ENABLED_FUTURE') },
-    { key: 'adminAlertsEnabled', control: 'toggle', ...fieldKeys('NOTIFICATIONS.ADMIN_ALERTS_ENABLED') },
-    { key: 'lowStockAlertsEnabled', control: 'toggle', ...fieldKeys('NOTIFICATIONS.LOW_STOCK_ALERTS_ENABLED') },
-    { key: 'workerAlertsEnabled', control: 'toggle', ...fieldKeys('NOTIFICATIONS.WORKER_ALERTS_ENABLED') },
+    // smsEnabledFuture/pushEnabledFuture/adminAlertsEnabled/lowStockAlertsEnabled/workerAlertsEnabled
+    // removed — none gate any actual alert-sending code path, only emailEnabled does.
   ],
   media: [
     {
@@ -770,46 +709,14 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       validators: { min: 1024 },
       ...fieldKeys('MEDIA.MAX_UPLOAD_SIZE_BYTES'),
     },
-    { key: 'imageCompressionEnabled', control: 'toggle', ...fieldKeys('MEDIA.IMAGE_COMPRESSION_ENABLED') },
     {
       key: 'allowedContentTypes',
       control: 'multiselect',
       options: ALLOWED_CONTENT_TYPE_OPTIONS,
       ...fieldKeys('MEDIA.ALLOWED_CONTENT_TYPES'),
     },
-    {
-      key: 'thumbnailSmallPx',
-      control: 'stepper',
-      min: 32,
-      max: 512,
-      unit: 'px',
-      validators: { min: 32, max: 512 },
-      group: 'ADVANCED',
-      advanced: true,
-      ...fieldKeys('MEDIA.THUMBNAIL_SMALL_PX'),
-    },
-    {
-      key: 'thumbnailMediumPx',
-      control: 'stepper',
-      min: 64,
-      max: 1024,
-      unit: 'px',
-      validators: { min: 64, max: 1024 },
-      group: 'ADVANCED',
-      advanced: true,
-      ...fieldKeys('MEDIA.THUMBNAIL_MEDIUM_PX'),
-    },
-    {
-      key: 'thumbnailLargePx',
-      control: 'stepper',
-      min: 128,
-      max: 2048,
-      unit: 'px',
-      validators: { min: 128, max: 2048 },
-      group: 'ADVANCED',
-      advanced: true,
-      ...fieldKeys('MEDIA.THUMBNAIL_LARGE_PX'),
-    },
+    // imageCompressionEnabled and thumbnailSmallPx/MediumPx/LargePx removed — no image
+    // compression or thumbnail generation exists in the backend to read them.
   ],
   seo: [
     { key: 'metaTitle', control: 'text', ...fieldKeys('SEO.META_TITLE') },
@@ -845,14 +752,8 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     { key: 'metaPixelId', control: 'text', ...fieldKeys('ANALYTICS.META_PIXEL_ID') },
     { key: 'enableTracking', control: 'toggle', ...fieldKeys('ANALYTICS.ENABLE_TRACKING') },
   ],
-  integrations: [
-    { key: 'stripePublishableKey', control: 'text', ...fieldKeys('INTEGRATIONS.STRIPE_PUBLISHABLE_KEY') },
-    { key: 'paypalClientId', control: 'text', ...fieldKeys('INTEGRATIONS.PAYPAL_CLIENT_ID') },
-    { key: 'webhooksEnabled', control: 'toggle', ...fieldKeys('INTEGRATIONS.WEBHOOKS_ENABLED') },
-    // `stripeWebhookSecretConfigured` is a read-only status flag (mirrors the `hasStoredPassword` /
-    // `hasStoredBypassPassword` pattern) — rendered as a status badge next to the Stripe fields in the
-    // page template, not as an editable field here.
-  ],
+  // `integrations` category removed entirely — Stripe/PayPal/webhooks have no real backend
+  // implementation; the fields round-trip to storage only.
   maintenance: [
     { key: 'enabled', control: 'toggle', dangerous: true, ...fieldKeys('MAINTENANCE.ENABLED') },
     { key: 'message', control: 'textarea', rows: 3, ...fieldKeys('MAINTENANCE.MESSAGE') },
@@ -873,4 +774,8 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
 };
 
 /** Categories that are purely technical/operational — collapsed into an "Advanced" nav section by default rather than sitting alongside everyday settings. */
-export const ADVANCED_CATEGORY_KEYS: readonly string[] = ['queue', 'retryPolicies', 'otp', 'totp'];
+export const ADVANCED_CATEGORY_KEYS: readonly string[] = ['queue', 'retryPolicies', 'otp'];
+
+/** Categories the backend still returns (default payload rows exist) but that have no real
+ * consumer anywhere — hidden from the settings nav so admins can't "configure" something inert. */
+export const HIDDEN_CATEGORY_KEYS: readonly string[] = ['totp', 'integrations', 'branding'];

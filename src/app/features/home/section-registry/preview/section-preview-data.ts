@@ -58,15 +58,6 @@ export const SECTION_PREVIEW_CONTEXT: SectionRenderContext = {
       badgeColor: '#6C5CE7',
       visible: true,
     },
-    announcementBar: {
-      text: 'Limited-time offer — preview data',
-      link: null,
-      buttonText: null,
-      backgroundColor: '#6C5CE7',
-      textColor: '#ffffff',
-      visible: true,
-      displayPosition: 'top',
-    },
     promoBanner: {
       title: 'Preview Promotion',
       subtitle: 'Demo copy for the Section Library preview.',

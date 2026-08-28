@@ -22,22 +22,70 @@
     color: var(--color-danger);
   }
 
-  &__set-flag {
+  // Groups the Connection form into "what the provider enforces" vs. "what the admin actually tunes" —
+  // same fields as before, just visually separated so they don't all read as equally editable.
+  &__field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-2);
+
+    & + & {
+      margin-top: var(--hambox-spacing-4);
+    }
+  }
+
+  &__group-label {
     font-size: var(--hambox-font-size-xs);
-    color: var(--color-success);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
   }
 
   &__capabilities {
-    margin-top: var(--admin-field-gap, 1.25rem);
+    margin-top: var(--hambox-spacing-4);
     display: flex;
     flex-direction: column;
     gap: var(--hambox-spacing-2);
   }
 
-  &__checkbox-grid {
+  &__section-heading {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--hambox-spacing-4);
+    align-items: center;
+    gap: var(--hambox-spacing-2) var(--hambox-spacing-3);
+  }
+
+  // Compact capability row — read-only status chips for providers whose capabilities are fixed by the
+  // integration (Bamboo/Visoria), a 2-column list on mobile per the responsive spec.
+  &__capability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--hambox-spacing-2) var(--hambox-spacing-4);
+
+    @media (max-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__capability-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    color: var(--color-text-muted);
+
+    .pi {
+      font-size: 0.9rem;
+    }
+
+    &--on {
+      color: var(--color-text);
+
+      .pi {
+        color: var(--color-success);
+      }
+    }
   }
 
   &__checkbox {
@@ -48,13 +96,171 @@
 
   &__actions {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: var(--hambox-spacing-3);
-    margin-top: var(--admin-field-gap, 1.25rem);
+    margin-top: var(--hambox-spacing-3);
   }
 
   &__hint {
     font-size: var(--hambox-font-size-xs);
     color: var(--color-text-muted);
-    margin-top: var(--hambox-spacing-2);
+  }
+
+  &__test-result {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hambox-spacing-2) var(--hambox-spacing-3);
+    margin-top: var(--hambox-spacing-3);
+  }
+
+  // Supplier identity/status header row — provider chip + status badges on one horizontal line, with
+  // last-sync as a quieter second line underneath. Never one badge per row.
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-1);
+  }
+
+  &__identity-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hambox-spacing-2);
+  }
+
+  &__meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hambox-spacing-1);
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  &__meta-text {
+    font-size: var(--hambox-font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  // Redundant with the "View Mappings" entry in the More Actions menu — hidden on narrow screens so the
+  // header collapses to just the primary action + the action menu, per the mobile spec.
+  &__secondary-action {
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
+
+  // Replaces the old 5-card KPI grid — the same counts as one slim, scannable bar instead of five tall
+  // cards, so the page leads with configuration/actions rather than statistics.
+  &__summary-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hambox-spacing-5) var(--hambox-spacing-6);
+    padding: var(--hambox-spacing-3) var(--hambox-spacing-4);
+    border: 1px solid var(--admin-border-subtle);
+    border-radius: var(--admin-radius-lg, 0.875rem);
+    background: var(--admin-bg-elevated, var(--color-surface-elevated));
+  }
+
+  &__summary-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 8rem;
+  }
+
+  &__summary-label {
+    font-size: var(--hambox-font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+
+  &__summary-value {
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  // Compact masked-credentials read view — replaces an always-open password field with a scannable
+  // stored/not-set summary, only expanding into the real form on "Update credentials".
+  &__credentials-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hambox-spacing-2);
+  }
+
+  &__credential-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--hambox-spacing-3);
+    padding: var(--hambox-spacing-2) 0;
+    border-bottom: 1px solid var(--admin-border-subtle);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__credential-value {
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  &__inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--hambox-spacing-1);
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--admin-accent-green, var(--color-success));
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Catalog & Fulfillment Health — one status line + one metrics line, no nested stat cards.
+  &__fulfillment-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--hambox-spacing-2) var(--hambox-spacing-3);
+  }
+
+  &__fulfillment-line {
+    margin: var(--hambox-spacing-2) 0 0;
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  // Disabled fields must read as "not editable", never "illegible" — the shared --color-text-disabled
+  // token is far too low-contrast for provider-locked fields (Code, Provider type, Authentication type,
+  // Base URL). Overridden here, scoped to this page only, rather than touching the token every other
+  // disabled control in the app also uses.
+  ::ng-deep {
+    input.p-inputtext:disabled,
+    input.p-inputtext.p-disabled,
+    .p-inputnumber-input:disabled,
+    .p-select.p-disabled,
+    .p-select.p-disabled .p-select-label {
+      color: var(--color-text) !important;
+      -webkit-text-fill-color: var(--color-text);
+      background: var(--admin-bg-elevated, var(--color-surface-elevated)) !important;
+      border-color: var(--admin-border-default, var(--color-border)) !important;
+      opacity: 1 !important;
+    }
+
+    .p-select.p-disabled .p-select-dropdown {
+      color: var(--color-text-muted) !important;
+    }
   }
 }

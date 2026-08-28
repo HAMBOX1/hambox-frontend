@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -96,6 +96,8 @@ import { OrderManagementFacade } from '../../services/order-management.facade';
     RouterLink,
 
     DatePipe,
+
+    CurrencyPipe,
 
     TranslatePipe,
 

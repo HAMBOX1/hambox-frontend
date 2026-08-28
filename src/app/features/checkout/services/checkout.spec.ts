@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { vi } from 'vitest';
 
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { CartFacade } from '../../cart/services/cart.facade';
@@ -22,7 +23,7 @@ describe('CheckoutFacade', () => {
         validationErrors: [],
         appliedCouponCode: null,
       }),
-      load: jasmine.createSpy('load').and.resolveTo(),
+      load: vi.fn().mockResolvedValue(undefined),
       isEmpty: () => true,
     };
 
@@ -33,10 +34,7 @@ describe('CheckoutFacade', () => {
         { provide: CartFacade, useValue: cartFacade },
         {
           provide: CheckoutService,
-          useValue: jasmine.createSpyObj<CheckoutService>('CheckoutService', [
-            'checkout',
-            'getOrder',
-          ]),
+          useValue: { checkout: vi.fn(), getOrder: vi.fn() },
         },
       ],
     });

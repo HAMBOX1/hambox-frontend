@@ -43,6 +43,9 @@ export class SupplierCatalogSelectComponent {
 
   private readonly facade = inject(SuppliersManagementFacade);
   private readonly search$ = new Subject<string>();
+  /** Bumped on every search kicked off — a response only gets applied if it's still the most recent
+   * request, so a slow reply for an old keystroke can never clobber a newer one's results. */
+  private searchToken = 0;
 
   constructor() {
     this.search$.pipe(debounceTime(300)).subscribe((term) => {
@@ -77,12 +80,16 @@ export class SupplierCatalogSelectComponent {
   }
 
   private async runSearch(term: string): Promise<void> {
+    const token = ++this.searchToken;
     this.loading.set(true);
     this.error.set(false);
     this.unsupportedMessage.set(null);
 
     try {
       const result = await this.facade.searchCatalog(this.supplierId(), term);
+      if (token !== this.searchToken) {
+        return;
+      }
       this.loading.set(false);
       if (!result.isSuccess) {
         this.results.set([]);
@@ -91,6 +98,9 @@ export class SupplierCatalogSelectComponent {
       }
       this.results.set(result.items);
     } catch (err) {
+      if (token !== this.searchToken) {
+        return;
+      }
       console.error('SupplierCatalogSelectComponent: search failed', err);
       this.loading.set(false);
       this.error.set(true);

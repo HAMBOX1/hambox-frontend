@@ -289,6 +289,14 @@
   font-size: 13px;
 }
 
+.order-summary__terms-note {
+  margin: 0 0 12px;
+  color: var(--color-text-secondary);
+  font-family: var(--sf-font-body);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .order-summary__purchase {
   display: flex;
   align-items: center;

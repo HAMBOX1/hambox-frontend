@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 import { GuestCartSessionService } from '../../../core/cart/guest-cart-session.service';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
@@ -29,6 +30,8 @@ const POPULATED_CART: CartApiDto = {
   items: [
     {
       productId: 'product-1',
+      productVariantId: null,
+      variantSku: null,
       productNameEn: 'Test Product',
       quantity: 2,
       unitPrice: 25,
@@ -49,17 +52,24 @@ const POPULATED_CART: CartApiDto = {
 
 describe('CartFacade', () => {
   let facade: CartFacade;
-  let cartService: jasmine.SpyObj<CartService>;
+  let cartService: {
+    getCart: ReturnType<typeof vi.fn>;
+    addItem: ReturnType<typeof vi.fn>;
+    updateItem: ReturnType<typeof vi.fn>;
+    removeItem: ReturnType<typeof vi.fn>;
+    clearCart: ReturnType<typeof vi.fn>;
+    mergeGuestCart: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
-    cartService = jasmine.createSpyObj<CartService>('CartService', [
-      'getCart',
-      'addItem',
-      'updateItem',
-      'removeItem',
-      'clearCart',
-      'mergeGuestCart',
-    ]);
+    cartService = {
+      getCart: vi.fn(),
+      addItem: vi.fn(),
+      updateItem: vi.fn(),
+      removeItem: vi.fn(),
+      clearCart: vi.fn(),
+      mergeGuestCart: vi.fn(),
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -71,18 +81,18 @@ describe('CartFacade', () => {
     });
 
     facade = TestBed.inject(CartFacade);
-    cartService.getCart.and.returnValue(of(EMPTY_CART));
+    cartService.getCart.mockReturnValue(of(EMPTY_CART));
   });
 
   it('should load an empty cart', async () => {
     await facade.load();
 
-    expect(facade.isEmpty()).toBeTrue();
+    expect(facade.isEmpty()).toBe(true);
     expect(facade.itemCount()).toBe(0);
   });
 
   it('should map cart items and totals from the API', async () => {
-    cartService.getCart.and.returnValue(of(POPULATED_CART));
+    cartService.getCart.mockReturnValue(of(POPULATED_CART));
 
     await facade.load();
 
@@ -92,11 +102,11 @@ describe('CartFacade', () => {
   });
 
   it('should surface API errors when loading fails', async () => {
-    cartService.getCart.and.returnValue(throwError(() => new Error('network')));
+    cartService.getCart.mockReturnValue(throwError(() => new Error('network')));
 
     await facade.load();
 
     expect(facade.error()).toBe('Failed to load your cart.');
-    expect(facade.isEmpty()).toBeTrue();
+    expect(facade.isEmpty()).toBe(true);
   });
 });

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import {
   UiAuthCardComponent,
@@ -42,6 +42,7 @@ export class AdminLoginPageComponent {
   private readonly adminAuth = inject(AdminAuth);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   protected readonly theme = inject(ThemeService);
 
   protected readonly isSubmitting = signal(false);
@@ -74,6 +75,7 @@ export class AdminLoginPageComponent {
 
     this.isSubmitting.set(true);
     const { email, password } = this.form.getRawValue();
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/admin/products';
 
     this.adminAuth
       .login({ email, password })
@@ -87,7 +89,7 @@ export class AdminLoginPageComponent {
                 'disabled in Settings → Authentication (typically because SMTP email ' +
                 'delivery is not configured yet). Re-enable Admin OTP as soon as email is working.',
             );
-            await this.router.navigateByUrl('/admin/products');
+            await this.router.navigateByUrl(returnUrl);
             return;
           }
 
@@ -96,6 +98,7 @@ export class AdminLoginPageComponent {
             maskedEmail: challenge.maskedEmail,
             expiresAt: challenge.expiresAt,
             resendAvailableAt: challenge.resendAvailableAt,
+            returnUrl,
           });
           void this.router.navigate(['/admin/login/verify-otp']);
         },

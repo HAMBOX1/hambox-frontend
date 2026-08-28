@@ -18,10 +18,6 @@
       <app-loading-skeleton type="card" [count]="4" />
     </main>
   } @else {
-    @if (content()!.announcementBar.visible && content()!.announcementBar.displayPosition === 'top') {
-      <app-announcement-bar [announcement]="content()!.announcementBar" />
-    }
-
     <main class="storefront-home__main">
       @if (renderContext(); as ctx) {
         @for (entry of sections(); track entry.instanceId; let first = $first) {

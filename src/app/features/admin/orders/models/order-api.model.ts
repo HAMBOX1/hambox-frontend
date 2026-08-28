@@ -151,6 +151,32 @@ export interface AdminOrderDetailDto {
   readonly createdOnUtc: string;
   readonly lastEditedByName: string | null;
   readonly lastEditedOnUtc: string | null;
+  readonly supplierRouting: readonly AdminOrderSupplierRoutingDto[];
+}
+
+/**
+ * One automated-supplier routing decision for one order item — admin-only (acquisition cost, never the
+ * customer's selling price). Mirrors backend `AdminOrderSupplierRoutingDto`.
+ */
+export interface AdminOrderSupplierRoutingDto {
+  readonly orderItemId: string;
+  readonly selectedSupplierName: string | null;
+  readonly selectedCostInBaseCurrency: number | null;
+  readonly baseCurrency: string;
+  readonly fallbackOccurred: boolean;
+  readonly candidates: readonly AdminOrderSupplierRoutingCandidateDto[];
+  readonly createdOnUtc: string;
+}
+
+export interface AdminOrderSupplierRoutingCandidateDto {
+  readonly supplierName: string;
+  readonly providerType: string;
+  readonly eligible: boolean;
+  readonly selected: boolean;
+  readonly costInBaseCurrency: number | null;
+  readonly originalCurrency: string | null;
+  readonly originalCost: number | null;
+  readonly rejectionReason: string | null;
 }
 
 export type AdminOrderListResult = PagedResult<AdminOrderListItemDto>;

@@ -70,6 +70,61 @@
   gap: 0.75rem;
 }
 
+.order-detail-page__routing-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.order-detail-page__routing-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-md);
+  background: var(--admin-bg-panel);
+}
+
+.order-detail-page__routing-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.order-detail-page__routing-candidates {
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--hambox-font-size-sm, 0.875rem);
+    color: var(--admin-text-muted);
+
+    .pi-check-circle {
+      color: var(--admin-color-success, var(--color-success));
+    }
+
+    .pi-times-circle {
+      color: var(--admin-text-muted);
+    }
+  }
+}
+
+.order-detail-page__routing-candidate--selected {
+  color: var(--admin-text-primary, var(--color-text-primary));
+  font-weight: 600;
+}
+
+.order-detail-page__routing-selected-tag {
+  color: var(--admin-color-success, var(--color-success));
+  font-weight: 600;
+}
+
 .order-detail-page__callback-card {
   display: grid;
   gap: 0.5rem;

@@ -28,7 +28,6 @@ import {
   AdminPageHeaderComponent,
   AdminSearchBarComponent,
   AdminSectionCardComponent,
-  AdminStatusBadgeComponent,
   AdminStickySaveBarComponent,
   AdminUnsavedChangesDialogComponent,
 } from '../../../../../shared/components/admin';
@@ -38,6 +37,7 @@ import { ThemeManagementFacade } from '../../../themes/services/theme-management
 import {
   ADVANCED_CATEGORY_KEYS,
   CURRENCY_OPTIONS,
+  HIDDEN_CATEGORY_KEYS,
   PlatformSettingsCategoryDto,
   SETTINGS_FIELD_CONFIGS,
   SettingsFieldConfig,
@@ -109,7 +109,6 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
     AdminErrorAlertComponent,
     AdminSearchBarComponent,
     AdminSectionCardComponent,
-    AdminStatusBadgeComponent,
     AdminLoadingSkeletonComponent,
     AdminStickySaveBarComponent,
     AdminConfirmDialogComponent,
@@ -160,6 +159,13 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
 
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.SETTINGS.BREADCRUMB' });
 
+  /** Backend still returns these category rows (default payloads exist), but nothing reads
+   * them — filtered out here rather than in the nav computed so every "pick a category" path
+   * (nav list, default-on-load, deep link) shares one source of truth. */
+  protected readonly visibleCategories = computed(() =>
+    this.facade.categories().filter((c) => !HIDDEN_CATEGORY_KEYS.includes(c.key)),
+  );
+
   protected readonly roleOptions = computed<SettingsFieldOption[]>(() =>
     this.rolesFacade.roles().map((role) => ({ label: role.name, value: role.name })),
   );
@@ -171,7 +177,7 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
   /** Substring match against the category itself, or against any of its fields' translated labels — so "sender" (an Email field) surfaces the Email category, not just "email" itself. */
   protected readonly navSections = computed<SettingsNavSection[]>(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    const items = this.facade.categories();
+    const items = this.visibleCategories();
 
     const matches = (category: PlatformSettingsCategoryDto): boolean => {
       if (!term) {
@@ -250,9 +256,6 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
     () => this.activeCategoryKey() === 'storefront',
   );
   protected readonly isCurrencyCategory = computed(() => this.activeCategoryKey() === 'currency');
-  protected readonly isIntegrationsCategory = computed(
-    () => this.activeCategoryKey() === 'integrations',
-  );
 
   protected readonly rateEntries = computed(() => {
     const rates = this.draftPayload()['staticRates'];
@@ -262,17 +265,6 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
   protected readonly availableRateCurrencies = computed(() => {
     const used = new Set(this.rateEntries().map(([code]) => code));
     return this.currencyOptions.filter((option) => !used.has(option.value));
-  });
-
-  protected readonly brandingPreview = computed(() => {
-    const payload = this.draftPayload();
-    return {
-      title: String(payload['browserTitle'] ?? 'HAMBOX'),
-      primary: String(payload['primaryColor'] ?? '#6366f1'),
-      secondary: String(payload['secondaryColor'] ?? '#0f172a'),
-      accent: String(payload['accentColor'] ?? '#22d3ee'),
-      logoUrl: payload['logoUrl'] ? String(payload['logoUrl']) : null,
-    };
   });
 
   async ngOnInit(): Promise<void> {
@@ -285,9 +277,9 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
     // Settings" shortcut on a Referral Reward promotion) — falls back to the first category.
     const requestedKey = this.route.snapshot.queryParamMap.get('category');
     const requested = requestedKey
-      ? this.facade.categories().find((c) => c.key === requestedKey)
+      ? this.visibleCategories().find((c) => c.key === requestedKey)
       : undefined;
-    const first = requested ?? this.facade.categories()[0];
+    const first = requested ?? this.visibleCategories()[0];
     if (first) {
       this.applyCategory(first);
     }

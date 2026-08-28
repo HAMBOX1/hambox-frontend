@@ -119,10 +119,12 @@ export class SupplierMappingsPageComponent implements OnInit {
   protected readonly selectedCatalogItem = signal<SupplierCatalogItemDto | null>(null);
   protected readonly buyingPriceTouched = signal(false);
 
-  protected readonly form = this.fb.nonNullable.group({
-    buyingPrice: [0, [Validators.required, Validators.min(0)]],
-    priority: [100, [Validators.required, Validators.min(0)]],
-    status: ['Active'],
+  protected readonly form = this.fb.group({
+    buyingPrice: this.fb.nonNullable.control(0, [Validators.required, Validators.min(0)]),
+    priority: this.fb.nonNullable.control(100, [Validators.required, Validators.min(0)]),
+    status: this.fb.nonNullable.control('Active'),
+    /** Null = use the platform default margin (Commerce Platform Settings). */
+    marginPercentOverride: this.fb.control<number | null>(null, [Validators.min(0)]),
   });
 
   /** Currency is derived, never typed — from the selected supplier catalog item once picked, otherwise the existing mapping's currency in edit mode. */
@@ -159,14 +161,19 @@ export class SupplierMappingsPageComponent implements OnInit {
   protected openCreateDialog(): void {
     this.editingMapping.set(null);
     this.resetSelectionState();
-    this.form.reset({ buyingPrice: 0, priority: 100, status: 'Active' });
+    this.form.reset({ buyingPrice: 0, priority: 100, status: 'Active', marginPercentOverride: null });
     this.dialogOpen.set(true);
   }
 
   protected async openEditDialog(mapping: SupplierMappingDto): Promise<void> {
     this.editingMapping.set(mapping);
     this.resetSelectionState();
-    this.form.reset({ buyingPrice: mapping.buyingPrice, priority: mapping.priority, status: mapping.status });
+    this.form.reset({
+      buyingPrice: mapping.buyingPrice,
+      priority: mapping.priority,
+      status: mapping.status,
+      marginPercentOverride: mapping.marginPercentOverride,
+    });
     // Pre-populate the read-only "what this maps to" summary from the mapping's own already-known
     // display fields — no extra product lookup needed for the internal side in edit mode.
     this.scope.set(mapping.internalProductVariantId ? 'variant' : 'product');
@@ -235,10 +242,11 @@ export class SupplierMappingsPageComponent implements OnInit {
           externalProductId: catalogItem?.externalProductId ?? editing.externalProductId,
           externalSku: editing.externalSku,
           externalName: catalogItem?.name ?? editing.externalName,
-          buyingPrice: value.buyingPrice,
+          buyingPrice: value.buyingPrice!,
           currency: this.currency(),
-          priority: value.priority,
+          priority: value.priority!,
           status: value.status as SupplierMappingDto['status'],
+          marginPercentOverride: value.marginPercentOverride ?? null,
         })
       : await this.facade.createMapping(supplierId, {
           internalProductId: this.selectedProduct()!.id,
@@ -246,9 +254,10 @@ export class SupplierMappingsPageComponent implements OnInit {
           externalProductId: catalogItem!.externalProductId,
           externalSku: null, // Bamboo's catalog has no SKU concept — never fabricated (see SupplierCatalogItemDto)
           externalName: catalogItem!.name,
-          buyingPrice: value.buyingPrice,
+          buyingPrice: value.buyingPrice!,
           currency: this.currency(),
-          priority: value.priority,
+          priority: value.priority!,
+          marginPercentOverride: value.marginPercentOverride ?? null,
         });
 
     this.saving.set(false);

@@ -88,6 +88,7 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
   protected readonly canSubmit = signal(false);
 
   private challengeId = '';
+  private returnUrl = '/admin/products';
 
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -133,6 +134,7 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
 
 
     this.challengeId = challenge.challengeId;
+    this.returnUrl = challenge.returnUrl;
 
     this.maskedEmail.set(challenge.maskedEmail);
 
@@ -200,7 +202,7 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
 
           await this.adminAuth.syncAccessFromProfile();
 
-          await this.router.navigateByUrl('/admin/products');
+          await this.router.navigateByUrl(this.returnUrl);
 
         },
 
@@ -263,6 +265,8 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
             expiresAt: challenge.expiresAt,
 
             resendAvailableAt: challenge.resendAvailableAt,
+
+            returnUrl: this.returnUrl,
 
           });
 

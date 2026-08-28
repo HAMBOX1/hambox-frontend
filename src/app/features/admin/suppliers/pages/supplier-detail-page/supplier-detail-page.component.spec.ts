@@ -117,6 +117,40 @@ describe('SupplierDetailPageComponent — create mode', () => {
     expect(c.form.controls.supportsInventorySync.disabled).toBe(false);
   });
 
+  it('locks Base URL and forces BearerToken auth for Visoria, and locks the same capabilities as Bamboo', () => {
+    c.form.controls.authenticationType.setValue('ApiKey');
+    c.form.controls.providerType.setValue('Visoria');
+    fixture.detectChanges();
+
+    expect(c.form.controls.baseUrl.value).toBe('https://api.visoria.digital');
+    expect(c.form.controls.baseUrl.disabled).toBe(true);
+    expect(c.form.controls.authenticationType.value).toBe('BearerToken');
+    expect(c.form.controls.authenticationType.disabled).toBe(true);
+    expect(c.form.controls.supportsInventorySync.disabled).toBe(true);
+    expect(c.form.controls.supportsPriceSync.disabled).toBe(true);
+    expect(c.form.controls.supportsReservations.disabled).toBe(true);
+    expect(c.form.controls.supportsWebhooks.disabled).toBe(true);
+    expect(c.form.controls.supportsOrderStatus.disabled).toBe(false);
+    expect(c.form.controls.supportsOrderStatus.value).toBe(true);
+  });
+
+  it('locks Base URL to the Eneba Sandbox host and forces OAuth2 auth, and locks the same capabilities as Bamboo/Visoria/GlobeTopper', () => {
+    c.form.controls.authenticationType.setValue('ApiKey');
+    c.form.controls.providerType.setValue('Eneba');
+    fixture.detectChanges();
+
+    expect(c.form.controls.baseUrl.value).toBe('https://api-sandbox.eneba.com');
+    expect(c.form.controls.baseUrl.disabled).toBe(true);
+    expect(c.form.controls.authenticationType.value).toBe('OAuth2');
+    expect(c.form.controls.authenticationType.disabled).toBe(true);
+    expect(c.form.controls.supportsInventorySync.disabled).toBe(true);
+    expect(c.form.controls.supportsPriceSync.disabled).toBe(true);
+    expect(c.form.controls.supportsReservations.disabled).toBe(true);
+    expect(c.form.controls.supportsWebhooks.disabled).toBe(true);
+    expect(c.form.controls.supportsOrderStatus.disabled).toBe(false);
+    expect(c.form.controls.supportsOrderStatus.value).toBe(true);
+  });
+
   it('shows the Client ID / Client Secret pair only for BasicAuth, never Username/Password', () => {
     c.form.controls.authenticationType.setValue('BasicAuth');
     fixture.detectChanges();

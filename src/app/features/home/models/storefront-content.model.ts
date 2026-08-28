@@ -13,16 +13,6 @@ export interface StorefrontHeroContent {
   readonly visible: boolean;
 }
 
-export interface StorefrontAnnouncementBarContent {
-  readonly text: string;
-  readonly link: string | null;
-  readonly buttonText: string | null;
-  readonly backgroundColor: string;
-  readonly textColor: string;
-  readonly visible: boolean;
-  readonly displayPosition: string;
-}
-
 export interface StorefrontPromoBannerContent {
   readonly title: string;
   readonly subtitle: string;
@@ -104,7 +94,6 @@ export interface StorefrontSeoContent {
 
 export interface StorefrontContent {
   readonly hero: StorefrontHeroContent;
-  readonly announcementBar: StorefrontAnnouncementBarContent;
   readonly promoBanner: StorefrontPromoBannerContent;
   readonly flashDeals: StorefrontFlashDealsContent;
   readonly featuredCollections: StorefrontFeaturedCollectionsContent;

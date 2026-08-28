@@ -5,7 +5,6 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
 import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
-import { AnnouncementBarComponent } from '../../components/announcement-bar/announcement-bar.component';
 import { SectionRendererComponent } from '../../section-registry/render/section-renderer.component';
 import { SectionRenderContext } from '../../section-registry/models/section-variant.model';
 import { STOREFRONT_NAV_LINKS } from '../../services/storefront-home-data';
@@ -16,7 +15,6 @@ import { HomeFacade } from '../../services/home.facade';
   standalone: true,
   imports: [
     StorefrontNavComponent,
-    AnnouncementBarComponent,
     SectionRendererComponent,
     StorefrontFooterComponent,
     EmptyStateComponent,

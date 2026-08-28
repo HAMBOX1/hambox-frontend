@@ -212,6 +212,49 @@
       </p-table>
     </app-admin-section-card>
 
+    @if (order.supplierRouting.length > 0) {
+      <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.SUPPLIER_ROUTING' | translate">
+        <div class="order-detail-page__routing-list">
+          @for (routing of order.supplierRouting; track routing.orderItemId) {
+            <article class="order-detail-page__routing-card">
+              <div class="order-detail-page__routing-summary">
+                @if (routing.selectedSupplierName) {
+                  <strong>{{ 'ADMIN.ORDERS.DETAIL.SUPPLIER' | translate }}: {{ routing.selectedSupplierName }}</strong>
+                  <span>{{ 'ADMIN.ORDERS.DETAIL.COST' | translate }}: {{ routing.selectedCostInBaseCurrency | currency: routing.baseCurrency }}</span>
+                } @else {
+                  <strong>{{ 'ADMIN.ORDERS.DETAIL.NO_SUPPLIER_SELECTED' | translate }}</strong>
+                }
+                @if (routing.fallbackOccurred) {
+                  <app-admin-status-badge [label]="'ADMIN.ORDERS.DETAIL.FALLBACK_OCCURRED' | translate" tone="warning" />
+                }
+              </div>
+              <ul class="order-detail-page__routing-candidates">
+                @for (candidate of routing.candidates; track candidate.supplierName + candidate.providerType) {
+                  <li [class.order-detail-page__routing-candidate--selected]="candidate.selected">
+                    <i
+                      class="pi"
+                      [class.pi-check-circle]="candidate.eligible"
+                      [class.pi-times-circle]="!candidate.eligible"
+                      aria-hidden="true"
+                    ></i>
+                    <span>{{ candidate.supplierName }}</span>
+                    @if (candidate.eligible) {
+                      <span>{{ candidate.costInBaseCurrency | currency: routing.baseCurrency }}</span>
+                      @if (candidate.selected) {
+                        <span class="order-detail-page__routing-selected-tag">{{ 'ADMIN.ORDERS.DETAIL.SELECTED' | translate }}</span>
+                      }
+                    } @else {
+                      <span class="order-detail-page__muted">{{ candidate.rejectionReason }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            </article>
+          }
+        </div>
+      </app-admin-section-card>
+    }
+
     <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.DIGITAL_CODES' | translate">
       @if (order.licenseKeys.length === 0) {
         <p class="order-detail-page__muted">{{ 'ADMIN.ORDERS.DETAIL.NO_CODES' | translate }}</p>

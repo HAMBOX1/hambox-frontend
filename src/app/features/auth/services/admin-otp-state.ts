@@ -5,6 +5,7 @@ export interface AdminOtpChallengeState {
   readonly maskedEmail: string;
   readonly expiresAt: string;
   readonly resendAvailableAt: string;
+  readonly returnUrl: string;
 }
 
 export function saveAdminOtpChallenge(state: AdminOtpChallengeState): void {

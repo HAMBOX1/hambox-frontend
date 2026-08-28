@@ -98,9 +98,10 @@ export class Auth {
   }
 
   verifyEmail(token: string): Observable<void> {
-    return this.api.post<void>(AUTH_API.verifyEmail, null, {
-      params: { token },
-    });
+    // Sent in the request body (not a query param) so the plaintext token never lands in
+    // ApiRequestLogs' logged Path + QueryString, browser history for the API call, or referrer
+    // headers. The page itself still reads the token from its own URL — see verify-email-page.
+    return this.api.post<void>(AUTH_API.verifyEmail, { token });
   }
 
   forgotPassword(request: ForgotPasswordRequest): Observable<void> {

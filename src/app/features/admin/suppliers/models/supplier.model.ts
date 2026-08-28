@@ -110,6 +110,14 @@ export interface SupplierMappingDto {
   readonly availabilityState: SupplierAvailabilityState | null;
   readonly availableQuantity: number | null;
   readonly availabilityLastCheckedAtUtc: string | null;
+  /** Null means "use the platform default margin" (Commerce Platform Settings). */
+  readonly marginPercentOverride: number | null;
+  /** The margin actually applied when this mapping was last priced — override if set, else the platform default at that time. */
+  readonly effectiveMarginPercent: number | null;
+  /** Buying price × (1 + effective margin) — admin-only, never shown on any customer-facing surface. */
+  readonly sellingPrice: number | null;
+  /** True when this mapping is the one currently driving the variant's storefront effective price. */
+  readonly isSelectedForPricing: boolean;
 }
 
 /** Counts for the supplier detail page's availability status section, from `GET /suppliers/{id}/availability-summary`. */
@@ -141,6 +149,8 @@ export interface CreateSupplierMappingRequest {
   currency: string;
   priority: number;
   internalProductVariantId?: string | null;
+  /** Null = use the platform default margin. */
+  marginPercentOverride?: number | null;
 }
 
 /** Mapping scope, matching backend `SupplierFulfillmentChainCandidateDto.Scope`. */
@@ -173,6 +183,8 @@ export interface UpdateSupplierMappingRequest {
   currency: string;
   priority: number;
   status: SupplierMappingStatus;
+  /** Null = use the platform default margin. */
+  marginPercentOverride?: number | null;
 }
 
 /** One selectable supplier catalog product/denomination — safe display fields only, from `GET /suppliers/{id}/catalog`. */
@@ -321,4 +333,23 @@ export const SUPPLIER_AUTH_TYPE_OPTIONS: readonly { label: string; value: Suppli
 export const SUPPLIER_FIXED_BASE_URLS: Readonly<Record<string, string>> = {
   Bamboo: 'https://api.bamboocardportal.com',
   Visoria: 'https://api.visoria.digital',
+  // GlobeTopper's own OpenAPI document declares only this one (sandbox) host — no separate production
+  // host is documented anywhere reachable; see docs/integrations/suppliers/README.md.
+  GlobeTopper: 'https://partner.sandbox.globetopper.com/api/v2',
+  // Eneba's getting-started guide only gives a concrete URL for Sandbox — production is described as
+  // "provided in the credentials dashboard" (possibly merchant-specific), so only Sandbox is wired up
+  // today; see docs/integrations/suppliers/README.md §19.
+  Eneba: 'https://api-sandbox.eneba.com',
+};
+
+/**
+ * CodesWholesale is the one provider with two genuinely different real hosts (not one fixed host like
+ * every entry in {@link SUPPLIER_FIXED_BASE_URLS}) — which one is actually used is chosen by the
+ * `codesWholesaleEnvironmentControl` select in `SupplierDetailPageComponent`, round-tripped through the
+ * generic `settingsJson` field exactly like Bamboo's Account ID; see
+ * docs/integrations/suppliers/README.md §21.3.
+ */
+export const CODESWHOLESALE_BASE_URLS: Readonly<Record<'Sandbox' | 'Production', string>> = {
+  Sandbox: 'https://sandbox.codeswholesale.com',
+  Production: 'https://api.codeswholesale.com',
 };

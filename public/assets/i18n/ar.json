@@ -325,6 +325,7 @@
     "APPLYING": "جارٍ التطبيق…",
     "COMPLETE_PURCHASE": "إتمام الشراء",
     "COMPLETE_PURCHASE_DEV": "إتمام الشراء (بيئة التطوير)",
+    "TERMS_NOTE": "بإتمامك عملية الشراء، فإنك توافق على شروط الخدمة وسياسة الخصوصية وسياسة الاسترجاع الخاصة بنا.",
     "DELIVERY_REASSURANCE": "سيتم تسليم الكود فوراً إلى بريدك الإلكتروني بعد الدفع. يرجى التحقق من مجلد الرسائل غير المرغوب فيها إذا لم تجده خلال بضع دقائق.",
     "SSL_SECURE": "اتصال آمن SSL",
     "PCI_COMPLIANT": "متوافق مع PCI",
@@ -2035,10 +2036,6 @@
           "NAME_DESC": "الاسم (ي–أ)",
           "MOST_POPULAR": "الأكثر شعبية"
         },
-        "ANNOUNCEMENT_POSITION": {
-          "TOP": "أعلى الصفحة",
-          "BOTTOM": "أسفل الصفحة"
-        },
         "TWITTER_CARD": {
           "SUMMARY": "ملخص",
           "SUMMARY_LARGE_IMAGE": "ملخص بصورة كبيرة"
@@ -2417,6 +2414,11 @@
             "LABEL": "بادئة الفاتورة",
             "HELP": "نص يظهر قبل رقم الفاتورة، مثل \"INV-\".",
             "TOOLTIP": "تنطبق على الفواتير الجديدة مستقبلاً — لا تتغيّر أرقام الفواتير الحالية."
+          },
+          "DEFAULT_SUPPLIER_MARGIN_PERCENT": {
+            "LABEL": "هامش المورد الافتراضي",
+            "HELP": "نسبة الربح الافتراضية المضافة إلى تكلفة الشراء من المورد لحساب سعر المتجر للمنتجات التي يتم توريدها تلقائيًا.",
+            "TOOLTIP": "تُستخدم ما لم يكن لربط مورد معيّن هامش خاص به. تنطبق التغييرات على عمليات حساب السعر الجديدة فقط، ولا تؤثر على الطلبات الحالية."
           }
         },
         "CHECKOUT": {
@@ -2807,38 +2809,6 @@
           "VISIBLE": {
             "LABEL": "مرئي",
             "HELP": "يظهر أو يخفي هذا القسم في الصفحة الرئيسية فورًا."
-          }
-        },
-        "ANNOUNCEMENT": {
-          "TITLE_CARD": "شريط الإعلانات",
-          "DESCRIPTION_CARD": "شريط ترويجي رفيع يظهر أعلى أو أسفل الصفحة.",
-          "TEXT": {
-            "LABEL": "النص",
-            "HELP": "الرسالة الظاهرة في شريط الإعلانات."
-          },
-          "LINK": {
-            "LABEL": "الرابط",
-            "HELP": "الوجهة التي يشير إليها شريط الإعلانات عند النقر."
-          },
-          "BUTTON_TEXT": {
-            "LABEL": "نص الزر",
-            "HELP": "تسمية زر اختياري داخل الشريط."
-          },
-          "BACKGROUND_COLOR": {
-            "LABEL": "لون الخلفية",
-            "HELP": "لون خلفية شريط الإعلانات."
-          },
-          "TEXT_COLOR": {
-            "LABEL": "لون النص",
-            "HELP": "لون نص شريط الإعلانات."
-          },
-          "DISPLAY_POSITION": {
-            "LABEL": "موضع العرض",
-            "HELP": "مكان ظهور الشريط في الصفحة."
-          },
-          "VISIBLE": {
-            "LABEL": "مرئي",
-            "HELP": "يظهر أو يخفي شريط الإعلانات فورًا."
           }
         },
         "PROMO_BANNER": {
@@ -3312,6 +3282,12 @@
         "LAST_EDITED_BY": "بواسطة {{name}}",
         "TIMELINE": "الجدول الزمني للطلب",
         "PRODUCTS": "المنتجات المشتراة",
+        "SUPPLIER_ROUTING": "توجيه المورد",
+        "SUPPLIER": "المورد",
+        "COST": "التكلفة",
+        "NO_SUPPLIER_SELECTED": "لم يتم العثور على مورد مؤهل",
+        "FALLBACK_OCCURRED": "تم اللجوء إلى مورد بديل",
+        "SELECTED": "تم الاختيار",
         "DIGITAL_CODES": "الأكواد الرقمية المسلَّمة",
         "ADMIN_NOTES": "ملاحظات داخلية للإدارة",
         "TOTAL": "إجمالي الطلب",
@@ -4901,12 +4877,12 @@
         "PROVIDER_TYPE": "نوع المزود",
         "PROVIDER_TYPE_HINT": "اختر أو اكتب مفتاح المزود",
         "AUTH_TYPE": "نوع المصادقة",
-        "AUTH_TYPE_LOCKED_HINT": "تستخدم Bamboo دائمًا مصادقة HTTP الأساسية (Basic Auth) عبر معرّف العميل وسرّ العميل — لا يمكن تغيير ذلك.",
+        "AUTH_TYPE_LOCKED_HINT": "يستخدم {{provider}} دائمًا المصادقة عبر {{authType}} — لا يمكن تغيير ذلك.",
         "BASE_URL": "عنوان URL الأساسي",
         "BASE_URL_LOCKED_HINT": "عنوان {{provider}} الأساسي ثابت ويُفرض من الخادم — لا يمكن تغييره.",
         "PRIORITY": "الأولوية",
         "CAPABILITIES": "الإمكانيات",
-        "CAPABILITIES_LOCKED_HINT": "لا يمكن تفعيل سوى ما يدعمه تكامل Bamboo فعليًا حاليًا (الشراء وحالة الطلب).",
+        "CAPABILITIES_LOCKED_HINT": "لا يمكن تفعيل سوى ما يدعمه تكامل {{provider}} فعليًا حاليًا.",
         "SUPPORTS_INVENTORY_SYNC": "مزامنة المخزون",
         "SUPPORTS_PRICE_SYNC": "مزامنة الأسعار",
         "SUPPORTS_RESERVATIONS": "الحجوزات",
@@ -4917,6 +4893,8 @@
         "ACCOUNT_ID": "معرّف الحساب الافتراضي",
         "ACCOUNT_ID_HINT": "معرّف حساب Bamboo المستخدم في عمليات الشراء. احصل عليه من نقطة نهاية Accounts في Bamboo أو من بوابة العملاء (Client Portal).",
         "ACCOUNT_ID_REQUIRED": "معرّف حساب افتراضي موجب مطلوب لـ Bamboo.",
+        "ENVIRONMENT": "البيئة",
+        "ENVIRONMENT_HINT": "تُستخدم بيئة Sandbox للاختبار ولا تخصم أبدًا من رصيد حساب CodesWholesale الحقيقي. انتقل إلى Production فقط عند الاستعداد لتنفيذ طلبات حقيقية.",
         "CREDENTIALS": "بيانات الاعتماد",
         "CREDENTIALS_HINT": "اترك الحقل فارغًا للاحتفاظ بالقيمة المخزنة الحالية.",
         "API_KEY": "مفتاح API",
@@ -4927,8 +4905,30 @@
         "PASSWORD": "كلمة المرور",
         "BEARER_TOKEN": "رمز الحامل",
         "OAUTH_SETTINGS": "إعدادات OAuth (JSON)",
+        "OAUTH_SETTINGS_ENEBA_HINT": "تتوقع Eneba الصيغة التالية: {\"authId\": \"...\", \"authSecret\": \"...\", \"accountEmail\": \"...\"}. يتم الحصول على Auth ID وAuth Secret من لوحة بيانات اعتماد Eneba (my.eneba.com/api/credentials) وتتطلب حساب Wholesale Buyer. أما accountEmail فهو بريد تسجيل الدخول لحساب Eneba — وليس بيانات اعتماد API، لكنه مطلوب لفك تشفير ملفات المفاتيح المُسلَّمة.",
         "NO_CREDENTIALS_REQUIRED": "لا حاجة إلى بيانات اعتماد لنوع المصادقة هذا.",
-        "STORED": "مخزّن"
+        "STORED": "مخزّن",
+        "NOT_SET": "غير محدد",
+        "UPDATE_CREDENTIALS": "تحديث بيانات الاعتماد",
+        "CONNECTION": "الاتصال",
+        "CONNECTION_STATUS": "حالة الاتصال",
+        "CONNECTED": "متصل",
+        "CONNECTION_ISSUE": "مشكلة في الاتصال",
+        "NOT_TESTED": "لم يتم الاختبار بعد",
+        "LAST_TESTED": "آخر اختبار {{time}}",
+        "LAST_SYNC_LABEL": "آخر مزامنة",
+        "ADVANCED_CONFIGURATION": "الإعدادات المتقدمة",
+        "CATALOG_SECTION": "الكتالوج وسلامة التنفيذ",
+        "CATALOG_STATUS_HEALTHY": "سليم",
+        "CATALOG_STATUS_ATTENTION": "يحتاج إلى انتباه",
+        "CATALOG_STATUS_UNKNOWN": "لم تتم المزامنة بعد",
+        "MORE_ACTIONS": "إجراءات إضافية",
+        "PROVIDER_INFO": "معلومات المزود",
+        "ADMIN_CONFIG": "إعدادات المسؤول",
+        "SUMMARY_PRODUCTS_LABEL": "المنتجات",
+        "SUMMARY_PRODUCTS_VALUE": "{{total}} إجمالي · {{mapped}} مرتبطة · {{unmapped}} غير مرتبطة",
+        "SUMMARY_AVAILABILITY_VALUE": "{{available}} متوفر · {{unavailable}} غير متوفر",
+        "FULFILLMENT_SUMMARY_LINE": "{{eligible}} مؤهلة · {{mapped}} مرتبطة · {{unmapped}} غير مرتبطة · {{unavailable}} غير متوفرة"
       },
       "MAPPINGS": {
         "TITLE": "ربط المنتجات",
@@ -4948,6 +4948,11 @@
         "STATUS": "الحالة",
         "STATUS_ACTIVE": "نشط",
         "STATUS_INACTIVE": "غير نشط",
+        "MARGIN_OVERRIDE": "تجاوز الهامش",
+        "MARGIN_OVERRIDE_PLACEHOLDER": "الافتراضي من المنصة",
+        "MARGIN_OVERRIDE_HINT": "اتركه فارغًا لاستخدام هامش المنصة الافتراضي (الإعدادات ← التجارة). عيّن قيمة لتجاوزه لهذا الربط فقط.",
+        "MARGIN_DEFAULT": "افتراضي",
+        "SELECTED_FOR_PRICING": "المُختار",
         "COLUMNS": {
           "INTERNAL_PRODUCT": "المنتج الداخلي",
           "HAMBOX_PRODUCT": "منتج HAMBOX",
@@ -4955,6 +4960,8 @@
           "SUPPLIER_PRODUCT": "منتج المورد",
           "SKU": "SKU",
           "BUYING_PRICE": "سعر الشراء",
+          "MARGIN": "الهامش",
+          "SELLING_PRICE": "سعر البيع",
           "PRIORITY": "الأولوية",
           "STATUS": "الحالة",
           "SCOPE": "النطاق"
@@ -5083,6 +5090,7 @@
         "UNKNOWN": "غير معروف",
         "LAST_SYNCED": "آخر مزامنة: {{time}}",
         "NEVER_SYNCED": "لم تتم المزامنة بعد.",
+        "NEVER": "أبدًا",
         "SYNC_NOW": "مزامنة الآن",
         "SYNC_SUCCESS": "تمت مزامنة التوفر.",
         "SYNC_FAILED": "فشلت المزامنة.",

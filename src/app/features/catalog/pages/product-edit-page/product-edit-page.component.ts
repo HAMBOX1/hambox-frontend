@@ -196,8 +196,10 @@ export class ProductEditPageComponent implements OnInit {
     void this.facade.loadCollections();
   }
 
-  /** Watches the General form and auto-creates the backend Draft product the moment it becomes
-   * saveable, so the admin is always "just editing a product" and never presses a Create button. */
+  /** Watches the General form and, on a pause in typing, either silently creates the backend Draft
+   * product (before one exists) or silently persists the edit (once it does and is still
+   * unpublished) — so the admin is always "just editing a product" and never loses in-progress work
+   * to a missed Save click or a closed tab. */
   private setupAutoDraft(): void {
     const form = this.productForm();
     if (!form) {
@@ -205,8 +207,35 @@ export class ProductEditPageComponent implements OnInit {
     }
 
     form.valueChanges$.pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      void this.maybeCreateDraft();
+      if (this.product()) {
+        void this.maybeAutoSaveDraft();
+      } else {
+        void this.maybeCreateDraft();
+      }
     });
+  }
+
+  /** Auto-save for a Draft-status product: silent (no toast, no navigation) and a no-op unless the
+   * form is both dirty and currently valid, so a mid-edit blank required field just skips this
+   * cycle rather than surfacing a validation error the admin didn't ask for. Scoped to Draft status
+   * only — once a product is Active, edits go through the explicit Save button like any other
+   * change to something already live. */
+  private async maybeAutoSaveDraft(): Promise<void> {
+    const product = this.product();
+    const form = this.productForm();
+    if (!product || product.status !== 'Draft' || this.submitting() || !form?.dirty()) {
+      return;
+    }
+
+    const value = form.getValue();
+    if (!value) {
+      return;
+    }
+
+    const saved = await this.facade.updateProduct({ ...value, status: product.status });
+    if (saved) {
+      this.flashSaved();
+    }
   }
 
   private async maybeCreateDraft(): Promise<void> {
