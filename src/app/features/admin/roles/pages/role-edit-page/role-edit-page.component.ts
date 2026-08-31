@@ -217,6 +217,18 @@ export class RoleEditPageComponent implements OnInit {
 
 
 
+  /** Membership (who holds a role) is independent of the role's definition: system roles
+   * (Owner/Administrator/Customer) forbid renaming or re-permissioning, but assigning or
+   * removing users is its own backend-gated action (Roles.AssignUsers), not blocked by
+   * IsSystem — see AssignUsersToRoleCommandHandler / RemoveUserFromRoleCommandHandler. */
+  protected readonly usersPanelDisabled = computed(
+    () =>
+      !this.permissionService.isOwner() &&
+      !this.permissionService.hasPermission(PERMISSIONS.Roles.AssignUsers),
+  );
+
+
+
   constructor() {
 
     effect(() => {

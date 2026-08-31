@@ -88,7 +88,7 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
   protected readonly canSubmit = signal(false);
 
   private challengeId = '';
-  private returnUrl = '/admin/products';
+  private returnUrl = '/admin/dashboard';
 
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 

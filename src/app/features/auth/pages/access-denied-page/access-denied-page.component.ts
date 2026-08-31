@@ -12,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
       <h1>{{ 'AUTH.ACCESS_DENIED.TITLE' | translate }}</h1>
       <p>{{ messageKey() | translate }}</p>
       <div class="access-denied__actions">
-        <a routerLink="/admin/products" pButton>{{ 'AUTH.ACCESS_DENIED.GO_TO_ADMIN' | translate }}</a>
+        <a routerLink="/admin/dashboard" pButton>{{ 'AUTH.ACCESS_DENIED.GO_TO_ADMIN' | translate }}</a>
         <a routerLink="/home" pButton severity="secondary">{{ 'AUTH.ACCESS_DENIED.GO_TO_STOREFRONT' | translate }}</a>
       </div>
     </section>

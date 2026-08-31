@@ -16,7 +16,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse) {
         const body = error.error as { code?: string; message?: string } | null;
-        if (error.status === 503 && body?.code === 'MAINTENANCE') {
+        const gateReason =
+          body?.code === 'MAINTENANCE'
+            ? 'maintenance'
+            : body?.code === 'STORE_CLOSED'
+              ? 'closed'
+              : body?.code === 'COMING_SOON'
+                ? 'comingSoon'
+                : null;
+
+        if (error.status === 503 && gateReason) {
           // maintenanceBypassInterceptor attaches the stored bypass token to every API request,
           // so a 503 means the server refused it: its Data Protection key ring rotated, the app
           // restarted without persisted keys, or the token really has expired. Our copy carries
@@ -24,7 +33,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           // days — long enough for /coming-soon to bounce to the storefront, whose calls 503
           // straight back to /coming-soon, forever. Discard it and ask for the password again.
           bypass.clear();
-          maintenance.markEnabled(body.message);
+          maintenance.markEnabled(gateReason, body?.message);
           // Admin routes are deliberately exempt from the maintenance redirect (maintenanceGuard
           // never gates them) so admins can still sign in and turn maintenance off. A background
           // 503 from an unrelated bootstrap call (theme/translation/currency init) must not force

@@ -49,6 +49,9 @@ export class AdminAuth {
     await this.syncAccessFromProfile();
   }
 
+  /** The caller (admin-otp-page) always awaits syncAccessFromProfile() itself right after
+   * subscribing, so this doesn't call it too — that would just be a second, redundant /auth/me
+   * request racing the caller's own. */
   verifyOtp(request: VerifyAdminOtpRequest): Observable<AccessTokenResponse> {
     return this.api
       .post<AccessTokenResponse>(AUTH_API.adminVerifyOtp, request, {
@@ -59,7 +62,6 @@ export class AdminAuth {
         tap((tokens) => {
           this.session.setSession(AUTH_CONTEXT.Admin, tokens);
           this.session.markInitialized(AUTH_CONTEXT.Admin);
-          void this.syncAccessFromProfile();
         }),
       );
   }

@@ -60,13 +60,16 @@
     <div class="form-row form-row--split">
       <label class="form-field">
         <span>{{ 'SUPPORT.CREATE.RELATED_ORDER' | translate }}</span>
-        <input
-          type="text"
+        <select
           name="relatedOrder"
           [ngModel]="relatedOrderNumber()"
           (ngModelChange)="relatedOrderNumber.set($event)"
-          placeholder="ORD-88231"
-        />
+        >
+          <option value="">{{ 'SUPPORT.CREATE.RELATED_ORDER_DEFAULT' | translate }}</option>
+          @for (order of orders(); track order.id) {
+            <option [value]="order.orderNumber">{{ order.orderNumber }}</option>
+          }
+        </select>
       </label>
 
       <label class="form-field">

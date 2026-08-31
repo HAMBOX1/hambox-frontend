@@ -863,6 +863,7 @@
       "DESCRIPTION": "Description",
       "DESCRIPTION_PLACEHOLDER": "Describe your issue in detail...",
       "RELATED_ORDER": "Related Order",
+      "RELATED_ORDER_DEFAULT": "No specific order",
       "RELATED_PRODUCT": "Related Product",
       "RELATED_PRODUCT_PLACEHOLDER": "Which product is this about?",
       "MEMBERSHIP": "Membership",
@@ -3205,6 +3206,8 @@
         "ASSIGN_EMPTY": "No users match your search.",
         "SEARCH_PLACEHOLDER": "Search assigned users…",
         "REMOVE": "Remove user from role",
+        "REMOVE_CONFIRM_TITLE": "Remove user from role",
+        "REMOVE_CONFIRM_MESSAGE": "Remove {{name}} from this role? They will lose the permissions it grants.",
         "EMPTY": "No users are assigned to this role yet.",
         "COLUMNS": {
           "NAME": "Name",

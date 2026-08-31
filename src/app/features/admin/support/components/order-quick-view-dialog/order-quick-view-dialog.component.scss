@@ -1,0 +1,30 @@
+.order-quick-view-dialog__badges {
+  display: flex;
+  gap: var(--hambox-spacing-2);
+  flex-wrap: wrap;
+  margin-block-end: var(--hambox-spacing-4);
+}
+
+.order-quick-view-dialog__summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--hambox-spacing-1) var(--hambox-spacing-3);
+  margin: 0 0 var(--hambox-spacing-4);
+  font-size: var(--admin-type-caption);
+
+  dt {
+    color: var(--admin-text-secondary, var(--color-text-secondary));
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.order-quick-view-dialog__total {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--hambox-spacing-2);
+  margin-block-start: var(--hambox-spacing-3);
+  font-size: var(--admin-type-body);
+}

@@ -74,8 +74,10 @@ export const HamboxPrimePreset = definePreset(Aura, {
         },
         formField: {
           background: '{surface.700}',
+          disabledBackground: '{surface.800}',
           borderColor: 'rgba(255, 255, 255, 0.1)',
           color: '{surface.0}',
+          disabledColor: 'rgba(229, 226, 227, 0.5)',
           placeholderColor: 'rgba(187, 203, 188, 0.55)',
         },
         content: {

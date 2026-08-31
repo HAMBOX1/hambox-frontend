@@ -150,11 +150,6 @@ export function validateFieldValue(field: SettingsFieldConfig, value: unknown): 
 // radio controls, none of which translate `optionLabel` themselves.
 const OPT = (path: string) => `ADMIN.SETTINGS.OPTIONS.${path}`;
 
-export const LANGUAGE_OPTIONS: SettingsFieldOption[] = [
-  { label: OPT('LANGUAGE.EN'), value: 'en' },
-  { label: OPT('LANGUAGE.AR'), value: 'ar' },
-];
-
 export const CURRENCY_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CURRENCY.USD'), value: 'USD' },
   { label: OPT('CURRENCY.EUR'), value: 'EUR' },
@@ -172,12 +167,6 @@ export const STORE_STATUS_OPTIONS: SettingsFieldOption[] = [
 export const CURRENCY_PROVIDER_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CURRENCY_PROVIDER.CONFIGURATION'), value: 'Configuration' },
   { label: OPT('CURRENCY_PROVIDER.HTTP'), value: 'Http' },
-];
-
-export const CODE_REVEAL_POLICY_OPTIONS: SettingsFieldOption[] = [
-  { label: OPT('CODE_REVEAL_POLICY.AFTER_PAYMENT'), value: 'AfterPayment' },
-  { label: OPT('CODE_REVEAL_POLICY.ON_FULFILLMENT'), value: 'OnFulfillment' },
-  { label: OPT('CODE_REVEAL_POLICY.MANUAL'), value: 'Manual' },
 ];
 
 export const FLASH_DEALS_SORT_OPTIONS: SettingsFieldOption[] = [
@@ -203,13 +192,6 @@ export const TWITTER_CARD_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('TWITTER_CARD.SUMMARY_LARGE_IMAGE'), value: 'summary_large_image' },
 ];
 
-export const ROBOTS_DIRECTIVE_OPTIONS: SettingsFieldOption[] = [
-  { label: OPT('ROBOTS_DIRECTIVE.INDEX_FOLLOW'), value: 'index,follow' },
-  { label: OPT('ROBOTS_DIRECTIVE.NOINDEX_FOLLOW'), value: 'noindex,follow' },
-  { label: OPT('ROBOTS_DIRECTIVE.INDEX_NOFOLLOW'), value: 'index,nofollow' },
-  { label: OPT('ROBOTS_DIRECTIVE.NOINDEX_NOFOLLOW'), value: 'noindex,nofollow' },
-];
-
 export const ALLOWED_CONTENT_TYPE_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CONTENT_TYPE.JPEG'), value: 'image/jpeg' },
   { label: OPT('CONTENT_TYPE.PNG'), value: 'image/png' },
@@ -222,52 +204,16 @@ export const ALLOWED_CONTENT_TYPE_OPTIONS: SettingsFieldOption[] = [
 export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
   general: [
     { key: 'storeName', control: 'text', validators: { required: true }, ...fieldKeys('GENERAL.STORE_NAME') },
-    { key: 'storeDescription', control: 'textarea', rows: 3, ...fieldKeys('GENERAL.STORE_DESCRIPTION') },
-    {
-      key: 'contactEmail',
-      control: 'email',
-      validators: { required: true, format: 'email' },
-      ...fieldKeys('GENERAL.CONTACT_EMAIL'),
-    },
-    {
-      key: 'supportEmail',
-      control: 'email',
-      validators: { required: true, format: 'email' },
-      ...fieldKeys('GENERAL.SUPPORT_EMAIL'),
-    },
-    { key: 'phone', control: 'text', ...fieldKeys('GENERAL.PHONE') },
-    { key: 'address', control: 'textarea', rows: 2, ...fieldKeys('GENERAL.ADDRESS') },
-    { key: 'timezone', control: 'autocomplete', options: 'timezones', ...fieldKeys('GENERAL.TIMEZONE') },
-    {
-      key: 'defaultLanguage',
-      control: 'select',
-      options: LANGUAGE_OPTIONS,
-      ...fieldKeys('GENERAL.DEFAULT_LANGUAGE'),
-    },
-    {
-      key: 'defaultCurrency',
-      control: 'select',
-      options: CURRENCY_OPTIONS,
-      ...fieldKeys('GENERAL.DEFAULT_CURRENCY'),
-    },
+    // storeDescription/contactEmail/supportEmail/phone/address/timezone/defaultLanguage/defaultCurrency
+    // removed — no backend consumer; contact/address info is actually served from the wired
+    // Storefront → Footer fields instead, and defaultLanguage/defaultCurrency duplicate the
+    // (also unwired) localization/currency category fields without either being read anywhere.
     { key: 'storeStatus', control: 'select', options: STORE_STATUS_OPTIONS, ...fieldKeys('GENERAL.STORE_STATUS') },
   ],
   // `branding` category removed from the settings UI by request — see HIDDEN_CATEGORY_KEYS.
-  localization: [
-    {
-      key: 'defaultLanguage',
-      control: 'select',
-      options: LANGUAGE_OPTIONS,
-      ...fieldKeys('LOCALIZATION.DEFAULT_LANGUAGE'),
-    },
-    {
-      key: 'supportedLanguages',
-      control: 'multiselect',
-      options: LANGUAGE_OPTIONS,
-      ...fieldKeys('LOCALIZATION.SUPPORTED_LANGUAGES'),
-    },
-    { key: 'rtlEnabled', control: 'toggle', ...fieldKeys('LOCALIZATION.RTL_ENABLED') },
-  ],
+  // `localization` category removed entirely — the frontend hardcodes AVAILABLE_LANGUAGES
+  // (core/i18n/locale.model.ts) and no backend consumer reads DefaultLanguage/SupportedLanguages/
+  // RtlEnabled beyond a discarded health-check probe. See HIDDEN_CATEGORY_KEYS.
   currency: [
     { key: 'baseCurrency', control: 'select', options: CURRENCY_OPTIONS, ...fieldKeys('CURRENCY.BASE_CURRENCY') },
     {
@@ -302,11 +248,10 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     // settings page template, not through the generic field renderer — a key/value map doesn't fit the
     // flat field-list shape the other 25 categories use.
   ],
-  theme: [
-    { key: 'defaultThemeId', control: 'select', options: 'themes', ...fieldKeys('THEME.DEFAULT_THEME_ID') },
-    { key: 'allowCustomerThemeSwitch', control: 'toggle', ...fieldKeys('THEME.ALLOW_CUSTOMER_THEME_SWITCH') },
-    // `syncWithSystemPreference` removed — no backend consumer, not read by the theme engine.
-  ],
+  // `theme` category removed entirely — defaultThemeId is superseded by the Themes module's own
+  // IsDefault flag (set via the real theme editor, ThemeEngine.cs), and allowCustomerThemeSwitch
+  // conflates the admin-curated store-theme concept with the unrelated light/dark ThemeService
+  // toggle, which renders unconditionally everywhere already. See HIDDEN_CATEGORY_KEYS.
   email: [
     { key: 'enabled', control: 'toggle', ...fieldKeys('EMAIL.ENABLED') },
     { key: 'senderName', control: 'text', validators: { required: true }, ...fieldKeys('EMAIL.SENDER_NAME') },
@@ -521,20 +466,10 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('COMMERCE.DEFAULT_SUPPLIER_MARGIN_PERCENT'),
     },
   ],
-  checkout: [
-    { key: 'guestCheckoutAllowed', control: 'toggle', ...fieldKeys('CHECKOUT.GUEST_CHECKOUT_ALLOWED') },
-    { key: 'requirePhoneNumber', control: 'toggle', ...fieldKeys('CHECKOUT.REQUIRE_PHONE_NUMBER') },
-    // `defaultPaymentMethod` removed — checkout doesn't branch on it; the payment provider is
-    // chosen by infra config, not this field.
-    {
-      key: 'cartAbandonmentMinutes',
-      control: 'stepper',
-      min: 5,
-      unit: 'minutes',
-      validators: { min: 5 },
-      ...fieldKeys('CHECKOUT.CART_ABANDONMENT_MINUTES'),
-    },
-  ],
+  // `checkout` category removed entirely — guestCheckoutAllowed is directly contradicted by the
+  // hardcoded authGuard on the storefront /checkout route (checkout always requires login);
+  // requirePhoneNumber and cartAbandonmentMinutes have no backend consumer at all. See
+  // HIDDEN_CATEGORY_KEYS.
   promotions: [
     {
       key: 'defaultMaxDiscountPercent',
@@ -561,18 +496,10 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('PROMOTIONS.DEFAULT_PER_USER_LIMIT'),
     },
   ],
-  memberships: [
-    { key: 'enabled', control: 'toggle', ...fieldKeys('MEMBERSHIPS.ENABLED') },
-    {
-      key: 'defaultTrialDays',
-      control: 'stepper',
-      min: 0,
-      unit: 'days',
-      validators: { min: 0 },
-      ...fieldKeys('MEMBERSHIPS.DEFAULT_TRIAL_DAYS'),
-    },
-    { key: 'autoRenewDefault', control: 'toggle', ...fieldKeys('MEMBERSHIPS.AUTO_RENEW_DEFAULT') },
-  ],
+  // `memberships` category removed entirely — no consumer reads Enabled/DefaultTrialDays/
+  // AutoRenewDefault; the purchase flow (MembershipCheckoutCommandHandler) always sets
+  // autoRenew explicitly per-subscription from the customer's own choice, never from a global
+  // default, and no trial concept exists in that flow. See HIDDEN_CATEGORY_KEYS.
   referral: [
     { key: 'enabled', control: 'toggle', ...fieldKeys('REFERRAL.ENABLED') },
     {
@@ -620,12 +547,10 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('INVENTORY.RESERVATION_TIMEOUT_MINUTES'),
     },
     { key: 'automaticReleaseEnabled', control: 'toggle', ...fieldKeys('INVENTORY.AUTOMATIC_RELEASE_ENABLED') },
-    {
-      key: 'codeRevealPolicy',
-      control: 'select',
-      options: CODE_REVEAL_POLICY_OPTIONS,
-      ...fieldKeys('INVENTORY.CODE_REVEAL_POLICY'),
-    },
+    // `codeRevealPolicy` removed — reveal has no policy branching today (RevealCustomerLibraryKeyQuery
+    // reveals whenever the key value is populated, which already behaves like AfterPayment for
+    // manually-fulfilled orders and like OnFulfillment for supplier-fulfilled ones); implementing a
+    // real "Manual" gate needs new admin-approval domain state, not a wiring fix.
   ],
   queue: [
     {
@@ -643,21 +568,9 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       validators: { min: 1 },
       ...fieldKeys('QUEUE.BATCH_SIZE'),
     },
-    {
-      key: 'maxConcurrency',
-      control: 'stepper',
-      min: 1,
-      validators: { min: 1 },
-      ...fieldKeys('QUEUE.MAX_CONCURRENCY'),
-    },
-    {
-      key: 'visibilityTimeoutSeconds',
-      control: 'stepper',
-      min: 30,
-      unit: 'seconds',
-      validators: { min: 30 },
-      ...fieldKeys('QUEUE.VISIBILITY_TIMEOUT_SECONDS'),
-    },
+    // maxConcurrency/visibilityTimeoutSeconds removed — OperationalJobWorker processes its claimed
+    // batch sequentially (no bounded-parallelism mechanism) and OperationalJobQueue has no
+    // lease/reclaim concept, so neither field has anything to gate.
   ],
   retryPolicies: [
     {
@@ -718,42 +631,13 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     // imageCompressionEnabled and thumbnailSmallPx/MediumPx/LargePx removed — no image
     // compression or thumbnail generation exists in the backend to read them.
   ],
-  seo: [
-    { key: 'metaTitle', control: 'text', ...fieldKeys('SEO.META_TITLE') },
-    { key: 'metaDescription', control: 'textarea', rows: 2, ...fieldKeys('SEO.META_DESCRIPTION') },
-    {
-      key: 'openGraphImageUrl',
-      control: 'url',
-      validators: { format: 'url' },
-      ...fieldKeys('SEO.OPEN_GRAPH_IMAGE_URL'),
-    },
-    {
-      key: 'twitterCardType',
-      control: 'select',
-      options: TWITTER_CARD_OPTIONS,
-      ...fieldKeys('SEO.TWITTER_CARD_TYPE'),
-    },
-    {
-      key: 'robotsDirective',
-      control: 'select',
-      options: ROBOTS_DIRECTIVE_OPTIONS,
-      ...fieldKeys('SEO.ROBOTS_DIRECTIVE'),
-    },
-    {
-      key: 'canonicalBaseUrl',
-      control: 'url',
-      validators: { required: true, format: 'url' },
-      ...fieldKeys('SEO.CANONICAL_BASE_URL'),
-    },
-  ],
-  analytics: [
-    { key: 'googleAnalyticsId', control: 'text', ...fieldKeys('ANALYTICS.GOOGLE_ANALYTICS_ID') },
-    { key: 'googleTagManagerId', control: 'text', ...fieldKeys('ANALYTICS.GOOGLE_TAG_MANAGER_ID') },
-    { key: 'metaPixelId', control: 'text', ...fieldKeys('ANALYTICS.META_PIXEL_ID') },
-    { key: 'enableTracking', control: 'toggle', ...fieldKeys('ANALYTICS.ENABLE_TRACKING') },
-  ],
+  // `seo` category removed entirely — no Angular code reads publicSettings.seo to set meta tags,
+  // <title>, or Open Graph/Twitter Card data; the fields round-trip to storage only.
+  // `analytics` category removed entirely — no Angular code reads publicSettings.analytics to
+  // inject a GA/GTM/Meta Pixel script; enableTracking is a no-op toggle today.
   // `integrations` category removed entirely — Stripe/PayPal/webhooks have no real backend
   // implementation; the fields round-trip to storage only.
+  // See HIDDEN_CATEGORY_KEYS for all three.
   maintenance: [
     { key: 'enabled', control: 'toggle', dangerous: true, ...fieldKeys('MAINTENANCE.ENABLED') },
     { key: 'message', control: 'textarea', rows: 3, ...fieldKeys('MAINTENANCE.MESSAGE') },
@@ -765,12 +649,10 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     },
     { key: 'bypassPassword', control: 'text', ...fieldKeys('MAINTENANCE.BYPASS_PASSWORD') },
   ],
-  legal: [
-    { key: 'termsHtml', control: 'textarea', rows: 8, ...fieldKeys('LEGAL.TERMS_HTML') },
-    { key: 'privacyHtml', control: 'textarea', rows: 8, ...fieldKeys('LEGAL.PRIVACY_HTML') },
-    { key: 'refundPolicyHtml', control: 'textarea', rows: 8, ...fieldKeys('LEGAL.REFUND_POLICY_HTML') },
-    { key: 'supportPolicyHtml', control: 'textarea', rows: 8, ...fieldKeys('LEGAL.SUPPORT_POLICY_HTML') },
-  ],
+  // `legal` category removed entirely — superseded by the dedicated Legal module
+  // (/api/v1/legal/public/documents/{slug}), which is what the real Terms/Privacy/Refund pages
+  // actually fetch. Editing this category's HTML strings has no effect on what customers see;
+  // use the Legal module's own admin UI instead. See HIDDEN_CATEGORY_KEYS.
 };
 
 /** Categories that are purely technical/operational — collapsed into an "Advanced" nav section by default rather than sitting alongside everyday settings. */
@@ -778,4 +660,15 @@ export const ADVANCED_CATEGORY_KEYS: readonly string[] = ['queue', 'retryPolicie
 
 /** Categories the backend still returns (default payload rows exist) but that have no real
  * consumer anywhere — hidden from the settings nav so admins can't "configure" something inert. */
-export const HIDDEN_CATEGORY_KEYS: readonly string[] = ['totp', 'integrations', 'branding'];
+export const HIDDEN_CATEGORY_KEYS: readonly string[] = [
+  'totp',
+  'integrations',
+  'branding',
+  'localization',
+  'theme',
+  'checkout',
+  'memberships',
+  'seo',
+  'analytics',
+  'legal',
+];

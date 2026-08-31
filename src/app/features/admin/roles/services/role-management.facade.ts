@@ -256,7 +256,11 @@ export class RoleManagementFacade {
 
     try {
       await firstValueFrom(this.api.put<void>(ROLES_API.role(roleId), request));
-      await this.loadRoleDetail(roleId);
+      // Deliberately does NOT reload the role detail here: loadRoleDetail() resets
+      // selectedPermissionIdsState to the server's stored list, which would discard the
+      // admin's unsaved permission-checkbox edits before savePermissions() gets to send
+      // them (the edit page always calls updateRole -> savePermissions in that order).
+      // savePermissions() reloads the detail itself once the new set is persisted.
       return true;
     } catch (error) {
       this.detailErrorState.set(this.toErrorMessage(error, 'Failed to update role.'));

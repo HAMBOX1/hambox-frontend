@@ -17,6 +17,12 @@
     <div class="admin-login-page__alert" role="alert">{{ errorMessage() }}</div>
   }
 
+  @if (otpDisabledNotice()) {
+    <div class="admin-login-page__alert admin-login-page__alert--warning" role="status">
+      {{ otpDisabledNotice() }}
+    </div>
+  }
+
   <form class="admin-login-page__form" [formGroup]="form" (ngSubmit)="submit()">
     <ui-field label="Email" [required]="true" [error]="fieldError('email')">
       <ui-input

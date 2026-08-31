@@ -130,7 +130,7 @@
 
                 [disabled]="disabled() || actionLoading()"
 
-                (pressed)="removeUser(user)"
+                (pressed)="requestRemoveUser(user)"
 
               />
 
@@ -317,4 +317,26 @@
   </ng-template>
 
 </p-dialog>
+
+
+
+<app-admin-confirm-dialog
+
+  [visible]="removeDialogOpen()"
+
+  (visibleChange)="removeDialogOpen.set($event)"
+
+  [title]="'ADMIN.ROLES.USERS.REMOVE_CONFIRM_TITLE' | translate"
+
+  [message]="'ADMIN.ROLES.USERS.REMOVE_CONFIRM_MESSAGE' | translate: { name: removeDialogMessage() }"
+
+  [confirmLabel]="'ADMIN.ROLES.USERS.REMOVE'"
+
+  [destructive]="true"
+
+  [loading]="actionLoading()"
+
+  (confirmed)="confirmRemoveUser()"
+
+/>
 

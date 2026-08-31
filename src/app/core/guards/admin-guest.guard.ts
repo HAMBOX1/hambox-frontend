@@ -8,7 +8,7 @@ export const adminGuestGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (session.isAdminAuthenticated()) {
-    return router.createUrlTree(['/admin/products']);
+    return router.createUrlTree(['/admin/dashboard']);
   }
 
   return true;

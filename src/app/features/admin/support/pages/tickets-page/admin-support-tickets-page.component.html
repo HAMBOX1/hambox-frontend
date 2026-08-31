@@ -307,6 +307,12 @@
   }
 </section>
 
+<app-order-quick-view-dialog
+  [visible]="quickViewVisible()"
+  [orderId]="quickViewOrderId()"
+  (visibleChange)="quickViewVisible.set($event)"
+/>
+
 <ng-template #messagesContent let-t>
   @for (message of t.messages; track message.id) {
     <div class="detail-bubble-row" [class.detail-bubble-row--customer]="message.authorRole === 'customer'">
@@ -357,7 +363,9 @@
           <dt>{{ 'ADMIN.SUPPORT.DETAIL.RELATED_ORDER' | translate }}</dt>
           <dd>
             @if (t.context?.relatedOrderId; as relatedOrderId) {
-              <a [routerLink]="['/admin/orders', relatedOrderId]">{{ t.relatedOrderNumber ?? '—' }}</a>
+              <button type="button" class="admin-support-detail__related-link" (click)="openOrderQuickView(relatedOrderId)">
+                {{ t.relatedOrderNumber ?? '—' }}
+              </button>
             } @else {
               {{ t.relatedOrderNumber ?? '—' }}
             }
@@ -392,7 +400,7 @@
         <ul class="admin-support-detail__related-list">
           @for (order of t.context!.recentOrders; track order.orderId) {
             <li>
-              <a [routerLink]="['/admin/orders', order.orderId]" class="admin-support-detail__related-link">
+              <button type="button" class="admin-support-detail__related-link" (click)="openOrderQuickView(order.orderId)">
                 <span>{{ order.orderNumber }} — {{ order.status }}</span>
                 <span>{{ order.productNames.join(', ') }}</span>
                 @if (order.hasLicenseKeys) {
@@ -400,7 +408,7 @@
                     <i class="pi pi-key" aria-hidden="true"></i> {{ 'ADMIN.SUPPORT.DETAIL.LICENSE_KEYS' | translate }}
                   </span>
                 }
-              </a>
+              </button>
             </li>
           }
         </ul>

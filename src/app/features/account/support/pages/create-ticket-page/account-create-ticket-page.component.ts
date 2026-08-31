@@ -7,6 +7,7 @@ import { EditorModule } from 'primeng/editor';
 import { HamboxTranslateRefreshDirective } from '../../../../../shared/directives/hambox-translate-refresh.directive';
 import { SupportTicketsStore } from '../../../../../core/support/support-tickets.store';
 import { AccountSupportFacade } from '../../services/account-support.facade';
+import { AccountOrdersFacade } from '../../../services/account-orders.facade';
 import { SupportSubnavComponent } from '../../components/support-subnav/support-subnav.component';
 
 function attachmentKindLabel(fileName: string): string {
@@ -30,11 +31,13 @@ function attachmentKindLabel(fileName: string): string {
 export class AccountCreateTicketPageComponent {
   private readonly facade = inject(AccountSupportFacade);
   private readonly store = inject(SupportTicketsStore);
+  private readonly ordersFacade = inject(AccountOrdersFacade);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   protected readonly categories = this.store.categories;
   protected readonly priorities = this.store.priorities;
+  protected readonly orders = this.ordersFacade.orders;
 
   protected readonly categoryId = signal<string | null>(null);
   protected readonly priorityId = signal<string | null>(null);
@@ -53,6 +56,7 @@ export class AccountCreateTicketPageComponent {
 
   constructor() {
     void this.store.loadLookups();
+    void this.ordersFacade.loadOrders();
 
     const params = this.route.snapshot.queryParamMap;
     const subject = params.get('subject');

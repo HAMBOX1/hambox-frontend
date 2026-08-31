@@ -856,6 +856,7 @@
       "DESCRIPTION": "الوصف",
       "DESCRIPTION_PLACEHOLDER": "صف مشكلتك بالتفصيل...",
       "RELATED_ORDER": "الطلب المرتبط",
+      "RELATED_ORDER_DEFAULT": "لا يوجد طلب محدد",
       "RELATED_PRODUCT": "المنتج المرتبط",
       "RELATED_PRODUCT_PLACEHOLDER": "ما هو المنتج المعني؟",
       "MEMBERSHIP": "العضوية",
@@ -3188,6 +3189,8 @@
         "ASSIGN_EMPTY": "لا يوجد مستخدمون مطابقون لبحثك.",
         "SEARCH_PLACEHOLDER": "ابحث في المستخدمين المعيّنين…",
         "REMOVE": "إزالة المستخدم من الدور",
+        "REMOVE_CONFIRM_TITLE": "إزالة المستخدم من الدور",
+        "REMOVE_CONFIRM_MESSAGE": "هل تريد إزالة {{name}} من هذا الدور؟ سيفقد الصلاحيات التي يمنحها.",
         "EMPTY": "لم يُعيَّن أي مستخدم لهذا الدور بعد.",
         "COLUMNS": {
           "NAME": "الاسم",

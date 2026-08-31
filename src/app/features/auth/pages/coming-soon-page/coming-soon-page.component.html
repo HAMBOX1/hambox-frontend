@@ -1,7 +1,7 @@
 <ui-auth-card
   eyebrow="HAMBOX"
-  title="Coming Soon"
-  [subtitle]="maintenance.message() || 'We are putting the final touches on HAMBOX. Please check back soon.'"
+  [title]="title()"
+  [subtitle]="subtitle()"
 >
   @if (!showLoginForm()) {
     <button

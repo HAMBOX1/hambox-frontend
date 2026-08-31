@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -26,6 +26,7 @@ import { MobileViewportService } from '../../../../../shared/services/mobile-vie
 import { SupportTicketsStore } from '../../../../../core/support/support-tickets.store';
 import { statusToApi, Ticket, TicketStatus, TICKET_STATUS_META } from '../../../../../core/support/support.model';
 import { AdminSupportFacade } from '../../services/admin-support.facade';
+import { OrderQuickViewDialogComponent } from '../../components/order-quick-view-dialog/order-quick-view-dialog.component';
 
 const TYPING_STOP_DELAY_MS = 2_000;
 const MOBILE_COMPOSER_MAX_HEIGHT_PX = 120;
@@ -42,7 +43,6 @@ const MOBILE_COMPOSER_MAX_HEIGHT_PX = 120;
   imports: [
     FormsModule,
     NgTemplateOutlet,
-    RouterLink,
     TranslatePipe,
     HamboxDatePipe,
     ButtonModule,
@@ -55,6 +55,7 @@ const MOBILE_COMPOSER_MAX_HEIGHT_PX = 120;
     AdminStatusBadgeComponent,
     AdminActionMenuComponent,
     HamboxBottomSheetComponent,
+    OrderQuickViewDialogComponent,
   ],
   templateUrl: './admin-support-tickets-page.component.html',
   styleUrl: './admin-support-tickets-page.component.scss',
@@ -81,6 +82,14 @@ export class AdminSupportTicketsPageComponent {
   protected readonly isMobile = this.mobileViewport.isMobile;
   protected readonly mobileContextOpen = signal(false);
   protected readonly mobileFiltersOpen = signal(false);
+
+  protected readonly quickViewOrderId = signal<string | null>(null);
+  protected readonly quickViewVisible = signal(false);
+
+  protected openOrderQuickView(orderId: string): void {
+    this.quickViewOrderId.set(orderId);
+    this.quickViewVisible.set(true);
+  }
 
   // How far to lift the fixed composer off the true screen bottom. Needed because
   // position: fixed anchors to the *layout* viewport, not the *visual* one — the moment the

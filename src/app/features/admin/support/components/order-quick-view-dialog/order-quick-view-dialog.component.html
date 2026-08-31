@@ -1,0 +1,62 @@
+<p-dialog
+  [header]="detail()?.orderNumber ?? ('ADMIN.ORDERS.DETAIL.TITLE' | translate)"
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(48rem, 94vw)' }"
+  styleClass="admin-dialog order-quick-view-dialog"
+  (onHide)="onHide()"
+>
+  @if (loading()) {
+    <app-admin-loading-skeleton variant="detail" [rows]="4" />
+  } @else if (error(); as message) {
+    <app-admin-error-alert [message]="message" [showRetry]="false" />
+  } @else if (detail(); as order) {
+    <div class="order-quick-view-dialog__badges">
+      <app-admin-status-badge [label]="order.orderStatus" [tone]="statusTone(order.orderStatus)" />
+      <app-admin-status-badge [label]="order.paymentStatus" [tone]="statusTone(order.paymentStatus)" [outlined]="true" />
+      <app-admin-status-badge [label]="order.deliveryStatus" [tone]="statusTone(order.deliveryStatus)" [outlined]="true" />
+    </div>
+
+    <dl class="order-quick-view-dialog__summary">
+      <dt>{{ 'ADMIN.ORDERS.DETAIL.CUSTOMER' | translate }}</dt>
+      <dd>{{ order.customerName }} — {{ order.email }}</dd>
+      <dt>{{ 'ADMIN.ORDERS.COLUMNS.PURCHASE_DATE' | translate }}</dt>
+      <dd>{{ order.createdOnUtc | date: 'medium' }}</dd>
+    </dl>
+
+    <p-table [value]="[...order.items]" [scrollable]="true" styleClass="order-quick-view-dialog__table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ADMIN.ORDERS.DETAIL.PRODUCT' | translate }}</th>
+          <th>{{ 'ADMIN.ORDERS.DETAIL.QTY' | translate }}</th>
+          <th>{{ 'ADMIN.ORDERS.DETAIL.SUBTOTAL_LINE' | translate }}</th>
+          <th>{{ 'ADMIN.SUPPORT.DETAIL.LICENSE_KEYS' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.productName }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.subtotal | hamboxCurrency }}</td>
+          <td>{{ item.deliveredCodesCount }}/{{ item.quantity }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="order-quick-view-dialog__total">
+      <span>{{ 'ADMIN.ORDERS.DETAIL.TOTAL' | translate }}</span>
+      <strong>{{ order.totalAmount | hamboxCurrency }}</strong>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" [label]="'COMMON.CLOSE' | translate" severity="secondary" [text]="true" (click)="close()"></button>
+    @if (orderId(); as id) {
+      <a pButton type="button" [label]="'ADMIN.ORDERS.ACTIONS.VIEW' | translate" icon="pi pi-arrow-up-right" [routerLink]="['/admin/orders', id]" (click)="close()"></a>
+    }
+  </ng-template>
+</p-dialog>

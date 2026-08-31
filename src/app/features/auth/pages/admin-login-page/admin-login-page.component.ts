@@ -47,6 +47,7 @@ export class AdminLoginPageComponent {
 
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly otpDisabledNotice = signal<string | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -75,7 +76,7 @@ export class AdminLoginPageComponent {
 
     this.isSubmitting.set(true);
     const { email, password } = this.form.getRawValue();
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/admin/products';
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/admin/dashboard';
 
     this.adminAuth
       .login({ email, password })
@@ -84,12 +85,12 @@ export class AdminLoginPageComponent {
         next: async (challenge) => {
           if (challenge.token) {
             await this.adminAuth.completeLoginWithToken(challenge.token);
-            window.alert(
-              'You were signed in without OTP verification because Admin OTP is currently ' +
-                'disabled in Settings → Authentication (typically because SMTP email ' +
-                'delivery is not configured yet). Re-enable Admin OTP as soon as email is working.',
+            this.otpDisabledNotice.set(
+              'Signed in without OTP verification because Admin OTP is currently disabled in ' +
+                'Settings → Authentication (typically because SMTP email delivery is not ' +
+                'configured yet). Re-enable Admin OTP as soon as email is working.',
             );
-            await this.router.navigateByUrl(returnUrl);
+            setTimeout(() => void this.router.navigateByUrl(returnUrl), 3000);
             return;
           }
 

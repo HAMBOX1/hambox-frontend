@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
@@ -55,6 +55,32 @@ export class ComingSoonPageComponent {
 
   protected readonly form = this.fb.nonNullable.group({
     password: ['', [Validators.required]],
+  });
+
+  protected readonly title = computed(() => {
+    switch (this.maintenance.reason()) {
+      case 'closed':
+        return 'Temporarily Closed';
+      case 'comingSoon':
+        return 'Coming Soon';
+      default:
+        return 'Under Maintenance';
+    }
+  });
+
+  protected readonly subtitle = computed(() => {
+    if (this.maintenance.message()) {
+      return this.maintenance.message();
+    }
+
+    switch (this.maintenance.reason()) {
+      case 'closed':
+        return "We're temporarily closed for orders. Please check back soon.";
+      case 'comingSoon':
+        return 'We are putting the final touches on HAMBOX. Please check back soon.';
+      default:
+        return "We're performing scheduled maintenance. Please check back soon.";
+    }
   });
 
   constructor() {

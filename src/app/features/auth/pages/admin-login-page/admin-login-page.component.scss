@@ -19,6 +19,11 @@
   color: color-mix(in srgb, var(--ui-danger) 70%, var(--color-text-primary) 30%);
   font-size: var(--ui-font-body);
   line-height: 1.45;
+
+  &--warning {
+    background: color-mix(in srgb, var(--ui-warning) 14%, transparent);
+    color: color-mix(in srgb, var(--ui-warning) 70%, var(--color-text-primary) 30%);
+  }
 }
 
 .admin-login-page__form {

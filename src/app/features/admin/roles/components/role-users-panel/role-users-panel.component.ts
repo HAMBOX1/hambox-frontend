@@ -32,6 +32,8 @@ import { PERMISSIONS } from '../../../../../core/permissions/permission.constant
 
 import {
 
+  AdminConfirmDialogComponent,
+
   AdminDataTableShellComponent,
 
   AdminEmptyStateComponent,
@@ -98,6 +100,8 @@ import { RoleManagementFacade } from '../../services/role-management.facade';
 
   AdminStatusBadgeComponent,
 
+  AdminConfirmDialogComponent,
+
   ],
 
   templateUrl: './role-users-panel.component.html',
@@ -131,6 +135,10 @@ export class RoleUsersPanelComponent {
   protected readonly assignDialogOpen = signal(false);
 
   protected readonly selectedUserIds = signal<readonly string[]>([]);
+
+  protected readonly removeDialogOpen = signal(false);
+
+  protected readonly removeTarget = signal<UserSearchResultApiDto | null>(null);
 
 
 
@@ -254,15 +262,49 @@ export class RoleUsersPanelComponent {
 
 
 
-  protected async removeUser(user: UserSearchResultApiDto): Promise<void> {
+  protected requestRemoveUser(user: UserSearchResultApiDto): void {
+
+    this.removeTarget.set(user);
+
+    this.removeDialogOpen.set(true);
+
+  }
+
+  protected closeRemoveDialog(): void {
+
+    this.removeDialogOpen.set(false);
+
+    this.removeTarget.set(null);
+
+  }
+
+  protected async confirmRemoveUser(): Promise<void> {
+
+    const user = this.removeTarget();
+
+    if (!user) {
+
+      return;
+
+    }
 
     const success = await this.facade.removeUser(this.roleId(), user.id);
 
     if (success) {
 
+      this.closeRemoveDialog();
+
       this.usersChanged.emit();
 
     }
+
+  }
+
+  protected removeDialogMessage(): string {
+
+    const user = this.removeTarget();
+
+    return user ? this.displayName(user) : '';
 
   }
 

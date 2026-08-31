@@ -29,7 +29,12 @@ export class StorefrontSettingsEditorComponent {
   protected readonly seoFields: SettingsFieldConfig[] = [
     { key: 'defaultMetaTitle', control: 'text', ...storefrontFieldKeys('SEO.DEFAULT_META_TITLE') },
     { key: 'defaultMetaDescription', control: 'textarea', rows: 3, ...storefrontFieldKeys('SEO.DEFAULT_META_DESCRIPTION') },
-    { key: 'openGraphImageUrl', control: 'url', ...storefrontFieldKeys('SEO.OPEN_GRAPH_IMAGE_URL') },
+    {
+      key: 'openGraphImageUrl',
+      control: 'media',
+      recommendedSize: '1200×630px, JPG/PNG/WebP',
+      ...storefrontFieldKeys('SEO.OPEN_GRAPH_IMAGE_URL'),
+    },
     {
       key: 'twitterCard',
       control: 'select',
