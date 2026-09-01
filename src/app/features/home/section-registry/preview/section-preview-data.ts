@@ -125,6 +125,12 @@ export const SECTION_PREVIEW_CONTEXT: SectionRenderContext = {
       twitterCard: 'summary_large_image',
       canonicalUrl: '/',
     },
+    navigationLinks: [
+      { id: 'games', labelEn: 'Games', labelAr: 'الألعاب', visible: true },
+      { id: 'gift-cards', labelEn: 'Digital Products', labelAr: 'منتجات رقمية', visible: true },
+      { id: 'subscriptions', labelEn: 'Subscriptions', labelAr: 'الاشتراكات', visible: true },
+      { id: 'deals', labelEn: 'Deals', labelAr: 'العروض', visible: true },
+    ],
   },
   categories: [
     { id: 'cat-1', title: 'PC Games', subtitle: 'Steam, Epic & more', imageUrl: placeholderImage('PC Games'), route: '/products' },

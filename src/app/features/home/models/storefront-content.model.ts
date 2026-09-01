@@ -84,6 +84,13 @@ export interface StorefrontFooterContent {
   readonly whatsAppUrl: string | null;
 }
 
+export interface StorefrontNavLinkContent {
+  readonly id: string;
+  readonly labelEn: string;
+  readonly labelAr: string;
+  readonly visible: boolean;
+}
+
 export interface StorefrontSeoContent {
   readonly defaultMetaTitle: string;
   readonly defaultMetaDescription: string;
@@ -102,4 +109,5 @@ export interface StorefrontContent {
   readonly trustBar: readonly StorefrontTrustItemContent[];
   readonly footer: StorefrontFooterContent;
   readonly seo: StorefrontSeoContent;
+  readonly navigationLinks: readonly StorefrontNavLinkContent[];
 }

@@ -15,7 +15,7 @@ import { StoreFlashHeroComponent } from '../../components/store-flash-hero/store
 import { StoreProductCardComponent } from '../../components/store-product-card/store-product-card.component';
 import { StoreProductListItemComponent } from '../../components/store-product-list-item/store-product-list-item.component';
 import { StoreAppliedFiltersComponent } from '../../components/store-applied-filters/store-applied-filters.component';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { ProductsFacade, StorefrontClientFilters } from '../../services/products.facade';
 import { StorefrontFilterPanelService } from '../../services/storefront-filter-panel.service';
 import { StorefrontViewModeService } from '../../services/storefront-view-mode.service';
@@ -52,7 +52,7 @@ export class ProductsPageComponent implements OnInit {
   private readonly router = inject(Router);
   private initialized = false;
 
-  protected readonly navLinks = STOREFRONT_PRODUCTS_NAV_LINKS;
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
 
   protected readonly flashDealCount = signal(0);
   protected readonly flashDealsVisible = signal(false);

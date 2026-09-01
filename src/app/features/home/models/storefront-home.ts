@@ -5,6 +5,8 @@ export interface NavLink {
   route: string;
   section?: string;
   active?: boolean;
+  /** Resolved, language-correct display text from Platform Settings. Overrides `labelKey` when set. */
+  label?: string;
 }
 
 export interface TrustFeature {

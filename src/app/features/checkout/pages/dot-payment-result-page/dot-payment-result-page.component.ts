@@ -10,7 +10,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { PaymentProcessingCardComponent } from '../../components/payment-processing-card/payment-processing-card.component';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { DotPaymentStatus } from '../../models/checkout';
@@ -37,7 +37,7 @@ export class DotPaymentResultPageComponent implements OnInit {
   private destroyed = false;
   private pollTimeoutId?: ReturnType<typeof setTimeout>;
 
-  protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly status = signal<DotPaymentStatus | 'Invalid'>('Pending');
   protected readonly errorMessage = signal<string | null>(null);
 

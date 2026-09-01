@@ -4,7 +4,7 @@ import { StorefrontNavComponent } from '../../../../shared/components/storefront
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { PaymentMethodSelectorComponent } from '../../components/payment-method-selector/payment-method-selector.component';
@@ -32,7 +32,7 @@ export class CheckoutPageComponent implements OnInit {
   private readonly checkoutFacade = inject(CheckoutFacade);
   private readonly router = inject(Router);
 
-  protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly loading = this.cartFacade.loading;
   protected readonly error = this.cartFacade.error;
   protected readonly isEmpty = this.cartFacade.isEmpty;

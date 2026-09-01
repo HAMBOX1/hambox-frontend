@@ -47,7 +47,7 @@
             [routerLink]="item.route"
             [queryParams]="linkQueryParams(item)"
           >
-            {{ item.labelKey | translate }}
+            {{ item.label ?? (item.labelKey | translate) }}
           </a>
         }
       </nav>

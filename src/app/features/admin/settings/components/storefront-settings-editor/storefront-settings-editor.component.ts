@@ -1,9 +1,17 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AdminSectionCardComponent } from '../../../../../shared/components/admin';
 import { SettingsFieldConfig, TWITTER_CARD_OPTIONS } from '../../models/platform-settings.model';
 import { SettingsFieldComponent } from '../settings-field/settings-field.component';
+
+export interface StorefrontNavLinkSetting {
+  readonly id: string;
+  readonly labelEn: string;
+  readonly labelAr: string;
+  readonly visible: boolean;
+}
 
 /** Storefront translations live at ADMIN.SETTINGS.STOREFRONT.* (a sibling of ADMIN.SETTINGS.FIELDS.*,
  * matching how TITLE_CARD/DESCRIPTION_CARD are referenced directly in the template) — the shared
@@ -16,7 +24,7 @@ function storefrontFieldKeys(path: string): { labelKey: string; helperKey: strin
 @Component({
   selector: 'app-storefront-settings-editor',
   standalone: true,
-  imports: [TranslatePipe, AdminSectionCardComponent, SettingsFieldComponent],
+  imports: [TranslatePipe, FormsModule, AdminSectionCardComponent, SettingsFieldComponent],
   templateUrl: './storefront-settings-editor.component.html',
   styleUrl: './storefront-settings-editor.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +51,18 @@ export class StorefrontSettingsEditorComponent {
     },
     { key: 'canonicalUrl', control: 'url', validators: { required: true }, ...storefrontFieldKeys('SEO.CANONICAL_URL') },
   ];
+
+  protected readonly navigationLinks = computed<readonly StorefrontNavLinkSetting[]>(() => {
+    const value = this.payload()['navigationLinks'];
+    return Array.isArray(value) ? (value as StorefrontNavLinkSetting[]) : [];
+  });
+
+  protected updateNavLink(id: string, patch: Partial<StorefrontNavLinkSetting>): void {
+    const next = structuredClone(this.payload()) as Record<string, unknown>;
+    const links = this.navigationLinks().map((link) => (link.id === id ? { ...link, ...patch } : link));
+    next['navigationLinks'] = links;
+    this.payloadChange.emit(next);
+  }
 
   protected section(key: string): Record<string, unknown> {
     const value = this.payload()[key];

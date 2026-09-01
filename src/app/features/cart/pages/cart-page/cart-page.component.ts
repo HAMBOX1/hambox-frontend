@@ -8,7 +8,7 @@ import { LoadingSkeletonComponent } from '../../../../shared/components/loading-
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { CartLineItemComponent } from '../../components/cart-line-item/cart-line-item.component';
 import { CartOrderSummaryComponent } from '../../components/cart-order-summary/cart-order-summary.component';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { CartFacade } from '../../services/cart.facade';
 import { CartLineItem } from '../../models/cart';
 
@@ -40,7 +40,7 @@ export class CartPageComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly items = this.cartFacade.items;
   protected readonly summary = this.cartFacade.summary;
   protected readonly isEmpty = this.cartFacade.isEmpty;

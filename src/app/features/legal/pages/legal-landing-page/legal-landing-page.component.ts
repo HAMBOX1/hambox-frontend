@@ -8,7 +8,7 @@ import { StorefrontFooterComponent } from '../../../../shared/components/storefr
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
 import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 import { TranslationService } from '../../../../core/i18n/translation.service';
-import { STOREFRONT_NAV_LINKS } from '../../../home/services/storefront-home-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { PublicLegalSectionSummaryDto } from '../../models/legal-section.model';
 import { LegalService } from '../../services/legal.service';
 
@@ -41,7 +41,7 @@ export class LegalLandingPageComponent implements OnInit {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
-  protected readonly navLinks = STOREFRONT_NAV_LINKS;
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly loading = this.legal.documentsLoading;
 
   protected readonly groups = computed<readonly LegalCategoryGroup[]>(() => {

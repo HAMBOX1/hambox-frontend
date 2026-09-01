@@ -10,7 +10,7 @@ import { PaymentMethodSelectorComponent } from '../../components/payment-method-
 import { CheckoutBillingFormComponent } from '../../components/checkout-billing-form/checkout-billing-form.component';
 import { MembershipCheckoutFacade } from '../../services/membership-checkout.facade';
 import { CheckoutFacade } from '../../services/checkout.facade';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 
 @Component({
   selector: 'app-membership-checkout-page',
@@ -40,7 +40,7 @@ export class MembershipCheckoutPageComponent implements OnInit {
   protected readonly error = this.membershipCheckout.error;
   protected readonly action = this.membershipCheckout.action;
   protected readonly discountCode = this.membershipCheckout.discountCode;
-  protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
 
   ngOnInit(): void {
     const planId = this.route.snapshot.queryParamMap.get('planId');

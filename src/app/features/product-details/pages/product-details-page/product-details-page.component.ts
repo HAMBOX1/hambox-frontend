@@ -22,7 +22,7 @@ import { StorefrontNavComponent } from '../../../../shared/components/storefront
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { ProductDetailsItem } from '../../models/product-details';
 import { ProductDetails } from '../../services/product-details';
 import { StorefrontVariantFacade } from '../../services/storefront-variant.facade';
@@ -101,7 +101,7 @@ export class ProductDetailsPageComponent {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
-  protected readonly navLinks = STOREFRONT_PRODUCTS_NAV_LINKS;
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly product = signal<ProductDetailsItem | null>(null);
   protected readonly selectedImageIndex = signal(0);
   protected readonly loading = signal(true);

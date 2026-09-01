@@ -1,5 +1,46 @@
 <div class="storefront-editor">
   <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.DESCRIPTION_CARD' | translate"
+  >
+    <div class="storefront-editor__nav-list">
+      @for (link of navigationLinks(); track link.id) {
+        <div class="storefront-editor__nav-row">
+          <span class="storefront-editor__nav-id">{{ 'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.IDS.' + link.id | translate }}</span>
+          <label class="storefront-editor__nav-field">
+            <span>{{ 'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.LABEL_EN' | translate }}</span>
+            <input
+              type="text"
+              [ngModel]="link.labelEn"
+              [disabled]="disabled()"
+              (ngModelChange)="updateNavLink(link.id, { labelEn: $event })"
+            />
+          </label>
+          <label class="storefront-editor__nav-field">
+            <span>{{ 'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.LABEL_AR' | translate }}</span>
+            <input
+              type="text"
+              dir="rtl"
+              [ngModel]="link.labelAr"
+              [disabled]="disabled()"
+              (ngModelChange)="updateNavLink(link.id, { labelAr: $event })"
+            />
+          </label>
+          <label class="storefront-editor__nav-visible">
+            <input
+              type="checkbox"
+              [ngModel]="link.visible"
+              [disabled]="disabled()"
+              (ngModelChange)="updateNavLink(link.id, { visible: $event })"
+            />
+            <span>{{ 'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.VISIBLE' | translate }}</span>
+          </label>
+        </div>
+      }
+    </div>
+  </app-admin-section-card>
+
+  <app-admin-section-card
     [title]="'ADMIN.SETTINGS.STOREFRONT.SEO.TITLE_CARD' | translate"
     [description]="'ADMIN.SETTINGS.STOREFRONT.SEO.DESCRIPTION_CARD' | translate"
   >

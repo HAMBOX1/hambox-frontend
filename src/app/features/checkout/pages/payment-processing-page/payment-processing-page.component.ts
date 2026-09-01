@@ -11,7 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { interval } from 'rxjs';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../../products/services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { PaymentProcessingCardComponent } from '../../components/payment-processing-card/payment-processing-card.component';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { MembershipCheckoutFacade } from '../../services/membership-checkout.facade';
@@ -54,7 +54,7 @@ export class PaymentProcessingPageComponent implements OnInit {
   private readonly cartFacade = inject(CartFacade);
   private readonly themeEngine = inject(ThemeEngineService);
 
-  protected readonly navLinks = signal([...STOREFRONT_PRODUCTS_NAV_LINKS]);
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly progress = signal(8);
   protected readonly stageLabel = signal<string>(CHECKOUT_STAGES[0]);
   protected readonly error = signal<string | null>(null);

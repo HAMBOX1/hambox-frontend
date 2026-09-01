@@ -74,7 +74,7 @@ export class StorefrontFooterComponent {
 
   protected readonly navigationLinks = [
     { label: 'Marketplace', route: '/products' },
-    { label: 'Gift Cards', route: '/products' },
+    { label: 'Digital Products', route: '/products' },
     { label: 'Subscriptions', route: '/products' },
   ] as const;
 }

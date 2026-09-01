@@ -7,7 +7,7 @@ import { StorefrontNavComponent } from '../../../../shared/components/storefront
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
 import { SectionRendererComponent } from '../../section-registry/render/section-renderer.component';
 import { SectionRenderContext } from '../../section-registry/models/section-variant.model';
-import { STOREFRONT_NAV_LINKS } from '../../services/storefront-home-data';
+import { StorefrontNavLinksService } from '../../services/storefront-nav-links.service';
 import { HomeFacade } from '../../services/home.facade';
 
 @Component({
@@ -30,7 +30,7 @@ export class HomePageComponent implements OnInit {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
-  protected readonly navLinks = STOREFRONT_NAV_LINKS;
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
 
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;

@@ -85,7 +85,7 @@
     "ACCOUNT_MENU": "Account menu",
     "CATEGORIES": {
       "GAMES": "Games",
-      "GIFT_CARDS": "Gift Cards",
+      "GIFT_CARDS": "Digital Products",
       "SUBSCRIPTIONS": "Subscriptions",
       "DEALS": "Deals"
     }
@@ -100,7 +100,7 @@
     "COPYRIGHT": "© 2026 HAMBOX Global. All rights reserved. Secure terminal active.",
     "LINKS": {
       "MARKETPLACE": "Marketplace",
-      "GIFT_CARDS": "Gift Cards",
+      "GIFT_CARDS": "Digital Products",
       "SUBSCRIPTIONS": "Subscriptions",
       "AFFILIATE": "Affiliate program",
       "TERMS": "Terms of service",
@@ -3081,6 +3081,19 @@
           "CANONICAL_URL": {
             "LABEL": "Canonical URL",
             "HELP": "The home page's official URL, used to avoid duplicate-content issues."
+          }
+        },
+        "NAVIGATION": {
+          "TITLE_CARD": "Navigation Links",
+          "DESCRIPTION_CARD": "Labels shown in the top navigation bar and category filters across the whole site (not just the home page).",
+          "LABEL_EN": "Label (English)",
+          "LABEL_AR": "Label (Arabic)",
+          "VISIBLE": "Visible",
+          "IDS": {
+            "games": "Games",
+            "gift-cards": "Gift Cards / Digital Products",
+            "subscriptions": "Subscriptions",
+            "deals": "Deals"
           }
         }
       }

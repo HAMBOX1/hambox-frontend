@@ -21,7 +21,7 @@ import { TranslationService } from '../../../../core/i18n/translation.service';
 import { FaqPublicService } from '../../../../core/faq/faq-public.service';
 import { PublicFaqDto } from '../../../../core/faq/faq-public.model';
 import { pageHasFaqSection } from '../../../home/section-registry/section-variant-registry';
-import { STOREFRONT_PRODUCTS_NAV_LINKS } from '../../services/storefront-products-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 
 /**
  * Public entry point for a Category Marketing Page: `/categories/:slug` resolves the category by its
@@ -57,7 +57,7 @@ export class CategoryLandingPageComponent {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
-  protected readonly navLinks = STOREFRONT_PRODUCTS_NAV_LINKS;
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly loading = signal(true);
   protected readonly notFound = signal(false);
 

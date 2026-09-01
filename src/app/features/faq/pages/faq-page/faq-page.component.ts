@@ -13,7 +13,7 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
 import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 import { StorefrontFooterComponent } from '../../../../shared/components/storefront-footer/storefront-footer.component';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
-import { STOREFRONT_NAV_LINKS } from '../../../home/services/storefront-home-data';
+import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 
 @Component({
   selector: 'app-faq-page',
@@ -39,7 +39,7 @@ export class FaqPageComponent {
   private readonly meta = inject(Meta);
   protected readonly translation = inject(TranslationService);
 
-  protected readonly navLinks = STOREFRONT_NAV_LINKS;
+  protected readonly navLinks = inject(StorefrontNavLinksService).links;
 
   protected readonly faqs = signal<readonly PublicFaqDto[]>([]);
   protected readonly loading = signal(true);
