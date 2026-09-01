@@ -15,7 +15,7 @@
 
 .storefront-editor__nav-row {
   display: grid;
-  grid-template-columns: minmax(8rem, auto) 1fr 1fr auto;
+  grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0.75rem;
@@ -28,16 +28,22 @@
 }
 
 .storefront-editor__nav-id {
+  min-width: 0;
+  overflow-wrap: break-word;
   font-weight: 600;
   font-size: 0.875rem;
 }
 
 .storefront-editor__nav-field {
+  min-width: 0;
   display: grid;
   gap: 0.25rem;
   font-size: 0.75rem;
 
   input[type='text'] {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
     padding: 0.4rem 0.6rem;
     border: 1px solid var(--surface-border, #e2e8f0);
     border-radius: 0.375rem;
