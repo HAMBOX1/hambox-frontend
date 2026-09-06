@@ -1,5 +1,21 @@
 <div class="storefront-editor">
   <app-admin-section-card
+    [title]="'ADMIN.SETTINGS.STOREFRONT.FOOTER.TITLE_CARD' | translate"
+    [description]="'ADMIN.SETTINGS.STOREFRONT.FOOTER.DESCRIPTION_CARD' | translate"
+  >
+    <div class="storefront-editor__grid">
+      @for (field of footerFields; track field.key) {
+        <app-settings-field
+          [field]="field"
+          [value]="section('footer')[field.key]"
+          [disabled]="disabled()"
+          (valueChange)="setSectionField('footer', field.key, $event)"
+        />
+      }
+    </div>
+  </app-admin-section-card>
+
+  <app-admin-section-card
     [title]="'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.TITLE_CARD' | translate"
     [description]="'ADMIN.SETTINGS.STOREFRONT.NAVIGATION.DESCRIPTION_CARD' | translate"
   >

@@ -34,6 +34,23 @@ export class StorefrontSettingsEditorComponent {
   readonly disabled = input(false);
   readonly payloadChange = output<Record<string, unknown>>();
 
+  protected readonly footerFields: SettingsFieldConfig[] = [
+    { key: 'companyName', control: 'text', validators: { required: true }, ...storefrontFieldKeys('FOOTER.COMPANY_NAME') },
+    { key: 'copyright', control: 'text', ...storefrontFieldKeys('FOOTER.COPYRIGHT') },
+    { key: 'supportEmail', control: 'email', validators: { format: 'email' }, ...storefrontFieldKeys('FOOTER.SUPPORT_EMAIL') },
+    { key: 'supportPhone', control: 'text', ...storefrontFieldKeys('FOOTER.SUPPORT_PHONE') },
+    { key: 'address', control: 'textarea', rows: 2, ...storefrontFieldKeys('FOOTER.ADDRESS') },
+    { key: 'workingHours', control: 'text', ...storefrontFieldKeys('FOOTER.WORKING_HOURS') },
+    { key: 'facebookUrl', control: 'url', ...storefrontFieldKeys('FOOTER.FACEBOOK_URL') },
+    { key: 'instagramUrl', control: 'url', ...storefrontFieldKeys('FOOTER.INSTAGRAM_URL') },
+    { key: 'xUrl', control: 'url', ...storefrontFieldKeys('FOOTER.X_URL') },
+    { key: 'discordUrl', control: 'url', ...storefrontFieldKeys('FOOTER.DISCORD_URL') },
+    { key: 'telegramUrl', control: 'url', ...storefrontFieldKeys('FOOTER.TELEGRAM_URL') },
+    { key: 'youTubeUrl', control: 'url', ...storefrontFieldKeys('FOOTER.YOUTUBE_URL') },
+    { key: 'tikTokUrl', control: 'url', ...storefrontFieldKeys('FOOTER.TIKTOK_URL') },
+    { key: 'whatsAppUrl', control: 'url', ...storefrontFieldKeys('FOOTER.WHATSAPP_URL') },
+  ];
+
   protected readonly seoFields: SettingsFieldConfig[] = [
     { key: 'defaultMetaTitle', control: 'text', ...storefrontFieldKeys('SEO.DEFAULT_META_TITLE') },
     { key: 'defaultMetaDescription', control: 'textarea', rows: 3, ...storefrontFieldKeys('SEO.DEFAULT_META_DESCRIPTION') },
