@@ -11,6 +11,7 @@ export interface StorefrontNavLinkSetting {
   readonly labelEn: string;
   readonly labelAr: string;
   readonly visible: boolean;
+  readonly showInFooter: boolean;
 }
 
 /** Storefront translations live at ADMIN.SETTINGS.STOREFRONT.* (a sibling of ADMIN.SETTINGS.FIELDS.*,

@@ -21,7 +21,13 @@ export class StorefrontNavLinksService {
   private readonly dynamicLinks = signal<readonly StorefrontNavLinkContent[] | null>(null);
   private loaded = false;
 
-  readonly links = computed<readonly NavLink[]>(() => {
+  readonly links = computed<readonly NavLink[]>(() => this.buildLinks((override) => override.visible));
+
+  // Independent from the top-nav's `visible` flag — see `StorefrontNavLinkContent.showInFooter` —
+  // so hiding/showing a category in the top nav bar doesn't force the footer's copy to follow.
+  readonly footerLinks = computed<readonly NavLink[]>(() => this.buildLinks((override) => override.showInFooter));
+
+  private buildLinks(isShown: (override: StorefrontNavLinkContent) => boolean): readonly NavLink[] {
     const dynamic = this.dynamicLinks();
     const lang = this.translation.language();
 
@@ -30,7 +36,7 @@ export class StorefrontNavLinksService {
       if (!override) {
         return base;
       }
-      if (!override.visible) {
+      if (!isShown(override)) {
         return null;
       }
       return {
@@ -38,7 +44,7 @@ export class StorefrontNavLinksService {
         label: lang === 'ar' ? override.labelAr : override.labelEn,
       };
     }).filter((item): item is NavLink => item !== null);
-  });
+  }
 
   constructor() {
     this.load();

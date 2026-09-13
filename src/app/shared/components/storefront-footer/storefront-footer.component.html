@@ -20,8 +20,10 @@
       <div class="footer__column">
         <h2 class="footer__heading">Navigation</h2>
         <nav class="footer__nav" aria-label="Footer navigation">
-          @for (link of navigationLinks; track link.label) {
-            <a class="footer__link" [routerLink]="link.route">{{ link.label }}</a>
+          @for (link of navigationLinks(); track link.labelKey) {
+            <a class="footer__link" [routerLink]="link.route" [queryParams]="linkQueryParams(link)">
+              {{ link.label ?? (link.labelKey | translate) }}
+            </a>
           }
         </nav>
       </div>

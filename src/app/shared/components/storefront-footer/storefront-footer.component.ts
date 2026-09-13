@@ -4,8 +4,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { StorefrontFooterContent } from '../../../features/home/models/storefront-content.model';
+import { StorefrontNavLinksService } from '../../../features/home/services/storefront-nav-links.service';
 import { PublicLegalSectionSummaryDto } from '../../../features/legal/models/legal-section.model';
 import { LegalService } from '../../../features/legal/services/legal.service';
+import { navLinkQueryParams } from '../../utils/storefront-nav.utils';
 import { StorefrontFooterContentService } from './storefront-footer-content.service';
 
 @Component({
@@ -72,9 +74,9 @@ export class StorefrontFooterComponent {
     ].filter((link) => !!link.url);
   });
 
-  protected readonly navigationLinks = [
-    { label: 'Marketplace', route: '/products' },
-    { label: 'Digital Products', route: '/products' },
-    { label: 'Subscriptions', route: '/products' },
-  ] as const;
+  // Admin-editable (Platform Settings → Storefront → Navigation Links), but gated by its own
+  // "Show in Footer" flag rather than the top-nav's "Visible" flag — hiding a category from the
+  // top nav bar shouldn't silently hide it from the footer too, and vice versa.
+  protected readonly navigationLinks = inject(StorefrontNavLinksService).footerLinks;
+  protected readonly linkQueryParams = navLinkQueryParams;
 }

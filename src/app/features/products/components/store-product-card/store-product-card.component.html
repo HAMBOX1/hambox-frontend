@@ -6,6 +6,16 @@
 >
   <a class="store-card__link" [routerLink]="['/products', product().id]">
     <div class="store-card__media">
+      @if (product().imageUrl) {
+        <img
+          class="store-card__image-bg"
+          [src]="product().imageUrl"
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+        />
+      }
+      <div class="store-card__media-backdrop" aria-hidden="true"></div>
       <img
         class="store-card__image"
         [src]="product().imageUrl"

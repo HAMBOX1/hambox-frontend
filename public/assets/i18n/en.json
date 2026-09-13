@@ -3084,17 +3084,22 @@
           }
         },
         "NAVIGATION": {
-          "TITLE_CARD": "Navigation Links",
-          "DESCRIPTION_CARD": "Labels shown in the top navigation bar and category filters across the whole site (not just the home page).",
+          "TITLE_CARD": "Top Navigation",
+          "DESCRIPTION_CARD": "Labels and visibility for the top navigation bar and category filters across the whole site (not just the home page). Turning a link off here does not remove it from the footer — that's controlled separately below.",
           "LABEL_EN": "Label (English)",
           "LABEL_AR": "Label (Arabic)",
-          "VISIBLE": "Visible",
+          "VISIBLE": "Visible in top nav",
           "IDS": {
             "games": "Games",
             "gift-cards": "Gift Cards / Digital Products",
             "subscriptions": "Subscriptions",
             "deals": "Deals"
           }
+        },
+        "FOOTER_NAVIGATION": {
+          "TITLE_CARD": "Footer Navigation",
+          "DESCRIPTION_CARD": "Choose which of the links above also show in the site footer's \"Navigation\" column. This is separate from the top navigation bar — turning a link off here does not affect the top nav.",
+          "SHOW_IN_FOOTER": "Show in footer"
         }
       }
     },

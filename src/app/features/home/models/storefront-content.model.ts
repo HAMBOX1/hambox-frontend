@@ -89,6 +89,7 @@ export interface StorefrontNavLinkContent {
   readonly labelEn: string;
   readonly labelAr: string;
   readonly visible: boolean;
+  readonly showInFooter: boolean;
 }
 
 export interface StorefrontSeoContent {

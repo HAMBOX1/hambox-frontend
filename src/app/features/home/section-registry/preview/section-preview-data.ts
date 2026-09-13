@@ -126,10 +126,10 @@ export const SECTION_PREVIEW_CONTEXT: SectionRenderContext = {
       canonicalUrl: '/',
     },
     navigationLinks: [
-      { id: 'games', labelEn: 'Games', labelAr: 'الألعاب', visible: true },
-      { id: 'gift-cards', labelEn: 'Digital Products', labelAr: 'منتجات رقمية', visible: true },
-      { id: 'subscriptions', labelEn: 'Subscriptions', labelAr: 'الاشتراكات', visible: true },
-      { id: 'deals', labelEn: 'Deals', labelAr: 'العروض', visible: true },
+      { id: 'games', labelEn: 'Games', labelAr: 'الألعاب', visible: true, showInFooter: true },
+      { id: 'gift-cards', labelEn: 'Digital Products', labelAr: 'منتجات رقمية', visible: true, showInFooter: true },
+      { id: 'subscriptions', labelEn: 'Subscriptions', labelAr: 'الاشتراكات', visible: true, showInFooter: true },
+      { id: 'deals', labelEn: 'Deals', labelAr: 'العروض', visible: true, showInFooter: true },
     ],
   },
   categories: [

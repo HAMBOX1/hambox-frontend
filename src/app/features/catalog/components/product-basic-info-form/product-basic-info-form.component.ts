@@ -159,8 +159,8 @@ export class ProductBasicInfoFormComponent {
   protected readonly form = this.fb.nonNullable.group({
     nameEn: ['', [Validators.required, Validators.maxLength(200)]],
     nameAr: ['', [Validators.maxLength(200)]],
-    descriptionEn: ['', [Validators.maxLength(2000)]],
-    descriptionAr: ['', [Validators.maxLength(2000)]],
+    descriptionEn: [''],
+    descriptionAr: [''],
     price: [0, [Validators.required, Validators.min(0)]],
     categoryId: ['', [Validators.required]],
     additionalCategoryIds: this.fb.nonNullable.control<readonly string[]>([]),

@@ -72,6 +72,19 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           // Refresh itself failed (cookie missing/expired/reused) — the session is gone; clear it
           // once here rather than once per failed request, and never retry, avoiding any loop.
           session.clearSession(context);
+
+          // Admin-only: on the storefront, a 401 can legitimately happen for an anonymous guest
+          // hitting a customer endpoint (no session to lose), so redirecting there would bounce
+          // browsing guests to a login screen for no reason. In the admin portal every route
+          // already requires a signed-in session, so a failed refresh always means that session
+          // just expired/rotated out from under them. Without this, they're left staring at the
+          // current screen with a raw, unrelated-looking backend error (e.g. a "publish" action
+          // surfacing Identity's "token is invalid or has already been used" message) and no way
+          // to recover short of manually navigating away — send them to sign back in instead.
+          if (context === AUTH_CONTEXT.Admin && !router.url.startsWith('/admin/login')) {
+            void router.navigate(['/admin/login'], { queryParams: { returnUrl: router.url } });
+          }
+
           return throwError(() => refreshError);
         }),
       );
