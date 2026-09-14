@@ -175,6 +175,30 @@ export interface BulkProductsResult {
   readonly errors: readonly string[];
 }
 
+/** Merges `sourceProductIds` into `targetProductId`: each source becomes a variant of the target
+ * (keeping its own price) and is then removed from the catalog. See backend `MergeProductsCommand`. */
+export interface MergeProductsRequest {
+  readonly targetProductId: string;
+  readonly sourceProductIds: readonly string[];
+  readonly confirmStockLoss: boolean;
+}
+
+export interface MergeProductsResult {
+  readonly targetProductId: string;
+  readonly createdVariantIds: readonly string[];
+  readonly mergedSourceCount: number;
+}
+
+/** Product counts per status, scoped by the current search/category/collection filter but not by
+ * status itself — badges the catalog page's status tabs. See backend `GetProductStatusCountsQuery`. */
+export interface ProductStatusCounts {
+  readonly all: number;
+  readonly draft: number;
+  readonly active: number;
+  readonly inactive: number;
+  readonly archived: number;
+}
+
 export interface ProductInventoryPlaceholders {
   readonly liveStock: string;
   readonly avgMargin: string;

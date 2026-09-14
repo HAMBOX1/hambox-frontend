@@ -113,7 +113,7 @@
     }
   </div>
 
-  @if (totalRecords() > pageSize()) {
+  @if (pageSize() !== -1 && totalRecords() > pageSize()) {
     <p-paginator
       [first]="first()"
       [rows]="pageSize()"

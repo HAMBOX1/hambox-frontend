@@ -24,6 +24,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { PermissionService } from '../../../../core/permissions/permission.service';
 import { ProductCatalogToolbarComponent } from '../../components/product-catalog-toolbar/product-catalog-toolbar.component';
+import { ProductCatalogStatusTabsComponent } from '../../components/product-catalog-status-tabs/product-catalog-status-tabs.component';
 import {
   ProductCatalogTableComponent,
   ProductFieldEdit,
@@ -31,6 +32,10 @@ import {
 } from '../../components/product-catalog-table/product-catalog-table.component';
 import { ProductCatalogCardsComponent } from '../../components/product-catalog-cards/product-catalog-cards.component';
 import { ProductDetailPanelComponent } from '../../components/product-detail-panel/product-detail-panel.component';
+import {
+  ProductMergeConfirmEvent,
+  ProductMergeDialogComponent,
+} from '../../components/product-merge-dialog/product-merge-dialog.component';
 import {
   PriceAdjustmentMode,
   Product,
@@ -94,9 +99,11 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
     ToastModule,
     HasPermissionDirective,
     ProductCatalogToolbarComponent,
+    ProductCatalogStatusTabsComponent,
     ProductCatalogTableComponent,
     ProductCatalogCardsComponent,
     ProductDetailPanelComponent,
+    ProductMergeDialogComponent,
     SupplierCatalogSearchDrawerComponent,
     AdminActionMenuComponent,
     AdminBulkBarComponent,
@@ -127,6 +134,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly loading = this.facade.loading;
   protected readonly searchTerm = this.facade.searchTerm;
   protected readonly statusFilter = this.facade.statusFilter;
+  protected readonly statusCounts = this.facade.statusCounts;
   protected readonly error = this.facade.error;
   protected readonly totalCount = this.facade.totalCount;
   protected readonly pageSize = this.facade.pageSize;
@@ -167,12 +175,31 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkAssignCollectionDialogOpen = signal(false);
   protected readonly bulkRemoveCollectionDialogOpen = signal(false);
   protected readonly bulkCreateCollectionDialogOpen = signal(false);
+  protected readonly bulkMergeDialogOpen = signal(false);
+  protected readonly bulkMergeNeedsStockConfirm = signal(false);
   protected readonly bulkDuplicateSuffix = signal(' Copy');
   protected readonly bulkTargetCategoryId = signal<string | null>(null);
   protected readonly bulkPriceMode = signal<PriceAdjustmentMode>('IncreasePercent');
   protected readonly bulkPriceValue = signal<number | null>(null);
   protected readonly bulkTargetCollectionId = signal<string | null>(null);
   protected readonly bulkNewCollectionName = signal('');
+
+  /** Bulk-selected products resolvable against the currently loaded page. Merge intentionally never
+   * targets "select all matching filter" (the admin must see exactly what they're merging), and it
+   * only works when every checked id is actually present on the current page — if selection spans
+   * pages (rare, since it survives navigation), the merge action stays hidden rather than silently
+   * merging a subset the admin didn't visually confirm. */
+  protected readonly mergeableSelectedProducts = computed(() => {
+    const selected = this.bulkSelectedIds();
+    return this.items().filter((product) => selected.has(product.id));
+  });
+
+  protected readonly canBulkMerge = computed(
+    () =>
+      !this.selectAllMatchingActive() &&
+      this.bulkSelectedIds().size >= 2 &&
+      this.mergeableSelectedProducts().length === this.bulkSelectedIds().size,
+  );
 
   protected readonly bulkMoreMenuItems = computed<MenuItem[]>(() => {
     const t = (key: string) => this.translate.instant(key);
@@ -195,6 +222,13 @@ export class ProductCatalogPageComponent implements OnInit {
         icon: 'pi pi-dollar',
         command: () => this.bulkPriceDialogOpen.set(true),
       });
+      if (this.canBulkMerge()) {
+        items.push({
+          label: t('ADMIN.CATALOG_PAGE.BULK.MERGE'),
+          icon: 'pi pi-sitemap',
+          command: () => this.openBulkMergeDialog(),
+        });
+      }
     }
     if (this.permissionService.hasPermission(this.permissions.Catalog.Collections.Edit)) {
       items.push({
@@ -302,8 +336,6 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onPageChange(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.facade.pageSize();
-    const first = event.first ?? 0;
-    const pageNumber = Math.floor(first / rows) + 1;
 
     const sortField = typeof event.sortField === 'string' ? event.sortField : null;
     if (sortField && event.sortOrder) {
@@ -313,12 +345,27 @@ export class ProductCatalogPageComponent implements OnInit {
       this.facade.setSort(null);
     }
 
+    if (rows === -1) {
+      // -1 is the "show all" sentinel (see showAllRows) — never reachable through the paginator's
+      // own math, but guarded here defensively since PrimeNG still fires onLazyLoad after it.
+      this.facade.setPage(1, -1);
+      return;
+    }
+
+    const first = event.first ?? 0;
+    const pageNumber = Math.floor(first / rows) + 1;
     this.facade.setPage(pageNumber, rows);
   }
 
   protected onCardsPageChange(event: { first: number; rows: number }): void {
     const pageNumber = Math.floor(event.first / event.rows) + 1;
     this.facade.setPage(pageNumber, event.rows);
+  }
+
+  /** "Show all" bypasses PrimeNG's own rows-per-page dropdown (which has no way to label an entry
+   * "All") with a dedicated button that requests the backend's pageSize=-1 sentinel directly. */
+  protected showAllRows(): void {
+    this.facade.setPage(1, -1);
   }
 
   protected onViewModeChange(mode: AdminProductsViewMode): void {
@@ -569,9 +616,16 @@ export class ProductCatalogPageComponent implements OnInit {
     this.bulkAnchorId.set(event.productId);
   }
 
+  /** Checking "select all" on the header checkbox now jumps straight to "all N matching the
+   * filter" whenever there's more beyond the loaded page, instead of requiring a second explicit
+   * click on a separate "select all matching" prompt — see `selectPageOnly` for the fallback. */
   protected onBulkToggleAllPage(selectAll: boolean): void {
     if (selectAll) {
-      this.facade.selectAllOnPage();
+      if (this.totalCount() > this.items().length) {
+        this.facade.selectAllMatchingFilter();
+      } else {
+        this.facade.selectAllOnPage();
+      }
     } else {
       this.facade.clearBulkSelection();
     }
@@ -579,6 +633,12 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected selectAllMatchingFilter(): void {
     this.facade.selectAllMatchingFilter();
+  }
+
+  /** Fallback for when the automatic "select all matching" escalation in `onBulkToggleAllPage`
+   * wasn't what the admin wanted — narrows back down to just the currently loaded page. */
+  protected selectPageOnly(): void {
+    this.facade.selectAllOnPage();
   }
 
   protected clearBulkSelection(): void {
@@ -662,6 +722,45 @@ export class ProductCatalogPageComponent implements OnInit {
     );
     this.bulkCreateCollectionDialogOpen.set(false);
     this.bulkNewCollectionName.set('');
+  }
+
+  protected openBulkMergeDialog(): void {
+    this.bulkMergeNeedsStockConfirm.set(false);
+    this.bulkMergeDialogOpen.set(true);
+  }
+
+  /** Unlike the other confirmBulk* handlers this doesn't go through `runBulkAction` — a stock-loss
+   * conflict from the backend must re-open the SAME dialog with a confirmation checkbox rather than
+   * being treated as a terminal error, so `facade.mergeProducts` reports that case separately. */
+  protected async confirmBulkMerge(event: ProductMergeConfirmEvent): Promise<void> {
+    const { result, requiresStockLossConfirmation } = await this.facade.mergeProducts(
+      event.targetProductId,
+      event.sourceProductIds,
+      event.confirmStockLoss,
+    );
+
+    if (requiresStockLossConfirmation) {
+      this.bulkMergeNeedsStockConfirm.set(true);
+      return;
+    }
+
+    if (result) {
+      this.bulkMergeDialogOpen.set(false);
+      this.bulkMergeNeedsStockConfirm.set(false);
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION'),
+        detail: `${result.mergedSourceCount} product(s) merged.`,
+        life: 4000,
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Merge failed',
+        detail: this.facade.bulkError() ?? 'Failed to merge products.',
+        life: 5000,
+      });
+    }
   }
 
   protected async confirmBulkPriceAdjust(): Promise<void> {

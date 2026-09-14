@@ -1,0 +1,66 @@
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.MERGE_TITLE' | translate"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  (onShow)="onDialogShow()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(30rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="admin-field">
+    <label class="admin-field__label">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_TARGET_LABEL' | translate }}</label>
+    <div class="product-merge-dialog__options">
+      @for (product of products(); track product.id) {
+        <label class="product-merge-dialog__option">
+          <p-radioButton
+            name="mergeTarget"
+            [value]="product.id"
+            [ngModel]="targetProductId()"
+            (ngModelChange)="selectTarget($event)"
+          />
+          <span>{{ product.nameEn }}</span>
+        </label>
+      }
+    </div>
+    @if (sourceProducts().length > 0) {
+      <p class="admin-field__hint">
+        {{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_SOURCES_HINT' | translate: { count: sourceProducts().length } }}
+      </p>
+    }
+  </div>
+
+  @if (needsStockLossConfirmation()) {
+    <div class="admin-field product-merge-dialog__warning">
+      <p>{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_STOCK_WARNING' | translate }}</p>
+      <label class="product-merge-dialog__checkbox">
+        <p-checkbox
+          [binary]="true"
+          [ngModel]="stockLossAcknowledged()"
+          (ngModelChange)="stockLossAcknowledged.set($event)"
+        />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_CONFIRM_STOCK_LOSS' | translate }}
+      </label>
+    </div>
+  }
+
+  <div class="admin-dialog__actions">
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="onVisibleChange(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION' | translate"
+      icon="pi pi-sitemap"
+      [disabled]="!targetProductId() || (needsStockLossConfirmation() && !stockLossAcknowledged())"
+      [loading]="loading()"
+      (click)="confirm()"
+    ></button>
+  </div>
+</p-dialog>

@@ -10,6 +10,8 @@ import {
   BulkProductAction,
   BulkProductsResult,
   CreateProductRequest,
+  MergeProductsRequest,
+  MergeProductsResult,
   PriceAdjustmentMode,
   Product,
   ProductBulkSelection,
@@ -17,6 +19,7 @@ import {
   ProductFacetQuery,
   ProductImage,
   ProductListQuery,
+  ProductStatusCounts,
   UpdateProductRequest,
 } from '../models/product.model';
 import { productStatusToApi } from '../utils/product-display.utils';
@@ -182,6 +185,29 @@ export class ProductApiService {
       ...this.selectionBody(selection),
       nameSuffix: nameSuffix ?? null,
     });
+  }
+
+  mergeProducts(request: MergeProductsRequest): Observable<MergeProductsResult> {
+    return this.api.post<MergeProductsResult>(CATALOG_API.productsBulkMerge, request);
+  }
+
+  getProductStatusCounts(query: { searchTerm?: string; categoryId?: string; collectionId?: string }): Observable<ProductStatusCounts> {
+    const params: Record<string, string> = {};
+
+    const searchTerm = query.searchTerm?.trim();
+    if (searchTerm) {
+      params['searchTerm'] = searchTerm;
+    }
+
+    if (query.categoryId) {
+      params['categoryId'] = query.categoryId;
+    }
+
+    if (query.collectionId) {
+      params['collectionId'] = query.collectionId;
+    }
+
+    return this.api.get<ProductStatusCounts>(CATALOG_API.productStatusCounts, { params });
   }
 
   exportProducts(selection: ProductBulkSelection): Observable<Blob> {

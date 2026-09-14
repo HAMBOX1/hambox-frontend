@@ -1004,8 +1004,23 @@
         "PRICE_FIXED": "تحديد قيمة ثابتة",
         "PRICE_PERCENT_LABEL": "النسبة المئوية",
         "PRICE_NEW_LABEL": "السعر الجديد",
-        "APPLY": "تطبيق"
+        "APPLY": "تطبيق",
+        "MERGE": "دمج في منتج واحد",
+        "MERGE_TITLE": "دمج المنتجات",
+        "MERGE_TARGET_LABEL": "اختر المنتج اللي هيفضل رئيسيًا",
+        "MERGE_SOURCES_HINT": "باقي {{count}} منتج محدد هيتحولوا لخيارات (variants) تحت المنتج ده ومش هيظهروا لوحدهم في الكتالوج بعد كده.",
+        "MERGE_STOCK_WARNING": "بعض المنتجات دي عندها مخزون مسجل مش هينتقل تلقائيًا وهيتفقد لو كملت.",
+        "MERGE_CONFIRM_STOCK_LOSS": "فاهم، كمّل الدمج",
+        "MERGE_ACTION": "دمج",
+        "SELECT_PAGE_ONLY": "تحديد الصفحة الظاهرة بس"
       },
+      "STATUS_TABS": {
+        "ALL": "الكل",
+        "DRAFT": "مسودة",
+        "LIVE": "مباشر",
+        "ARCHIVED": "مؤرشف"
+      },
+      "SHOW_ALL_ROWS": "عرض الكل",
       "STOCK": {
         "IN_STOCK": "{{count}} متوفر",
         "ADD_STOCK": "انقر لإضافة مخزون",

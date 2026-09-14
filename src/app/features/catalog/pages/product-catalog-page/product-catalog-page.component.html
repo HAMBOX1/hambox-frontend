@@ -60,6 +60,12 @@
     />
   </app-admin-page-header>
 
+  <app-product-catalog-status-tabs
+    [activeStatus]="statusFilter()"
+    [counts]="statusCounts()"
+    (statusChange)="onStatusFilterChange($event)"
+  />
+
   <app-product-catalog-toolbar
     [searchTerm]="searchTerm()"
     [statusFilter]="statusFilter()"
@@ -89,6 +95,16 @@
         size="small"
         [label]="'ADMIN.CATALOG_PAGE.BULK.SELECT_ALL_MATCHING' | translate: { count: totalCount() }"
         (click)="selectAllMatchingFilter()"
+      ></button>
+    }
+    @if (selectAllMatchingActive()) {
+      <button
+        pButton
+        type="button"
+        [text]="true"
+        size="small"
+        [label]="'ADMIN.CATALOG_PAGE.BULK.SELECT_PAGE_ONLY' | translate"
+        (click)="selectPageOnly()"
       ></button>
     }
     <button
@@ -140,6 +156,20 @@
       [disabled]="bulkActionLoading()"
     />
   </app-admin-bulk-bar>
+
+  @if (pageSize() !== -1) {
+    <div class="product-catalog-page__show-all">
+      <button
+        pButton
+        type="button"
+        [text]="true"
+        size="small"
+        icon="pi pi-list"
+        [label]="'ADMIN.CATALOG_PAGE.SHOW_ALL_ROWS' | translate"
+        (click)="showAllRows()"
+      ></button>
+    </div>
+  }
 
   @if (viewMode() === 'table') {
     <app-product-catalog-table
@@ -597,6 +627,15 @@
     ></button>
   </div>
 </p-dialog>
+
+<app-product-merge-dialog
+  [visible]="bulkMergeDialogOpen()"
+  [products]="mergeableSelectedProducts()"
+  [loading]="bulkActionLoading()"
+  [needsStockLossConfirmation]="bulkMergeNeedsStockConfirm()"
+  (visibleChange)="bulkMergeDialogOpen.set($event)"
+  (confirmed)="confirmBulkMerge($event)"
+/>
 
 <app-supplier-catalog-search-drawer
   [target]="mappingDrawerTarget()"

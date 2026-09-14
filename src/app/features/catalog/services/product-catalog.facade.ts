@@ -9,11 +9,13 @@ import { CategoryOption } from '../models/category.model';
 import { CollectionOption } from '../models/collection.model';
 import {
   BulkProductsResult,
+  MergeProductsResult,
   PriceAdjustmentMode,
   Product,
   ProductBulkSelection,
   ProductSortBy,
   ProductStatus,
+  ProductStatusCounts,
   UpdateProductRequest,
 } from '../models/product.model';
 import { toUpdateProductRequest } from '../utils/product-display.utils';
@@ -61,6 +63,7 @@ export class ProductCatalogFacade {
   private readonly selectAllMatchingState = signal(false);
   private readonly bulkActionLoadingState = signal(false);
   private readonly bulkErrorState = signal<string | null>(null);
+  private readonly statusCountsState = signal<ProductStatusCounts | null>(null);
 
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   private hasLoaded = false;
@@ -104,6 +107,7 @@ export class ProductCatalogFacade {
   readonly selectAllMatchingActive = this.selectAllMatchingState.asReadonly();
   readonly bulkActionLoading = this.bulkActionLoadingState.asReadonly();
   readonly bulkError = this.bulkErrorState.asReadonly();
+  readonly statusCounts = this.statusCountsState.asReadonly();
 
   readonly bulkSelectedCount = computed(() =>
     this.selectAllMatchingState() ? this.totalCountState() : this.bulkSelectedIdsState().size,
@@ -497,6 +501,46 @@ export class ProductCatalogFacade {
     return this.runBulkAction(() => this.api.bulkDuplicateProducts(this.currentBulkSelection(), nameSuffix));
   }
 
+  /**
+   * Merges `sourceProductIds` into `targetProductId` (each source becomes a variant of the target,
+   * keeping its own price, and is removed from the catalog). Unlike the other bulk actions this never
+   * runs against "select all matching filter" — the caller must pass an explicit, visually-confirmed
+   * id list — so it doesn't go through `currentBulkSelection()`/`runBulkAction()`. On a stock-loss
+   * conflict (some source has raw stock that can't be carried over into the variant model) this
+   * returns `requiresStockLossConfirmation: true` instead of setting `bulkError`, so the merge dialog
+   * can re-prompt with the confirmation checkbox rather than showing a dead-end error toast.
+   */
+  async mergeProducts(
+    targetProductId: string,
+    sourceProductIds: readonly string[],
+    confirmStockLoss: boolean,
+  ): Promise<{ result: MergeProductsResult | null; requiresStockLossConfirmation: boolean }> {
+    this.bulkActionLoadingState.set(true);
+    this.bulkErrorState.set(null);
+
+    try {
+      const result = await firstValueFrom(
+        this.api.mergeProducts({
+          targetProductId,
+          sourceProductIds: [...sourceProductIds],
+          confirmStockLoss,
+        }),
+      );
+      this.clearBulkSelection();
+      await this.fetchProducts(true);
+      return { result, requiresStockLossConfirmation: false };
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'Products.MergeStockLossRequiresConfirmation') {
+        return { result: null, requiresStockLossConfirmation: true };
+      }
+
+      this.bulkErrorState.set(this.toErrorMessage(error, 'Failed to merge products.'));
+      return { result: null, requiresStockLossConfirmation: false };
+    } finally {
+      this.bulkActionLoadingState.set(false);
+    }
+  }
+
   async exportSelected(): Promise<Blob | null> {
     this.bulkActionLoadingState.set(true);
     this.bulkErrorState.set(null);
@@ -566,6 +610,7 @@ export class ProductCatalogFacade {
       const sortBy = this.sortByState();
       const collectionId = this.collectionFilterState();
       const supplierMappingProductIds = this.supplierMappingFilterProductIdsState();
+      const requestedPageNumber = this.pageNumberState();
       const result = await firstValueFrom(
         this.api.getProducts({
           pageNumber: this.pageNumberState(),
@@ -586,6 +631,12 @@ export class ProductCatalogFacade {
       this.hasLoaded = true;
       this.syncSelection(items);
       void this.refreshMappingStatusForVisibleProducts(items);
+      if (requestedPageNumber === 1) {
+        // Only re-fetch tab badge counts on a fresh filter/search (not on every page/sort change) —
+        // a page-1 request is exactly what setSearchTerm/setStatusFilter/setCollectionFilter/setSort
+        // all force via pageNumberState.set(1) before calling here.
+        void this.refreshStatusCounts();
+      }
     } catch (error) {
       this.itemsState.set([]);
       this.totalCountState.set(0);
@@ -613,6 +664,23 @@ export class ProductCatalogFacade {
       this.mappingStatusByProductIdState.set(new Map(Object.entries(statusByProductId)));
     } catch {
       // Best-effort enrichment only — the product list itself already loaded successfully.
+    }
+  }
+
+  /** Badge counts for the status tabs — scoped by search/collection like the main list, but never
+   * by status itself, so every tab shows its own count regardless of which one is active. Best-effort:
+   * a failure here just leaves the tab badges stale/hidden, never blocks the product list. */
+  private async refreshStatusCounts(): Promise<void> {
+    try {
+      const counts = await firstValueFrom(
+        this.api.getProductStatusCounts({
+          searchTerm: this.searchTermState().trim() || undefined,
+          collectionId: this.collectionFilterState() ?? undefined,
+        }),
+      );
+      this.statusCountsState.set(counts);
+    } catch {
+      // Best-effort enrichment only.
     }
   }
 

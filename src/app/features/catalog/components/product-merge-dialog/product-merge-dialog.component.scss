@@ -1,0 +1,29 @@
+.product-merge-dialog__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-field-gap, 0.75rem);
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.product-merge-dialog__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-merge-dialog__warning {
+  border: 1px solid var(--color-warning, #d97706);
+  border-radius: var(--admin-radius-md, 0.5rem);
+  padding: 0.75rem;
+
+  p {
+    margin: 0 0 0.5rem;
+  }
+}
+
+.product-merge-dialog__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}

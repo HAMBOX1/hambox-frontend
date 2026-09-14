@@ -7,6 +7,11 @@
   width: 100%;
 }
 
+.product-catalog-page__show-all {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .product-catalog-page__price-mode-options {
   display: flex;
   flex-direction: column;

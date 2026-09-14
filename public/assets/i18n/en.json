@@ -1011,8 +1011,23 @@
         "PRICE_FIXED": "Set fixed value",
         "PRICE_PERCENT_LABEL": "Percent",
         "PRICE_NEW_LABEL": "New price",
-        "APPLY": "Apply"
+        "APPLY": "Apply",
+        "MERGE": "Merge into one product",
+        "MERGE_TITLE": "Merge products",
+        "MERGE_TARGET_LABEL": "Choose the product to keep as the parent",
+        "MERGE_SOURCES_HINT": "The other {{count}} selected product(s) will become variants of this one and will no longer appear on their own in the catalog.",
+        "MERGE_STOCK_WARNING": "Some of these products have recorded stock that cannot be carried over automatically and will be lost if you continue.",
+        "MERGE_CONFIRM_STOCK_LOSS": "I understand, merge anyway",
+        "MERGE_ACTION": "Merge",
+        "SELECT_PAGE_ONLY": "Select this page only"
       },
+      "STATUS_TABS": {
+        "ALL": "All",
+        "DRAFT": "Draft",
+        "LIVE": "Live",
+        "ARCHIVED": "Archived"
+      },
+      "SHOW_ALL_ROWS": "Show all",
       "STOCK": {
         "IN_STOCK": "{{count}} in stock",
         "ADD_STOCK": "Click to add stock",

@@ -25,6 +25,8 @@ export const CATALOG_API = {
   productsBulkDelete: '/api/v1/products/bulk-delete',
   productsBulkDuplicate: '/api/v1/products/bulk-duplicate',
   productsBulkExport: '/api/v1/products/bulk-export',
+  productsBulkMerge: '/api/v1/products/bulk-merge',
+  productStatusCounts: '/api/v1/products/status-counts',
   productImages: (productId: string) => `/api/v1/products/${productId}/images`,
   productImage: (productId: string, imageId: string) =>
     `/api/v1/products/${productId}/images/${imageId}`,

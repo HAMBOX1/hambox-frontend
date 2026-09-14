@@ -1,0 +1,17 @@
+<div class="product-catalog-status-tabs" role="tablist">
+  @for (tab of tabs(); track tab.value) {
+    <button
+      type="button"
+      role="tab"
+      class="product-catalog-status-tabs__tab"
+      [class.product-catalog-status-tabs__tab--active]="tab.value === activeStatus()"
+      [attr.aria-selected]="tab.value === activeStatus()"
+      (click)="select(tab.value)"
+    >
+      <span>{{ tab.labelKey | translate }}</span>
+      @if (tab.count !== null) {
+        <span class="product-catalog-status-tabs__count">{{ tab.count }}</span>
+      }
+    </button>
+  }
+</div>
