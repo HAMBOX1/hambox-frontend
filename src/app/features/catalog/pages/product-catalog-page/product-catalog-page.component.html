@@ -628,6 +628,15 @@
   </div>
 </p-dialog>
 
+<app-admin-confirm-dialog
+  [visible]="showAllConfirmDialogOpen()"
+  [title]="'ADMIN.CATALOG_PAGE.SHOW_ALL_CONFIRM_TITLE' | translate"
+  [message]="'ADMIN.CATALOG_PAGE.SHOW_ALL_CONFIRM_MESSAGE' | translate: { count: totalCount() }"
+  [loading]="loading()"
+  (visibleChange)="showAllConfirmDialogOpen.set($event)"
+  (confirmed)="confirmShowAllRows()"
+/>
+
 <app-product-merge-dialog
   [visible]="bulkMergeDialogOpen()"
   [products]="mergeableSelectedProducts()"

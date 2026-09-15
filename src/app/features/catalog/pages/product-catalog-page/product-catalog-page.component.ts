@@ -63,6 +63,9 @@ import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-brea
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { computeRangeIds } from '../../../../shared/utils/selection.utils';
 
+/** Above this many matching products, "Show all" warns before loading — see `showAllRows`. */
+const SHOW_ALL_WARN_THRESHOLD = 300;
+
 const SORT_FIELD_TO_ENUM: Record<string, { asc: ProductSortBy; desc: ProductSortBy }> = {
   nameEn: { asc: 'NameAsc', desc: 'NameDesc' },
   categoryName: { asc: 'CategoryAsc', desc: 'CategoryDesc' },
@@ -177,6 +180,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkCreateCollectionDialogOpen = signal(false);
   protected readonly bulkMergeDialogOpen = signal(false);
   protected readonly bulkMergeNeedsStockConfirm = signal(false);
+  protected readonly showAllConfirmDialogOpen = signal(false);
   protected readonly bulkDuplicateSuffix = signal(' Copy');
   protected readonly bulkTargetCategoryId = signal<string | null>(null);
   protected readonly bulkPriceMode = signal<PriceAdjustmentMode>('IncreasePercent');
@@ -363,9 +367,22 @@ export class ProductCatalogPageComponent implements OnInit {
   }
 
   /** "Show all" bypasses PrimeNG's own rows-per-page dropdown (which has no way to label an entry
-   * "All") with a dedicated button that requests the backend's pageSize=-1 sentinel directly. */
+   * "All") with a dedicated button that requests the backend's pageSize=-1 sentinel directly.
+   * Neither view renders its rows virtually, so confirm first past a size where rendering every
+   * row (with its thumbnail) at once would visibly stall the tab — verified in production: ~2500
+   * products froze the page for 30+ seconds. */
   protected showAllRows(): void {
+    if (this.totalCount() > SHOW_ALL_WARN_THRESHOLD) {
+      this.showAllConfirmDialogOpen.set(true);
+      return;
+    }
+
     this.facade.setPage(1, -1);
+  }
+
+  protected confirmShowAllRows(): void {
+    this.facade.setPage(1, -1);
+    this.showAllConfirmDialogOpen.set(false);
   }
 
   protected onViewModeChange(mode: AdminProductsViewMode): void {

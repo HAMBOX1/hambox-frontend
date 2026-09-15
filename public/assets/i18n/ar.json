@@ -1021,6 +1021,8 @@
         "ARCHIVED": "مؤرشف"
       },
       "SHOW_ALL_ROWS": "عرض الكل",
+      "SHOW_ALL_CONFIRM_TITLE": "تحميل كل المنتجات؟",
+      "SHOW_ALL_CONFIRM_MESSAGE": "ده هيحمّل كل الـ {{count}} منتج المطابق في صفحة واحدة، وممكن يبقى بطيء. تحب تكمل؟",
       "STOCK": {
         "IN_STOCK": "{{count}} متوفر",
         "ADD_STOCK": "انقر لإضافة مخزون",
