@@ -46,6 +46,122 @@
     (confirmed)="confirmDeleteGroup()"
   />
 
+  <p-dialog
+    [header]="group().displayName + ' — General Instructions'"
+    [visible]="groupInstructionsOpen()"
+    (visibleChange)="!$event && closeGroupInstructions()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(32rem, 94vw)' }"
+    styleClass="admin-dialog"
+  >
+    <p-editor
+      [ngModel]="groupInstructionsDraft()"
+      (ngModelChange)="groupInstructionsDraft.set($event)"
+      [style]="{ height: '180px' }"
+    />
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingGroupInstructions()" (click)="closeGroupInstructions()"></button>
+      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingGroupInstructions()" (click)="saveGroupInstructions()"></button>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    [header]="group().displayName + ' — ' + (instructionsOptionLabel() ?? '')"
+    [visible]="instructionsOptionId() !== null"
+    (visibleChange)="!$event && closeInstructions()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(32rem, 94vw)' }"
+    styleClass="admin-dialog"
+  >
+    <div class="admin-field instructions-dialog__saved-description">
+      <div class="instructions-dialog__saved-description-row">
+        <p-iconField iconPosition="right" class="instructions-dialog__saved-description-field">
+          <p-inputIcon styleClass="pi pi-search" />
+          <p-autoComplete
+            inputId="mobile-instructions-saved-description"
+            [ngModel]="descriptionTemplateQuery()"
+            (ngModelChange)="descriptionTemplateQuery.set($event)"
+            [suggestions]="[...descriptionTemplateSuggestions()]"
+            (completeMethod)="searchDescriptionTemplates($event)"
+            (onSelect)="onDescriptionTemplateSelected($event)"
+            optionLabel="name"
+            [dropdown]="false"
+            [forceSelection]="false"
+            placeholder="Search saved descriptions..."
+            emptyMessage="No matches"
+            styleClass="instructions-dialog__saved-description-input"
+          />
+        </p-iconField>
+        <app-admin-icon-button icon="pi pi-cog" label="Manage saved descriptions" (pressed)="openDescriptionTemplateManager()" />
+      </div>
+    </div>
+
+    <div class="instructions-dialog__field-header">
+      <span class="admin-field__label">Content</span>
+      <app-admin-icon-button
+        icon="pi pi-bookmark"
+        label="Save as reusable"
+        [disabled]="!instructionsDraft().trim()"
+        (pressed)="openSaveDescriptionDialog()"
+      />
+    </div>
+    <p-editor
+      [ngModel]="instructionsDraft()"
+      (ngModelChange)="instructionsDraft.set($event)"
+      [style]="{ height: '180px' }"
+    />
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
+      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    header="Save as reusable description"
+    [visible]="saveDescriptionDialogOpen()"
+    (visibleChange)="saveDescriptionDialogOpen.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(26rem, 92vw)' }"
+    styleClass="admin-dialog"
+  >
+    <div class="admin-field">
+      <label class="admin-field__label" for="mobile-save-description-name">Name</label>
+      <input
+        pInputText
+        id="mobile-save-description-name"
+        class="admin-field__input"
+        [ngModel]="saveDescriptionName()"
+        (ngModelChange)="saveDescriptionName.set($event)"
+        placeholder="e.g. Argentina region requirements"
+        (keyup.enter)="confirmSaveDescription()"
+      />
+    </div>
+    @if (saveDescriptionError()) {
+      <p class="question-card__save-template-error">{{ saveDescriptionError() }}</p>
+    }
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingDescriptionTemplate()" (click)="saveDescriptionDialogOpen.set(false)"></button>
+      <button
+        pButton
+        type="button"
+        label="Save"
+        icon="pi pi-check"
+        [loading]="savingDescriptionTemplate()"
+        [disabled]="!saveDescriptionName().trim()"
+        (click)="confirmSaveDescription()"
+      ></button>
+    </div>
+  </p-dialog>
+
   @if (editingGroup() && group().parentOptionId !== null) {
     <label class="mobile-question-card__required-toggle">
       <p-checkbox [binary]="true" [ngModel]="editingGroupRequired()" (ngModelChange)="editingGroupRequired.set($event)" />

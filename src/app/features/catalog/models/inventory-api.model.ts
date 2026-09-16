@@ -16,6 +16,7 @@ export interface ProductOptionGroupDto {
   readonly sortOrder: number;
   readonly isRequired: boolean;
   readonly options: readonly ProductOptionDto[];
+  readonly descriptionHtml?: string | null;
 }
 
 /** Matches backend `HAMBOX.Modules.Catalog.Domain.Enums.FulfillmentMode`. */
@@ -267,6 +268,7 @@ export interface UpdateOptionGroupRequest {
   readonly displayName: string;
   readonly sortOrder: number;
   readonly isRequired: boolean;
+  readonly descriptionHtml?: string | null;
 }
 
 export interface UpdateOptionRequest {

@@ -1,16 +1,21 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
+import { EditorModule } from 'primeng/editor';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { PermissionService } from '../../../../core/permissions/permission.service';
-import { AdminActionMenuComponent, AdminConfirmDialogComponent } from '../../../../shared/components/admin';
+import { AdminActionMenuComponent, AdminConfirmDialogComponent, AdminIconButtonComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { LongPressDirective } from '../../../../shared/directives/long-press.directive';
-import { ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
+import { OptionDescriptionTemplateDto, ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
 
@@ -25,13 +30,19 @@ import { slugify } from '../../utils/product-display.utils';
   standalone: true,
   imports: [
     FormsModule,
+    AutoCompleteModule,
     ButtonModule,
     CheckboxModule,
+    DialogModule,
+    EditorModule,
+    IconFieldModule,
+    InputIconModule,
     InputTextModule,
     HasPermissionDirective,
     LongPressDirective,
     AdminActionMenuComponent,
     AdminConfirmDialogComponent,
+    AdminIconButtonComponent,
     ProductOptionMobileGroupCardComponent,
   ],
   templateUrl: './product-option-mobile-group-card.component.html',
@@ -70,6 +81,22 @@ export class ProductOptionMobileGroupCardComponent {
   protected readonly newFollowupRequired = signal(true);
   protected readonly creatingFollowup = signal(false);
   protected readonly deleteDialogOpen = signal(false);
+
+  protected readonly instructionsOptionId = signal<string | null>(null);
+  protected readonly instructionsDraft = signal('');
+  protected readonly savingInstructions = signal(false);
+
+  protected readonly descriptionTemplateQuery = signal<string | OptionDescriptionTemplateDto>('');
+  protected readonly descriptionTemplateSuggestions = signal<readonly OptionDescriptionTemplateDto[]>([]);
+
+  protected readonly saveDescriptionDialogOpen = signal(false);
+  protected readonly saveDescriptionName = signal('');
+  protected readonly savingDescriptionTemplate = signal(false);
+  protected readonly saveDescriptionError = signal<string | null>(null);
+
+  protected readonly groupInstructionsOpen = signal(false);
+  protected readonly groupInstructionsDraft = signal('');
+  protected readonly savingGroupInstructions = signal(false);
 
   protected sortedOptions(): readonly ProductOptionDto[] {
     return [...this.group().options].sort((left, right) => left.sortOrder - right.sortOrder);
@@ -124,6 +151,11 @@ export class ProductOptionMobileGroupCardComponent {
 
   protected groupMenuItems(): MenuItem[] {
     const items: MenuItem[] = [
+      {
+        label: this.group().descriptionHtml ? 'Edit group instructions' : 'Add group instructions',
+        icon: 'pi pi-info-circle',
+        command: () => this.openGroupInstructions(),
+      },
       { label: 'Edit option group', icon: 'pi pi-pencil', command: () => this.startEditGroup() },
     ];
     if (this.canReorderGroup()) {
@@ -138,6 +170,11 @@ export class ProductOptionMobileGroupCardComponent {
 
   protected optionMenuItems(option: ProductOptionDto): MenuItem[] {
     return [
+      {
+        label: option.descriptionHtml ? 'Edit instructions' : 'Add instructions',
+        icon: 'pi pi-info-circle',
+        command: () => this.openInstructions(option),
+      },
       { label: 'Edit option', icon: 'pi pi-pencil', command: () => this.startEditOption(option) },
       { label: 'Move up', icon: 'pi pi-arrow-up', command: () => this.moveOption(option, -1) },
       { label: 'Move down', icon: 'pi pi-arrow-down', command: () => this.moveOption(option, 1) },
@@ -168,10 +205,36 @@ export class ProductOptionMobileGroupCardComponent {
         displayName: label,
         sortOrder: this.group().sortOrder,
         isRequired: this.editingGroupRequired(),
+        descriptionHtml: this.group().descriptionHtml,
       });
       this.cancelEditGroup();
     } finally {
       this.savingGroup.set(false);
+    }
+  }
+
+  protected openGroupInstructions(): void {
+    this.groupInstructionsDraft.set(this.group().descriptionHtml ?? '');
+    this.groupInstructionsOpen.set(true);
+  }
+
+  protected closeGroupInstructions(): void {
+    this.groupInstructionsOpen.set(false);
+    this.groupInstructionsDraft.set('');
+  }
+
+  protected async saveGroupInstructions(): Promise<void> {
+    this.savingGroupInstructions.set(true);
+    try {
+      await this.facade.updateOptionGroup(this.group().id, {
+        displayName: this.group().displayName,
+        sortOrder: this.group().sortOrder,
+        isRequired: this.group().isRequired,
+        descriptionHtml: this.groupInstructionsDraft().trim() || null,
+      });
+      this.closeGroupInstructions();
+    } finally {
+      this.savingGroupInstructions.set(false);
     }
   }
 
@@ -210,10 +273,90 @@ export class ProductOptionMobileGroupCardComponent {
       await this.facade.updateOption(option.id, {
         label,
         sortOrder: option.sortOrder,
+        descriptionHtml: option.descriptionHtml,
       });
       this.cancelEditOption();
     } finally {
       this.savingOption.set(false);
+    }
+  }
+
+  protected instructionsOptionLabel(): string | null {
+    const optionId = this.instructionsOptionId();
+    return this.group().options.find((option) => option.id === optionId)?.label ?? null;
+  }
+
+  protected openInstructions(option: ProductOptionDto): void {
+    this.instructionsOptionId.set(option.id);
+    this.instructionsDraft.set(option.descriptionHtml ?? '');
+    this.descriptionTemplateQuery.set('');
+    this.descriptionTemplateSuggestions.set([]);
+  }
+
+  protected closeInstructions(): void {
+    this.instructionsOptionId.set(null);
+    this.instructionsDraft.set('');
+    this.descriptionTemplateQuery.set('');
+  }
+
+  protected async searchDescriptionTemplates(event: AutoCompleteCompleteEvent): Promise<void> {
+    this.descriptionTemplateSuggestions.set(await this.facade.searchOptionDescriptionTemplates(event.query));
+  }
+
+  protected onDescriptionTemplateSelected(event: AutoCompleteSelectEvent): void {
+    const template = event.value as OptionDescriptionTemplateDto;
+    this.instructionsDraft.set(template.descriptionHtml);
+    this.descriptionTemplateQuery.set('');
+  }
+
+  protected openDescriptionTemplateManager(): void {
+    this.facade.openDescriptionTemplateManager();
+  }
+
+  protected openSaveDescriptionDialog(): void {
+    this.saveDescriptionError.set(null);
+    this.saveDescriptionName.set('');
+    this.saveDescriptionDialogOpen.set(true);
+  }
+
+  protected async confirmSaveDescription(): Promise<void> {
+    const name = this.saveDescriptionName().trim();
+    const descriptionHtml = this.instructionsDraft().trim();
+    if (!name || !descriptionHtml) {
+      return;
+    }
+
+    this.savingDescriptionTemplate.set(true);
+    this.saveDescriptionError.set(null);
+    try {
+      const success = await this.facade.createOptionDescriptionTemplate({ name, descriptionHtml });
+      if (success) {
+        this.saveDescriptionDialogOpen.set(false);
+      } else {
+        this.saveDescriptionError.set(this.facade.templateActionError() ?? 'Unable to save this description as reusable.');
+      }
+    } finally {
+      this.savingDescriptionTemplate.set(false);
+    }
+  }
+
+  protected async saveInstructions(): Promise<void> {
+    const optionId = this.instructionsOptionId();
+    const option = this.group().options.find((candidate) => candidate.id === optionId);
+    if (!option) {
+      return;
+    }
+
+    this.savingInstructions.set(true);
+    try {
+      await this.facade.updateOption(option.id, {
+        label: option.label,
+        sortOrder: option.sortOrder,
+        descriptionHtml: this.instructionsDraft().trim() || null,
+      });
+      this.closeInstructions();
+    } finally {
+      this.savingInstructions.set(false);
     }
   }
 

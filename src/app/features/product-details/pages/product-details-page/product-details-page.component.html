@@ -167,6 +167,7 @@
             [groupLabel]="group.displayName"
             [options]="variantFacade.optionsForGroup(group)"
             [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
+            [groupDescriptionHtml]="group.descriptionHtml ?? null"
             (optionSelected)="onOptionChange(group.id, $event)"
             (instructionsRequested)="openInstructions($event)"
           />
@@ -314,7 +315,9 @@
     <ng-template pTemplate="header">
       <div class="pdp__instructions-dialog-header">
         <span class="pdp__instructions-dialog-group">{{ instructionsDialog()?.groupLabel }}</span>
-        <span class="pdp__instructions-dialog-option">{{ instructionsDialog()?.optionLabel }}</span>
+        @if (instructionsDialog()?.optionLabel) {
+          <span class="pdp__instructions-dialog-option">{{ instructionsDialog()?.optionLabel }}</span>
+        }
       </div>
     </ng-template>
     <div class="pdp__instructions-dialog-body" [innerHTML]="instructionsDialog()?.descriptionHtml"></div>

@@ -102,6 +102,10 @@ export class ProductOptionGroupNodeComponent {
   protected readonly savingDescriptionTemplate = signal(false);
   protected readonly saveDescriptionError = signal<string | null>(null);
 
+  protected readonly groupInstructionsOpen = signal(false);
+  protected readonly groupInstructionsDraft = signal('');
+  protected readonly savingGroupInstructions = signal(false);
+
   private canEdit(): boolean {
     return (
       this.permissionService.isOwner() ||
@@ -174,10 +178,36 @@ export class ProductOptionGroupNodeComponent {
         displayName: label,
         sortOrder: this.group().sortOrder,
         isRequired: this.editingGroupRequired(),
+        descriptionHtml: this.group().descriptionHtml,
       });
       this.cancelEditGroup();
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  protected openGroupInstructions(): void {
+    this.groupInstructionsDraft.set(this.group().descriptionHtml ?? '');
+    this.groupInstructionsOpen.set(true);
+  }
+
+  protected closeGroupInstructions(): void {
+    this.groupInstructionsOpen.set(false);
+    this.groupInstructionsDraft.set('');
+  }
+
+  protected async saveGroupInstructions(): Promise<void> {
+    this.savingGroupInstructions.set(true);
+    try {
+      await this.facade.updateOptionGroup(this.group().id, {
+        displayName: this.group().displayName,
+        sortOrder: this.group().sortOrder,
+        isRequired: this.group().isRequired,
+        descriptionHtml: this.groupInstructionsDraft().trim() || null,
+      });
+      this.closeGroupInstructions();
+    } finally {
+      this.savingGroupInstructions.set(false);
     }
   }
 
@@ -339,6 +369,7 @@ export class ProductOptionGroupNodeComponent {
       await this.facade.updateOption(option.id, {
         label,
         sortOrder: option.sortOrder,
+        descriptionHtml: option.descriptionHtml,
       });
       this.cancelEditOption();
     } finally {

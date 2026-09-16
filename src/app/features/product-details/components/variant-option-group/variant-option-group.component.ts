@@ -10,7 +10,7 @@ export interface VariantOptionChip {
 
 export interface VariantOptionInstructionsRequest {
   readonly groupLabel: string;
-  readonly optionLabel: string;
+  readonly optionLabel: string | null;
   readonly descriptionHtml: string;
 }
 
@@ -26,6 +26,7 @@ export class VariantOptionGroupComponent {
   readonly groupLabel = input.required<string>();
   readonly options = input.required<readonly VariantOptionChip[]>();
   readonly selectedId = input<string>('');
+  readonly groupDescriptionHtml = input<string | null>(null);
 
   readonly optionSelected = output<string>();
   /** Purely informational — never touches selection/variant-resolution state. */
@@ -55,6 +56,19 @@ export class VariantOptionGroupComponent {
       groupLabel: this.groupLabel(),
       optionLabel: option.label,
       descriptionHtml: option.descriptionHtml,
+    });
+  }
+
+  protected openGroupInstructions(): void {
+    const descriptionHtml = this.groupDescriptionHtml();
+    if (!descriptionHtml) {
+      return;
+    }
+
+    this.instructionsRequested.emit({
+      groupLabel: this.groupLabel(),
+      optionLabel: null,
+      descriptionHtml,
     });
   }
 }

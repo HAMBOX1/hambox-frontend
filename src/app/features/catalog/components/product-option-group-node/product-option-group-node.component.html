@@ -38,6 +38,11 @@
         <app-admin-icon-button icon="pi pi-times" label="Cancel" (pressed)="cancelEditGroup()" />
       } @else {
         <app-admin-icon-button
+          icon="pi pi-info-circle"
+          [label]="group().descriptionHtml ? 'Edit group instructions' : 'Add group instructions'"
+          (pressed)="openGroupInstructions()"
+        />
+        <app-admin-icon-button
           icon="pi pi-bookmark"
           label="Save as reusable group"
           [disabled]="hasAnyFollowUps()"
@@ -68,6 +73,28 @@
     (visibleChange)="deleteOptionDialogOpen.set($event)"
     (confirmed)="confirmDeleteOption()"
   />
+
+  <p-dialog
+    [header]="group().displayName + ' — General Instructions'"
+    [visible]="groupInstructionsOpen()"
+    (visibleChange)="!$event && closeGroupInstructions()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body"
+    [style]="{ width: 'min(32rem, 94vw)' }"
+    styleClass="admin-dialog"
+  >
+    <p-editor
+      [ngModel]="groupInstructionsDraft()"
+      (ngModelChange)="groupInstructionsDraft.set($event)"
+      [style]="{ height: '180px' }"
+    />
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingGroupInstructions()" (click)="closeGroupInstructions()"></button>
+      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingGroupInstructions()" (click)="saveGroupInstructions()"></button>
+    </div>
+  </p-dialog>
 
   <p-dialog
     header="Save as reusable group"
