@@ -64,6 +64,8 @@ import {
 
   CreateOptionDescriptionTemplateRequest,
 
+  CreateOptionGroupTemplateRequest,
+
   ImportOptionGroupTemplateRequest,
 
   OptionDescriptionTemplateDto,
@@ -1171,6 +1173,18 @@ export class ProductEditorFacade {
     }
   }
 
+  /** Creates an empty, product-independent template the admin can then populate via
+   * `updateOptionGroupTemplate` — see `option-group-template-manager`'s "New" flow. */
+  async createOptionGroupTemplate(request: CreateOptionGroupTemplateRequest): Promise<string | null> {
+    this.templateActionErrorState.set(null);
+    try {
+      return await firstValueFrom(this.inventoryApi.createOptionGroupTemplate(request));
+    } catch (error) {
+      this.templateActionErrorState.set(this.toErrorMessage(error, 'Failed to create the new group.'));
+      return null;
+    }
+  }
+
   async saveOptionGroupAsTemplate(groupId: string, request: SaveOptionGroupAsTemplateRequest): Promise<boolean> {
     this.templateActionErrorState.set(null);
     try {
@@ -1205,8 +1219,14 @@ export class ProductEditorFacade {
   }
 
   /** Imports a saved reusable group into the current product as independent option-group/option
-   * records, then syncs variants once — a single round trip, not one create call per value. */
-  async importOptionGroupTemplate(templateId: string, resolution: ImportConflictResolution): Promise<boolean> {
+   * records, then syncs variants once — a single round trip, not one create call per value.
+   * `selectedOptionIds`, when given, imports only that subset of the template's options instead
+   * of all of them — see `ProductOptionGroupsPanelComponent`'s selection-checklist step. */
+  async importOptionGroupTemplate(
+    templateId: string,
+    resolution: ImportConflictResolution,
+    selectedOptionIds?: readonly string[],
+  ): Promise<boolean> {
     const productId = this.productId();
     if (!productId) {
       return false;
@@ -1214,7 +1234,7 @@ export class ProductEditorFacade {
 
     this.templateActionErrorState.set(null);
     try {
-      const request: ImportOptionGroupTemplateRequest = { templateId, resolution };
+      const request: ImportOptionGroupTemplateRequest = { templateId, resolution, selectedOptionIds };
       await firstValueFrom(this.inventoryApi.importOptionGroupTemplate(productId, request));
       await this.syncVariants(productId);
       return true;

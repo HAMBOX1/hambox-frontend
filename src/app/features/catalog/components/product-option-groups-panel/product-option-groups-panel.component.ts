@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import type { AutoCompleteCompleteEvent, AutoCompleteSelectEvent } from 'primeng/types/autocomplete';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 
@@ -11,6 +12,7 @@ import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
   AdminEmptyStateComponent,
   AdminLoadingSkeletonComponent,
+  AdminSearchBarComponent,
   AdminSectionCardComponent,
 } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
@@ -22,6 +24,12 @@ import { OptionDescriptionTemplateManagerComponent } from '../option-description
 import { OptionGroupTemplateManagerComponent } from '../option-group-template-manager/option-group-template-manager.component';
 import { ProductOptionGroupNodeComponent } from '../product-option-group-node/product-option-group-node.component';
 import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/product-option-mobile-nav.component';
+
+interface TemplateSelectionRow {
+  readonly id: string;
+  readonly label: string;
+  readonly selected: boolean;
+}
 
 /**
  * Below 768px this renders `ProductOptionMobileNavComponent` (an accordion-style single-view
@@ -36,6 +44,7 @@ import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/pr
     FormsModule,
     AutoCompleteModule,
     ButtonModule,
+    CheckboxModule,
     DialogModule,
     InputTextModule,
     DragDropModule,
@@ -43,6 +52,7 @@ import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/pr
     AdminSectionCardComponent,
     AdminEmptyStateComponent,
     AdminLoadingSkeletonComponent,
+    AdminSearchBarComponent,
     OptionDescriptionTemplateManagerComponent,
     OptionGroupTemplateManagerComponent,
     ProductOptionGroupNodeComponent,
@@ -76,6 +86,26 @@ export class ProductOptionGroupsPanelComponent {
   protected readonly conflictDialogOpen = signal(false);
   protected readonly conflictTemplate = signal<OptionGroupTemplateSummaryDto | null>(null);
   protected readonly importError = signal<string | null>(null);
+
+  // Selection-checklist step — shown between picking a saved group and actually importing it, so
+  // the admin can pick just the values relevant to this product (e.g. 5 of 190 countries) instead
+  // of importing everything and deleting the rest afterward.
+  protected readonly selectionDialogOpen = signal(false);
+  protected readonly selectionLoading = signal(false);
+  protected readonly selectionTemplate = signal<OptionGroupTemplateSummaryDto | null>(null);
+  protected readonly selectionOptions = signal<readonly TemplateSelectionRow[]>([]);
+  protected readonly selectionSearchTerm = signal('');
+  private pendingSelectedOptionIds: readonly string[] = [];
+
+  protected readonly filteredSelectionOptions = computed(() => {
+    const term = this.selectionSearchTerm().trim().toLowerCase();
+    const rows = this.selectionOptions();
+    return term ? rows.filter((row) => row.label.toLowerCase().includes(term)) : rows;
+  });
+
+  protected readonly selectedOptionCount = computed(
+    () => this.selectionOptions().filter((row) => row.selected).length,
+  );
 
   /** Only root groups render at the top level; nested child groups render recursively inside `app-option-group-node`. */
   protected readonly sortedRootGroups = computed(() =>
@@ -115,8 +145,70 @@ export class ProductOptionGroupsPanelComponent {
     this.templateSuggestions.set(results);
   }
 
+  /** Picking a suggestion never imports immediately — it opens the selection checklist first
+   * (`openSelectionDialog`) so the admin picks which of the template's values apply to this
+   * product before anything is actually attached. */
   protected async onTemplateSelected(event: AutoCompleteSelectEvent): Promise<void> {
     const template = event.value as OptionGroupTemplateSummaryDto;
+    await this.openSelectionDialog(template);
+  }
+
+  protected async openSelectionDialog(template: OptionGroupTemplateSummaryDto): Promise<void> {
+    this.selectionTemplate.set(template);
+    this.selectionSearchTerm.set('');
+    this.selectionOptions.set([]);
+    this.importError.set(null);
+    this.selectionDialogOpen.set(true);
+    this.selectionLoading.set(true);
+    try {
+      const full = await this.facade.getOptionGroupTemplate(template.id);
+      this.selectionOptions.set(
+        (full?.options ?? [])
+          .slice()
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((option) => ({ id: option.id, label: option.label, selected: false })),
+      );
+    } finally {
+      this.selectionLoading.set(false);
+    }
+  }
+
+  protected toggleSelectionOption(id: string): void {
+    this.selectionOptions.update((rows) =>
+      rows.map((row) => (row.id === id ? { ...row, selected: !row.selected } : row)),
+    );
+  }
+
+  /** Selects/clears every row currently matching the search filter, not the whole list — lets the
+   * admin type e.g. "Europe" then "Select all" to grab just that filtered subset. */
+  protected setAllFilteredSelected(selected: boolean): void {
+    const visibleIds = new Set(this.filteredSelectionOptions().map((row) => row.id));
+    this.selectionOptions.update((rows) =>
+      rows.map((row) => (visibleIds.has(row.id) ? { ...row, selected } : row)),
+    );
+  }
+
+  protected cancelSelection(): void {
+    this.selectionDialogOpen.set(false);
+    this.selectionTemplate.set(null);
+    this.selectionOptions.set([]);
+    this.groupNameInput.set('');
+  }
+
+  protected async confirmSelection(): Promise<void> {
+    const template = this.selectionTemplate();
+    const selectedIds = this.selectionOptions()
+      .filter((row) => row.selected)
+      .map((row) => row.id);
+
+    if (!template || selectedIds.length === 0) {
+      this.importError.set('Select at least one value to import.');
+      return;
+    }
+
+    this.pendingSelectedOptionIds = selectedIds;
+    this.selectionDialogOpen.set(false);
+
     const key = slugify(template.name);
     const conflict = this.optionGroups().some((group) => group.parentOptionId === null && group.key === key);
 
@@ -133,11 +225,12 @@ export class ProductOptionGroupsPanelComponent {
     this.importingTemplate.set(true);
     this.importError.set(null);
     try {
-      const success = await this.facade.importOptionGroupTemplate(template.id, resolution);
+      const success = await this.facade.importOptionGroupTemplate(template.id, resolution, this.pendingSelectedOptionIds);
       if (success) {
         this.groupNameInput.set('');
         this.conflictDialogOpen.set(false);
         this.conflictTemplate.set(null);
+        this.pendingSelectedOptionIds = [];
       } else {
         // Stay open with the choice still visible — templateActionError carries the specific
         // reason (not facade.error(), which product-edit-page treats as a page-fatal failure).
@@ -153,6 +246,7 @@ export class ProductOptionGroupsPanelComponent {
     this.conflictTemplate.set(null);
     this.importError.set(null);
     this.groupNameInput.set('');
+    this.pendingSelectedOptionIds = [];
   }
 
   protected async onGroupDrop(event: CdkDragDrop<readonly ProductOptionGroupDto[]>): Promise<void> {

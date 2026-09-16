@@ -1,6 +1,14 @@
+.template-manager__toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
 .template-manager__search {
   display: block;
-  margin-bottom: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .template-manager__list {

@@ -60,6 +60,9 @@ export class OptionGroupTemplateManagerComponent {
   protected readonly searchTerm = signal('');
 
   protected readonly editingTemplateId = signal<string | null>(null);
+  /** True while authoring a brand-new template from scratch (no existing template ID yet) — shows
+   * the same name+rows form as editing, but `saveEdit` creates instead of updating. */
+  protected readonly creatingNew = signal(false);
   protected readonly editName = signal('');
   protected readonly editRows = signal<readonly EditRow[]>([]);
   protected readonly newRowLabel = signal('');
@@ -76,10 +79,23 @@ export class OptionGroupTemplateManagerComponent {
     effect(() => {
       if (this.visible()) {
         this.editingTemplateId.set(null);
+        this.creatingNew.set(false);
         this.searchTerm.set('');
         void this.load();
       }
     });
+  }
+
+  /** Opens the same name+rows form used for editing, but with nothing pre-filled — a brand-new,
+   * product-independent template (see `CreateOptionGroupTemplateCommand`) that the admin populates
+   * here instead of having to first build the full list on some real product's option group. */
+  protected startCreate(): void {
+    this.saveError.set(null);
+    this.creatingNew.set(true);
+    this.editingTemplateId.set(null);
+    this.editName.set('');
+    this.editRows.set([]);
+    this.newRowLabel.set('');
   }
 
   protected async load(): Promise<void> {
@@ -98,6 +114,7 @@ export class OptionGroupTemplateManagerComponent {
 
   protected async startEdit(template: OptionGroupTemplateSummaryDto): Promise<void> {
     this.saveError.set(null);
+    this.creatingNew.set(false);
     const full = await this.facade.getOptionGroupTemplate(template.id);
     if (!full) {
       return;
@@ -116,6 +133,7 @@ export class OptionGroupTemplateManagerComponent {
 
   protected cancelEdit(): void {
     this.editingTemplateId.set(null);
+    this.creatingNew.set(false);
     this.saveError.set(null);
   }
 
@@ -138,9 +156,10 @@ export class OptionGroupTemplateManagerComponent {
   }
 
   protected async saveEdit(): Promise<void> {
+    const isCreating = this.creatingNew();
     const templateId = this.editingTemplateId();
     const name = this.editName().trim();
-    if (!templateId || !name || this.editRows().length === 0) {
+    if ((!isCreating && !templateId) || !name || this.editRows().length === 0) {
       this.saveError.set('Give the group a name and at least one value.');
       return;
     }
@@ -156,14 +175,20 @@ export class OptionGroupTemplateManagerComponent {
     }));
 
     try {
-      const success = await this.facade.updateOptionGroupTemplate(templateId, {
-        name,
-        isRequiredDefault: true,
-        options,
-      });
+      let success: boolean;
+
+      if (isCreating) {
+        const newId = await this.facade.createOptionGroupTemplate({ name, isRequiredDefault: true });
+        // Two round trips (create the shell, then attach the typed values) rather than a combined
+        // endpoint — reuses updateOptionGroupTemplate's existing ReplaceOptions path unchanged.
+        success = newId !== null && (await this.facade.updateOptionGroupTemplate(newId, { name, isRequiredDefault: true, options }));
+      } else {
+        success = await this.facade.updateOptionGroupTemplate(templateId!, { name, isRequiredDefault: true, options });
+      }
 
       if (success) {
         this.editingTemplateId.set(null);
+        this.creatingNew.set(false);
         await this.load();
       } else {
         // Surfaces the backend's actual reason (e.g. a name clash with another saved group) —

@@ -103,6 +103,59 @@
   </div>
 </p-dialog>
 
+<p-dialog
+  header="Choose values to import from &quot;{{ selectionTemplate()?.name }}&quot;"
+  [visible]="selectionDialogOpen()"
+  (visibleChange)="selectionDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  @if (selectionLoading()) {
+    <app-admin-loading-skeleton variant="table" [rows]="4" />
+  } @else {
+    <app-admin-search-bar
+      class="option-groups-panel__selection-search"
+      [value]="selectionSearchTerm()"
+      placeholder="Search values..."
+      (searchChange)="selectionSearchTerm.set($event)"
+    />
+    <div class="option-groups-panel__selection-toolbar">
+      <span>{{ selectedOptionCount() }} of {{ selectionOptions().length }} selected</span>
+      <div class="option-groups-panel__selection-toolbar-actions">
+        <button pButton type="button" [text]="true" size="small" label="Select all" (click)="setAllFilteredSelected(true)"></button>
+        <button pButton type="button" [text]="true" size="small" label="Clear" (click)="setAllFilteredSelected(false)"></button>
+      </div>
+    </div>
+    <ul class="option-groups-panel__selection-list">
+      @for (row of filteredSelectionOptions(); track row.id) {
+        <li class="option-groups-panel__selection-row">
+          <p-checkbox [binary]="true" [ngModel]="row.selected" (onChange)="toggleSelectionOption(row.id)" [inputId]="'selopt-' + row.id" />
+          <label [for]="'selopt-' + row.id">{{ row.label }}</label>
+        </li>
+      }
+    </ul>
+  }
+  @if (importError()) {
+    <p class="option-groups-panel__import-error">{{ importError() }}</p>
+  }
+  <div class="admin-dialog__actions">
+    <button pButton type="button" label="Cancel" severity="secondary" [disabled]="importingTemplate()" (click)="cancelSelection()"></button>
+    <button
+      pButton
+      type="button"
+      label="Continue"
+      icon="pi pi-check"
+      [disabled]="selectionLoading() || selectedOptionCount() === 0"
+      [loading]="importingTemplate()"
+      (click)="confirmSelection()"
+    ></button>
+  </div>
+</p-dialog>
+
 <app-option-group-template-manager
   [visible]="templateManagerOpen()"
   (visibleChange)="templateManagerOpen.set($event)"

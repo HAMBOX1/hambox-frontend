@@ -27,6 +27,7 @@ import {
   InventoryStatisticsDto,
   InventorySupplierDto,
   CreateOptionDescriptionTemplateRequest,
+  CreateOptionGroupTemplateRequest,
   ImportOptionGroupTemplateRequest,
   OptionDescriptionTemplateDto,
   OptionGroupTemplateDto,
@@ -196,6 +197,10 @@ export class InventoryApiService {
 
   saveOptionGroupAsTemplate(groupId: string, request: SaveOptionGroupAsTemplateRequest): Observable<string> {
     return this.api.post<string>(INVENTORY_API.saveOptionGroupAsTemplate(groupId), request);
+  }
+
+  createOptionGroupTemplate(request: CreateOptionGroupTemplateRequest): Observable<string> {
+    return this.api.post<string>(INVENTORY_API.optionGroupTemplates, request);
   }
 
   updateOptionGroupTemplate(templateId: string, request: UpdateOptionGroupTemplateRequest): Observable<void> {

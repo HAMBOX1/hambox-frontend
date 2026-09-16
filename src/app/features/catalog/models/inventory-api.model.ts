@@ -307,6 +307,12 @@ export interface SaveOptionGroupAsTemplateRequest {
   readonly name: string;
 }
 
+/** Creates an empty, product-independent template — see `CreateOptionGroupTemplateCommand`. */
+export interface CreateOptionGroupTemplateRequest {
+  readonly name: string;
+  readonly isRequiredDefault: boolean;
+}
+
 export interface UpdateOptionGroupTemplateRequest {
   readonly name: string;
   readonly isRequiredDefault: boolean;
@@ -318,6 +324,10 @@ export type ImportConflictResolution = 'AddSeparate' | 'Replace';
 export interface ImportOptionGroupTemplateRequest {
   readonly templateId: string;
   readonly resolution: ImportConflictResolution;
+  /** Only these template option IDs are attached to the product when provided (non-empty) — lets
+   * an admin import a subset of a large master list (e.g. 5 of 190 countries) instead of getting
+   * everything and deleting the rest afterward. Omitted/empty imports every option, unchanged. */
+  readonly selectedOptionIds?: readonly string[];
 }
 
 export interface OptionDescriptionTemplateDto {

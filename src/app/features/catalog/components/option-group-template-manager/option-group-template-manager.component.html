@@ -9,7 +9,7 @@
   [style]="{ width: 'min(32rem, 94vw)' }"
   styleClass="admin-dialog template-manager"
 >
-  @if (editingTemplateId()) {
+  @if (editingTemplateId() || creatingNew()) {
     <div class="admin-field">
       <label class="admin-field__label" for="template-manager-name">Name</label>
       <input
@@ -57,12 +57,15 @@
       <button pButton type="button" label="Save Changes" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
     </div>
   } @else {
-    <app-admin-search-bar
-      class="template-manager__search"
-      [value]="searchTerm()"
-      placeholder="Search saved groups..."
-      (searchChange)="onSearchChange($event)"
-    />
+    <div class="template-manager__toolbar">
+      <app-admin-search-bar
+        class="template-manager__search"
+        [value]="searchTerm()"
+        placeholder="Search saved groups..."
+        (searchChange)="onSearchChange($event)"
+      />
+      <button pButton type="button" label="New" icon="pi pi-plus" (click)="startCreate()"></button>
+    </div>
 
     @if (loading()) {
       <app-admin-loading-skeleton variant="table" [rows]="4" />
