@@ -73,6 +73,13 @@
   min-height: 2.25rem;
 }
 
+.variant-manager__row-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.125rem;
+}
+
 .variant-manager__row-body {
   display: flex;
   flex: 1;

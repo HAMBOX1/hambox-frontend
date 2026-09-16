@@ -33,6 +33,19 @@
           <span class="variant-manager__row-available">Available {{ node.variant!.availableStock }}</span>
         </div>
       </div>
+
+      <span class="variant-manager__row-actions" (click)="$event.stopPropagation()">
+        <app-admin-icon-button
+          icon="pi pi-box"
+          label="Manage stock"
+          (pressed)="callbacks().openVariant(node.variant!)"
+        />
+        <app-admin-icon-button
+          icon="pi pi-pencil"
+          label="Edit price"
+          (pressed)="callbacks().editVariant(node.variant!)"
+        />
+      </span>
     </div>
   </div>
 </cdk-virtual-scroll-viewport>
