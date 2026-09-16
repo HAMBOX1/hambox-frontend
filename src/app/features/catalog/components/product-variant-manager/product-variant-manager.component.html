@@ -352,6 +352,13 @@
     }
   </p-dialog>
 
+  <app-variant-instructions-dialog
+    [visible]="!!instructionsDialogVariant()"
+    [productId]="productId() ?? ''"
+    [variant]="instructionsDialogVariant()"
+    (visibleChange)="!$event && instructionsDialogVariant.set(null)"
+  />
+
   <app-admin-confirm-dialog
     [visible]="deleteDialogOpen()"
     title="Delete variant"

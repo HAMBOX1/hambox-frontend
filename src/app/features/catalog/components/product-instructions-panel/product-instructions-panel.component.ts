@@ -48,6 +48,7 @@ export class ProductInstructionsPanelComponent {
   private readonly messageService = inject(MessageService);
 
   readonly productId = input<string | null>(null);
+  readonly variantId = input<string | null>(null);
 
   protected readonly permissions = PERMISSIONS;
   protected readonly instructions = this.facade.instructions;
@@ -75,10 +76,11 @@ export class ProductInstructionsPanelComponent {
   constructor() {
     effect(() => {
       const productId = this.productId();
+      const variantId = this.variantId();
       if (!productId) {
         return;
       }
-      void this.facade.load(productId);
+      void this.facade.load(productId, variantId);
     });
 
     effect(() => {
@@ -105,7 +107,7 @@ export class ProductInstructionsPanelComponent {
     }
     this.publishConfirmOpen.set(false);
     await this.flushAutosave();
-    const published = await this.facade.publish(productId);
+    const published = await this.facade.publish(productId, this.variantId());
     this.notify(published, 'Instructions published.', 'Failed to publish instructions.');
   }
 
@@ -115,7 +117,7 @@ export class ProductInstructionsPanelComponent {
       return;
     }
     this.unpublishConfirmOpen.set(false);
-    const unpublished = await this.facade.unpublish(productId);
+    const unpublished = await this.facade.unpublish(productId, this.variantId());
     this.notify(unpublished, 'Instructions unpublished.', 'Failed to unpublish instructions.');
   }
 
@@ -131,7 +133,7 @@ export class ProductInstructionsPanelComponent {
     }
 
     this.autosaveTimer = setTimeout(() => {
-      void this.facade.save(productId, this.titleState(), this.contentState());
+      void this.facade.save(productId, this.titleState(), this.contentState(), this.variantId());
     }, AUTOSAVE_DEBOUNCE_MS);
   }
 
@@ -151,7 +153,7 @@ export class ProductInstructionsPanelComponent {
       return;
     }
 
-    await this.facade.save(productId, this.titleState(), this.contentState());
+    await this.facade.save(productId, this.titleState(), this.contentState(), this.variantId());
   }
 
   private async uploadImage(file: File): Promise<string | null> {

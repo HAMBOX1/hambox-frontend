@@ -26,12 +26,12 @@ export class ProductInstructionsFacade {
   readonly publishing = this.publishingState.asReadonly();
   readonly error = this.errorState.asReadonly();
 
-  async load(productId: string): Promise<void> {
+  async load(productId: string, variantId?: string | null): Promise<void> {
     this.loadingState.set(true);
     this.errorState.set(null);
 
     try {
-      const result = await firstValueFrom(this.api.get(productId));
+      const result = await firstValueFrom(this.api.get(productId, variantId));
       this.instructionsState.set(result);
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Failed to load instructions.'));
@@ -40,12 +40,12 @@ export class ProductInstructionsFacade {
     }
   }
 
-  async save(productId: string, title: string, contentHtml: string): Promise<boolean> {
+  async save(productId: string, title: string, contentHtml: string, variantId?: string | null): Promise<boolean> {
     this.savingState.set(true);
     this.errorState.set(null);
 
     try {
-      const result = await firstValueFrom(this.api.save(productId, { title, contentHtml }));
+      const result = await firstValueFrom(this.api.save(productId, { title, contentHtml }, variantId));
       this.instructionsState.set(result);
       return true;
     } catch (error) {
@@ -56,12 +56,12 @@ export class ProductInstructionsFacade {
     }
   }
 
-  async publish(productId: string): Promise<boolean> {
+  async publish(productId: string, variantId?: string | null): Promise<boolean> {
     this.publishingState.set(true);
     this.errorState.set(null);
 
     try {
-      const result = await firstValueFrom(this.api.publish(productId));
+      const result = await firstValueFrom(this.api.publish(productId, variantId));
       this.instructionsState.set(result);
       return true;
     } catch (error) {
@@ -72,12 +72,12 @@ export class ProductInstructionsFacade {
     }
   }
 
-  async unpublish(productId: string): Promise<boolean> {
+  async unpublish(productId: string, variantId?: string | null): Promise<boolean> {
     this.publishingState.set(true);
     this.errorState.set(null);
 
     try {
-      const result = await firstValueFrom(this.api.unpublish(productId));
+      const result = await firstValueFrom(this.api.unpublish(productId, variantId));
       this.instructionsState.set(result);
       return true;
     } catch (error) {

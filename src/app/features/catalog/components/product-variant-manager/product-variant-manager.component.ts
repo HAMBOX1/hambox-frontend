@@ -49,6 +49,7 @@ import { ProductVariantLeafListComponent } from '../product-variant-leaf-list/pr
 import { ProductVariantTreeNodeComponent } from '../product-variant-tree-node/product-variant-tree-node.component';
 import { ProductVariantUsageDialogComponent } from '../product-variant-usage-dialog/product-variant-usage-dialog.component';
 import { VariantFulfillmentPanelComponent } from '../variant-fulfillment-panel/variant-fulfillment-panel.component';
+import { VariantInstructionsDialogComponent } from '../variant-instructions-dialog/variant-instructions-dialog.component';
 import { VariantInventoryPanelComponent } from '../variant-inventory-panel/variant-inventory-panel.component';
 
 const VARIANT_STATUS_OPTIONS = [
@@ -94,6 +95,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
     ProductVariantUsageDialogComponent,
     VariantInventoryPanelComponent,
     VariantFulfillmentPanelComponent,
+    VariantInstructionsDialogComponent,
   ],
   providers: [MessageService],
   templateUrl: './product-variant-manager.component.html',
@@ -112,6 +114,7 @@ export class ProductVariantManagerComponent {
   protected readonly optionGroups = this.facade.optionGroups;
   protected readonly variants = this.facade.variants;
   protected readonly product = this.facade.product;
+  protected readonly productId = this.facade.productId;
   protected readonly loading = this.facade.loading;
   protected readonly statusOptions = VARIANT_STATUS_OPTIONS;
   protected readonly statusFilterOptions = STATUS_FILTER_OPTIONS;
@@ -187,6 +190,7 @@ export class ProductVariantManagerComponent {
   protected readonly selectedVariantForCodes = signal<ProductVariantDto | null>(null);
   protected readonly creatingDefaultVariant = signal(false);
   protected readonly editDialogVisible = signal(false);
+  protected readonly instructionsDialogVariant = signal<ProductVariantDto | null>(null);
 
   /** Branches start expanded; this tracks only the ones an admin explicitly collapsed. Collapsing a parent hides its children from the render tree entirely, so no prefix/ancestor bookkeeping is needed here. */
   private readonly collapsedKeys = signal<ReadonlySet<string>>(new Set());
@@ -245,6 +249,7 @@ export class ProductVariantManagerComponent {
     toggleSelect: (variantId, checked, shiftKey) => this.toggleVariantSelection(variantId, checked, shiftKey),
     openVariant: (variant) => void this.manageCodes(variant),
     editVariant: (variant) => this.openEditDialog(variant),
+    editInstructions: (variant) => this.instructionsDialogVariant.set(variant),
     deleteVariant: (variant) => this.requestDelete(variant),
     isActive: (variantId) => this.selectedVariantForCodes()?.id === variantId,
     displayPrice: (variant) => variant.priceOverride ?? this.product()?.price ?? 0,

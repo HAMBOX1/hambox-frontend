@@ -1,5 +1,6 @@
 export interface ProductInstructionsDto {
   readonly productId: string;
+  readonly variantId: string | null;
   readonly title: string;
   readonly contentHtml: string;
   readonly version: number;

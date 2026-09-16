@@ -1,0 +1,15 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [header]="header()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(860px, 95vw)' }"
+  styleClass="admin-dialog"
+>
+  @if (visible() && variant(); as v) {
+    <app-product-instructions-panel [productId]="productId()" [variantId]="v.id" />
+  }
+</p-dialog>

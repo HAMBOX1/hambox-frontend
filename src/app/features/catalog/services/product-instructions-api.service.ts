@@ -11,20 +11,32 @@ import { ProductInstructionsDto, SaveProductInstructionsRequest } from '../model
 export class ProductInstructionsApiService {
   private readonly api = inject(ApiClientService);
 
-  get(productId: string): Observable<ProductInstructionsDto> {
-    return this.api.get<ProductInstructionsDto>(CATALOG_API.productInstructions(productId));
+  get(productId: string, variantId?: string | null): Observable<ProductInstructionsDto> {
+    return this.api.get<ProductInstructionsDto>(CATALOG_API.productInstructions(productId), {
+      params: this.variantParams(variantId),
+    });
   }
 
-  save(productId: string, request: SaveProductInstructionsRequest): Observable<ProductInstructionsDto> {
-    return this.api.put<ProductInstructionsDto>(CATALOG_API.productInstructions(productId), request);
+  save(productId: string, request: SaveProductInstructionsRequest, variantId?: string | null): Observable<ProductInstructionsDto> {
+    return this.api.put<ProductInstructionsDto>(CATALOG_API.productInstructions(productId), request, {
+      params: this.variantParams(variantId),
+    });
   }
 
-  publish(productId: string): Observable<ProductInstructionsDto> {
-    return this.api.post<ProductInstructionsDto>(CATALOG_API.productInstructionsPublish(productId), {});
+  publish(productId: string, variantId?: string | null): Observable<ProductInstructionsDto> {
+    return this.api.post<ProductInstructionsDto>(CATALOG_API.productInstructionsPublish(productId), {}, {
+      params: this.variantParams(variantId),
+    });
   }
 
-  unpublish(productId: string): Observable<ProductInstructionsDto> {
-    return this.api.post<ProductInstructionsDto>(CATALOG_API.productInstructionsUnpublish(productId), {});
+  unpublish(productId: string, variantId?: string | null): Observable<ProductInstructionsDto> {
+    return this.api.post<ProductInstructionsDto>(CATALOG_API.productInstructionsUnpublish(productId), {}, {
+      params: this.variantParams(variantId),
+    });
+  }
+
+  private variantParams(variantId?: string | null): Record<string, string> {
+    return variantId ? { variantId } : {};
   }
 
   uploadImage(productId: string, file: File): Observable<{ url: string }> {

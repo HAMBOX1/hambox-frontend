@@ -17,6 +17,7 @@ export interface VariantTreeCallbacks {
   bulkSelectionActive(): boolean;
   openVariant(variant: ProductVariantDto): void;
   editVariant(variant: ProductVariantDto): void;
+  editInstructions(variant: ProductVariantDto): void;
   deleteVariant(variant: ProductVariantDto): void;
   isActive(variantId: string): boolean;
   displayPrice(variant: ProductVariantDto): number;
