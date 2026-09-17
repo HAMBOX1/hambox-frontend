@@ -1031,7 +1031,7 @@
       "SHOW_ALL_CONFIRM_TITLE": "Load all products?",
       "SHOW_ALL_CONFIRM_MESSAGE": "This will load all {{count}} matching products on one page, which can be slow to render. Continue?",
       "STOCK": {
-        "IN_STOCK": "{{count}} in stock",
+        "IN_STOCK": "{{count}}",
         "ADD_STOCK": "Click to add stock",
         "ARIA_LABEL": "View stock and variants for {{name}}"
       },

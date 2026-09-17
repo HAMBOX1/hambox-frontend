@@ -199,6 +199,7 @@
       (mappingOpenRequested)="onMappingOpenRequested($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
+      (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
       (fieldEdit)="onFieldEdit($event)"
       (statusEdit)="onStatusEdit($event)"
       (categoryCreated)="onCategoryCreated()"
@@ -226,6 +227,7 @@
       (deleteProduct)="requestDelete($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
+      (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
       (bulkToggle)="onBulkToggle($event)"
       (collectionsEdit)="onCollectionsEdit($event)"
       (collectionCreated)="onCollectionCreated()"
@@ -299,6 +301,52 @@
       icon="pi pi-copy"
       [loading]="actionLoading()"
       (click)="confirmDuplicate()"
+    ></button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [header]="chatDeliveryTarget()?.hasChatDeliveryVariant ? 'Edit On-Delivery' : 'Set as On-Delivery'"
+  [visible]="chatDeliveryDialogOpen()"
+  (visibleChange)="chatDeliveryDialogOpen.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(26rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">
+    Delivered manually over a support chat opened right after payment, instead of an instant digital code. Set how many units can be sold before this runs out — you can top it up again anytime.
+  </p>
+  <div class="admin-field">
+    <label class="admin-field__label" for="chat-delivery-capacity">Capacity</label>
+    <p-inputNumber
+      inputId="chat-delivery-capacity"
+      class="admin-field__input"
+      [ngModel]="chatDeliveryCapacity()"
+      (ngModelChange)="chatDeliveryCapacity.set($event)"
+      [min]="0"
+      [showButtons]="true"
+    />
+  </div>
+  @if (chatDeliveryError(); as error) {
+    <p class="admin-dialog__error">{{ error }}</p>
+  }
+  <div class="admin-dialog__actions">
+    <button
+      pButton
+      type="button"
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      (click)="chatDeliveryDialogOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Save"
+      icon="pi pi-check"
+      [loading]="actionLoading()"
+      (click)="confirmChatDelivery()"
     ></button>
   </div>
 </p-dialog>

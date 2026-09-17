@@ -160,6 +160,10 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateNameSuffix = signal(' Copy');
   protected readonly actionTarget = signal<Product | null>(null);
+  protected readonly chatDeliveryDialogOpen = signal(false);
+  protected readonly chatDeliveryTarget = signal<Product | null>(null);
+  protected readonly chatDeliveryCapacity = signal(100);
+  protected readonly chatDeliveryError = this.facade.error;
   protected readonly mappingDrawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
 
   // Bulk selection (product list)
@@ -540,6 +544,30 @@ export class ProductCatalogPageComponent implements OnInit {
       });
       this.duplicateDialogOpen.set(false);
       void this.router.navigate(['/admin/products', newId, 'edit']);
+    }
+  }
+
+  protected openChatDeliveryDialog(product: Product): void {
+    this.chatDeliveryTarget.set(product);
+    this.chatDeliveryCapacity.set(product.availableStock && product.hasChatDeliveryVariant ? product.availableStock : 100);
+    this.chatDeliveryDialogOpen.set(true);
+  }
+
+  protected async confirmChatDelivery(): Promise<void> {
+    const product = this.chatDeliveryTarget();
+    if (!product) {
+      return;
+    }
+
+    const success = await this.facade.setChatDelivery(product.id, this.chatDeliveryCapacity());
+    if (success) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'On-Delivery',
+        detail: 'This product is now set to deliver via support chat.',
+        life: 4000,
+      });
+      this.chatDeliveryDialogOpen.set(false);
     }
   }
 

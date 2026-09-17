@@ -393,6 +393,10 @@ export class ProductCatalogFacade {
     return this.runProductAction(productId, () => firstValueFrom(this.api.restoreProduct(productId)));
   }
 
+  async setChatDelivery(productId: string, capacity: number): Promise<boolean> {
+    return this.runProductAction(productId, () => firstValueFrom(this.api.quickSetChatDelivery(productId, capacity)));
+  }
+
   reload(): Promise<void> {
     return this.fetchProducts(true);
   }

@@ -141,6 +141,10 @@ export class ProductCatalogTableComponent {
    * badge / "+ Add Supplier Mapping" action. */
   readonly mappingOpenRequested = output<Product>();
   readonly manageMarketingPage = output<Product>();
+  /** Opens the "set as On-Delivery" capacity dialog — only offered for products with 0 or 1
+   * variant (see productActionMenuItems); multi-variant products use the per-variant controls
+   * in the variant manager instead. */
+  readonly setChatDeliveryRequested = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
   readonly statusEdit = output<ProductStatusEdit>();
   /** Emitted after a category is created inline from the popover, so the parent facade can refresh its category list. */
@@ -353,6 +357,17 @@ export class ProductCatalogTableComponent {
         label: t('ADMIN.CATALOG_PAGE.ACTIONS.DUPLICATE'),
         icon: 'pi pi-copy',
         command: () => this.duplicateProduct.emit(product),
+      });
+    }
+
+    if (
+      this.permissionService.hasPermission(this.permissions.Catalog.Inventory.Create) &&
+      (product.variantCount ?? 0) <= 1
+    ) {
+      items.push({
+        label: product.hasChatDeliveryVariant ? 'Edit On-Delivery' : 'Set as On-Delivery',
+        icon: 'pi pi-comments',
+        command: () => this.setChatDeliveryRequested.emit(product),
       });
     }
 

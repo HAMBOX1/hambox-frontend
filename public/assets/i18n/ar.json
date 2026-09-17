@@ -1024,7 +1024,7 @@
       "SHOW_ALL_CONFIRM_TITLE": "تحميل كل المنتجات؟",
       "SHOW_ALL_CONFIRM_MESSAGE": "ده هيحمّل كل الـ {{count}} منتج المطابق في صفحة واحدة، وممكن يبقى بطيء. تحب تكمل؟",
       "STOCK": {
-        "IN_STOCK": "{{count}} متوفر",
+        "IN_STOCK": "{{count}}",
         "ADD_STOCK": "انقر لإضافة مخزون",
         "ARIA_LABEL": "عرض المخزون والمتغيرات لـ {{name}}"
       },

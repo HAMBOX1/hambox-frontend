@@ -60,6 +60,14 @@
               : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
             [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
           />
+          @if (product.hasChatDeliveryVariant) {
+            <i
+              class="pi pi-comments product-catalog-cards__chat-delivery-icon"
+              pTooltip="On-Delivery — delivered manually via support chat"
+              tooltipPosition="top"
+              aria-hidden="true"
+            ></i>
+          }
           <app-admin-status-badge
             [label]="product.categoryName || 'Uncategorized'"
             tone="info"

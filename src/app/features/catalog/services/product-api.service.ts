@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { CATALOG_API } from '../../../core/api/api-endpoints';
+import { CATALOG_API, INVENTORY_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
 import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import { PagedResult } from '../models/category.model';
@@ -142,6 +142,10 @@ export class ProductApiService {
 
   restoreProduct(id: string): Observable<void> {
     return this.api.post<void>(CATALOG_API.productRestore(id), {});
+  }
+
+  quickSetChatDelivery(id: string, capacity: number): Observable<void> {
+    return this.api.post<void>(INVENTORY_API.quickSetChatDelivery(id), { capacity });
   }
 
   duplicateProduct(id: string, nameSuffix?: string | null): Observable<string> {

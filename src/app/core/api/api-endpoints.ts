@@ -91,6 +91,8 @@ export const CATALOG_IMPORT_EXPORT_API = {
 export const INVENTORY_API = {
   statistics: '/api/v1/inventory/statistics',
   productVariants: (productId: string) => `/api/v1/inventory/products/${productId}/variants`,
+  quickSetChatDelivery: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/quick-chat-delivery`,
   generateProductVariants: (productId: string) =>
     `/api/v1/inventory/products/${productId}/variants/generate`,
   bulkUpdateProductVariants: (productId: string) =>

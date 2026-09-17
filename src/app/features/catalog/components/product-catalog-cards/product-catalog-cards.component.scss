@@ -80,6 +80,11 @@
   cursor: pointer;
 }
 
+.product-catalog-cards__chat-delivery-icon {
+  color: var(--admin-text-muted);
+  font-size: 0.9rem;
+}
+
 .product-catalog-cards__actions {
   display: flex;
   align-items: center;

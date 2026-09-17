@@ -93,13 +93,23 @@
             </div>
           </td>
           <td (click)="onStockClick(product, $event)">
-            <app-admin-status-badge
-              class="product-catalog-table__stock-badge"
-              [label]="(product.availableStock ?? 0) > 0
-                ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
-                : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
-              [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
-            />
+            <div class="product-catalog-table__stock-cell">
+              <app-admin-status-badge
+                class="product-catalog-table__stock-badge"
+                [label]="(product.availableStock ?? 0) > 0
+                  ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
+                  : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
+                [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
+              />
+              @if (product.hasChatDeliveryVariant) {
+                <i
+                  class="pi pi-comments product-catalog-table__chat-delivery-icon"
+                  pTooltip="On-Delivery — delivered manually via support chat"
+                  tooltipPosition="top"
+                  aria-hidden="true"
+                ></i>
+              }
+            </div>
           </td>
           <td
             class="product-catalog-table__category-cell"
