@@ -21,6 +21,13 @@ export interface VariantTreeCallbacks {
   deleteVariant(variant: ProductVariantDto): void;
   isActive(variantId: string): boolean;
   displayPrice(variant: ProductVariantDto): number;
+  /** Inline price editing on the row itself — the small-screen replacement for the hidden price column. Only one row edits at a time. */
+  isEditingPrice(variantId: string): boolean;
+  startEditPrice(variant: ProductVariantDto, event: Event): void;
+  priceDraft(): number | null;
+  setPriceDraft(value: number | null): void;
+  saveEditPrice(variant: ProductVariantDto): void;
+  cancelEditPrice(): void;
   statusSeverity(variant: ProductVariantDto): 'success' | 'warn' | 'danger' | 'secondary' | 'info';
   isHighlighted(variantId: string): boolean;
   searchActive(): boolean;

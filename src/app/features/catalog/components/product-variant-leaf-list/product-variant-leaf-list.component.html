@@ -29,7 +29,28 @@
           <p-tag [value]="node.variant!.status" [severity]="callbacks().statusSeverity(node.variant!)" />
         </div>
         <div class="variant-manager__row-stats">
-          <span class="variant-manager__row-price">{{ callbacks().displayPrice(node.variant!) | hamboxCurrency }}</span>
+          <span class="variant-manager__row-price" (click)="$event.stopPropagation()">
+            @if (callbacks().isEditingPrice(node.variant!.id)) {
+              <p-inputNumber
+                class="variant-manager__row-price-input"
+                [ngModel]="callbacks().priceDraft()"
+                (ngModelChange)="callbacks().setPriceDraft($event)"
+                (keydown.enter)="callbacks().saveEditPrice(node.variant!)"
+                (keydown.escape)="callbacks().cancelEditPrice()"
+                (onBlur)="callbacks().saveEditPrice(node.variant!)"
+                mode="currency"
+                currency="USD"
+                [minFractionDigits]="2"
+                autofocus
+              />
+            } @else {
+              <span
+                class="variant-manager__row-price-value"
+                (click)="callbacks().startEditPrice(node.variant!, $event)"
+                >{{ callbacks().displayPrice(node.variant!) | hamboxCurrency }}</span
+              >
+            }
+          </span>
           <span class="variant-manager__row-available">Available {{ node.variant!.availableStock }}</span>
         </div>
       </div>
@@ -42,7 +63,7 @@
         />
         <app-admin-icon-button
           icon="pi pi-pencil"
-          label="Edit price"
+          label="Edit details"
           (pressed)="callbacks().editVariant(node.variant!)"
         />
         <app-admin-icon-button

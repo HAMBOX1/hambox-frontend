@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, injec
 import { FormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { CheckboxModule } from 'primeng/checkbox';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { TagModule } from 'primeng/tag';
 
 import { AdminIconButtonComponent } from '../../../../shared/components/admin';
@@ -28,7 +29,15 @@ const MAX_VISIBLE_ROWS = 8;
 @Component({
   selector: 'app-variant-leaf-list',
   standalone: true,
-  imports: [FormsModule, CheckboxModule, TagModule, ScrollingModule, HamboxCurrencyPipe, AdminIconButtonComponent],
+  imports: [
+    FormsModule,
+    CheckboxModule,
+    InputNumberModule,
+    TagModule,
+    ScrollingModule,
+    HamboxCurrencyPipe,
+    AdminIconButtonComponent,
+  ],
   templateUrl: './product-variant-leaf-list.component.html',
   styleUrl: './product-variant-leaf-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

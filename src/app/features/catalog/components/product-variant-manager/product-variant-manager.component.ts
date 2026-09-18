@@ -221,6 +221,12 @@ export class ProductVariantManagerComponent {
   protected readonly editDialogVisible = signal(false);
   protected readonly instructionsDialogVariant = signal<ProductVariantDto | null>(null);
 
+  /** Inline price editing on the leaf-list row itself (mobile's replacement for the hidden price
+   * column) — only one row edits at a time, tracked here rather than per-row so `treeCallbacks`
+   * stays a single stable reference. */
+  protected readonly editingPriceVariantId = signal<string | null>(null);
+  protected readonly priceDraftValue = signal<number | null>(null);
+
   /** Branches start expanded; this tracks only the ones an admin explicitly collapsed. Collapsing a parent hides its children from the render tree entirely, so no prefix/ancestor bookkeeping is needed here. */
   private readonly collapsedKeys = signal<ReadonlySet<string>>(new Set());
 
@@ -282,6 +288,12 @@ export class ProductVariantManagerComponent {
     deleteVariant: (variant) => this.requestDelete(variant),
     isActive: (variantId) => this.selectedVariantForCodes()?.id === variantId,
     displayPrice: (variant) => variant.priceOverride ?? this.product()?.price ?? 0,
+    isEditingPrice: (variantId) => this.editingPriceVariantId() === variantId,
+    startEditPrice: (variant, event) => this.startEditPrice(variant, event),
+    priceDraft: () => this.priceDraftValue(),
+    setPriceDraft: (value) => this.priceDraftValue.set(value),
+    saveEditPrice: (variant) => void this.saveEditPrice(variant),
+    cancelEditPrice: () => this.cancelEditPrice(),
     statusSeverity: (variant) => this.statusSeverity(variant),
     isHighlighted: (variantId) => this.searchMatchIds()?.has(variantId) ?? false,
     searchActive: () => this.searchTerm().trim().length > 0,
@@ -383,6 +395,52 @@ export class ProductVariantManagerComponent {
   protected cancelEdit(): void {
     this.editDialogVisible.set(false);
     this.editTarget.set(null);
+  }
+
+  protected startEditPrice(variant: ProductVariantDto, event: Event): void {
+    event.stopPropagation();
+    this.priceDraftValue.set(variant.priceOverride ?? this.product()?.price ?? 0);
+    this.editingPriceVariantId.set(variant.id);
+  }
+
+  protected cancelEditPrice(): void {
+    this.editingPriceVariantId.set(null);
+    this.priceDraftValue.set(null);
+  }
+
+  /** Saves just the price, leaving every other field on the variant untouched — mirrors the
+   * catalog table's inline price edit for products (`ProductCatalogFacade.updateProductInline`),
+   * just against `ProductEditorFacade.updateVariant`'s full-payload shape instead of a partial one. */
+  protected async saveEditPrice(variant: ProductVariantDto): Promise<void> {
+    const priceOverride = this.priceDraftValue();
+    this.editingPriceVariantId.set(null);
+
+    if (priceOverride === null || priceOverride === variant.priceOverride) {
+      return;
+    }
+
+    const success = await this.facade.updateVariant(variant.id, {
+      sku: variant.sku,
+      planId: variant.planId,
+      priceOverride,
+      comparePrice: variant.comparePrice,
+      costPrice: variant.costPrice,
+      memberPrice: variant.memberPrice,
+      sortOrder: variant.sortOrder,
+      status: variant.status,
+      isVisible: variant.isVisible,
+      membershipPlanId: variant.membershipPlanId,
+      lowStockThreshold: variant.lowStockThreshold,
+      optionIds: variant.optionIds,
+    });
+
+    if (!success) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to update price',
+        detail: this.facade.variantSyncError() ?? 'Failed to update the variant price.',
+      });
+    }
   }
 
   protected onEditDialogVisibleChange(visible: boolean): void {

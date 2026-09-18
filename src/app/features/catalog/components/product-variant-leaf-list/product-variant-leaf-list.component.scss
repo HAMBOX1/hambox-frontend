@@ -133,10 +133,26 @@
 }
 
 .variant-manager__row-price {
+  display: inline-flex;
+  align-items: center;
+}
+
+.variant-manager__row-price-value {
   color: var(--variant-accent);
   font-size: 0.875rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+:host ::ng-deep .variant-manager__row-price-input {
+  width: 5.5rem;
+
+  .p-inputnumber-input {
+    width: 100%;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.8125rem;
+  }
 }
 
 .variant-manager__row-available::before {
@@ -145,19 +161,16 @@
   color: var(--variant-text-muted);
 }
 
-// Reserved/Sold live in the Manage Codes drawer only. Desktop/tablet keep the
-// two-line row (name+status, then price+Available); phone-and-below drop the
-// price — Available alone tells the owner whether stock exists, which is all
-// this scan list needs to answer before the drawer opens.
+// Reserved/Sold live in the Manage Codes drawer only. Below 767px the row no
+// longer has room to spare on a bare price label, so it becomes a small boxed
+// field instead — still one tap to edit, but visually distinct from the row's
+// own open-codes tap target.
 @media (max-width: 767px) {
-  .variant-manager__row-price {
-    display: none;
-  }
-
-  // Available is the only stat left on this line below 767px — no leading
-  // bullet needed when there's nothing left to separate it from.
-  .variant-manager__row-available::before {
-    content: none;
+  .variant-manager__row-price-value {
+    padding: 0.0625rem 0.5rem;
+    border: 1px solid var(--variant-accent);
+    border-radius: var(--admin-radius-sm, 0.375rem);
+    background: color-mix(in srgb, var(--variant-accent) 12%, transparent);
   }
 }
 
