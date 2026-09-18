@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { InputTextModule } from 'primeng/inputtext';
 import { Subject } from 'rxjs';
@@ -50,6 +50,15 @@ export class SupplierCatalogSelectComponent {
   constructor() {
     this.search$.pipe(debounceTime(300)).subscribe((term) => {
       void this.runSearch(term);
+    });
+
+    // Load an unfiltered first page as soon as the supplier is known, so the picker shows the
+    // catalog right away instead of a blank list until the admin types something. Only tracks
+    // `supplierId` — deliberately doesn't read `query`, which already has its own debounced path
+    // via `search$` above.
+    effect(() => {
+      this.supplierId();
+      void this.runSearch('');
     });
   }
 
