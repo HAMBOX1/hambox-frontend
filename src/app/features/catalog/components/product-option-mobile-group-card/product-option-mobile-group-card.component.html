@@ -24,7 +24,7 @@
 
     @if (editingGroup()) {
       <div class="mobile-question-card__edit-actions">
-        <button pButton type="button" icon="pi pi-check" [loading]="savingGroup()" severity="secondary" aria-label="Save option group" (click)="saveEditGroup()"></button>
+        <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingGroup()" severity="secondary" aria-label="Save option group" (click)="saveEditGroup()"></button>
         <button pButton type="button" icon="pi pi-times" severity="secondary" [text]="true" aria-label="Cancel" (click)="cancelEditGroup()"></button>
       </div>
     } @else {
@@ -185,7 +185,7 @@
               (keyup.enter)="saveEditOption(option)"
             />
             <div class="mobile-answer-row__edit-actions">
-              <button pButton type="button" icon="pi pi-check" [loading]="savingOption()" severity="secondary" aria-label="Save option" (click)="saveEditOption(option)"></button>
+              <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingOption()" severity="secondary" aria-label="Save option" (click)="saveEditOption(option)"></button>
               <button pButton type="button" icon="pi pi-times" severity="secondary" [text]="true" aria-label="Cancel" (click)="cancelEditOption()"></button>
             </div>
           } @else {
