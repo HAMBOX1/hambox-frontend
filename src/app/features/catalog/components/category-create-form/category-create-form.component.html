@@ -157,6 +157,18 @@
       </div>
     }
 
+    <div class="admin-field">
+      <label class="admin-field__label" for="category-description">
+        Customer instructions <span class="admin-field__optional">(optional)</span>
+      </label>
+      <p-editor
+        id="category-description"
+        formControlName="descriptionHtml"
+        [style]="{ height: '160px' }"
+      />
+      <p class="admin-field__hint">Shown to customers browsing this category — e.g. regional requirements or usage notes.</p>
+    </div>
+
     <div class="category-create-form__arabic-section">
       @if (!showArabic()) {
         <button

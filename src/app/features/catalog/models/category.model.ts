@@ -6,6 +6,8 @@ export interface Category {
   readonly isActive: boolean;
   readonly parentId: string | null;
   readonly imageUrl?: string | null;
+  /** Optional rich-text instructions shown to customers browsing this category. */
+  readonly descriptionHtml?: string | null;
 }
 
 export interface CategoryTreeItem extends Category {
@@ -37,6 +39,7 @@ export interface CreateCategoryRequest {
   readonly parentId?: string | null;
   readonly newParent?: NewParentDraft | null;
   readonly subcategories?: readonly NewParentDraft[] | null;
+  readonly descriptionHtml?: string | null;
 }
 
 export interface UpdateCategoryRequest {
@@ -45,6 +48,7 @@ export interface UpdateCategoryRequest {
   readonly slug: string;
   readonly isActive: boolean;
   readonly parentId?: string | null;
+  readonly descriptionHtml?: string | null;
 }
 
 export interface CategoryListQuery {

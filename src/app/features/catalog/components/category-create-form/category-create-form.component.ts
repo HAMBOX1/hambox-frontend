@@ -15,6 +15,7 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { firstValueFrom } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { EditorModule } from 'primeng/editor';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
@@ -46,6 +47,7 @@ const FIELD_LABELS = {
     ButtonModule,
     SelectModule,
     CheckboxModule,
+    EditorModule,
     TooltipModule,
     AdminErrorAlertComponent,
     AdminSectionCardComponent,
@@ -112,6 +114,7 @@ export class CategoryCreateFormComponent {
     categoryType: this.fb.nonNullable.control<'root' | 'child'>('root'),
     parentId: this.fb.control<string | null>(null),
     isActive: [true],
+    descriptionHtml: [''],
     newParent: this.fb.nonNullable.group({
       nameEn: ['', [Validators.required, Validators.maxLength(200)]],
       nameAr: ['', [Validators.maxLength(200)]],
@@ -144,6 +147,7 @@ export class CategoryCreateFormComponent {
           categoryType: parentId ? 'child' : 'root',
           parentId,
           isActive: editing ? category.isActive : true,
+          descriptionHtml: editing ? (category.descriptionHtml ?? '') : '',
           newParent: { nameEn: '', nameAr: '', slug: '' },
         },
         { emitEvent: false },
@@ -454,6 +458,7 @@ export class CategoryCreateFormComponent {
         slug: value.slug,
         isActive: value.isActive,
         parentId: value.parentId,
+        descriptionHtml: value.descriptionHtml.trim() || null,
       });
       return;
     }
@@ -468,6 +473,7 @@ export class CategoryCreateFormComponent {
       slug: value.slug,
       parentId,
       newParent,
+      descriptionHtml: value.descriptionHtml.trim() || null,
       // For a root category these become its children; for a child category
       // there's no "root" to nest under, so createCategoryWithHierarchy parents
       // them as siblings under the same parentId instead — see there.
