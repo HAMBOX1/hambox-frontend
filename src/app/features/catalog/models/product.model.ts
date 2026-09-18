@@ -70,6 +70,12 @@ export interface Product {
   /** Number of non-deleted variants — drives whether the catalog list's one-click "set as
    * On-Delivery" action is offered (only for 0 or 1 variant). */
   readonly variantCount?: number;
+  /** Set when this product is parked as a duplicate pending merge into another product (see
+   * the Merge Products feature) — null/undefined otherwise. Admin-only, only populated when the
+   * "Pending Merge" tab is active. */
+  readonly pendingMergeIntoProductId?: string | null;
+  /** Display name of `pendingMergeIntoProductId`'s product. */
+  readonly pendingMergeIntoProductName?: string | null;
 }
 
 export interface CreateProductRequest {
@@ -132,6 +138,9 @@ export interface ProductListQuery {
   /** Narrows to exactly this id set — populated only by the Supplier Mapping filter, which resolves
    * matching ids from the Suppliers module first (see `ProductCatalogFacade.setSupplierMappingFilter`). */
   readonly productIds?: readonly string[];
+  /** When true, shows only products parked as a pending merge (orthogonal to `status`) — powers
+   * the catalog page's "Pending Merge" tab. Admin-only; ignored for anonymous/storefront callers. */
+  readonly pendingMergeOnly?: boolean;
 }
 
 export interface ProductFacetQuery {
@@ -195,6 +204,13 @@ export interface MergeProductsResult {
   readonly mergedSourceCount: number;
 }
 
+/** Marks a product as a duplicate pending merge into `targetProductId` — see backend
+ * `SetPendingMergeCommand`. Unlike `MergeProductsRequest`, nothing is touched yet: no variant is
+ * created and no stock is lost. */
+export interface SetPendingMergeRequest {
+  readonly targetProductId: string;
+}
+
 /** Product counts per status, scoped by the current search/category/collection filter but not by
  * status itself — badges the catalog page's status tabs. See backend `GetProductStatusCountsQuery`. */
 export interface ProductStatusCounts {
@@ -203,6 +219,7 @@ export interface ProductStatusCounts {
   readonly active: number;
   readonly inactive: number;
   readonly archived: number;
+  readonly pendingMerge: number;
 }
 
 export interface ProductInventoryPlaceholders {

@@ -122,6 +122,9 @@ export class ProductCatalogTableComponent {
   readonly sortOrder = input(0);
   readonly bulkSelectedIds = input<ReadonlySet<string>>(new Set());
   readonly allPageSelected = input(false);
+  /** True while "select all N matching the filter" is active — every loaded row counts as
+   * selected even though `bulkSelectedIds` only tracks individually-toggled ids. */
+  readonly selectAllMatchingActive = input(false);
   /** True while a prior inline edit (name/price/category) is still saving — blocks starting another
    * on the same row before its save+refetch resolves, which would otherwise race the row version. */
   readonly actionLoading = input(false);
@@ -137,6 +140,10 @@ export class ProductCatalogTableComponent {
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
+  /** Row actions for a product parked as a pending merge (see `pendingMergeIntoProductId`) — runs
+   * the actual merge (existing `MergeProductsCommand`, single source) / unlinks it back to normal. */
+  readonly promoteToVariant = output<Product>();
+  readonly unlinkPendingMerge = output<Product>();
   /** Opens the product-centric supplier mapping drawer for this product — the Supplier cell's status
    * badge / "+ Add Supplier Mapping" action. */
   readonly mappingOpenRequested = output<Product>();
@@ -165,6 +172,11 @@ export class ProductCatalogTableComponent {
   protected readonly resolveImageUrl = resolveProductImageUrl;
   protected readonly failedImageIds = signal<ReadonlySet<string>>(new Set());
   protected readonly statusOptions = STATUS_EDIT_OPTIONS;
+
+  /** Per-row "show every category / internal category chip instead of the +N overflow badge"
+   * toggle — purely a client-side view over data already loaded, independent of the category/
+   * collection edit popovers below (which still open on a click anywhere else in the cell). */
+  protected readonly expandedRowIds = signal<ReadonlySet<string>>(new Set());
 
   protected readonly editingCell = signal<{ productId: string; field: EditableField } | null>(null);
   protected readonly editDraftText = signal('');
@@ -218,7 +230,7 @@ export class ProductCatalogTableComponent {
   }
 
   protected isBulkSelected(productId: string): boolean {
-    return this.bulkSelectedIds().has(productId);
+    return this.selectAllMatchingActive() || this.bulkSelectedIds().has(productId);
   }
 
   protected onBulkCheckboxClick(product: Product, event: Event | undefined): void {
@@ -263,6 +275,23 @@ export class ProductCatalogTableComponent {
 
   protected productCollectionLabels(product: Product): string[] {
     return (product.collectionIds ?? []).map((id) => this.collectionLabel(id));
+  }
+
+  protected isRowExpanded(productId: string): boolean {
+    return this.expandedRowIds().has(productId);
+  }
+
+  protected toggleRowExpanded(productId: string, event: Event): void {
+    event.stopPropagation();
+    this.expandedRowIds.update((ids) => {
+      const next = new Set(ids);
+      if (next.has(productId)) {
+        next.delete(productId);
+      } else {
+        next.add(productId);
+      }
+      return next;
+    });
   }
 
   protected onStockClick(product: Product, event: Event): void {
@@ -344,6 +373,22 @@ export class ProductCatalogTableComponent {
 
   protected productActionMenuItems(product: Product): MenuItem[] {
     const t = (key: string) => this.translate.instant(key);
+
+    if (product.pendingMergeIntoProductId) {
+      return [
+        {
+          label: t('ADMIN.CATALOG_PAGE.PENDING_MERGE.PROMOTE_ACTION'),
+          icon: 'pi pi-sitemap',
+          command: () => this.promoteToVariant.emit(product),
+        },
+        {
+          label: t('ADMIN.CATALOG_PAGE.PENDING_MERGE.UNLINK_ACTION'),
+          icon: 'pi pi-link-slash',
+          command: () => this.unlinkPendingMerge.emit(product),
+        },
+      ];
+    }
+
     const items: MenuItem[] = [
       {
         label: t('ADMIN.CATALOG_PAGE.ACTIONS.PREVIEW'),

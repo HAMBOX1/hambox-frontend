@@ -9,6 +9,7 @@ import { CategoryOption } from '../models/category.model';
 import { CollectionOption } from '../models/collection.model';
 import {
   BulkProductsResult,
+  CreateProductRequest,
   MergeProductsResult,
   PriceAdjustmentMode,
   Product,
@@ -64,6 +65,7 @@ export class ProductCatalogFacade {
   private readonly bulkActionLoadingState = signal(false);
   private readonly bulkErrorState = signal<string | null>(null);
   private readonly statusCountsState = signal<ProductStatusCounts | null>(null);
+  private readonly pendingMergeOnlyState = signal(false);
 
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   private hasLoaded = false;
@@ -89,7 +91,11 @@ export class ProductCatalogFacade {
 
   readonly hasActiveSearch = computed(() => this.searchTermState().trim().length > 0);
   readonly hasActiveFilters = computed(
-    () => this.hasActiveSearch() || this.statusFilterState().trim().length > 0 || this.collectionFilterState() !== null,
+    () =>
+      this.hasActiveSearch() ||
+      this.statusFilterState().trim().length > 0 ||
+      this.collectionFilterState() !== null ||
+      this.pendingMergeOnlyState(),
   );
   readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
 
@@ -108,6 +114,7 @@ export class ProductCatalogFacade {
   readonly bulkActionLoading = this.bulkActionLoadingState.asReadonly();
   readonly bulkError = this.bulkErrorState.asReadonly();
   readonly statusCounts = this.statusCountsState.asReadonly();
+  readonly pendingMergeOnly = this.pendingMergeOnlyState.asReadonly();
 
   readonly bulkSelectedCount = computed(() =>
     this.selectAllMatchingState() ? this.totalCountState() : this.bulkSelectedIdsState().size,
@@ -124,9 +131,17 @@ export class ProductCatalogFacade {
   });
 
   /** Show the "select all N matching your filter" prompt only once the whole loaded page is
-   * checked and there's more beyond it. */
+   * checked and there's more beyond it. Never offered on the Pending Merge tab: "select all
+   * matching" is resolved server-side from search/status/category alone (see
+   * `BulkProductSelectionResolver`), which doesn't know about `pendingMergeOnly` — offering it here
+   * would silently widen a bulk action (e.g. bulk delete) to every product matching those filters,
+   * not just the parked duplicates on screen. */
   readonly canOfferSelectAllMatching = computed(
-    () => this.isAllPageSelected() && !this.selectAllMatchingState() && this.totalCountState() > this.itemsState().length,
+    () =>
+      this.isAllPageSelected() &&
+      !this.selectAllMatchingState() &&
+      !this.pendingMergeOnlyState() &&
+      this.totalCountState() > this.itemsState().length,
   );
 
   setSearchTerm(term: string): void {
@@ -137,6 +152,19 @@ export class ProductCatalogFacade {
 
   setStatusFilter(status: string): void {
     this.statusFilterState.set(status);
+    this.pendingMergeOnlyState.set(false);
+    this.pageNumberState.set(1);
+    void this.fetchProducts();
+  }
+
+  /** Toggles the "Pending Merge" tab — mutually exclusive with the regular status tabs, since a
+   * parked duplicate keeps whatever status it had (see `Product.SetPendingMerge`) and is otherwise
+   * excluded from every status-scoped view server-side (see `ProductQueryFilters.ApplyBaseFilters`). */
+  setPendingMergeOnly(value: boolean): void {
+    this.pendingMergeOnlyState.set(value);
+    if (value) {
+      this.statusFilterState.set('');
+    }
     this.pageNumberState.set(1);
     void this.fetchProducts();
   }
@@ -156,6 +184,7 @@ export class ProductCatalogFacade {
 
     this.searchTermState.set('');
     this.statusFilterState.set('');
+    this.pendingMergeOnlyState.set(false);
     this.collectionFilterState.set(null);
     this.supplierMappingFilterState.set('');
     this.supplierMappingFilterProductIdsState.set(null);
@@ -545,6 +574,71 @@ export class ProductCatalogFacade {
     }
   }
 
+  /** Creates a brand-new product, for the merge dialog's "create a new product" target option —
+   * the caller then merges/parks the selected sources into the returned id exactly as it would an
+   * existing product. Reuses the same `ProductApiService.createProduct` the product-edit page uses. */
+  async createProduct(request: CreateProductRequest): Promise<string | null> {
+    this.bulkActionLoadingState.set(true);
+    this.bulkErrorState.set(null);
+
+    try {
+      return await firstValueFrom(this.api.createProduct(request));
+    } catch (error) {
+      this.bulkErrorState.set(this.toErrorMessage(error, 'Failed to create product.'));
+      return null;
+    } finally {
+      this.bulkActionLoadingState.set(false);
+    }
+  }
+
+  /**
+   * Parks each of `sourceProductIds` as a pending merge into `targetProductId` — the deferred
+   * alternative to `mergeProducts`: nothing is touched yet (no variant, no stock loss), so unlike
+   * `mergeProducts` this never needs a stock-loss confirmation round trip. Mirrors `mergeProducts`'s
+   * loading/error/refetch shape so the merge dialog can treat both paths the same way.
+   */
+  async setPendingMergeForSelection(
+    targetProductId: string,
+    sourceProductIds: readonly string[],
+  ): Promise<boolean> {
+    this.bulkActionLoadingState.set(true);
+    this.bulkErrorState.set(null);
+
+    try {
+      await Promise.all(
+        sourceProductIds.map((sourceProductId) =>
+          firstValueFrom(this.api.setPendingMerge(sourceProductId, targetProductId)),
+        ),
+      );
+      this.clearBulkSelection();
+      await this.fetchProducts(true);
+      return true;
+    } catch (error) {
+      this.bulkErrorState.set(this.toErrorMessage(error, 'Failed to mark products as pending merge.'));
+      return false;
+    } finally {
+      this.bulkActionLoadingState.set(false);
+    }
+  }
+
+  /** Unlinks a previously parked duplicate — it reappears in the normal catalog list at whatever
+   * status it had. Used by the "Unlink" row action in the Pending Merge tab. */
+  async clearPendingMerge(productId: string): Promise<boolean> {
+    this.actionLoadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      await firstValueFrom(this.api.clearPendingMerge(productId));
+      await this.fetchProducts(true);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to unlink pending merge.'));
+      return false;
+    } finally {
+      this.actionLoadingState.set(false);
+    }
+  }
+
   async exportSelected(): Promise<Blob | null> {
     this.bulkActionLoadingState.set(true);
     this.bulkErrorState.set(null);
@@ -614,6 +708,7 @@ export class ProductCatalogFacade {
       const sortBy = this.sortByState();
       const collectionId = this.collectionFilterState();
       const supplierMappingProductIds = this.supplierMappingFilterProductIdsState();
+      const pendingMergeOnly = this.pendingMergeOnlyState();
       const requestedPageNumber = this.pageNumberState();
       const result = await firstValueFrom(
         this.api.getProducts({
@@ -624,6 +719,7 @@ export class ProductCatalogFacade {
           ...(sortBy ? { sortBy } : {}),
           ...(collectionId ? { collectionId } : {}),
           ...(supplierMappingProductIds ? { productIds: supplierMappingProductIds } : {}),
+          ...(pendingMergeOnly ? { pendingMergeOnly: true } : {}),
         }),
       );
 

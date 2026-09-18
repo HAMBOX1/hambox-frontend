@@ -3,6 +3,7 @@
   [visible]="visible()"
   (visibleChange)="visibleChange.emit($event)"
   [modal]="true"
+  [dismissableMask]="!loading()"
   [draggable]="false"
   [resizable]="false"
   [closable]="!loading()"

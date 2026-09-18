@@ -35,6 +35,7 @@ import { ProductDetailPanelComponent } from '../../components/product-detail-pan
 import {
   ProductMergeConfirmEvent,
   ProductMergeDialogComponent,
+  ProductMergeTarget,
 } from '../../components/product-merge-dialog/product-merge-dialog.component';
 import {
   PriceAdjustmentMode,
@@ -138,6 +139,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly searchTerm = this.facade.searchTerm;
   protected readonly statusFilter = this.facade.statusFilter;
   protected readonly statusCounts = this.facade.statusCounts;
+  protected readonly pendingMergeOnly = this.facade.pendingMergeOnly;
   protected readonly error = this.facade.error;
   protected readonly totalCount = this.facade.totalCount;
   protected readonly pageSize = this.facade.pageSize;
@@ -157,6 +159,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly viewMode = this.viewModeService.mode;
 
   protected readonly deleteDialogOpen = signal(false);
+  protected readonly promoteStockConfirmTarget = signal<Product | null>(null);
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateNameSuffix = signal(' Copy');
   protected readonly actionTarget = signal<Product | null>(null);
@@ -184,6 +187,9 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkCreateCollectionDialogOpen = signal(false);
   protected readonly bulkMergeDialogOpen = signal(false);
   protected readonly bulkMergeNeedsStockConfirm = signal(false);
+  /** Caches the id of a just-created "new product" merge target across the stock-loss-confirmation
+   * retry round trip (see `confirmBulkMerge`), so retrying never creates a second empty product. */
+  protected readonly createdMergeTargetId = signal<string | null>(null);
   protected readonly showAllConfirmDialogOpen = signal(false);
   protected readonly bulkDuplicateSuffix = signal(' Copy');
   protected readonly bulkTargetCategoryId = signal<string | null>(null);
@@ -316,6 +322,10 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onStatusFilterChange(status: ProductStatus | ''): void {
     this.facade.setStatusFilter(status);
+  }
+
+  protected onPendingMergeTabSelected(): void {
+    this.facade.setPendingMergeOnly(true);
   }
 
   protected onCollectionFilterChange(collectionId: string | null): void {
@@ -605,6 +615,93 @@ export class ProductCatalogPageComponent implements OnInit {
       : '';
   }
 
+  /** Runs the actual merge for a single pending-merge row (existing `MergeProductsCommand`, one
+   * source) — re-prompts via `promoteStockConfirmTarget` on the same stock-loss conflict the bulk
+   * merge dialog handles, since this bypasses that dialog entirely. */
+  protected async onPromoteToVariant(product: Product): Promise<void> {
+    if (!product.pendingMergeIntoProductId) {
+      return;
+    }
+
+    const { result, requiresStockLossConfirmation } = await this.facade.mergeProducts(
+      product.pendingMergeIntoProductId,
+      [product.id],
+      false,
+    );
+
+    if (requiresStockLossConfirmation) {
+      this.promoteStockConfirmTarget.set(product);
+      return;
+    }
+
+    if (result) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.PENDING_MERGE.PROMOTE_ACTION'),
+        detail: `${result.mergedSourceCount} product(s) merged.`,
+        life: 4000,
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Promote failed',
+        detail: this.facade.bulkError() ?? 'Failed to promote product to variant.',
+        life: 5000,
+      });
+    }
+  }
+
+  protected onPromoteStockConfirmVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.promoteStockConfirmTarget.set(null);
+    }
+  }
+
+  protected async confirmPromoteStockLoss(): Promise<void> {
+    const product = this.promoteStockConfirmTarget();
+    if (!product?.pendingMergeIntoProductId) {
+      return;
+    }
+
+    const { result } = await this.facade.mergeProducts(product.pendingMergeIntoProductId, [product.id], true);
+    this.promoteStockConfirmTarget.set(null);
+
+    if (result) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.PENDING_MERGE.PROMOTE_ACTION'),
+        detail: `${result.mergedSourceCount} product(s) merged.`,
+        life: 4000,
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Promote failed',
+        detail: this.facade.bulkError() ?? 'Failed to promote product to variant.',
+        life: 5000,
+      });
+    }
+  }
+
+  protected async onUnlinkPendingMerge(product: Product): Promise<void> {
+    const success = await this.facade.clearPendingMerge(product.id);
+    if (success) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.PENDING_MERGE.UNLINK_ACTION'),
+        detail: product.nameEn,
+        life: 4000,
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Unlink failed',
+        detail: this.facade.error() ?? 'Failed to unlink pending merge.',
+        life: 5000,
+      });
+    }
+  }
+
   protected async onRowArchive(product: Product): Promise<void> {
     const success = await this.facade.updateProductStatus(product, 'Archived');
     if (success) {
@@ -771,15 +868,46 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected openBulkMergeDialog(): void {
     this.bulkMergeNeedsStockConfirm.set(false);
+    this.createdMergeTargetId.set(null);
     this.bulkMergeDialogOpen.set(true);
   }
 
   /** Unlike the other confirmBulk* handlers this doesn't go through `runBulkAction` — a stock-loss
    * conflict from the backend must re-open the SAME dialog with a confirmation checkbox rather than
-   * being treated as a terminal error, so `facade.mergeProducts` reports that case separately. */
+   * being treated as a terminal error, so `facade.mergeProducts` reports that case separately.
+   * `event.mode === 'pending'` skips all of that: it just parks every source as a pending merge
+   * (see `ProductCatalogFacade.setPendingMergeForSelection`), which never touches stock. */
   protected async confirmBulkMerge(event: ProductMergeConfirmEvent): Promise<void> {
+    const targetProductId = await this.resolveMergeTargetId(event.target);
+    if (!targetProductId) {
+      return;
+    }
+
+    if (event.mode === 'pending') {
+      const success = await this.facade.setPendingMergeForSelection(targetProductId, event.sourceProductIds);
+      if (success) {
+        this.bulkMergeDialogOpen.set(false);
+        this.bulkMergeNeedsStockConfirm.set(false);
+        this.createdMergeTargetId.set(null);
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('ADMIN.CATALOG_PAGE.BULK.MARK_AS_PENDING_ACTION'),
+          detail: `${event.sourceProductIds.length} product(s) marked as pending merge.`,
+          life: 4000,
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed to mark as pending merge',
+          detail: this.facade.bulkError() ?? 'Failed to mark products as pending merge.',
+          life: 5000,
+        });
+      }
+      return;
+    }
+
     const { result, requiresStockLossConfirmation } = await this.facade.mergeProducts(
-      event.targetProductId,
+      targetProductId,
       event.sourceProductIds,
       event.confirmStockLoss,
     );
@@ -792,6 +920,7 @@ export class ProductCatalogPageComponent implements OnInit {
     if (result) {
       this.bulkMergeDialogOpen.set(false);
       this.bulkMergeNeedsStockConfirm.set(false);
+      this.createdMergeTargetId.set(null);
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION'),
@@ -806,6 +935,34 @@ export class ProductCatalogPageComponent implements OnInit {
         life: 5000,
       });
     }
+  }
+
+  /** Resolves the merge dialog's target choice to a real product id. For 'new', creates the
+   * product on first call and caches the id in `createdMergeTargetId` so a stock-loss-confirmation
+   * retry (see `confirmBulkMerge`) reuses it instead of creating a second empty product. */
+  private async resolveMergeTargetId(target: ProductMergeTarget): Promise<string | null> {
+    if (target.kind === 'existing') {
+      return target.productId;
+    }
+
+    const cached = this.createdMergeTargetId();
+    if (cached) {
+      return cached;
+    }
+
+    const newId = await this.facade.createProduct(target.request);
+    if (!newId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to create product',
+        detail: this.facade.bulkError() ?? 'Failed to create the new product.',
+        life: 5000,
+      });
+      return null;
+    }
+
+    this.createdMergeTargetId.set(newId);
+    return newId;
   }
 
   protected async confirmBulkPriceAdjust(): Promise<void> {

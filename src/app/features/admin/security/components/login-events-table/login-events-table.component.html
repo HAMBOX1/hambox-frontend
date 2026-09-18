@@ -97,6 +97,7 @@
   [visible]="detailTarget() !== null"
   (visibleChange)="!$event && detailTarget.set(null)"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '32rem' }"
   [header]="'ADMIN.SECURITY.LOGIN_EVENTS.DETAIL_TITLE' | translate"
 >

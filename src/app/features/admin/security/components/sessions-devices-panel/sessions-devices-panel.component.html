@@ -155,6 +155,7 @@
   [visible]="blockDeviceDialogOpen()"
   (visibleChange)="blockDeviceDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [style]="{ width: '32rem' }"
   [header]="'ADMIN.SECURITY.DEVICES.ACTIONS.BLOCK' | translate"
 >

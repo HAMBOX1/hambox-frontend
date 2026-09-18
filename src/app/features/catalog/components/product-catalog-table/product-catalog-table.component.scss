@@ -13,6 +13,16 @@
   }
 }
 
+.product-catalog-table__pending-merge-hint {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--admin-text-muted, #6b7280);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
 .product-catalog-table__product {
   display: flex;
   align-items: center;
@@ -173,9 +183,29 @@
   color: var(--admin-text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
+  // These render as <button> (toggles row expand/collapse) — reset UA button styling to match
+  // the plain-span look the class was designed for.
+  appearance: none;
+  font-family: inherit;
+  line-height: 1.2;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--admin-bg-hover, color-mix(in srgb, var(--admin-border-default) 25%, transparent));
+  }
 
   &--narrow {
     display: none;
+  }
+}
+
+.product-catalog-table__category-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 0.6875rem;
   }
 }
 

@@ -62,8 +62,10 @@
 
   <app-product-catalog-status-tabs
     [activeStatus]="statusFilter()"
+    [pendingMergeActive]="pendingMergeOnly()"
     [counts]="statusCounts()"
     (statusChange)="onStatusFilterChange($event)"
+    (pendingMergeChange)="onPendingMergeTabSelected()"
   />
 
   <app-product-catalog-toolbar
@@ -188,6 +190,7 @@
       [sortOrder]="sortOrder()"
       [bulkSelectedIds]="bulkSelectedIds()"
       [allPageSelected]="isAllPageSelected()"
+      [selectAllMatchingActive]="selectAllMatchingActive()"
       [actionLoading]="actionLoading()"
       (pageChange)="onPageChange($event)"
       (productSelect)="onProductSelect($event)"
@@ -206,6 +209,8 @@
       (collectionCreated)="onCollectionCreated()"
       (bulkToggle)="onBulkToggle($event)"
       (bulkToggleAllPage)="onBulkToggleAllPage($event)"
+      (promoteToVariant)="onPromoteToVariant($event)"
+      (unlinkPendingMerge)="onUnlinkPendingMerge($event)"
     />
   } @else {
     <app-product-catalog-cards
@@ -216,6 +221,7 @@
       [first]="tableFirst()"
       [searchActive]="hasActiveSearch()"
       [bulkSelectedIds]="bulkSelectedIds()"
+      [selectAllMatchingActive]="selectAllMatchingActive()"
       [collectionOptions]="collectionOptions()"
       [mappingStatusByProductId]="mappingStatusByProductId()"
       (pageChange)="onCardsPageChange($event)"
@@ -269,6 +275,7 @@
   [visible]="duplicateDialogOpen()"
   (visibleChange)="duplicateDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -310,6 +317,7 @@
   [visible]="chatDeliveryDialogOpen()"
   (visibleChange)="chatDeliveryDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(26rem, 92vw)' }"
@@ -362,6 +370,15 @@
 />
 
 <app-admin-confirm-dialog
+  [visible]="promoteStockConfirmTarget() !== null"
+  [title]="'ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION' | translate"
+  [message]="'ADMIN.CATALOG_PAGE.BULK.MERGE_STOCK_WARNING' | translate"
+  [loading]="bulkActionLoading()"
+  (visibleChange)="onPromoteStockConfirmVisibleChange($event)"
+  (confirmed)="confirmPromoteStockLoss()"
+/>
+
+<app-admin-confirm-dialog
   [visible]="bulkDeleteDialogOpen()"
   [title]="'ADMIN.CONFIRM.DELETE_PRODUCTS_TITLE' | translate"
   [message]="'ADMIN.CONFIRM.DELETE_PRODUCTS' | translate: { count: bulkSelectedCount() }"
@@ -376,6 +393,7 @@
   [visible]="bulkDuplicateDialogOpen()"
   (visibleChange)="bulkDuplicateDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -417,6 +435,7 @@
   [visible]="bulkCategoryDialogOpen()"
   (visibleChange)="bulkCategoryDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -462,6 +481,7 @@
   [visible]="bulkPriceDialogOpen()"
   (visibleChange)="bulkPriceDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -542,6 +562,7 @@
   [visible]="bulkAssignCollectionDialogOpen()"
   (visibleChange)="bulkAssignCollectionDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -587,6 +608,7 @@
   [visible]="bulkRemoveCollectionDialogOpen()"
   (visibleChange)="bulkRemoveCollectionDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -633,6 +655,7 @@
   [visible]="bulkCreateCollectionDialogOpen()"
   (visibleChange)="bulkCreateCollectionDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(28rem, 92vw)' }"
@@ -690,6 +713,7 @@
   [products]="mergeableSelectedProducts()"
   [loading]="bulkActionLoading()"
   [needsStockLossConfirmation]="bulkMergeNeedsStockConfirm()"
+  [categoryOptions]="categoryOptions()"
   (visibleChange)="bulkMergeDialogOpen.set($event)"
   (confirmed)="confirmBulkMerge($event)"
 />

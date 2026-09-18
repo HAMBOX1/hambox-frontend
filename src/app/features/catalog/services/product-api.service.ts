@@ -64,6 +64,10 @@ export class ProductApiService {
       params['collectionId'] = query.collectionId;
     }
 
+    if (query.pendingMergeOnly) {
+      params['pendingMergeOnly'] = true;
+    }
+
     if (query.productIds && query.productIds.length > 0) {
       // Repeated query params (?productIds=a&productIds=b) — the plain Record shape above can't
       // express an array value, so build HttpParams directly only for this one case.
@@ -193,6 +197,14 @@ export class ProductApiService {
 
   mergeProducts(request: MergeProductsRequest): Observable<MergeProductsResult> {
     return this.api.post<MergeProductsResult>(CATALOG_API.productsBulkMerge, request);
+  }
+
+  setPendingMerge(productId: string, targetProductId: string): Observable<void> {
+    return this.api.post<void>(CATALOG_API.productPendingMerge(productId), { targetProductId });
+  }
+
+  clearPendingMerge(productId: string): Observable<void> {
+    return this.api.delete<void>(CATALOG_API.productPendingMerge(productId));
   }
 
   getProductStatusCounts(query: { searchTerm?: string; categoryId?: string; collectionId?: string }): Observable<ProductStatusCounts> {

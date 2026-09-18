@@ -109,6 +109,7 @@
   [visible]="detail() !== null || detailLoading()"
   (visibleChange)="!$event && closeDetail()"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(36rem, 92vw)' }"

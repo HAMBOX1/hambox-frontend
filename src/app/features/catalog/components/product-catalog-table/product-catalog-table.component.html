@@ -120,6 +120,19 @@
             <div class="product-catalog-table__category-chips">
               @if (categoryLabels.length === 0) {
                 <span class="product-catalog-table__category-empty">Uncategorized</span>
+              } @else if (isRowExpanded(product.id)) {
+                @for (label of categoryLabels; track label) {
+                  <span class="product-catalog-table__category-chip">{{ label }}</span>
+                }
+                @if (categoryLabels.length > 1) {
+                  <button
+                    type="button"
+                    class="product-catalog-table__category-overflow product-catalog-table__category-toggle"
+                    pTooltip="Show less"
+                    tooltipPosition="top"
+                    (click)="toggleRowExpanded(product.id, $event)"
+                  ><i class="pi pi-chevron-up" aria-hidden="true"></i></button>
+                }
               } @else {
                 <span class="product-catalog-table__category-chip">{{ categoryLabels[0] }}</span>
                 @if (categoryLabels.length > 1) {
@@ -128,19 +141,23 @@
                   }}</span>
                 }
                 @if (categoryLabels.length > 2) {
-                  <span
+                  <button
+                    type="button"
                     class="product-catalog-table__category-overflow product-catalog-table__category-overflow--wide"
                     [pTooltip]="categoryLabels.join(', ')"
                     tooltipPosition="top"
-                    >+{{ categoryLabels.length - 2 }}</span
+                    (click)="toggleRowExpanded(product.id, $event)"
+                    >+{{ categoryLabels.length - 2 }}</button
                   >
                 }
                 @if (categoryLabels.length > 1) {
-                  <span
+                  <button
+                    type="button"
                     class="product-catalog-table__category-overflow product-catalog-table__category-overflow--narrow"
                     [pTooltip]="categoryLabels.join(', ')"
                     tooltipPosition="top"
-                    >+{{ categoryLabels.length - 1 }}</span
+                    (click)="toggleRowExpanded(product.id, $event)"
+                    >+{{ categoryLabels.length - 1 }}</button
                   >
                 }
               }
@@ -155,6 +172,21 @@
             <div class="product-catalog-table__category-chips">
               @if (collectionLabels.length === 0) {
                 <span class="product-catalog-table__category-empty">None</span>
+              } @else if (isRowExpanded(product.id)) {
+                @for (label of collectionLabels; track label) {
+                  <span class="product-catalog-table__category-chip product-catalog-table__category-chip--collection">{{
+                    label
+                  }}</span>
+                }
+                @if (collectionLabels.length > 1) {
+                  <button
+                    type="button"
+                    class="product-catalog-table__category-overflow product-catalog-table__category-toggle"
+                    pTooltip="Show less"
+                    tooltipPosition="top"
+                    (click)="toggleRowExpanded(product.id, $event)"
+                  ><i class="pi pi-chevron-up" aria-hidden="true"></i></button>
+                }
               } @else {
                 <span class="product-catalog-table__category-chip product-catalog-table__category-chip--collection">{{
                   collectionLabels[0]
@@ -166,19 +198,23 @@
                   >
                 }
                 @if (collectionLabels.length > 2) {
-                  <span
+                  <button
+                    type="button"
                     class="product-catalog-table__category-overflow product-catalog-table__category-overflow--wide"
                     [pTooltip]="collectionLabels.join(', ')"
                     tooltipPosition="top"
-                    >+{{ collectionLabels.length - 2 }}</span
+                    (click)="toggleRowExpanded(product.id, $event)"
+                    >+{{ collectionLabels.length - 2 }}</button
                   >
                 }
                 @if (collectionLabels.length > 1) {
-                  <span
+                  <button
+                    type="button"
                     class="product-catalog-table__category-overflow product-catalog-table__category-overflow--narrow"
                     [pTooltip]="collectionLabels.join(', ')"
                     tooltipPosition="top"
-                    >+{{ collectionLabels.length - 1 }}</span
+                    (click)="toggleRowExpanded(product.id, $event)"
+                    >+{{ collectionLabels.length - 1 }}</button
                   >
                 }
               }
@@ -219,6 +255,12 @@
                 <app-admin-status-badge [label]="statusLabel(status)" [tone]="statusTone(status)" />
               </ng-template>
             </p-select>
+            @if (product.pendingMergeIntoProductId) {
+              <div class="product-catalog-table__pending-merge-hint">
+                {{ 'ADMIN.CATALOG_PAGE.PENDING_MERGE.TARGET_COLUMN' | translate }}:
+                {{ product.pendingMergeIntoProductName || product.pendingMergeIntoProductId }}
+              </div>
+            }
           </td>
           <td (click)="$event.stopPropagation()">
             @if (mappingStatusFor(product.id); as mapping) {
@@ -339,6 +381,7 @@
     [visible]="categoryDialogOpen()"
     (visibleChange)="onCategoryCreateDialogVisibleChange($event)"
     [modal]="true"
+    [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: 'min(32rem, 92vw)' }"
@@ -420,6 +463,7 @@
     [visible]="collectionDialogOpen()"
     (visibleChange)="onCollectionCreateDialogVisibleChange($event)"
     [modal]="true"
+    [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: 'min(28rem, 92vw)' }"

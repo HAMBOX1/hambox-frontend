@@ -99,7 +99,7 @@
           <td>
             <div class="supplier-mappings-page__cell">
               @if (mapping.sellingPrice !== null) {
-                <span class="supplier-mappings-page__cell-primary">{{ mapping.sellingPrice }} {{ mapping.currency }}</span>
+                <span class="supplier-mappings-page__cell-primary">{{ mapping.sellingPrice }} {{ mapping.sellingPriceCurrency }}</span>
               } @else {
                 <span class="admin-cell-secondary">—</span>
               }
@@ -170,6 +170,7 @@
   [visible]="dialogOpen()"
   (visibleChange)="dialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(34rem, 92vw)' }"

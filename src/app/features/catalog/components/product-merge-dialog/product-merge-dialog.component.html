@@ -4,26 +4,97 @@
   (visibleChange)="onVisibleChange($event)"
   (onShow)="onDialogShow()"
   [modal]="true"
+  [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(30rem, 92vw)' }"
   styleClass="admin-dialog"
 >
   <div class="admin-field">
+    <label class="admin-field__label">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_MODE_LABEL' | translate }}</label>
+    <div class="product-merge-dialog__options">
+      <label class="product-merge-dialog__option">
+        <p-radioButton name="mergeMode" value="merge" [ngModel]="mode()" (ngModelChange)="selectMode($event)" />
+        <span>{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_MODE_NOW' | translate }}</span>
+      </label>
+      <label class="product-merge-dialog__option">
+        <p-radioButton name="mergeMode" value="pending" [ngModel]="mode()" (ngModelChange)="selectMode($event)" />
+        <span>{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_MODE_PENDING' | translate }}</span>
+      </label>
+    </div>
+    @if (mode() === 'pending') {
+      <p class="admin-field__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_MODE_PENDING_HINT' | translate }}</p>
+    }
+  </div>
+
+  <div class="admin-field">
     <label class="admin-field__label">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_TARGET_LABEL' | translate }}</label>
     <div class="product-merge-dialog__options">
-      @for (product of products(); track product.id) {
-        <label class="product-merge-dialog__option">
-          <p-radioButton
-            name="mergeTarget"
-            [value]="product.id"
-            [ngModel]="targetProductId()"
-            (ngModelChange)="selectTarget($event)"
-          />
-          <span>{{ product.nameEn }}</span>
-        </label>
-      }
+      <label class="product-merge-dialog__option">
+        <p-radioButton
+          name="mergeTargetKind"
+          value="existing"
+          [ngModel]="targetKind()"
+          (ngModelChange)="selectTargetKind($event)"
+        />
+        <span>{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_TARGET_EXISTING' | translate }}</span>
+      </label>
+      <label class="product-merge-dialog__option">
+        <p-radioButton
+          name="mergeTargetKind"
+          value="new"
+          [ngModel]="targetKind()"
+          (ngModelChange)="selectTargetKind($event)"
+        />
+        <span>{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_TARGET_NEW' | translate }}</span>
+      </label>
     </div>
+
+    @if (targetKind() === 'existing') {
+      <div class="product-merge-dialog__options">
+        @for (product of products(); track product.id) {
+          <label class="product-merge-dialog__option">
+            <p-radioButton
+              name="mergeTarget"
+              [value]="product.id"
+              [ngModel]="targetProductId()"
+              (ngModelChange)="selectTarget($event)"
+            />
+            <span>{{ product.nameEn }}</span>
+          </label>
+        }
+      </div>
+    } @else {
+      <div class="product-merge-dialog__new-target">
+        <input
+          pInputText
+          class="admin-field__input"
+          [placeholder]="'ADMIN.CATALOG_PAGE.BULK.MERGE_NEW_NAME_PLACEHOLDER' | translate"
+          [ngModel]="newProductNameEn()"
+          (ngModelChange)="newProductNameEn.set($event)"
+        />
+        <p-select
+          [options]="[...categoryOptions()]"
+          optionLabel="label"
+          optionValue="id"
+          [placeholder]="'ADMIN.CATALOG_PAGE.BULK.MERGE_NEW_CATEGORY_PLACEHOLDER' | translate"
+          [ngModel]="newProductCategoryId()"
+          (ngModelChange)="newProductCategoryId.set($event)"
+          appendTo="body"
+          [style]="{ width: '100%' }"
+        />
+        <p-inputNumber
+          mode="currency"
+          currency="USD"
+          [minFractionDigits]="2"
+          [placeholder]="'ADMIN.CATALOG_PAGE.BULK.MERGE_NEW_PRICE_PLACEHOLDER' | translate"
+          [ngModel]="newProductPrice()"
+          (ngModelChange)="newProductPrice.set($event)"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+    }
+
     @if (sourceProducts().length > 0) {
       <p class="admin-field__hint">
         {{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_SOURCES_HINT' | translate: { count: sourceProducts().length } }}
@@ -31,7 +102,7 @@
     }
   </div>
 
-  @if (needsStockLossConfirmation()) {
+  @if (mode() === 'merge' && needsStockLossConfirmation()) {
     <div class="admin-field product-merge-dialog__warning">
       <p>{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_STOCK_WARNING' | translate }}</p>
       <label class="product-merge-dialog__checkbox">
@@ -56,9 +127,9 @@
     <button
       pButton
       type="button"
-      [label]="'ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION' | translate"
+      [label]="(mode() === 'pending' ? 'ADMIN.CATALOG_PAGE.BULK.MARK_AS_PENDING_ACTION' : 'ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION') | translate"
       icon="pi pi-sitemap"
-      [disabled]="!targetProductId() || (needsStockLossConfirmation() && !stockLossAcknowledged())"
+      [disabled]="!canConfirm() || (mode() === 'merge' && needsStockLossConfirmation() && !stockLossAcknowledged())"
       [loading]="loading()"
       (click)="confirm()"
     ></button>

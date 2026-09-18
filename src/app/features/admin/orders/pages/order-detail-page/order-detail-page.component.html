@@ -443,6 +443,7 @@
   [visible]="statusDialogOpen()"
   (visibleChange)="statusDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   styleClass="admin-dialog"
 >
   <p>{{ 'ADMIN.ORDERS.DETAIL.STATUS_CONFIRM' | translate }}</p>
@@ -495,6 +496,7 @@
   [visible]="manualCodeDialogOpen()"
   (visibleChange)="manualCodeDialogOpen.set($event)"
   [modal]="true"
+  [dismissableMask]="true"
   styleClass="admin-dialog"
 >
   <label class="order-detail-page__field">
