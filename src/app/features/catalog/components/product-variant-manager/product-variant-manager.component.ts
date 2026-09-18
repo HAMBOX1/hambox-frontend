@@ -480,7 +480,7 @@ export class ProductVariantManagerComponent {
     this.saving.set(true);
     try {
       const isVisible = this.editStatus() === 'Active';
-      await this.facade.updateVariant(variant.id, {
+      const success = await this.facade.updateVariant(variant.id, {
         sku,
         priceOverride,
         comparePrice: this.editComparePrice(),
@@ -492,7 +492,16 @@ export class ProductVariantManagerComponent {
         lowStockThreshold: this.editLowStockThreshold(),
         optionIds: variant.optionIds,
       });
-      this.cancelEdit();
+
+      if (success) {
+        this.cancelEdit();
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed to save variant',
+          detail: this.facade.variantSyncError() ?? 'Failed to update the variant. Please try again.',
+        });
+      }
     } finally {
       this.saving.set(false);
     }
