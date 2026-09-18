@@ -80,6 +80,9 @@ export class ProductCatalogCardsComponent {
   readonly first = input(0);
   readonly searchActive = input(false);
   readonly bulkSelectedIds = input<ReadonlySet<string>>(new Set());
+  /** True while "select all N matching the filter" is active — every loaded card counts as
+   * selected even though `bulkSelectedIds` only tracks individually-toggled ids. */
+  readonly selectAllMatchingActive = input(false);
   readonly collectionOptions = input<readonly CollectionOption[]>([]);
   readonly mappingStatusByProductId = input<ReadonlyMap<string, ProductSupplierMappingStatusDto>>(new Map());
 
@@ -141,7 +144,7 @@ export class ProductCatalogCardsComponent {
   }
 
   protected isBulkSelected(productId: string): boolean {
-    return this.bulkSelectedIds().has(productId);
+    return this.selectAllMatchingActive() || this.bulkSelectedIds().has(productId);
   }
 
   protected onBulkCheckboxClick(product: Product, event: Event | undefined): void {
