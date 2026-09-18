@@ -30,6 +30,81 @@
   min-width: 0;
 }
 
+.product-catalog-table__variant-expander {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--admin-radius-sm);
+  background: transparent;
+  color: var(--admin-text-muted, #6b7280);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    background: var(--admin-surface-hover, rgba(255, 255, 255, 0.06));
+  }
+
+  i {
+    transition: transform 0.15s ease;
+  }
+
+  &--open i {
+    transform: rotate(90deg);
+  }
+}
+
+// Reserves the expander's width on rows without one, so product names still line up in a column
+// regardless of which rows happen to have variants.
+.product-catalog-table__variant-expander-placeholder {
+  flex-shrink: 0;
+  width: 1.5rem;
+}
+
+.product-catalog-table__variant-panel-row > td {
+  padding: 0 !important;
+  background: var(--admin-surface-subtle, rgba(255, 255, 255, 0.02));
+}
+
+.product-catalog-table__variant-panel {
+  padding: 0.75rem 0.875rem 0.75rem 3.5rem;
+}
+
+.product-catalog-table__variant-panel-status {
+  font-size: 0.8125rem;
+  color: var(--admin-text-muted, #6b7280);
+}
+
+.product-catalog-table__variant-mini-table {
+  width: 100%;
+  max-width: 40rem;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+
+  th {
+    padding: 0.375rem 0.625rem;
+    text-align: start;
+    color: var(--admin-text-muted, #6b7280);
+    font-weight: 600;
+  }
+
+  td {
+    padding: 0.375rem 0.625rem;
+    border-top: 1px solid var(--admin-border-default);
+  }
+
+  tbody tr {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--admin-surface-hover, rgba(255, 255, 255, 0.06));
+    }
+  }
+}
+
 .product-catalog-table__thumb {
   display: grid;
   flex-shrink: 0;

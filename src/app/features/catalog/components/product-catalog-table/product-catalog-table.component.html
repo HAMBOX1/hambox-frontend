@@ -52,6 +52,22 @@
           </td>
           <td>
             <div class="product-catalog-table__product">
+              @if (hasExpandableVariants(product)) {
+                <button
+                  type="button"
+                  class="product-catalog-table__variant-expander"
+                  [class.product-catalog-table__variant-expander--open]="isVariantsExpanded(product.id)"
+                  [pTooltip]="isVariantsExpanded(product.id) ? 'Hide variants' : 'Show variants'"
+                  tooltipPosition="top"
+                  [attr.aria-label]="(isVariantsExpanded(product.id) ? 'Hide' : 'Show') + ' variants for ' + product.nameEn"
+                  [attr.aria-expanded]="isVariantsExpanded(product.id)"
+                  (click)="toggleVariantsExpansion(product, $event)"
+                >
+                  <i class="pi pi-chevron-right" aria-hidden="true"></i>
+                </button>
+              } @else {
+                <span class="product-catalog-table__variant-expander-placeholder" aria-hidden="true"></span>
+              }
               <span class="product-catalog-table__thumb">
                 @if (product.displayImageUrl && !isImageFailed(product.id)) {
                   <img
@@ -293,6 +309,43 @@
             </div>
           </td>
         </tr>
+
+        @if (hasExpandableVariants(product) && isVariantsExpanded(product.id)) {
+          <tr class="product-catalog-table__variant-panel-row">
+            <td colspan="9">
+              <div class="product-catalog-table__variant-panel">
+                @if (isVariantsLoading(product.id)) {
+                  <span class="product-catalog-table__variant-panel-status">Loading variants…</span>
+                } @else if (variantsFor(product.id).length === 0) {
+                  <span class="product-catalog-table__variant-panel-status">No variants found.</span>
+                } @else {
+                  <table class="product-catalog-table__variant-mini-table">
+                    <thead>
+                      <tr>
+                        <th>SKU</th>
+                        <th>Price</th>
+                        <th>Available</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (variant of variantsFor(product.id); track variant.id) {
+                        <tr [routerLink]="'/admin/products/' + product.id + '/edit'">
+                          <td>{{ variant.sku }}</td>
+                          <td>{{ (variant.priceOverride ?? product.price) | hamboxCurrency }}</td>
+                          <td>{{ variant.availableStock }}</td>
+                          <td>
+                            <app-admin-status-badge [label]="variantStatusLabel(variant.status)" [tone]="variantStatusTone(variant.status)" />
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                }
+              </div>
+            </td>
+          </tr>
+        }
       </ng-template>
 
       <ng-template pTemplate="emptymessage">

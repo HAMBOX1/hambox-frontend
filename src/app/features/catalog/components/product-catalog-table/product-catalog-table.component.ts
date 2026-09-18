@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -42,12 +43,14 @@ import { CollectionCreateFormComponent } from '../collection-create-form/collect
 import { ProductSupplierMappingStatusDto } from '../../../admin/suppliers/models/supplier.model';
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
 import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
+import { ProductVariantDto } from '../../models/inventory-api.model';
 import { Product, ProductStatus } from '../../models/product.model';
 import {
   CategoryApiService,
   createCategoryWithHierarchy,
 } from '../../services/category-api.service';
 import { CollectionApiService } from '../../services/collection-api.service';
+import { InventoryApiService } from '../../services/inventory-api.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
@@ -74,6 +77,7 @@ export interface ProductStatusEdit {
   standalone: true,
   imports: [
     FormsModule,
+    RouterLink,
     TableModule,
     ButtonModule,
     CheckboxModule,
@@ -105,6 +109,7 @@ export class ProductCatalogTableComponent {
   private readonly translate = inject(TranslateService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly collectionApi = inject(CollectionApiService);
+  private readonly inventoryApi = inject(InventoryApiService);
 
   protected readonly permissions = PERMISSIONS;
 
@@ -178,11 +183,40 @@ export class ProductCatalogTableComponent {
    * collection edit popovers below (which still open on a click anywhere else in the cell). */
   protected readonly expandedRowIds = signal<ReadonlySet<string>>(new Set());
 
+  /** Per-product "show its variants inline" toggle — a separate concept from `expandedRowIds`
+   * above (which only expands category/collection chip overflow). Variant lists are fetched
+   * on first expand and cached here for the row's lifetime. */
+  protected readonly expandedVariantIds = signal<ReadonlySet<string>>(new Set());
+  protected readonly variantsByProductId = signal<ReadonlyMap<string, readonly ProductVariantDto[]>>(new Map());
+  protected readonly variantsLoadingIds = signal<ReadonlySet<string>>(new Set());
+
   protected readonly editingCell = signal<{ productId: string; field: EditableField } | null>(null);
   protected readonly editDraftText = signal('');
   protected readonly editDraftNumber = signal<number | null>(null);
 
   protected statusTone(status: ProductStatus): AdminStatusTone {
+    switch (status) {
+      case 'Active':
+        return 'success';
+      case 'Draft':
+        return 'warning';
+      case 'Inactive':
+        return 'danger';
+      case 'Archived':
+        return 'neutral';
+      default:
+        return 'neutral';
+    }
+  }
+
+  /** Variant status is a plain string on `ProductVariantDto` (not the `ProductStatus` union
+   * `statusTone` above expects), but shares the same Draft/Active/Inactive/Archived values —
+   * these two small helpers avoid an unsound cast just to reuse that switch. */
+  protected variantStatusLabel(status: string): string {
+    return status;
+  }
+
+  protected variantStatusTone(status: string): AdminStatusTone {
     switch (status) {
       case 'Active':
         return 'success';
@@ -292,6 +326,66 @@ export class ProductCatalogTableComponent {
       }
       return next;
     });
+  }
+
+  /** Only multi-variant products get an expand arrow — a simple 0/1-variant product has nothing
+   * distinct to drill into (mirrors the same threshold the On-Delivery quick action uses). */
+  protected hasExpandableVariants(product: Product): boolean {
+    return (product.variantCount ?? 0) > 1;
+  }
+
+  protected isVariantsExpanded(productId: string): boolean {
+    return this.expandedVariantIds().has(productId);
+  }
+
+  protected isVariantsLoading(productId: string): boolean {
+    return this.variantsLoadingIds().has(productId);
+  }
+
+  protected variantsFor(productId: string): readonly ProductVariantDto[] {
+    return this.variantsByProductId().get(productId) ?? [];
+  }
+
+  protected toggleVariantsExpansion(product: Product, event: Event): void {
+    event.stopPropagation();
+    const productId = product.id;
+    const alreadyExpanded = this.expandedVariantIds().has(productId);
+
+    this.expandedVariantIds.update((ids) => {
+      const next = new Set(ids);
+      if (alreadyExpanded) {
+        next.delete(productId);
+      } else {
+        next.add(productId);
+      }
+      return next;
+    });
+
+    if (!alreadyExpanded && !this.variantsByProductId().has(productId)) {
+      void this.loadVariantsFor(productId);
+    }
+  }
+
+  private async loadVariantsFor(productId: string): Promise<void> {
+    this.variantsLoadingIds.update((ids) => new Set(ids).add(productId));
+    try {
+      const variants = await firstValueFrom(this.inventoryApi.getProductVariants(productId));
+      this.variantsByProductId.update((current) => {
+        const next = new Map(current);
+        next.set(productId, variants);
+        return next;
+      });
+    } catch {
+      // Leave the row expanded with an empty list rather than surfacing a toast for a
+      // read-only, low-stakes inline preview — the full variant manager (via Edit) is the
+      // authoritative place to retry/diagnose.
+    } finally {
+      this.variantsLoadingIds.update((ids) => {
+        const next = new Set(ids);
+        next.delete(productId);
+        return next;
+      });
+    }
   }
 
   protected onStockClick(product: Product, event: Event): void {
