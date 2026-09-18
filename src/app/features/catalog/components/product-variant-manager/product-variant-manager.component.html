@@ -245,6 +245,7 @@
       [visible]="codesDialogVisible()"
       (visibleChange)="onCodesDialogVisibleChange($event)"
       [modal]="true"
+      [dismissableMask]="true"
       [draggable]="false"
       [resizable]="false"
       appendTo="body"
@@ -291,6 +292,7 @@
     (visibleChange)="onEditDialogVisibleChange($event)"
     header="Edit variant"
     [modal]="true"
+    [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: 'min(28rem, 92vw)' }"
@@ -303,15 +305,44 @@
           <input id="variant-edit-sku" pInputText [ngModel]="editSku()" (ngModelChange)="editSku.set($event)" />
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-price">Price override</label>
+          <label for="variant-edit-cost">Cost price</label>
           <p-inputNumber
-            inputId="variant-edit-price"
-            [ngModel]="editPriceOverride()"
-            (ngModelChange)="editPriceOverride.set($event)"
+            inputId="variant-edit-cost"
+            [ngModel]="editCostPrice()"
+            (ngModelChange)="editCostPrice.set($event)"
             mode="decimal"
             [minFractionDigits]="2"
-            placeholder="Uses base price"
+            placeholder="Optional"
           />
+        </div>
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-price">Sale price</label>
+          <p-select
+            [options]="priceModeOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="salePriceMode()"
+            (ngModelChange)="salePriceMode.set($event)"
+          />
+          @if (salePriceMode() === 'manual') {
+            <p-inputNumber
+              inputId="variant-edit-price"
+              [ngModel]="editPriceOverride()"
+              (ngModelChange)="editPriceOverride.set($event)"
+              mode="decimal"
+              [minFractionDigits]="2"
+              placeholder="Uses base price"
+            />
+          } @else {
+            <p-inputNumber
+              inputId="variant-edit-price-percent"
+              [ngModel]="salePricePercent()"
+              (ngModelChange)="salePricePercent.set($event)"
+              suffix="%"
+              placeholder="e.g. 20"
+            />
+            <span class="variant-manager__computed-price">= {{ computedSalePrice() ?? '—' }}</span>
+          }
         </div>
         <div class="variant-manager__edit-field">
           <label for="variant-edit-compare">Compare-at price</label>
@@ -323,6 +354,35 @@
             [minFractionDigits]="2"
             placeholder="Optional"
           />
+        </div>
+        <div class="variant-manager__edit-field">
+          <label for="variant-edit-member-price">Member (Elite) sale price</label>
+          <p-select
+            [options]="priceModeOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="memberPriceMode()"
+            (ngModelChange)="memberPriceMode.set($event)"
+          />
+          @if (memberPriceMode() === 'manual') {
+            <p-inputNumber
+              inputId="variant-edit-member-price"
+              [ngModel]="editMemberPrice()"
+              (ngModelChange)="editMemberPrice.set($event)"
+              mode="decimal"
+              [minFractionDigits]="2"
+              placeholder="Optional"
+            />
+          } @else {
+            <p-inputNumber
+              inputId="variant-edit-member-price-percent"
+              [ngModel]="memberPricePercent()"
+              (ngModelChange)="memberPricePercent.set($event)"
+              suffix="%"
+              placeholder="e.g. 10"
+            />
+            <span class="variant-manager__computed-price">= {{ computedMemberPrice() ?? '—' }}</span>
+          }
         </div>
         <div class="variant-manager__edit-field">
           <label for="variant-edit-low-stock">Low stock threshold</label>
@@ -397,6 +457,7 @@
     (visibleChange)="!$event && closeBulkBlockedDialog()"
     header="These variants are still in use"
     [modal]="true"
+    [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
     appendTo="body"
@@ -434,6 +495,7 @@
     (visibleChange)="bulkPriceStatusDialogOpen.set($event)"
     header="Change price / status"
     [modal]="true"
+    [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: 'min(24rem, 92vw)' }"

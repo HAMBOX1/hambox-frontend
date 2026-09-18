@@ -17,6 +17,8 @@ function variant(overrides: Partial<ProductVariantDto> = {}): ProductVariantDto 
     sku: 'SKU-1',
     priceOverride: null,
     comparePrice: null,
+    costPrice: null,
+    memberPrice: null,
     sortOrder: 0,
     status: 'Active',
     isVisible: true,

@@ -36,6 +36,10 @@ export interface ProductVariantDto {
   readonly sku: string;
   readonly priceOverride: number | null;
   readonly comparePrice: number | null;
+  /** What this variant costs to acquire — basis for the % markup helper on `priceOverride`/`memberPrice`. */
+  readonly costPrice: number | null;
+  /** Discounted price for members of an eligible plan. Not yet applied at checkout. */
+  readonly memberPrice: number | null;
   readonly sortOrder: number;
   readonly status: string;
   readonly isVisible: boolean;
@@ -252,6 +256,8 @@ export interface UpdateVariantRequest {
   readonly planId?: string | null;
   readonly priceOverride?: number | null;
   readonly comparePrice?: number | null;
+  readonly costPrice?: number | null;
+  readonly memberPrice?: number | null;
   readonly sortOrder: number;
   readonly status: string;
   readonly isVisible: boolean;

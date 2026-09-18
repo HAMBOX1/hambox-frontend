@@ -183,6 +183,11 @@
   }
 }
 
+.variant-manager__computed-price {
+  color: var(--variant-text-muted);
+  font-size: 0.8125rem;
+}
+
 .variant-manager__edit-actions {
   display: flex;
   justify-content: flex-end;

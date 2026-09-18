@@ -147,6 +147,39 @@ export class ProductVariantManagerComponent {
   protected readonly editLowStockThreshold = signal(5);
   protected readonly editStatus = signal('Draft');
 
+  protected readonly editCostPrice = signal<number | null>(null);
+  protected readonly editMemberPrice = signal<number | null>(null);
+  /** Whether the sale/member price fields below are typed directly or computed as a % markup over
+   * `editCostPrice`. Purely a data-entry convenience — only the resulting number is ever persisted. */
+  protected readonly salePriceMode = signal<'manual' | 'percent'>('manual');
+  protected readonly salePricePercent = signal<number | null>(null);
+  protected readonly memberPriceMode = signal<'manual' | 'percent'>('manual');
+  protected readonly memberPricePercent = signal<number | null>(null);
+
+  protected readonly priceModeOptions = [
+    { label: 'Manual', value: 'manual' as const },
+    { label: '% over cost', value: 'percent' as const },
+  ];
+
+  protected readonly computedSalePrice = computed(() =>
+    this.computePriceFromCost(this.editCostPrice(), this.salePricePercent()),
+  );
+  protected readonly computedMemberPrice = computed(() =>
+    this.computePriceFromCost(this.editCostPrice(), this.memberPricePercent()),
+  );
+
+  private computePriceFromCost(cost: number | null, percent: number | null): number | null {
+    if (cost == null || percent == null) {
+      return null;
+    }
+
+    return Math.round(cost * (1 + percent / 100) * 100) / 100;
+  }
+
+  /** Which row's price is being edited inline (the small-screen quick-edit box) — at most one at a time. */
+  protected readonly inlinePriceEditVariantId = signal<string | null>(null);
+  protected readonly inlinePriceDraft = signal<number | null>(null);
+
   protected readonly searchTerm = signal('');
   protected readonly statusFilter = signal('');
   protected readonly quickFilter = signal<VariantFilter>('all');
@@ -257,6 +290,19 @@ export class ProductVariantManagerComponent {
     isHighlighted: (variantId) => this.searchMatchIds()?.has(variantId) ?? false,
     searchActive: () => this.searchTerm().trim().length > 0,
     bulkSelectionActive: () => this.bulkSelectedCount() > 0,
+    isEditingPrice: (variantId) => this.inlinePriceEditVariantId() === variantId,
+    startEditPrice: (variant, event) => {
+      event.stopPropagation();
+      if (this.saving()) {
+        return;
+      }
+      this.inlinePriceDraft.set(variant.priceOverride ?? this.product()?.price ?? 0);
+      this.inlinePriceEditVariantId.set(variant.id);
+    },
+    priceDraft: () => this.inlinePriceDraft(),
+    setPriceDraft: (value) => this.inlinePriceDraft.set(value),
+    saveEditPrice: (variant) => void this.saveInlinePrice(variant),
+    cancelEditPrice: () => this.inlinePriceEditVariantId.set(null),
   };
 
   constructor() {
@@ -340,6 +386,14 @@ export class ProductVariantManagerComponent {
     this.editComparePrice.set(variant.comparePrice);
     this.editLowStockThreshold.set(variant.lowStockThreshold);
     this.editStatus.set(variant.status);
+    this.editCostPrice.set(variant.costPrice);
+    this.editMemberPrice.set(variant.memberPrice);
+    // Always reopens in manual mode — the % is a one-time calculator, not a stored setting, so it
+    // isn't remembered between edits (the resulting number is what persists).
+    this.salePriceMode.set('manual');
+    this.salePricePercent.set(null);
+    this.memberPriceMode.set('manual');
+    this.memberPricePercent.set(null);
     this.editDialogVisible.set(true);
   }
 
@@ -361,13 +415,36 @@ export class ProductVariantManagerComponent {
       return;
     }
 
+    const priceOverride = this.salePriceMode() === 'percent' ? this.computedSalePrice() : this.editPriceOverride();
+    const memberPrice = this.memberPriceMode() === 'percent' ? this.computedMemberPrice() : this.editMemberPrice();
+
+    if (this.salePriceMode() === 'percent' && priceOverride == null) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Cannot compute sale price',
+        detail: 'Enter both a cost price and a percentage.',
+      });
+      return;
+    }
+
+    if (this.memberPriceMode() === 'percent' && memberPrice == null) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Cannot compute member price',
+        detail: 'Enter both a cost price and a percentage.',
+      });
+      return;
+    }
+
     this.saving.set(true);
     try {
       const isVisible = this.editStatus() === 'Active';
       await this.facade.updateVariant(variant.id, {
         sku,
-        priceOverride: this.editPriceOverride(),
+        priceOverride,
         comparePrice: this.editComparePrice(),
+        costPrice: this.editCostPrice(),
+        memberPrice,
         sortOrder: variant.sortOrder,
         status: this.editStatus(),
         isVisible,
@@ -375,6 +452,32 @@ export class ProductVariantManagerComponent {
         optionIds: variant.optionIds,
       });
       this.cancelEdit();
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  /** Quick-edit box on the row itself — price only, everything else on the variant stays untouched. */
+  protected async saveInlinePrice(variant: ProductVariantDto): Promise<void> {
+    const value = this.inlinePriceDraft();
+    this.inlinePriceEditVariantId.set(null);
+
+    if (value === null || value === (variant.priceOverride ?? this.product()?.price ?? 0)) {
+      return;
+    }
+
+    this.saving.set(true);
+    try {
+      await this.facade.updateVariant(variant.id, {
+        sku: variant.sku,
+        priceOverride: value,
+        comparePrice: variant.comparePrice,
+        sortOrder: variant.sortOrder,
+        status: variant.status,
+        isVisible: variant.isVisible,
+        lowStockThreshold: variant.lowStockThreshold,
+        optionIds: variant.optionIds,
+      });
     } finally {
       this.saving.set(false);
     }
