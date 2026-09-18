@@ -15,13 +15,44 @@
       (click)="!callbacks().bulkSelectionActive() && callbacks().openVariant(node.variant!)"
       (keydown.enter)="!callbacks().bulkSelectionActive() && callbacks().openVariant(node.variant!)"
     >
-      <span class="variant-manager__row-check" (click)="$event.stopPropagation()">
-        <p-checkbox
-          [binary]="true"
-          [ngModel]="callbacks().isSelected(node.variant!.id)"
-          (onChange)="callbacks().toggleSelect(node.variant!.id, $event.checked, isShiftClick($event.originalEvent))"
-        />
-      </span>
+      <ng-template #priceField>
+        <span class="variant-manager__row-price" (click)="$event.stopPropagation()">
+          @if (callbacks().isEditingPrice(node.variant!.id)) {
+            <p-inputNumber
+              class="variant-manager__row-price-input"
+              [ngModel]="callbacks().priceDraft()"
+              (ngModelChange)="callbacks().setPriceDraft($event)"
+              (keydown.enter)="callbacks().saveEditPrice(node.variant!)"
+              (keydown.escape)="callbacks().cancelEditPrice()"
+              (onBlur)="callbacks().saveEditPrice(node.variant!)"
+              mode="currency"
+              currency="USD"
+              [minFractionDigits]="2"
+              autofocus
+            />
+          } @else {
+            <span
+              class="variant-manager__row-price-value"
+              (click)="callbacks().startEditPrice(node.variant!, $event)"
+              >{{ callbacks().displayPrice(node.variant!) | hamboxCurrency }}</span
+            >
+          }
+        </span>
+      </ng-template>
+
+      @if (isMobile()) {
+        <span class="variant-manager__row-check variant-manager__row-check--price">
+          <ng-container [ngTemplateOutlet]="priceField" />
+        </span>
+      } @else {
+        <span class="variant-manager__row-check" (click)="$event.stopPropagation()">
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="callbacks().isSelected(node.variant!.id)"
+            (onChange)="callbacks().toggleSelect(node.variant!.id, $event.checked, isShiftClick($event.originalEvent))"
+          />
+        </span>
+      }
 
       <div class="variant-manager__row-body">
         <div class="variant-manager__row-top">
@@ -29,28 +60,9 @@
           <p-tag [value]="node.variant!.status" [severity]="callbacks().statusSeverity(node.variant!)" />
         </div>
         <div class="variant-manager__row-stats">
-          <span class="variant-manager__row-price" (click)="$event.stopPropagation()">
-            @if (callbacks().isEditingPrice(node.variant!.id)) {
-              <p-inputNumber
-                class="variant-manager__row-price-input"
-                [ngModel]="callbacks().priceDraft()"
-                (ngModelChange)="callbacks().setPriceDraft($event)"
-                (keydown.enter)="callbacks().saveEditPrice(node.variant!)"
-                (keydown.escape)="callbacks().cancelEditPrice()"
-                (onBlur)="callbacks().saveEditPrice(node.variant!)"
-                mode="currency"
-                currency="USD"
-                [minFractionDigits]="2"
-                autofocus
-              />
-            } @else {
-              <span
-                class="variant-manager__row-price-value"
-                (click)="callbacks().startEditPrice(node.variant!, $event)"
-                >{{ callbacks().displayPrice(node.variant!) | hamboxCurrency }}</span
-              >
-            }
-          </span>
+          @if (!isMobile()) {
+            <ng-container [ngTemplateOutlet]="priceField" />
+          }
           <span class="variant-manager__row-available">Available {{ node.variant!.availableStock }}</span>
         </div>
       </div>

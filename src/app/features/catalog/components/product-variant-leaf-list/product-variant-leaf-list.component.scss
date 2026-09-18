@@ -73,6 +73,14 @@
   min-height: 2.25rem;
 }
 
+// Mobile swaps the select checkbox for the price box in this same leading slot (see the
+// component) — the checkbox's fixed square sizing doesn't fit a currency value, so this
+// widens it and drops the forced centering that made sense for a small checkbox only.
+.variant-manager__row-check--price {
+  min-width: 0;
+  justify-content: flex-start;
+}
+
 .variant-manager__row-actions {
   display: flex;
   flex: 0 0 auto;

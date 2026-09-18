@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
@@ -7,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 
 import { AdminIconButtonComponent } from '../../../../shared/components/admin';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
+import { MobileViewportService } from '../../../../shared/services/mobile-viewport.service';
 import { VariantTreeCallbacks, VariantTreeNode } from '../../utils/variant-tree.utils';
 
 /**
@@ -30,6 +32,7 @@ const MAX_VISIBLE_ROWS = 8;
   selector: 'app-variant-leaf-list',
   standalone: true,
   imports: [
+    NgTemplateOutlet,
     FormsModule,
     CheckboxModule,
     InputNumberModule,
@@ -46,6 +49,12 @@ export class ProductVariantLeafListComponent {
   readonly children = input.required<readonly VariantTreeNode[]>();
   readonly callbacks = input.required<VariantTreeCallbacks>();
   readonly depth = input(0);
+
+  /** On mobile there's no room to spare on a per-row select checkbox next to a boxed, tappable
+   * price — the checkbox column is dropped there in favor of always-visible inline price editing
+   * ("Select all" up top still bulk-selects everything; only per-row (de)selection is unavailable
+   * on mobile). Desktop keeps the checkbox, unchanged. */
+  protected readonly isMobile = inject(MobileViewportService).isMobile;
 
   private readonly stackedMediaQuery =
     typeof window !== 'undefined' ? window.matchMedia(STACKED_LAYOUT_QUERY) : null;
