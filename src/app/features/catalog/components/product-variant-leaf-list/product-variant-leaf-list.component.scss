@@ -118,9 +118,16 @@
   white-space: nowrap;
 }
 
-:host ::ng-deep .variant-manager__row-top .p-tag {
+// The clickable wrapper (not the tag itself) is .row-top's direct flex child now, so the
+// shrink/ellipsis behavior described above has to live here to still take effect.
+.variant-manager__row-status {
+  display: inline-flex;
   flex: 0 1 auto;
   min-width: 0;
+  cursor: pointer;
+}
+
+:host ::ng-deep .variant-manager__row-status .p-tag {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

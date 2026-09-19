@@ -57,7 +57,16 @@
       <div class="variant-manager__row-body">
         <div class="variant-manager__row-top">
           <span class="variant-manager__row-name">{{ node.label }}</span>
-          <p-tag [value]="node.variant!.status" [severity]="callbacks().statusSeverity(node.variant!)" />
+          <span
+            class="variant-manager__row-status"
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="'Toggle status for ' + node.label"
+            (click)="$event.stopPropagation(); callbacks().toggleVariantStatus(node.variant!)"
+            (keydown.enter)="$event.stopPropagation(); callbacks().toggleVariantStatus(node.variant!)"
+          >
+            <p-tag [value]="node.variant!.status" [severity]="callbacks().statusSeverity(node.variant!)" />
+          </span>
         </div>
         <div class="variant-manager__row-stats">
           @if (!isMobile()) {

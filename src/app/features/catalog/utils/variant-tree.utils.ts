@@ -33,6 +33,10 @@ export interface VariantTreeCallbacks {
    * that blurred the price input (blur fires before click), which would otherwise race with the
    * in-flight price save. */
   isRecentlyEditedPrice(variantId: string): boolean;
+  /** Tapping the status tag directly flips Active <-> Inactive — the mobile replacement for
+   * bulk-selecting variants just to activate them one at a time (there's no room for both a
+   * select checkbox and the price box in the same row on a phone). */
+  toggleVariantStatus(variant: ProductVariantDto): void;
   statusSeverity(variant: ProductVariantDto): 'success' | 'warn' | 'danger' | 'secondary' | 'info';
   isHighlighted(variantId: string): boolean;
   searchActive(): boolean;

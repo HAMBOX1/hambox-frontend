@@ -295,6 +295,7 @@ export class ProductVariantManagerComponent {
     saveEditPrice: (variant) => void this.saveEditPrice(variant),
     cancelEditPrice: () => this.cancelEditPrice(),
     isRecentlyEditedPrice: (variantId) => this.isRecentlyEditedPrice(variantId),
+    toggleVariantStatus: (variant) => void this.toggleVariantStatus(variant),
     statusSeverity: (variant) => this.statusSeverity(variant),
     isHighlighted: (variantId) => this.searchMatchIds()?.has(variantId) ?? false,
     searchActive: () => this.searchTerm().trim().length > 0,
@@ -432,6 +433,23 @@ export class ProductVariantManagerComponent {
       this.recentlyEditedPriceVariantId === variantId &&
       Date.now() - this.recentlyEditedPriceAt < ProductVariantManagerComponent.RECENT_EDIT_COOLDOWN_MS
     );
+  }
+
+  /** Tapping a row's status tag flips it straight to Active/Inactive — a quicker one-tap
+   * alternative to bulk-selecting variants just to activate a handful of them. */
+  protected async toggleVariantStatus(variant: ProductVariantDto): Promise<void> {
+    const success =
+      variant.status === 'Active'
+        ? await this.facade.deactivateVariant(variant.id)
+        : await this.facade.activateVariant(variant.id);
+
+    if (!success) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to update status',
+        detail: this.facade.variantSyncError() ?? 'Please try again.',
+      });
+    }
   }
 
   /** Saves just the price, leaving every other field on the variant untouched — mirrors the
