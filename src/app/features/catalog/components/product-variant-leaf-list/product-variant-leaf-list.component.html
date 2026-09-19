@@ -25,8 +25,8 @@
               (keydown.enter)="callbacks().saveEditPrice(node.variant!)"
               (keydown.escape)="callbacks().cancelEditPrice()"
               (onBlur)="callbacks().saveEditPrice(node.variant!)"
-              mode="currency"
-              currency="USD"
+              (onFocus)="selectAllText($event)"
+              mode="decimal"
               [minFractionDigits]="2"
               autofocus
             />

@@ -98,4 +98,14 @@ export class ProductVariantLeafListComponent {
   protected isShiftClick(event: Event | undefined): boolean {
     return event instanceof MouseEvent && event.shiftKey;
   }
+
+  /** Selects the field's whole current value on focus so tapping in and typing replaces it
+   * outright — without this, a touch keyboard has no "select all" gesture equivalent to Ctrl+A,
+   * so a tap-then-type would otherwise insert at the cursor and leave the old digits behind. */
+  protected selectAllText(event: Event): void {
+    const target = event.target;
+    if (target instanceof HTMLInputElement) {
+      target.select();
+    }
+  }
 }
