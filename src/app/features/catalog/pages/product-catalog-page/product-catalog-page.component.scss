@@ -2,6 +2,11 @@
   display: block;
 }
 
+.admin-field__inline-action.p-button {
+  align-self: flex-start;
+  padding-left: 0;
+}
+
 .product-catalog-page__table {
   min-width: 0;
   width: 100%;

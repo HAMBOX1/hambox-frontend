@@ -826,6 +826,13 @@ export class ProductCatalogPageComponent implements OnInit {
     this.bulkCategoryDialogOpen.set(false);
   }
 
+  /** "+ Create New" shortcut inside the Assign dialog — swaps to the create-and-assign dialog
+   * without losing the current bulk selection (selection state lives outside either dialog). */
+  protected switchToCreateCollectionDialog(): void {
+    this.bulkAssignCollectionDialogOpen.set(false);
+    this.bulkCreateCollectionDialogOpen.set(true);
+  }
+
   protected async confirmBulkAssignCollection(): Promise<void> {
     const collectionId = this.bulkTargetCollectionId();
     if (!collectionId) {
