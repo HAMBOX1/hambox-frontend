@@ -89,9 +89,11 @@ export class ProductEditPageComponent implements OnInit {
 
   private readonly productForm = viewChild('productForm', { read: ProductBasicInfoFormComponent });
   private readonly assetsUpload = viewChild(ProductAssetsUploadComponent);
+  private readonly variantManager = viewChild(ProductVariantManagerComponent);
   private readonly variantsAnchor = viewChild<ElementRef<HTMLElement>>('variantsAnchor');
   private readonly imagesAnchor = viewChild<ElementRef<HTMLElement>>('imagesAnchor');
   private hasScrolledToFragment = false;
+  private hasOpenedDeepLinkedVariant = false;
   private readonly draftCreatingState = signal(false);
 
   protected readonly permissions = PERMISSIONS;
@@ -153,6 +155,25 @@ export class ProductEditPageComponent implements OnInit {
         void this.suppliersFacade.loadProductVariantMappings(id);
       }
     });
+    effect(() => {
+      if (this.hasOpenedDeepLinkedVariant || this.loading() || !this.product()) {
+        return;
+      }
+
+      const variantId = this.route.snapshot.queryParamMap.get('editVariant');
+      if (!variantId) {
+        return;
+      }
+
+      const manager = this.variantManager();
+      if (!manager) {
+        return;
+      }
+
+      this.hasOpenedDeepLinkedVariant = true;
+      manager.openEditDialogForVariant(variantId);
+    });
+
     effect(() => {
       if (this.hasScrolledToFragment || this.loading() || !this.product()) {
         return;

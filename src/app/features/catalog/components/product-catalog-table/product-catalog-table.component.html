@@ -331,8 +331,39 @@
                     <tbody>
                       @for (variant of variantsFor(product.id); track variant.id) {
                         <tr [routerLink]="'/admin/products/' + product.id + '/edit'">
-                          <td>{{ variantDisplayLabel(product.id, variant) }}</td>
-                          <td>{{ (variant.priceOverride ?? product.price) | hamboxCurrency }}</td>
+                          <td (click)="$event.stopPropagation()">
+                            @if (isEditingVariantLabel(variant.id)) {
+                              <input
+                                pInputText
+                                class="product-catalog-table__variant-edit-input"
+                                [ngModel]="editVariantDraftText()"
+                                (ngModelChange)="editVariantDraftText.set($event)"
+                                (keydown.enter)="saveEditVariantLabel(product.id, variant)"
+                                (keydown.escape)="cancelEditVariantLabel()"
+                                (blur)="saveEditVariantLabel(product.id, variant)"
+                                autofocus
+                              />
+                            } @else {
+                              <span
+                                class="product-catalog-table__variant-label"
+                                (dblclick)="startEditVariantLabel(product.id, variant, $event)"
+                                >{{ variantDisplayLabel(product.id, variant) }}</span
+                              >
+                            }
+                          </td>
+                          <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
+                            {{ (variant.priceOverride ?? product.price) | hamboxCurrency }}
+                            <a
+                              class="product-catalog-table__variant-price-edit"
+                              [routerLink]="'/admin/products/' + product.id + '/edit'"
+                              [queryParams]="{ editVariant: variant.id }"
+                              fragment="variants"
+                              pTooltip="Edit price details"
+                              tooltipPosition="top"
+                              aria-label="Edit price details"
+                              ><i class="pi pi-pencil" aria-hidden="true"></i
+                            ></a>
+                          </td>
                           <td>{{ variant.availableStock }}</td>
                           <td>
                             <app-admin-status-badge [label]="variantStatusLabel(variant.status)" [tone]="variantStatusTone(variant.status)" />

@@ -20,7 +20,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { ApiError } from '../../../../core/models/api-error.model';
@@ -110,6 +110,7 @@ export class ProductCatalogTableComponent {
   private readonly categoryApi = inject(CategoryApiService);
   private readonly collectionApi = inject(CollectionApiService);
   private readonly inventoryApi = inject(InventoryApiService);
+  private readonly messageService = inject(MessageService);
 
   protected readonly permissions = PERMISSIONS;
 
@@ -189,6 +190,11 @@ export class ProductCatalogTableComponent {
   protected readonly expandedVariantIds = signal<ReadonlySet<string>>(new Set());
   protected readonly variantsByProductId = signal<ReadonlyMap<string, readonly ProductVariantDto[]>>(new Map());
   protected readonly variantsLoadingIds = signal<ReadonlySet<string>>(new Set());
+
+  /** Inline rename of a variant's option-describing label (see `variantDisplayLabel`) — mirrors
+   * the product name's dblclick-to-edit above, scoped to variant ids instead of product ids. */
+  protected readonly editingVariantId = signal<string | null>(null);
+  protected readonly editVariantDraftText = signal('');
 
   protected readonly editingCell = signal<{ productId: string; field: EditableField } | null>(null);
   protected readonly editDraftText = signal('');
@@ -412,6 +418,63 @@ export class ProductCatalogTableComponent {
         const next = new Set(ids);
         next.delete(productId);
         return next;
+      });
+    }
+  }
+
+  protected isEditingVariantLabel(variantId: string): boolean {
+    return this.editingVariantId() === variantId;
+  }
+
+  protected startEditVariantLabel(productId: string, variant: ProductVariantDto, event: Event): void {
+    event.stopPropagation();
+    this.editVariantDraftText.set(this.variantDisplayLabel(productId, variant));
+    this.editingVariantId.set(variant.id);
+  }
+
+  protected cancelEditVariantLabel(): void {
+    this.editingVariantId.set(null);
+    this.editVariantDraftText.set('');
+  }
+
+  protected async saveEditVariantLabel(productId: string, variant: ProductVariantDto): Promise<void> {
+    const newLabel = this.editVariantDraftText().trim();
+    this.editingVariantId.set(null);
+
+    if (!newLabel) {
+      return;
+    }
+
+    const prefix = this.commonSkuPrefix(productId).replace(/[-_]+$/, '');
+    const newSku = (prefix.length > 0 ? `${prefix}-${newLabel}` : newLabel).toUpperCase();
+
+    if (newSku === variant.sku) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(
+        this.inventoryApi.updateVariant(variant.id, {
+          sku: newSku,
+          planId: variant.planId,
+          priceOverride: variant.priceOverride,
+          comparePrice: variant.comparePrice,
+          costPrice: variant.costPrice,
+          memberPrice: variant.memberPrice,
+          sortOrder: variant.sortOrder,
+          status: variant.status,
+          isVisible: variant.isVisible,
+          membershipPlanId: variant.membershipPlanId,
+          lowStockThreshold: variant.lowStockThreshold,
+          optionIds: variant.optionIds,
+        }),
+      );
+      await this.loadVariantsFor(productId);
+    } catch {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to rename variant',
+        detail: 'Please try again.',
       });
     }
   }

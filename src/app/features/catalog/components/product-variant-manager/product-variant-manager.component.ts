@@ -375,6 +375,16 @@ export class ProductVariantManagerComponent {
     return visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
   });
 
+  /** Deep-link entry point: opens the edit dialog for a specific variant once its data is loaded
+   * (called by the host page after navigating here with an `editVariant` query param, e.g. from
+   * the catalog list's per-row pricing shortcut) — a no-op if the variant isn't found yet. */
+  openEditDialogForVariant(variantId: string): void {
+    const variant = this.variants().find((entry) => entry.id === variantId);
+    if (variant) {
+      this.openEditDialog(variant);
+    }
+  }
+
   protected openEditDialog(variant: ProductVariantDto): void {
     this.editTarget.set(variant);
     this.editSku.set(variant.sku);
