@@ -30,6 +30,28 @@
   gap: 0.625rem;
 }
 
+.product-catalog-cards__favorite-toggle {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--admin-radius-sm);
+  background: transparent;
+  color: var(--admin-text-muted, #6b7280);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--admin-surface-hover, rgba(255, 255, 255, 0.06));
+  }
+
+  &--active {
+    color: var(--admin-accent-amber, #f59e0b);
+  }
+}
+
 .product-catalog-cards__thumb {
   display: grid;
   flex-shrink: 0;

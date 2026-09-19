@@ -68,6 +68,18 @@
               } @else {
                 <span class="product-catalog-table__variant-expander-placeholder" aria-hidden="true"></span>
               }
+              <button
+                type="button"
+                class="product-catalog-table__favorite-toggle"
+                [class.product-catalog-table__favorite-toggle--active]="product.isFavorite"
+                [pTooltip]="product.isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+                tooltipPosition="top"
+                [attr.aria-label]="(product.isFavorite ? 'Remove' : 'Add') + ' favorite: ' + product.nameEn"
+                [attr.aria-pressed]="!!product.isFavorite"
+                (click)="$event.stopPropagation(); favoriteToggle.emit(product)"
+              >
+                <i [class]="product.isFavorite ? 'pi pi-star-fill' : 'pi pi-star'" aria-hidden="true"></i>
+              </button>
               <span class="product-catalog-table__thumb">
                 @if (product.displayImageUrl && !isImageFailed(product.id)) {
                   <img

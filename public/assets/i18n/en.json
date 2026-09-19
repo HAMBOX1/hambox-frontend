@@ -1043,6 +1043,9 @@
         "PROMOTE_ACTION": "Promote to variant",
         "UNLINK_ACTION": "Unlink"
       },
+      "FAVORITES": {
+        "TAB_LABEL": "Favorites"
+      },
       "SHOW_ALL_ROWS": "Show all",
       "SHOW_ALL_CONFIRM_TITLE": "Load all products?",
       "SHOW_ALL_CONFIRM_MESSAGE": "This will load all {{count}} matching products on one page, which can be slow to render. Continue?",

@@ -158,6 +158,8 @@ export class ProductCatalogTableComponent {
    * variant (see productActionMenuItems); multi-variant products use the per-variant controls
    * in the variant manager instead. */
   readonly setChatDeliveryRequested = output<Product>();
+  /** The star toggle next to the product name — a personal admin bookmark, unrelated to status. */
+  readonly favoriteToggle = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
   readonly statusEdit = output<ProductStatusEdit>();
   /** Emitted after a category is created inline from the popover, so the parent facade can refresh its category list. */

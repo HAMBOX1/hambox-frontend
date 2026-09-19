@@ -4,9 +4,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ProductStatus, ProductStatusCounts } from '../../models/product.model';
 
 const PENDING_MERGE_TAB = 'PendingMerge' as const;
+const FAVORITES_TAB = 'Favorites' as const;
 
 interface StatusTab {
-  readonly value: ProductStatus | '' | typeof PENDING_MERGE_TAB;
+  readonly value: ProductStatus | '' | typeof PENDING_MERGE_TAB | typeof FAVORITES_TAB;
   readonly labelKey: string;
   readonly count: number | null;
 }
@@ -32,9 +33,11 @@ export class ProductCatalogStatusTabsComponent {
   // signal type — mirrors `ProductCatalogToolbarComponent.statusFilter` for the same reason.
   readonly activeStatus = input('');
   readonly pendingMergeActive = input(false);
+  readonly favoritesActive = input(false);
   readonly counts = input<ProductStatusCounts | null>(null);
   readonly statusChange = output<ProductStatus | ''>();
   readonly pendingMergeChange = output<void>();
+  readonly favoritesChange = output<void>();
 
   protected readonly tabs = computed<StatusTab[]>(() => {
     const counts = this.counts();
@@ -44,6 +47,11 @@ export class ProductCatalogStatusTabsComponent {
       { value: 'Active', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.LIVE', count: counts?.active ?? null },
       { value: 'Archived', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.ARCHIVED', count: counts?.archived ?? null },
       {
+        value: FAVORITES_TAB,
+        labelKey: 'ADMIN.CATALOG_PAGE.FAVORITES.TAB_LABEL',
+        count: counts?.favorites ?? null,
+      },
+      {
         value: PENDING_MERGE_TAB,
         labelKey: 'ADMIN.CATALOG_PAGE.PENDING_MERGE.TAB_LABEL',
         count: counts?.pendingMerge ?? null,
@@ -52,13 +60,26 @@ export class ProductCatalogStatusTabsComponent {
   });
 
   protected isActive(tab: StatusTab): boolean {
-    return tab.value === PENDING_MERGE_TAB ? this.pendingMergeActive() : tab.value === this.activeStatus();
+    if (tab.value === PENDING_MERGE_TAB) {
+      return this.pendingMergeActive();
+    }
+    if (tab.value === FAVORITES_TAB) {
+      return this.favoritesActive();
+    }
+    return tab.value === this.activeStatus();
   }
 
   protected select(tab: StatusTab): void {
     if (tab.value === PENDING_MERGE_TAB) {
       if (!this.pendingMergeActive()) {
         this.pendingMergeChange.emit();
+      }
+      return;
+    }
+
+    if (tab.value === FAVORITES_TAB) {
+      if (!this.favoritesActive()) {
+        this.favoritesChange.emit();
       }
       return;
     }

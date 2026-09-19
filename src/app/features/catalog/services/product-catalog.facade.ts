@@ -66,6 +66,7 @@ export class ProductCatalogFacade {
   private readonly bulkErrorState = signal<string | null>(null);
   private readonly statusCountsState = signal<ProductStatusCounts | null>(null);
   private readonly pendingMergeOnlyState = signal(false);
+  private readonly favoritesOnlyState = signal(false);
 
   private searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   private hasLoaded = false;
@@ -95,7 +96,8 @@ export class ProductCatalogFacade {
       this.hasActiveSearch() ||
       this.statusFilterState().trim().length > 0 ||
       this.collectionFilterState() !== null ||
-      this.pendingMergeOnlyState(),
+      this.pendingMergeOnlyState() ||
+      this.favoritesOnlyState(),
   );
   readonly isEmpty = computed(() => !this.loading() && this.items().length === 0);
 
@@ -115,6 +117,7 @@ export class ProductCatalogFacade {
   readonly bulkError = this.bulkErrorState.asReadonly();
   readonly statusCounts = this.statusCountsState.asReadonly();
   readonly pendingMergeOnly = this.pendingMergeOnlyState.asReadonly();
+  readonly favoritesOnly = this.favoritesOnlyState.asReadonly();
 
   readonly bulkSelectedCount = computed(() =>
     this.selectAllMatchingState() ? this.totalCountState() : this.bulkSelectedIdsState().size,
@@ -141,6 +144,7 @@ export class ProductCatalogFacade {
       this.isAllPageSelected() &&
       !this.selectAllMatchingState() &&
       !this.pendingMergeOnlyState() &&
+      !this.favoritesOnlyState() &&
       this.totalCountState() > this.itemsState().length,
   );
 
@@ -153,6 +157,7 @@ export class ProductCatalogFacade {
   setStatusFilter(status: string): void {
     this.statusFilterState.set(status);
     this.pendingMergeOnlyState.set(false);
+    this.favoritesOnlyState.set(false);
     this.pageNumberState.set(1);
     void this.fetchProducts();
   }
@@ -164,6 +169,20 @@ export class ProductCatalogFacade {
     this.pendingMergeOnlyState.set(value);
     if (value) {
       this.statusFilterState.set('');
+      this.favoritesOnlyState.set(false);
+    }
+    this.pageNumberState.set(1);
+    void this.fetchProducts();
+  }
+
+  /** Toggles the "Favorites" tab — mutually exclusive with the regular status tabs and Pending
+   * Merge, same reasoning as `setPendingMergeOnly`: a favorited product keeps whatever status it
+   * had, this just narrows which ones show. */
+  setFavoritesOnly(value: boolean): void {
+    this.favoritesOnlyState.set(value);
+    if (value) {
+      this.statusFilterState.set('');
+      this.pendingMergeOnlyState.set(false);
     }
     this.pageNumberState.set(1);
     void this.fetchProducts();
@@ -185,6 +204,7 @@ export class ProductCatalogFacade {
     this.searchTermState.set('');
     this.statusFilterState.set('');
     this.pendingMergeOnlyState.set(false);
+    this.favoritesOnlyState.set(false);
     this.collectionFilterState.set(null);
     this.supplierMappingFilterState.set('');
     this.supplierMappingFilterProductIdsState.set(null);
@@ -639,6 +659,29 @@ export class ProductCatalogFacade {
     }
   }
 
+  /** Optimistically flips the star locally so the click feels instant, then persists it — reverts
+   * on failure. If the Favorites tab is active, a successful unstar also refetches so the product
+   * drops out of the now-stale list immediately instead of lingering until the next reload. */
+  async toggleFavorite(productId: string, isFavorite: boolean): Promise<boolean> {
+    this.itemsState.update((items) =>
+      items.map((product) => (product.id === productId ? { ...product, isFavorite } : product)),
+    );
+
+    try {
+      await firstValueFrom(this.api.setFavorite(productId, isFavorite));
+      if (this.favoritesOnlyState()) {
+        await this.fetchProducts(true);
+      }
+      return true;
+    } catch (error) {
+      this.itemsState.update((items) =>
+        items.map((product) => (product.id === productId ? { ...product, isFavorite: !isFavorite } : product)),
+      );
+      this.errorState.set(this.toErrorMessage(error, 'Failed to update favorite.'));
+      return false;
+    }
+  }
+
   async exportSelected(): Promise<Blob | null> {
     this.bulkActionLoadingState.set(true);
     this.bulkErrorState.set(null);
@@ -709,6 +752,7 @@ export class ProductCatalogFacade {
       const collectionId = this.collectionFilterState();
       const supplierMappingProductIds = this.supplierMappingFilterProductIdsState();
       const pendingMergeOnly = this.pendingMergeOnlyState();
+      const favoritesOnly = this.favoritesOnlyState();
       const requestedPageNumber = this.pageNumberState();
       const result = await firstValueFrom(
         this.api.getProducts({
@@ -720,6 +764,7 @@ export class ProductCatalogFacade {
           ...(collectionId ? { collectionId } : {}),
           ...(supplierMappingProductIds ? { productIds: supplierMappingProductIds } : {}),
           ...(pendingMergeOnly ? { pendingMergeOnly: true } : {}),
+          ...(favoritesOnly ? { favoritesOnly: true } : {}),
         }),
       );
 

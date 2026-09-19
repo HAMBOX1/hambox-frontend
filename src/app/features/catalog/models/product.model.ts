@@ -76,6 +76,9 @@ export interface Product {
   readonly pendingMergeIntoProductId?: string | null;
   /** Display name of `pendingMergeIntoProductId`'s product. */
   readonly pendingMergeIntoProductName?: string | null;
+  /** Admin-only personal bookmark for quickly finding this product again — never shown to
+   * anonymous/storefront callers. */
+  readonly isFavorite?: boolean;
 }
 
 export interface CreateProductRequest {
@@ -141,6 +144,9 @@ export interface ProductListQuery {
   /** When true, shows only products parked as a pending merge (orthogonal to `status`) — powers
    * the catalog page's "Pending Merge" tab. Admin-only; ignored for anonymous/storefront callers. */
   readonly pendingMergeOnly?: boolean;
+  /** When true, shows only products the admin has starred (orthogonal to `status`) — powers the
+   * catalog page's "Favorites" tab. Admin-only; ignored for anonymous/storefront callers. */
+  readonly favoritesOnly?: boolean;
 }
 
 export interface ProductFacetQuery {
@@ -220,6 +226,7 @@ export interface ProductStatusCounts {
   readonly inactive: number;
   readonly archived: number;
   readonly pendingMerge: number;
+  readonly favorites: number;
 }
 
 export interface ProductInventoryPlaceholders {

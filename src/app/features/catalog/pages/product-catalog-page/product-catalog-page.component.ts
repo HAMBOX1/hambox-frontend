@@ -140,6 +140,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly statusFilter = this.facade.statusFilter;
   protected readonly statusCounts = this.facade.statusCounts;
   protected readonly pendingMergeOnly = this.facade.pendingMergeOnly;
+  protected readonly favoritesOnly = this.facade.favoritesOnly;
   protected readonly error = this.facade.error;
   protected readonly totalCount = this.facade.totalCount;
   protected readonly pageSize = this.facade.pageSize;
@@ -326,6 +327,14 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected onPendingMergeTabSelected(): void {
     this.facade.setPendingMergeOnly(true);
+  }
+
+  protected onFavoritesTabSelected(): void {
+    this.facade.setFavoritesOnly(true);
+  }
+
+  protected async onToggleFavorite(product: Product): Promise<void> {
+    await this.facade.toggleFavorite(product.id, !product.isFavorite);
   }
 
   protected onCollectionFilterChange(collectionId: string | null): void {

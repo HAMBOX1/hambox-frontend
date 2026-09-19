@@ -1036,6 +1036,9 @@
         "PROMOTE_ACTION": "ترقية إلى variant",
         "UNLINK_ACTION": "إلغاء الربط"
       },
+      "FAVORITES": {
+        "TAB_LABEL": "المفضلة"
+      },
       "SHOW_ALL_ROWS": "عرض الكل",
       "SHOW_ALL_CONFIRM_TITLE": "تحميل كل المنتجات؟",
       "SHOW_ALL_CONFIRM_MESSAGE": "ده هيحمّل كل الـ {{count}} منتج المطابق في صفحة واحدة، وممكن يبقى بطيء. تحب تكمل؟",

@@ -63,9 +63,11 @@
   <app-product-catalog-status-tabs
     [activeStatus]="statusFilter()"
     [pendingMergeActive]="pendingMergeOnly()"
+    [favoritesActive]="favoritesOnly()"
     [counts]="statusCounts()"
     (statusChange)="onStatusFilterChange($event)"
     (pendingMergeChange)="onPendingMergeTabSelected()"
+    (favoritesChange)="onFavoritesTabSelected()"
   />
 
   <app-product-catalog-toolbar
@@ -211,6 +213,7 @@
       (bulkToggleAllPage)="onBulkToggleAllPage($event)"
       (promoteToVariant)="onPromoteToVariant($event)"
       (unlinkPendingMerge)="onUnlinkPendingMerge($event)"
+      (favoriteToggle)="onToggleFavorite($event)"
     />
   } @else {
     <app-product-catalog-cards
@@ -238,6 +241,7 @@
       (collectionsEdit)="onCollectionsEdit($event)"
       (collectionCreated)="onCollectionCreated()"
       (mappingOpenRequested)="onMappingOpenRequested($event)"
+      (favoriteToggle)="onToggleFavorite($event)"
     />
   }
 

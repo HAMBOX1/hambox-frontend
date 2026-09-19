@@ -98,6 +98,8 @@ export class ProductCatalogCardsComponent {
   /** Opens the "set as On-Delivery" capacity dialog — only offered for products with 0 or 1
    * variant, mirrors the desktop table's action menu item. */
   readonly setChatDeliveryRequested = output<Product>();
+  /** The star toggle on the card — a personal admin bookmark, unrelated to status. */
+  readonly favoriteToggle = output<Product>();
   readonly bulkToggle = output<{ productId: string; shiftKey: boolean }>();
   /** Opens the product-centric supplier mapping drawer for this product — mirrors the desktop
    * table's Supplier cell (status badge / "+ Add Supplier Mapping" action). */
