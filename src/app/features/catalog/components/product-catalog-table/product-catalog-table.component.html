@@ -322,7 +322,7 @@
                   <table class="product-catalog-table__variant-mini-table">
                     <thead>
                       <tr>
-                        <th>SKU</th>
+                        <th>Variant</th>
                         <th>Price</th>
                         <th>Available</th>
                         <th>Status</th>
@@ -331,7 +331,7 @@
                     <tbody>
                       @for (variant of variantsFor(product.id); track variant.id) {
                         <tr [routerLink]="'/admin/products/' + product.id + '/edit'">
-                          <td>{{ variant.sku }}</td>
+                          <td>{{ variantDisplayLabel(product.id, variant) }}</td>
                           <td>{{ (variant.priceOverride ?? product.price) | hamboxCurrency }}</td>
                           <td>{{ variant.availableStock }}</td>
                           <td>

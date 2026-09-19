@@ -346,6 +346,34 @@ export class ProductCatalogTableComponent {
     return this.variantsByProductId().get(productId) ?? [];
   }
 
+  /** Strips the SKU prefix shared by every variant of this product (typically the product's own
+   * id/code, e.g. "9EBEE706-") so the expander shows the option-describing tail ("US-5") instead
+   * of the full internal SKU — purely a display concern, the real SKU is unchanged everywhere else. */
+  protected variantDisplayLabel(productId: string, variant: ProductVariantDto): string {
+    const prefix = this.commonSkuPrefix(productId).replace(/[-_]+$/, '');
+    const stripped = prefix.length > 0 && variant.sku.startsWith(prefix) ? variant.sku.slice(prefix.length).replace(/^[-_]+/, '') : '';
+    return stripped.length > 0 ? stripped : variant.sku;
+  }
+
+  private commonSkuPrefix(productId: string): string {
+    const skus = this.variantsFor(productId).map((variant) => variant.sku);
+    if (skus.length === 0) {
+      return '';
+    }
+
+    let prefix = skus[0];
+    for (const sku of skus.slice(1)) {
+      while (prefix.length > 0 && !sku.startsWith(prefix)) {
+        prefix = prefix.slice(0, -1);
+      }
+      if (prefix.length === 0) {
+        break;
+      }
+    }
+
+    return prefix;
+  }
+
   protected toggleVariantsExpansion(product: Product, event: Event): void {
     event.stopPropagation();
     const productId = product.id;
