@@ -331,9 +331,20 @@
                 } @else if (variantsFor(product.id).length === 0) {
                   <span class="product-catalog-table__variant-panel-status">No variants found.</span>
                 } @else {
+                  @if (selectedVariantCountFor(product.id); as selectedCount) {
+                    @if (selectedCount > 0) {
+                      <div class="product-catalog-table__variant-bulk-bar" (click)="$event.stopPropagation()">
+                        <span>{{ selectedCount }} selected</span>
+                        <button pButton type="button" label="Activate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Active')"></button>
+                        <button pButton type="button" label="Deactivate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Inactive')"></button>
+                        <button pButton type="button" label="Clear" size="small" text (click)="clearVariantSelection(product.id)"></button>
+                      </div>
+                    }
+                  }
                   <table class="product-catalog-table__variant-mini-table">
                     <thead>
                       <tr>
+                        <th style="width: 2rem"></th>
                         <th>Variant</th>
                         <th>Price</th>
                         <th>Available</th>
@@ -343,6 +354,13 @@
                     <tbody>
                       @for (variant of variantsFor(product.id); track variant.id) {
                         <tr [routerLink]="'/admin/products/' + product.id + '/edit'">
+                          <td (click)="$event.stopPropagation()">
+                            <p-checkbox
+                              [binary]="true"
+                              [ngModel]="isVariantSelected(variant.id)"
+                              (onChange)="toggleVariantSelection(variant.id, $event.checked)"
+                            />
+                          </td>
                           <td (click)="$event.stopPropagation()">
                             @if (isEditingVariantLabel(variant.id)) {
                               <input
@@ -377,7 +395,14 @@
                             ></a>
                           </td>
                           <td>{{ variant.availableStock }}</td>
-                          <td>
+                          <td
+                            class="product-catalog-table__variant-status-cell"
+                            role="button"
+                            tabindex="0"
+                            [attr.aria-label]="'Toggle status for ' + variantDisplayLabel(product.id, variant)"
+                            (click)="$event.stopPropagation(); toggleVariantStatus(product.id, variant)"
+                            (keydown.enter)="$event.stopPropagation(); toggleVariantStatus(product.id, variant)"
+                          >
                             <app-admin-status-badge [label]="variantStatusLabel(variant.status)" [tone]="variantStatusTone(variant.status)" />
                           </td>
                         </tr>

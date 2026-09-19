@@ -198,6 +198,11 @@ export class ProductCatalogTableComponent {
   protected readonly editingVariantId = signal<string | null>(null);
   protected readonly editVariantDraftText = signal('');
 
+  /** Variant ids checked in the expander's own selection column — separate from the outer table's
+   * `bulkSelectedIds` (which is scoped to product ids), so a variant-level bulk activate/deactivate
+   * here never interacts with the product-level bulk bar. */
+  protected readonly selectedVariantIds = signal<ReadonlySet<string>>(new Set());
+
   protected readonly editingCell = signal<{ productId: string; field: EditableField } | null>(null);
   protected readonly editDraftText = signal('');
   protected readonly editDraftNumber = signal<number | null>(null);
@@ -476,6 +481,80 @@ export class ProductCatalogTableComponent {
       this.messageService.add({
         severity: 'error',
         summary: 'Failed to rename variant',
+        detail: 'Please try again.',
+      });
+    }
+  }
+
+  protected async toggleVariantStatus(productId: string, variant: ProductVariantDto): Promise<void> {
+    try {
+      if (variant.status === 'Active') {
+        await firstValueFrom(this.inventoryApi.deactivateVariant(variant.id));
+      } else {
+        await firstValueFrom(this.inventoryApi.activateVariant(variant.id));
+      }
+      await this.loadVariantsFor(productId);
+    } catch {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to update status',
+        detail: 'Please try again.',
+      });
+    }
+  }
+
+  protected isVariantSelected(variantId: string): boolean {
+    return this.selectedVariantIds().has(variantId);
+  }
+
+  protected toggleVariantSelection(variantId: string, checked: boolean): void {
+    this.selectedVariantIds.update((ids) => {
+      const next = new Set(ids);
+      if (checked) {
+        next.add(variantId);
+      } else {
+        next.delete(variantId);
+      }
+      return next;
+    });
+  }
+
+  /** Scoped to this product's own currently-loaded variants — the selection set itself is global,
+   * but only one product's panel is ever expanded/interacted with at a time in practice. */
+  protected selectedVariantCountFor(productId: string): number {
+    const selected = this.selectedVariantIds();
+    return this.variantsFor(productId).filter((variant) => selected.has(variant.id)).length;
+  }
+
+  protected clearVariantSelection(productId: string): void {
+    const idsForProduct = new Set(this.variantsFor(productId).map((variant) => variant.id));
+    this.selectedVariantIds.update((ids) => new Set([...ids].filter((id) => !idsForProduct.has(id))));
+  }
+
+  protected async bulkSetVariantStatus(productId: string, status: 'Active' | 'Inactive'): Promise<void> {
+    const selected = this.selectedVariantIds();
+    const targetVariantIds = this.variantsFor(productId)
+      .filter((variant) => selected.has(variant.id))
+      .map((variant) => variant.id);
+
+    if (targetVariantIds.length === 0) {
+      return;
+    }
+
+    try {
+      await Promise.all(
+        targetVariantIds.map((variantId) =>
+          firstValueFrom(
+            status === 'Active' ? this.inventoryApi.activateVariant(variantId) : this.inventoryApi.deactivateVariant(variantId),
+          ),
+        ),
+      );
+      this.clearVariantSelection(productId);
+      await this.loadVariantsFor(productId);
+    } catch {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to update status for one or more variants',
         detail: 'Please try again.',
       });
     }
