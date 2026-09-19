@@ -66,7 +66,10 @@ export class ProductCatalogStatusTabsComponent {
     if (tab.value === FAVORITES_TAB) {
       return this.favoritesActive();
     }
-    return tab.value === this.activeStatus();
+    // A plain status tab (including "All") reads active only when neither orthogonal tab is —
+    // otherwise, e.g., "All" and "Favorites" would both show highlighted at once, since Favorites
+    // never touches `activeStatus` underneath.
+    return !this.pendingMergeActive() && !this.favoritesActive() && tab.value === this.activeStatus();
   }
 
   protected select(tab: StatusTab): void {
@@ -84,7 +87,10 @@ export class ProductCatalogStatusTabsComponent {
       return;
     }
 
-    if (tab.value !== this.activeStatus()) {
+    // Emit even when `tab.value` already equals `activeStatus` underneath, as long as Pending
+    // Merge or Favorites is active — otherwise clicking "All" (value `''`) while one of those is
+    // on would silently no-op, since `activeStatus` was already `''` the whole time.
+    if (tab.value !== this.activeStatus() || this.pendingMergeActive() || this.favoritesActive()) {
       this.statusChange.emit(tab.value);
     }
   }
