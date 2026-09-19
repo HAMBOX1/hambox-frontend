@@ -30,11 +30,11 @@
           </th>
           <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
           <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
-          <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
-          <th>Internal Categories</th>
           <th pSortableColumn="price" class="product-catalog-table__price-head">
             Price <p-sortIcon field="price" />
           </th>
+          <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
+          <th>Internal Categories</th>
           <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
           <th>Supplier</th>
           <th style="width: 5.5rem"></th>
@@ -138,6 +138,26 @@
                 ></i>
               }
             </div>
+          </td>
+          <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
+            @if (isEditing(product.id, 'price')) {
+              <p-inputNumber
+                class="product-catalog-table__edit-number"
+                [ngModel]="editDraftNumber()"
+                (ngModelChange)="editDraftNumber.set($event)"
+                (keydown.enter)="saveEdit(product)"
+                (keydown.escape)="cancelEdit()"
+                (onBlur)="saveEdit(product)"
+                mode="currency"
+                currency="USD"
+                [minFractionDigits]="2"
+                autofocus
+              />
+            } @else {
+              <span class="admin-cell-primary" (click)="startEdit(product, 'price', $event)">{{
+                product.price | hamboxCurrency
+              }}</span>
+            }
           </td>
           <td
             class="product-catalog-table__category-cell"
@@ -247,26 +267,6 @@
                 }
               }
             </div>
-          </td>
-          <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
-            @if (isEditing(product.id, 'price')) {
-              <p-inputNumber
-                class="product-catalog-table__edit-number"
-                [ngModel]="editDraftNumber()"
-                (ngModelChange)="editDraftNumber.set($event)"
-                (keydown.enter)="saveEdit(product)"
-                (keydown.escape)="cancelEdit()"
-                (onBlur)="saveEdit(product)"
-                mode="currency"
-                currency="USD"
-                [minFractionDigits]="2"
-                autofocus
-              />
-            } @else {
-              <span class="admin-cell-primary" (click)="startEdit(product, 'price', $event)">{{
-                product.price | hamboxCurrency
-              }}</span>
-            }
           </td>
           <td (click)="$event.stopPropagation()">
             <p-select
