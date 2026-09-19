@@ -12,8 +12,8 @@
       [class.variant-manager__row--highlighted]="callbacks().isHighlighted(node.variant!.id)"
       tabindex="0"
       [attr.aria-label]="'Open codes for ' + node.label"
-      (click)="!callbacks().bulkSelectionActive() && callbacks().openVariant(node.variant!)"
-      (keydown.enter)="!callbacks().bulkSelectionActive() && callbacks().openVariant(node.variant!)"
+      (click)="!callbacks().bulkSelectionActive() && !callbacks().isEditingPrice(node.variant!.id) && callbacks().openVariant(node.variant!)"
+      (keydown.enter)="!callbacks().bulkSelectionActive() && !callbacks().isEditingPrice(node.variant!.id) && callbacks().openVariant(node.variant!)"
     >
       <ng-template #priceField>
         <span class="variant-manager__row-price" (click)="$event.stopPropagation()">
