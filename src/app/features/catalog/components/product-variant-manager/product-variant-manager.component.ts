@@ -294,6 +294,7 @@ export class ProductVariantManagerComponent {
     setPriceDraft: (value) => this.priceDraftValue.set(value),
     saveEditPrice: (variant) => void this.saveEditPrice(variant),
     cancelEditPrice: () => this.cancelEditPrice(),
+    isRecentlyEditedPrice: (variantId) => this.isRecentlyEditedPrice(variantId),
     statusSeverity: (variant) => this.statusSeverity(variant),
     isHighlighted: (variantId) => this.searchMatchIds()?.has(variantId) ?? false,
     searchActive: () => this.searchTerm().trim().length > 0,
@@ -397,6 +398,14 @@ export class ProductVariantManagerComponent {
     this.editTarget.set(null);
   }
 
+  /** Set (with a timestamp) whenever price-editing ends on a row via `saveEditPrice`, so a click
+   * arriving immediately after — e.g. the very same tap that blurred the input to dismiss a
+   * mobile keyboard — can still be recognized as part of that edit. Plain fields, not signals:
+   * read imperatively from a `(click)` binding, never from a template `[binding]`. */
+  private recentlyEditedPriceVariantId: string | null = null;
+  private recentlyEditedPriceAt = 0;
+  private static readonly RECENT_EDIT_COOLDOWN_MS = 400;
+
   protected startEditPrice(variant: ProductVariantDto, event: Event): void {
     event.stopPropagation();
     this.priceDraftValue.set(variant.priceOverride ?? this.product()?.price ?? 0);
@@ -408,12 +417,21 @@ export class ProductVariantManagerComponent {
     this.priceDraftValue.set(null);
   }
 
+  protected isRecentlyEditedPrice(variantId: string): boolean {
+    return (
+      this.recentlyEditedPriceVariantId === variantId &&
+      Date.now() - this.recentlyEditedPriceAt < ProductVariantManagerComponent.RECENT_EDIT_COOLDOWN_MS
+    );
+  }
+
   /** Saves just the price, leaving every other field on the variant untouched — mirrors the
    * catalog table's inline price edit for products (`ProductCatalogFacade.updateProductInline`),
    * just against `ProductEditorFacade.updateVariant`'s full-payload shape instead of a partial one. */
   protected async saveEditPrice(variant: ProductVariantDto): Promise<void> {
     const priceOverride = this.priceDraftValue();
     this.editingPriceVariantId.set(null);
+    this.recentlyEditedPriceVariantId = variant.id;
+    this.recentlyEditedPriceAt = Date.now();
 
     if (priceOverride === null || priceOverride === variant.priceOverride) {
       return;

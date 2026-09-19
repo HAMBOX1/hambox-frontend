@@ -28,6 +28,11 @@ export interface VariantTreeCallbacks {
   setPriceDraft(value: number | null): void;
   saveEditPrice(variant: ProductVariantDto): void;
   cancelEditPrice(): void;
+  /** True for a brief window right after this row's price edit was committed (by blur or Enter) —
+   * guards against the row's own tap-to-open-codes handler firing from the very same physical tap
+   * that blurred the price input (blur fires before click), which would otherwise race with the
+   * in-flight price save. */
+  isRecentlyEditedPrice(variantId: string): boolean;
   statusSeverity(variant: ProductVariantDto): 'success' | 'warn' | 'danger' | 'secondary' | 'info';
   isHighlighted(variantId: string): boolean;
   searchActive(): boolean;
