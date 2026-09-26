@@ -37,14 +37,16 @@
           <img class="hero__button-icon" [src]="boltIcon" alt="" aria-hidden="true" />
         </a>
 
-        <a
-          pButton
-          [routerLink]="hero().secondaryButtonUrl"
-          class="hero__button hero__button--secondary"
-          styleClass="hero__button hero__button--secondary"
-        >
-          <span class="hero__button-label">{{ hero().secondaryButtonText }}</span>
-        </a>
+        @if (hero().secondaryButtonText?.trim()) {
+          <a
+            pButton
+            [routerLink]="hero().secondaryButtonUrl"
+            class="hero__button hero__button--secondary"
+            styleClass="hero__button hero__button--secondary"
+          >
+            <span class="hero__button-label">{{ hero().secondaryButtonText }}</span>
+          </a>
+        }
       </div>
     </div>
   </div>
