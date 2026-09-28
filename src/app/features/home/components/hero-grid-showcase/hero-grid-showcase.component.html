@@ -37,14 +37,16 @@
           <span class="hero-grid__button-label">{{ hero().primaryButtonText }}</span>
         </a>
 
-        <a
-          pButton
-          [routerLink]="hero().secondaryButtonUrl"
-          class="hero-grid__button hero-grid__button--secondary"
-          styleClass="hero-grid__button hero-grid__button--secondary"
-        >
-          <span class="hero-grid__button-label">{{ hero().secondaryButtonText }}</span>
-        </a>
+        @if (hero().secondaryButtonText?.trim()) {
+          <a
+            pButton
+            [routerLink]="hero().secondaryButtonUrl"
+            class="hero-grid__button hero-grid__button--secondary"
+            styleClass="hero-grid__button hero-grid__button--secondary"
+          >
+            <span class="hero-grid__button-label">{{ hero().secondaryButtonText }}</span>
+          </a>
+        }
       </div>
     </div>
   </div>
