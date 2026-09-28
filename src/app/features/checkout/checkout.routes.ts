@@ -1,13 +1,17 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from '../../core/guards/auth.guard';
+
 export const routes: Routes = [
   {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/checkout-page/checkout-page.component').then((c) => c.CheckoutPageComponent),
   },
   {
     path: 'membership',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/membership-checkout-page/membership-checkout-page.component').then(
         (c) => c.MembershipCheckoutPageComponent,
@@ -15,6 +19,7 @@ export const routes: Routes = [
   },
   {
     path: 'processing',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/payment-processing-page/payment-processing-page.component').then(
         (c) => c.PaymentProcessingPageComponent,
@@ -35,7 +40,18 @@ export const routes: Routes = [
       ),
   },
   {
+    // No authGuard here either — same reasoning as 'dot/result': Cryptomus's own hosted page
+    // redirects the browser back with no HAMBOX session attached, which can reload the SPA from
+    // scratch. Authorizes via the opaque paymentAttemptId in the URL instead of a live session.
+    path: 'cryptomus/result',
+    loadComponent: () =>
+      import('./pages/cryptomus-payment-result-page/cryptomus-payment-result-page.component').then(
+        (c) => c.CryptomusPaymentResultPageComponent,
+      ),
+  },
+  {
     path: 'success/:orderId',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/order-success-page/order-success-page.component').then(
         (c) => c.OrderSuccessPageComponent,

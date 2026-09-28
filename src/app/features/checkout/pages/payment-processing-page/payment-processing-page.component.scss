@@ -103,3 +103,25 @@
     height: 320px;
   }
 }
+
+.payment-processing__hint {
+  max-width: 520px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+  color: var(--color-text-secondary, rgba(255, 255, 255, 0.72));
+
+  strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}

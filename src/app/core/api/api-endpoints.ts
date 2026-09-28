@@ -168,6 +168,8 @@ export const COMMERCE_API = {
   dotPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/dot/${paymentAttemptId}/status`,
   checkoutDotFawry: '/api/v1/checkout/dot-fawry',
   dotFawryPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/dot-fawry/${paymentAttemptId}/status`,
+  checkoutCryptomus: '/api/v1/checkout/cryptomus',
+  cryptomusPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/cryptomus/${paymentAttemptId}/status`,
   order: (orderId: string) => `/api/v1/orders/${orderId}`,
   cartPromotionsApply: '/api/v1/cart/promotions/apply',
   cartPromotions: '/api/v1/cart/promotions',

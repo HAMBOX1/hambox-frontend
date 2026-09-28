@@ -12,6 +12,8 @@ import {
   CardPaymentDetails,
   CheckoutOrderItem,
   CheckoutSummary,
+  CryptomusCheckoutInitiationDto,
+  CryptomusPaymentStatusDto,
   DOT_FAWRY_WALLET_IDS,
   DOT_FAWRY_WALLET_OPERATOR,
   DOT_WALLET_IDS,
@@ -43,6 +45,7 @@ const INITIAL_BILLING: BillingDetails = {
 const IDEMPOTENCY_SCOPE = 'checkout';
 const DOT_IDEMPOTENCY_SCOPE = 'checkout-dot';
 const DOT_FAWRY_IDEMPOTENCY_SCOPE = 'checkout-dot-fawry';
+const CRYPTOMUS_IDEMPOTENCY_SCOPE = 'checkout-cryptomus';
 
 @Injectable({
   providedIn: 'root',
@@ -64,6 +67,7 @@ export class CheckoutFacade {
   private readonly developmentCheckoutEnabledState = signal(false);
   private readonly dotCheckoutEnabledState = signal(false);
   private readonly dotFawryCheckoutEnabledState = signal(false);
+  private readonly cryptomusCheckoutEnabledState = signal(false);
   private readonly configurationLoadingState = signal(false);
 
   readonly paymentMethod = this.paymentMethodState.asReadonly();
@@ -79,13 +83,15 @@ export class CheckoutFacade {
   readonly configurationLoading = this.configurationLoadingState.asReadonly();
 
   /**
-   * Only "card" is offered — PayPal/crypto/Apple Pay have no backend integration and would silently
-   * fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real payment.
-   * Do not re-add them here until a real provider exists for each. Fawry (Direct Billing, in-app,
-   * gated by dotFawryCheckoutEnabled) is confirmed working directly against DOT. Orange Cash and
-   * Vodafone Cash go through a different DOT product — the OTP redirect flow, same shape as the
+   * Only "card" is offered unconditionally — PayPal/Apple Pay have no backend integration and would
+   * silently fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real
+   * payment. Do not re-add them here until a real provider exists for each. Fawry (Direct Billing,
+   * in-app, gated by dotFawryCheckoutEnabled) is confirmed working directly against DOT. Orange Cash
+   * and Vodafone Cash go through a different DOT product — the OTP redirect flow, same shape as the
    * generic "dot" carrier-billing option — gated by dotCheckoutEnabled instead, since that's the
-   * flag for that product's own price-point/credential configuration.
+   * flag for that product's own price-point/credential configuration. "crypto" (Cryptomus) is gated
+   * by cryptomusCheckoutEnabled — real backend integration, but not yet exercised against a live
+   * payment; see InitiateCryptomusCheckoutCommandHandler.
    */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
     const methods: PaymentMethodId[] = ['card'];
@@ -94,6 +100,9 @@ export class CheckoutFacade {
     }
     if (this.dotFawryCheckoutEnabledState()) {
       methods.push(...DOT_FAWRY_WALLET_IDS);
+    }
+    if (this.cryptomusCheckoutEnabledState()) {
+      methods.push('crypto');
     }
     if (this.developmentCheckoutEnabledState()) {
       return ['development', ...methods];
@@ -158,6 +167,7 @@ export class CheckoutFacade {
     clearIdempotencyKey(IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
   }
 
   async loadConfiguration(): Promise<void> {
@@ -168,6 +178,7 @@ export class CheckoutFacade {
       this.developmentCheckoutEnabledState.set(configuration.developmentCheckoutEnabled);
       this.dotCheckoutEnabledState.set(configuration.dotCheckoutEnabled);
       this.dotFawryCheckoutEnabledState.set(configuration.dotFawryCheckoutEnabled);
+      this.cryptomusCheckoutEnabledState.set(configuration.cryptomusCheckoutEnabled);
       if (configuration.developmentCheckoutEnabled) {
         this.paymentMethodState.set('development');
       }
@@ -175,6 +186,7 @@ export class CheckoutFacade {
       this.developmentCheckoutEnabledState.set(false);
       this.dotCheckoutEnabledState.set(false);
       this.dotFawryCheckoutEnabledState.set(false);
+      this.cryptomusCheckoutEnabledState.set(false);
     } finally {
       this.configurationLoadingState.set(false);
     }
@@ -373,6 +385,45 @@ export class CheckoutFacade {
     return firstValueFrom(this.checkoutService.getDotFawryPaymentStatus(paymentAttemptId));
   }
 
+  /**
+   * Initiates a Cryptomus (crypto/USDT) checkout and returns the redirect target — callers must
+   * navigate the browser to `paymentUrl` themselves (a full page navigation), same shape as
+   * {@link initiateDotCheckout}. The order stays Pending until Cryptomus confirms the payment
+   * server-to-server.
+   */
+  async initiateCryptomusCheckout(): Promise<CryptomusCheckoutInitiationDto> {
+    const billing = this.billingDetailsState();
+    if (!billing.email.trim()) {
+      throw new Error('Email is required to complete checkout.');
+    }
+
+    this.submittingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const idempotencyKey = getOrCreateIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
+      const initiation = await firstValueFrom(
+        this.checkoutService.initiateCryptomusCheckout(
+          { email: billing.email.trim(), country: billing.country },
+          idempotencyKey,
+        ),
+      );
+
+      clearIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
+      return initiation;
+    } catch (error) {
+      clearIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
+      this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
+      throw error;
+    } finally {
+      this.submittingState.set(false);
+    }
+  }
+
+  async getCryptomusPaymentStatus(paymentAttemptId: string): Promise<CryptomusPaymentStatusDto> {
+    return firstValueFrom(this.checkoutService.getCryptomusPaymentStatus(paymentAttemptId));
+  }
+
   async loadOrder(orderId: string): Promise<ReturnType<typeof mapOrderToSuccessDetails>> {
     const order = await firstValueFrom(this.checkoutService.getOrder(orderId));
     return mapOrderToSuccessDetails(order);
@@ -389,6 +440,7 @@ export class CheckoutFacade {
     clearIdempotencyKey(IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
     this.initialize();
   }
 
