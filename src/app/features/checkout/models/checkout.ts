@@ -91,6 +91,7 @@ export interface CheckoutConfigurationDto {
   readonly developmentCheckoutEnabled: boolean;
   readonly dotCheckoutEnabled: boolean;
   readonly dotFawryCheckoutEnabled: boolean;
+  readonly cryptomusCheckoutEnabled: boolean;
 }
 
 export interface DotCheckoutInitiationDto {
@@ -126,6 +127,23 @@ export interface DotFawryPaymentStatusDto {
   readonly fawryReferenceNumber: string | null;
   readonly completedOrderId: string | null;
   readonly operator: string;
+}
+
+/** Returned from initiating a Cryptomus (crypto/USDT) checkout — the customer's browser must be redirected to {@link CryptomusCheckoutInitiationDto.paymentUrl} next. */
+export interface CryptomusCheckoutInitiationDto {
+  readonly paymentAttemptId: string;
+  readonly orderId: string;
+  readonly paymentUrl: string;
+  readonly expiresOnUtc: string;
+}
+
+export type CryptomusPaymentStatus = 'Pending' | 'Succeeded' | 'Failed' | 'Expired';
+
+export interface CryptomusPaymentStatusDto {
+  readonly paymentAttemptId: string;
+  readonly orderId: string;
+  readonly status: CryptomusPaymentStatus;
+  readonly completedOrderId: string | null;
 }
 
 export interface CountryOption {

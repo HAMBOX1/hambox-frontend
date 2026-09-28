@@ -40,6 +40,16 @@ export const routes: Routes = [
       ),
   },
   {
+    // No authGuard here either — same reasoning as 'dot/result': Cryptomus's own hosted page
+    // redirects the browser back with no HAMBOX session attached, which can reload the SPA from
+    // scratch. Authorizes via the opaque paymentAttemptId in the URL instead of a live session.
+    path: 'cryptomus/result',
+    loadComponent: () =>
+      import('./pages/cryptomus-payment-result-page/cryptomus-payment-result-page.component').then(
+        (c) => c.CryptomusPaymentResultPageComponent,
+      ),
+  },
+  {
     path: 'success/:orderId',
     canActivate: [authGuard],
     loadComponent: () =>

@@ -6,6 +6,8 @@ import { ApiClientService } from '../../../core/api/api-client.service';
 import { CheckoutRequest, OrderApiDto } from '../../cart/models/cart-api.model';
 import {
   CheckoutConfigurationDto,
+  CryptomusCheckoutInitiationDto,
+  CryptomusPaymentStatusDto,
   DotCheckoutInitiationDto,
   DotFawryCheckoutInitiationDto,
   DotFawryPaymentStatusDto,
@@ -16,6 +18,11 @@ interface InitiateDotCheckoutRequest {
   email: string;
   country: string;
   wallet: string;
+}
+
+interface InitiateCryptomusCheckoutRequest {
+  email: string;
+  country: string;
 }
 
 interface InitiateDotFawryCheckoutRequest {
@@ -70,5 +77,18 @@ export class CheckoutService {
 
   getDotFawryPaymentStatus(paymentAttemptId: string): Observable<DotFawryPaymentStatusDto> {
     return this.api.get<DotFawryPaymentStatusDto>(COMMERCE_API.dotFawryPaymentStatus(paymentAttemptId));
+  }
+
+  initiateCryptomusCheckout(
+    request: InitiateCryptomusCheckoutRequest,
+    idempotencyKey: string,
+  ): Observable<CryptomusCheckoutInitiationDto> {
+    return this.api.post<CryptomusCheckoutInitiationDto>(COMMERCE_API.checkoutCryptomus, request, {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
+  }
+
+  getCryptomusPaymentStatus(paymentAttemptId: string): Observable<CryptomusPaymentStatusDto> {
+    return this.api.get<CryptomusPaymentStatusDto>(COMMERCE_API.cryptomusPaymentStatus(paymentAttemptId));
   }
 }
