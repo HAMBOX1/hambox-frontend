@@ -350,6 +350,8 @@
     "METHOD_VODAFONE_CASH": "Vodafone Cash",
     "DEV_NOTE": "Development checkout is enabled. No card or external payment provider is required.",
     "DOT_VERIFYING": "Verifying your payment...",
+    "DOT_PENDING_HINT_TITLE": "Paying with Orange Cash?",
+    "DOT_PENDING_HINT": "You'll receive an SMS from Orange with a payment link or a code to dial (#7115#). Open the link or dial the code and approve the payment within 5 minutes. This page updates automatically once the payment is confirmed.",
     "DOT_FAILED": "Your payment could not be completed. You have not been charged.",
     "DOT_EXPIRED": "This payment window has expired. Please try again.",
     "DOT_FAWRY_AWAITING": "Awaiting your {{wallet}} payment...",

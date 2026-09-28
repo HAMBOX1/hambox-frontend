@@ -14,6 +14,10 @@
           [progress]="60"
           [stageLabel]="'CHECKOUT.DOT_VERIFYING' | translate"
         />
+        <aside class="payment-processing__hint" role="note">
+          <strong>{{ 'CHECKOUT.DOT_PENDING_HINT_TITLE' | translate }}</strong>
+          <p>{{ 'CHECKOUT.DOT_PENDING_HINT' | translate }}</p>
+        </aside>
       }
       @case ('Failed') {
         <div class="payment-processing__error" role="alert">
