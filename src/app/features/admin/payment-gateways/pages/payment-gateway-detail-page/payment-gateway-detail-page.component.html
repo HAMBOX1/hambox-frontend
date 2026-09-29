@@ -1,0 +1,135 @@
+<p-toast position="top-right" />
+
+<section class="admin-page payment-gateway-detail-page">
+  <app-admin-page-header [title]="detail()?.displayName ?? gatewayKey()" [breadcrumbs]="breadcrumbs">
+    <div adminHeaderActions class="admin-actions-row">
+      @if (detail(); as d) {
+        <app-admin-status-badge
+          [label]="d.isEnabled ? ('ADMIN.PAYMENT_GATEWAYS.ENABLED' | translate) : ('ADMIN.PAYMENT_GATEWAYS.DISABLED' | translate)"
+          [tone]="d.isEnabled ? 'success' : 'neutral'"
+        />
+        <button
+          *hamboxHasPermission="permissions.PaymentGateways.Edit"
+          pButton
+          type="button"
+          [class]="d.isEnabled ? 'admin-btn-secondary' : 'admin-btn-primary'"
+          [disabled]="actionLoading()"
+          [label]="d.isEnabled ? ('ADMIN.PAYMENT_GATEWAYS.ACTIONS.DISABLE' | translate) : ('ADMIN.PAYMENT_GATEWAYS.ACTIONS.ENABLE' | translate)"
+          (click)="toggleEnabled()"
+        ></button>
+      }
+    </div>
+  </app-admin-page-header>
+
+  @if (detailError()) {
+    <app-admin-error-alert [message]="detailError()!" />
+  }
+
+  @if (detailLoading()) {
+    <app-admin-loading-skeleton />
+  } @else if (detail(); as d) {
+    <app-admin-section-card [title]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.GENERAL' | translate">
+      <form [formGroup]="generalForm" (ngSubmit)="saveGeneral()" class="admin-form">
+        <div class="admin-form__field">
+          <label for="pg-display-name">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.DISPLAY_NAME' | translate }}</label>
+          <input id="pg-display-name" pInputText formControlName="displayName" />
+        </div>
+
+        <div class="admin-form__field admin-form__field--checkbox">
+          <p-checkbox formControlName="isTestMode" [binary]="true" inputId="pg-test-mode" />
+          <label for="pg-test-mode">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.TEST_MODE' | translate }}</label>
+        </div>
+
+        <div class="admin-form__field">
+          <label for="pg-base-url">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.BASE_URL' | translate }}</label>
+          <input id="pg-base-url" pInputText formControlName="baseUrl" />
+        </div>
+
+        <div class="admin-form__field">
+          <label for="pg-account-id">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.ACCOUNT_ID' | translate }}</label>
+          <input id="pg-account-id" pInputText formControlName="accountId" />
+        </div>
+
+        <div class="admin-form__field">
+          <label for="pg-webhook-url">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.WEBHOOK_URL' | translate }}</label>
+          <input id="pg-webhook-url" pInputText formControlName="webhookUrl" />
+        </div>
+
+        <div class="admin-form__field">
+          <label for="pg-frontend-result-url">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.FRONTEND_RESULT_URL' | translate }}</label>
+          <input id="pg-frontend-result-url" pInputText formControlName="frontendResultUrl" />
+        </div>
+
+        <button
+          *hamboxHasPermission="permissions.PaymentGateways.Edit"
+          pButton
+          type="submit"
+          class="admin-btn-primary"
+          [disabled]="saving()"
+          [label]="'ADMIN.PAYMENT_GATEWAYS.ACTIONS.SAVE' | translate"
+        ></button>
+      </form>
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.CREDENTIALS' | translate">
+      @if (!editingCredentials()) {
+        <div class="admin-form">
+          <p>
+            {{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.API_KEY' | translate }}:
+            <strong>{{ d.hasApiKey ? ('ADMIN.PAYMENT_GATEWAYS.STORED' | translate) : ('ADMIN.PAYMENT_GATEWAYS.NOT_SET' | translate) }}</strong>
+          </p>
+          <p>
+            {{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.API_SECRET' | translate }}:
+            <strong>{{ d.hasApiSecret ? ('ADMIN.PAYMENT_GATEWAYS.STORED' | translate) : ('ADMIN.PAYMENT_GATEWAYS.NOT_SET' | translate) }}</strong>
+          </p>
+          <button
+            *hamboxHasPermission="permissions.PaymentGateways.Edit"
+            pButton
+            type="button"
+            class="admin-btn-secondary"
+            [label]="'ADMIN.PAYMENT_GATEWAYS.ACTIONS.UPDATE_CREDENTIALS' | translate"
+            (click)="startEditCredentials()"
+          ></button>
+        </div>
+      } @else {
+        <form [formGroup]="credentialsForm" (ngSubmit)="saveCredentials()" class="admin-form">
+          <div class="admin-form__field">
+            <label for="pg-api-key">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.API_KEY' | translate }}</label>
+            <p-password id="pg-api-key" formControlName="apiKey" [feedback]="false" [toggleMask]="true" [placeholder]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.LEAVE_BLANK' | translate" />
+          </div>
+          <div class="admin-form__field">
+            <label for="pg-api-secret">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.API_SECRET' | translate }}</label>
+            <p-password id="pg-api-secret" formControlName="apiSecret" [feedback]="false" [toggleMask]="true" [placeholder]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.LEAVE_BLANK' | translate" />
+          </div>
+          <div class="admin-form__field">
+            <label for="pg-secondary-id">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.SECONDARY_ID' | translate }}</label>
+            <p-password id="pg-secondary-id" formControlName="secondaryId" [feedback]="false" [toggleMask]="true" [placeholder]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.LEAVE_BLANK' | translate" />
+          </div>
+          <div class="admin-actions-row">
+            <button pButton type="submit" class="admin-btn-primary" [disabled]="saving()" [label]="'ADMIN.PAYMENT_GATEWAYS.ACTIONS.SAVE' | translate"></button>
+            <button pButton type="button" class="admin-btn-secondary" (click)="cancelEditCredentials()" [label]="'ADMIN.PAYMENT_GATEWAYS.ACTIONS.CANCEL' | translate"></button>
+          </div>
+        </form>
+      }
+    </app-admin-section-card>
+
+    <app-admin-section-card [title]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.TEST_CONNECTION' | translate">
+      <div class="admin-form">
+        <button
+          pButton
+          type="button"
+          class="admin-btn-secondary"
+          [disabled]="actionLoading()"
+          [label]="'ADMIN.PAYMENT_GATEWAYS.ACTIONS.TEST_CONNECTION' | translate"
+          (click)="testConnection()"
+        ></button>
+
+        @if (testResult(); as result) {
+          <p [style.color]="result.isSuccess ? 'var(--admin-color-success)' : 'var(--admin-color-danger)'">
+            {{ result.message }}
+          </p>
+        }
+      </div>
+    </app-admin-section-card>
+  }
+</section>

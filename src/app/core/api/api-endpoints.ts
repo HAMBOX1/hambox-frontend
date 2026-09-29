@@ -448,6 +448,15 @@ export const SUPPLIERS_API = {
   productMappings: '/api/v1/suppliers/product-mappings',
 } as const;
 
+export const PAYMENT_GATEWAYS_API = {
+  gateways: '/api/v1/admin/payment-gateways',
+  gateway: (gatewayKey: string) => `/api/v1/admin/payment-gateways/${gatewayKey}`,
+  credentials: (gatewayKey: string) => `/api/v1/admin/payment-gateways/${gatewayKey}/credentials`,
+  enable: (gatewayKey: string) => `/api/v1/admin/payment-gateways/${gatewayKey}/enable`,
+  disable: (gatewayKey: string) => `/api/v1/admin/payment-gateways/${gatewayKey}/disable`,
+  testConnection: (gatewayKey: string) => `/api/v1/admin/payment-gateways/${gatewayKey}/test-connection`,
+} as const;
+
 export const COMMUNICATION_API = {
   dashboardStats: '/api/v1/communication/dashboard/stats',
   templates: '/api/v1/communication/templates',

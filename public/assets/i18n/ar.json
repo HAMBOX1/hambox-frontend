@@ -1262,7 +1262,8 @@
       "SUPPLIERS": "الموردون",
       "SECURITY": "مركز الأمان",
       "COMMUNICATION": "التواصل",
-      "WHATSAPP": "بوت واتساب"
+      "WHATSAPP": "بوت واتساب",
+      "PAYMENT_GATEWAYS": "بوابات الدفع"
     },
     "WHATSAPP": {
       "BREADCRUMB": "بوت واتساب",
@@ -5465,6 +5466,56 @@
         "TITLE": "تغيير وضع التنفيذ؟",
         "TO_SUPPLIER_ONLY": "لن يستخدم هذا المتغير المخزون اليدوي بعد الآن. ستعتمد الطلبات كليًا على سلسلة الموردين المهيأة.",
         "TO_MANUAL_ONLY": "لن يحاول هذا المتغير التنفيذ الآلي عبر المورد بعد الآن."
+      }
+    },
+    "PAYMENT_GATEWAYS": {
+      "LIST": {
+        "TITLE": "بوابات الدفع",
+        "SUBTITLE": "فعّل واضبط واختبر بيانات كل بوابة دفع.",
+        "COLUMNS": {
+          "NAME": "البوابة",
+          "STATUS": "الحالة",
+          "MODE": "الوضع",
+          "CREDENTIALS": "بيانات الاعتماد"
+        }
+      },
+      "ENABLED": "مفعّلة",
+      "DISABLED": "معطّلة",
+      "TEST_MODE": "تجريبي",
+      "LIVE_MODE": "حي",
+      "STORED": "محفوظ",
+      "NOT_SET": "غير محدد",
+      "ACTIONS": {
+        "MANAGE": "إدارة",
+        "SAVE": "حفظ",
+        "CANCEL": "إلغاء",
+        "ENABLE": "تفعيل",
+        "DISABLE": "تعطيل",
+        "UPDATE_CREDENTIALS": "تحديث بيانات الاعتماد",
+        "TEST_CONNECTION": "اختبار الاتصال"
+      },
+      "DETAIL": {
+        "GENERAL": "عام",
+        "CREDENTIALS": "بيانات الاعتماد",
+        "TEST_CONNECTION": "اختبار الاتصال",
+        "DISPLAY_NAME": "الاسم المعروض",
+        "TEST_MODE": "وضع تجريبي",
+        "BASE_URL": "رابط API الأساسي",
+        "ACCOUNT_ID": "معرّف التاجر / الحساب",
+        "WEBHOOK_URL": "رابط Webhook",
+        "FRONTEND_RESULT_URL": "رابط صفحة النتيجة",
+        "API_KEY": "مفتاح API",
+        "API_SECRET": "سر API",
+        "SECONDARY_ID": "معرّف ثانوي",
+        "LEAVE_BLANK": "اتركه فارغاً للإبقاء على القيمة الحالية"
+      },
+      "MESSAGES": {
+        "SAVED": "تم الحفظ",
+        "SAVE_FAILED": "فشل الحفظ",
+        "CREDENTIALS_SAVED": "تم حفظ بيانات الاعتماد",
+        "ENABLED": "مفعّلة",
+        "DISABLED": "معطّلة",
+        "ACTION_FAILED": "فشل الإجراء"
       }
     }
   },

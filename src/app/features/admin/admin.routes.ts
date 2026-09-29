@@ -169,6 +169,11 @@ export const routes: Routes = [
       import('./suppliers/admin-suppliers.routes').then((m) => m.routes),
   },
   {
+    path: 'payment-gateways',
+    loadChildren: () =>
+      import('./payment-gateways/admin-payment-gateways.routes').then((m) => m.routes),
+  },
+  {
     path: 'communication',
     loadChildren: () =>
       import('./communication/admin-communication.routes').then((m) => m.routes),

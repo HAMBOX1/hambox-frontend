@@ -127,6 +127,10 @@ export const PERMISSIONS = {
     Delete: 'Suppliers.Delete',
     ManageMappings: 'Suppliers.ManageMappings',
   },
+  PaymentGateways: {
+    View: 'PaymentGateways.View',
+    Edit: 'PaymentGateways.Edit',
+  },
   Security: {
     View: 'Security.View',
     ManageUsers: 'Security.ManageUsers',

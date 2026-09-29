@@ -1277,6 +1277,7 @@
       "REPORTS": "Reports",
       "SETTINGS": "Settings",
       "SUPPLIERS": "Suppliers",
+      "PAYMENT_GATEWAYS": "Payment Gateways",
       "SECURITY": "Security Center",
       "COMMUNICATION": "Communication",
       "WHATSAPP": "WhatsApp Bot"
@@ -5604,6 +5605,56 @@
         "TITLE": "Change fulfillment mode?",
         "TO_SUPPLIER_ONLY": "This variant will no longer use manual inventory. Orders will depend entirely on the configured supplier chain.",
         "TO_MANUAL_ONLY": "This variant will no longer attempt automated supplier fulfillment."
+      }
+    },
+    "PAYMENT_GATEWAYS": {
+      "LIST": {
+        "TITLE": "Payment Gateways",
+        "SUBTITLE": "Enable, configure, and test credentials for each payment gateway.",
+        "COLUMNS": {
+          "NAME": "Gateway",
+          "STATUS": "Status",
+          "MODE": "Mode",
+          "CREDENTIALS": "Credentials"
+        }
+      },
+      "ENABLED": "Enabled",
+      "DISABLED": "Disabled",
+      "TEST_MODE": "Test",
+      "LIVE_MODE": "Live",
+      "STORED": "Stored",
+      "NOT_SET": "Not set",
+      "ACTIONS": {
+        "MANAGE": "Manage",
+        "SAVE": "Save",
+        "CANCEL": "Cancel",
+        "ENABLE": "Enable",
+        "DISABLE": "Disable",
+        "UPDATE_CREDENTIALS": "Update credentials",
+        "TEST_CONNECTION": "Test Connection"
+      },
+      "DETAIL": {
+        "GENERAL": "General",
+        "CREDENTIALS": "Credentials",
+        "TEST_CONNECTION": "Test Connection",
+        "DISPLAY_NAME": "Display Name",
+        "TEST_MODE": "Test mode",
+        "BASE_URL": "Base URL",
+        "ACCOUNT_ID": "Merchant / Account ID",
+        "WEBHOOK_URL": "Webhook URL",
+        "FRONTEND_RESULT_URL": "Frontend Result URL",
+        "API_KEY": "API Key",
+        "API_SECRET": "API Secret",
+        "SECONDARY_ID": "Secondary ID",
+        "LEAVE_BLANK": "Leave blank to keep existing"
+      },
+      "MESSAGES": {
+        "SAVED": "Saved",
+        "SAVE_FAILED": "Save failed",
+        "CREDENTIALS_SAVED": "Credentials saved",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "ACTION_FAILED": "Action failed"
       }
     }
   },

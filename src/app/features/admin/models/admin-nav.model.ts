@@ -16,6 +16,7 @@ export type AdminNavId =
   | 'faqs'
   | 'legal'
   | 'suppliers'
+  | 'payment-gateways'
   | 'communication'
   | 'orders'
   | 'operations'
@@ -138,6 +139,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/suppliers',
     icon: 'pi pi-truck',
     permission: PERMISSIONS.Suppliers.View,
+  },
+  {
+    id: 'payment-gateways',
+    labelKey: 'ADMIN.NAV.PAYMENT_GATEWAYS',
+    route: '/admin/payment-gateways',
+    icon: 'pi pi-credit-card',
+    permission: PERMISSIONS.PaymentGateways.View,
   },
   {
     id: 'communication',
