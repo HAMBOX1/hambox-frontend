@@ -83,18 +83,17 @@ export class CheckoutFacade {
   readonly configurationLoading = this.configurationLoadingState.asReadonly();
 
   /**
-   * Only "card" is offered unconditionally — PayPal/Apple Pay have no backend integration and would
-   * silently fall through to the same no-op ImmediatePaymentProvider as "card", collecting no real
-   * payment. Do not re-add them here until a real provider exists for each. Fawry (Direct Billing,
-   * in-app, gated by dotFawryCheckoutEnabled) is confirmed working directly against DOT. Orange Cash
-   * and Vodafone Cash go through a different DOT product — the OTP redirect flow, same shape as the
-   * generic "dot" carrier-billing option — gated by dotCheckoutEnabled instead, since that's the
-   * flag for that product's own price-point/credential configuration. "crypto" (Cryptomus) is gated
-   * by cryptomusCheckoutEnabled — real backend integration, but not yet exercised against a live
-   * payment; see InitiateCryptomusCheckoutCommandHandler.
+   * "card" is hidden — it has no real backend integration and silently falls through to the no-op
+   * ImmediatePaymentProvider, collecting no real payment. Do not re-add it (or PayPal/Apple Pay,
+   * same problem) until a real card processor is wired up. Fawry (Direct Billing, in-app, gated by
+   * dotFawryCheckoutEnabled) is confirmed working directly against DOT. Orange Cash and Vodafone
+   * Cash go through a different DOT product — the OTP redirect flow, same shape as the generic
+   * "dot" carrier-billing option — gated by dotCheckoutEnabled instead, since that's the flag for
+   * that product's own price-point/credential configuration. "crypto" (Cryptomus) is gated by
+   * cryptomusCheckoutEnabled — verified end-to-end against the live Cryptomus API.
    */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
-    const methods: PaymentMethodId[] = ['card'];
+    const methods: PaymentMethodId[] = [];
     if (this.dotCheckoutEnabledState()) {
       methods.push('dot', ...DOT_WALLET_IDS);
     }
@@ -181,6 +180,13 @@ export class CheckoutFacade {
       this.cryptomusCheckoutEnabledState.set(configuration.cryptomusCheckoutEnabled);
       if (configuration.developmentCheckoutEnabled) {
         this.paymentMethodState.set('development');
+      } else if (!this.availablePaymentMethods().includes(this.paymentMethodState())) {
+        // "card" (the default before configuration loads) is no longer a real option — fall back
+        // to whichever real gateway is actually enabled, if any.
+        const [first] = this.availablePaymentMethods();
+        if (first) {
+          this.paymentMethodState.set(first);
+        }
       }
     } catch {
       this.developmentCheckoutEnabledState.set(false);
