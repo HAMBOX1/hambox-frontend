@@ -41,6 +41,11 @@
         </div>
 
         <div class="admin-form__field">
+          <label for="pg-fee-percent">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.FEE_PERCENT' | translate }}</label>
+          <input id="pg-fee-percent" type="number" min="0" max="100" step="0.01" pInputText formControlName="feePercent" [placeholder]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.FEE_PERCENT_PLACEHOLDER' | translate" />
+        </div>
+
+        <div class="admin-form__field">
           <label for="pg-base-url">{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.BASE_URL' | translate }}</label>
           <input id="pg-base-url" pInputText formControlName="baseUrl" />
         </div>

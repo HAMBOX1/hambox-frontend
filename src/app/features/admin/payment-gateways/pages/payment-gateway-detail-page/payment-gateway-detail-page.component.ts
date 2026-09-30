@@ -66,6 +66,7 @@ export class PaymentGatewayDetailPageComponent implements OnInit {
   protected readonly generalForm = this.fb.nonNullable.group({
     displayName: ['', Validators.required],
     isTestMode: [false],
+    feePercent: this.fb.control<number | null>(null, [Validators.min(0), Validators.max(100)]),
     baseUrl: [''],
     accountId: [''],
     webhookUrl: [''],
@@ -88,6 +89,7 @@ export class PaymentGatewayDetailPageComponent implements OnInit {
       this.generalForm.reset({
         displayName: detail.displayName,
         isTestMode: detail.isTestMode,
+        feePercent: detail.feePercent,
         baseUrl: detail.baseUrl ?? '',
         accountId: detail.accountId ?? '',
         webhookUrl: detail.webhookUrl ?? '',
@@ -112,6 +114,7 @@ export class PaymentGatewayDetailPageComponent implements OnInit {
     const success = await this.facade.updateGeneral(this.gatewayKey(), {
       displayName: value.displayName,
       isTestMode: value.isTestMode,
+      feePercent: value.feePercent,
       baseUrl: value.baseUrl.trim() || null,
       accountId: value.accountId.trim() || null,
       webhookUrl: value.webhookUrl.trim() || null,

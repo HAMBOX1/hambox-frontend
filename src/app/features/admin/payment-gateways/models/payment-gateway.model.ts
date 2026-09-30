@@ -12,6 +12,7 @@ export interface PaymentGatewayDetailDto {
   readonly displayName: string;
   readonly isEnabled: boolean;
   readonly isTestMode: boolean;
+  readonly feePercent: number | null;
   readonly baseUrl: string | null;
   readonly accountId: string | null;
   readonly secondaryId: string | null;
@@ -26,6 +27,7 @@ export interface PaymentGatewayDetailDto {
 export interface UpdatePaymentGatewayGeneralRequest {
   displayName: string;
   isTestMode: boolean;
+  feePercent: number | null;
   baseUrl: string | null;
   accountId: string | null;
   webhookUrl: string | null;

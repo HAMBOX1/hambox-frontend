@@ -5639,6 +5639,8 @@
         "TEST_CONNECTION": "Test Connection",
         "DISPLAY_NAME": "Display Name",
         "TEST_MODE": "Test mode",
+        "FEE_PERCENT": "Fee / Tax percent",
+        "FEE_PERCENT_PLACEHOLDER": "Leave empty to use the platform default rate",
         "BASE_URL": "Base URL",
         "ACCOUNT_ID": "Merchant / Account ID",
         "WEBHOOK_URL": "Webhook URL",

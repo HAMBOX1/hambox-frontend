@@ -5500,6 +5500,8 @@
         "TEST_CONNECTION": "اختبار الاتصال",
         "DISPLAY_NAME": "الاسم المعروض",
         "TEST_MODE": "وضع تجريبي",
+        "FEE_PERCENT": "نسبة الرسوم / الضريبة",
+        "FEE_PERCENT_PLACEHOLDER": "اتركه فارغًا لاستخدام النسبة الافتراضية للمنصة",
         "BASE_URL": "رابط API الأساسي",
         "ACCOUNT_ID": "معرّف التاجر / الحساب",
         "WEBHOOK_URL": "رابط Webhook",

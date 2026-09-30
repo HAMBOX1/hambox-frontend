@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { COMMERCE_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
-import { CheckoutRequest, OrderApiDto } from '../../cart/models/cart-api.model';
+import { CartTotalsApiDto, CheckoutRequest, OrderApiDto } from '../../cart/models/cart-api.model';
 import {
   CheckoutConfigurationDto,
   CryptomusCheckoutInitiationDto,
@@ -47,6 +47,12 @@ export class CheckoutService {
 
   getConfiguration(): Observable<CheckoutConfigurationDto> {
     return this.api.get<CheckoutConfigurationDto>(COMMERCE_API.checkoutConfiguration);
+  }
+
+  getTotalsPreview(paymentMethod: string, country: string): Observable<CartTotalsApiDto> {
+    return this.api.get<CartTotalsApiDto>(COMMERCE_API.checkoutTotalsPreview, {
+      params: { paymentMethod, country },
+    });
   }
 
   getOrder(orderId: string): Observable<OrderApiDto> {

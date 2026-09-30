@@ -5,7 +5,9 @@ import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ApiError } from '../../../core/models/api-error.model';
 import { clearIdempotencyKey, getOrCreateIdempotencyKey } from '../../../shared/utils/idempotency-key.util';
 import { CartFacade } from '../../cart/services/cart.facade';
+import { CartSummary } from '../../cart/models/cart';
 import { OrderApiDto } from '../../cart/models/cart-api.model';
+import { mapCartSummary } from '../../cart/utils/cart.mapper';
 import { CheckoutService } from './checkout.service';
 import {
   BillingDetails,
@@ -69,6 +71,8 @@ export class CheckoutFacade {
   private readonly dotFawryCheckoutEnabledState = signal(false);
   private readonly cryptomusCheckoutEnabledState = signal(false);
   private readonly configurationLoadingState = signal(false);
+  private readonly gatewayPreviewState = signal<CartSummary | null>(null);
+  private previewRequestToken = 0;
 
   readonly paymentMethod = this.paymentMethodState.asReadonly();
   readonly cardDetails = this.cardDetailsState.asReadonly();
@@ -124,8 +128,15 @@ export class CheckoutFacade {
     })),
   );
 
+  /**
+   * Prefers the gateway-specific preview (fetched whenever the selected payment method or the cart's
+   * discount changes — see {@link refreshGatewayPreview}) since gateways can carry their own fee
+   * percent that overrides the platform default; falls back to the cart's own totals (platform
+   * default rate) while a preview hasn't resolved yet or for the 'card'/'development' placeholders,
+   * which have no gateway row to preview.
+   */
   readonly summary = computed<CheckoutSummary>(() => {
-    const cartSummary = this.cartFacade.summary();
+    const cartSummary = this.gatewayPreviewState() ?? this.cartFacade.summary();
     return {
       subtotal: cartSummary.subtotal,
       totalDiscount: cartSummary.totalDiscount,
@@ -188,6 +199,7 @@ export class CheckoutFacade {
           this.paymentMethodState.set(first);
         }
       }
+      void this.refreshGatewayPreview();
     } catch {
       this.developmentCheckoutEnabledState.set(false);
       this.dotCheckoutEnabledState.set(false);
@@ -200,6 +212,36 @@ export class CheckoutFacade {
 
   selectPaymentMethod(method: PaymentMethodId): void {
     this.paymentMethodState.set(method);
+    void this.refreshGatewayPreview();
+  }
+
+  /**
+   * Re-previews Subtotal/Tax/Total for the currently selected payment method — gateways can carry
+   * their own fee percent (see the Payment Gateways admin dashboard) that replaces the platform
+   * default rate, so the total shown must depend on which gateway is selected. Called whenever the
+   * selection or the cart's discount changes. A request token guards against an older, slower
+   * response overwriting a newer one if the customer switches methods again before the first reply
+   * lands.
+   */
+  private async refreshGatewayPreview(): Promise<void> {
+    const method = this.paymentMethodState();
+    if (method === 'card' || method === 'development') {
+      this.gatewayPreviewState.set(null);
+      return;
+    }
+
+    const token = ++this.previewRequestToken;
+    try {
+      const country = this.billingDetailsState().country;
+      const totals = await firstValueFrom(this.checkoutService.getTotalsPreview(method, country));
+      if (token === this.previewRequestToken) {
+        this.gatewayPreviewState.set(mapCartSummary(totals));
+      }
+    } catch {
+      if (token === this.previewRequestToken) {
+        this.gatewayPreviewState.set(null);
+      }
+    }
   }
 
   updateCardField<K extends keyof CardPaymentDetails>(
@@ -238,6 +280,7 @@ export class CheckoutFacade {
       if (validationErrors.length > 0) {
         this.discountErrorState.set(validationErrors.join(' '));
       }
+      await this.refreshGatewayPreview();
     } catch (error) {
       this.discountErrorState.set(this.toErrorMessage(error, 'Unable to apply coupon.'));
     } finally {
@@ -253,6 +296,7 @@ export class CheckoutFacade {
       const country = this.billingDetailsState().country;
       await this.cartFacade.removeCoupon(country);
       this.discountCodeState.set('');
+      await this.refreshGatewayPreview();
     } catch (error) {
       this.discountErrorState.set(this.toErrorMessage(error, 'Unable to remove coupon.'));
     } finally {
@@ -443,6 +487,7 @@ export class CheckoutFacade {
     this.discountErrorState.set(null);
     this.errorState.set(null);
     this.lastOrderState.set(null);
+    this.gatewayPreviewState.set(null);
     clearIdempotencyKey(IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);

@@ -161,6 +161,7 @@ export const COMMERCE_API = {
       : `/api/v1/cart/items/${productId}`,
   mergeCart: '/api/v1/cart/merge',
   checkout: '/api/v1/checkout',
+  checkoutTotalsPreview: '/api/v1/checkout/totals-preview',
   membershipCheckoutPreview: '/api/v1/checkout/membership/preview',
   membershipCheckout: '/api/v1/checkout/membership',
   checkoutConfiguration: '/api/v1/checkout/configuration',
