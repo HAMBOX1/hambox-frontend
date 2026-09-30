@@ -5622,6 +5622,8 @@
       "LIST": {
         "TITLE": "Payment Gateways",
         "SUBTITLE": "Enable, configure, and test credentials for each payment gateway.",
+        "EMPTY_TITLE": "No payment gateways yet",
+        "EMPTY_DESCRIPTION": "Ask your developer to integrate a new payment gateway — each one needs its own backend setup before it can appear here.",
         "COLUMNS": {
           "NAME": "Gateway",
           "STATUS": "Status",

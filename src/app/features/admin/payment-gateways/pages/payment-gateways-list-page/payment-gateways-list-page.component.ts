@@ -4,9 +4,10 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
 import {
-  AdminDataTableShellComponent,
+  AdminEmptyStateComponent,
   AdminErrorAlertComponent,
   AdminIconButtonComponent,
+  AdminLoadingSkeletonComponent,
   AdminPageHeaderComponent,
   AdminStatusBadgeComponent,
 } from '../../../../../shared/components/admin';
@@ -23,12 +24,14 @@ import { PaymentGatewaysManagementFacade } from '../../services/payment-gateways
     HasPermissionDirective,
     AdminPageHeaderComponent,
     AdminErrorAlertComponent,
-    AdminDataTableShellComponent,
+    AdminEmptyStateComponent,
+    AdminLoadingSkeletonComponent,
     AdminIconButtonComponent,
     AdminStatusBadgeComponent,
   ],
   providers: [PaymentGatewaysManagementFacade],
   templateUrl: './payment-gateways-list-page.component.html',
+  styleUrl: './payment-gateways-list-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentGatewaysListPageComponent implements OnInit {
