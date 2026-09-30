@@ -5501,7 +5501,8 @@
         "ENABLE": "تفعيل",
         "DISABLE": "تعطيل",
         "UPDATE_CREDENTIALS": "تحديث بيانات الاعتماد",
-        "TEST_CONNECTION": "اختبار الاتصال"
+        "TEST_CONNECTION": "اختبار الاتصال",
+        "OPEN_EXTERNAL_DASHBOARD": "فتح الداشبورد"
       },
       "DETAIL": {
         "GENERAL": "عام",
@@ -5518,7 +5519,9 @@
         "API_KEY": "مفتاح API",
         "API_SECRET": "سر API",
         "SECONDARY_ID": "معرّف ثانوي",
-        "LEAVE_BLANK": "اتركه فارغاً للإبقاء على القيمة الحالية"
+        "LEAVE_BLANK": "اتركه فارغاً للإبقاء على القيمة الحالية",
+        "EXTERNAL_DASHBOARD": "الداشبورد الخارجي",
+        "EXTERNAL_DASHBOARD_HINT": "DOT بتوفر داشبورد خاص بيها لمتابعة المبيعات من عندهم. سجّل دخول بالبيانات اللي بعتوهالك مباشرة — مش متخزنة في نظام HAMBOX."
       },
       "MESSAGES": {
         "SAVED": "تم الحفظ",

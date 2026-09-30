@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -62,6 +62,19 @@ export class PaymentGatewayDetailPageComponent implements OnInit {
   protected readonly testResult = this.facade.testResult;
 
   protected readonly editingCredentials = signal(false);
+
+  /**
+   * DOT's own operator dashboard (https://dot-jo.biz/operators-dashboard/) — shared across both
+   * DOT products (carrier-billing OTP and DOT Fawry Direct Billing), so it's shown for either
+   * gateway key. DOT hands out login credentials separately (not stored here — see the
+   * "External Dashboard" card's hint text); this is just a navigation shortcut, not a credential
+   * store.
+   */
+  protected readonly externalDashboardUrl = computed(() =>
+    this.gatewayKey() === 'dot' || this.gatewayKey() === 'dotfawry'
+      ? 'https://dot-jo.biz/operators-dashboard/'
+      : null,
+  );
 
   protected readonly generalForm = this.fb.nonNullable.group({
     displayName: ['', Validators.required],

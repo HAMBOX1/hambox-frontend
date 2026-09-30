@@ -118,6 +118,22 @@
       }
     </app-admin-section-card>
 
+    @if (externalDashboardUrl(); as dashboardUrl) {
+      <app-admin-section-card [title]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.EXTERNAL_DASHBOARD' | translate">
+        <div class="admin-form">
+          <p>{{ 'ADMIN.PAYMENT_GATEWAYS.DETAIL.EXTERNAL_DASHBOARD_HINT' | translate }}</p>
+          <a
+            pButton
+            [href]="dashboardUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="admin-btn-secondary"
+            [label]="'ADMIN.PAYMENT_GATEWAYS.ACTIONS.OPEN_EXTERNAL_DASHBOARD' | translate"
+          ></a>
+        </div>
+      </app-admin-section-card>
+    }
+
     <app-admin-section-card [title]="'ADMIN.PAYMENT_GATEWAYS.DETAIL.TEST_CONNECTION' | translate">
       <div class="admin-form">
         <button

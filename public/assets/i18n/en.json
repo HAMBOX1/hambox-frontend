@@ -5640,7 +5640,8 @@
         "ENABLE": "Enable",
         "DISABLE": "Disable",
         "UPDATE_CREDENTIALS": "Update credentials",
-        "TEST_CONNECTION": "Test Connection"
+        "TEST_CONNECTION": "Test Connection",
+        "OPEN_EXTERNAL_DASHBOARD": "Open Dashboard"
       },
       "DETAIL": {
         "GENERAL": "General",
@@ -5657,7 +5658,9 @@
         "API_KEY": "API Key",
         "API_SECRET": "API Secret",
         "SECONDARY_ID": "Secondary ID",
-        "LEAVE_BLANK": "Leave blank to keep existing"
+        "LEAVE_BLANK": "Leave blank to keep existing",
+        "EXTERNAL_DASHBOARD": "External Dashboard",
+        "EXTERNAL_DASHBOARD_HINT": "DOT provides its own dashboard for tracking sales on their side. Sign in with the credentials DOT shared with you directly — they are not stored in HAMBOX."
       },
       "MESSAGES": {
         "SAVED": "Saved",
