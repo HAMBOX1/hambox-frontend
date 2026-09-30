@@ -1,6 +1,6 @@
 export type SupportedCurrencyCode = 'USD' | 'EUR' | 'EGP' | 'SAR';
 
-export const DEFAULT_CURRENCY_CODE: SupportedCurrencyCode = 'USD';
+export const DEFAULT_CURRENCY_CODE: SupportedCurrencyCode = 'EUR';
 export const BASE_CURRENCY_CODE: SupportedCurrencyCode = 'USD';
 export const CURRENCY_STORAGE_KEY = 'hambox.currency';
 export const EXCHANGE_RATES_CACHE_KEY = 'hambox.exchange-rates.cache';
