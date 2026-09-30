@@ -250,7 +250,9 @@
       "SECS": "Secs"
     },
     "CATEGORY_NAV": {
-      "LABEL": "Browse categories"
+      "LABEL": "Browse categories",
+      "SCROLL_LEFT": "Scroll categories left",
+      "SCROLL_RIGHT": "Scroll categories right"
     },
     "TOOLBAR": {
       "SORT_LABEL": "Sort by:",

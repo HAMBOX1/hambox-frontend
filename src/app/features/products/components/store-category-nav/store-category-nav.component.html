@@ -1,15 +1,49 @@
 <nav class="category-nav" [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.LABEL' | translate">
-  <div class="category-nav__scroller" role="tablist" [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.LABEL' | translate">
-    @for (category of categories(); track category.id) {
+  <div
+    class="category-nav__viewport"
+    [class.category-nav__viewport--fade-start]="canScrollStart()"
+    [class.category-nav__viewport--fade-end]="canScrollEnd()"
+  >
+    @if (canScrollStart()) {
       <button
         type="button"
-        class="category-nav__pill"
-        [class.category-nav__pill--active]="activeCategoryId() === category.id"
-        role="tab"
-        [attr.aria-selected]="activeCategoryId() === category.id"
-        (click)="select(category.id)"
+        class="category-nav__arrow category-nav__arrow--start"
+        (click)="scrollByDirection(-1)"
+        [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.SCROLL_LEFT' | translate"
       >
-        {{ category.label }}
+        <i class="pi pi-chevron-left" aria-hidden="true"></i>
+      </button>
+    }
+
+    <div
+      #scroller
+      class="category-nav__scroller"
+      role="tablist"
+      [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.LABEL' | translate"
+      (scroll)="onScroll()"
+    >
+      @for (category of categories(); track category.id) {
+        <button
+          type="button"
+          class="category-nav__pill"
+          [class.category-nav__pill--active]="activeCategoryId() === category.id"
+          role="tab"
+          [attr.aria-selected]="activeCategoryId() === category.id"
+          (click)="select(category.id)"
+        >
+          {{ category.label }}
+        </button>
+      }
+    </div>
+
+    @if (canScrollEnd()) {
+      <button
+        type="button"
+        class="category-nav__arrow category-nav__arrow--end"
+        (click)="scrollByDirection(1)"
+        [attr.aria-label]="'PRODUCTS.CATEGORY_NAV.SCROLL_RIGHT' | translate"
+      >
+        <i class="pi pi-chevron-right" aria-hidden="true"></i>
       </button>
     }
   </div>

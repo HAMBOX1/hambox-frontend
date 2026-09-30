@@ -244,7 +244,9 @@
       "SECS": "ثواني"
     },
     "CATEGORY_NAV": {
-      "LABEL": "تصفح الفئات"
+      "LABEL": "تصفح الفئات",
+      "SCROLL_LEFT": "تمرير الفئات لليسار",
+      "SCROLL_RIGHT": "تمرير الفئات لليمين"
     },
     "TOOLBAR": {
       "SORT_LABEL": "ترتيب حسب:",
