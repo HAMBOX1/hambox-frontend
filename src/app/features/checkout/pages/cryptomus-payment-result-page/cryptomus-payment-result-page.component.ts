@@ -14,6 +14,7 @@ import { StorefrontNavLinksService } from '../../../home/services/storefront-nav
 import { PaymentProcessingCardComponent } from '../../components/payment-processing-card/payment-processing-card.component';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { CryptomusPaymentStatus } from '../../models/checkout';
+import { parseApiError } from '../../../../core/models/api-error.model';
 
 const POLL_INTERVAL_MS = 3000;
 // Mirrors dot-payment-result-page's own budget — if a Cryptomus attempt genuinely stalls this
@@ -38,8 +39,9 @@ export class CryptomusPaymentResultPageComponent implements OnInit {
   private pollTimeoutId?: ReturnType<typeof setTimeout>;
 
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
-  protected readonly status = signal<CryptomusPaymentStatus | 'Invalid'>('Pending');
+  protected readonly status = signal<CryptomusPaymentStatus | 'Invalid' | 'SessionExpired'>('Pending');
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly returnUrl = this.router.url;
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -78,9 +80,15 @@ export class CryptomusPaymentResultPageComponent implements OnInit {
         this.status.set(result.status);
         return;
       }
-    } catch {
-      // Transient — the next poll tick picks the real state back up. Never treat a status-check
-      // network error as payment failure.
+    } catch (error) {
+      // A 401 that survives the auth interceptor's own refresh attempt means the session is
+      // genuinely gone — retrying forever would just spin in place while the order may already be
+      // paid. Every other error (network blip, 5xx) stays transient: the next poll tick picks the
+      // real state back up.
+      if (parseApiError(error).status === 401) {
+        this.status.set('SessionExpired');
+        return;
+      }
     }
 
     if (this.destroyed) {

@@ -37,6 +37,13 @@
           <a routerLink="/checkout">{{ 'CHECKOUT.RETURN_TO_CHECKOUT' | translate }}</a>
         </div>
       }
+      @case ('SessionExpired') {
+        <div class="payment-processing__error" role="alert">
+          <p>{{ 'CHECKOUT.SESSION_EXPIRED_MESSAGE' | translate }}</p>
+          <a [routerLink]="'/auth/login'" [queryParams]="{ returnUrl }">{{ 'CHECKOUT.SIGN_IN_AGAIN' | translate }}</a>
+          <a routerLink="/account/orders">{{ 'CHECKOUT.VIEW_YOUR_ORDERS' | translate }}</a>
+        </div>
+      }
     }
   </main>
 

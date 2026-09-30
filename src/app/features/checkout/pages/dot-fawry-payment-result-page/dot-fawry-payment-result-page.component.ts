@@ -15,6 +15,7 @@ import { StorefrontNavLinksService } from '../../../home/services/storefront-nav
 import { PaymentProcessingCardComponent } from '../../components/payment-processing-card/payment-processing-card.component';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { DotFawryPaymentStatus } from '../../models/checkout';
+import { parseApiError } from '../../../../core/models/api-error.model';
 
 const WALLET_LABEL_KEYS: Record<string, string> = {
   Fawry: 'CHECKOUT.METHOD_FAWRY',
@@ -47,9 +48,10 @@ export class DotFawryPaymentResultPageComponent implements OnInit {
   private pollTimeoutId?: ReturnType<typeof setTimeout>;
 
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
-  protected readonly status = signal<DotFawryPaymentStatus | 'Invalid'>('AwaitingPayment');
+  protected readonly status = signal<DotFawryPaymentStatus | 'Invalid' | 'SessionExpired'>('AwaitingPayment');
   protected readonly fawryReferenceNumber = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly returnUrl = this.router.url;
   private readonly operator = signal<string | null>(null);
 
   /** The selected wallet's translated display name (e.g. "Fawry", "Orange Cash") — interpolated into every stage message below. */
@@ -99,9 +101,15 @@ export class DotFawryPaymentResultPageComponent implements OnInit {
       }
 
       this.status.set('AwaitingPayment');
-    } catch {
-      // Transient — the next poll tick picks the real state back up. Never treat a status-check
-      // network error as payment failure.
+    } catch (error) {
+      // A 401 that survives the auth interceptor's own refresh attempt means the session is
+      // genuinely gone — retrying forever would just spin in place while the order may already be
+      // paid. Every other error (network blip, 5xx) stays transient: the next poll tick picks the
+      // real state back up.
+      if (parseApiError(error).status === 401) {
+        this.status.set('SessionExpired');
+        return;
+      }
     }
 
     if (this.destroyed) {

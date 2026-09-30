@@ -14,6 +14,7 @@ import { StorefrontNavLinksService } from '../../../home/services/storefront-nav
 import { PaymentProcessingCardComponent } from '../../components/payment-processing-card/payment-processing-card.component';
 import { CheckoutFacade } from '../../services/checkout.facade';
 import { DotPaymentStatus } from '../../models/checkout';
+import { parseApiError } from '../../../../core/models/api-error.model';
 
 const POLL_INTERVAL_MS = 3000;
 // DOT's own OTP session times out well before this; if the attempt genuinely stalls this long,
@@ -38,8 +39,9 @@ export class DotPaymentResultPageComponent implements OnInit {
   private pollTimeoutId?: ReturnType<typeof setTimeout>;
 
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
-  protected readonly status = signal<DotPaymentStatus | 'Invalid'>('Pending');
+  protected readonly status = signal<DotPaymentStatus | 'Invalid' | 'SessionExpired'>('Pending');
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly returnUrl = this.router.url;
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -79,9 +81,16 @@ export class DotPaymentResultPageComponent implements OnInit {
         this.status.set(result.status);
         return;
       }
-    } catch {
-      // Transient — the next poll tick picks the real state back up. Never treat a status-check
-      // network error as payment failure.
+    } catch (error) {
+      // A 401 that survives the auth interceptor's own refresh attempt means the session is
+      // genuinely gone (e.g. the customer's tab sat idle through DOT's OTP flow long enough for
+      // the refresh token to expire too) — retrying forever would just spin in place while the
+      // order may already be paid. Every other error (network blip, 5xx) stays transient: the
+      // next poll tick picks the real state back up.
+      if (parseApiError(error).status === 401) {
+        this.status.set('SessionExpired');
+        return;
+      }
     }
 
     if (this.destroyed) {
