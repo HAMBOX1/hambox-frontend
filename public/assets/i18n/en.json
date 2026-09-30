@@ -5190,6 +5190,7 @@
         "SUPPLIER_PRODUCT": "Supplier Product",
         "SEARCH_SUPPLIER_CATALOG": "Search supplier catalog...",
         "NO_SUPPLIER_PRODUCTS_FOUND": "No supplier products found.",
+        "CATALOG_EMPTY": "This supplier's catalog is empty.",
         "CATALOG_UNAVAILABLE": "Unable to load supplier catalog.",
         "RETRY": "Retry",
         "AVAILABLE": "Available",

@@ -5056,6 +5056,7 @@
         "SUPPLIER_PRODUCT": "منتج المورد",
         "SEARCH_SUPPLIER_CATALOG": "البحث في كتالوج المورد...",
         "NO_SUPPLIER_PRODUCTS_FOUND": "لم يتم العثور على منتجات لدى المورد.",
+        "CATALOG_EMPTY": "كتالوج هذا المورد فارغ حاليًا.",
         "CATALOG_UNAVAILABLE": "تعذّر تحميل كتالوج المورد.",
         "RETRY": "إعادة المحاولة",
         "AVAILABLE": "متوفر",
