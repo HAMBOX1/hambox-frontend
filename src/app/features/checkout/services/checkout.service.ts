@@ -12,6 +12,8 @@ import {
   DotFawryCheckoutInitiationDto,
   DotFawryPaymentStatusDto,
   DotPaymentStatusDto,
+  OxaPayCheckoutInitiationDto,
+  OxaPayPaymentStatusDto,
 } from '../models/checkout';
 
 interface InitiateDotCheckoutRequest {
@@ -21,6 +23,11 @@ interface InitiateDotCheckoutRequest {
 }
 
 interface InitiateCryptomusCheckoutRequest {
+  email: string;
+  country: string;
+}
+
+interface InitiateOxaPayCheckoutRequest {
   email: string;
   country: string;
 }
@@ -96,5 +103,18 @@ export class CheckoutService {
 
   getCryptomusPaymentStatus(paymentAttemptId: string): Observable<CryptomusPaymentStatusDto> {
     return this.api.get<CryptomusPaymentStatusDto>(COMMERCE_API.cryptomusPaymentStatus(paymentAttemptId));
+  }
+
+  initiateOxaPayCheckout(
+    request: InitiateOxaPayCheckoutRequest,
+    idempotencyKey: string,
+  ): Observable<OxaPayCheckoutInitiationDto> {
+    return this.api.post<OxaPayCheckoutInitiationDto>(COMMERCE_API.checkoutOxaPay, request, {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
+  }
+
+  getOxaPayPaymentStatus(paymentAttemptId: string): Observable<OxaPayPaymentStatusDto> {
+    return this.api.get<OxaPayPaymentStatusDto>(COMMERCE_API.oxaPayPaymentStatus(paymentAttemptId));
   }
 }

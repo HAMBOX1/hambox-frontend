@@ -50,6 +50,16 @@ export const routes: Routes = [
       ),
   },
   {
+    // No authGuard here either — same reasoning as 'cryptomus/result': OxaPay's own hosted page
+    // redirects the browser back with no HAMBOX session attached, which can reload the SPA from
+    // scratch. Authorizes via the opaque paymentAttemptId in the URL instead of a live session.
+    path: 'oxapay/result',
+    loadComponent: () =>
+      import('./pages/oxapay-payment-result-page/oxapay-payment-result-page.component').then(
+        (c) => c.OxaPayPaymentResultPageComponent,
+      ),
+  },
+  {
     path: 'success/:orderId',
     canActivate: [authGuard],
     loadComponent: () =>

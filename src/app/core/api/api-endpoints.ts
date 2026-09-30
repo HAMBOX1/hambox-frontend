@@ -171,6 +171,8 @@ export const COMMERCE_API = {
   dotFawryPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/dot-fawry/${paymentAttemptId}/status`,
   checkoutCryptomus: '/api/v1/checkout/cryptomus',
   cryptomusPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/cryptomus/${paymentAttemptId}/status`,
+  checkoutOxaPay: '/api/v1/checkout/oxapay',
+  oxaPayPaymentStatus: (paymentAttemptId: string) => `/api/v1/payments/oxapay/${paymentAttemptId}/status`,
   order: (orderId: string) => `/api/v1/orders/${orderId}`,
   cartPromotionsApply: '/api/v1/cart/promotions/apply',
   cartPromotions: '/api/v1/cart/promotions',

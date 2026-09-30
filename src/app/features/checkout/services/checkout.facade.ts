@@ -26,6 +26,8 @@ import {
   DotPaymentStatusDto,
   isDotFawryWallet,
   isDotWallet,
+  OxaPayCheckoutInitiationDto,
+  OxaPayPaymentStatusDto,
   PaymentMethodId,
 } from '../models/checkout';
 import { mapOrderToSuccessDetails } from '../utils/checkout.mapper';
@@ -48,6 +50,7 @@ const IDEMPOTENCY_SCOPE = 'checkout';
 const DOT_IDEMPOTENCY_SCOPE = 'checkout-dot';
 const DOT_FAWRY_IDEMPOTENCY_SCOPE = 'checkout-dot-fawry';
 const CRYPTOMUS_IDEMPOTENCY_SCOPE = 'checkout-cryptomus';
+const OXAPAY_IDEMPOTENCY_SCOPE = 'checkout-oxapay';
 
 @Injectable({
   providedIn: 'root',
@@ -70,6 +73,7 @@ export class CheckoutFacade {
   private readonly dotCheckoutEnabledState = signal(false);
   private readonly dotFawryCheckoutEnabledState = signal(false);
   private readonly cryptomusCheckoutEnabledState = signal(false);
+  private readonly oxapayCheckoutEnabledState = signal(false);
   private readonly configurationLoadingState = signal(false);
   private readonly gatewayPreviewState = signal<CartSummary | null>(null);
   private previewRequestToken = 0;
@@ -94,7 +98,8 @@ export class CheckoutFacade {
    * Cash go through a different DOT product — the OTP redirect flow, same shape as the generic
    * "dot" carrier-billing option — gated by dotCheckoutEnabled instead, since that's the flag for
    * that product's own price-point/credential configuration. "crypto" (Cryptomus) is gated by
-   * cryptomusCheckoutEnabled — verified end-to-end against the live Cryptomus API.
+   * cryptomusCheckoutEnabled — verified end-to-end against the live Cryptomus API. "oxapay" is a
+   * second, independent crypto gateway alongside Cryptomus, gated by oxapayCheckoutEnabled.
    */
   readonly availablePaymentMethods = computed<readonly PaymentMethodId[]>(() => {
     const methods: PaymentMethodId[] = [];
@@ -106,6 +111,9 @@ export class CheckoutFacade {
     }
     if (this.cryptomusCheckoutEnabledState()) {
       methods.push('crypto');
+    }
+    if (this.oxapayCheckoutEnabledState()) {
+      methods.push('oxapay');
     }
     if (this.developmentCheckoutEnabledState()) {
       return ['development', ...methods];
@@ -178,6 +186,7 @@ export class CheckoutFacade {
     clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(OXAPAY_IDEMPOTENCY_SCOPE);
   }
 
   async loadConfiguration(): Promise<void> {
@@ -189,6 +198,7 @@ export class CheckoutFacade {
       this.dotCheckoutEnabledState.set(configuration.dotCheckoutEnabled);
       this.dotFawryCheckoutEnabledState.set(configuration.dotFawryCheckoutEnabled);
       this.cryptomusCheckoutEnabledState.set(configuration.cryptomusCheckoutEnabled);
+      this.oxapayCheckoutEnabledState.set(configuration.oxaPayCheckoutEnabled);
       if (configuration.developmentCheckoutEnabled) {
         this.paymentMethodState.set('development');
       } else if (!this.availablePaymentMethods().includes(this.paymentMethodState())) {
@@ -205,6 +215,7 @@ export class CheckoutFacade {
       this.dotCheckoutEnabledState.set(false);
       this.dotFawryCheckoutEnabledState.set(false);
       this.cryptomusCheckoutEnabledState.set(false);
+      this.oxapayCheckoutEnabledState.set(false);
     } finally {
       this.configurationLoadingState.set(false);
     }
@@ -474,6 +485,45 @@ export class CheckoutFacade {
     return firstValueFrom(this.checkoutService.getCryptomusPaymentStatus(paymentAttemptId));
   }
 
+  /**
+   * Initiates an OxaPay (crypto) checkout and returns the redirect target — callers must navigate
+   * the browser to `paymentUrl` themselves (a full page navigation), same shape as
+   * {@link initiateCryptomusCheckout}. A second, independent crypto gateway alongside Cryptomus. The
+   * order stays Pending until OxaPay confirms the payment server-to-server.
+   */
+  async initiateOxaPayCheckout(): Promise<OxaPayCheckoutInitiationDto> {
+    const billing = this.billingDetailsState();
+    if (!billing.email.trim()) {
+      throw new Error('Email is required to complete checkout.');
+    }
+
+    this.submittingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const idempotencyKey = getOrCreateIdempotencyKey(OXAPAY_IDEMPOTENCY_SCOPE);
+      const initiation = await firstValueFrom(
+        this.checkoutService.initiateOxaPayCheckout(
+          { email: billing.email.trim(), country: billing.country },
+          idempotencyKey,
+        ),
+      );
+
+      clearIdempotencyKey(OXAPAY_IDEMPOTENCY_SCOPE);
+      return initiation;
+    } catch (error) {
+      clearIdempotencyKey(OXAPAY_IDEMPOTENCY_SCOPE);
+      this.errorState.set(this.toErrorMessage(error, 'Checkout failed. Please try again.'));
+      throw error;
+    } finally {
+      this.submittingState.set(false);
+    }
+  }
+
+  async getOxaPayPaymentStatus(paymentAttemptId: string): Promise<OxaPayPaymentStatusDto> {
+    return firstValueFrom(this.checkoutService.getOxaPayPaymentStatus(paymentAttemptId));
+  }
+
   async loadOrder(orderId: string): Promise<ReturnType<typeof mapOrderToSuccessDetails>> {
     const order = await firstValueFrom(this.checkoutService.getOrder(orderId));
     return mapOrderToSuccessDetails(order);
@@ -492,6 +542,7 @@ export class CheckoutFacade {
     clearIdempotencyKey(DOT_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(DOT_FAWRY_IDEMPOTENCY_SCOPE);
     clearIdempotencyKey(CRYPTOMUS_IDEMPOTENCY_SCOPE);
+    clearIdempotencyKey(OXAPAY_IDEMPOTENCY_SCOPE);
     this.initialize();
   }
 

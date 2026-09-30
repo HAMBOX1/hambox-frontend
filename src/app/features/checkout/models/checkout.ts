@@ -4,6 +4,7 @@ export type PaymentMethodId =
   | 'card'
   | 'paypal'
   | 'crypto'
+  | 'oxapay'
   | 'apple-pay'
   | 'development'
   | 'dot'
@@ -92,6 +93,7 @@ export interface CheckoutConfigurationDto {
   readonly dotCheckoutEnabled: boolean;
   readonly dotFawryCheckoutEnabled: boolean;
   readonly cryptomusCheckoutEnabled: boolean;
+  readonly oxaPayCheckoutEnabled: boolean;
 }
 
 export interface DotCheckoutInitiationDto {
@@ -143,6 +145,23 @@ export interface CryptomusPaymentStatusDto {
   readonly paymentAttemptId: string;
   readonly orderId: string;
   readonly status: CryptomusPaymentStatus;
+  readonly completedOrderId: string | null;
+}
+
+/** Returned from initiating an OxaPay (crypto) checkout — the customer's browser must be redirected to {@link OxaPayCheckoutInitiationDto.paymentUrl} next. A second, independent crypto gateway alongside Cryptomus. */
+export interface OxaPayCheckoutInitiationDto {
+  readonly paymentAttemptId: string;
+  readonly orderId: string;
+  readonly paymentUrl: string;
+  readonly expiresOnUtc: string;
+}
+
+export type OxaPayPaymentStatus = 'Pending' | 'Succeeded' | 'Failed' | 'Expired';
+
+export interface OxaPayPaymentStatusDto {
+  readonly paymentAttemptId: string;
+  readonly orderId: string;
+  readonly status: OxaPayPaymentStatus;
   readonly completedOrderId: string | null;
 }
 

@@ -8,6 +8,7 @@ const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   card: 'CHECKOUT.METHOD_CARD',
   paypal: 'CHECKOUT.METHOD_PAYPAL',
   crypto: 'CHECKOUT.METHOD_CRYPTO',
+  oxapay: 'CHECKOUT.METHOD_OXAPAY',
   'apple-pay': 'CHECKOUT.METHOD_APPLE_PAY',
   development: 'CHECKOUT.METHOD_DEVELOPMENT',
   dot: 'CHECKOUT.METHOD_DOT',

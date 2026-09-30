@@ -116,6 +116,11 @@ export class PaymentProcessingPageComponent implements OnInit {
       return;
     }
 
+    if (this.checkout.paymentMethod() === 'oxapay') {
+      void this.runOxaPayCheckoutFlow();
+      return;
+    }
+
     let stageIndex = 0;
     const stageTimer = interval(700)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -174,6 +179,27 @@ export class PaymentProcessingPageComponent implements OnInit {
       // same shape as runDotCheckoutFlow. The browser leaves the app until Cryptomus redirects back
       // to /checkout/cryptomus/result (the paymentAttemptId is already on that URL — see
       // InitiateCryptomusCheckoutCommandHandler).
+      window.location.href = initiation.paymentUrl;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Checkout failed. Please try again.';
+      this.error.set(message);
+      this.stageLabel.set('Payment failed');
+    }
+  }
+
+  private async runOxaPayCheckoutFlow(): Promise<void> {
+    this.stageLabel.set('Preparing secure payment');
+    this.progress.set(20);
+
+    try {
+      const initiation = await this.checkout.initiateOxaPayCheckout();
+      this.stageLabel.set('Redirecting to payment page');
+      this.progress.set(90);
+      // Full page navigation — OxaPay's hosted invoice page is an external, off-app experience,
+      // same shape as runCryptomusCheckoutFlow. The browser leaves the app until OxaPay redirects
+      // back to /checkout/oxapay/result (the paymentAttemptId is already on that URL — see
+      // InitiateOxaPayCheckoutCommandHandler).
       window.location.href = initiation.paymentUrl;
     } catch (error) {
       const message =
