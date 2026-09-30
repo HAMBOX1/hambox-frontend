@@ -11,6 +11,10 @@
   flex-direction: column;
   width: var(--admin-sidebar-current-width);
   height: 100vh;
+  /* Mobile browsers count the address bar in `100vh`, which can push this fixed panel's
+     bottom edge below what's actually visible. `100dvh` tracks the real visible viewport —
+     unsupported browsers keep the `vh` value above. */
+  height: 100dvh;
   overflow: hidden;
   border-right: 1px solid var(--admin-border-subtle);
   background: var(--admin-bg-sidebar);
@@ -91,6 +95,34 @@
   object-fit: contain;
 }
 
+.admin-sidebar__nav-viewport {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+
+  &--fade-top .admin-sidebar__nav {
+    mask-image: linear-gradient(to bottom, transparent, black 24px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 24px);
+  }
+
+  &--fade-bottom .admin-sidebar__nav {
+    mask-image: linear-gradient(to top, transparent, black 24px);
+    -webkit-mask-image: linear-gradient(to top, transparent, black 24px);
+  }
+
+  &--fade-top.admin-sidebar__nav-viewport--fade-bottom .admin-sidebar__nav {
+    mask-image: linear-gradient(to bottom, transparent, black 24px, black calc(100% - 24px), transparent);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 24px,
+      black calc(100% - 24px),
+      transparent
+    );
+  }
+}
+
 .admin-sidebar__nav {
   display: flex;
   flex: 1;
@@ -100,6 +132,18 @@
   padding: 0.875rem 0.625rem;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-sidebar__scroll-hint {
+  position: absolute;
+  bottom: 0.375rem;
+  left: 50%;
+  z-index: 1;
+  color: var(--admin-text-muted, var(--admin-text-secondary));
+  font-size: 0.75rem;
+  pointer-events: none;
+  transform: translateX(-50%);
 }
 
 .admin-sidebar__link {

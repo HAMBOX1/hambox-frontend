@@ -5624,6 +5624,8 @@
         "SUBTITLE": "Enable, configure, and test credentials for each payment gateway.",
         "EMPTY_TITLE": "No payment gateways yet",
         "EMPTY_DESCRIPTION": "Ask your developer to integrate a new payment gateway — each one needs its own backend setup before it can appear here.",
+        "TAX_SHORTCUT_TITLE": "Tax & Currency Settings",
+        "TAX_SHORTCUT_HINT": "Set the platform-wide default tax rate and currency exchange rates.",
         "COLUMNS": {
           "NAME": "Gateway",
           "STATUS": "Status",

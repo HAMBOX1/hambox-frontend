@@ -9,6 +9,19 @@
     <app-admin-error-alert [message]="error()!" (retry)="retryLoad()" />
   }
 
+  <a class="payment-gateways-cards__shortcut" routerLink="/admin/settings" [queryParams]="{ category: 'commerce' }">
+    <i class="pi pi-percentage" aria-hidden="true"></i>
+    <div class="payment-gateways-cards__shortcut-body">
+      <span class="payment-gateways-cards__shortcut-title">{{
+        'ADMIN.PAYMENT_GATEWAYS.LIST.TAX_SHORTCUT_TITLE' | translate
+      }}</span>
+      <span class="payment-gateways-cards__shortcut-hint">{{
+        'ADMIN.PAYMENT_GATEWAYS.LIST.TAX_SHORTCUT_HINT' | translate
+      }}</span>
+    </div>
+    <i class="pi pi-arrow-right" aria-hidden="true"></i>
+  </a>
+
   @if (loading() && gateways().length === 0) {
     <app-admin-loading-skeleton variant="table" [rows]="4" />
   } @else if (gateways().length === 0) {

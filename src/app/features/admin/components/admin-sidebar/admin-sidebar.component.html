@@ -53,19 +53,29 @@
     </div>
   </div>
 
-  <nav class="admin-sidebar__nav">
-    @for (item of navItems(); track item.id) {
-      <a
-        class="admin-sidebar__link"
-        [routerLink]="item.route"
-        routerLinkActive="admin-sidebar__link--active"
-        [routerLinkActiveOptions]="{ exact: false }"
-        [attr.title]="navTooltip(item.labelKey)"
-        (click)="onNavigate()"
-      >
-        <i class="admin-sidebar__icon" [class]="item.icon" aria-hidden="true"></i>
-        <span class="admin-sidebar__label">{{ item.labelKey | translate }}</span>
-      </a>
+  <div
+    class="admin-sidebar__nav-viewport"
+    [class.admin-sidebar__nav-viewport--fade-top]="canScrollUp()"
+    [class.admin-sidebar__nav-viewport--fade-bottom]="canScrollDown()"
+  >
+    <nav #nav class="admin-sidebar__nav" (scroll)="onNavScroll()">
+      @for (item of navItems(); track item.id) {
+        <a
+          class="admin-sidebar__link"
+          [routerLink]="item.route"
+          routerLinkActive="admin-sidebar__link--active"
+          [routerLinkActiveOptions]="{ exact: false }"
+          [attr.title]="navTooltip(item.labelKey)"
+          (click)="onNavigate()"
+        >
+          <i class="admin-sidebar__icon" [class]="item.icon" aria-hidden="true"></i>
+          <span class="admin-sidebar__label">{{ item.labelKey | translate }}</span>
+        </a>
+      }
+    </nav>
+
+    @if (canScrollDown()) {
+      <i class="pi pi-angle-down admin-sidebar__scroll-hint" aria-hidden="true"></i>
     }
-  </nav>
+  </div>
 </aside>
