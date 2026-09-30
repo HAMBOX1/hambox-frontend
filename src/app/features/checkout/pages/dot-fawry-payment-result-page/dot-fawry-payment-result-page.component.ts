@@ -102,11 +102,14 @@ export class DotFawryPaymentResultPageComponent implements OnInit {
 
       this.status.set('AwaitingPayment');
     } catch (error) {
-      // A 401 that survives the auth interceptor's own refresh attempt means the session is
-      // genuinely gone — retrying forever would just spin in place while the order may already be
-      // paid. Every other error (network blip, 5xx) stays transient: the next poll tick picks the
-      // real state back up.
-      if (parseApiError(error).status === 401) {
+      // A session that's genuinely gone surfaces here as either the original request's 401, or —
+      // once the auth interceptor's own refresh attempt also fails — a 403 from the refresh
+      // endpoint itself (authInterceptor rethrows whatever the refresh call failed with, not the
+      // original 401). Either way, retrying forever would just spin in place while the order may
+      // already be paid. Every other error (network blip, 5xx) stays transient: the next poll
+      // tick picks the real state back up.
+      const status = parseApiError(error).status;
+      if (status === 401 || status === 403) {
         this.status.set('SessionExpired');
         return;
       }
