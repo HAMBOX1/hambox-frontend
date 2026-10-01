@@ -189,6 +189,7 @@ export const CUSTOMER_ALERTS_API = {
 export const LOCALIZATION_API = {
   currencies: '/api/v1/localization/currencies',
   exchangeRates: '/api/v1/localization/exchange-rates',
+  detectCurrency: '/api/v1/localization/detect-currency',
 } as const;
 
 export const AUTH_API = {

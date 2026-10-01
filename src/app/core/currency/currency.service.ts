@@ -53,7 +53,7 @@ export class CurrencyService {
 
   /** Bootstrap currency preference and exchange rates. */
   async init(): Promise<void> {
-    const initial = this.resolveInitialCurrency();
+    const initial = await this.resolveInitialCurrency();
     this.currencyState.set(initial);
     await this.loadRates();
     this.startPeriodicRefresh();
@@ -161,12 +161,35 @@ export class CurrencyService {
     return normalized;
   }
 
-  private resolveInitialCurrency(): SupportedCurrencyCode {
+  /**
+   * A returning visitor (or one who already picked a currency) always keeps that choice — this only
+   * runs for a brand-new one. Asks the backend to guess from the visitor's IP (Egypt → EGP, Saudi
+   * Arabia → SAR, everyone else → USD); capped at 1.5s and never allowed to fail the whole app
+   * bootstrap, since this only picks a starting point the switcher lets them change immediately.
+   */
+  private async resolveInitialCurrency(): Promise<SupportedCurrencyCode> {
     const stored = typeof localStorage !== 'undefined'
       ? localStorage.getItem(CURRENCY_STORAGE_KEY)
       : null;
 
-    return isSupportedCurrencyCode(stored) ? stored : DEFAULT_CURRENCY_CODE;
+    if (isSupportedCurrencyCode(stored)) {
+      return stored;
+    }
+
+    const detected = await this.detectCurrencyByLocation();
+    return detected ?? DEFAULT_CURRENCY_CODE;
+  }
+
+  private async detectCurrencyByLocation(): Promise<SupportedCurrencyCode | null> {
+    try {
+      const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500));
+      const request = firstValueFrom(this.api.get<{ currencyCode: string }>(LOCALIZATION_API.detectCurrency));
+      const result = await Promise.race([request, timeout]);
+
+      return result && isSupportedCurrencyCode(result.currencyCode) ? result.currencyCode : null;
+    } catch {
+      return null;
+    }
   }
 
   private persistCurrency(code: SupportedCurrencyCode): void {
