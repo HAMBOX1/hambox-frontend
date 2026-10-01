@@ -2039,6 +2039,14 @@
         "TITLE": "Confirm this change",
         "MESSAGE": "This affects your storefront immediately and customers may notice right away. Do you want to apply it?"
       },
+      "COMING_SOON_PROMPT": {
+        "TITLE": "Set a bypass password",
+        "HINT": "Customers will see the Coming Soon page. Set a password here so you (or anyone you share it with) can still preview the live site.",
+        "PLACEHOLDER": "Choose a password",
+        "FULL_SETTINGS_LINK": "Manage the full maintenance message and allowed roles →",
+        "SKIP": "Skip for now",
+        "SAVED": "Bypass password saved"
+      },
       "AUDIT": {
         "TITLE": "Recent Changes",
         "DESCRIPTION": "Configuration audit trail",

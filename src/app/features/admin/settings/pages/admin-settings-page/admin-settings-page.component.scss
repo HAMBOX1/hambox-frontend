@@ -218,3 +218,15 @@
     max-height: 14rem;
   }
 }
+
+.admin-dialog__link {
+  display: inline-block;
+  margin-top: -0.25rem;
+  color: var(--admin-accent-blue);
+  font-size: var(--admin-type-label);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

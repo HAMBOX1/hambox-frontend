@@ -282,3 +282,58 @@
   (visibleChange)="onDangerousDialogVisibleChange($event)"
   (confirmed)="confirmDangerousChange()"
 />
+
+<p-dialog
+  [header]="'ADMIN.SETTINGS.COMING_SOON_PROMPT.TITLE' | translate"
+  [visible]="comingSoonPromptOpen()"
+  (visibleChange)="onComingSoonPromptVisibleChange($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">{{ 'ADMIN.SETTINGS.COMING_SOON_PROMPT.HINT' | translate }}</p>
+
+  <div class="admin-field">
+    <label class="admin-field__label" for="coming-soon-bypass-password">{{
+      'ADMIN.SETTINGS.FIELDS.MAINTENANCE.BYPASS_PASSWORD.LABEL' | translate
+    }}</label>
+    <p-password
+      inputId="coming-soon-bypass-password"
+      [ngModel]="comingSoonBypassPassword()"
+      (ngModelChange)="comingSoonBypassPassword.set($event)"
+      [feedback]="false"
+      [toggleMask]="true"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+      [placeholder]="'ADMIN.SETTINGS.COMING_SOON_PROMPT.PLACEHOLDER' | translate"
+    />
+  </div>
+
+  <a
+    class="admin-dialog__link"
+    routerLink="/admin/settings"
+    [queryParams]="{ category: 'maintenance' }"
+    (click)="comingSoonPromptOpen.set(false)"
+  >
+    {{ 'ADMIN.SETTINGS.COMING_SOON_PROMPT.FULL_SETTINGS_LINK' | translate }}
+  </a>
+
+  <div class="admin-dialog__actions">
+    <p-button
+      [label]="'ADMIN.SETTINGS.COMING_SOON_PROMPT.SKIP' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="comingSoonPromptOpen.set(false)"
+    />
+    <p-button
+      [label]="'COMMON.SAVE' | translate"
+      icon="pi pi-check"
+      [loading]="savingBypassPassword()"
+      [disabled]="!comingSoonBypassPassword().trim()"
+      (onClick)="saveBypassPasswordFromPrompt()"
+    />
+  </div>
+</p-dialog>

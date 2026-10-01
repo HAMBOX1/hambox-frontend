@@ -9,11 +9,13 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -99,9 +101,12 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
   imports: [
     DatePipe,
     FormsModule,
+    RouterLink,
     ButtonModule,
+    DialogModule,
     InputNumberModule,
     InputTextModule,
+    PasswordModule,
     SelectModule,
     ToastModule,
     TranslatePipe,
@@ -152,6 +157,14 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
 
   protected readonly dangerousConfirmOpen = signal(false);
   private pendingDangerousField: { key: string; previousValue: unknown } | null = null;
+
+  /** The bypass password lives in a separate "maintenance" settings category from the "Store
+   * Status" dropdown that actually triggers it — easy to miss. Prompting for it right here, the
+   * moment an admin flips Store Status to Coming Soon, means they never have to go hunting for it
+   * on a second settings page while customers are already locked out. */
+  protected readonly comingSoonPromptOpen = signal(false);
+  protected readonly comingSoonBypassPassword = signal('');
+  protected readonly savingBypassPassword = signal(false);
 
   protected readonly canEdit = computed(() =>
     this.permissionService.hasPermission(PERMISSIONS.Settings.Edit),
@@ -335,7 +348,55 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
       this.dangerousConfirmOpen.set(true);
       return;
     }
+
+    if (
+      this.activeCategoryKey() === 'general' &&
+      field.key === 'storeStatus' &&
+      value === 'ComingSoon' &&
+      this.draftPayload()['storeStatus'] !== 'ComingSoon'
+    ) {
+      this.comingSoonPromptOpen.set(true);
+    }
+
     this.draftPayload.update((current) => ({ ...current, [field.key]: value }));
+  }
+
+  protected onComingSoonPromptVisibleChange(visible: boolean): void {
+    this.comingSoonPromptOpen.set(visible);
+    if (!visible) {
+      this.comingSoonBypassPassword.set('');
+    }
+  }
+
+  protected async saveBypassPasswordFromPrompt(): Promise<void> {
+    const password = this.comingSoonBypassPassword().trim();
+    if (!password) {
+      return;
+    }
+
+    this.savingBypassPassword.set(true);
+    const maintenancePayload = this.facade.categories().find((c) => c.key === 'maintenance')?.payload as
+      | Record<string, unknown>
+      | undefined;
+    const ok = await this.facade.saveCategory('maintenance', { ...(maintenancePayload ?? {}), bypassPassword: password });
+    this.savingBypassPassword.set(false);
+
+    if (ok) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.SETTINGS.COMING_SOON_PROMPT.SAVED'),
+      });
+      this.comingSoonPromptOpen.set(false);
+      this.comingSoonBypassPassword.set('');
+      await this.facade.loadAudit();
+      return;
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translate.instant('ADMIN.SETTINGS.TOAST.SAVE_FAILED_SUMMARY'),
+      detail: this.facade.error() ?? '',
+    });
   }
 
   protected confirmDangerousChange(): void {
