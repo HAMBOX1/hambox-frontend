@@ -31,6 +31,14 @@ export const routes: Routes = [
     canActivate: [permissionGuard([PERMISSIONS.Suppliers.ManageMappings])],
   },
   {
+    path: ':id/catalog',
+    loadComponent: () =>
+      import('./pages/supplier-catalog-page/supplier-catalog-page.component').then(
+        (c) => c.SupplierCatalogPageComponent,
+      ),
+    canActivate: [permissionGuard([PERMISSIONS.Suppliers.View])],
+  },
+  {
     path: ':id/mappings',
     loadComponent: () =>
       import('./pages/supplier-mappings-page/supplier-mappings-page.component').then(

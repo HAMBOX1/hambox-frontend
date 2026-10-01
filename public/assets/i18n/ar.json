@@ -5006,6 +5006,13 @@
         "SUMMARY_AVAILABILITY_VALUE": "{{available}} متوفر · {{unavailable}} غير متوفر",
         "FULFILLMENT_SUMMARY_LINE": "{{eligible}} مؤهلة · {{mapped}} مرتبطة · {{unmapped}} غير مرتبطة · {{unavailable}} غير متوفرة"
       },
+      "CATALOG": {
+        "TITLE": "منتجات المورد",
+        "SUBTITLE": "كل ما يعرضه هذا المورد في كتالوجه — تصفح بحرية من غير ما تحتاج تبحث.",
+        "SEARCH_PLACEHOLDER": "فلترة منتجات المورد...",
+        "LOAD_MORE": "تحميل المزيد",
+        "LOADING_MORE": "جاري التحميل…"
+      },
       "MAPPINGS": {
         "TITLE": "ربط المنتجات",
         "SUBTITLE": "قم بربط منتجات HAMBOX بمنتجات هذا المورد الخارجية.",
@@ -5071,6 +5078,7 @@
         "CREATE": "إنشاء مورد",
         "SAVE_CREDENTIALS": "حفظ بيانات الاعتماد",
         "TEST_CONNECTION": "اختبار الاتصال",
+        "VIEW_PRODUCTS": "عرض المنتجات",
         "MAP_PRODUCTS": "ربط المنتجات",
         "MAPPINGS": "عرض الروابط",
         "ENABLE": "تفعيل",

@@ -1,0 +1,71 @@
+<section class="admin-page supplier-catalog-page">
+  <app-admin-page-header
+    [title]="'ADMIN.SUPPLIERS.CATALOG.TITLE' | translate"
+    [subtitle]="'ADMIN.SUPPLIERS.CATALOG.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs()"
+  />
+
+  <app-admin-search-bar
+    [value]="searchTerm()"
+    [placeholder]="'ADMIN.SUPPLIERS.CATALOG.SEARCH_PLACEHOLDER' | translate"
+    [ariaLabel]="'ADMIN.SUPPLIERS.CATALOG.SEARCH_PLACEHOLDER' | translate"
+    (searchChange)="onSearchChange($event)"
+  />
+
+  @if (error()) {
+    <app-admin-error-alert [message]="'ADMIN.SUPPLIERS.MAPPINGS.CATALOG_UNAVAILABLE' | translate" (retry)="retryLoad()" />
+  } @else if (unsupportedMessage()) {
+    <app-admin-empty-state icon="pi pi-info-circle" [title]="unsupportedMessage()!" />
+  } @else if (loading() && items().length === 0) {
+    <app-admin-loading-skeleton variant="table" [rows]="6" />
+  } @else if (items().length === 0) {
+    <app-admin-empty-state
+      icon="pi pi-box"
+      [title]="
+        searchTerm()
+          ? ('ADMIN.SUPPLIERS.MAPPINGS.NO_SUPPLIER_PRODUCTS_FOUND' | translate)
+          : ('ADMIN.SUPPLIERS.MAPPINGS.CATALOG_EMPTY' | translate)
+      "
+    />
+  } @else {
+    <div class="supplier-catalog-cards">
+      @for (item of items(); track item.externalProductId) {
+        <div class="supplier-catalog-cards__card">
+          <div class="supplier-catalog-cards__body">
+            <span class="supplier-catalog-cards__name">{{ item.name }}</span>
+            <span class="supplier-catalog-cards__meta">
+              @if (item.brandName) {
+                {{ item.brandName }} ·
+              }
+              {{ item.currency }}
+              @if (item.minFaceValue !== null) {
+                · {{ item.minFaceValue | number: '1.0-2' }}
+                @if (item.maxFaceValue !== null && item.maxFaceValue !== item.minFaceValue) {
+                  – {{ item.maxFaceValue | number: '1.0-2' }}
+                }
+              }
+            </span>
+            <span class="supplier-catalog-cards__technical">
+              {{ 'ADMIN.SUPPLIERS.MAPPINGS.EXTERNAL_PRODUCT_ID' | translate }}: {{ item.externalProductId }}
+            </span>
+          </div>
+          <app-admin-status-badge
+            [label]="
+              (item.available ? 'ADMIN.SUPPLIERS.MAPPINGS.AVAILABLE' : 'ADMIN.SUPPLIERS.MAPPINGS.UNAVAILABLE')
+                | translate
+            "
+            [tone]="item.available ? 'success' : 'neutral'"
+          />
+        </div>
+      }
+    </div>
+
+    @if (hasMore()) {
+      <button type="button" class="supplier-catalog-page__load-more" [disabled]="loadingMore()" (click)="loadMore()">
+        {{
+          (loadingMore() ? 'ADMIN.SUPPLIERS.CATALOG.LOADING_MORE' : 'ADMIN.SUPPLIERS.CATALOG.LOAD_MORE') | translate
+        }}
+      </button>
+    }
+  }
+</section>

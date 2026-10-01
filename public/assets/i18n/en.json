@@ -5140,6 +5140,13 @@
         "SUMMARY_AVAILABILITY_VALUE": "{{available}} available · {{unavailable}} unavailable",
         "FULFILLMENT_SUMMARY_LINE": "{{eligible}} eligible · {{mapped}} mapped · {{unmapped}} unmapped · {{unavailable}} unavailable"
       },
+      "CATALOG": {
+        "TITLE": "Supplier Products",
+        "SUBTITLE": "Everything this supplier reports in its catalog — browse freely, no search required.",
+        "SEARCH_PLACEHOLDER": "Filter supplier products...",
+        "LOAD_MORE": "Load more",
+        "LOADING_MORE": "Loading…"
+      },
       "MAPPINGS": {
         "TITLE": "Product Mappings",
         "SUBTITLE": "Map HAMBOX products to this supplier's external products.",
@@ -5205,6 +5212,7 @@
         "CREATE": "Create supplier",
         "SAVE_CREDENTIALS": "Save credentials",
         "TEST_CONNECTION": "Test connection",
+        "VIEW_PRODUCTS": "View Products",
         "MAP_PRODUCTS": "Map Products",
         "MAPPINGS": "View Mappings",
         "ENABLE": "Enable",
