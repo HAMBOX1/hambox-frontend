@@ -79,6 +79,17 @@
               tooltipPosition="top"
               aria-hidden="true"
             ></i>
+          } @else if ((product.variantCount ?? 0) <= 1) {
+            <button
+              *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+              type="button"
+              class="product-catalog-cards__quick-chat-delivery"
+              pTooltip="Quick-set as On-Delivery (no codes needed)"
+              tooltipPosition="top"
+              (click)="$event.stopPropagation(); setChatDeliveryRequested.emit(product)"
+            >
+              <i class="pi pi-comments" aria-hidden="true"></i>
+            </button>
           }
           <app-admin-status-badge
             [label]="product.categoryName || 'Uncategorized'"

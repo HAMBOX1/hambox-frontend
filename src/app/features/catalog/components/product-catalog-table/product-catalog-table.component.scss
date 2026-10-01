@@ -223,6 +223,26 @@
   font-size: 0.9rem;
 }
 
+.product-catalog-table__quick-chat-delivery {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid var(--admin-border-default);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--admin-accent-blue);
+    color: var(--admin-accent-blue);
+  }
+}
+
 .product-catalog-table__mapping-cell {
   display: inline-flex;
   align-items: center;
