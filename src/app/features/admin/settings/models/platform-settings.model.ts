@@ -150,11 +150,54 @@ export function validateFieldValue(field: SettingsFieldConfig, value: unknown): 
 // radio controls, none of which translate `optionLabel` themselves.
 const OPT = (path: string) => `ADMIN.SETTINGS.OPTIONS.${path}`;
 
+// Deliberately broader than the storefront's own currency switcher (AVAILABLE_CURRENCIES in
+// core/currency/currency.model.ts, which customers pick a display currency from — USD/EUR/EGP/SAR
+// only, by design). This list instead feeds "Base Currency"/"Supported Currencies"/the static
+// exchange-rate table — an admin needs a rate registered here for ANY currency a supplier quotes
+// costs in (see SupplierRoutingEngine.NormalizeToBaseCurrency), even one no customer ever sees,
+// or that mapping silently gets rejected from order routing with "No exchange rate is configured
+// for currency 'X'".
 export const CURRENCY_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CURRENCY.USD'), value: 'USD' },
   { label: OPT('CURRENCY.EUR'), value: 'EUR' },
+  { label: OPT('CURRENCY.GBP'), value: 'GBP' },
   { label: OPT('CURRENCY.EGP'), value: 'EGP' },
   { label: OPT('CURRENCY.SAR'), value: 'SAR' },
+  { label: OPT('CURRENCY.AED'), value: 'AED' },
+  { label: OPT('CURRENCY.QAR'), value: 'QAR' },
+  { label: OPT('CURRENCY.KWD'), value: 'KWD' },
+  { label: OPT('CURRENCY.BHD'), value: 'BHD' },
+  { label: OPT('CURRENCY.OMR'), value: 'OMR' },
+  { label: OPT('CURRENCY.JOD'), value: 'JOD' },
+  { label: OPT('CURRENCY.MAD'), value: 'MAD' },
+  { label: OPT('CURRENCY.DZD'), value: 'DZD' },
+  { label: OPT('CURRENCY.TND'), value: 'TND' },
+  { label: OPT('CURRENCY.CAD'), value: 'CAD' },
+  { label: OPT('CURRENCY.AUD'), value: 'AUD' },
+  { label: OPT('CURRENCY.NZD'), value: 'NZD' },
+  { label: OPT('CURRENCY.INR'), value: 'INR' },
+  { label: OPT('CURRENCY.PKR'), value: 'PKR' },
+  { label: OPT('CURRENCY.JPY'), value: 'JPY' },
+  { label: OPT('CURRENCY.CNY'), value: 'CNY' },
+  { label: OPT('CURRENCY.KRW'), value: 'KRW' },
+  { label: OPT('CURRENCY.HKD'), value: 'HKD' },
+  { label: OPT('CURRENCY.SGD'), value: 'SGD' },
+  { label: OPT('CURRENCY.MYR'), value: 'MYR' },
+  { label: OPT('CURRENCY.THB'), value: 'THB' },
+  { label: OPT('CURRENCY.IDR'), value: 'IDR' },
+  { label: OPT('CURRENCY.PHP'), value: 'PHP' },
+  { label: OPT('CURRENCY.VND'), value: 'VND' },
+  { label: OPT('CURRENCY.TRY'), value: 'TRY' },
+  { label: OPT('CURRENCY.BRL'), value: 'BRL' },
+  { label: OPT('CURRENCY.MXN'), value: 'MXN' },
+  { label: OPT('CURRENCY.ZAR'), value: 'ZAR' },
+  { label: OPT('CURRENCY.NGN'), value: 'NGN' },
+  { label: OPT('CURRENCY.KES'), value: 'KES' },
+  { label: OPT('CURRENCY.CHF'), value: 'CHF' },
+  { label: OPT('CURRENCY.NOK'), value: 'NOK' },
+  { label: OPT('CURRENCY.SEK'), value: 'SEK' },
+  { label: OPT('CURRENCY.DKK'), value: 'DKK' },
+  { label: OPT('CURRENCY.PLN'), value: 'PLN' },
 ];
 
 export const STORE_STATUS_OPTIONS: SettingsFieldOption[] = [
