@@ -72,7 +72,16 @@
           @if (!isMobile()) {
             <ng-container [ngTemplateOutlet]="priceField" />
           }
-          <span class="variant-manager__row-available">Available {{ node.variant!.availableStock }}</span>
+          @if (node.variant!.fulfillmentMode === 'SupplierOnly') {
+            <span class="variant-manager__row-available" title="Price and availability come from the supplier">Supplier stock</span>
+          } @else {
+            <span class="variant-manager__row-available">
+              Available {{ node.variant!.availableStock }}
+              @if (node.variant!.fulfillmentMode === 'SupplierFirst') {
+                + supplier
+              }
+            </span>
+          }
         </div>
       </div>
 
