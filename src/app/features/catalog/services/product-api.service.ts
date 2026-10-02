@@ -254,6 +254,10 @@ export class ProductApiService {
     return this.api.get<readonly ProductImage[]>(CATALOG_API.productImages(productId));
   }
 
+  importProductImageFromUrl(productId: string, url: string): Observable<ProductImage> {
+    return this.api.post<ProductImage>(CATALOG_API.productImageFromUrl(productId), { url });
+  }
+
   uploadProductImage(productId: string, file: File): Observable<ProductImage> {
     const formData = new FormData();
     formData.append('file', file, file.name);

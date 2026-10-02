@@ -30,6 +30,7 @@ export const CATALOG_API = {
   productFavorite: (id: string) => `/api/v1/products/${id}/favorite`,
   productStatusCounts: '/api/v1/products/status-counts',
   productImages: (productId: string) => `/api/v1/products/${productId}/images`,
+  productImageFromUrl: (productId: string) => `/api/v1/products/${productId}/images/from-url`,
   productImage: (productId: string, imageId: string) =>
     `/api/v1/products/${productId}/images/${imageId}`,
   productImagePrimary: (productId: string, imageId: string) =>

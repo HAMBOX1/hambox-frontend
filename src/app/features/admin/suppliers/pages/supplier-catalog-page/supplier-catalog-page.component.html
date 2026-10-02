@@ -32,6 +32,9 @@
     <div class="supplier-catalog-cards">
       @for (item of items(); track item.externalProductId) {
         <div class="supplier-catalog-cards__card">
+          @if (item.imageUrl) {
+            <img class="supplier-catalog-cards__thumb" [src]="item.imageUrl" alt="" loading="lazy" referrerpolicy="no-referrer" />
+          }
           <div class="supplier-catalog-cards__body">
             <span class="supplier-catalog-cards__name">{{ item.name }}</span>
             <span class="supplier-catalog-cards__meta">
@@ -89,6 +92,17 @@
 >
   <div class="supplier-catalog-import">
     <p class="supplier-catalog-import__hint">{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_HINT' | translate }}</p>
+
+    @if (importItem(); as source) {
+      @if (source.imageUrl) {
+        <img class="supplier-catalog-import__image" [src]="source.imageUrl" alt="" referrerpolicy="no-referrer" />
+      }
+      <p class="supplier-catalog-import__included">
+        {{ (source.imageUrl ? 'ADMIN.SUPPLIERS.CATALOG.IMPORT_INCLUDES_IMAGE' : 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NO_IMAGE') | translate }}
+        ·
+        {{ (source.description ? 'ADMIN.SUPPLIERS.CATALOG.IMPORT_INCLUDES_DESCRIPTION' : 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NO_DESCRIPTION') | translate }}
+      </p>
+    }
 
     <label class="supplier-catalog-import__field">
       <span>{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NAME_EN' | translate }}</span>

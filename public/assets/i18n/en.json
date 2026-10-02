@@ -5203,7 +5203,7 @@
         "LOADING_MORE": "Loading…",
         "IMPORT": "Import",
         "IMPORT_TITLE": "Import as HAMBOX product",
-        "IMPORT_HINT": "Creates an editable draft product linked to this supplier (fulfilled by the supplier). Edit it freely, then activate it when ready.",
+        "IMPORT_HINT": "Creates an editable draft product with the supplier's image and description, linked to this supplier (fulfilled by the supplier). Edit it freely, then activate it when ready.",
         "IMPORT_NAME_EN": "Name (English)",
         "IMPORT_NAME_AR": "Name (Arabic)",
         "IMPORT_CATEGORY": "Category",
@@ -5211,9 +5211,13 @@
         "IMPORT_PRICE": "Fallback price (USD)",
         "IMPORT_PRICE_HINT": "The live price is calculated from the supplier cost plus margin; this is only a fallback.",
         "IMPORT_CONFIRM": "Import product",
-        "IMPORT_SUCCESS": "Product imported. You can now edit it.",
+        "IMPORT_SUCCESS": "Product imported with supplier data. You can now edit it.",
         "IMPORT_FAILED": "Could not import this product.",
-        "IMPORT_PARTIAL": "The product was created but linking it to the supplier failed. Open it in Products and check its fulfillment/mapping."
+        "IMPORT_PARTIAL": "The product was created but linking it to the supplier failed. Open it in Products and check its fulfillment/mapping.",
+        "IMPORT_INCLUDES_IMAGE": "Image included",
+        "IMPORT_NO_IMAGE": "No image from supplier",
+        "IMPORT_INCLUDES_DESCRIPTION": "Description included",
+        "IMPORT_NO_DESCRIPTION": "No description from supplier"
       },
       "MAPPINGS": {
         "TITLE": "Product Mappings",

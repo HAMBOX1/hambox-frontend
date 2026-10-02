@@ -101,6 +101,7 @@ export class SupplierCatalogPageComponent implements OnInit {
   protected importNameAr = '';
   protected importCategoryId: string | null = null;
   protected importPrice = 0;
+  private importDescriptionHtml = '';
 
   private searchToken = 0;
   private usdRates: Readonly<Record<string, number>> | null = null;
@@ -126,6 +127,7 @@ export class SupplierCatalogPageComponent implements OnInit {
     this.importNameEn = item.name;
     this.importNameAr = item.name;
     this.importPrice = 0;
+    this.importDescriptionHtml = this.toHtml(item.description);
     this.importOpen.set(true);
 
     await this.loadCategories();
@@ -153,8 +155,8 @@ export class SupplierCatalogPageComponent implements OnInit {
         this.productApi.createProduct({
           nameEn,
           nameAr,
-          descriptionEn: '',
-          descriptionAr: '',
+          descriptionEn: this.importDescriptionHtml,
+          descriptionAr: this.importDescriptionHtml,
           price: Math.max(0, this.importPrice ?? 0),
           categoryId: this.importCategoryId,
         }),
@@ -186,9 +188,11 @@ export class SupplierCatalogPageComponent implements OnInit {
         throw new Error('mapping-failed');
       }
 
+      const imageImported = await this.importImage(productId, item.imageUrl);
+
       this.importOpen.set(false);
       this.messages.add({
-        severity: 'success',
+        severity: imageImported ? 'success' : 'warn',
         summary: this.translate.instant('ADMIN.SUPPLIERS.CATALOG.IMPORT_SUCCESS'),
       });
       await this.router.navigate(['/admin/products', productId, 'edit']);
@@ -203,6 +207,34 @@ export class SupplierCatalogPageComponent implements OnInit {
     } finally {
       this.importing.set(false);
     }
+  }
+
+  /** Best-effort: a missing/blocked supplier image must never undo an otherwise complete import. */
+  private async importImage(productId: string, imageUrl: string | null | undefined): Promise<boolean> {
+    if (!imageUrl) {
+      return true;
+    }
+
+    try {
+      await firstValueFrom(this.productApi.importProductImageFromUrl(productId, imageUrl));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private toHtml(text: string | null | undefined): string {
+    if (!text?.trim()) {
+      return '';
+    }
+
+    const escape = (value: string) =>
+      value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return text
+      .trim()
+      .split(/\n{2,}/)
+      .map((paragraph) => `<p>${escape(paragraph).replace(/\n/g, '<br>')}</p>`)
+      .join('');
   }
 
   private async loadCategories(): Promise<void> {

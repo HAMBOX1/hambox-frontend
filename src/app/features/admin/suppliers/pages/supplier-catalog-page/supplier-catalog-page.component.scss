@@ -89,3 +89,26 @@
     font-weight: 400;
   }
 }
+
+.supplier-catalog-cards__thumb {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  object-fit: contain;
+  background: var(--admin-bg-muted, transparent);
+}
+
+.supplier-catalog-import__image {
+  align-self: center;
+  max-width: 8rem;
+  max-height: 8rem;
+  border-radius: 0.5rem;
+  object-fit: contain;
+}
+
+.supplier-catalog-import__included {
+  margin: 0;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+}

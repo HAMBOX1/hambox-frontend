@@ -196,6 +196,8 @@ export interface SupplierCatalogItemDto {
   readonly minFaceValue: number | null;
   readonly maxFaceValue: number | null;
   readonly available: boolean;
+  readonly imageUrl?: string | null;
+  readonly description?: string | null;
 }
 
 export interface SupplierCatalogSearchResultDto {
