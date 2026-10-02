@@ -110,6 +110,13 @@
               </li>
             }
           </ol>
+
+          @if (product()!.categoryInstructionsHtml) {
+            <div class="pdp__category-instructions">
+              <h3 class="pdp__step-title">{{ 'PRODUCT.CATEGORY_INSTRUCTIONS' | translate }}</h3>
+              <div class="pdp__step-text" [innerHTML]="product()!.categoryInstructionsHtml"></div>
+            </div>
+          }
         </section>
       }
     </main>

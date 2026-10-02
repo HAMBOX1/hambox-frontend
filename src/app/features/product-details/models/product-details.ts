@@ -23,6 +23,9 @@ export interface ProductDetailsItem {
   discountLabel: string;
   categoryId: string;
   categoryName?: string;
+  /** The category's own "Customer instructions" (set by the admin on the category, not this
+   * product) — shown alongside the redeem steps when present. Raw HTML from a rich-text editor. */
+  categoryInstructionsHtml?: string | null;
   trustFeatures: readonly ProductDetailsTrustFeature[];
   redeemSteps: readonly ProductDetailsRedeemStep[];
   /** Null if already public; a future date if gated behind the Early Access membership benefit. */

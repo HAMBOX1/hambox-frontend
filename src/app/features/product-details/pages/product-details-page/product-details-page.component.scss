@@ -516,6 +516,16 @@
   line-height: 1.65;
 }
 
+.pdp__category-instructions {
+  max-width: 672px;
+  margin: 32px auto 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--surface);
+  text-align: start;
+}
+
 @media (max-width: 991px) {
   .pdp__main {
     padding: 48px var(--sf-container-px-tablet) var(--sf-section-gap);

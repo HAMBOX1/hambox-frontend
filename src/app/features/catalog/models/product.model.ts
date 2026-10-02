@@ -41,6 +41,9 @@ export interface Product {
   readonly categoryId: string;
   readonly categoryName: string;
   readonly categoryNameAr: string;
+  /** The primary category's own customer-facing instructions (admin's "Customer instructions"
+   * field on the category form), if set. Populated on detail reads only. */
+  readonly categoryDescriptionHtml?: string | null;
   readonly additionalCategoryIds?: readonly string[];
   readonly collectionIds?: readonly string[];
   readonly primaryImageUrl?: string | null;
