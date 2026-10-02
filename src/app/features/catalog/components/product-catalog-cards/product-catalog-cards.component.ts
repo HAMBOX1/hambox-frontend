@@ -325,7 +325,7 @@ export class ProductCatalogCardsComponent {
       (product.variantCount ?? 0) <= 1
     ) {
       items.push({
-        label: product.hasChatDeliveryVariant ? 'Edit On-Delivery' : 'Set as On-Delivery',
+        label: product.hasChatDeliveryVariant ? 'Delivery type (On-Delivery)' : 'Set as On-Delivery / Instant',
         icon: 'pi pi-comments',
         command: () => this.setChatDeliveryRequested.emit(product),
       });

@@ -152,8 +152,8 @@ export class ProductApiService {
     return this.api.post<void>(CATALOG_API.productRestore(id), {});
   }
 
-  quickSetChatDelivery(id: string, capacity: number): Observable<void> {
-    return this.api.post<void>(INVENTORY_API.quickSetChatDelivery(id), { capacity });
+  quickSetChatDelivery(id: string, capacity: number, instant = false): Observable<void> {
+    return this.api.post<void>(INVENTORY_API.quickSetChatDelivery(id), { capacity, instant });
   }
 
   duplicateProduct(id: string, nameSuffix?: string | null): Observable<string> {

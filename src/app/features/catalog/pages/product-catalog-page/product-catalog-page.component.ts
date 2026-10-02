@@ -167,6 +167,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly chatDeliveryDialogOpen = signal(false);
   protected readonly chatDeliveryTarget = signal<Product | null>(null);
   protected readonly chatDeliveryCapacity = signal(100);
+  protected readonly deliveryKind = signal<'chat' | 'instant'>('chat');
   protected readonly chatDeliveryError = this.facade.error;
   protected readonly mappingDrawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
 
@@ -569,6 +570,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected openChatDeliveryDialog(product: Product): void {
     this.chatDeliveryTarget.set(product);
     this.chatDeliveryCapacity.set(product.availableStock && product.hasChatDeliveryVariant ? product.availableStock : 100);
+    this.deliveryKind.set('chat');
     this.chatDeliveryDialogOpen.set(true);
   }
 
@@ -578,12 +580,15 @@ export class ProductCatalogPageComponent implements OnInit {
       return;
     }
 
-    const success = await this.facade.setChatDelivery(product.id, this.chatDeliveryCapacity());
+    const instant = this.deliveryKind() === 'instant';
+    const success = await this.facade.setChatDelivery(product.id, this.chatDeliveryCapacity(), instant);
     if (success) {
       this.messageService.add({
         severity: 'success',
-        summary: 'On-Delivery',
-        detail: 'This product is now set to deliver via support chat.',
+        summary: instant ? 'Instant stock' : 'On-Delivery',
+        detail: instant
+          ? 'This product now delivers instantly from its stocked codes. Make sure codes are imported.'
+          : 'This product is now set to deliver via support chat.',
         life: 4000,
       });
       this.chatDeliveryDialogOpen.set(false);

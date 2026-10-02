@@ -317,7 +317,7 @@
 </p-dialog>
 
 <p-dialog
-  [header]="chatDeliveryTarget()?.hasChatDeliveryVariant ? 'Edit On-Delivery' : 'Set as On-Delivery'"
+  header="Delivery type"
   [visible]="chatDeliveryDialogOpen()"
   (visibleChange)="chatDeliveryDialogOpen.set($event)"
   [modal]="true"
@@ -327,6 +327,20 @@
   [style]="{ width: 'min(26rem, 92vw)' }"
   styleClass="admin-dialog"
 >
+  <div class="admin-field">
+    <label class="admin-field__label">How is it delivered?</label>
+    <div class="" style="display:flex;flex-direction:column;gap:.5rem">
+      <label style="display:flex;align-items:center;gap:.5rem">
+        <input type="radio" name="deliveryKind" [checked]="deliveryKind() === 'chat'" (change)="deliveryKind.set('chat')" />
+        <span>On-Delivery — support chat after payment</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem">
+        <input type="radio" name="deliveryKind" [checked]="deliveryKind() === 'instant'" (change)="deliveryKind.set('instant')" />
+        <span>Instant stock — codes delivered immediately</span>
+      </label>
+    </div>
+  </div>
+  @if (deliveryKind() === 'chat') {
   <p class="admin-dialog__hint">
     Delivered manually over a support chat opened right after payment, instead of an instant digital code. Set how many units can be sold before this runs out — you can top it up again anytime.
   </p>
@@ -341,6 +355,11 @@
       [showButtons]="true"
     />
   </div>
+  } @else {
+    <p class="admin-dialog__hint">
+      Delivered instantly from the product's stocked digital codes. Import codes from the product's stock page; with no codes it shows as out of stock.
+    </p>
+  }
   @if (chatDeliveryError(); as error) {
     <p class="admin-dialog__error">{{ error }}</p>
   }
