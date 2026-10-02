@@ -59,6 +59,11 @@
           <div class="product-catalog-cards__heading">
             <span class="product-catalog-cards__name">{{ product.nameEn }}</span>
             <span class="product-catalog-cards__price">{{ product.price | hamboxCurrency }}</span>
+            @if (product.priceTiers; as tiers) {
+              <span class="product-catalog-cards__tiers">
+                Cost {{ tierRange(tiers.costMin, tiers.costMax) }} · Member {{ tierRange(tiers.memberMin, tiers.memberMax) }}
+              </span>
+            }
           </div>
           <app-admin-status-badge [label]="statusLabel(product.status)" [tone]="statusTone(product.status)" />
         </div>

@@ -276,6 +276,16 @@ export class ProductCatalogTableComponent {
     this.productSelect.emit(product.id);
   }
 
+  /** "—" when unset, one price when min = max, otherwise "min – max". USD like the rest of the admin list. */
+  protected tierRange(min: number | null | undefined, max: number | null | undefined): string {
+    if (min == null || max == null) {
+      return '—';
+    }
+
+    const format = (value: number) => `$${value.toFixed(2)}`;
+    return min === max ? format(min) : `${format(min)} – ${format(max)}`;
+  }
+
   protected isBulkSelected(productId: string): boolean {
     return this.selectAllMatchingActive() || this.bulkSelectedIds().has(productId);
   }

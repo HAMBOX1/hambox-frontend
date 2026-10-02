@@ -466,3 +466,9 @@
   padding-top: 0.5rem;
   border-top: 1px solid var(--admin-border-default);
 }
+
+.product-catalog-table__tier-head,
+.product-catalog-table__tier-cell {
+  white-space: nowrap;
+  color: var(--admin-text-secondary);
+}

@@ -33,6 +33,8 @@
           <th pSortableColumn="price" class="product-catalog-table__price-head">
             Price <p-sortIcon field="price" />
           </th>
+          <th class="product-catalog-table__tier-head">Cost</th>
+          <th class="product-catalog-table__tier-head">Member</th>
           <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
           <th>Internal Categories</th>
           <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
@@ -170,6 +172,8 @@
               }}</span>
             }
           </td>
+          <td class="product-catalog-table__tier-cell">{{ tierRange(product.priceTiers?.costMin, product.priceTiers?.costMax) }}</td>
+          <td class="product-catalog-table__tier-cell">{{ tierRange(product.priceTiers?.memberMin, product.priceTiers?.memberMax) }}</td>
           <td
             class="product-catalog-table__category-cell"
             [class.product-catalog-table__category-cell--active]="isCategoryPopoverOpenFor(product.id)"
@@ -335,7 +339,7 @@
 
         @if (hasExpandableVariants(product) && isVariantsExpanded(product.id)) {
           <tr class="product-catalog-table__variant-panel-row">
-            <td colspan="9">
+            <td colspan="11">
               <div class="product-catalog-table__variant-panel">
                 @if (isVariantsLoading(product.id)) {
                   <span class="product-catalog-table__variant-panel-status">Loading variants…</span>
@@ -429,7 +433,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="9">
+          <td colspan="11">
             <app-admin-empty-state
               icon="pi pi-inbox"
               [title]="searchActive() ? 'No matching products' : 'No products yet'"

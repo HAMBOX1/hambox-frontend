@@ -70,6 +70,8 @@ export interface Product {
   /** True if at least one variant is fulfilled manually over a support chat (On-Delivery) rather
    * than an instant digital code. */
   readonly hasChatDeliveryVariant?: boolean;
+  /** Admin-only cost / sale / member price ranges across the product's variants (null for storefront callers). */
+  readonly priceTiers?: ProductPriceTiers | null;
   /** Number of non-deleted variants — drives whether the catalog list's one-click "set as
    * On-Delivery" action is offered (only for 0 or 1 variant). */
   readonly variantCount?: number;
@@ -82,6 +84,15 @@ export interface Product {
   /** Admin-only personal bookmark for quickly finding this product again — never shown to
    * anonymous/storefront callers. */
   readonly isFavorite?: boolean;
+}
+
+export interface ProductPriceTiers {
+  readonly costMin: number | null;
+  readonly costMax: number | null;
+  readonly saleMin: number | null;
+  readonly saleMax: number | null;
+  readonly memberMin: number | null;
+  readonly memberMax: number | null;
 }
 
 export interface CreateProductRequest {
