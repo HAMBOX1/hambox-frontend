@@ -213,7 +213,10 @@ export class ProductDetailsPageComponent {
       return { key: 'PRODUCT.OUT_OF_STOCK', params: {}, isOutOfStock: true };
     }
 
-    if (resolved.isLowStock || remaining <= 3) {
+    // Settings → Inventory can turn this "only N left" wording off; the normal in-stock messages
+    // below then apply instead (still an accurate count, just without the scarcity framing).
+    const showLowStockMessage = this.variantFacade.configuration()?.showLowStockMessage !== false;
+    if (showLowStockMessage && (resolved.isLowStock || remaining <= 3)) {
       if (inCart > 0) {
         return {
           key: 'PRODUCT.STOCK_LOW_WITH_CART',

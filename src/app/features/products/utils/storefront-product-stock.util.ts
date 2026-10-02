@@ -35,7 +35,7 @@ export function computeProductStockStatus(
     return 'out-of-stock';
   }
 
-  if (purchasable.some((variant) => variant.isLowStock)) {
+  if (configuration.showLowStockBadge !== false && purchasable.some((variant) => variant.isLowStock)) {
     return 'low-stock';
   }
 

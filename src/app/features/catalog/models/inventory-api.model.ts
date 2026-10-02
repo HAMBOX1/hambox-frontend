@@ -159,6 +159,11 @@ export interface StorefrontProductConfigurationDto {
   readonly basePrice: number;
   readonly optionGroups: readonly ProductOptionGroupDto[];
   readonly variants: readonly StorefrontVariantDto[];
+  /** Settings → Inventory: whether listing cards may show a "Low stock" badge. Absent on older
+   * API responses / test fixtures, which behave as true. */
+  readonly showLowStockBadge?: boolean;
+  /** Settings → Inventory: whether the product page may show its "only N left" message. */
+  readonly showLowStockMessage?: boolean;
 }
 
 export interface GenerateProductVariantsResultDto {

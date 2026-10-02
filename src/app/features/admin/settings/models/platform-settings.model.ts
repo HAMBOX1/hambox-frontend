@@ -590,6 +590,8 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('INVENTORY.RESERVATION_TIMEOUT_MINUTES'),
     },
     { key: 'automaticReleaseEnabled', control: 'toggle', ...fieldKeys('INVENTORY.AUTOMATIC_RELEASE_ENABLED') },
+    { key: 'showLowStockBadge', control: 'toggle', ...fieldKeys('INVENTORY.SHOW_LOW_STOCK_BADGE') },
+    { key: 'showLowStockMessage', control: 'toggle', ...fieldKeys('INVENTORY.SHOW_LOW_STOCK_MESSAGE') },
     // `codeRevealPolicy` removed — reveal has no policy branching today (RevealCustomerLibraryKeyQuery
     // reveals whenever the key value is populated, which already behaves like AfterPayment for
     // manually-fulfilled orders and like OnFulfillment for supplier-fulfilled ones); implementing a

@@ -2638,6 +2638,16 @@
             "HELP": "Automatically returns reserved stock to inventory if a purchase isn't completed.",
             "TOOLTIP": "Recommended to keep on — otherwise abandoned checkouts can hold stock indefinitely."
           },
+          "SHOW_LOW_STOCK_BADGE": {
+            "LABEL": "Show \"Low stock\" badge on product cards",
+            "HELP": "Turn off to stop product cards in listings from showing the Low stock badge.",
+            "TOOLTIP": "Only affects the badge on cards in the storefront. The product page message has its own switch below."
+          },
+          "SHOW_LOW_STOCK_MESSAGE": {
+            "LABEL": "Show \"only N left\" message on the product page",
+            "HELP": "Turn off to stop the product page from warning customers that stock is running low.",
+            "TOOLTIP": "Only affects the message on the product page itself. The card badge has its own switch above."
+          },
           "CODE_REVEAL_POLICY": {
             "LABEL": "Code Reveal Policy",
             "HELP": "Choose how stock is deducted and codes are shown after purchase.",
