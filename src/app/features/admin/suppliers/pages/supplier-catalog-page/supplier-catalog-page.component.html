@@ -1,3 +1,4 @@
+<p-toast position="top-right" />
 <section class="admin-page supplier-catalog-page">
   <app-admin-page-header
     [title]="'ADMIN.SUPPLIERS.CATALOG.TITLE' | translate"
@@ -56,6 +57,13 @@
             "
             [tone]="item.available ? 'success' : 'neutral'"
           />
+          <p-button
+            icon="pi pi-download"
+            size="small"
+            [label]="'ADMIN.SUPPLIERS.CATALOG.IMPORT' | translate"
+            [outlined]="true"
+            (onClick)="openImport(item)"
+          />
         </div>
       }
     </div>
@@ -69,3 +77,72 @@
     }
   }
 </section>
+
+<p-dialog
+  [visible]="importOpen()"
+  (visibleChange)="!$event && closeImport()"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!importing()"
+  [style]="{ width: 'min(30rem, 94vw)' }"
+  [header]="'ADMIN.SUPPLIERS.CATALOG.IMPORT_TITLE' | translate"
+>
+  <div class="supplier-catalog-import">
+    <p class="supplier-catalog-import__hint">{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_HINT' | translate }}</p>
+
+    <label class="supplier-catalog-import__field">
+      <span>{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NAME_EN' | translate }}</span>
+      <input pInputText type="text" [(ngModel)]="importNameEn" [disabled]="importing()" />
+    </label>
+
+    <label class="supplier-catalog-import__field">
+      <span>{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NAME_AR' | translate }}</span>
+      <input pInputText type="text" dir="rtl" [(ngModel)]="importNameAr" [disabled]="importing()" />
+    </label>
+
+    <label class="supplier-catalog-import__field">
+      <span>{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_CATEGORY' | translate }}</span>
+      <p-select
+        [options]="categories()"
+        optionLabel="nameEn"
+        optionValue="id"
+        [filter]="true"
+        filterBy="nameEn,nameAr"
+        appendTo="body"
+        [(ngModel)]="importCategoryId"
+        [disabled]="importing()"
+        [placeholder]="'ADMIN.SUPPLIERS.CATALOG.IMPORT_CATEGORY_PLACEHOLDER' | translate"
+      />
+    </label>
+
+    <label class="supplier-catalog-import__field">
+      <span>{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_PRICE' | translate }}</span>
+      <p-inputnumber
+        mode="decimal"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="2"
+        [min]="0"
+        [(ngModel)]="importPrice"
+        [disabled]="importing()"
+      />
+      <small>{{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_PRICE_HINT' | translate }}</small>
+    </label>
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      [label]="'COMMON.CANCEL' | translate"
+      severity="secondary"
+      [text]="true"
+      [disabled]="importing()"
+      (onClick)="closeImport()"
+    />
+    <p-button
+      icon="pi pi-download"
+      [label]="'ADMIN.SUPPLIERS.CATALOG.IMPORT_CONFIRM' | translate"
+      [loading]="importing()"
+      [disabled]="!importCategoryId || !importNameEn.trim()"
+      (onClick)="confirmImport()"
+    />
+  </ng-template>
+</p-dialog>

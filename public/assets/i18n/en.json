@@ -5200,7 +5200,20 @@
         "SUBTITLE": "Everything this supplier reports in its catalog — browse freely, no search required.",
         "SEARCH_PLACEHOLDER": "Filter supplier products...",
         "LOAD_MORE": "Load more",
-        "LOADING_MORE": "Loading…"
+        "LOADING_MORE": "Loading…",
+        "IMPORT": "Import",
+        "IMPORT_TITLE": "Import as HAMBOX product",
+        "IMPORT_HINT": "Creates an editable draft product linked to this supplier (fulfilled by the supplier). Edit it freely, then activate it when ready.",
+        "IMPORT_NAME_EN": "Name (English)",
+        "IMPORT_NAME_AR": "Name (Arabic)",
+        "IMPORT_CATEGORY": "Category",
+        "IMPORT_CATEGORY_PLACEHOLDER": "Choose a category",
+        "IMPORT_PRICE": "Fallback price (USD)",
+        "IMPORT_PRICE_HINT": "The live price is calculated from the supplier cost plus margin; this is only a fallback.",
+        "IMPORT_CONFIRM": "Import product",
+        "IMPORT_SUCCESS": "Product imported. You can now edit it.",
+        "IMPORT_FAILED": "Could not import this product.",
+        "IMPORT_PARTIAL": "The product was created but linking it to the supplier failed. Open it in Products and check its fulfillment/mapping."
       },
       "MAPPINGS": {
         "TITLE": "Product Mappings",
