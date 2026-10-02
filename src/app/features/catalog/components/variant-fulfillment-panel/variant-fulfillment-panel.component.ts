@@ -28,6 +28,7 @@ const MODE_OPTIONS: readonly FulfillmentModeOption[] = [
   { mode: 'ManualFirst', icon: 'pi pi-sort-amount-down', titleKey: 'ADMIN.FULFILLMENT.MODE.MANUAL_FIRST', descriptionKey: 'ADMIN.FULFILLMENT.MODE.MANUAL_FIRST_DESC' },
   { mode: 'SupplierFirst', icon: 'pi pi-sort-amount-up', titleKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_FIRST', descriptionKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_FIRST_DESC' },
   { mode: 'SupplierOnly', icon: 'pi pi-cloud', titleKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_ONLY', descriptionKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_ONLY_DESC' },
+  { mode: 'ChatDelivery', icon: 'pi pi-comments', titleKey: 'ADMIN.FULFILLMENT.MODE.CHAT_DELIVERY', descriptionKey: 'ADMIN.FULFILLMENT.MODE.CHAT_DELIVERY_DESC' },
 ];
 
 /**
@@ -109,6 +110,11 @@ export class VariantFulfillmentPanelComponent {
     const variant = this.selectedVariant();
     if (!variant) {
       return 'warning';
+    }
+
+    if (variant.fulfillmentMode === 'ChatDelivery') {
+      // Delivered by hand over a support chat — needs neither codes nor a supplier.
+      return 'success';
     }
 
     if (variant.fulfillmentMode === 'ManualOnly') {

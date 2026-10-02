@@ -20,7 +20,7 @@ export interface ProductOptionGroupDto {
 }
 
 /** Matches backend `HAMBOX.Modules.Catalog.Domain.Enums.FulfillmentMode`. */
-export type FulfillmentMode = 'ManualOnly' | 'ManualFirst' | 'SupplierFirst' | 'SupplierOnly';
+export type FulfillmentMode = 'ManualOnly' | 'ManualFirst' | 'SupplierFirst' | 'SupplierOnly' | 'ChatDelivery';
 
 export const FULFILLMENT_MODES: readonly FulfillmentMode[] = [
   'ManualOnly',

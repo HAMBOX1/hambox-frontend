@@ -5675,7 +5675,9 @@
         "SUPPLIER_FIRST": "Supplier First",
         "SUPPLIER_FIRST_DESC": "Use the configured supplier chain first. Manual inventory is used only when supplier fulfillment is definitively exhausted.",
         "SUPPLIER_ONLY": "Supplier Only",
-        "SUPPLIER_ONLY_DESC": "Fulfill this variant exclusively through the configured supplier chain. Manual inventory is never used."
+        "SUPPLIER_ONLY_DESC": "Fulfill this variant exclusively through the configured supplier chain. Manual inventory is never used.",
+        "CHAT_DELIVERY": "On Delivery (support chat)",
+        "CHAT_DELIVERY_DESC": "After payment a support chat opens and you deliver by hand. No codes or supplier needed — switch to Manual Only for instant stock."
       },
       "CHAIN": {
         "TITLE": "Fulfillment chain",
