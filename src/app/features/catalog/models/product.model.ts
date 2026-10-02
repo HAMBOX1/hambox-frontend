@@ -205,6 +205,8 @@ export interface MergeProductsRequest {
   readonly targetProductId: string;
   readonly sourceProductIds: readonly string[];
   readonly confirmStockLoss: boolean;
+  /** Optional per-source variant name (keyed by source product id); defaults to the source product's name. */
+  readonly variantLabels?: Readonly<Record<string, string>>;
 }
 
 export interface MergeProductsResult {

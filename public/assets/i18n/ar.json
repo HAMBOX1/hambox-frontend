@@ -1041,7 +1041,9 @@
         "MERGE_STOCK_WARNING": "بعض المنتجات دي عندها مخزون مسجل مش هينتقل تلقائيًا وهيتفقد لو كملت.",
         "MERGE_CONFIRM_STOCK_LOSS": "فاهم، كمّل الدمج",
         "MERGE_ACTION": "دمج",
-        "SELECT_PAGE_ONLY": "تحديد الصفحة الظاهرة بس"
+        "SELECT_PAGE_ONLY": "تحديد الصفحة الظاهرة بس",
+        "MERGE_VARIANT_NAMES_LABEL": "أسماء الـ Variants",
+        "MERGE_VARIANT_NAMES_HINT": "كل منتج مدموج هيبقى Variant. غيّر اسمه هنا (مثلًا PC أو Xbox أو 10 EUR) عشان العميل يفرّق بينهم."
       },
       "STATUS_TABS": {
         "ALL": "الكل",

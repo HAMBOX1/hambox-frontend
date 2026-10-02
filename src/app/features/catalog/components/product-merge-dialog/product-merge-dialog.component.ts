@@ -28,6 +28,8 @@ export interface ProductMergeConfirmEvent {
   /** 'merge' runs the immediate merge (today's behavior); 'pending' just parks every source as a
    * pending merge into the target — see `ProductCatalogFacade.setPendingMergeForSelection`. */
   readonly mode: ProductMergeMode;
+  /** Variant name per source product id, only for names the admin changed from the default. */
+  readonly variantLabels: Readonly<Record<string, string>>;
 }
 
 /**
@@ -74,6 +76,7 @@ export class ProductMergeDialogComponent {
   protected readonly newProductNameEn = signal('');
   protected readonly newProductCategoryId = signal<string | null>(null);
   protected readonly newProductPrice = signal<number | null>(null);
+  protected readonly variantLabels = signal<Readonly<Record<string, string>>>({});
 
   /** Every selected product becomes a source when creating a brand-new parent; otherwise every
    * selected product except the chosen existing parent. */
@@ -117,8 +120,17 @@ export class ProductMergeDialogComponent {
       this.newProductNameEn.set('');
       this.newProductCategoryId.set(null);
       this.newProductPrice.set(null);
+      this.variantLabels.set({});
     }
     this.visibleChange.emit(visible);
+  }
+
+  protected variantLabelFor(product: Product): string {
+    return this.variantLabels()[product.id] ?? product.nameEn;
+  }
+
+  protected setVariantLabel(productId: string, label: string): void {
+    this.variantLabels.set({ ...this.variantLabels(), [productId]: label });
   }
 
   protected selectTarget(productId: string): void {
@@ -131,6 +143,17 @@ export class ProductMergeDialogComponent {
 
   protected selectTargetKind(kind: ProductMergeTargetKind): void {
     this.targetKind.set(kind);
+  }
+
+  private collectVariantLabels(): Record<string, string> {
+    const labels: Record<string, string> = {};
+    for (const product of this.sourceProducts()) {
+      const label = this.variantLabels()[product.id]?.trim();
+      if (label && label !== product.nameEn) {
+        labels[product.id] = label;
+      }
+    }
+    return labels;
   }
 
   protected confirm(): void {
@@ -158,6 +181,7 @@ export class ProductMergeDialogComponent {
       sourceProductIds: this.sourceProducts().map((product) => product.id),
       confirmStockLoss: this.mode() === 'merge' && this.stockLossAcknowledged(),
       mode: this.mode(),
+      variantLabels: this.collectVariantLabels(),
     });
   }
 }

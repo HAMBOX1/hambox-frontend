@@ -926,6 +926,7 @@ export class ProductCatalogPageComponent implements OnInit {
       targetProductId,
       event.sourceProductIds,
       event.confirmStockLoss,
+      event.variantLabels,
     );
 
     if (requiresStockLossConfirmation) {

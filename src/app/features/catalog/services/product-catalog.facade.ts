@@ -567,6 +567,7 @@ export class ProductCatalogFacade {
     targetProductId: string,
     sourceProductIds: readonly string[],
     confirmStockLoss: boolean,
+    variantLabels?: Readonly<Record<string, string>>,
   ): Promise<{ result: MergeProductsResult | null; requiresStockLossConfirmation: boolean }> {
     this.bulkActionLoadingState.set(true);
     this.bulkErrorState.set(null);
@@ -577,6 +578,7 @@ export class ProductCatalogFacade {
           targetProductId,
           sourceProductIds: [...sourceProductIds],
           confirmStockLoss,
+          variantLabels,
         }),
       );
       this.clearBulkSelection();

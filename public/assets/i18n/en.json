@@ -1048,7 +1048,9 @@
         "MERGE_STOCK_WARNING": "Some of these products have recorded stock that cannot be carried over automatically and will be lost if you continue.",
         "MERGE_CONFIRM_STOCK_LOSS": "I understand, merge anyway",
         "MERGE_ACTION": "Merge",
-        "SELECT_PAGE_ONLY": "Select this page only"
+        "SELECT_PAGE_ONLY": "Select this page only",
+        "MERGE_VARIANT_NAMES_LABEL": "Variant names",
+        "MERGE_VARIANT_NAMES_HINT": "Each merged product becomes a variant. Rename it here (e.g. PC, Xbox, 10 EUR) so customers can tell them apart."
       },
       "STATUS_TABS": {
         "ALL": "All",

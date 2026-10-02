@@ -95,6 +95,22 @@
       </div>
     }
 
+    @if (mode() === 'merge' && sourceProducts().length > 0) {
+      <label class="admin-field__label">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_VARIANT_NAMES_LABEL' | translate }}</label>
+      <div class="product-merge-dialog__new-target">
+        @for (source of sourceProducts(); track source.id) {
+          <input
+            pInputText
+            class="admin-field__input"
+            [attr.aria-label]="source.nameEn"
+            [ngModel]="variantLabelFor(source)"
+            (ngModelChange)="setVariantLabel(source.id, $event)"
+          />
+        }
+      </div>
+      <p class="admin-field__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_VARIANT_NAMES_HINT' | translate }}</p>
+    }
+
     @if (sourceProducts().length > 0) {
       <p class="admin-field__hint">
         {{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_SOURCES_HINT' | translate: { count: sourceProducts().length } }}
