@@ -156,8 +156,10 @@ export class ProductAssetsUploadComponent implements OnDestroy {
 
   protected onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.addFiles(input.files);
+    // Snapshot the files before clearing the input — see `toMemoryFile` for why.
+    const files = input.files ? Array.from(input.files) : [];
     input.value = '';
+    void this.addFiles(files);
   }
 
   protected onDragOver(event: DragEvent): void {
@@ -173,7 +175,8 @@ export class ProductAssetsUploadComponent implements OnDestroy {
   protected onDrop(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver.set(false);
-    this.addFiles(event.dataTransfer?.files ?? null);
+    const files = event.dataTransfer?.files ? Array.from(event.dataTransfer.files) : [];
+    void this.addFiles(files);
   }
 
   /** Local only — nothing hits the backend until `commitChanges` runs from Save. */
@@ -256,8 +259,14 @@ export class ProductAssetsUploadComponent implements OnDestroy {
       }
 
       await this.refreshPersistedImages(targetProductId);
-    } catch {
-      this.validationError.set('Unable to save image changes.');
+    } catch (error) {
+      console.error('ProductAssetsUploadComponent: saving image changes failed', error);
+      const status = (error as { status?: number } | null)?.status;
+      this.validationError.set(
+        status
+          ? `Unable to save image changes (error ${status}).`
+          : 'Unable to save image changes — check your connection and try again.',
+      );
     } finally {
       this.uploading.set(false);
     }
@@ -275,8 +284,20 @@ export class ProductAssetsUploadComponent implements OnDestroy {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  private addFiles(fileList: FileList | null): void {
-    if (!fileList?.length) {
+  /**
+   * Mobile browsers (Chrome on Android especially, for gallery/cloud/camera picks) hand back a File
+   * that's only a handle to the picker's source — if it's read much later (here: when Save runs,
+   * possibly minutes after picking) the read can fail with the request never leaving the browser,
+   * which surfaced as "Unable to save image changes" with nothing in the server logs. Copying the
+   * bytes into memory at pick time makes the later upload independent of that handle.
+   */
+  private async toMemoryFile(file: File): Promise<File> {
+    const buffer = await file.arrayBuffer();
+    return new File([buffer], file.name, { type: file.type, lastModified: file.lastModified });
+  }
+
+  private async addFiles(files: readonly File[]): Promise<void> {
+    if (!files.length) {
       return;
     }
 
@@ -288,7 +309,7 @@ export class ProductAssetsUploadComponent implements OnDestroy {
       return;
     }
 
-    const candidates = Array.from(fileList).slice(0, remainingSlots);
+    const candidates = files.slice(0, remainingSlots);
     const validFiles: File[] = [];
 
     for (const file of candidates) {
@@ -302,7 +323,11 @@ export class ProductAssetsUploadComponent implements OnDestroy {
         continue;
       }
 
-      validFiles.push(file);
+      try {
+        validFiles.push(await this.toMemoryFile(file));
+      } catch {
+        this.validationError.set(`Couldn't read "${file.name}" — please pick it again.`);
+      }
     }
 
     if (!validFiles.length) {
