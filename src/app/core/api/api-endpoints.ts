@@ -1,6 +1,7 @@
 export const CATALOG_API = {
   categories: '/api/v1/categories',
   categoriesTree: '/api/v1/categories/tree',
+  categoryFilters: (categoryId: string) => `/api/v1/category-filters/${categoryId}`,
   categoriesReorder: '/api/v1/categories/reorder',
   category: (id: string) => `/api/v1/categories/${id}`,
   categoryBySlug: (slug: string) => `/api/v1/categories/by-slug/${slug}`,

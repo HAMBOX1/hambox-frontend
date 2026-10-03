@@ -7,6 +7,8 @@ import { ApiClientService } from '../../../core/api/api-client.service';
 import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import {
   Category,
+  CategoryFilterConfig,
+  CategoryFilterInput,
   CategoryListQuery,
   CategoryReorderEntry,
   CategoryTreeItem,
@@ -22,6 +24,18 @@ export class CategoryApiService {
   private readonly api = inject(ApiClientService);
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = inject(API_BASE_URL);
+
+  getCategoryFilterConfig(categoryId: string): Observable<CategoryFilterConfig> {
+    return this.api.get<CategoryFilterConfig>(CATALOG_API.categoryFilters(categoryId));
+  }
+
+  saveCategoryFilterConfig(categoryId: string, items: readonly CategoryFilterInput[]): Observable<void> {
+    return this.api.put<void>(CATALOG_API.categoryFilters(categoryId), { items });
+  }
+
+  resetCategoryFilterConfig(categoryId: string): Observable<void> {
+    return this.api.delete<void>(CATALOG_API.categoryFilters(categoryId));
+  }
 
   getCategories(query: CategoryListQuery): Observable<PagedResult<Category>> {
     const params: Record<string, string | number | boolean> = {

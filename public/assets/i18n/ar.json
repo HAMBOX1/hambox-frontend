@@ -1278,7 +1278,8 @@
       "COMMUNICATION": "التواصل",
       "WHATSAPP": "بوت واتساب",
       "PAYMENT_GATEWAYS": "بوابات الدفع",
-      "IMAGE_LIBRARY": "مكتبة الصور"
+      "IMAGE_LIBRARY": "مكتبة الصور",
+      "STOREFRONT_FILTERS": "فلاتر المتجر"
     },
     "WHATSAPP": {
       "BREADCRUMB": "بوت واتساب",

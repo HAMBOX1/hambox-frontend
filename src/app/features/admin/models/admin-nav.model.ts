@@ -5,6 +5,7 @@ export type AdminNavId =
   | 'products'
   | 'categories'
   | 'image-library'
+  | 'storefront-filters'
   | 'collections'
   | 'roles'
   | 'security'
@@ -55,6 +56,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     labelKey: 'ADMIN.NAV.CATEGORIES',
     route: '/admin/categories',
     icon: 'pi pi-tags',
+    permission: PERMISSIONS.Catalog.Categories.View,
+  },
+  {
+    id: 'storefront-filters',
+    labelKey: 'ADMIN.NAV.STOREFRONT_FILTERS',
+    route: '/admin/storefront-filters',
+    icon: 'pi pi-filter',
     permission: PERMISSIONS.Catalog.Categories.View,
   },
   {

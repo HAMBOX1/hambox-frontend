@@ -10,6 +10,38 @@ export interface Category {
   readonly descriptionHtml?: string | null;
 }
 
+/** One filter on a category's storefront filter list (admin). */
+export interface CategoryFilterItem {
+  readonly groupKey: string;
+  readonly defaultName: string;
+  readonly displayNameEn: string | null;
+  readonly displayNameAr: string | null;
+  readonly isVisible: boolean;
+  readonly productCount: number;
+}
+
+export interface AvailableFilterGroup {
+  readonly groupKey: string;
+  readonly defaultName: string;
+  readonly productCount: number;
+}
+
+export interface CategoryFilterConfig {
+  readonly categoryId: string;
+  readonly hasOwnList: boolean;
+  readonly inheritedFromCategoryId: string | null;
+  readonly inheritedFromDefault: boolean;
+  readonly items: readonly CategoryFilterItem[];
+  readonly availableGroups: readonly AvailableFilterGroup[];
+}
+
+export interface CategoryFilterInput {
+  readonly groupKey: string;
+  readonly displayNameEn: string | null;
+  readonly displayNameAr: string | null;
+  readonly isVisible: boolean;
+}
+
 export interface CategoryTreeItem extends Category {
   readonly sortOrder: number;
   readonly childrenCount: number;

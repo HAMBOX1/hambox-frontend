@@ -1295,7 +1295,8 @@
       "SECURITY": "Security Center",
       "COMMUNICATION": "Communication",
       "WHATSAPP": "WhatsApp Bot",
-      "IMAGE_LIBRARY": "Image Library"
+      "IMAGE_LIBRARY": "Image Library",
+      "STOREFRONT_FILTERS": "Storefront Filters"
     },
     "WHATSAPP": {
       "BREADCRUMB": "WhatsApp Bot",

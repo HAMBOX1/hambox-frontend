@@ -1,0 +1,117 @@
+<p-toast position="top-right" />
+
+<section class="admin-page store-filters">
+  <app-admin-page-header
+    title="Storefront Filters"
+    subtitle="Choose which filters customers see for each category. A category without its own list uses its parent's, then the default."
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <div class="store-filters__layout">
+    <nav class="store-filters__tree" aria-label="Categories">
+      <button
+        type="button"
+        class="store-filters__node store-filters__node--default"
+        [class.is-selected]="selectedId() === defaultListId"
+        (click)="select(defaultListId)"
+      >
+        <i class="pi pi-filter" aria-hidden="true"></i> Default (all categories)
+      </button>
+      @for (row of rows(); track row.id) {
+        <button
+          type="button"
+          class="store-filters__node"
+          [class.is-selected]="selectedId() === row.id"
+          [style.padding-inline-start.rem]="0.75 + row.depth * 1"
+          (click)="select(row.id)"
+        >
+          {{ row.name }}
+        </button>
+      }
+    </nav>
+
+    <div class="store-filters__editor">
+      <h2 class="store-filters__title">{{ selectedName() }}</h2>
+      <p class="store-filters__note">{{ sourceNote() }}</p>
+
+      @if (loading()) {
+        <p class="store-filters__note">Loading…</p>
+      } @else {
+        <ol class="store-filters__list">
+          @for (item of items(); track item.groupKey; let i = $index; let first = $first; let last = $last) {
+            <li class="store-filters__item" [class.is-hidden]="!item.isVisible">
+              <div class="store-filters__item-head">
+                <strong>{{ item.defaultName }}</strong>
+                <span class="store-filters__count">{{ item.productCount }} product(s) here</span>
+              </div>
+              <div class="store-filters__names">
+                <input
+                  pInputText
+                  type="text"
+                  placeholder="Name shown (EN) — optional"
+                  [ngModel]="item.displayNameEn"
+                  (ngModelChange)="rename(i, 'displayNameEn', $event)"
+                />
+                <input
+                  pInputText
+                  type="text"
+                  dir="rtl"
+                  placeholder="الاسم المعروض (AR) — اختياري"
+                  [ngModel]="item.displayNameAr"
+                  (ngModelChange)="rename(i, 'displayNameAr', $event)"
+                />
+              </div>
+              <div class="store-filters__item-actions">
+                <label class="store-filters__visible">
+                  <input type="checkbox" [checked]="item.isVisible" (change)="toggleVisible(i, $any($event.target).checked)" />
+                  Shown to customers
+                </label>
+                <span class="store-filters__spacer"></span>
+                <button type="button" class="store-filters__icon" aria-label="Move up" [disabled]="first" (click)="move(i, -1)">
+                  <i class="pi pi-arrow-up" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="store-filters__icon" aria-label="Move down" [disabled]="last" (click)="move(i, 1)">
+                  <i class="pi pi-arrow-down" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="store-filters__icon store-filters__icon--danger" aria-label="Remove filter" (click)="remove(i)">
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>
+          } @empty {
+            <li class="store-filters__empty">No filters in this list yet.</li>
+          }
+        </ol>
+
+        <div class="store-filters__add">
+          <p-select
+            class="store-filters__add-select"
+            [options]="[...available()]"
+            optionLabel="defaultName"
+            optionValue="groupKey"
+            [filter]="true"
+            filterBy="defaultName,groupKey"
+            appendTo="body"
+            placeholder="Add a filter…"
+            [ngModel]="addKey()"
+            (ngModelChange)="addKey.set($event)"
+          >
+            <ng-template let-group #item>
+              {{ group.defaultName }} <small>({{ group.productCount }} product(s) here)</small>
+            </ng-template>
+          </p-select>
+          <button pButton type="button" label="Add" icon="pi pi-plus" severity="secondary" [disabled]="!addKey()" (click)="addFilter()"></button>
+        </div>
+
+        @if (permissions.Catalog.Categories.Edit | hamboxHasPermission) {
+          <div class="store-filters__footer">
+            @if (config()?.hasOwnList && selectedId() !== defaultListId) {
+              <button pButton type="button" label="Use inherited list" icon="pi pi-undo" severity="secondary" [text]="true" [disabled]="saving()" (click)="resetToInherited()"></button>
+            }
+            <button pButton type="button" label="Save filters" icon="pi pi-check" [loading]="saving()" [disabled]="!dirty()" (click)="save()"></button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</section>

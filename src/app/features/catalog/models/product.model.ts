@@ -205,6 +205,7 @@ export interface ProductFacetQuery {
 export interface ProductFacetGroup {
   readonly key: string;
   readonly displayName: string;
+  readonly displayNameAr?: string | null;
   readonly options: readonly ProductFacetOption[];
 }
 

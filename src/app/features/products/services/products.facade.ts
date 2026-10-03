@@ -17,10 +17,10 @@ import {
 } from '../utils/storefront-filter.util';
 import { Products } from './products';
 
-function mapFacetGroups(groups: readonly ProductFacetGroup[]): readonly DynamicFilterGroup[] {
+function mapFacetGroups(groups: readonly ProductFacetGroup[], language: string): readonly DynamicFilterGroup[] {
   return groups.map((group) => ({
     id: group.key,
-    label: group.displayName,
+    label: language === 'ar' && group.displayNameAr ? group.displayNameAr : group.displayName,
     options: group.options.map((option) => ({
       id: option.value,
       label: option.label,
@@ -367,7 +367,7 @@ export class ProductsFacade {
         attributes: this.clientFiltersState().attributes,
       });
 
-      this.facetGroupsState.set(mapFacetGroups(groups));
+      this.facetGroupsState.set(mapFacetGroups(groups, this.translation.language()));
     } catch {
       this.facetGroupsState.set([]);
     }
