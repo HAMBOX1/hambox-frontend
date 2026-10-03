@@ -1277,7 +1277,8 @@
       "SECURITY": "مركز الأمان",
       "COMMUNICATION": "التواصل",
       "WHATSAPP": "بوت واتساب",
-      "PAYMENT_GATEWAYS": "بوابات الدفع"
+      "PAYMENT_GATEWAYS": "بوابات الدفع",
+      "IMAGE_LIBRARY": "مكتبة الصور"
     },
     "WHATSAPP": {
       "BREADCRUMB": "بوت واتساب",

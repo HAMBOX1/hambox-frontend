@@ -106,6 +106,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'image-library',
+    canActivate: [permissionGuard([PERMISSIONS.Catalog.Products.View])],
+    loadComponent: () =>
+      import('../catalog/pages/product-image-library-page/product-image-library-page.component').then(
+        (c) => c.ProductImageLibraryPageComponent,
+      ),
+  },
+  {
     path: 'collections',
     canActivate: [permissionGuard([PERMISSIONS.Catalog.Collections.View])],
     loadComponent: () =>

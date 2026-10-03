@@ -1,0 +1,176 @@
+<p-toast position="top-right" />
+
+<section class="admin-page image-library">
+  <app-admin-page-header
+    title="Image Library"
+    subtitle="Every product image in one place — replace, delete or copy pictures without opening each product."
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <div class="image-library__filters">
+    <input
+      pInputText
+      type="search"
+      class="image-library__search"
+      placeholder="Search by product name…"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearch($event)"
+    />
+    <p-select
+      class="image-library__category"
+      [options]="categories()"
+      optionLabel="nameEn"
+      optionValue="id"
+      [filter]="true"
+      filterBy="nameEn,nameAr"
+      [showClear]="true"
+      appendTo="body"
+      placeholder="All categories"
+      [ngModel]="categoryId()"
+      (ngModelChange)="onCategoryChange($event)"
+    />
+    <label class="image-library__toggle">
+      <p-checkbox
+        inputId="without-images"
+        [binary]="true"
+        [ngModel]="withoutImages()"
+        (ngModelChange)="onWithoutImagesChange($event)"
+      />
+      <span>Products without images</span>
+    </label>
+    <span class="image-library__count">{{ totalCount() }} {{ withoutImages() ? 'product(s)' : 'image(s)' }}</span>
+  </div>
+
+  @if (loading() && items().length === 0) {
+    <p class="image-library__status">Loading…</p>
+  } @else if (items().length === 0) {
+    <p class="image-library__status">{{ withoutImages() ? 'Every matching product has an image.' : 'No images found.' }}</p>
+  } @else {
+    <div class="image-library__grid" [class.image-library__grid--loading]="loading()">
+      @for (item of items(); track rowKey(item)) {
+        <article class="image-library__card" [class.image-library__card--busy]="busyKey() === rowKey(item)">
+          <div class="image-library__thumb">
+            @if (item.imageUrl) {
+              <img [src]="item.imageUrl" [alt]="item.productName" loading="lazy" />
+            } @else {
+              <span class="image-library__placeholder"><i class="pi pi-image" aria-hidden="true"></i></span>
+            }
+            @if (item.isPrimary) {
+              <span class="image-library__primary">Primary</span>
+            }
+          </div>
+
+          <div class="image-library__meta">
+            <a class="image-library__product" [routerLink]="['/admin/products', item.productId, 'edit']" [title]="item.productName">{{
+              item.productName
+            }}</a>
+            <span class="image-library__category-name">{{ item.categoryName }}</span>
+          </div>
+
+          <div class="image-library__actions">
+            @if (item.imageId) {
+              <label class="image-library__action" title="Replace this picture">
+                <i class="pi pi-sync" aria-hidden="true"></i> Replace
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="replaceImage(item, $event)" />
+              </label>
+              @if (!item.isPrimary) {
+                <button type="button" class="image-library__action" (click)="makePrimary(item)" title="Use as the product's main image">
+                  <i class="pi pi-star" aria-hidden="true"></i> Primary
+                </button>
+              }
+              <button type="button" class="image-library__action" (click)="openApply(item)" title="Copy this picture onto other products">
+                <i class="pi pi-copy" aria-hidden="true"></i> Use for others
+              </button>
+              <button type="button" class="image-library__action image-library__action--danger" (click)="askDelete(item)" title="Delete this picture">
+                <i class="pi pi-trash" aria-hidden="true"></i>
+              </button>
+            } @else {
+              <label class="image-library__action" title="Upload a picture for this product">
+                <i class="pi pi-upload" aria-hidden="true"></i> Upload
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="uploadImage(item, $event)" />
+              </label>
+            }
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (pageCount() > 1) {
+      <nav class="image-library__pager" aria-label="Pages">
+        <button type="button" pButton severity="secondary" size="small" label="Previous" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"></button>
+        <span>Page {{ page() }} of {{ pageCount() }}</span>
+        <button type="button" pButton severity="secondary" size="small" label="Next" [disabled]="page() >= pageCount()" (click)="goToPage(page() + 1)"></button>
+      </nav>
+    }
+  }
+</section>
+
+<p-dialog
+  header="Delete image"
+  [visible]="deleteTarget() !== null"
+  (visibleChange)="!$event && deleteTarget.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: 'min(26rem, 92vw)' }"
+>
+  <p>Delete this picture of “{{ deleteTarget()?.productName }}”? This cannot be undone.</p>
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="deleteTarget.set(null)" />
+    <p-button label="Delete" severity="danger" icon="pi pi-trash" (onClick)="confirmDelete()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Use this image for other products"
+  [visible]="applySource() !== null"
+  (visibleChange)="!$event && closeApply()"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: 'min(32rem, 94vw)' }"
+>
+  @if (applySource(); as source) {
+    <div class="image-library__apply-source">
+      @if (source.imageUrl) {
+        <img [src]="source.imageUrl" [alt]="source.productName" />
+      }
+      <span>Copies this picture onto each product you pick (each gets its own copy, added as an extra image).</span>
+    </div>
+
+    <input
+      pInputText
+      type="search"
+      class="image-library__search"
+      placeholder="Search products…"
+      [ngModel]="applySearch()"
+      (ngModelChange)="onApplySearch($event)"
+    />
+
+    <ul class="image-library__apply-list">
+      @for (product of applyCandidates(); track product.id) {
+        <li>
+          <label>
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="applySelected().has(product.id)"
+              (ngModelChange)="toggleApplyTarget(product.id, $event)"
+            />
+            <span>{{ product.nameEn }}</span>
+          </label>
+        </li>
+      } @empty {
+        <li class="image-library__status">{{ applySearching() ? 'Searching…' : 'No products found.' }}</li>
+      }
+    </ul>
+  }
+
+  <ng-template #footer>
+    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="applying()" (onClick)="closeApply()" />
+    <p-button
+      icon="pi pi-copy"
+      [label]="'Apply to ' + applySelected().size + ' product(s)'"
+      [loading]="applying()"
+      [disabled]="applySelected().size === 0"
+      (onClick)="confirmApply()"
+    />
+  </ng-template>
+</p-dialog>

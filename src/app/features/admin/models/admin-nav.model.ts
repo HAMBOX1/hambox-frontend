@@ -4,6 +4,7 @@ export type AdminNavId =
   | 'dashboard'
   | 'products'
   | 'categories'
+  | 'image-library'
   | 'collections'
   | 'roles'
   | 'security'
@@ -55,6 +56,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/categories',
     icon: 'pi pi-tags',
     permission: PERMISSIONS.Catalog.Categories.View,
+  },
+  {
+    id: 'image-library',
+    labelKey: 'ADMIN.NAV.IMAGE_LIBRARY',
+    route: '/admin/image-library',
+    icon: 'pi pi-images',
+    permission: PERMISSIONS.Catalog.Products.View,
   },
   {
     id: 'collections',

@@ -10,6 +10,7 @@ import {
   BulkProductAction,
   BulkProductsResult,
   CreateProductRequest,
+  ApplyImageResult,
   MergeProductsRequest,
   MergeProductsResult,
   PriceAdjustmentMode,
@@ -18,6 +19,8 @@ import {
   ProductFacetGroup,
   ProductFacetQuery,
   ProductImage,
+  ProductImageLibraryPage,
+  ProductImageLibraryQuery,
   ProductListQuery,
   ProductStatusCounts,
   UpdateProductRequest,
@@ -252,6 +255,29 @@ export class ProductApiService {
 
   getProductImages(productId: string): Observable<readonly ProductImage[]> {
     return this.api.get<readonly ProductImage[]>(CATALOG_API.productImages(productId));
+  }
+
+  getProductImageLibrary(query: ProductImageLibraryQuery): Observable<ProductImageLibraryPage> {
+    return this.api.get<ProductImageLibraryPage>(CATALOG_API.productImageLibrary, {
+      params: {
+        ...(query.searchTerm ? { searchTerm: query.searchTerm } : {}),
+        ...(query.categoryId ? { categoryId: query.categoryId } : {}),
+        ...(query.withoutImages ? { withoutImages: 'true' } : {}),
+        page: String(query.page),
+        pageSize: String(query.pageSize),
+      },
+    });
+  }
+
+  replaceProductImage(productId: string, imageId: string, file: File): Observable<ProductImage> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+
+    return this.http.post<ProductImage>(this.resolveUrl(CATALOG_API.productImageReplace(productId, imageId)), formData);
+  }
+
+  applyImageToProducts(sourceImageId: string, productIds: readonly string[]): Observable<ApplyImageResult> {
+    return this.api.post<ApplyImageResult>(CATALOG_API.productImagesApply, { sourceImageId, productIds });
   }
 
   importProductImageFromUrl(productId: string, url: string): Observable<ProductImage> {

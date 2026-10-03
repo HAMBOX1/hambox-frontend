@@ -1294,7 +1294,8 @@
       "PAYMENT_GATEWAYS": "Payment Gateways",
       "SECURITY": "Security Center",
       "COMMUNICATION": "Communication",
-      "WHATSAPP": "WhatsApp Bot"
+      "WHATSAPP": "WhatsApp Bot",
+      "IMAGE_LIBRARY": "Image Library"
     },
     "WHATSAPP": {
       "BREADCRUMB": "WhatsApp Bot",

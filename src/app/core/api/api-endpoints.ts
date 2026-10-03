@@ -31,6 +31,10 @@ export const CATALOG_API = {
   productStatusCounts: '/api/v1/products/status-counts',
   productImages: (productId: string) => `/api/v1/products/${productId}/images`,
   productImageFromUrl: (productId: string) => `/api/v1/products/${productId}/images/from-url`,
+  productImageReplace: (productId: string, imageId: string) =>
+    `/api/v1/products/${productId}/images/${imageId}/replace`,
+  productImageLibrary: '/api/v1/product-images/library',
+  productImagesApply: '/api/v1/product-images/apply',
   productImage: (productId: string, imageId: string) =>
     `/api/v1/products/${productId}/images/${imageId}`,
   productImagePrimary: (productId: string, imageId: string) =>

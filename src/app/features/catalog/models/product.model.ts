@@ -95,6 +95,38 @@ export interface ProductPriceTiers {
   readonly memberMax: number | null;
 }
 
+/** One tile of the admin image library — a product image, or (imageId null) a product that has none. */
+export interface ProductImageLibraryItem {
+  readonly imageId: string | null;
+  readonly productId: string;
+  readonly productName: string;
+  readonly categoryName: string;
+  readonly imageUrl: string | null;
+  readonly isPrimary: boolean;
+  readonly displayOrder: number;
+  readonly fileSizeBytes: number;
+}
+
+export interface ProductImageLibraryPage {
+  readonly items: readonly ProductImageLibraryItem[];
+  readonly totalCount: number;
+  readonly page: number;
+  readonly pageSize: number;
+}
+
+export interface ProductImageLibraryQuery {
+  readonly searchTerm?: string;
+  readonly categoryId?: string;
+  readonly withoutImages?: boolean;
+  readonly page: number;
+  readonly pageSize: number;
+}
+
+export interface ApplyImageResult {
+  readonly applied: number;
+  readonly skipped: number;
+}
+
 export interface CreateProductRequest {
   readonly nameAr: string;
   readonly nameEn: string;
