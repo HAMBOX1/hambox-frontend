@@ -472,3 +472,17 @@
   white-space: nowrap;
   color: var(--admin-text-secondary);
 }
+
+.product-catalog-table__variant-price-value {
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 1px dashed transparent;
+
+  &:hover {
+    border-bottom-color: var(--admin-text-secondary);
+  }
+}
+
+.product-catalog-table__variant-price-value--inherited {
+  color: var(--admin-text-secondary);
+}

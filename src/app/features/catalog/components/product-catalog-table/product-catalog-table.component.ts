@@ -55,6 +55,7 @@ import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
 type EditableField = 'name' | 'price';
+type VariantPriceField = 'cost' | 'sale' | 'member';
 
 const STATUS_EDIT_OPTIONS: readonly ProductStatus[] = ['Draft', 'Active', 'Inactive', 'Archived'];
 
@@ -196,6 +197,9 @@ export class ProductCatalogTableComponent {
   /** Inline rename of a variant's option-describing label (see `variantDisplayLabel`) — mirrors
    * the product name's dblclick-to-edit above, scoped to variant ids instead of product ids. */
   protected readonly editingVariantId = signal<string | null>(null);
+  protected readonly variantPriceFields: readonly VariantPriceField[] = ['cost', 'sale', 'member'];
+  protected readonly editingVariantPrice = signal<{ variantId: string; field: VariantPriceField } | null>(null);
+  protected readonly variantPriceDraft = signal<number | null>(null);
   protected readonly editVariantDraftText = signal('');
 
   /** Variant ids checked in the expander's own selection column — separate from the outer table's
@@ -435,6 +439,84 @@ export class ProductCatalogTableComponent {
         const next = new Set(ids);
         next.delete(productId);
         return next;
+      });
+    }
+  }
+
+  protected isEditingVariantPrice(variantId: string, field: VariantPriceField): boolean {
+    const editing = this.editingVariantPrice();
+    return editing?.variantId === variantId && editing.field === field;
+  }
+
+  /** Cost / member are exactly what is stored (null = unset); sale shows what customers pay for this
+   * variant before supplier pricing — its own override, else the product's base price. */
+  protected variantPriceDisplay(variant: ProductVariantDto, product: Product, field: VariantPriceField): number | null {
+    switch (field) {
+      case 'cost':
+        return variant.costPrice;
+      case 'member':
+        return variant.memberPrice;
+      default:
+        return variant.priceOverride ?? product.price;
+    }
+  }
+
+  protected startEditVariantPrice(product: Product, variant: ProductVariantDto, field: VariantPriceField, event: Event): void {
+    event.stopPropagation();
+    this.variantPriceDraft.set(this.variantPriceDisplay(variant, product, field));
+    this.editingVariantPrice.set({ variantId: variant.id, field });
+  }
+
+  protected cancelVariantPrice(): void {
+    this.editingVariantPrice.set(null);
+    this.variantPriceDraft.set(null);
+  }
+
+  /** Saves one of a variant's three prices straight from the list. Clearing cost / member unsets them;
+   * clearing sale removes the variant's own price so it falls back to the product's base price. */
+  protected async saveVariantPrice(product: Product, variant: ProductVariantDto): Promise<void> {
+    const editing = this.editingVariantPrice();
+    if (!editing || editing.variantId !== variant.id) {
+      return;
+    }
+
+    const draft = this.variantPriceDraft();
+    this.editingVariantPrice.set(null);
+    this.variantPriceDraft.set(null);
+
+    const value = draft !== null && draft >= 0 ? draft : null;
+    const current = editing.field === 'sale' ? variant.priceOverride : this.variantPriceDisplay(variant, product, editing.field);
+    const unchanged =
+      editing.field === 'sale'
+        ? (value ?? product.price) === (current ?? product.price)
+        : value === current;
+    if (unchanged) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(
+        this.inventoryApi.updateVariant(variant.id, {
+          sku: variant.sku,
+          planId: variant.planId,
+          priceOverride: editing.field === 'sale' ? value : variant.priceOverride,
+          comparePrice: variant.comparePrice,
+          costPrice: editing.field === 'cost' ? value : variant.costPrice,
+          memberPrice: editing.field === 'member' ? value : variant.memberPrice,
+          sortOrder: variant.sortOrder,
+          status: variant.status,
+          isVisible: variant.isVisible,
+          membershipPlanId: variant.membershipPlanId,
+          lowStockThreshold: variant.lowStockThreshold,
+          optionIds: variant.optionIds,
+        }),
+      );
+      await this.loadVariantsFor(product.id);
+    } catch {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Failed to update price',
+        detail: 'Please try again.',
       });
     }
   }

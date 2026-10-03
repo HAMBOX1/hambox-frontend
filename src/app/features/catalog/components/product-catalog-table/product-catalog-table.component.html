@@ -361,7 +361,9 @@
                       <tr>
                         <th style="width: 2rem"></th>
                         <th>Variant</th>
-                        <th>Price</th>
+                        <th>Cost</th>
+                        <th>Sale</th>
+                        <th>Member</th>
                         <th>Available</th>
                         <th>Status</th>
                       </tr>
@@ -396,8 +398,37 @@
                               >
                             }
                           </td>
+                          @for (field of variantPriceFields; track field) {
+                            <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
+                              @if (isEditingVariantPrice(variant.id, field)) {
+                                <p-inputNumber
+                                  class="product-catalog-table__edit-number"
+                                  [ngModel]="variantPriceDraft()"
+                                  (ngModelChange)="variantPriceDraft.set($event)"
+                                  (keydown.enter)="saveVariantPrice(product, variant)"
+                                  (keydown.escape)="cancelVariantPrice()"
+                                  (onBlur)="saveVariantPrice(product, variant)"
+                                  mode="currency"
+                                  currency="USD"
+                                  [minFractionDigits]="2"
+                                  [min]="0"
+                                  autofocus
+                                />
+                              } @else {
+                                @let priceValue = variantPriceDisplay(variant, product, field);
+                                <span
+                                  class="product-catalog-table__variant-price-value"
+                                  [class.product-catalog-table__variant-price-value--inherited]="field === 'sale' && variant.priceOverride == null"
+                                  role="button"
+                                  tabindex="0"
+                                  (click)="startEditVariantPrice(product, variant, field, $event)"
+                                  (keydown.enter)="startEditVariantPrice(product, variant, field, $event)"
+                                  >{{ priceValue == null ? '—' : (priceValue | hamboxCurrency) }}</span
+                                >
+                              }
+                            </td>
+                          }
                           <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
-                            {{ (variant.priceOverride ?? product.price) | hamboxCurrency }}
                             <a
                               class="product-catalog-table__variant-price-edit"
                               [routerLink]="'/admin/products/' + product.id + '/edit'"
