@@ -181,6 +181,11 @@ export class AccountLibraryPageComponent implements OnInit {
     }
   }
 
+  /** A multi-line code is a whole account block (email, security details, 2FA codes...), shown as lines, not one clipped line. */
+  protected isMultiline(item: CustomerLibraryItemApiDto): boolean {
+    return this.displayKey(item).includes('\n') || item.maskedLicenseKey.includes('(multi-line)');
+  }
+
   protected displayKey(item: CustomerLibraryItemApiDto): string {
     return this.isKeyRevealed(item.id)
       ? (this.facade.getRevealedKey(item.id) ?? item.maskedLicenseKey)

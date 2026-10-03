@@ -1685,7 +1685,7 @@ export class ProductEditorFacade {
 
 
 
-  async importCodes(codes: readonly string[], batchId?: string): Promise<ImportCodesResultDto | null> {
+  async importCodes(codes: readonly string[], batchId?: string, note?: string | null): Promise<ImportCodesResultDto | null> {
 
     const variant = this.selectedVariant();
 
@@ -1707,7 +1707,7 @@ export class ProductEditorFacade {
 
     try {
 
-      const result = await firstValueFrom(this.inventoryApi.importCodes(variant.id, batch.id, { codes }));
+      const result = await firstValueFrom(this.inventoryApi.importCodes(variant.id, batch.id, { codes, note: note ?? null }));
 
       await this.reloadInventory(productId);
 

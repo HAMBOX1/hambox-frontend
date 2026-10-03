@@ -239,6 +239,8 @@ export interface CreateBatchRequest {
 
 export interface ImportCodesRequest {
   readonly codes: readonly string[];
+  /** Optional internal note stored on every code in this import. */
+  readonly note?: string | null;
 }
 
 export interface ImportCodeDuplicateDto {

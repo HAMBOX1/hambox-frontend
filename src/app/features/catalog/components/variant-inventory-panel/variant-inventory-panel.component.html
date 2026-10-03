@@ -25,17 +25,32 @@
         </label>
       </div>
 
-      <label for="bulk-codes">Paste codes (one per line)</label>
+      <label for="bulk-codes">{{ multiLine() ? 'Paste the full code (all lines = one product)' : 'Paste codes (one per line)' }}</label>
       <textarea
         id="bulk-codes"
         pTextarea
         class="variant-inventory-panel__codes-textarea"
         rows="6"
         wrap="off"
-        placeholder="XXXX-XXXX-XXXX"
+        [placeholder]="multiLine() ? 'Email: ...&#10;Password: ...&#10;Security email: ...&#10;2FA codes: ...' : 'XXXX-XXXX-XXXX'"
         [ngModel]="bulkCodes()"
         (ngModelChange)="bulkCodes.set($event)"
       ></textarea>
+
+      <label class="variant-inventory-panel__multiline-toggle" for="multi-line-code">
+        <p-checkbox inputId="multi-line-code" [binary]="true" [ngModel]="multiLine()" (ngModelChange)="multiLine.set($event)" />
+        <span>Multi-line code: treat everything above as ONE code (one product), not one code per line</span>
+      </label>
+
+      <label for="code-note">Note for these codes (optional, internal)</label>
+      <input
+        id="code-note"
+        pInputText
+        type="text"
+        maxlength="500"
+        [ngModel]="codeNote()"
+        (ngModelChange)="codeNote.set($event)"
+      />
 
       <button
         type="button"

@@ -187,9 +187,13 @@
       </p>
     }
 
-    <div class="library-card__code" [class.library-card__code--revealed]="isKeyRevealed(item.id)">
+    <div
+      class="library-card__code"
+      [class.library-card__code--revealed]="isKeyRevealed(item.id)"
+      [class.library-card__code--multiline]="isMultiline(item)"
+    >
       <i class="pi pi-shield" aria-hidden="true"></i>
-      <code [title]="displayKey(item)">{{ displayKey(item) }}</code>
+      <code [title]="isMultiline(item) ? '' : displayKey(item)">{{ displayKey(item) }}</code>
       <button
         type="button"
         class="library-card__eye"

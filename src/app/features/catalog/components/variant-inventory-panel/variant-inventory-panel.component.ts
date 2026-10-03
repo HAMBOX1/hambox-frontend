@@ -130,6 +130,11 @@ export class VariantInventoryPanelComponent {
   protected readonly batchName = signal('');
   protected readonly importNotes = signal('');
 
+  /** Multi-line mode: the whole pasted text is ONE code (e.g. an account with email, security email, 2FA codes...). */
+  protected readonly multiLine = signal(false);
+  /** Optional internal note stored on every code imported in this go. */
+  protected readonly codeNote = signal('');
+
   /** True once codes are typed/pasted/uploaded and (if grouping is on) a batch name is set — gates the Import button. */
   protected readonly canImport = computed(() => {
     if (!this.bulkCodes().trim()) {
@@ -241,7 +246,9 @@ export class VariantInventoryPanelComponent {
       return;
     }
 
-    const codes = raw.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const codes = this.multiLine()
+      ? [raw.split(/\r?\n/).map((line) => line.trimEnd()).join('\n').trim()]
+      : raw.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 
     this.importing.set(true);
     try {
@@ -258,9 +265,10 @@ export class VariantInventoryPanelComponent {
         return;
       }
 
-      const result = await this.facade.importCodes(codes);
+      const result = await this.facade.importCodes(codes, undefined, this.codeNote().trim() || null);
       if (result) {
         this.bulkCodes.set('');
+        this.codeNote.set('');
         if (grouping) {
           this.batchName.set('');
         }

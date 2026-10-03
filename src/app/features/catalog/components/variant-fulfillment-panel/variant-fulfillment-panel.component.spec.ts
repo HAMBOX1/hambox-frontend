@@ -1,7 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal, WritableSignal } from '@angular/core';
 import { provideTranslateService } from '@ngx-translate/core';
 
+import { API_BASE_URL } from '../../../../core/tokens/api-base-url.token';
 import { PermissionService } from '../../../../core/permissions/permission.service';
 import { SupplierFulfillmentChainCandidateDto } from '../../../admin/suppliers/models/supplier.model';
 import { SuppliersManagementFacade } from '../../../admin/suppliers/services/suppliers-management.facade';
@@ -54,6 +57,8 @@ class FakeSuppliersManagementFacade {
   readonly fulfillmentChainError: WritableSignal<string | null> = signal(null);
   readonly loadFulfillmentChain = vi.fn().mockResolvedValue(undefined);
   readonly clearFulfillmentChain = vi.fn();
+  readonly loadSuppliers = vi.fn().mockResolvedValue(undefined);
+  readonly list = signal<{ items: readonly { id: string; isEnabled: boolean }[] } | null>(null);
   readonly reorderFulfillmentChainPriorities = vi.fn().mockResolvedValue(true);
 }
 
@@ -74,6 +79,9 @@ describe('VariantFulfillmentPanelComponent', () => {
       imports: [VariantFulfillmentPanelComponent],
       providers: [
         provideTranslateService({ lang: 'en', fallbackLang: 'en' }),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: API_BASE_URL, useValue: '' },
         { provide: ProductEditorFacade, useValue: facade },
         { provide: PermissionService, useValue: { isOwner: () => canEdit, hasAnyPermission: () => canEdit } },
       ],
@@ -87,10 +95,10 @@ describe('VariantFulfillmentPanelComponent', () => {
     fixture.detectChanges();
   }
 
-  it('renders all four fulfillment modes', async () => {
+  it('renders all five fulfillment modes (incl. On Delivery)', async () => {
     await setup();
     const cards = fixture.nativeElement.querySelectorAll('.variant-fulfillment__mode-card');
-    expect(cards.length).toBe(4);
+    expect(cards.length).toBe(5);
   });
 
   it('highlights the currently selected mode', async () => {

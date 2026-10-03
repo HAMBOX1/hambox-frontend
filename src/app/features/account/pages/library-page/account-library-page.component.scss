@@ -654,3 +654,16 @@
     color: var(--color-cta-cart-text, #fff);
   }
 }
+
+// Multi-line codes (account details): keep every line visible instead of clipping to one ellipsised line.
+.library-card__code--multiline {
+  align-items: flex-start;
+
+  code {
+    white-space: pre-wrap;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-word;
+    line-height: 1.6;
+  }
+}
