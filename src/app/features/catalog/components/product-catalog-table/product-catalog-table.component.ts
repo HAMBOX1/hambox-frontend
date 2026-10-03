@@ -514,11 +514,12 @@ export class ProductCatalogTableComponent {
         }),
       );
       await this.loadVariantsFor(product.id);
-    } catch {
+    } catch (error) {
       this.messageService.add({
         severity: 'error',
         summary: 'Failed to update price',
-        detail: 'Please try again.',
+        detail: this.errorDetail(error),
+        life: 6000,
       });
     }
   }
@@ -746,6 +747,10 @@ export class ProductCatalogTableComponent {
     }
   }
 
+  private errorDetail(error: unknown): string {
+    return error instanceof ApiError && error.message ? error.message : 'Please try again.';
+  }
+
   /** Applies a cost / member price to every variant of the product (clearing the field unsets it everywhere). */
   private async saveTier(product: Product, field: 'cost' | 'member', value: number | null): Promise<void> {
     const tiers = product.priceTiers;
@@ -777,8 +782,8 @@ export class ProductCatalogTableComponent {
         life: 2500,
       });
       this.productPricesChanged.emit();
-    } catch {
-      this.messageService.add({ severity: 'error', summary: 'Failed to update the price', detail: 'Please try again.', life: 5000 });
+    } catch (error) {
+      this.messageService.add({ severity: 'error', summary: 'Failed to update the price', detail: this.errorDetail(error), life: 6000 });
     }
   }
 
