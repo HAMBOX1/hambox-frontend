@@ -11,6 +11,13 @@
         />
       </div>
 
+      @if (savedInstantCodes() > 0) {
+        <p class="variant-fulfillment__saved-note">
+          <i class="pi pi-lock" aria-hidden="true"></i>
+          {{ 'ADMIN.FULFILLMENT.SAVED_INSTANT_NOTE' | translate: { count: savedInstantCodes() } }}
+        </p>
+      }
+
       <div
         class="variant-fulfillment__modes"
         role="radiogroup"

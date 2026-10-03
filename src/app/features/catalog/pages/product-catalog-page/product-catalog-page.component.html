@@ -360,6 +360,19 @@
       Delivered instantly from the product's stocked digital codes. Import codes from the product's stock page; with no codes it shows as out of stock.
     </p>
   }
+  @if (hidesInstantStock()) {
+    <div class="admin-dialog__error" role="alert">
+      <strong>⛔ This product has {{ chatDeliveryTarget()?.availableStock }} instant code(s) in stock.</strong>
+      <p>
+        Switching to On-Delivery hides them from customers. They are <strong>not deleted</strong>: they stay saved for you,
+        and choosing Instant stock again makes them available once more.
+      </p>
+      <label style="display:flex;align-items:center;gap:.5rem">
+        <input type="checkbox" [checked]="instantStockAcknowledged()" (change)="instantStockAcknowledged.set($any($event.target).checked)" />
+        <span>I understand, switch to On-Delivery</span>
+      </label>
+    </div>
+  }
   @if (chatDeliveryError(); as error) {
     <p class="admin-dialog__error">{{ error }}</p>
   }
@@ -377,6 +390,7 @@
       label="Save"
       icon="pi pi-check"
       [loading]="actionLoading()"
+      [disabled]="hidesInstantStock() && !instantStockAcknowledged()"
       (click)="confirmChatDelivery()"
     ></button>
   </div>

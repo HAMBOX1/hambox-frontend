@@ -83,3 +83,11 @@
   font-weight: 700;
   color: var(--admin-color-text-primary, var(--color-text-primary));
 }
+
+.variant-fulfillment__saved-note {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgb(250 204 21 / 12%);
+  font-size: 0.8125rem;
+}

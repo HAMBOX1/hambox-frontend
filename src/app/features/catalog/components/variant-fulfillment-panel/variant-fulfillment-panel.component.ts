@@ -92,6 +92,12 @@ export class VariantFulfillmentPanelComponent {
     return mode === 'ManualFirst' || mode === 'SupplierFirst' || mode === 'SupplierOnly';
   });
 
+  /** Instant codes that are still saved on a variant that is currently On-Delivery: hidden from customers, restorable. */
+  protected readonly savedInstantCodes = computed(() => {
+    const variant = this.selectedVariant();
+    return variant?.fulfillmentMode === 'ChatDelivery' ? variant.totalCodesCount : 0;
+  });
+
   protected readonly hasReadySupplier = computed(() => this.chain().some((c) => c.isReady));
 
   protected readonly drawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
@@ -188,6 +194,16 @@ export class VariantFulfillmentPanelComponent {
   protected onSelectMode(mode: FulfillmentMode): void {
     const variant = this.selectedVariant();
     if (!variant || this.saving() || mode === variant.fulfillmentMode) {
+      return;
+    }
+
+    if (mode === 'ChatDelivery' && variant.fulfillmentMode !== 'ChatDelivery' && variant.totalCodesCount > 0) {
+      // Instant stock is never deleted by this switch — it is kept for the admin and hidden from customers.
+      this.pendingMode = mode;
+      this.confirmMessage.set(
+        this.translate.instant('ADMIN.FULFILLMENT.CONFIRM.TO_CHAT_DELIVERY', { count: variant.totalCodesCount }),
+      );
+      this.confirmDialogOpen.set(true);
       return;
     }
 

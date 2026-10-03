@@ -5701,8 +5701,10 @@
       "CONFIRM": {
         "TITLE": "Change fulfillment mode?",
         "TO_SUPPLIER_ONLY": "This variant will no longer use manual inventory. Orders will depend entirely on the configured supplier chain.",
-        "TO_MANUAL_ONLY": "This variant will no longer attempt automated supplier fulfillment."
-      }
+        "TO_MANUAL_ONLY": "This variant will no longer attempt automated supplier fulfillment.",
+        "TO_CHAT_DELIVERY": "This variant has {{count}} instant code(s) in stock. Switching to On Delivery hides them from customers. They are NOT deleted: they stay saved for you, and switching back to Manual Only makes them available again. Continue?"
+      },
+      "SAVED_INSTANT_NOTE": "{{count}} instant code(s) are saved for you (hidden from customers). Switch back to Manual Only to sell them again."
     },
     "PAYMENT_GATEWAYS": {
       "LIST": {

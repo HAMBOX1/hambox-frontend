@@ -168,6 +168,19 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly chatDeliveryTarget = signal<Product | null>(null);
   protected readonly chatDeliveryCapacity = signal(100);
   protected readonly deliveryKind = signal<'chat' | 'instant'>('chat');
+  protected readonly instantStockAcknowledged = signal(false);
+
+  /** Switching a product that currently sells instant codes to On-Delivery: warn first. The codes are kept
+   * (hidden from customers) and come back when switching to Instant stock again. */
+  protected readonly hidesInstantStock = computed(() => {
+    const product = this.chatDeliveryTarget();
+    return (
+      this.deliveryKind() === 'chat' &&
+      !!product &&
+      !product.hasChatDeliveryVariant &&
+      (product.availableStock ?? 0) > 0
+    );
+  });
   protected readonly chatDeliveryError = this.facade.error;
   protected readonly mappingDrawerTarget = signal<SupplierCatalogSearchDrawerTarget | null>(null);
 
@@ -571,12 +584,17 @@ export class ProductCatalogPageComponent implements OnInit {
     this.chatDeliveryTarget.set(product);
     this.chatDeliveryCapacity.set(product.availableStock && product.hasChatDeliveryVariant ? product.availableStock : 100);
     this.deliveryKind.set('chat');
+    this.instantStockAcknowledged.set(false);
     this.chatDeliveryDialogOpen.set(true);
   }
 
   protected async confirmChatDelivery(): Promise<void> {
     const product = this.chatDeliveryTarget();
     if (!product) {
+      return;
+    }
+
+    if (this.hidesInstantStock() && !this.instantStockAcknowledged()) {
       return;
     }
 
