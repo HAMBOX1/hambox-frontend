@@ -1,5 +1,35 @@
-<div class="fab-wrap" [class.hidden]="facade.isOpen()">
+@if (fabDocked() && !facade.isOpen()) {
+  <button
+    type="button"
+    class="fab-edge"
+    [class.fab-edge--end]="dockSide() === 'end'"
+    [style.top.px]="dockTop()"
+    [attr.aria-label]="'ASSISTANT.FAB_SHOW' | translate"
+    (click)="undockFab()"
+  >
+    <i class="pi" [class.pi-chevron-left]="dockSide() === 'end'" [class.pi-chevron-right]="dockSide() === 'start'"></i>
+  </button>
+}
+
+<div
+  #fabWrap
+  class="fab-wrap"
+  [class.hidden]="facade.isOpen() || fabDocked()"
+  [class.fab-wrap--custom]="fabPos() !== null"
+  [class.fab-wrap--dragging]="dragging()"
+  [style.left.px]="fabPos()?.x"
+  [style.top.px]="fabPos()?.y"
+>
   <div class="fab-tooltip">{{ 'ASSISTANT.FAB_TOOLTIP' | translate }}</div>
+  <button
+    type="button"
+    class="fab-hide"
+    [attr.aria-label]="'ASSISTANT.FAB_HIDE' | translate"
+    (click)="dockFab($event)"
+    (pointerdown)="$event.stopPropagation()"
+  >
+    <i class="pi pi-times"></i>
+  </button>
   <button
     type="button"
     class="fab"
@@ -7,6 +37,10 @@
     [attr.aria-label]="'ASSISTANT.FAB_TOOLTIP' | translate"
     aria-haspopup="dialog"
     (click)="onFabClick()"
+    (pointerdown)="onFabPointerDown($event)"
+    (pointermove)="onFabPointerMove($event)"
+    (pointerup)="onFabPointerUp($event)"
+    (pointercancel)="onFabPointerUp($event)"
   >
     <i class="pi pi-comments"></i>
     <span class="fab-sparkle"><i class="pi pi-sparkles"></i></span>

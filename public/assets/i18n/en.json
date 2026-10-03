@@ -5830,6 +5830,8 @@
     "TOAST_DOWNLOADING_LICENSE": "Downloading license file…",
     "TOAST_OPENING_INSTRUCTIONS": "Opening activation guide…",
     "TOAST_CONNECTING_SUPPORT": "Connecting you to support…",
-    "TOAST_ISSUE_REPORTED": "Issue reported — thank you"
+    "TOAST_ISSUE_REPORTED": "Issue reported — thank you",
+    "FAB_HIDE": "Hide chat button",
+    "FAB_SHOW": "Show chat button"
   }
 }

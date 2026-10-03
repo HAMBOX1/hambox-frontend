@@ -20,6 +20,21 @@ $mobile: 767px;
     display: none;
   }
 
+  // Once the user has dragged the button somewhere, left/top (set inline) take over from the default corner.
+  &.fab-wrap--custom {
+    inset-inline-end: auto;
+    bottom: auto;
+  }
+
+  &.fab-wrap--dragging {
+    transition: none;
+    cursor: grabbing;
+
+    .fab-tooltip {
+      display: none;
+    }
+  }
+
   @media (max-width: $mobile) {
     inset-inline-end: 16px;
     bottom: calc(80px + env(safe-area-inset-bottom, 0px) + var(--hambox-buy-bar-inset, 0px));
@@ -637,5 +652,65 @@ $mobile: 767px;
   .toast {
     animation: none !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+.fab {
+  touch-action: none;
+}
+
+// Small x that tucks the floating button away into the edge tab.
+.fab-hide {
+  all: unset;
+  position: absolute;
+  bottom: -4px;
+  inset-inline-start: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-panel-bg);
+  color: var(--color-text-secondary, var(--color-text-primary));
+  border: 1px solid var(--color-border);
+  box-shadow: var(--color-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+
+  i {
+    font-size: 10px;
+  }
+}
+
+// The thin tab the button collapses into: hugs the screen edge nearest to where it was.
+.fab-edge {
+  all: unset;
+  position: fixed;
+  left: 0;
+  z-index: 200;
+  width: 20px;
+  height: 64px;
+  border-radius: 0 12px 12px 0;
+  background: linear-gradient(
+    160deg,
+    var(--color-cta-gradient-start),
+    var(--color-cta-gradient-end)
+  );
+  color: var(--color-primary-text-on);
+  box-shadow: var(--color-shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  i {
+    font-size: 11px;
+  }
+
+  &.fab-edge--end {
+    left: auto;
+    right: 0;
+    border-radius: 12px 0 0 12px;
   }
 }

@@ -5691,6 +5691,8 @@
     "TOAST_DOWNLOADING_LICENSE": "جارٍ تنزيل ملف الترخيص…",
     "TOAST_OPENING_INSTRUCTIONS": "جارٍ فتح دليل التفعيل…",
     "TOAST_CONNECTING_SUPPORT": "جارٍ توصيلك بالدعم…",
-    "TOAST_ISSUE_REPORTED": "تم الإبلاغ عن المشكلة — شكرًا لك"
+    "TOAST_ISSUE_REPORTED": "تم الإبلاغ عن المشكلة — شكرًا لك",
+    "FAB_HIDE": "إخفاء زر المحادثة",
+    "FAB_SHOW": "إظهار زر المحادثة"
   }
 }
