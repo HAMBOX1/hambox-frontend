@@ -503,3 +503,35 @@
     border-bottom-color: transparent;
   }
 }
+
+// Switch in the price column header: pick which price the column shows (Sale / Cost / Member) or expand to all three.
+.price-switch {
+  display: inline-flex;
+  gap: 0.125rem;
+  margin-inline-start: 0.5rem;
+  vertical-align: middle;
+}
+
+.price-switch__btn {
+  all: unset;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.is-active {
+    background: var(--admin-accent-blue, #2563eb);
+    border-color: var(--admin-accent-blue, #2563eb);
+    color: #fff;
+  }
+}
+
+.price-switch__btn--mode {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.25rem;
+  padding: 0;
+}

@@ -199,7 +199,20 @@ export class ProductCatalogTableComponent {
   /** Inline rename of a variant's option-describing label (see `variantDisplayLabel`) — mirrors
    * the product name's dblclick-to-edit above, scoped to variant ids instead of product ids. */
   protected readonly editingVariantId = signal<string | null>(null);
-  protected readonly variantPriceFields: readonly VariantPriceField[] = ['cost', 'sale', 'member'];
+  protected readonly priceFieldOptions: readonly { id: VariantPriceField; label: string }[] = [
+    { id: 'sale', label: 'Sale' },
+    { id: 'cost', label: 'Cost' },
+    { id: 'member', label: 'Member' },
+  ];
+
+  /** "single": one price column with a Sale / Cost / Member switch (compact, good on phones);
+   * "all": three separate columns. The choice is remembered on this device. */
+  protected readonly priceMode = signal<'single' | 'all'>(this.initialPriceMode());
+  protected readonly priceView = signal<VariantPriceField>(this.initialPriceView());
+  protected readonly visiblePriceFields = computed<readonly VariantPriceField[]>(() =>
+    this.priceMode() === 'all' ? ['sale', 'cost', 'member'] : [this.priceView()],
+  );
+  protected readonly tableColspan = computed(() => 9 + (this.priceMode() === 'all' ? 2 : 0));
   protected readonly editingVariantPrice = signal<{ variantId: string; field: VariantPriceField } | null>(null);
   protected readonly variantPriceDraft = signal<number | null>(null);
   protected readonly editVariantDraftText = signal('');
@@ -442,6 +455,67 @@ export class ProductCatalogTableComponent {
         next.delete(productId);
         return next;
       });
+    }
+  }
+
+  protected priceFieldLabel(field: VariantPriceField): string {
+    return this.priceFieldOptions.find((option) => option.id === field)?.label ?? field;
+  }
+
+  protected setPriceView(view: VariantPriceField): void {
+    this.priceView.set(view);
+    this.persistPricePrefs();
+  }
+
+  protected togglePriceMode(): void {
+    this.priceMode.update((mode) => (mode === 'single' ? 'all' : 'single'));
+    this.persistPricePrefs();
+  }
+
+  protected isEditingTier(productId: string, field: VariantPriceField): boolean {
+    return field !== 'sale' && this.isEditing(productId, field);
+  }
+
+  protected startTierEdit(product: Product, field: VariantPriceField, event: Event): void {
+    if (field !== 'sale') {
+      this.startEdit(product, field, event);
+    }
+  }
+
+  protected productTierText(product: Product, field: VariantPriceField): string {
+    const tiers = product.priceTiers;
+    return field === 'cost'
+      ? this.tierRange(tiers?.costMin, tiers?.costMax)
+      : this.tierRange(tiers?.memberMin, tiers?.memberMax);
+  }
+
+  private initialPriceMode(): 'single' | 'all' {
+    const stored = this.readPricePrefs();
+    if (stored?.mode) {
+      return stored.mode;
+    }
+
+    return typeof window !== 'undefined' && window.innerWidth < 900 ? 'single' : 'all';
+  }
+
+  private initialPriceView(): VariantPriceField {
+    return this.readPricePrefs()?.view ?? 'sale';
+  }
+
+  private readPricePrefs(): { mode?: 'single' | 'all'; view?: VariantPriceField } | null {
+    try {
+      const raw = localStorage.getItem('hambox.admin.priceColumns');
+      return raw ? (JSON.parse(raw) as { mode?: 'single' | 'all'; view?: VariantPriceField }) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private persistPricePrefs(): void {
+    try {
+      localStorage.setItem('hambox.admin.priceColumns', JSON.stringify({ mode: this.priceMode(), view: this.priceView() }));
+    } catch {
+      // Best effort only.
     }
   }
 

@@ -30,11 +30,57 @@
           </th>
           <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
           <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
-          <th pSortableColumn="price" class="product-catalog-table__price-head">
-            Sale <p-sortIcon field="price" />
-          </th>
-          <th class="product-catalog-table__tier-head">Cost</th>
-          <th class="product-catalog-table__tier-head">Member</th>
+          @for (field of visiblePriceFields(); track field; let first = $first) {
+            @if (field === 'sale') {
+              <th pSortableColumn="price" class="product-catalog-table__price-head">
+                {{ priceFieldLabel(field) }} <p-sortIcon field="price" />
+              @if (first) {
+                <span class="price-switch" (click)="$event.stopPropagation()">
+                  @if (priceMode() === 'single') {
+                    @for (option of priceFieldOptions; track option.id) {
+                      <button
+                        type="button"
+                        class="price-switch__btn"
+                        [class.is-active]="priceView() === option.id"
+                        (click)="setPriceView(option.id)"
+                      >{{ option.label }}</button>
+                    }
+                  }
+                  <button
+                    type="button"
+                    class="price-switch__btn price-switch__btn--mode"
+                    [attr.title]="priceMode() === 'single' ? 'Show Sale, Cost and Member as separate columns' : 'Show one price column with a switch'"
+                    (click)="togglePriceMode()"
+                  ><i class="pi" [class.pi-table]="priceMode() === 'single'" [class.pi-minus]="priceMode() === 'all'" aria-hidden="true"></i></button>
+                </span>
+              }
+              </th>
+            } @else {
+              <th class="product-catalog-table__tier-head">
+                {{ priceFieldLabel(field) }}
+              @if (first) {
+                <span class="price-switch" (click)="$event.stopPropagation()">
+                  @if (priceMode() === 'single') {
+                    @for (option of priceFieldOptions; track option.id) {
+                      <button
+                        type="button"
+                        class="price-switch__btn"
+                        [class.is-active]="priceView() === option.id"
+                        (click)="setPriceView(option.id)"
+                      >{{ option.label }}</button>
+                    }
+                  }
+                  <button
+                    type="button"
+                    class="price-switch__btn price-switch__btn--mode"
+                    [attr.title]="priceMode() === 'single' ? 'Show Sale, Cost and Member as separate columns' : 'Show one price column with a switch'"
+                    (click)="togglePriceMode()"
+                  ><i class="pi" [class.pi-table]="priceMode() === 'single'" [class.pi-minus]="priceMode() === 'all'" aria-hidden="true"></i></button>
+                </span>
+              }
+              </th>
+            }
+          }
           <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
           <th>Internal Categories</th>
           <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
@@ -152,82 +198,59 @@
               }
             </div>
           </td>
-          <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
-            @if (isEditing(product.id, 'price')) {
-              <p-inputNumber
-                class="product-catalog-table__edit-number"
-                [ngModel]="editDraftNumber()"
-                (ngModelChange)="editDraftNumber.set($event)"
-                (keydown.enter)="saveEdit(product)"
-                (keydown.escape)="cancelEdit()"
-                (onBlur)="saveEdit(product)"
-                mode="currency"
-                currency="USD"
-                [minFractionDigits]="2"
-                autofocus
-              />
+          @for (field of visiblePriceFields(); track field) {
+            @if (field === 'sale') {
+              <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
+                @if (isEditing(product.id, 'price')) {
+                  <p-inputNumber
+                    class="product-catalog-table__edit-number"
+                    [ngModel]="editDraftNumber()"
+                    (ngModelChange)="editDraftNumber.set($event)"
+                    (keydown.enter)="saveEdit(product)"
+                    (keydown.escape)="cancelEdit()"
+                    (onBlur)="saveEdit(product)"
+                    mode="currency"
+                    currency="USD"
+                    [minFractionDigits]="2"
+                    autofocus
+                  />
+                } @else {
+                  <span class="admin-cell-primary" (click)="startEdit(product, 'price', $event)">{{
+                    product.price | hamboxCurrency
+                  }}</span>
+                }
+              </td>
             } @else {
-              <span class="admin-cell-primary" (click)="startEdit(product, 'price', $event)">{{
-                product.price | hamboxCurrency
-              }}</span>
+            <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
+              @if (isEditingTier(product.id, field)) {
+                <p-inputNumber
+                  class="product-catalog-table__edit-number"
+                  [ngModel]="editDraftNumber()"
+                  (ngModelChange)="editDraftNumber.set($event)"
+                  (keydown.enter)="saveEdit(product)"
+                  (keydown.escape)="cancelEdit()"
+                  (onBlur)="saveEdit(product)"
+                  mode="currency"
+                  currency="USD"
+                  [minFractionDigits]="2"
+                  [min]="0"
+                  autofocus
+                />
+              } @else {
+                <span
+                  class="admin-cell-primary product-catalog-table__tier-value"
+                  [class.product-catalog-table__tier-value--disabled]="(product.variantCount ?? 0) === 0"
+                  role="button"
+                  tabindex="0"
+                  [attr.title]="(product.variantCount ?? 0) > 1 ? 'Edits all ' + product.variantCount + ' variants' : null"
+                  (click)="startTierEdit(product, field, $event)"
+                  (keydown.enter)="startTierEdit(product, field, $event)"
+                  >{{ productTierText(product, field) }}</span
+                >
+              }
+            </td>
             }
-          </td>
-          <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
-            @if (isEditing(product.id, 'cost')) {
-              <p-inputNumber
-                class="product-catalog-table__edit-number"
-                [ngModel]="editDraftNumber()"
-                (ngModelChange)="editDraftNumber.set($event)"
-                (keydown.enter)="saveEdit(product)"
-                (keydown.escape)="cancelEdit()"
-                (onBlur)="saveEdit(product)"
-                mode="currency"
-                currency="USD"
-                [minFractionDigits]="2"
-                [min]="0"
-                autofocus
-              />
-            } @else {
-              <span
-                class="admin-cell-primary product-catalog-table__tier-value"
-                [class.product-catalog-table__tier-value--disabled]="(product.variantCount ?? 0) === 0"
-                role="button"
-                tabindex="0"
-                [attr.title]="(product.variantCount ?? 0) > 1 ? 'Edits all ' + product.variantCount + ' variants' : null"
-                (click)="startEdit(product, 'cost', $event)"
-                (keydown.enter)="startEdit(product, 'cost', $event)"
-                >{{ tierRange(product.priceTiers?.costMin, product.priceTiers?.costMax) }}</span
-              >
-            }
-          </td>
-          <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
-            @if (isEditing(product.id, 'member')) {
-              <p-inputNumber
-                class="product-catalog-table__edit-number"
-                [ngModel]="editDraftNumber()"
-                (ngModelChange)="editDraftNumber.set($event)"
-                (keydown.enter)="saveEdit(product)"
-                (keydown.escape)="cancelEdit()"
-                (onBlur)="saveEdit(product)"
-                mode="currency"
-                currency="USD"
-                [minFractionDigits]="2"
-                [min]="0"
-                autofocus
-              />
-            } @else {
-              <span
-                class="admin-cell-primary product-catalog-table__tier-value"
-                [class.product-catalog-table__tier-value--disabled]="(product.variantCount ?? 0) === 0"
-                role="button"
-                tabindex="0"
-                [attr.title]="(product.variantCount ?? 0) > 1 ? 'Edits all ' + product.variantCount + ' variants' : null"
-                (click)="startEdit(product, 'member', $event)"
-                (keydown.enter)="startEdit(product, 'member', $event)"
-                >{{ tierRange(product.priceTiers?.memberMin, product.priceTiers?.memberMax) }}</span
-              >
-            }
-          </td>
+          }
           <td
             class="product-catalog-table__category-cell"
             [class.product-catalog-table__category-cell--active]="isCategoryPopoverOpenFor(product.id)"
@@ -393,7 +416,7 @@
 
         @if (hasExpandableVariants(product) && isVariantsExpanded(product.id)) {
           <tr class="product-catalog-table__variant-panel-row">
-            <td colspan="11">
+            <td [attr.colspan]="tableColspan()">
               <div class="product-catalog-table__variant-panel">
                 @if (isVariantsLoading(product.id)) {
                   <span class="product-catalog-table__variant-panel-status">Loading variants…</span>
@@ -415,9 +438,9 @@
                       <tr>
                         <th style="width: 2rem"></th>
                         <th>Variant</th>
-                        <th>Cost</th>
-                        <th>Sale</th>
-                        <th>Member</th>
+                        @for (field of visiblePriceFields(); track field) {
+                          <th>{{ priceFieldLabel(field) }}</th>
+                        }
                         <th>Available</th>
                         <th>Status</th>
                       </tr>
@@ -452,7 +475,7 @@
                               >
                             }
                           </td>
-                          @for (field of variantPriceFields; track field) {
+                          @for (field of visiblePriceFields(); track field) {
                             <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
                               @if (isEditingVariantPrice(variant.id, field)) {
                                 <p-inputNumber
@@ -518,7 +541,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="11">
+          <td [attr.colspan]="tableColspan()">
             <app-admin-empty-state
               icon="pi pi-inbox"
               [title]="searchActive() ? 'No matching products' : 'No products yet'"
