@@ -54,7 +54,7 @@ import { InventoryApiService } from '../../services/inventory-api.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
-type EditableField = 'name' | 'price';
+type EditableField = 'name' | 'price' | 'cost' | 'member';
 type VariantPriceField = 'cost' | 'sale' | 'member';
 
 const STATUS_EDIT_OPTIONS: readonly ProductStatus[] = ['Draft', 'Active', 'Inactive', 'Archived'];
@@ -162,6 +162,8 @@ export class ProductCatalogTableComponent {
   /** The star toggle next to the product name — a personal admin bookmark, unrelated to status. */
   readonly favoriteToggle = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
+  /** Emitted after a product-level cost / member price edit was saved, so the list can reload. */
+  readonly productPricesChanged = output<void>();
   readonly statusEdit = output<ProductStatusEdit>();
   /** Emitted after a category is created inline from the popover, so the parent facade can refresh its category list. */
   readonly categoryCreated = output<void>();
@@ -669,7 +671,23 @@ export class ProductCatalogTableComponent {
       return;
     }
 
-    if (field === 'name') {
+    if (field === 'cost' || field === 'member') {
+      if ((product.variantCount ?? 0) === 0) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Add a variant first',
+          detail: 'Cost and member prices live on the product variants.',
+          life: 3500,
+        });
+        return;
+      }
+
+      const tiers = product.priceTiers;
+      const min = field === 'cost' ? tiers?.costMin : tiers?.memberMin;
+      const max = field === 'cost' ? tiers?.costMax : tiers?.memberMax;
+      // One common value pre-fills; mixed values start empty so nothing is overwritten by accident.
+      this.editDraftNumber.set(min != null && min === max ? min : null);
+    } else if (field === 'name') {
       this.editDraftText.set(product.nameEn);
     } else {
       this.editDraftNumber.set(product.price);
@@ -717,9 +735,50 @@ export class ProductCatalogTableComponent {
       return;
     }
 
+    if (cell.field === 'cost' || cell.field === 'member') {
+      void this.saveTier(product, cell.field, this.editDraftNumber());
+      return;
+    }
+
     const value = this.editDraftNumber();
     if (value !== null && value !== product.price) {
       this.fieldEdit.emit({ product, price: value });
+    }
+  }
+
+  /** Applies a cost / member price to every variant of the product (clearing the field unsets it everywhere). */
+  private async saveTier(product: Product, field: 'cost' | 'member', value: number | null): Promise<void> {
+    const tiers = product.priceTiers;
+    const min = field === 'cost' ? tiers?.costMin : tiers?.memberMin;
+    const max = field === 'cost' ? tiers?.costMax : tiers?.memberMax;
+
+    if ((min ?? null) === (max ?? null) && (min ?? null) === value) {
+      return;
+    }
+
+    const variantCount = product.variantCount ?? 0;
+    const mixed = min != null && max != null && min !== max;
+    if (variantCount > 1 && (mixed || value === null) && min != null) {
+      const label = field === 'cost' ? 'cost' : 'member';
+      const message = value === null
+        ? `Clear the ${label} price on all ${variantCount} variants of “${product.nameEn}”?`
+        : `Set the ${label} price to $${value.toFixed(2)} on all ${variantCount} variants of “${product.nameEn}”? They currently differ.`;
+      if (!confirm(message)) {
+        return;
+      }
+    }
+
+    try {
+      const changed = await firstValueFrom(this.inventoryApi.setProductVariantPrices(product.id, field, value));
+      this.messageService.add({
+        severity: 'success',
+        summary: `${field === 'cost' ? 'Cost' : 'Member'} price updated`,
+        detail: changed > 1 ? `Applied to ${changed} variants.` : undefined,
+        life: 2500,
+      });
+      this.productPricesChanged.emit();
+    } catch {
+      this.messageService.add({ severity: 'error', summary: 'Failed to update the price', detail: 'Please try again.', life: 5000 });
     }
   }
 

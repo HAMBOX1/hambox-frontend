@@ -445,6 +445,10 @@ export class ProductCatalogPageComponent implements OnInit {
     await this.onFieldEdit({ product: event.product, collectionIds: event.collectionIds });
   }
 
+  protected reloadProducts(): void {
+    void this.facade.reload();
+  }
+
   protected async onFieldEdit(edit: ProductFieldEdit): Promise<void> {
     const { product, ...patch } = edit;
     const success = await this.facade.updateProductInline(product, patch);

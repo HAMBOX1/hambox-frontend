@@ -31,7 +31,7 @@
           <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
           <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
           <th pSortableColumn="price" class="product-catalog-table__price-head">
-            Price <p-sortIcon field="price" />
+            Sale <p-sortIcon field="price" />
           </th>
           <th class="product-catalog-table__tier-head">Cost</th>
           <th class="product-catalog-table__tier-head">Member</th>
@@ -172,8 +172,62 @@
               }}</span>
             }
           </td>
-          <td class="product-catalog-table__tier-cell">{{ tierRange(product.priceTiers?.costMin, product.priceTiers?.costMax) }}</td>
-          <td class="product-catalog-table__tier-cell">{{ tierRange(product.priceTiers?.memberMin, product.priceTiers?.memberMax) }}</td>
+          <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
+            @if (isEditing(product.id, 'cost')) {
+              <p-inputNumber
+                class="product-catalog-table__edit-number"
+                [ngModel]="editDraftNumber()"
+                (ngModelChange)="editDraftNumber.set($event)"
+                (keydown.enter)="saveEdit(product)"
+                (keydown.escape)="cancelEdit()"
+                (onBlur)="saveEdit(product)"
+                mode="currency"
+                currency="USD"
+                [minFractionDigits]="2"
+                [min]="0"
+                autofocus
+              />
+            } @else {
+              <span
+                class="admin-cell-primary product-catalog-table__tier-value"
+                [class.product-catalog-table__tier-value--disabled]="(product.variantCount ?? 0) === 0"
+                role="button"
+                tabindex="0"
+                [attr.title]="(product.variantCount ?? 0) > 1 ? 'Edits all ' + product.variantCount + ' variants' : null"
+                (click)="startEdit(product, 'cost', $event)"
+                (keydown.enter)="startEdit(product, 'cost', $event)"
+                >{{ tierRange(product.priceTiers?.costMin, product.priceTiers?.costMax) }}</span
+              >
+            }
+          </td>
+          <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
+            @if (isEditing(product.id, 'member')) {
+              <p-inputNumber
+                class="product-catalog-table__edit-number"
+                [ngModel]="editDraftNumber()"
+                (ngModelChange)="editDraftNumber.set($event)"
+                (keydown.enter)="saveEdit(product)"
+                (keydown.escape)="cancelEdit()"
+                (onBlur)="saveEdit(product)"
+                mode="currency"
+                currency="USD"
+                [minFractionDigits]="2"
+                [min]="0"
+                autofocus
+              />
+            } @else {
+              <span
+                class="admin-cell-primary product-catalog-table__tier-value"
+                [class.product-catalog-table__tier-value--disabled]="(product.variantCount ?? 0) === 0"
+                role="button"
+                tabindex="0"
+                [attr.title]="(product.variantCount ?? 0) > 1 ? 'Edits all ' + product.variantCount + ' variants' : null"
+                (click)="startEdit(product, 'member', $event)"
+                (keydown.enter)="startEdit(product, 'member', $event)"
+                >{{ tierRange(product.priceTiers?.memberMin, product.priceTiers?.memberMax) }}</span
+              >
+            }
+          </td>
           <td
             class="product-catalog-table__category-cell"
             [class.product-catalog-table__category-cell--active]="isCategoryPopoverOpenFor(product.id)"

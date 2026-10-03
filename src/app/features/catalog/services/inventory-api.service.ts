@@ -68,6 +68,11 @@ export class InventoryApiService {
     return this.api.get<readonly ProductVariantDto[]>(INVENTORY_API.productVariants(productId));
   }
 
+  /** Sets one price tier (cost / member) on every variant of the product; returns how many variants changed. */
+  setProductVariantPrices(productId: string, field: 'cost' | 'member', value: number | null): Observable<number> {
+    return this.api.put<number>(INVENTORY_API.productVariantPrices(productId), { field, value });
+  }
+
   createVariant(productId: string, request: CreateVariantRequest): Observable<string> {
     return this.api.post<string>(INVENTORY_API.productVariants(productId), request);
   }

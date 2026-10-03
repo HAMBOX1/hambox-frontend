@@ -132,9 +132,8 @@
 }
 
 .product-catalog-table__variant-price-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
+  // A table cell must stay display: table-cell; flex here made every price cell collapse into one stacked column.
+  vertical-align: middle;
   white-space: nowrap;
 }
 
@@ -485,4 +484,22 @@
 
 .product-catalog-table__variant-price-value--inherited {
   color: var(--admin-text-secondary);
+}
+
+.product-catalog-table__tier-value {
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+
+  &:hover {
+    border-bottom-color: var(--admin-text-secondary);
+  }
+}
+
+.product-catalog-table__tier-value--disabled {
+  cursor: default;
+  opacity: 0.55;
+
+  &:hover {
+    border-bottom-color: transparent;
+  }
 }
