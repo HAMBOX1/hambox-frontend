@@ -415,127 +415,148 @@
         </tr>
 
         @if (hasExpandableVariants(product) && isVariantsExpanded(product.id)) {
-          <tr class="product-catalog-table__variant-panel-row">
-            <td [attr.colspan]="tableColspan()">
-              <div class="product-catalog-table__variant-panel">
-                @if (isVariantsLoading(product.id)) {
-                  <span class="product-catalog-table__variant-panel-status">Loading variants…</span>
-                } @else if (variantsFor(product.id).length === 0) {
-                  <span class="product-catalog-table__variant-panel-status">No variants found.</span>
-                } @else {
-                  @if (selectedVariantCountFor(product.id); as selectedCount) {
-                    @if (selectedCount > 0) {
-                      <div class="product-catalog-table__variant-bulk-bar" (click)="$event.stopPropagation()">
-                        <span>{{ selectedCount }} selected</span>
-                        <button pButton type="button" label="Activate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Active')"></button>
-                        <button pButton type="button" label="Deactivate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Inactive')"></button>
-                        <button pButton type="button" label="Clear" size="small" text (click)="clearVariantSelection(product.id)"></button>
-                      </div>
+          @if (isVariantsLoading(product.id)) {
+            <tr class="product-catalog-table__variant-status-row">
+              <td [attr.colspan]="tableColspan()">Loading variants…</td>
+            </tr>
+          } @else if (variantsFor(product.id).length === 0) {
+            <tr class="product-catalog-table__variant-status-row">
+              <td [attr.colspan]="tableColspan()">No variants found.</td>
+            </tr>
+          } @else {
+            @if (selectedVariantCountFor(product.id); as selectedCount) {
+              <tr class="product-catalog-table__variant-status-row">
+                <td [attr.colspan]="tableColspan()" (click)="$event.stopPropagation()">
+                  <div class="product-catalog-table__variant-bulk-bar">
+                    <span>{{ selectedCount }} selected</span>
+                    <button pButton type="button" label="Activate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Active')"></button>
+                    <button pButton type="button" label="Deactivate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Inactive')"></button>
+                    <button pButton type="button" label="Clear" size="small" text (click)="clearVariantSelection(product.id)"></button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @for (variant of variantsFor(product.id); track variant.id) {
+              <tr class="product-catalog-table__variant-row" [routerLink]="'/admin/products/' + product.id + '/edit'">
+                <td (click)="$event.stopPropagation()">
+                  <p-checkbox
+                    [binary]="true"
+                    [ngModel]="isVariantSelected(variant.id)"
+                    (onChange)="toggleVariantSelection(variant.id, $event.checked)"
+                  />
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  <div class="product-catalog-table__variant-name-cell">
+                    @if (isEditingVariantLabel(variant.id)) {
+                      <input
+                        pInputText
+                        class="product-catalog-table__variant-edit-input"
+                        [ngModel]="editVariantDraftText()"
+                        (ngModelChange)="editVariantDraftText.set($event)"
+                        (keydown.enter)="saveEditVariantLabel(product.id, variant)"
+                        (keydown.escape)="cancelEditVariantLabel()"
+                        (blur)="saveEditVariantLabel(product.id, variant)"
+                        autofocus
+                      />
+                    } @else {
+                      <span
+                        class="product-catalog-table__variant-label"
+                        (dblclick)="startEditVariantLabel(product.id, variant, $event)"
+                        >{{ variantDisplayLabel(product.id, variant) }}</span
+                      >
                     }
-                  }
-                  <table class="product-catalog-table__variant-mini-table">
-                    <thead>
-                      <tr>
-                        <th style="width: 2rem"></th>
-                        <th>Variant</th>
-                        @for (field of visiblePriceFields(); track field) {
-                          <th>{{ priceFieldLabel(field) }}</th>
-                        }
-                        <th>Available</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (variant of variantsFor(product.id); track variant.id) {
-                        <tr [routerLink]="'/admin/products/' + product.id + '/edit'">
-                          <td (click)="$event.stopPropagation()">
-                            <p-checkbox
-                              [binary]="true"
-                              [ngModel]="isVariantSelected(variant.id)"
-                              (onChange)="toggleVariantSelection(variant.id, $event.checked)"
-                            />
-                          </td>
-                          <td (click)="$event.stopPropagation()">
-                            @if (isEditingVariantLabel(variant.id)) {
-                              <input
-                                pInputText
-                                class="product-catalog-table__variant-edit-input"
-                                [ngModel]="editVariantDraftText()"
-                                (ngModelChange)="editVariantDraftText.set($event)"
-                                (keydown.enter)="saveEditVariantLabel(product.id, variant)"
-                                (keydown.escape)="cancelEditVariantLabel()"
-                                (blur)="saveEditVariantLabel(product.id, variant)"
-                                autofocus
-                              />
-                            } @else {
-                              <span
-                                class="product-catalog-table__variant-label"
-                                (dblclick)="startEditVariantLabel(product.id, variant, $event)"
-                                >{{ variantDisplayLabel(product.id, variant) }}</span
-                              >
-                            }
-                          </td>
-                          @for (field of visiblePriceFields(); track field) {
-                            <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
-                              @if (isEditingVariantPrice(variant.id, field)) {
-                                <p-inputNumber
-                                  class="product-catalog-table__edit-number"
-                                  [ngModel]="variantPriceDraft()"
-                                  (ngModelChange)="variantPriceDraft.set($event)"
-                                  (keydown.enter)="saveVariantPrice(product, variant)"
-                                  (keydown.escape)="cancelVariantPrice()"
-                                  (onBlur)="saveVariantPrice(product, variant)"
-                                  mode="currency"
-                                  currency="USD"
-                                  [minFractionDigits]="2"
-                                  [min]="0"
-                                  autofocus
-                                />
-                              } @else {
-                                @let priceValue = variantPriceDisplay(variant, product, field);
-                                <span
-                                  class="product-catalog-table__variant-price-value"
-                                  [class.product-catalog-table__variant-price-value--inherited]="field === 'sale' && variant.priceOverride == null"
-                                  role="button"
-                                  tabindex="0"
-                                  (click)="startEditVariantPrice(product, variant, field, $event)"
-                                  (keydown.enter)="startEditVariantPrice(product, variant, field, $event)"
-                                  >{{ priceValue == null ? '—' : (priceValue | hamboxCurrency) }}</span
-                                >
-                              }
-                            </td>
-                          }
-                          <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
-                            <a
-                              class="product-catalog-table__variant-price-edit"
-                              [routerLink]="'/admin/products/' + product.id + '/edit'"
-                              [queryParams]="{ editVariant: variant.id }"
-                              fragment="variants"
-                              pTooltip="Edit price details"
-                              tooltipPosition="top"
-                              aria-label="Edit price details"
-                              ><i class="pi pi-pencil" aria-hidden="true"></i
-                            ></a>
-                          </td>
-                          <td>{{ variant.availableStock }}</td>
-                          <td
-                            class="product-catalog-table__variant-status-cell"
-                            role="button"
-                            tabindex="0"
-                            [attr.aria-label]="'Toggle status for ' + variantDisplayLabel(product.id, variant)"
-                            (click)="$event.stopPropagation(); toggleVariantStatus(product.id, variant)"
-                            (keydown.enter)="$event.stopPropagation(); toggleVariantStatus(product.id, variant)"
-                          >
-                            <app-admin-status-badge [label]="variantStatusLabel(variant.status)" [tone]="variantStatusTone(variant.status)" />
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
+                  </div>
+                </td>
+                <td (click)="onStockClick(product, $event)">
+                  <div class="product-catalog-table__stock-cell">
+                    <app-admin-status-badge
+                      class="product-catalog-table__stock-badge"
+                      [label]="variant.availableStock > 0
+                        ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: variant.availableStock })
+                        : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
+                      [tone]="variant.availableStock > 0 ? 'success' : 'danger'"
+                    />
+                    @if (variant.fulfillmentMode === 'ChatDelivery') {
+                      <i
+                        class="pi pi-comments product-catalog-table__chat-delivery-icon"
+                        pTooltip="On-Delivery — delivered manually via support chat"
+                        tooltipPosition="top"
+                        aria-hidden="true"
+                      ></i>
+                    } @else {
+                      <button
+                        *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+                        type="button"
+                        class="product-catalog-table__quick-chat-delivery"
+                        pTooltip="Quick-set as On-Delivery (no codes needed)"
+                        tooltipPosition="top"
+                        (click)="$event.stopPropagation(); setVariantChatDeliveryRequested.emit({ product, variant })"
+                      >
+                        <i class="pi pi-comments" aria-hidden="true"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
+                @for (field of visiblePriceFields(); track field) {
+                  <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
+                    @if (isEditingVariantPrice(variant.id, field)) {
+                      <p-inputNumber
+                        class="product-catalog-table__edit-number"
+                        [ngModel]="variantPriceDraft()"
+                        (ngModelChange)="variantPriceDraft.set($event)"
+                        (keydown.enter)="saveVariantPrice(product, variant)"
+                        (keydown.escape)="cancelVariantPrice()"
+                        (onBlur)="saveVariantPrice(product, variant)"
+                        mode="currency"
+                        currency="USD"
+                        [minFractionDigits]="2"
+                        [min]="0"
+                        autofocus
+                      />
+                    } @else {
+                      @let priceValue = variantPriceDisplay(variant, product, field);
+                      <span
+                        class="product-catalog-table__variant-price-value"
+                        [class.product-catalog-table__variant-price-value--inherited]="field === 'sale' && variant.priceOverride == null"
+                        role="button"
+                        tabindex="0"
+                        (click)="startEditVariantPrice(product, variant, field, $event)"
+                        (keydown.enter)="startEditVariantPrice(product, variant, field, $event)"
+                        >{{ priceValue == null ? '—' : (priceValue | hamboxCurrency) }}</span
+                      >
+                    }
+                  </td>
                 }
-              </div>
-            </td>
-          </tr>
+                <td></td>
+                <td></td>
+                <td
+                  class="product-catalog-table__variant-status-cell"
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-label]="'Toggle status for ' + variantDisplayLabel(product.id, variant)"
+                  (click)="$event.stopPropagation(); toggleVariantStatus(product.id, variant)"
+                  (keydown.enter)="$event.stopPropagation(); toggleVariantStatus(product.id, variant)"
+                >
+                  <app-admin-status-badge [label]="variantStatusLabel(variant.status)" [tone]="variantStatusTone(variant.status)" />
+                </td>
+                <td></td>
+                <td (click)="$event.stopPropagation()">
+                  <div class="admin-actions-row">
+                    <a
+                      class="product-catalog-table__variant-price-edit"
+                      [routerLink]="'/admin/products/' + product.id + '/edit'"
+                      [queryParams]="{ editVariant: variant.id }"
+                      fragment="variants"
+                      pTooltip="Edit variant details"
+                      tooltipPosition="top"
+                      aria-label="Edit variant details"
+                      ><i class="pi pi-pencil" aria-hidden="true"></i
+                    ></a>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
         }
       </ng-template>
 

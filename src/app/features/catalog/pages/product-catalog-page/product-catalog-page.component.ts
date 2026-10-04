@@ -6,7 +6,9 @@ import {
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
+import { ProductVariantDto } from '../../models/inventory-api.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -169,11 +171,24 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly chatDeliveryCapacity = signal(100);
   protected readonly deliveryKind = signal<'chat' | 'instant'>('chat');
   protected readonly instantStockAcknowledged = signal(false);
+  /** Set when the dialog was opened for one sub-product (variant) instead of the whole product. */
+  protected readonly chatDeliveryVariant = signal<ProductVariantDto | null>(null);
+  private readonly catalogTable = viewChild(ProductCatalogTableComponent);
+
+  protected readonly instantStockCount = computed(() => {
+    const variant = this.chatDeliveryVariant();
+    return variant ? variant.availableStock : (this.chatDeliveryTarget()?.availableStock ?? 0);
+  });
 
   /** Switching a product that currently sells instant codes to On-Delivery: warn first. The codes are kept
    * (hidden from customers) and come back when switching to Instant stock again. */
   protected readonly hidesInstantStock = computed(() => {
     const product = this.chatDeliveryTarget();
+    const variant = this.chatDeliveryVariant();
+    if (variant) {
+      return this.deliveryKind() === 'chat' && variant.fulfillmentMode !== 'ChatDelivery' && variant.availableStock > 0;
+    }
+
     return (
       this.deliveryKind() === 'chat' &&
       !!product &&
@@ -584,7 +599,17 @@ export class ProductCatalogPageComponent implements OnInit {
     }
   }
 
+  protected openVariantChatDeliveryDialog(event: { product: Product; variant: ProductVariantDto }): void {
+    this.chatDeliveryTarget.set(event.product);
+    this.chatDeliveryVariant.set(event.variant);
+    this.chatDeliveryCapacity.set(event.variant.fulfillmentMode === 'ChatDelivery' && event.variant.availableStock ? event.variant.availableStock : 100);
+    this.deliveryKind.set('chat');
+    this.instantStockAcknowledged.set(false);
+    this.chatDeliveryDialogOpen.set(true);
+  }
+
   protected openChatDeliveryDialog(product: Product): void {
+    this.chatDeliveryVariant.set(null);
     this.chatDeliveryTarget.set(product);
     this.chatDeliveryCapacity.set(product.availableStock && product.hasChatDeliveryVariant ? product.availableStock : 100);
     this.deliveryKind.set('chat');
@@ -603,7 +628,8 @@ export class ProductCatalogPageComponent implements OnInit {
     }
 
     const instant = this.deliveryKind() === 'instant';
-    const success = await this.facade.setChatDelivery(product.id, this.chatDeliveryCapacity(), instant);
+    const variantId = this.chatDeliveryVariant()?.id ?? null;
+    const success = await this.facade.setChatDelivery(product.id, this.chatDeliveryCapacity(), instant, variantId);
     if (success) {
       this.messageService.add({
         severity: 'success',
@@ -614,6 +640,9 @@ export class ProductCatalogPageComponent implements OnInit {
         life: 4000,
       });
       this.chatDeliveryDialogOpen.set(false);
+      if (variantId) {
+        this.catalogTable()?.reloadVariants(product.id);
+      }
     }
   }
 

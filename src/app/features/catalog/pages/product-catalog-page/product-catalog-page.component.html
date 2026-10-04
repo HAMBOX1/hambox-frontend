@@ -205,6 +205,7 @@
       (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
       (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
+      (setVariantChatDeliveryRequested)="openVariantChatDeliveryDialog($event)"
       (fieldEdit)="onFieldEdit($event)"
       (productPricesChanged)="reloadProducts()"
       (statusEdit)="onStatusEdit($event)"
@@ -363,7 +364,7 @@
   }
   @if (hidesInstantStock()) {
     <div class="admin-dialog__error" role="alert">
-      <strong>⛔ This product has {{ chatDeliveryTarget()?.availableStock }} instant code(s) in stock.</strong>
+      <strong>⛔ {{ chatDeliveryVariant() ? 'This sub-product' : 'This product' }} has {{ instantStockCount() }} instant code(s) in stock.</strong>
       <p>
         Switching to On-Delivery hides them from customers. They are <strong>not deleted</strong>: they stay saved for you,
         and choosing Instant stock again makes them available once more.

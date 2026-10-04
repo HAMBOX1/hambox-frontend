@@ -159,6 +159,8 @@ export class ProductCatalogTableComponent {
    * variant (see productActionMenuItems); multi-variant products use the per-variant controls
    * in the variant manager instead. */
   readonly setChatDeliveryRequested = output<Product>();
+  /** Same On-Delivery quick action, for one sub-product (variant) of a product. */
+  readonly setVariantChatDeliveryRequested = output<{ product: Product; variant: ProductVariantDto }>();
   /** The star toggle next to the product name — a personal admin bookmark, unrelated to status. */
   readonly favoriteToggle = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
@@ -456,6 +458,11 @@ export class ProductCatalogTableComponent {
         return next;
       });
     }
+  }
+
+  /** Re-fetches a product's variants so the expanded rows reflect an edit made outside this component. */
+  reloadVariants(productId: string): void {
+    void this.loadVariantsFor(productId);
   }
 
   protected priceFieldLabel(field: VariantPriceField): string {

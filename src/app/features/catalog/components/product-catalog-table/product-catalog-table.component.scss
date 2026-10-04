@@ -535,3 +535,26 @@
   height: 1.25rem;
   padding: 0;
 }
+
+// Variant (sub-product) rows share the main table's columns; this just sets them apart visually.
+.product-catalog-table__variant-row > td {
+  background: var(--admin-bg-muted, rgb(127 127 127 / 6%));
+  vertical-align: middle;
+  font-size: 0.8125rem;
+}
+
+.product-catalog-table__variant-row {
+  cursor: pointer;
+}
+
+.product-catalog-table__variant-name-cell {
+  display: flex;
+  align-items: center;
+  padding-inline-start: 2.25rem;
+}
+
+.product-catalog-table__variant-status-row > td {
+  padding: 0.5rem 1rem;
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+}
