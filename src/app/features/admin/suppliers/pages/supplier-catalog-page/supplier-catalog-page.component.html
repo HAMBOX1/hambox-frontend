@@ -97,6 +97,12 @@
       @if (source.imageUrl) {
         <img class="supplier-catalog-import__image" [src]="source.imageUrl" alt="" referrerpolicy="no-referrer" />
       }
+      @if ((source.minFaceValue ?? 0) <= 0) {
+        <p class="supplier-catalog-import__warning" role="alert">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          {{ 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NO_PRICE_WARNING' | translate }}
+        </p>
+      }
       <p class="supplier-catalog-import__included">
         {{ (source.imageUrl ? 'ADMIN.SUPPLIERS.CATALOG.IMPORT_INCLUDES_IMAGE' : 'ADMIN.SUPPLIERS.CATALOG.IMPORT_NO_IMAGE') | translate }}
         ·

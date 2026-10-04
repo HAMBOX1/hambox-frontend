@@ -5221,7 +5221,8 @@
         "IMPORT_INCLUDES_IMAGE": "Image included",
         "IMPORT_NO_IMAGE": "No image from supplier",
         "IMPORT_INCLUDES_DESCRIPTION": "Description included",
-        "IMPORT_NO_DESCRIPTION": "No description from supplier"
+        "IMPORT_NO_DESCRIPTION": "No description from supplier",
+        "IMPORT_NO_PRICE_WARNING": "The supplier reports no price for this product (0). It will not be sold automatically until a real cost is set on its mapping, so set the price yourself or check your supplier account."
       },
       "MAPPINGS": {
         "TITLE": "Product Mappings",

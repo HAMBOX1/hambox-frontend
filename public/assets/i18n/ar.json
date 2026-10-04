@@ -5087,7 +5087,8 @@
         "IMPORT_INCLUDES_IMAGE": "الصورة مرفقة",
         "IMPORT_NO_IMAGE": "المورد لا يوفّر صورة",
         "IMPORT_INCLUDES_DESCRIPTION": "الوصف مرفق",
-        "IMPORT_NO_DESCRIPTION": "المورد لا يوفّر وصفًا"
+        "IMPORT_NO_DESCRIPTION": "المورد لا يوفّر وصفًا",
+        "IMPORT_NO_PRICE_WARNING": "المورد مش بيرجّع سعر للمنتج ده (0). مش هيتباع تلقائيًا لحد ما تتحط تكلفة حقيقية في الـ Mapping، فحدد السعر بنفسك أو راجع حسابك عند المورد."
       },
       "MAPPINGS": {
         "TITLE": "ربط المنتجات",
