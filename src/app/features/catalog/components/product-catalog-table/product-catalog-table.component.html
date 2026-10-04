@@ -36,22 +36,21 @@
                 {{ priceFieldLabel(field) }} <p-sortIcon field="price" />
               @if (first) {
                 <span class="price-switch" (click)="$event.stopPropagation()">
-                  @if (priceMode() === 'single') {
-                    @for (option of priceFieldOptions; track option.id) {
-                      <button
-                        type="button"
-                        class="price-switch__btn"
-                        [class.is-active]="priceView() === option.id"
-                        (click)="setPriceView(option.id)"
-                      >{{ option.label }}</button>
-                    }
+                  @for (option of priceFieldOptions; track option.id) {
+                    <button
+                      type="button"
+                      class="price-switch__btn"
+                      [class.is-active]="priceMode() === 'single' && priceView() === option.id"
+                      (click)="setPriceView(option.id)"
+                    >{{ option.label }}</button>
                   }
                   <button
                     type="button"
-                    class="price-switch__btn price-switch__btn--mode"
-                    [attr.title]="priceMode() === 'single' ? 'Show Sale, Cost and Member as separate columns' : 'Show one price column with a switch'"
-                    (click)="togglePriceMode()"
-                  ><i class="pi" [class.pi-table]="priceMode() === 'single'" [class.pi-minus]="priceMode() === 'all'" aria-hidden="true"></i></button>
+                    class="price-switch__btn"
+                    [class.is-active]="priceMode() === 'all'"
+                    title="Show Sale, Cost and Member as separate columns"
+                    (click)="showAllPrices()"
+                  >All</button>
                 </span>
               }
               </th>
@@ -60,22 +59,21 @@
                 {{ priceFieldLabel(field) }}
               @if (first) {
                 <span class="price-switch" (click)="$event.stopPropagation()">
-                  @if (priceMode() === 'single') {
-                    @for (option of priceFieldOptions; track option.id) {
-                      <button
-                        type="button"
-                        class="price-switch__btn"
-                        [class.is-active]="priceView() === option.id"
-                        (click)="setPriceView(option.id)"
-                      >{{ option.label }}</button>
-                    }
+                  @for (option of priceFieldOptions; track option.id) {
+                    <button
+                      type="button"
+                      class="price-switch__btn"
+                      [class.is-active]="priceMode() === 'single' && priceView() === option.id"
+                      (click)="setPriceView(option.id)"
+                    >{{ option.label }}</button>
                   }
                   <button
                     type="button"
-                    class="price-switch__btn price-switch__btn--mode"
-                    [attr.title]="priceMode() === 'single' ? 'Show Sale, Cost and Member as separate columns' : 'Show one price column with a switch'"
-                    (click)="togglePriceMode()"
-                  ><i class="pi" [class.pi-table]="priceMode() === 'single'" [class.pi-minus]="priceMode() === 'all'" aria-hidden="true"></i></button>
+                    class="price-switch__btn"
+                    [class.is-active]="priceMode() === 'all'"
+                    title="Show Sale, Cost and Member as separate columns"
+                    (click)="showAllPrices()"
+                  >All</button>
                 </span>
               }
               </th>

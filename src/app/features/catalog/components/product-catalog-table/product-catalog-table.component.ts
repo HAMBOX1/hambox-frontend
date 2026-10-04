@@ -469,13 +469,16 @@ export class ProductCatalogTableComponent {
     return this.priceFieldOptions.find((option) => option.id === field)?.label ?? field;
   }
 
+  /** Shows one price column (Sale, Cost or Member). */
   protected setPriceView(view: VariantPriceField): void {
     this.priceView.set(view);
+    this.priceMode.set('single');
     this.persistPricePrefs();
   }
 
-  protected togglePriceMode(): void {
-    this.priceMode.update((mode) => (mode === 'single' ? 'all' : 'single'));
+  /** Shows Sale, Cost and Member as three separate columns. */
+  protected showAllPrices(): void {
+    this.priceMode.set('all');
     this.persistPricePrefs();
   }
 

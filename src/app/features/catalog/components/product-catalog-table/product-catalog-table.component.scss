@@ -528,13 +528,6 @@
   }
 }
 
-.price-switch__btn--mode {
-  display: inline-grid;
-  place-items: center;
-  width: 1.5rem;
-  height: 1.25rem;
-  padding: 0;
-}
 
 // Variant (sub-product) rows share the main table's columns; this just sets them apart visually.
 .product-catalog-table__variant-row > td {
