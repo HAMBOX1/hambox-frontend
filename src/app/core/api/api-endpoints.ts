@@ -99,6 +99,8 @@ export const CATALOG_IMPORT_EXPORT_API = {
 export const INVENTORY_API = {
   statistics: '/api/v1/inventory/statistics',
   productVariants: (productId: string) => `/api/v1/inventory/products/${productId}/variants`,
+  deletedCodes: '/api/v1/inventory/deleted-codes',
+  restoreDeletedCode: (archiveId: string) => `/api/v1/inventory/deleted-codes/${archiveId}/restore`,
   productVariantPrices: (productId: string) => `/api/v1/inventory/products/${productId}/variant-prices`,
   quickSetChatDelivery: (productId: string) =>
     `/api/v1/inventory/products/${productId}/quick-chat-delivery`,

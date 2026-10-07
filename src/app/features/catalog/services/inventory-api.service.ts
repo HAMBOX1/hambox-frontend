@@ -19,6 +19,7 @@ import {
   DigitalInventoryCodeDto,
   DuplicateVariantRequest,
   GenerateProductVariantsResultDto,
+  DeletedInventoryCodesPageDto,
   ImportCodesRequest,
   ImportCodesResultDto,
   InventoryAuditLogDto,
@@ -66,6 +67,21 @@ export class InventoryApiService {
 
   getProductVariants(productId: string): Observable<readonly ProductVariantDto[]> {
     return this.api.get<readonly ProductVariantDto[]>(INVENTORY_API.productVariants(productId));
+  }
+
+  /** Owner-only: archived (deleted) inventory codes. */
+  getDeletedCodes(searchTerm: string, page: number, pageSize: number): Observable<DeletedInventoryCodesPageDto> {
+    return this.api.get<DeletedInventoryCodesPageDto>(INVENTORY_API.deletedCodes, {
+      params: {
+        ...(searchTerm ? { searchTerm } : {}),
+        page: String(page),
+        pageSize: String(pageSize),
+      },
+    });
+  }
+
+  restoreDeletedCode(archiveId: string): Observable<void> {
+    return this.api.post<void>(INVENTORY_API.restoreDeletedCode(archiveId), {});
   }
 
   /** Sets one price tier (cost / member) on every variant of the product; returns how many variants changed. */

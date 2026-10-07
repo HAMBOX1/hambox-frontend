@@ -1300,7 +1300,8 @@
       "WHATSAPP": "بوت واتساب",
       "PAYMENT_GATEWAYS": "بوابات الدفع",
       "IMAGE_LIBRARY": "مكتبة الصور",
-      "STOREFRONT_FILTERS": "فلاتر المتجر"
+      "STOREFRONT_FILTERS": "فلاتر المتجر",
+      "DELETED_CODES": "الأكواد المحذوفة"
     },
     "WHATSAPP": {
       "BREADCRUMB": "بوت واتساب",

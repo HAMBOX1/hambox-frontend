@@ -38,7 +38,9 @@ export class AdminSidebarComponent implements AfterViewInit, OnDestroy {
   protected readonly logoSrc = 'assets/images/top-nav/hambox-title.png';
   protected readonly logoMarkSrc = 'assets/images/top-nav/hambox-mark.png';
   protected readonly navItems = computed(() =>
-    ADMIN_NAV_ITEMS.filter((item) => this.permissionService.canViewNavItem(item.permission)),
+    ADMIN_NAV_ITEMS.filter((item) =>
+      item.ownerOnly ? this.permissionService.isOwner() : this.permissionService.canViewNavItem(item.permission),
+    ),
   );
 
   private readonly nav = viewChild<ElementRef<HTMLElement>>('nav');

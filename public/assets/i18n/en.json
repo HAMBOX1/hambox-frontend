@@ -1317,7 +1317,8 @@
       "COMMUNICATION": "Communication",
       "WHATSAPP": "WhatsApp Bot",
       "IMAGE_LIBRARY": "Image Library",
-      "STOREFRONT_FILTERS": "Storefront Filters"
+      "STOREFRONT_FILTERS": "Storefront Filters",
+      "DELETED_CODES": "Deleted Codes"
     },
     "WHATSAPP": {
       "BREADCRUMB": "WhatsApp Bot",

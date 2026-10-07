@@ -1,0 +1,70 @@
+<p-toast position="top-right" />
+
+<section class="admin-page deleted-codes">
+  <app-admin-page-header
+    title="Deleted Codes"
+    subtitle="Every inventory code that was deleted is kept here. Only the primary admin can see this page — customers and other admins cannot."
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <div class="deleted-codes__filters">
+    <input
+      pInputText
+      type="search"
+      class="deleted-codes__search"
+      placeholder="Search by product name or variant SKU…"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearch($event)"
+    />
+    <span class="deleted-codes__count">{{ totalCount() }} deleted code(s)</span>
+  </div>
+
+  @if (loading() && items().length === 0) {
+    <p class="deleted-codes__status">Loading…</p>
+  } @else if (items().length === 0) {
+    <p class="deleted-codes__status">No deleted codes{{ searchTerm() ? ' match this search' : ' yet' }}.</p>
+  } @else {
+    <div class="deleted-codes__list" [class.deleted-codes__list--loading]="loading()">
+      @for (item of items(); track item.id) {
+        <article class="deleted-codes__row">
+          <div class="deleted-codes__main">
+            <strong class="deleted-codes__product">{{ item.productName ?? 'Unknown product' }}</strong>
+            <span class="deleted-codes__sku">{{ item.variantSku ?? 'Unknown variant' }}</span>
+            <pre class="deleted-codes__code">{{ shownCode(item) }}</pre>
+            @if (item.notes) {
+              <span class="deleted-codes__note">Note: {{ item.notes }}</span>
+            }
+          </div>
+
+          <div class="deleted-codes__meta">
+            <span>{{ item.deletedOnUtc | date: 'medium' }}</span>
+            <span>{{ item.reason }} · was {{ item.statusAtDeletion }}</span>
+          </div>
+
+          <div class="deleted-codes__actions">
+            <button type="button" class="deleted-codes__btn" (click)="toggleReveal(item.id)">
+              <i class="pi" [class.pi-eye]="!isRevealed(item.id)" [class.pi-eye-slash]="isRevealed(item.id)" aria-hidden="true"></i>
+              {{ isRevealed(item.id) ? 'Hide' : 'Reveal' }}
+            </button>
+            <button
+              type="button"
+              class="deleted-codes__btn deleted-codes__btn--primary"
+              [disabled]="busyId() === item.id"
+              (click)="restore(item)"
+            >
+              <i class="pi pi-undo" aria-hidden="true"></i> Restore to stock
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (pageCount() > 1) {
+      <nav class="deleted-codes__pager" aria-label="Pages">
+        <button type="button" pButton severity="secondary" size="small" label="Previous" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"></button>
+        <span>Page {{ page() }} of {{ pageCount() }}</span>
+        <button type="button" pButton severity="secondary" size="small" label="Next" [disabled]="page() >= pageCount()" (click)="goToPage(page() + 1)"></button>
+      </nav>
+    }
+  }
+</section>

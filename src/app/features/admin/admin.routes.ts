@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { ownerOnlyGuard } from '../../core/guards/owner.guard';
 import { permissionGuard } from '../../core/guards/permission.guard';
 import { unsavedChangesGuard } from '../../core/guards/unsaved-changes.guard';
 import { PERMISSIONS } from '../../core/permissions/permission.constants';
@@ -111,6 +112,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../catalog/pages/storefront-filters-page/storefront-filters-page.component').then(
         (c) => c.StorefrontFiltersPageComponent,
+      ),
+  },
+  {
+    path: 'deleted-codes',
+    canActivate: [ownerOnlyGuard],
+    loadComponent: () =>
+      import('../catalog/pages/deleted-codes-page/deleted-codes-page.component').then(
+        (c) => c.DeletedCodesPageComponent,
       ),
   },
   {

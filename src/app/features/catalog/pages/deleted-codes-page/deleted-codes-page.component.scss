@@ -1,0 +1,128 @@
+.deleted-codes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.deleted-codes__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.deleted-codes__search {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.deleted-codes__count,
+.deleted-codes__status,
+.deleted-codes__note {
+  color: var(--admin-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.deleted-codes__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.deleted-codes__list--loading {
+  opacity: 0.6;
+}
+
+.deleted-codes__row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: var(--admin-radius-md, 0.75rem);
+  background: var(--admin-bg-surface, var(--color-surface));
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.deleted-codes__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.deleted-codes__product {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deleted-codes__sku {
+  color: var(--admin-text-secondary);
+  font-size: 0.75rem;
+}
+
+.deleted-codes__code {
+  margin: 0.25rem 0 0;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  background: rgb(127 127 127 / 10%);
+  font-family: var(--sf-font-mono, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.deleted-codes__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  color: var(--admin-text-secondary);
+  font-size: 0.75rem;
+}
+
+.deleted-codes__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.deleted-codes__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--admin-text-primary);
+  font-size: 0.8125rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--admin-accent-blue, #2563eb);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.deleted-codes__btn--primary {
+  background: var(--admin-accent-blue, #2563eb);
+  border-color: var(--admin-accent-blue, #2563eb);
+  color: #fff;
+}
+
+.deleted-codes__pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+}

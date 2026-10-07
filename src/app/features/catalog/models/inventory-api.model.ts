@@ -237,6 +237,34 @@ export interface CreateBatchRequest {
   readonly notes?: string | null;
 }
 
+/** One archived (deleted) inventory code. Owner-only data. */
+export interface DeletedInventoryCodeDto {
+  readonly id: string;
+  readonly originalCodeId: string;
+  readonly variantId: string;
+  readonly batchId: string;
+  readonly productId: string | null;
+  readonly productName: string | null;
+  readonly variantSku: string | null;
+  readonly digitalCode: string;
+  readonly serialNumber: string | null;
+  readonly pin: string | null;
+  readonly purchaseCost: number | null;
+  readonly currency: string;
+  readonly notes: string | null;
+  readonly statusAtDeletion: string;
+  readonly deletedOnUtc: string;
+  readonly deletedByUserId: string | null;
+  readonly reason: string;
+}
+
+export interface DeletedInventoryCodesPageDto {
+  readonly items: readonly DeletedInventoryCodeDto[];
+  readonly totalCount: number;
+  readonly page: number;
+  readonly pageSize: number;
+}
+
 export interface ImportCodesRequest {
   readonly codes: readonly string[];
   /** Optional internal note stored on every code in this import. */

@@ -5,6 +5,7 @@ export type AdminNavId =
   | 'products'
   | 'categories'
   | 'image-library'
+  | 'deleted-codes'
   | 'storefront-filters'
   | 'collections'
   | 'roles'
@@ -34,6 +35,8 @@ export interface AdminNavItem {
   readonly route: string;
   readonly icon: string;
   readonly permission?: string | readonly string[];
+  /** Shown only to the primary admin (Owner), regardless of permissions. */
+  readonly ownerOnly?: boolean;
 }
 
 export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
@@ -64,6 +67,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/storefront-filters',
     icon: 'pi pi-filter',
     permission: PERMISSIONS.Catalog.Categories.View,
+  },
+  {
+    id: 'deleted-codes',
+    labelKey: 'ADMIN.NAV.DELETED_CODES',
+    route: '/admin/deleted-codes',
+    icon: 'pi pi-lock',
+    ownerOnly: true,
   },
   {
     id: 'image-library',
