@@ -34,6 +34,7 @@ import {
 } from '../../components/product-catalog-table/product-catalog-table.component';
 import { ProductCatalogCardsComponent } from '../../components/product-catalog-cards/product-catalog-cards.component';
 import { ProductDetailPanelComponent } from '../../components/product-detail-panel/product-detail-panel.component';
+import { QuickAddStockDialogComponent } from '../../components/quick-add-stock-dialog/quick-add-stock-dialog.component';
 import {
   ProductMergeConfirmEvent,
   ProductMergeDialogComponent,
@@ -109,6 +110,7 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
     ProductCatalogTableComponent,
     ProductCatalogCardsComponent,
     ProductDetailPanelComponent,
+    QuickAddStockDialogComponent,
     ProductMergeDialogComponent,
     SupplierCatalogSearchDrawerComponent,
     AdminActionMenuComponent,
@@ -166,6 +168,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly duplicateDialogOpen = signal(false);
   protected readonly duplicateNameSuffix = signal(' Copy');
   protected readonly actionTarget = signal<Product | null>(null);
+  protected readonly quickStockProduct = signal<Product | null>(null);
   protected readonly chatDeliveryDialogOpen = signal(false);
   protected readonly chatDeliveryTarget = signal<Product | null>(null);
   protected readonly chatDeliveryCapacity = signal(100);
@@ -441,8 +444,9 @@ export class ProductCatalogPageComponent implements OnInit {
     this.viewModeService.setMode(mode);
   }
 
+  /** Opens the quick "Add stock" dialog; the full variants editor stays one click away inside it. */
   protected navigateToStock(product: Product): void {
-    void this.router.navigate(['/admin/products', product.id, 'edit'], { fragment: 'variants' });
+    this.quickStockProduct.set(product);
   }
 
   protected onCategoryCreated(): void {

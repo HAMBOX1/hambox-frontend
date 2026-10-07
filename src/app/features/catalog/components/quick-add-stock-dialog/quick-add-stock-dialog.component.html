@@ -1,0 +1,78 @@
+<p-dialog
+  [header]="'Add stock — ' + (product()?.nameEn ?? '')"
+  [visible]="product() !== null"
+  (visibleChange)="$event || closed.emit()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(32rem, 94vw)' }"
+  styleClass="admin-dialog"
+>
+  @if (loading()) {
+    <p class="admin-dialog__hint">Loading variants…</p>
+  } @else if (variants().length === 0) {
+    <p class="admin-dialog__hint">
+      This product has no variants yet, so there is nothing to attach codes to. Create a variant first in the full editor.
+    </p>
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Open full editor" icon="pi pi-external-link" (click)="openEditor()"></button>
+    </div>
+  } @else {
+    <div class="admin-field">
+      <label class="admin-field__label" for="quick-stock-variant">Variant</label>
+      <p-select
+        inputId="quick-stock-variant"
+        class="admin-field__input"
+        [options]="choices()"
+        optionLabel="label"
+        optionValue="value"
+        optionDisabled="disabled"
+        placeholder="Choose a variant"
+        appendTo="body"
+        [ngModel]="variantId()"
+        (ngModelChange)="variantId.set($event)"
+      />
+    </div>
+
+    <div class="admin-field">
+      <label class="admin-field__label" for="quick-stock-codes">Codes</label>
+      <textarea
+        id="quick-stock-codes"
+        class="admin-field__input"
+        rows="7"
+        style="width:100%;font-family:monospace"
+        [placeholder]="multiLine() ? 'Paste one account / multi-line entry' : 'One code per line'"
+        [ngModel]="codesText()"
+        (ngModelChange)="codesText.set($event)"
+      ></textarea>
+      <label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem">
+        <input type="checkbox" [checked]="multiLine()" (change)="multiLine.set($any($event.target).checked)" />
+        <span>The whole text is ONE entry (e.g. account with email + password lines)</span>
+      </label>
+    </div>
+
+    @if (result(); as r) {
+      <p class="admin-dialog__hint" role="status">
+        {{ r.importedCount }} added{{ r.duplicateCount ? ' • ' + r.duplicateCount + ' skipped (already exist)' : '' }}{{ r.invalidCount ? ' • ' + r.invalidCount + ' invalid' : '' }}.
+      </p>
+    }
+    @if (error(); as message) {
+      <p class="admin-dialog__error" role="alert">{{ message }}</p>
+    }
+
+    <div class="admin-dialog__actions">
+      <button pButton type="button" label="Full editor" severity="secondary" (click)="openEditor()"></button>
+      <button pButton type="button" label="Close" severity="secondary" (click)="closed.emit()"></button>
+      <button
+        pButton
+        type="button"
+        [label]="codeCount() > 0 ? 'Add ' + codeCount() + (codeCount() === 1 ? ' code' : ' codes') : 'Add'"
+        icon="pi pi-plus"
+        [loading]="saving()"
+        [disabled]="!variantId() || codeCount() === 0"
+        (click)="add()"
+      ></button>
+    </div>
+  }
+</p-dialog>

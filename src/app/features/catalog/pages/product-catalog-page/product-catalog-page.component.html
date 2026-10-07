@@ -319,6 +319,12 @@
   </div>
 </p-dialog>
 
+<app-quick-add-stock-dialog
+  [product]="quickStockProduct()"
+  (closed)="quickStockProduct.set(null)"
+  (stockAdded)="reloadProducts()"
+/>
+
 <p-dialog
   header="Delivery type"
   [visible]="chatDeliveryDialogOpen()"
