@@ -13,6 +13,16 @@
     <button
       type="button"
       class="route-picker__mode-btn"
+      [class.route-picker__mode-btn--active]="activeMode() === 'product'"
+      [disabled]="disabled()"
+      (click)="setMode('product')"
+    >
+      <i class="pi pi-box" aria-hidden="true"></i>
+      {{ 'ADMIN.PICKERS.ROUTE_PICKER.MODE_PRODUCT' | translate }}
+    </button>
+    <button
+      type="button"
+      class="route-picker__mode-btn"
       [class.route-picker__mode-btn--active]="activeMode() === 'custom'"
       [disabled]="disabled()"
       (click)="setMode('custom')"
@@ -36,6 +46,22 @@
       [ngModel]="value()"
       [disabled]="disabled()"
       (ngModelChange)="emit($event)"
+    />
+  } @else if (activeMode() === 'product') {
+    <p-autoComplete
+      [inputId]="fieldId"
+      class="w-full"
+      styleClass="w-full"
+      [suggestions]="productSuggestions()"
+      optionLabel="nameEn"
+      [forceSelection]="true"
+      [showClear]="true"
+      [placeholder]="'ADMIN.PICKERS.ROUTE_PICKER.PRODUCT_PLACEHOLDER' | translate"
+      [ngModel]="selectedProduct()"
+      [disabled]="disabled()"
+      (completeMethod)="searchProducts($event)"
+      (onSelect)="selectProduct($event.value)"
+      (onClear)="emit(null)"
     />
   } @else {
     <input

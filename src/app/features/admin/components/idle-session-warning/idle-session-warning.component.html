@@ -1,0 +1,34 @@
+<p-dialog
+  [header]="'ADMIN.IDLE_SESSION.TITLE' | translate"
+  [visible]="idleSession.showWarning()"
+  [modal]="true"
+  [dismissableMask]="false"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(26rem, 92vw)' }"
+  styleClass="admin-dialog idle-session-warning"
+>
+  <p class="idle-session-warning__message">{{ 'ADMIN.IDLE_SESSION.MESSAGE' | translate }}</p>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.IDLE_SESSION.SIGN_OUT' | translate"
+      severity="secondary"
+      [text]="true"
+      [disabled]="idleSession.staying()"
+      (click)="signOut()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.IDLE_SESSION.STAY_SIGNED_IN' | translate"
+      severity="primary"
+      [loading]="idleSession.staying()"
+      (click)="stayActive()"
+    ></button>
+  </ng-template>
+</p-dialog>

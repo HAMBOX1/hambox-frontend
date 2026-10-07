@@ -17,11 +17,39 @@ import { CommunicationFacade } from '../../services/communication.facade';
   imports: [RouterLink, TranslatePipe, AdminPageHeaderComponent, AdminStatGridComponent, AdminStatCardComponent, AdminErrorAlertComponent],
   providers: [CommunicationFacade],
   templateUrl: './communication-dashboard-page.component.html',
+  styleUrl: './communication-dashboard-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunicationDashboardPageComponent implements OnInit {
   protected readonly facade = inject(CommunicationFacade);
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Communication' });
+
+  protected readonly navLinks = [
+    {
+      route: '/admin/communication/templates',
+      icon: 'pi-file-edit',
+      titleKey: 'ADMIN.COMMUNICATION.NAV.TEMPLATES',
+      descriptionKey: 'ADMIN.COMMUNICATION.TEMPLATES.SUBTITLE',
+    },
+    {
+      route: '/admin/communication/messages',
+      icon: 'pi-bell',
+      titleKey: 'ADMIN.COMMUNICATION.NAV.MESSAGES',
+      descriptionKey: 'ADMIN.COMMUNICATION.MESSAGES.SUBTITLE',
+    },
+    {
+      route: '/admin/communication/failed-deliveries',
+      icon: 'pi-exclamation-triangle',
+      titleKey: 'ADMIN.COMMUNICATION.NAV.FAILED_DELIVERIES',
+      descriptionKey: 'ADMIN.COMMUNICATION.FAILED_DELIVERIES.SUBTITLE',
+    },
+    {
+      route: '/admin/communication/providers',
+      icon: 'pi-send',
+      titleKey: 'ADMIN.COMMUNICATION.NAV.PROVIDERS',
+      descriptionKey: 'ADMIN.COMMUNICATION.PROVIDERS.SUBTITLE',
+    },
+  ] as const;
 
   protected readonly stats = this.facade.stats;
   protected readonly loading = this.facade.statsLoading;

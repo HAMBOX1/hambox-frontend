@@ -209,6 +209,7 @@ export const AUTH_API = {
   maintenanceBypass: '/api/auth/maintenance-bypass',
   sessions: '/api/auth/sessions',
   revokeAllSessions: '/api/auth/sessions/revoke-all',
+  revokeSession: (sessionId: string) => `/api/auth/sessions/${sessionId}`,
   refresh: '/api/auth/refresh',
   logout: '/api/auth/logout',
   verifyEmail: '/api/auth/verify-email',

@@ -222,6 +222,11 @@ export class AssistantWidgetComponent {
     }
   }
 
+  protected onExitTicketChatClick(event: Event): void {
+    event.stopPropagation();
+    this.facade.exitTicketChat();
+  }
+
   protected onCollapseClick(event: Event): void {
     event.stopPropagation();
     this.facade.toggleCollapse();
@@ -289,6 +294,17 @@ export class AssistantWidgetComponent {
       case 'Create Ticket':
         this.facade.createTicket();
         return;
+      case 'View My Tickets':
+        void this.router.navigate(['/account/support']);
+        this.facade.close();
+        return;
+      case 'Chat in This Ticket': {
+        const ticketId = this.facade.lastDescribedTicketId();
+        if (ticketId) {
+          void this.facade.enterTicketChat(ticketId);
+        }
+        return;
+      }
       case 'Compare options':
         this.facade.selectSuggestion('compare');
         return;

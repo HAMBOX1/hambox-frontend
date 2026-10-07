@@ -61,10 +61,16 @@
     }
   </app-admin-stat-grid>
 
-  <div class="admin-quick-links">
-    <a routerLink="/admin/communication/templates" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.TEMPLATES' | translate }}</a>
-    <a routerLink="/admin/communication/messages" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.MESSAGES' | translate }}</a>
-    <a routerLink="/admin/communication/failed-deliveries" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.FAILED_DELIVERIES' | translate }}</a>
-    <a routerLink="/admin/communication/providers" class="admin-btn-secondary">{{ 'ADMIN.COMMUNICATION.NAV.PROVIDERS' | translate }}</a>
+  <div class="comm-nav-grid">
+    @for (link of navLinks; track link.route) {
+      <a [routerLink]="link.route" class="comm-nav-card admin-glass-card admin-glass-card--interactive">
+        <span class="comm-nav-card__icon"><i class="pi" [class]="link.icon"></i></span>
+        <span class="comm-nav-card__text">
+          <span class="comm-nav-card__title">{{ link.titleKey | translate }}</span>
+          <span class="comm-nav-card__description">{{ link.descriptionKey | translate }}</span>
+        </span>
+        <i class="pi pi-chevron-right comm-nav-card__chevron"></i>
+      </a>
+    }
   </div>
 </section>

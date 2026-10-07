@@ -119,7 +119,7 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
     AdminIconButtonComponent,
     TranslatePipe,
   ],
-  providers: [ProductCatalogFacade, MessageService],
+  providers: [MessageService],
   templateUrl: './product-catalog-page.component.html',
   styleUrl: './product-catalog-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

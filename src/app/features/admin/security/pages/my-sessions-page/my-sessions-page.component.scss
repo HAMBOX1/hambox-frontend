@@ -1,0 +1,11 @@
+.my-sessions-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-page-gap, 2rem);
+
+  &__actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--hambox-spacing-3, 0.75rem);
+  }
+}

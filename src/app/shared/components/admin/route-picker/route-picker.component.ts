@@ -1,11 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { firstValueFrom } from 'rxjs';
 
 import { TranslationService } from '../../../../core/i18n/translation.service';
+import { Product } from '../../../../features/catalog/models/product.model';
+import { ProductApiService } from '../../../../features/catalog/services/product-api.service';
 import { APP_ROUTE_REGISTRY } from './route-registry';
 
 interface RouteSelectOption {
@@ -13,7 +17,9 @@ interface RouteSelectOption {
   readonly value: string;
 }
 
-type RoutePickerMode = 'page' | 'custom';
+type RoutePickerMode = 'page' | 'product' | 'custom';
+
+const PRODUCT_LINK_PATTERN = /^\/products\/(.+)$/;
 
 const RECENT_ROUTES_KEY = 'hambox.route-picker.recent';
 const MAX_RECENT_ROUTES = 8;
@@ -28,7 +34,7 @@ let nextId = 0;
 @Component({
   selector: 'app-route-picker',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, ButtonModule, InputTextModule, SelectModule],
+  imports: [FormsModule, TranslatePipe, ButtonModule, InputTextModule, SelectModule, AutoCompleteModule],
   templateUrl: './route-picker.component.html',
   styleUrl: './route-picker.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,9 +48,12 @@ export class RoutePickerComponent {
 
   protected readonly fieldId = `route-picker-${++nextId}`;
   protected readonly recentRoutes = signal<string[]>(loadRecent());
+  protected readonly productSuggestions = signal<Product[]>([]);
+  protected readonly selectedProduct = signal<Product | null>(null);
 
   private readonly translate = inject(TranslateService);
   private readonly translationService = inject(TranslationService);
+  private readonly productApi = inject(ProductApiService);
 
   protected readonly options = computed<RouteSelectOption[]>(() => {
     this.translationService.revision();
@@ -59,17 +68,49 @@ export class RoutePickerComponent {
     if (!current) {
       return 'page';
     }
-    return APP_ROUTE_REGISTRY.some((route) => route.path === current) ? 'page' : 'custom';
+    if (APP_ROUTE_REGISTRY.some((route) => route.path === current)) {
+      return 'page';
+    }
+    return PRODUCT_LINK_PATTERN.test(current) ? 'product' : 'custom';
   });
 
   protected readonly forcedMode = signal<RoutePickerMode | null>(null);
   protected readonly activeMode = computed<RoutePickerMode>(() => this.forcedMode() ?? this.mode());
 
+  constructor() {
+    effect(() => {
+      const match = this.value()?.match(PRODUCT_LINK_PATTERN);
+      const productId = match?.[1] ?? null;
+      if (!productId) {
+        this.selectedProduct.set(null);
+        return;
+      }
+      if (this.selectedProduct()?.id === productId) {
+        return;
+      }
+      firstValueFrom(this.productApi.getProductById(productId))
+        .then((product) => this.selectedProduct.set(product))
+        .catch(() => this.selectedProduct.set(null));
+    });
+  }
+
   protected setMode(mode: RoutePickerMode): void {
     this.forcedMode.set(mode);
-    if (mode === 'page' && this.value() && !APP_ROUTE_REGISTRY.some((r) => r.path === this.value())) {
+    if (mode !== this.mode() && this.value()) {
       this.emit(null);
     }
+  }
+
+  protected async searchProducts(event: AutoCompleteCompleteEvent): Promise<void> {
+    const result = await firstValueFrom(
+      this.productApi.getProducts({ pageNumber: 1, pageSize: 20, searchTerm: event.query }),
+    );
+    this.productSuggestions.set([...result.items]);
+  }
+
+  protected selectProduct(product: Product): void {
+    this.selectedProduct.set(product);
+    this.emit(`/products/${product.id}`);
   }
 
   protected emit(value: string | null): void {

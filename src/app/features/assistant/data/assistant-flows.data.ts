@@ -120,6 +120,19 @@ export const FLOWS: Record<FlowKey, ConversationFlow> = {
     ],
     retryNote: 'Same options, in case that did not come through clearly.',
   },
+  // Content is built live from the real Support API (AssistantFacade.runTicketsFlow/
+  // submitTicketFromDescription) — these entries only exist to satisfy
+  // Record<FlowKey, ConversationFlow> and to back retry()'s lookup.
+  tickets: {
+    userText: 'What are my support tickets?',
+    reply: 'Let me check your tickets…',
+    retryNote: 'Here is your ticket status again.',
+  },
+  createTicket: {
+    userText: 'I want to open a support ticket',
+    reply: "Sure — describe what's going on and I'll open a ticket for you.",
+    retryNote: 'Here is that ticket update again.',
+  },
 };
 
 export const SEED_HISTORY: readonly HistoryItem[] = [

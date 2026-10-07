@@ -51,6 +51,7 @@ import {
 } from '../../services/category-api.service';
 import { CollectionApiService } from '../../services/collection-api.service';
 import { InventoryApiService } from '../../services/inventory-api.service';
+import { ProductColumnId, ProductTableColumnsService } from '../../services/product-table-columns.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
@@ -58,6 +59,18 @@ type EditableField = 'name' | 'price' | 'cost' | 'member';
 type VariantPriceField = 'cost' | 'sale' | 'member';
 
 const STATUS_EDIT_OPTIONS: readonly ProductStatus[] = ['Draft', 'Active', 'Inactive', 'Archived'];
+
+/** Toggleable columns other than the three price fields (which `visiblePriceFields` already
+ * tracks) — used only to size `tableColspan`. */
+const PRODUCT_TOGGLEABLE_NON_PRICE_COLUMNS: readonly ProductColumnId[] = [
+  'stock',
+  'sku',
+  'margin',
+  'category',
+  'internalCategories',
+  'status',
+  'supplier',
+];
 
 export interface ProductFieldEdit {
   readonly product: Product;
@@ -112,6 +125,7 @@ export class ProductCatalogTableComponent {
   private readonly collectionApi = inject(CollectionApiService);
   private readonly inventoryApi = inject(InventoryApiService);
   private readonly messageService = inject(MessageService);
+  protected readonly columns = inject(ProductTableColumnsService);
 
   protected readonly permissions = PERMISSIONS;
 
@@ -186,6 +200,16 @@ export class ProductCatalogTableComponent {
   protected readonly failedImageIds = signal<ReadonlySet<string>>(new Set());
   protected readonly statusOptions = STATUS_EDIT_OPTIONS;
 
+  private readonly columnsPopover = viewChild<Popover>('columnsPopover');
+
+  protected toggleColumnsPopover(event: Event): void {
+    this.columnsPopover()?.toggle(event);
+  }
+
+  protected onColumnVisibilityChange(id: ProductColumnId, visible: boolean): void {
+    this.columns.setVisible(id, visible);
+  }
+
   /** Per-row "show every category / internal category chip instead of the +N overflow badge"
    * toggle — purely a client-side view over data already loaded, independent of the category/
    * collection edit popovers below (which still open on a click anywhere else in the cell). */
@@ -207,14 +231,31 @@ export class ProductCatalogTableComponent {
     { id: 'member', label: 'Member' },
   ];
 
-  /** "single": one price column with a Sale / Cost / Member switch (compact, good on phones);
-   * "all": three separate columns. The choice is remembered on this device. */
-  protected readonly priceMode = signal<'single' | 'all'>(this.initialPriceMode());
-  protected readonly priceView = signal<VariantPriceField>(this.initialPriceView());
-  protected readonly visiblePriceFields = computed<readonly VariantPriceField[]>(() =>
-    this.priceMode() === 'all' ? ['sale', 'cost', 'member'] : [this.priceView()],
+  /** Which of Sale / Cost / Member show as columns — driven by the unified "Columns" picker
+   * (`columns`), not a dedicated mode of their own anymore. */
+  protected readonly visiblePriceFields = computed<readonly VariantPriceField[]>(() => {
+    const fields: VariantPriceField[] = [];
+    if (this.columns.isVisible('salePrice')) {
+      fields.push('sale');
+    }
+    if (this.columns.isVisible('costPrice')) {
+      fields.push('cost');
+    }
+    if (this.columns.isVisible('memberPrice')) {
+      fields.push('member');
+    }
+    return fields;
+  });
+
+  /** Checkbox + product + actions are always rendered (3); everything else is however many
+   * optional columns (including price fields) are currently visible. Keeps the empty-state and
+   * variant-subrow "full width" rows spanning the actual rendered column count. */
+  protected readonly tableColspan = computed(
+    () =>
+      3 +
+      this.visiblePriceFields().length +
+      PRODUCT_TOGGLEABLE_NON_PRICE_COLUMNS.filter((id) => this.columns.isVisible(id)).length,
   );
-  protected readonly tableColspan = computed(() => 9 + (this.priceMode() === 'all' ? 2 : 0));
   protected readonly editingVariantPrice = signal<{ variantId: string; field: VariantPriceField } | null>(null);
   protected readonly variantPriceDraft = signal<number | null>(null);
   protected readonly editVariantDraftText = signal('');
@@ -305,6 +346,31 @@ export class ProductCatalogTableComponent {
 
     const format = (value: number) => `$${value.toFixed(2)}`;
     return min === max ? format(min) : `${format(min)} – ${format(max)}`;
+  }
+
+  /** `(sale − cost) / sale` as a percentage, over the same cost range `tierRange`/the Cost column
+   * show — "—" when cost is unset or sale is 0. Purely a client-side computation over fields the
+   * list response already carries; no backend support needed. */
+  protected marginText(product: Product): string {
+    const tiers = product.priceTiers;
+    const costMin = tiers?.costMin;
+    const costMax = tiers?.costMax;
+    if (costMin == null || costMax == null || product.price <= 0) {
+      return '—';
+    }
+
+    const marginFor = (cost: number) => ((product.price - cost) / product.price) * 100;
+    // Lower cost ⇒ higher margin, so costMin/costMax map to the max/min of the margin range.
+    const marginMax = marginFor(costMin);
+    const marginMin = marginFor(costMax);
+    const format = (value: number) => `${value.toFixed(0)}%`;
+    return marginMin === marginMax ? format(marginMin) : `${format(marginMin)} – ${format(marginMax)}`;
+  }
+
+  /** The representative SKU (first variant by sort order) the backend provides — not a true
+   * per-product SKU, since a multi-variant product has one SKU per variant. */
+  protected skuText(product: Product): string {
+    return product.representativeSku ?? '—';
   }
 
   protected isBulkSelected(productId: string): boolean {
@@ -469,19 +535,6 @@ export class ProductCatalogTableComponent {
     return this.priceFieldOptions.find((option) => option.id === field)?.label ?? field;
   }
 
-  /** Shows one price column (Sale, Cost or Member). */
-  protected setPriceView(view: VariantPriceField): void {
-    this.priceView.set(view);
-    this.priceMode.set('single');
-    this.persistPricePrefs();
-  }
-
-  /** Shows Sale, Cost and Member as three separate columns. */
-  protected showAllPrices(): void {
-    this.priceMode.set('all');
-    this.persistPricePrefs();
-  }
-
   protected isEditingTier(productId: string, field: VariantPriceField): boolean {
     return field !== 'sale' && this.isEditing(productId, field);
   }
@@ -497,36 +550,6 @@ export class ProductCatalogTableComponent {
     return field === 'cost'
       ? this.tierRange(tiers?.costMin, tiers?.costMax)
       : this.tierRange(tiers?.memberMin, tiers?.memberMax);
-  }
-
-  private initialPriceMode(): 'single' | 'all' {
-    const stored = this.readPricePrefs();
-    if (stored?.mode) {
-      return stored.mode;
-    }
-
-    return typeof window !== 'undefined' && window.innerWidth < 900 ? 'single' : 'all';
-  }
-
-  private initialPriceView(): VariantPriceField {
-    return this.readPricePrefs()?.view ?? 'sale';
-  }
-
-  private readPricePrefs(): { mode?: 'single' | 'all'; view?: VariantPriceField } | null {
-    try {
-      const raw = localStorage.getItem('hambox.admin.priceColumns');
-      return raw ? (JSON.parse(raw) as { mode?: 'single' | 'all'; view?: VariantPriceField }) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  private persistPricePrefs(): void {
-    try {
-      localStorage.setItem('hambox.admin.priceColumns', JSON.stringify({ mode: this.priceMode(), view: this.priceView() }));
-    } catch {
-      // Best effort only.
-    }
   }
 
   protected isEditingVariantPrice(variantId: string, field: VariantPriceField): boolean {

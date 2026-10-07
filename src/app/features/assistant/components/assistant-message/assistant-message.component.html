@@ -1,11 +1,16 @@
 <div class="msg-row" [class.msg-row--user]="message().role === 'user'">
   @if (message().role === 'ai') {
     <div class="msg-avatar msg-avatar--ai"><i class="pi pi-sparkles"></i></div>
+  } @else if (message().role === 'agent') {
+    <div class="msg-avatar msg-avatar--agent">{{ (message().authorName || 'A').charAt(0) }}</div>
   } @else {
     <div class="msg-avatar msg-avatar--user">{{ userInitial() }}</div>
   }
 
   <div class="msg-col">
+    @if (message().role === 'agent' && message().authorName) {
+      <div class="msg-author">{{ message().authorName }}</div>
+    }
     <div class="bubble" [class.bubble--user]="message().role === 'user'">
       <div class="bubble-html" [innerHTML]="renderedHtml()"></div>
 

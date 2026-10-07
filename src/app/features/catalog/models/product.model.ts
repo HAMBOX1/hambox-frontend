@@ -84,6 +84,10 @@ export interface Product {
   /** Admin-only personal bookmark for quickly finding this product again — never shown to
    * anonymous/storefront callers. */
   readonly isFavorite?: boolean;
+  /** The lowest-sort-order non-deleted variant's SKU, for display only — there is no "default
+   * variant" concept, so this is just a representative value. Null if the product has no variants.
+   * Admin-only, like `priceTiers`. */
+  readonly representativeSku?: string | null;
 }
 
 export interface ProductPriceTiers {

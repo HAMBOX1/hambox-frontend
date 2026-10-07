@@ -33,7 +33,7 @@
   <button
     type="button"
     class="fab"
-    [class.pulse]="facade.hasNewSuggestion()"
+    [class.pulse]="facade.hasNewSuggestion() || facade.hasUnreadTicketReply()"
     [attr.aria-label]="'ASSISTANT.FAB_TOOLTIP' | translate"
     aria-haspopup="dialog"
     (click)="onFabClick()"
@@ -44,7 +44,7 @@
   >
     <i class="pi pi-comments"></i>
     <span class="fab-sparkle"><i class="pi pi-sparkles"></i></span>
-    @if (facade.hasNewSuggestion()) {
+    @if (facade.hasNewSuggestion() || facade.hasUnreadTicketReply()) {
       <span class="fab-badge">1</span>
     }
     <span class="fab-online" aria-hidden="true"></span>
@@ -64,11 +64,32 @@
     <div class="ai-avatar"><i class="pi pi-sparkles"></i></div>
     <div class="panel-titles">
       <h2 id="assistantPanelTitle">
-        {{ 'ASSISTANT.TITLE' | translate }}<span class="status-dot" aria-hidden="true"></span>
+        @if (facade.activeTicket(); as ticket) {
+          {{ ticket.subject }}
+        } @else {
+          {{ 'ASSISTANT.TITLE' | translate }}
+        }
+        <span class="status-dot" aria-hidden="true"></span>
       </h2>
-      <p>{{ 'ASSISTANT.SUBTITLE' | translate }}</p>
+      <p>
+        @if (facade.activeTicket(); as ticket) {
+          {{ 'ASSISTANT.TICKET_CHAT_SUBTITLE' | translate: { number: ticket.number } }}
+        } @else {
+          {{ 'ASSISTANT.SUBTITLE' | translate }}
+        }
+      </p>
     </div>
     <div class="panel-actions">
+      @if (facade.activeTicket()) {
+        <button
+          type="button"
+          class="icon-btn"
+          [attr.aria-label]="'ASSISTANT.BACK_TO_ASSISTANT' | translate"
+          (click)="onExitTicketChatClick($event)"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+      }
       <button
         type="button"
         class="icon-btn"

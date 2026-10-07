@@ -38,6 +38,18 @@
     background: var(--color-surface-elevated);
     color: var(--color-text-secondary);
   }
+
+  &--agent {
+    background: var(--color-primary);
+    color: #fff;
+  }
+}
+
+.msg-author {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  padding-inline-start: 2px;
 }
 
 .msg-col {

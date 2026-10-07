@@ -947,6 +947,7 @@
     },
     "TOPBAR": {
       "MORE": "More options",
+      "MY_SESSIONS": "My sessions",
       "LOGOUT": "Log out",
       "LOGGING_OUT": "Signing out…"
     },
@@ -968,6 +969,20 @@
         "PUBLISHED": "Published",
         "DRAFTS": "Drafts",
         "NEEDS_ATTENTION": "Needs Attention"
+      },
+      "COLUMNS": {
+        "BUTTON": "Columns",
+        "RESET": "Reset to defaults",
+        "STOCK": "Stock",
+        "SKU": "SKU",
+        "SALE_PRICE": "Sale Price",
+        "COST_PRICE": "Cost",
+        "MEMBER_PRICE": "Member Price",
+        "MARGIN": "Margin",
+        "CATEGORY": "Category",
+        "INTERNAL_CATEGORIES": "Internal Categories",
+        "STATUS": "Status",
+        "SUPPLIER": "Supplier"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "Add Supplier Mapping",
@@ -1234,6 +1249,12 @@
       "DISCARD_CATEGORY": "Discard unsaved changes and switch category?",
       "RESTORE_TITLE": "Restore defaults?",
       "RESTORE_MESSAGE": "Restore defaults for this category? Your custom values will be replaced."
+    },
+    "IDLE_SESSION": {
+      "TITLE": "Session expiring",
+      "MESSAGE": "Your session will expire due to inactivity.",
+      "STAY_SIGNED_IN": "Stay signed in",
+      "SIGN_OUT": "Sign out"
     },
     "CONFIRM": {
       "CONFIRM": "Confirm",
@@ -5593,11 +5614,38 @@
         "IP_BLOCKED": "IP address blocked."
       }
     },
+    "MY_SESSIONS": {
+      "TITLE": "My Sessions",
+      "SUBTITLE": "Devices and browsers currently signed in as you.",
+      "EMPTY": "No active sessions.",
+      "UNKNOWN": "Unknown",
+      "REVOKE": "Sign out",
+      "REVOKE_CONFIRM": "Sign out this session? That device will need to sign in again.",
+      "REVOKE_ALL_OTHERS": "Sign out all other sessions",
+      "REVOKE_ALL_OTHERS_CONFIRM": "Sign out every other session? This device stays signed in; all others will need to sign in again.",
+      "COLUMNS": {
+        "DEVICE": "Device",
+        "IP": "IP Address",
+        "STARTED": "Signed in",
+        "LAST_ACTIVITY": "Last activity",
+        "STATUS": "Status"
+      },
+      "STATUS": {
+        "CURRENT": "This device",
+        "OTHER": "Other session"
+      },
+      "MESSAGES": {
+        "ACTION_SUCCEEDED": "Done.",
+        "ACTION_FAILED": "Action failed."
+      }
+    },
     "PICKERS": {
       "ROUTE_PICKER": {
         "MODE_PAGE": "Choose a page",
+        "MODE_PRODUCT": "Product",
         "MODE_CUSTOM": "Custom link",
         "SELECT_PLACEHOLDER": "Search pages…",
+        "PRODUCT_PLACEHOLDER": "Search products…",
         "RECENT": "Recent:",
         "GROUPS": {
           "STOREFRONT": "Storefront",
@@ -5837,6 +5885,8 @@
     "TOAST_CONNECTING_SUPPORT": "Connecting you to support…",
     "TOAST_ISSUE_REPORTED": "Issue reported — thank you",
     "FAB_HIDE": "Hide chat button",
-    "FAB_SHOW": "Show chat button"
+    "FAB_SHOW": "Show chat button",
+    "TICKET_CHAT_SUBTITLE": "Ticket {{number}}",
+    "BACK_TO_ASSISTANT": "Back to assistant"
   }
 }

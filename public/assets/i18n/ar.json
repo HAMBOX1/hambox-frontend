@@ -940,6 +940,7 @@
     },
     "TOPBAR": {
       "MORE": "خيارات إضافية",
+      "MY_SESSIONS": "جلساتي",
       "LOGOUT": "تسجيل الخروج",
       "LOGGING_OUT": "جارٍ تسجيل الخروج…"
     },
@@ -961,6 +962,20 @@
         "PUBLISHED": "منشور",
         "DRAFTS": "مسودات",
         "NEEDS_ATTENTION": "تحتاج متابعة"
+      },
+      "COLUMNS": {
+        "BUTTON": "الأعمدة",
+        "RESET": "إعادة تعيين الافتراضي",
+        "STOCK": "المخزون",
+        "SKU": "رمز المنتج (SKU)",
+        "SALE_PRICE": "سعر البيع",
+        "COST_PRICE": "التكلفة",
+        "MEMBER_PRICE": "سعر العضو",
+        "MARGIN": "هامش الربح",
+        "CATEGORY": "الفئة",
+        "INTERNAL_CATEGORIES": "الفئات الداخلية",
+        "STATUS": "الحالة",
+        "SUPPLIER": "المورد"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "إضافة ربط مورد",
@@ -1218,6 +1233,12 @@
         "BATCH": "الدفعة",
         "EXPIRES": "ينتهي في"
       }
+    },
+    "IDLE_SESSION": {
+      "TITLE": "الجلسة على وشك الانتهاء",
+      "MESSAGE": "ستنتهي جلستك بسبب عدم النشاط.",
+      "STAY_SIGNED_IN": "البقاء مسجلاً للدخول",
+      "SIGN_OUT": "تسجيل الخروج"
     },
     "CONFIRM": {
       "CONFIRM": "تأكيد",
@@ -5459,11 +5480,38 @@
         "IP_BLOCKED": "تم حظر عنوان IP."
       }
     },
+    "MY_SESSIONS": {
+      "TITLE": "جلساتي",
+      "SUBTITLE": "الأجهزة والمتصفحات المسجّلة دخولًا باسمك حاليًا.",
+      "EMPTY": "لا توجد جلسات نشطة.",
+      "UNKNOWN": "غير معروف",
+      "REVOKE": "تسجيل الخروج",
+      "REVOKE_CONFIRM": "هل تريد تسجيل الخروج من هذه الجلسة؟ سيحتاج هذا الجهاز لتسجيل الدخول مرة أخرى.",
+      "REVOKE_ALL_OTHERS": "تسجيل الخروج من جميع الجلسات الأخرى",
+      "REVOKE_ALL_OTHERS_CONFIRM": "هل تريد تسجيل الخروج من كل جلسة أخرى؟ سيبقى هذا الجهاز مسجّلاً، وستحتاج جميع الأجهزة الأخرى لتسجيل الدخول مرة أخرى.",
+      "COLUMNS": {
+        "DEVICE": "الجهاز",
+        "IP": "عنوان IP",
+        "STARTED": "تاريخ الدخول",
+        "LAST_ACTIVITY": "آخر نشاط",
+        "STATUS": "الحالة"
+      },
+      "STATUS": {
+        "CURRENT": "هذا الجهاز",
+        "OTHER": "جلسة أخرى"
+      },
+      "MESSAGES": {
+        "ACTION_SUCCEEDED": "تم.",
+        "ACTION_FAILED": "فشل الإجراء."
+      }
+    },
     "PICKERS": {
       "ROUTE_PICKER": {
         "MODE_PAGE": "اختر صفحة",
+        "MODE_PRODUCT": "منتج",
         "MODE_CUSTOM": "رابط مخصص",
         "SELECT_PLACEHOLDER": "ابحث عن صفحة…",
+        "PRODUCT_PLACEHOLDER": "ابحث عن منتج…",
         "RECENT": "الأخيرة:",
         "GROUPS": {
           "STOREFRONT": "المتجر",
@@ -5698,6 +5746,8 @@
     "TOAST_CONNECTING_SUPPORT": "جارٍ توصيلك بالدعم…",
     "TOAST_ISSUE_REPORTED": "تم الإبلاغ عن المشكلة — شكرًا لك",
     "FAB_HIDE": "إخفاء زر المحادثة",
-    "FAB_SHOW": "إظهار زر المحادثة"
+    "FAB_SHOW": "إظهار زر المحادثة",
+    "TICKET_CHAT_SUBTITLE": "التذكرة {{number}}",
+    "BACK_TO_ASSISTANT": "العودة إلى المساعد"
   }
 }

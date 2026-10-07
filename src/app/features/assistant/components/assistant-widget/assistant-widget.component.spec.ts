@@ -16,6 +16,9 @@ class FakeAssistantFacade {
   readonly isCollapsed = signal(false);
   readonly isHistoryOpen = signal(false);
   readonly hasNewSuggestion = signal(false);
+  readonly hasUnreadTicketReply = signal(false);
+  readonly activeTicket = signal<{ subject: string; number: string } | null>(null);
+  readonly lastDescribedTicketId = signal<string | null>(null);
   readonly showContextBanner = signal(false);
   readonly contextProductName = signal('');
   readonly contextProductId = signal<string | null>(null);
@@ -35,6 +38,8 @@ class FakeAssistantFacade {
   readonly selectSuggestion = vi.fn();
   readonly dismissContext = vi.fn();
   readonly createTicket = vi.fn();
+  readonly exitTicketChat = vi.fn();
+  readonly enterTicketChat = vi.fn();
   readonly regenerate = vi.fn();
   readonly retry = vi.fn();
   readonly toggleLike = vi.fn();

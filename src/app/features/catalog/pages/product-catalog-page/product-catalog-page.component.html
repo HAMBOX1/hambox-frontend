@@ -60,15 +60,30 @@
     />
   </app-admin-page-header>
 
-  <app-product-catalog-status-tabs
-    [activeStatus]="statusFilter()"
-    [pendingMergeActive]="pendingMergeOnly()"
-    [favoritesActive]="favoritesOnly()"
-    [counts]="statusCounts()"
-    (statusChange)="onStatusFilterChange($event)"
-    (pendingMergeChange)="onPendingMergeTabSelected()"
-    (favoritesChange)="onFavoritesTabSelected()"
-  />
+  <div class="product-catalog-page__status-row">
+    <app-product-catalog-status-tabs
+      [activeStatus]="statusFilter()"
+      [pendingMergeActive]="pendingMergeOnly()"
+      [favoritesActive]="favoritesOnly()"
+      [counts]="statusCounts()"
+      (statusChange)="onStatusFilterChange($event)"
+      (pendingMergeChange)="onPendingMergeTabSelected()"
+      (favoritesChange)="onFavoritesTabSelected()"
+    />
+
+    @if (pageSize() !== -1) {
+      <button
+        pButton
+        type="button"
+        [text]="true"
+        size="small"
+        icon="pi pi-list"
+        [label]="'ADMIN.CATALOG_PAGE.SHOW_ALL_ROWS' | translate"
+        class="product-catalog-page__show-all"
+        (click)="showAllRows()"
+      ></button>
+    }
+  </div>
 
   <app-product-catalog-toolbar
     [searchTerm]="searchTerm()"
@@ -160,20 +175,6 @@
       [disabled]="bulkActionLoading()"
     />
   </app-admin-bulk-bar>
-
-  @if (pageSize() !== -1) {
-    <div class="product-catalog-page__show-all">
-      <button
-        pButton
-        type="button"
-        [text]="true"
-        size="small"
-        icon="pi pi-list"
-        [label]="'ADMIN.CATALOG_PAGE.SHOW_ALL_ROWS' | translate"
-        (click)="showAllRows()"
-      ></button>
-    </div>
-  }
 
   @if (viewMode() === 'table') {
     <app-product-catalog-table

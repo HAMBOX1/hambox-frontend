@@ -1,6 +1,14 @@
-export type FlowKey = 'find' | 'track' | 'compare' | 'activate' | 'refund' | 'support';
+export type FlowKey =
+  | 'find'
+  | 'track'
+  | 'compare'
+  | 'activate'
+  | 'refund'
+  | 'support'
+  | 'tickets'
+  | 'createTicket';
 
-export type MessageRole = 'user' | 'ai';
+export type MessageRole = 'user' | 'ai' | 'agent';
 
 export interface QuickAction {
   readonly label: string;
@@ -47,6 +55,8 @@ export interface AssistantMessage {
   content: string;
   readonly time: string;
   readonly flow?: FlowKey;
+  /** Set for `role: 'agent'` messages in a live ticket chat — the real support agent's name. */
+  readonly authorName?: string;
   cards?: readonly AssistantCard[];
   actions?: readonly QuickAction[];
   streaming?: boolean;

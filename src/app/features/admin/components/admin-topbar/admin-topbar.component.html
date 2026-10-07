@@ -57,6 +57,14 @@
 
     <p-popover #profilePanel>
       <div class="admin-topbar__profile-panel" role="menu">
+        <a
+          class="admin-topbar__profile-panel-item"
+          routerLink="/admin/security/my-sessions"
+          (click)="profilePanel.hide()"
+        >
+          <i class="pi pi-desktop" aria-hidden="true"></i>
+          <span>{{ 'ADMIN.TOPBAR.MY_SESSIONS' | translate }}</span>
+        </a>
         <button
           type="button"
           class="admin-topbar__profile-panel-item"

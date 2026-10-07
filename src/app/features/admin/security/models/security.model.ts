@@ -140,6 +140,7 @@ export interface UserSessionDto {
   readonly lastActivityOnUtc: string;
   readonly endedOnUtc: string | null;
   readonly isActive: boolean;
+  readonly isCurrent: boolean;
 }
 
 export interface TrustedDeviceDto {

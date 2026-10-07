@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PopoverModule } from 'primeng/popover';
 
@@ -13,6 +13,7 @@ import { AdminPageTitleService } from '../../services/admin-page-title.service';
   selector: 'app-admin-topbar',
   standalone: true,
   imports: [
+    RouterLink,
     ThemeToggleComponent,
     LanguageSwitcherComponent,
     CurrencySwitcherComponent,

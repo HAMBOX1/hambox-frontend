@@ -27,7 +27,15 @@ import { ProductApiService } from './product-api.service';
 const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
-@Injectable()
+/**
+ * Root-scoped (not provided by `ProductCatalogPageComponent` itself) so the list's tab/page/
+ * size/sort/search/filters survive navigating to a product's Edit page and back — the page
+ * component is destroyed and recreated by the router on that round trip, and a component-scoped
+ * facade would reset to defaults every time. The tradeoff: this state also outlives navigating to
+ * an unrelated admin section and back, which reads as "remembered filters", not "reset" — doesn't
+ * fully reset until the SPA itself reloads.
+ */
+@Injectable({ providedIn: 'root' })
 export class ProductCatalogFacade {
   private readonly api = inject(ProductApiService);
   private readonly categoryApi = inject(CategoryApiService);
@@ -773,10 +781,24 @@ export class ProductCatalogFacade {
       );
 
       const items = result.items ?? [];
+      const totalCount = result.totalCount ?? 0;
+      const pageSize = result.pageSize ?? this.pageSizeState();
+
+      // A restored (or stale) page can land past the end of the dataset once items are
+      // deleted/merged/filtered elsewhere — clamp to the last valid page instead of showing an
+      // empty list.
+      if (items.length === 0 && totalCount > 0 && requestedPageNumber > 1) {
+        const lastPage = Math.max(1, Math.ceil(totalCount / Math.max(pageSize, 1)));
+        if (lastPage < requestedPageNumber) {
+          this.pageNumberState.set(lastPage);
+          return this.fetchProducts(force);
+        }
+      }
+
       this.itemsState.set(items);
-      this.totalCountState.set(result.totalCount ?? 0);
+      this.totalCountState.set(totalCount);
       this.pageNumberState.set(result.pageNumber ?? this.pageNumberState());
-      this.pageSizeState.set(result.pageSize ?? this.pageSizeState());
+      this.pageSizeState.set(pageSize);
       this.hasLoaded = true;
       this.syncSelection(items);
       void this.refreshMappingStatusForVisibleProducts(items);

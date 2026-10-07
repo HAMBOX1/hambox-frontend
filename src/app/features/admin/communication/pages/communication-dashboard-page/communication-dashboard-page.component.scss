@@ -1,0 +1,52 @@
+.comm-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--admin-field-gap, 1.25rem);
+}
+
+.comm-nav-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: var(--admin-card-padding, 1.5rem);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.comm-nav-card__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg-elevated);
+  color: var(--admin-accent-green);
+  font-size: 1.125rem;
+}
+
+.comm-nav-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.comm-nav-card__title {
+  color: var(--admin-text-primary);
+  font-weight: 700;
+  font-size: var(--admin-type-card-title, 0.95rem);
+}
+
+.comm-nav-card__description {
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-type-caption, 0.8rem);
+  line-height: 1.45;
+}
+
+.comm-nav-card__chevron {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  color: var(--admin-text-secondary);
+}

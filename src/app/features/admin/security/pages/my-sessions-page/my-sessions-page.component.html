@@ -1,0 +1,96 @@
+<p-toast position="top-right" />
+
+<section class="admin-page my-sessions-page">
+  <app-admin-page-header
+    [title]="'ADMIN.MY_SESSIONS.TITLE' | translate"
+    [subtitle]="'ADMIN.MY_SESSIONS.SUBTITLE' | translate"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <app-admin-section-card [title]="'ADMIN.MY_SESSIONS.TITLE' | translate" [compact]="true">
+    @if (facade.error()) {
+      <app-admin-error-alert [message]="facade.error()!" />
+    }
+
+    @if (facade.loading()) {
+      <app-admin-loading-skeleton [rows]="3" />
+    } @else if (facade.sessions().length === 0) {
+      <app-admin-empty-state icon="pi pi-desktop" [title]="'ADMIN.MY_SESSIONS.EMPTY' | translate" />
+    } @else {
+      @if (facade.sessions().length > 1) {
+        <div class="my-sessions-page__actions-row">
+          <button
+            pButton
+            type="button"
+            class="admin-btn-secondary"
+            [label]="'ADMIN.MY_SESSIONS.REVOKE_ALL_OTHERS' | translate"
+            icon="pi pi-power-off"
+            [disabled]="facade.actionLoading()"
+            (click)="revokeAllDialogOpen.set(true)"
+          ></button>
+        </div>
+      }
+
+      <app-admin-data-table-shell>
+        <p-table class="admin-data-table" [value]="[...facade.sessions()]" dataKey="id" scrollable scrollHeight="flex" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ADMIN.MY_SESSIONS.COLUMNS.DEVICE' | translate }}</th>
+              <th>{{ 'ADMIN.MY_SESSIONS.COLUMNS.IP' | translate }}</th>
+              <th>{{ 'ADMIN.MY_SESSIONS.COLUMNS.STARTED' | translate }}</th>
+              <th>{{ 'ADMIN.MY_SESSIONS.COLUMNS.LAST_ACTIVITY' | translate }}</th>
+              <th>{{ 'ADMIN.MY_SESSIONS.COLUMNS.STATUS' | translate }}</th>
+              <th style="width: 6rem"></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-session>
+            <tr>
+              <td>{{ deviceLabel(session) }}</td>
+              <td>{{ session.ipAddress }}</td>
+              <td>{{ session.startedOnUtc | date: 'short' }}</td>
+              <td>{{ session.lastActivityOnUtc | date: 'short' }}</td>
+              <td>
+                @if (session.isCurrent) {
+                  <app-admin-status-badge [label]="'ADMIN.MY_SESSIONS.STATUS.CURRENT' | translate" tone="success" />
+                } @else {
+                  <app-admin-status-badge [label]="'ADMIN.MY_SESSIONS.STATUS.OTHER' | translate" tone="neutral" />
+                }
+              </td>
+              <td>
+                @if (!session.isCurrent) {
+                  <app-admin-icon-button
+                    icon="pi pi-power-off"
+                    severity="danger"
+                    [label]="'ADMIN.MY_SESSIONS.REVOKE' | translate"
+                    [disabled]="facade.actionLoading()"
+                    (pressed)="openRevokeConfirm(session)"
+                  />
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </app-admin-data-table-shell>
+    }
+  </app-admin-section-card>
+</section>
+
+<app-admin-confirm-dialog
+  [visible]="revokeTarget() !== null"
+  (visibleChange)="onRevokeDialogVisibleChange($event)"
+  [title]="'ADMIN.MY_SESSIONS.REVOKE' | translate"
+  [message]="'ADMIN.MY_SESSIONS.REVOKE_CONFIRM' | translate"
+  [destructive]="true"
+  [loading]="facade.actionLoading()"
+  (confirmed)="confirmRevoke()"
+/>
+
+<app-admin-confirm-dialog
+  [visible]="revokeAllDialogOpen()"
+  (visibleChange)="revokeAllDialogOpen.set($event)"
+  [title]="'ADMIN.MY_SESSIONS.REVOKE_ALL_OTHERS' | translate"
+  [message]="'ADMIN.MY_SESSIONS.REVOKE_ALL_OTHERS_CONFIRM' | translate"
+  [destructive]="true"
+  [loading]="facade.actionLoading()"
+  (confirmed)="confirmRevokeAllOthers()"
+/>
