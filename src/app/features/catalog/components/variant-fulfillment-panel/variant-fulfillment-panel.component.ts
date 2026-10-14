@@ -28,6 +28,7 @@ const MODE_OPTIONS: readonly FulfillmentModeOption[] = [
   { mode: 'ManualFirst', icon: 'pi pi-sort-amount-down', titleKey: 'ADMIN.FULFILLMENT.MODE.MANUAL_FIRST', descriptionKey: 'ADMIN.FULFILLMENT.MODE.MANUAL_FIRST_DESC' },
   { mode: 'SupplierFirst', icon: 'pi pi-sort-amount-up', titleKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_FIRST', descriptionKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_FIRST_DESC' },
   { mode: 'SupplierOnly', icon: 'pi pi-cloud', titleKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_ONLY', descriptionKey: 'ADMIN.FULFILLMENT.MODE.SUPPLIER_ONLY_DESC' },
+  { mode: 'Disabled', icon: 'pi pi-ban', titleKey: 'ADMIN.FULFILLMENT.MODE.DISABLED', descriptionKey: 'ADMIN.FULFILLMENT.MODE.DISABLED_DESC' },
   { mode: 'ChatDelivery', icon: 'pi pi-comments', titleKey: 'ADMIN.FULFILLMENT.MODE.CHAT_DELIVERY', descriptionKey: 'ADMIN.FULFILLMENT.MODE.CHAT_DELIVERY_DESC' },
 ];
 

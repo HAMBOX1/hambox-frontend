@@ -156,6 +156,7 @@ export const INVENTORY_API = {
   codeDisable: (codeId: string) => `/api/v1/inventory/codes/${codeId}/disable`,
   codeEnable: (codeId: string) => `/api/v1/inventory/codes/${codeId}/enable`,
   codeReveal: (codeId: string) => `/api/v1/inventory/codes/${codeId}/reveal`,
+  codeMarkFailed: (codeId: string) => `/api/v1/inventory/codes/${codeId}/mark-failed`,
   auditLogs: '/api/v1/inventory/audit-logs',
   reservations: '/api/v1/inventory/reservations',
   releaseReservation: (codeId: string) => `/api/v1/inventory/reservations/${codeId}/release`,

@@ -1735,6 +1735,14 @@ export class ProductEditorFacade {
 
 
 
+  async markCodeFailed(codeId: string, reason: string): Promise<boolean> {
+
+    return this.runCodeAction(() => firstValueFrom(this.inventoryApi.markCodeFailed(codeId, reason)));
+
+  }
+
+
+
   async enableCode(codeId: string): Promise<boolean> {
 
     return this.runCodeAction(() => firstValueFrom(this.inventoryApi.enableCode(codeId)));
@@ -1752,9 +1760,9 @@ export class ProductEditorFacade {
 
 
   /** Calls the dedicated reveal endpoint. Never caches the plaintext result. */
-  async revealCode(codeId: string): Promise<string | null> {
+  async revealCode(codeId: string, reason: string): Promise<string | null> {
     try {
-      const result = await firstValueFrom(this.inventoryApi.revealCode(codeId));
+      const result = await firstValueFrom(this.inventoryApi.revealCode(codeId, reason));
       return result.digitalCode;
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Failed to reveal code.'));

@@ -262,10 +262,10 @@ export class OrderManagementFacade {
     }
   }
 
-  async revealLicenseKey(orderId: string, licenseKeyId: string): Promise<string | null> {
+  async revealLicenseKey(orderId: string, licenseKeyId: string, reason: string): Promise<string | null> {
     try {
       const result = await firstValueFrom(
-        this.api.get<{ licenseKey: string }>(ORDERS_API.revealLicenseKey(orderId, licenseKeyId)),
+        this.api.post<{ licenseKey: string }>(ORDERS_API.revealLicenseKey(orderId, licenseKeyId), { reason }),
       );
       return result.licenseKey;
     } catch {

@@ -45,6 +45,7 @@ const CODE_STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'Sold', value: 'Sold' },
   { label: 'Expired', value: 'Expired' },
   { label: 'Disabled', value: 'Disabled' },
+  { label: 'Failed', value: 'Failed' },
 ];
 
 /** Friendly fallback labels for audit actions that don't carry their own `details` text. */
@@ -394,6 +395,31 @@ export class VariantInventoryPanelComponent {
     }
   }
 
+  protected readonly failTargetCode = signal<DigitalInventoryCodeDto | null>(null);
+  protected readonly failReason = signal('');
+
+  protected requestMarkFailed(code: DigitalInventoryCodeDto): void {
+    this.failReason.set('');
+    this.failTargetCode.set(code);
+  }
+
+  protected async confirmMarkFailed(): Promise<void> {
+    const code = this.failTargetCode();
+    const reason = this.failReason().trim();
+    if (!code || !reason) {
+      return;
+    }
+
+    this.actionLoading.set(true);
+    try {
+      if (await this.facade.markCodeFailed(code.id, reason)) {
+        this.failTargetCode.set(null);
+      }
+    } finally {
+      this.actionLoading.set(false);
+    }
+  }
+
   protected async enableCode(code: DigitalInventoryCodeDto): Promise<void> {
     this.actionLoading.set(true);
     try {
@@ -482,20 +508,24 @@ export class VariantInventoryPanelComponent {
     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
 
+  protected readonly revealReason = signal('');
+
   protected requestReveal(code: DigitalInventoryCodeDto): void {
+    this.revealReason.set('');
     this.revealTargetCode.set(code);
     this.revealDialogOpen.set(true);
   }
 
   protected async confirmReveal(): Promise<void> {
     const code = this.revealTargetCode();
-    if (!code) {
+    const reason = this.revealReason().trim();
+    if (!code || !reason) {
       return;
     }
 
     this.revealing.set(true);
     try {
-      const plaintext = await this.facade.revealCode(code.id);
+      const plaintext = await this.facade.revealCode(code.id, reason);
       if (plaintext) {
         this.showRevealed(code.id, plaintext);
       }

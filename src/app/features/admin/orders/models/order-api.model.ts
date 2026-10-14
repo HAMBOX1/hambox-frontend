@@ -88,6 +88,10 @@ export interface AdminOrderAuditEntryDto {
   readonly description: string;
   readonly actorDisplayName: string | null;
   readonly occurredOnUtc: string;
+  /** Why a sensitive action (e.g. a key reveal) was taken. */
+  readonly reason?: string | null;
+  readonly ipAddress?: string | null;
+  readonly userAgent?: string | null;
 }
 
 export interface AdminOrderPaymentCallbackDto {

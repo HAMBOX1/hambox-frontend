@@ -20,7 +20,13 @@ export interface ProductOptionGroupDto {
 }
 
 /** Matches backend `HAMBOX.Modules.Catalog.Domain.Enums.FulfillmentMode`. */
-export type FulfillmentMode = 'ManualOnly' | 'ManualFirst' | 'SupplierFirst' | 'SupplierOnly' | 'ChatDelivery';
+export type FulfillmentMode =
+  | 'ManualOnly'
+  | 'ManualFirst'
+  | 'SupplierFirst'
+  | 'SupplierOnly'
+  | 'ChatDelivery'
+  | 'Disabled';
 
 export const FULFILLMENT_MODES: readonly FulfillmentMode[] = [
   'ManualOnly',
@@ -105,6 +111,10 @@ export interface DigitalInventoryCodeDto {
   readonly expirationDate: string | null;
   readonly reservedOnUtc: string | null;
   readonly soldOnUtc: string | null;
+  readonly lastStatusChangedOnUtc?: string | null;
+  /** Why the code was marked Failed (e.g. rejected by the platform). */
+  readonly failureReason?: string | null;
+  readonly soldToUserId?: string | null;
 }
 
 export interface InventoryAuditLogDto {
@@ -278,12 +288,22 @@ export interface ImportCodeDuplicateDto {
   readonly batchName: string | null;
 }
 
+/** One line the import refused: position is 1-based in the submitted list; the code is masked. */
+export interface ImportCodeRejectionDto {
+  readonly position: number;
+  readonly maskedCode: string;
+  readonly reason: string;
+  readonly detail: string;
+}
+
 export interface ImportCodesResultDto {
   readonly totalSubmitted: number;
   readonly importedCount: number;
   readonly duplicateCount: number;
   readonly invalidCount: number;
   readonly duplicates: readonly ImportCodeDuplicateDto[];
+  /** Every refused line with its reason: duplicates, blanks and over-long lines. */
+  readonly rejected?: readonly ImportCodeRejectionDto[] | null;
 }
 
 export interface UpdateVariantRequest {

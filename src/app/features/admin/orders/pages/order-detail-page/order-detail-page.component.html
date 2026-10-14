@@ -281,7 +281,7 @@
                     size="small"
                     severity="secondary"
                     [label]="'ADMIN.ORDERS.DETAIL.REVEAL_CODE' | translate"
-                    (click)="revealKey(license.id)"
+                    (click)="requestReveal(license.id)"
                   ></button>
                 } @else {
                   <button
@@ -430,6 +430,12 @@
               <strong>{{ entry.eventType }}</strong>
               <span>{{ entry.description }}</span>
               <small>{{ entry.actorDisplayName || 'System' }} · {{ entry.occurredOnUtc | date: 'medium' }}</small>
+              @if (entry.reason) {
+                <small>Reason: {{ entry.reason }}</small>
+              }
+              @if (entry.ipAddress || entry.userAgent) {
+                <small [title]="entry.userAgent || ''">IP: {{ entry.ipAddress || '-' }} · {{ entry.userAgent || '-' }}</small>
+              }
             </li>
           }
         </ul>
@@ -533,6 +539,35 @@
       [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
       [loading]="actionLoading()"
       (click)="confirmManualCode()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.ORDERS.DETAIL.REVEAL_REASON_TITLE' | translate"
+  [visible]="revealReasonTargetId() !== null"
+  (visibleChange)="$event ? null : revealReasonTargetId.set(null)"
+  [modal]="true"
+  [dismissableMask]="true"
+  styleClass="admin-dialog"
+>
+  <p>{{ 'ADMIN.ORDERS.DETAIL.REVEAL_REASON_HINT' | translate }}</p>
+  <textarea
+    pTextarea
+    rows="3"
+    maxlength="500"
+    class="w-full"
+    [ngModel]="revealReason()"
+    (ngModelChange)="revealReason.set($event)"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.ORDERS.DETAIL.REVEAL_REASON_CONFIRM' | translate"
+      [disabled]="!revealReason().trim()"
+      [loading]="revealing()"
+      (click)="confirmReveal()"
     ></button>
   </ng-template>
 </p-dialog>

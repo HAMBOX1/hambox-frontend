@@ -248,14 +248,34 @@
                 }
               </td>
               <td>{{ batchLabel(code.batchId) }}</td>
-              <td><app-admin-status-badge [label]="code.status" /></td>
+              <td>
+                <app-admin-status-badge [label]="code.status" />
+                @if (code.status === 'Failed' && code.failureReason) {
+                  <small class="variant-inventory-panel__failure-reason" [title]="code.failureReason">
+                    {{ code.failureReason }}
+                  </small>
+                }
+              </td>
               <td>{{ code.reservedOnUtc ? (code.reservedOnUtc | date: 'short') : '—' }}</td>
               <td>—</td>
               <td>{{ code.soldOnUtc ? (code.soldOnUtc | date: 'short') : '—' }}</td>
               <td>{{ code.expirationDate ?? '—' }}</td>
               <td>
                 <div class="variant-inventory-panel__code-actions">
-                  @if (code.status === 'Disabled') {
+                  @if (code.status === 'Available' || code.status === 'Disabled') {
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-exclamation-triangle"
+                      size="small"
+                      severity="warn"
+                      title="Mark as failed"
+                      *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+                      [loading]="actionLoading()"
+                      (click)="requestMarkFailed(code)"
+                    ></button>
+                  }
+                  @if (code.status === 'Disabled' || code.status === 'Failed') {
                     <button
                       pButton
                       type="button"
@@ -371,15 +391,42 @@
   (confirmed)="confirmBulkDelete()"
 />
 
-<app-admin-confirm-dialog
+<p-dialog
   [visible]="revealDialogOpen()"
-  title="Reveal inventory code"
-  message="This action will reveal a sensitive inventory code. This action is audited."
-  confirmLabel="ADMIN.CONFIRM.REVEAL"
-  [loading]="revealing()"
   (visibleChange)="revealDialogOpen.set($event); revealTargetCode.set(null)"
-  (confirmed)="confirmReveal()"
-/>
+  header="Reveal inventory code"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p>
+    This reveals a sensitive inventory code. State why you need it — the reason, your account, IP and device are
+    written to the audit trail.
+  </p>
+  <textarea
+    pTextarea
+    rows="3"
+    maxlength="500"
+    placeholder="Reason (required)"
+    class="w-full"
+    [ngModel]="revealReason()"
+    (ngModelChange)="revealReason.set($event)"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Reveal"
+      [disabled]="!revealReason().trim()"
+      [loading]="revealing()"
+      (click)="confirmReveal()"
+    ></button>
+  </ng-template>
+</p-dialog>
 
 <p-dialog
   [visible]="importResultDialogOpen()"
@@ -421,6 +468,22 @@
         </div>
       }
     </div>
+
+    @if (result.rejected?.length) {
+      <div class="variant-inventory-panel__import-rejected">
+        <p><strong>Rejected lines ({{ result.rejected!.length }})</strong></p>
+        <ul class="variant-inventory-panel__import-duplicates-list">
+          @for (row of result.rejected!; track row.position) {
+            <li class="variant-inventory-panel__import-duplicate">
+              <span>#{{ row.position }}</span>
+              <code class="variant-inventory-panel__code">{{ row.maskedCode || '-' }}</code>
+              <span class="variant-inventory-panel__import-duplicate-reason">{{ row.reason }}</span>
+              <span class="variant-inventory-panel__import-duplicate-meta">{{ row.detail }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
 
     @if (result.duplicateCount > 0) {
       <div class="variant-inventory-panel__import-duplicates">
@@ -486,3 +549,38 @@
 </p-dialog>
 
 <p-toast />
+
+<p-dialog
+  [visible]="failTargetCode() !== null"
+  (visibleChange)="$event ? null : failTargetCode.set(null)"
+  header="Mark code as failed"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p>The code leaves stock and is kept with this reason (for example the platform said it is invalid or already used).</p>
+  <textarea
+    pTextarea
+    rows="3"
+    maxlength="500"
+    placeholder="Failure reason (required)"
+    class="w-full"
+    [ngModel]="failReason()"
+    (ngModelChange)="failReason.set($event)"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Mark failed"
+      severity="warn"
+      [disabled]="!failReason().trim()"
+      [loading]="actionLoading()"
+      (click)="confirmMarkFailed()"
+    ></button>
+  </ng-template>
+</p-dialog>

@@ -3513,6 +3513,9 @@
         "RETRY_FULFILLMENT": "Retry fulfillment",
         "RETRY_CONFIRM": "Attempt to deliver missing digital codes from inventory?",
         "RETRY_SUCCESS": "Delivered {{count}} code(s)",
+        "REVEAL_REASON_TITLE": "Reason for revealing this code",
+        "REVEAL_REASON_HINT": "Explain why you need to see this code (required). The reason, your account, IP and device are recorded in the audit trail.",
+        "REVEAL_REASON_CONFIRM": "Reveal",
         "ASSIGN_MANUAL_CODE": "Assign manual code",
         "MANUAL_CODE_ITEM": "Line item",
         "MANUAL_CODE_VALUE": "License key",
@@ -5759,6 +5762,8 @@
         "SUPPLIER_FIRST_DESC": "Use the configured supplier chain first. Manual inventory is used only when supplier fulfillment is definitively exhausted.",
         "SUPPLIER_ONLY": "Supplier Only",
         "SUPPLIER_ONLY_DESC": "Fulfill this variant exclusively through the configured supplier chain. Manual inventory is never used.",
+        "DISABLED": "Disabled",
+        "DISABLED_DESC": "Not sold at all: no stock, no supplier, no chat. Use it to pause a variant without touching its codes or supplier links.",
         "CHAT_DELIVERY": "On Delivery (support chat)",
         "CHAT_DELIVERY_DESC": "After payment a support chat opens and you deliver by hand. No codes or supplier needed — switch to Manual Only for instant stock."
       },

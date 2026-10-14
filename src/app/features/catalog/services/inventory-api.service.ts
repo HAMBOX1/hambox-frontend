@@ -313,8 +313,12 @@ export class InventoryApiService {
     return this.api.delete<void>(INVENTORY_API.code(codeId));
   }
 
-  revealCode(codeId: string): Observable<RevealInventoryCodeDto> {
-    return this.api.post<RevealInventoryCodeDto>(INVENTORY_API.codeReveal(codeId), {});
+  revealCode(codeId: string, reason: string): Observable<RevealInventoryCodeDto> {
+    return this.api.post<RevealInventoryCodeDto>(INVENTORY_API.codeReveal(codeId), { reason });
+  }
+
+  markCodeFailed(codeId: string, reason: string): Observable<void> {
+    return this.api.post<void>(INVENTORY_API.codeMarkFailed(codeId), { reason });
   }
 
   bulkDisableCodes(variantId: string, request: BulkCodeIdsRequest): Observable<BulkCodeActionResultDto> {

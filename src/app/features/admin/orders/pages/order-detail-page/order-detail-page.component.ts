@@ -525,13 +525,45 @@ export class OrderDetailPageComponent implements OnInit {
 
 
 
-  protected async revealKey(licenseKeyId: string): Promise<void> {
+  protected readonly revealReasonTargetId = signal<string | null>(null);
 
-    const key = await this.facade.revealLicenseKey(this.orderId(), licenseKeyId);
+  protected readonly revealReason = signal('');
 
-    if (!key) return;
+  protected readonly revealing = signal(false);
 
-    this.revealedKeys.update((current) => ({ ...current, [licenseKeyId]: key }));
+  protected requestReveal(licenseKeyId: string): void {
+
+    this.revealReason.set('');
+
+    this.revealReasonTargetId.set(licenseKeyId);
+
+  }
+
+  protected async confirmReveal(): Promise<void> {
+
+    const licenseKeyId = this.revealReasonTargetId();
+
+    const reason = this.revealReason().trim();
+
+    if (!licenseKeyId || !reason) return;
+
+    this.revealing.set(true);
+
+    try {
+
+      const key = await this.facade.revealLicenseKey(this.orderId(), licenseKeyId, reason);
+
+      if (!key) return;
+
+      this.revealedKeys.update((current) => ({ ...current, [licenseKeyId]: key }));
+
+      this.revealReasonTargetId.set(null);
+
+    } finally {
+
+      this.revealing.set(false);
+
+    }
 
   }
 
