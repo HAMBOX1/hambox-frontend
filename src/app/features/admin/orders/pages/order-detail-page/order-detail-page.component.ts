@@ -525,6 +525,26 @@ export class OrderDetailPageComponent implements OnInit {
 
 
 
+  protected readonly refundReference = signal('');
+
+  protected readonly refundNote = signal('');
+
+  protected async settleRefund(): Promise<void> {
+
+    const reference = this.refundReference().trim();
+
+    if (!reference) return;
+
+    if (await this.facade.settleRefund(this.orderId(), reference, this.refundNote().trim() || null)) {
+
+      this.refundReference.set('');
+
+      this.refundNote.set('');
+
+    }
+
+  }
+
   protected readonly holdDialogOpen = signal(false);
 
   protected readonly holdReason = signal('');

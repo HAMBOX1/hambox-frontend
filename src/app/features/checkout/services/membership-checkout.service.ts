@@ -26,6 +26,21 @@ export interface MembershipCheckoutRequestApiDto {
   readonly couponCode?: string | null;
 }
 
+export interface MembershipHostedCheckoutRequestApiDto {
+  readonly planId: string;
+  readonly action: string;
+  readonly gateway: 'cryptomus' | 'oxapay';
+  readonly email: string;
+  readonly country: string;
+}
+
+export interface MembershipHostedCheckoutApiDto {
+  readonly paymentAttemptId: string;
+  readonly orderId: string;
+  readonly paymentUrl: string;
+  readonly expiresOnUtc: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MembershipCheckoutService {
   private readonly http = inject(HttpClient);
@@ -36,6 +51,11 @@ export class MembershipCheckoutService {
       params = params.set('couponCode', couponCode.trim());
     }
     return this.http.get<MembershipCheckoutPreviewApiDto>(COMMERCE_API.membershipCheckoutPreview, { params });
+  }
+
+  /** Pays a membership through a hosted crypto gateway: returns the gateway's payment page. */
+  checkoutHosted(body: MembershipHostedCheckoutRequestApiDto) {
+    return this.http.post<MembershipHostedCheckoutApiDto>(COMMERCE_API.membershipHostedCheckout, body);
   }
 
   checkout(body: MembershipCheckoutRequestApiDto, idempotencyKey: string) {

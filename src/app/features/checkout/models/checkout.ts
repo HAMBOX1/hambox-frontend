@@ -74,13 +74,6 @@ export interface CheckoutSummary {
   appliedCouponCode: string | null;
 }
 
-export interface CardPaymentDetails {
-  cardholderName: string;
-  cardNumber: string;
-  expiryDate: string;
-  cvc: string;
-}
-
 export interface BillingDetails {
   email: string;
   country: string;

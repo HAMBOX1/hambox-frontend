@@ -46,20 +46,16 @@ describe('CheckoutFacade', () => {
     expect(facade.paymentMethod()).toBe('card');
   });
 
-  it('should update card and billing fields', () => {
-    facade.updateCardField('cardholderName', 'Jane Doe');
+  it('should update billing fields', () => {
     facade.updateBillingField('email', 'jane@example.com');
 
-    expect(facade.cardDetails().cardholderName).toBe('Jane Doe');
     expect(facade.billingDetails().email).toBe('jane@example.com');
   });
 
   it('should reset to initial state', () => {
     facade.selectPaymentMethod('crypto');
-    facade.updateCardField('cvc', '999');
     facade.reset();
 
     expect(facade.paymentMethod()).toBe('card');
-    expect(facade.cardDetails().cvc).toBe('');
   });
 });

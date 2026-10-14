@@ -342,6 +342,47 @@
       }
     </app-admin-section-card>
 
+    @if (order.refundSettlement === 'AwaitingGatewayRefund') {
+      <app-admin-section-card title="Refund owed to the customer">
+        <p>
+          This order is refunded in HAMBOX, but the money has not been returned yet. Refund it from the
+          {{ order.paymentProvider }} dashboard (transaction {{ order.paymentTransactionId }}), then record the
+          reference here.
+        </p>
+        <input
+          pInputText
+          type="text"
+          class="w-full"
+          placeholder="Gateway / wallet refund reference (required)"
+          [ngModel]="refundReference()"
+          (ngModelChange)="refundReference.set($event)"
+        />
+        <input
+          pInputText
+          type="text"
+          class="w-full"
+          placeholder="Note (optional)"
+          [ngModel]="refundNote()"
+          (ngModelChange)="refundNote.set($event)"
+        />
+        <button
+          pButton
+          type="button"
+          label="Mark refund as returned"
+          [disabled]="!refundReference().trim()"
+          [loading]="actionLoading()"
+          (click)="settleRefund()"
+        ></button>
+      </app-admin-section-card>
+    } @else if (order.refundSettlement === 'Settled') {
+      <app-admin-section-card title="Refund returned">
+        <p>
+          Returned to the customer on {{ order.refundSettledOnUtc | date: 'medium' }} — reference
+          {{ order.refundGatewayReference }}.
+        </p>
+      </app-admin-section-card>
+    }
+
     @if (order.holdKind) {
       <app-admin-section-card [title]="order.holdKind === 'ManualReview' ? 'Pending manual review' : 'Order on hold'">
         <p>{{ order.holdReason }}</p>

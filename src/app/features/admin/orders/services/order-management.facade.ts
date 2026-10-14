@@ -325,6 +325,10 @@ export class OrderManagementFacade {
     return this.postOrderAction(orderId, ORDERS_API.hold(orderId), { reason });
   }
 
+  async settleRefund(orderId: string, gatewayReference: string, note: string | null): Promise<boolean> {
+    return this.postOrderAction(orderId, ORDERS_API.settleRefund(orderId), { gatewayReference, note });
+  }
+
   async releaseOrderHold(orderId: string, note: string | null): Promise<boolean> {
     return this.postOrderAction(orderId, ORDERS_API.releaseHold(orderId), { note });
   }

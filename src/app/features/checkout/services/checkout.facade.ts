@@ -11,7 +11,6 @@ import { mapCartSummary } from '../../cart/utils/cart.mapper';
 import { CheckoutService } from './checkout.service';
 import {
   BillingDetails,
-  CardPaymentDetails,
   CheckoutOrderItem,
   CheckoutSummary,
   CryptomusCheckoutInitiationDto,
@@ -31,13 +30,6 @@ import {
   PaymentMethodId,
 } from '../models/checkout';
 import { mapOrderToSuccessDetails } from '../utils/checkout.mapper';
-
-const INITIAL_CARD: CardPaymentDetails = {
-  cardholderName: '',
-  cardNumber: '',
-  expiryDate: '',
-  cvc: '',
-};
 
 const INITIAL_BILLING: BillingDetails = {
   email: '',
@@ -61,7 +53,6 @@ export class CheckoutFacade {
   private readonly authSession = inject(AuthSessionService);
 
   private readonly paymentMethodState = signal<PaymentMethodId>('card');
-  private readonly cardDetailsState = signal<CardPaymentDetails>({ ...INITIAL_CARD });
   private readonly billingDetailsState = signal<BillingDetails>({ ...INITIAL_BILLING });
   private readonly discountCodeState = signal('');
   private readonly discountErrorState = signal<string | null>(null);
@@ -79,7 +70,6 @@ export class CheckoutFacade {
   private previewRequestToken = 0;
 
   readonly paymentMethod = this.paymentMethodState.asReadonly();
-  readonly cardDetails = this.cardDetailsState.asReadonly();
   readonly billingDetails = this.billingDetailsState.asReadonly();
   readonly discountCode = this.discountCodeState.asReadonly();
   readonly discountError = this.discountErrorState.asReadonly();
@@ -253,13 +243,6 @@ export class CheckoutFacade {
         this.gatewayPreviewState.set(null);
       }
     }
-  }
-
-  updateCardField<K extends keyof CardPaymentDetails>(
-    field: K,
-    value: CardPaymentDetails[K],
-  ): void {
-    this.cardDetailsState.update((details) => ({ ...details, [field]: value }));
   }
 
   updateBillingField<K extends keyof BillingDetails>(
@@ -531,7 +514,6 @@ export class CheckoutFacade {
 
   reset(): void {
     this.paymentMethodState.set('card');
-    this.cardDetailsState.set({ ...INITIAL_CARD });
     this.billingDetailsState.set({ ...INITIAL_BILLING });
     this.discountCodeState.set('');
     this.discountErrorState.set(null);

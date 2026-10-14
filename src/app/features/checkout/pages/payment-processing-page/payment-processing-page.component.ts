@@ -245,6 +245,35 @@ export class PaymentProcessingPageComponent implements OnInit {
     this.membershipCheckout.updateBillingField('country', this.checkout.billingDetails().country);
     this.membershipCheckout.selectPaymentMethod(this.checkout.paymentMethod());
 
+    // Production has no synchronous card processor: a membership is paid through a hosted gateway and
+    // activated by the server once the gateway confirms, exactly like a cart order.
+    const method = this.checkout.paymentMethod();
+    if (method === 'crypto' || method === 'oxapay') {
+      this.stageLabel.set('Preparing secure payment');
+      this.progress.set(20);
+      try {
+        const paymentUrl = await this.membershipCheckout.submitHostedCheckout(
+          method === 'crypto' ? 'cryptomus' : 'oxapay',
+        );
+        this.stageLabel.set('Redirecting to payment page');
+        this.progress.set(90);
+        window.location.href = paymentUrl;
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Membership checkout failed. Please try again.';
+        this.error.set(message);
+        this.stageLabel.set('Payment failed');
+      }
+
+      return;
+    }
+
+    if (method !== 'development') {
+      this.error.set('Membership can currently be paid with crypto only. Please choose a crypto payment method.');
+      this.stageLabel.set('Payment method unavailable');
+      return;
+    }
+
     let stageIndex = 0;
     const stageTimer = interval(700)
       .pipe(takeUntilDestroyed(this.destroyRef))

@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaymentMethodId } from '../../models/checkout';
 import { CheckoutFacade } from '../../services/checkout.facade';
-import { CheckoutCardFormComponent } from '../checkout-card-form/checkout-card-form.component';
 
 const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   card: 'CHECKOUT.METHOD_CARD',
@@ -20,7 +19,7 @@ const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
 @Component({
   selector: 'app-payment-method-selector',
   standalone: true,
-  imports: [CheckoutCardFormComponent, TranslatePipe],
+  imports: [TranslatePipe],
   templateUrl: './payment-method-selector.component.html',
   styleUrl: './payment-method-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

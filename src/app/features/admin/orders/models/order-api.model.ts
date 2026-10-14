@@ -165,6 +165,10 @@ export interface AdminOrderDetailDto {
   readonly holdKind?: string | null;
   readonly holdReason?: string | null;
   readonly heldOnUtc?: string | null;
+  /** 'AwaitingGatewayRefund' while the customer still has to be paid back; 'Settled' once an admin recorded it. */
+  readonly refundSettlement?: string | null;
+  readonly refundGatewayReference?: string | null;
+  readonly refundSettledOnUtc?: string | null;
 }
 
 /**

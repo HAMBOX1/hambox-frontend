@@ -8,20 +8,12 @@ import { OrderApiDto } from '../../cart/models/cart-api.model';
 import { CheckoutService } from './checkout.service';
 import {
   BillingDetails,
-  CardPaymentDetails,
   PaymentMethodId,
 } from '../models/checkout';
 import {
   MembershipCheckoutPreviewApiDto,
   MembershipCheckoutService,
 } from './membership-checkout.service';
-
-const INITIAL_CARD: CardPaymentDetails = {
-  cardholderName: '',
-  cardNumber: '',
-  expiryDate: '',
-  cvc: '',
-};
 
 const INITIAL_BILLING: BillingDetails = {
   email: '',
@@ -42,7 +34,6 @@ export class MembershipCheckoutFacade {
   private readonly planIdState = signal<string | null>(null);
   private readonly actionState = signal<string>('subscribe');
   private readonly paymentMethodState = signal<PaymentMethodId>('card');
-  private readonly cardDetailsState = signal<CardPaymentDetails>({ ...INITIAL_CARD });
   private readonly billingDetailsState = signal<BillingDetails>({ ...INITIAL_BILLING });
   private readonly discountCodeState = signal('');
   private readonly loadingState = signal(false);
@@ -54,7 +45,6 @@ export class MembershipCheckoutFacade {
   readonly planId = this.planIdState.asReadonly();
   readonly action = this.actionState.asReadonly();
   readonly paymentMethod = this.paymentMethodState.asReadonly();
-  readonly cardDetails = this.cardDetailsState.asReadonly();
   readonly billingDetails = this.billingDetailsState.asReadonly();
   readonly discountCode = this.discountCodeState.asReadonly();
   readonly loading = this.loadingState.asReadonly();
@@ -132,10 +122,6 @@ export class MembershipCheckoutFacade {
     this.paymentMethodState.set(method);
   }
 
-  updateCardField<K extends keyof CardPaymentDetails>(field: K, value: CardPaymentDetails[K]): void {
-    this.cardDetailsState.update((details) => ({ ...details, [field]: value }));
-  }
-
   updateBillingField<K extends keyof BillingDetails>(field: K, value: BillingDetails[K]): void {
     this.billingDetailsState.update((details) => ({ ...details, [field]: value }));
   }
@@ -185,6 +171,44 @@ export class MembershipCheckoutFacade {
       // A failed attempt must not leave a stale key behind — otherwise retrying with any changed
       // field gets rejected as a payload mismatch instead of actually retrying.
       clearIdempotencyKey(IDEMPOTENCY_SCOPE);
+      this.errorState.set(this.toErrorMessage(error, 'Membership checkout failed.'));
+      throw error;
+    } finally {
+      this.submittingState.set(false);
+    }
+  }
+
+  /**
+   * Starts a membership purchase through a hosted crypto gateway. Resolves with the gateway's payment URL; the
+   * caller navigates the browser there. The subscription is activated by the server once the gateway confirms.
+   */
+  async submitHostedCheckout(gateway: 'cryptomus' | 'oxapay'): Promise<string> {
+    const planId = this.planIdState();
+    const billing = this.billingDetailsState();
+
+    if (!planId || !this.previewState()) {
+      throw new Error('Membership checkout is not ready.');
+    }
+
+    if (!billing.email.trim()) {
+      throw new Error('Email is required to complete checkout.');
+    }
+
+    this.submittingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const result = await firstValueFrom(
+        this.membershipCheckout.checkoutHosted({
+          planId,
+          action: this.actionState(),
+          gateway,
+          email: billing.email.trim(),
+          country: billing.country,
+        }),
+      );
+      return result.paymentUrl;
+    } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Membership checkout failed.'));
       throw error;
     } finally {
