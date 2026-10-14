@@ -662,6 +662,8 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('RETRY_POLICIES.DEAD_LETTER_THRESHOLD'),
     },
     { key: 'useExponentialBackoff', control: 'toggle', ...fieldKeys('RETRY_POLICIES.USE_EXPONENTIAL_BACKOFF') },
+    { key: 'retryScheduleSeconds', control: 'text', ...fieldKeys('RETRY_POLICIES.RETRY_SCHEDULE_SECONDS') },
+    { key: 'useJitter', control: 'toggle', ...fieldKeys('RETRY_POLICIES.USE_JITTER') },
   ],
   notifications: [
     { key: 'emailEnabled', control: 'toggle', ...fieldKeys('NOTIFICATIONS.EMAIL_ENABLED') },

@@ -2741,6 +2741,16 @@
             "LABEL": "Use Exponential Backoff",
             "HELP": "Gradually increases the wait time between retries instead of using a fixed delay.",
             "TOOLTIP": "Recommended — reduces load on failing services instead of retrying rapidly."
+          },
+          "RETRY_SCHEDULE_SECONDS": {
+            "LABEL": "Retry schedule (seconds)",
+            "HELP": "Delay before each attempt, comma separated. The default 0,120,300,900 means: first attempt immediately, then retry after 2, 5 and 15 minutes.",
+            "TOOLTIP": "When set, this replaces the fixed delay and exponential backoff. Leave empty to use the fixed delay."
+          },
+          "USE_JITTER": {
+            "LABEL": "Spread retries (jitter)",
+            "HELP": "Randomises each retry delay by up to ±20% so a batch of failed jobs does not retry in the same second.",
+            "TOOLTIP": "Recommended — avoids hammering a supplier that has just recovered."
           }
         },
         "NOTIFICATIONS": {
