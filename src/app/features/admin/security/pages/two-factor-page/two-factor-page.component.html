@@ -1,0 +1,164 @@
+<p-toast position="top-right" />
+
+<section class="admin-page two-factor">
+  <app-admin-page-header
+    title="Two-factor authentication"
+    subtitle="Protect your admin account with an authenticator app. Once it is on, signing in needs your password and a 6-digit code from your phone."
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  @if (error()) {
+    <app-admin-error-alert [message]="error()!" />
+  }
+
+  @if (recoveryCodes().length > 0) {
+    <app-admin-section-card title="Save your recovery codes" [compact]="true">
+      <p class="two-factor__hint">
+        If you lose your phone, each of these codes lets you sign in <strong>once</strong>. They are shown only now —
+        store them somewhere safe (a password manager or a printed copy), not in the same place as your phone.
+      </p>
+      <ul class="two-factor__codes">
+        @for (item of recoveryCodes(); track item) {
+          <li><code>{{ item }}</code></li>
+        }
+      </ul>
+      <div class="two-factor__actions">
+        <button pButton type="button" class="admin-btn-secondary" icon="pi pi-copy" label="Copy" (click)="copyRecoveryCodes()"></button>
+        <button pButton type="button" class="admin-btn-secondary" icon="pi pi-download" label="Download" (click)="downloadRecoveryCodes()"></button>
+        <button pButton type="button" class="admin-btn-primary" icon="pi pi-check" label="I saved them" (click)="dismissRecoveryCodes()"></button>
+      </div>
+    </app-admin-section-card>
+  }
+
+  <app-admin-section-card title="Authenticator app" [compact]="true">
+    @if (loading() && !status()) {
+      <p class="two-factor__hint">Loading…</p>
+    } @else {
+      <p class="two-factor__status">
+        <app-admin-status-badge
+          [label]="isEnabled() ? 'On' : 'Off'"
+          [tone]="isEnabled() ? 'success' : 'warning'"
+        />
+        @if (isEnabled()) {
+          <span>{{ status()?.recoveryCodesRemaining }} recovery code(s) left</span>
+        }
+      </p>
+
+      @switch (mode()) {
+        @case ('enrolling') {
+          <ol class="two-factor__steps">
+            <li>Open an authenticator app (Google Authenticator, Microsoft Authenticator, Authy, 1Password…).</li>
+            <li>Scan this QR code, or enter the key by hand.</li>
+            <li>Type the 6-digit code the app shows to finish.</li>
+          </ol>
+
+          <div class="two-factor__enroll">
+            @if (qrDataUrl(); as qr) {
+              <img class="two-factor__qr" [src]="qr" alt="QR code to add this account to your authenticator app" width="220" height="220" />
+            }
+            <div class="two-factor__manual">
+              <span class="two-factor__label">Setup key</span>
+              <code class="two-factor__secret">{{ formattedSecret() }}</code>
+              <span class="two-factor__hint">Account: {{ enrollment()?.accountName }}</span>
+            </div>
+          </div>
+
+          <div class="two-factor__form">
+            <label for="totp-confirm-code">6-digit code</label>
+            <input
+              pInputText
+              id="totp-confirm-code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="8"
+              [ngModel]="code()"
+              (ngModelChange)="code.set($event)"
+              (keydown.enter)="confirmEnrollment()"
+            />
+          </div>
+          <div class="two-factor__actions">
+            <button pButton type="button" class="admin-btn-secondary" label="Cancel" (click)="cancel()"></button>
+            <button
+              pButton
+              type="button"
+              class="admin-btn-primary"
+              label="Turn on"
+              [loading]="busy()"
+              [disabled]="!code().trim()"
+              (click)="confirmEnrollment()"
+            ></button>
+          </div>
+        }
+
+        @case ('disabling') {
+          <p class="two-factor__hint">Confirm with your password and a current authenticator code (or an unused recovery code).</p>
+          <div class="two-factor__form">
+            <label for="totp-password">Password</label>
+            <input pInputText id="totp-password" type="password" autocomplete="current-password" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+            <label for="totp-code">Authenticator or recovery code</label>
+            <input pInputText id="totp-code" type="text" autocomplete="one-time-code" [ngModel]="code()" (ngModelChange)="code.set($event)" />
+          </div>
+          <div class="two-factor__actions">
+            <button pButton type="button" class="admin-btn-secondary" label="Cancel" (click)="cancel()"></button>
+            <button
+              pButton
+              type="button"
+              severity="danger"
+              label="Remove authenticator"
+              [loading]="busy()"
+              [disabled]="!password() || !code().trim()"
+              (click)="confirmDisable()"
+            ></button>
+          </div>
+        }
+
+        @case ('regenerating') {
+          <p class="two-factor__hint">Generating new codes invalidates every code you have now.</p>
+          <div class="two-factor__form">
+            <label for="totp-password-r">Password</label>
+            <input pInputText id="totp-password-r" type="password" autocomplete="current-password" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+            <label for="totp-code-r">Authenticator or recovery code</label>
+            <input pInputText id="totp-code-r" type="text" autocomplete="one-time-code" [ngModel]="code()" (ngModelChange)="code.set($event)" />
+          </div>
+          <div class="two-factor__actions">
+            <button pButton type="button" class="admin-btn-secondary" label="Cancel" (click)="cancel()"></button>
+            <button
+              pButton
+              type="button"
+              class="admin-btn-primary"
+              label="Generate new codes"
+              [loading]="busy()"
+              [disabled]="!password() || !code().trim()"
+              (click)="confirmRegenerate()"
+            ></button>
+          </div>
+        }
+
+        @default {
+          @if (isEnabled()) {
+            <div class="two-factor__actions">
+              <button pButton type="button" class="admin-btn-secondary" icon="pi pi-refresh" label="New recovery codes" (click)="openRegenerate()"></button>
+              <button pButton type="button" severity="danger" icon="pi pi-times" label="Remove authenticator" (click)="openDisable()"></button>
+            </div>
+          } @else {
+            <p class="two-factor__hint">
+              Not set up yet. Turn it on to require a code from your phone every time you sign in.
+            </p>
+            <div class="two-factor__actions">
+              <button
+                pButton
+                type="button"
+                class="admin-btn-primary"
+                icon="pi pi-shield"
+                label="Set up authenticator app"
+                [loading]="busy()"
+                (click)="startEnrollment()"
+              ></button>
+            </div>
+          }
+        }
+      }
+    }
+  </app-admin-section-card>
+</section>

@@ -59,6 +59,14 @@
       <div class="admin-topbar__profile-panel" role="menu">
         <a
           class="admin-topbar__profile-panel-item"
+          routerLink="/admin/security/two-factor"
+          (click)="profilePanel.hide()"
+        >
+          <i class="pi pi-shield" aria-hidden="true"></i>
+          <span>Two-factor authentication</span>
+        </a>
+        <a
+          class="admin-topbar__profile-panel-item"
           routerLink="/admin/security/my-sessions"
           (click)="profilePanel.hide()"
         >

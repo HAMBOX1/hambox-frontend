@@ -6,6 +6,8 @@ export interface AdminOtpChallengeState {
   readonly expiresAt: string;
   readonly resendAvailableAt: string;
   readonly returnUrl: string;
+  /** 'Totp' when the code comes from an authenticator app; absent/'Email' for the e-mailed code. */
+  readonly method?: 'Email' | 'Totp';
 }
 
 export function saveAdminOtpChallenge(state: AdminOtpChallengeState): void {

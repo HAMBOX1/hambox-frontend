@@ -100,6 +100,7 @@ export class AdminLoginPageComponent {
             expiresAt: challenge.expiresAt,
             resendAvailableAt: challenge.resendAvailableAt,
             returnUrl,
+            method: challenge.method ?? 'Email',
           });
           void this.router.navigate(['/admin/login/verify-otp']);
         },

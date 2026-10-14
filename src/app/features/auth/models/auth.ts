@@ -70,6 +70,8 @@ export interface AdminLoginChallengeResponse {
    * fully authenticated and should skip the OTP step entirely.
    */
   readonly token?: AccessTokenResponse | null;
+  /** How this challenge is answered: an e-mailed code, or an authenticator app / recovery code. */
+  readonly method?: 'Email' | 'Totp';
 }
 
 export interface VerifyAdminOtpRequest {

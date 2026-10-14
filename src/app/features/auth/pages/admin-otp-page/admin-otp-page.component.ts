@@ -81,6 +81,10 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly maskedEmail = signal('');
+  /** True when the code comes from the admin's authenticator app instead of an e-mail. */
+  protected readonly isTotp = signal(false);
+  /** Recovery-code entry (any format) instead of the 6-digit authenticator code. */
+  protected readonly useRecovery = signal(false);
 
   protected readonly resendSeconds = signal(0);
   protected readonly submitAttempted = signal(false);
@@ -137,6 +141,7 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
     this.returnUrl = challenge.returnUrl;
 
     this.maskedEmail.set(challenge.maskedEmail);
+    this.isTotp.set(challenge.method === 'Totp');
 
     this.startResendCountdown(challenge.resendAvailableAt);
 
@@ -160,6 +165,14 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
 
 
 
+  protected toggleRecovery(): void {
+    this.useRecovery.update((value) => !value);
+    this.form.controls.code.reset();
+    this.errorMessage.set(null);
+    this.submitAttempted.set(false);
+    this.canSubmit.set(false);
+  }
+
   protected toggleTheme(): void {
 
     this.theme.toggle();
@@ -173,11 +186,15 @@ export class AdminOtpPageComponent implements OnInit, OnDestroy {
     this.submitAttempted.set(true);
     this.form.markAllAsTouched();
 
-    const code = normalizeOtpCode(this.form.controls.code.value);
-    this.form.controls.code.setValue(code, { emitEvent: false });
-    this.canSubmit.set(code.length === 6);
+    const recovery = this.useRecovery();
+    const code = recovery
+      ? String(this.form.controls.code.value ?? '').trim()
+      : normalizeOtpCode(this.form.controls.code.value);
 
-    if (code.length !== 6 || this.isSubmitting()) {
+    this.form.controls.code.setValue(code, { emitEvent: false });
+    this.canSubmit.set(recovery ? code.length >= 8 : code.length === 6);
+
+    if ((recovery ? code.length < 8 : code.length !== 6) || this.isSubmitting()) {
       this.cdr.markForCheck();
       return;
     }

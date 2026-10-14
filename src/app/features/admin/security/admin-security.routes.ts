@@ -16,6 +16,11 @@ export const routes: Routes = [
     // Self-service "my own sessions" — no permission gate beyond being an authenticated admin
     // (already enforced by the parent /admin route's adminAuthenticationGuard), since this is
     // account-level, not a managed resource like the Security.View-gated investigator tool above.
+    path: 'two-factor',
+    loadComponent: () =>
+      import('./pages/two-factor-page/two-factor-page.component').then((c) => c.TwoFactorPageComponent),
+  },
+  {
     path: 'my-sessions',
     loadComponent: () =>
       import('./pages/my-sessions-page/my-sessions-page.component').then((c) => c.MySessionsPageComponent),
