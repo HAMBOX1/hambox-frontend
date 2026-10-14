@@ -260,6 +260,47 @@
   </article>
 </ng-template>
 
+@if (otpItem(); as otpTarget) {
+  <div class="library-reveal-modal" role="dialog" aria-modal="true" aria-labelledby="reveal-otp-title">
+    <div class="library-reveal-modal__backdrop" (click)="cancelOtp()"></div>
+    <div class="library-reveal-modal__panel">
+      <h2 id="reveal-otp-title">{{ 'ACCOUNT.LIBRARY_UI.REVEAL_OTP_TITLE' | translate }}</h2>
+      <p>
+        @if (otpMaskedEmail()) {
+          {{ 'ACCOUNT.LIBRARY_UI.REVEAL_OTP_BODY' | translate:{ email: otpMaskedEmail(), product: otpTarget.productNameEn } }}
+        } @else {
+          {{ 'ACCOUNT.LIBRARY_UI.REVEAL_OTP_SENDING' | translate }}
+        }
+      </p>
+      <input
+        class="library-reveal-modal__otp"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="8"
+        [value]="otpCode()"
+        (input)="otpCode.set($any($event.target).value)"
+        (keydown.enter)="submitOtp()"
+        [attr.aria-label]="'ACCOUNT.LIBRARY_UI.REVEAL_OTP_TITLE' | translate"
+      />
+      @if (otpError()) {
+        <p class="library-reveal-modal__error" role="alert">{{ otpError() }}</p>
+      }
+      <div class="library-reveal-modal__actions">
+        <button type="button" class="library-reveal-modal__btn library-reveal-modal__btn--ghost" (click)="cancelOtp()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </button>
+        <button type="button" class="library-reveal-modal__btn library-reveal-modal__btn--ghost" [disabled]="otpBusy()" (click)="sendOtp()">
+          {{ 'ACCOUNT.LIBRARY_UI.REVEAL_OTP_RESEND' | translate }}
+        </button>
+        <button type="button" class="library-reveal-modal__btn library-reveal-modal__btn--primary" [disabled]="otpBusy() || !otpCode().trim()" (click)="submitOtp()">
+          {{ 'ACCOUNT.LIBRARY_UI.REVEAL_CODE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
 @if (pendingRevealItem(); as revealItem) {
   <div class="library-reveal-modal" role="dialog" aria-modal="true" aria-labelledby="reveal-title">
     <div class="library-reveal-modal__backdrop" (click)="cancelReveal()"></div>

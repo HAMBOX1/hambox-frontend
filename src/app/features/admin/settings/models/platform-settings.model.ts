@@ -206,6 +206,12 @@ export const STORE_STATUS_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('STORE_STATUS.CLOSED'), value: 'Closed' },
 ];
 
+export const CUSTOMER_REVEAL_OTP_OPTIONS: SettingsFieldOption[] = [
+  { label: OPT('CUSTOMER_REVEAL_OTP.OFF'), value: 'Off' },
+  { label: OPT('CUSTOMER_REVEAL_OTP.FIRST_REVEAL'), value: 'FirstReveal' },
+  { label: OPT('CUSTOMER_REVEAL_OTP.EVERY_REVEAL'), value: 'EveryReveal' },
+];
+
 /** Matches CurrencyServiceCollectionExtensions.cs:25 exactly — "Http" (case-insensitive) selects the live provider, anything else falls back to configured static rates. */
 export const CURRENCY_PROVIDER_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CURRENCY_PROVIDER.CONFIGURATION'), value: 'Configuration' },
@@ -408,6 +414,12 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       key: 'requireEmailVerification',
       control: 'toggle',
       ...fieldKeys('SECURITY.REQUIRE_EMAIL_VERIFICATION'),
+    },
+    {
+      key: 'customerRevealOtpMode',
+      control: 'select',
+      options: CUSTOMER_REVEAL_OTP_OPTIONS,
+      ...fieldKeys('SECURITY.CUSTOMER_REVEAL_OTP_MODE'),
     },
     // `enforceHttps` removed — no backend consumer, HTTPS enforcement isn't conditional on it.
   ],

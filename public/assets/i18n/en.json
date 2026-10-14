@@ -469,7 +469,11 @@
       "REVEAL_REQUIRED_TITLE": "Reveal required",
       "REVEAL_REQUIRED_BODY": "Reveal the activation code before copying.",
       "COPIED_TITLE": "Activation code copied",
-      "COPIED_BODY": "Paste it in your platform redeem screen."
+      "COPIED_BODY": "Paste it in your platform redeem screen.",
+      "REVEAL_OTP_TITLE": "Enter your verification code",
+      "REVEAL_OTP_BODY": "We sent a code to {{email}} to show the code for {{product}}.",
+      "REVEAL_OTP_SENDING": "Sending a verification code to your e-mail…",
+      "REVEAL_OTP_RESEND": "Send a new code"
     },
     "INSTRUCTIONS_PAGE": {
       "ESTIMATED_TIME": "Estimated time",
@@ -2200,6 +2204,11 @@
           "GIF": "GIF image",
           "SVG": "SVG image",
           "PDF": "PDF document"
+        },
+        "CUSTOMER_REVEAL_OTP": {
+          "OFF": "Never ask",
+          "FIRST_REVEAL": "Once per key (first time only)",
+          "EVERY_REVEAL": "Every time"
         }
       },
       "FIELDS": {
@@ -2472,6 +2481,11 @@
             "LABEL": "Enforce HTTPS",
             "HELP": "Requires a secure connection for all traffic.",
             "TOOLTIP": "Turning this off is a security risk — customer data, including passwords, could be sent unencrypted. Only disable for local testing."
+          },
+          "CUSTOMER_REVEAL_OTP_MODE": {
+            "LABEL": "E-mail code before showing a license key",
+            "HELP": "Customers must enter a code sent to their e-mail before a purchased license key is shown.",
+            "TOOLTIP": "\"Once per key\" asks the first time a customer shows each key; \"Every time\" asks on every reveal. Applies immediately."
           }
         },
         "OTP": {

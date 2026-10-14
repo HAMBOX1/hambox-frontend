@@ -12,6 +12,7 @@ import {
   CustomerLibraryQuery,
   LibraryItemInstructionsApiDto,
   RevealCustomerLibraryKeyApiDto,
+  RevealOtpChallengeApiDto,
   OrderDetailApiDto,
   OrderSummaryApiDto,
   ProductReviewApiDto,
@@ -201,6 +202,15 @@ export class AccountApiService {
 
   revealLibraryKey(libraryItemId: string): Observable<RevealCustomerLibraryKeyApiDto> {
     return this.api.get<RevealCustomerLibraryKeyApiDto>(ACCOUNT_API.revealLibraryKey(libraryItemId));
+  }
+
+  /** Reveals a key with the e-mailed code; the code travels in the body, never the URL. */
+  revealLibraryKeyWithOtp(libraryItemId: string, otpCode: string): Observable<RevealCustomerLibraryKeyApiDto> {
+    return this.api.post<RevealCustomerLibraryKeyApiDto>(ACCOUNT_API.revealLibraryKey(libraryItemId), { otpCode });
+  }
+
+  requestRevealOtp(libraryItemId: string): Observable<RevealOtpChallengeApiDto> {
+    return this.api.post<RevealOtpChallengeApiDto>(ACCOUNT_API.requestRevealOtp(libraryItemId), {});
   }
 
   getLibraryItemInstructions(orderItemId: string): Observable<LibraryItemInstructionsApiDto> {

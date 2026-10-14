@@ -10,6 +10,12 @@ import { resolveWishlistItemImageUrl } from '../utils/wishlist-image.util';
 const SEARCH_DEBOUNCE_MS = 300;
 const REVEAL_TIMEOUT_MS = 30_000;
 
+export interface RevealOutcome {
+  readonly key: string | null;
+  readonly needsOtp: boolean;
+  readonly error: string | null;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -127,32 +133,56 @@ export class AccountLibraryFacade {
     return this.revealedKeysState().get(itemId) ?? null;
   }
 
-  async revealKey(itemId: string): Promise<string | null> {
+  /**
+   * Reveals one key. When the store requires an e-mailed code first, the answer is `needsOtp` (nothing is
+   * shown and no error is raised) so the page can ask for the code; pass it back as <paramref name="otpCode"/>.
+   */
+  async revealKey(itemId: string, otpCode?: string): Promise<RevealOutcome> {
     if (this.revealedKeysState().has(itemId)) {
       this.scheduleHide(itemId);
-      return this.revealedKeysState().get(itemId) ?? null;
+      return { key: this.revealedKeysState().get(itemId) ?? null, needsOtp: false, error: null };
     }
 
     this.revealingIdsState.update((current) => new Set([...current, itemId]));
 
     try {
-      const result = await firstValueFrom(this.api.revealLibraryKey(itemId));
+      const result = await firstValueFrom(
+        otpCode ? this.api.revealLibraryKeyWithOtp(itemId, otpCode) : this.api.revealLibraryKey(itemId),
+      );
       this.revealedKeysState.update((current) => {
         const next = new Map(current);
         next.set(itemId, result.licenseKey);
         return next;
       });
       this.scheduleHide(itemId);
-      return result.licenseKey;
+      return { key: result.licenseKey, needsOtp: false, error: null };
     } catch (error) {
-      this.errorState.set(this.toErrorMessage(error, 'Unable to reveal activation code.'));
-      return null;
+      if (error instanceof ApiError && error.code === 'Commerce.RevealOtpRequired' && !otpCode) {
+        return { key: null, needsOtp: true, error: null };
+      }
+
+      const message = this.toErrorMessage(error, 'Unable to reveal activation code.');
+      if (!otpCode) {
+        this.errorState.set(message);
+      }
+
+      return { key: null, needsOtp: false, error: message };
     } finally {
       this.revealingIdsState.update((current) => {
         const next = new Set(current);
         next.delete(itemId);
         return next;
       });
+    }
+  }
+
+  /** E-mails the one-time code that unlocks revealing this key. */
+  async requestRevealOtp(itemId: string): Promise<{ maskedEmail: string | null; error: string | null }> {
+    try {
+      const challenge = await firstValueFrom(this.api.requestRevealOtp(itemId));
+      return { maskedEmail: challenge.maskedEmail, error: null };
+    } catch (error) {
+      return { maskedEmail: null, error: this.toErrorMessage(error, 'Could not send the code. Please try again.') };
     }
   }
 

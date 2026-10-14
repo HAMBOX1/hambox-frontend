@@ -257,6 +257,7 @@ export const ACCOUNT_API = {
   membershipSubscribe: '/api/v1/account/membership/subscribe',
   library: '/api/v1/account/library',
   revealLibraryKey: (id: string) => `/api/v1/account/library/${id}/reveal`,
+  requestRevealOtp: (id: string) => `/api/v1/account/library/${id}/reveal/otp`,
   libraryItemInstructions: (orderItemId: string) =>
     `/api/v1/account/library/${orderItemId}/instructions`,
   wallet: '/api/v1/account/wallet',

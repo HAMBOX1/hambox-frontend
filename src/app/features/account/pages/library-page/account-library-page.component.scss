@@ -667,3 +667,22 @@
     line-height: 1.6;
   }
 }
+
+.library-reveal-modal__otp {
+  width: 100%;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(127 127 127 / 40%);
+  border-radius: 0.75rem;
+  background: transparent;
+  color: inherit;
+  font-size: 1.25rem;
+  letter-spacing: 0.35em;
+  text-align: center;
+}
+
+.library-reveal-modal__error {
+  margin: 0 0 0.5rem;
+  color: var(--color-danger, #dc2626);
+  font-size: 0.875rem;
+}

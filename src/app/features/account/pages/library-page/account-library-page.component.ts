@@ -65,6 +65,12 @@ export class AccountLibraryPageComponent implements OnInit {
   protected readonly instructionsItemId = signal<string | null>(null);
   protected readonly copyFeedbackId = signal<string | null>(null);
   protected readonly pendingRevealItem = signal<CustomerLibraryItemApiDto | null>(null);
+  /** The key whose reveal is waiting for an e-mailed code. */
+  protected readonly otpItem = signal<CustomerLibraryItemApiDto | null>(null);
+  protected readonly otpCode = signal('');
+  protected readonly otpMaskedEmail = signal<string | null>(null);
+  protected readonly otpError = signal<string | null>(null);
+  protected readonly otpBusy = signal(false);
   protected readonly actionMenuItems = signal<MenuItem[]>([]);
 
   private readonly actionMenuRef = viewChild<Menu>('actionMenu');
@@ -170,8 +176,13 @@ export class AccountLibraryPageComponent implements OnInit {
     }
 
     this.pendingRevealItem.set(null);
-    const key = await this.facade.revealKey(item.id);
-    if (!key) {
+    const outcome = await this.facade.revealKey(item.id);
+    if (outcome.needsOtp) {
+      await this.openOtpDialog(item);
+      return;
+    }
+
+    if (!outcome.key) {
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('ACCOUNT.LIBRARY_UI.REVEAL_FAILED_TITLE'),
@@ -179,6 +190,59 @@ export class AccountLibraryPageComponent implements OnInit {
         life: 3000,
       });
     }
+  }
+
+  private async openOtpDialog(item: CustomerLibraryItemApiDto): Promise<void> {
+    this.otpItem.set(item);
+    this.otpCode.set('');
+    this.otpError.set(null);
+    this.otpMaskedEmail.set(null);
+    await this.sendOtp();
+  }
+
+  protected async sendOtp(): Promise<void> {
+    const item = this.otpItem();
+    if (!item || this.otpBusy()) {
+      return;
+    }
+
+    this.otpBusy.set(true);
+    this.otpError.set(null);
+    const result = await this.facade.requestRevealOtp(item.id);
+    this.otpBusy.set(false);
+    if (result.error) {
+      this.otpError.set(result.error);
+      return;
+    }
+
+    this.otpMaskedEmail.set(result.maskedEmail);
+  }
+
+  protected async submitOtp(): Promise<void> {
+    const item = this.otpItem();
+    const code = this.otpCode().trim();
+    if (!item || !code || this.otpBusy()) {
+      return;
+    }
+
+    this.otpBusy.set(true);
+    this.otpError.set(null);
+    const outcome = await this.facade.revealKey(item.id, code);
+    this.otpBusy.set(false);
+
+    if (outcome.key) {
+      this.otpItem.set(null);
+      this.otpCode.set('');
+      return;
+    }
+
+    this.otpError.set(outcome.error ?? 'That code is not correct.');
+  }
+
+  protected cancelOtp(): void {
+    this.otpItem.set(null);
+    this.otpCode.set('');
+    this.otpError.set(null);
   }
 
   /** A multi-line code is a whole account block (email, security details, 2FA codes...), shown as lines, not one clipped line. */

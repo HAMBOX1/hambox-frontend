@@ -149,6 +149,13 @@ export interface RevealCustomerLibraryKeyApiDto {
   readonly licenseKey: string;
 }
 
+/** Returned when an e-mailed code has been sent to unlock revealing one key. */
+export interface RevealOtpChallengeApiDto {
+  readonly expiresAt: string;
+  readonly resendAvailableAt: string;
+  readonly maskedEmail: string;
+}
+
 export interface LibraryItemInstructionsApiDto {
   readonly title: string;
   readonly contentHtml: string;
