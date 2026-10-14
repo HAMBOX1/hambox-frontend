@@ -11,6 +11,7 @@ import {
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductStatus } from '../../models/product.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { ProductPurchaseControlsPanelComponent } from '../product-purchase-controls-panel/product-purchase-controls-panel.component';
 
 const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
   { label: 'Draft', value: 'Draft' },
@@ -29,6 +30,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
     HasPermissionDirective,
     AdminSectionCardComponent,
     AdminStatusBadgeComponent,
+    ProductPurchaseControlsPanelComponent,
   ],
   templateUrl: './product-publishing-panel.component.html',
   styleUrl: './product-publishing-panel.component.scss',

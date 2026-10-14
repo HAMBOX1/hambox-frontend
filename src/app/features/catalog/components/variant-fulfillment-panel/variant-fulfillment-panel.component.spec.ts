@@ -95,10 +95,10 @@ describe('VariantFulfillmentPanelComponent', () => {
     fixture.detectChanges();
   }
 
-  it('renders all five fulfillment modes (incl. On Delivery)', async () => {
+  it('renders all six fulfillment modes (incl. On Delivery and Disabled)', async () => {
     await setup();
     const cards = fixture.nativeElement.querySelectorAll('.variant-fulfillment__mode-card');
-    expect(cards.length).toBe(5);
+    expect(cards.length).toBe(6);
   });
 
   it('highlights the currently selected mode', async () => {
@@ -149,7 +149,7 @@ describe('VariantFulfillmentPanelComponent', () => {
     const buttons = fixture.nativeElement.querySelectorAll('button.variant-fulfillment__mode-card');
     const readOnlyCards = fixture.nativeElement.querySelectorAll('.variant-fulfillment__mode-card--readonly');
     expect(buttons.length).toBe(0);
-    expect(readOnlyCards.length).toBe(4);
+    expect(readOnlyCards.length).toBe(6);
   });
 
   it('surfaces a chain load error via the safe error-alert component, never a raw exception', async () => {

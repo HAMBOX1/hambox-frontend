@@ -342,6 +342,32 @@
       }
     </app-admin-section-card>
 
+    @if (order.holdKind) {
+      <app-admin-section-card [title]="order.holdKind === 'ManualReview' ? 'Pending manual review' : 'Order on hold'">
+        <p>{{ order.holdReason }}</p>
+        <button
+          pButton
+          type="button"
+          severity="success"
+          [label]="order.holdKind === 'ManualReview' ? 'Approve and release' : 'Release hold'"
+          [loading]="actionLoading()"
+          (click)="releaseHold()"
+        ></button>
+      </app-admin-section-card>
+    } @else if (order.paymentStatus === 'Paid' && order.orderStatus !== 'Completed') {
+      <div class="order-detail-page__hold-action">
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          size="small"
+          label="Hold this order"
+          icon="pi pi-pause"
+          (click)="openHoldDialog()"
+        ></button>
+      </div>
+    }
+
     <app-admin-section-card [title]="'ADMIN.ORDERS.DETAIL.PAYMENT_CALLBACKS' | translate">
       @if (order.paymentCallbacks.length) {
         <div class="order-detail-page__callbacks">
@@ -360,6 +386,18 @@
                 <div>
                   <dt>{{ 'ADMIN.ORDERS.ACTIONS.COPY_TXN' | translate }}</dt>
                   <dd>{{ callback.transactionId || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Signature check</dt>
+                  <dd>{{ callback.signatureVerificationResult || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Gateway reference</dt>
+                  <dd>{{ callback.gatewayReference || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Processing result</dt>
+                  <dd>{{ callback.processingResult || '—' }}</dd>
                 </div>
               </dl>
               <pre>{{ formatCallbackPayload(callback.payloadJson) }}</pre>
@@ -568,6 +606,35 @@
       [disabled]="!revealReason().trim()"
       [loading]="revealing()"
       (click)="confirmReveal()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Hold this order"
+  [visible]="holdDialogOpen()"
+  (visibleChange)="holdDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  styleClass="admin-dialog"
+>
+  <p>Nothing is delivered and no supplier is called until you release the hold. A reason is required.</p>
+  <textarea
+    pTextarea
+    rows="3"
+    maxlength="500"
+    class="w-full"
+    [ngModel]="holdReason()"
+    (ngModelChange)="holdReason.set($event)"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Hold order"
+      [disabled]="!holdReason().trim()"
+      [loading]="actionLoading()"
+      (click)="confirmHold()"
     ></button>
   </ng-template>
 </p-dialog>

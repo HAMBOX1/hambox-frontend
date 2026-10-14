@@ -102,6 +102,11 @@ export interface AdminOrderPaymentCallbackDto {
   readonly transactionId: string | null;
   readonly payloadJson: string;
   readonly occurredOnUtc: string;
+  /** How the callback's authenticity was established (HMAC valid, gateway status API, ...). */
+  readonly signatureVerificationResult?: string | null;
+  readonly gatewayReference?: string | null;
+  /** What HAMBOX did with it: Paid, Failed, Pending, AmountMismatch, Duplicate, ... */
+  readonly processingResult?: string | null;
 }
 
 export interface AdminCustomerOrderHistoryItemDto {
@@ -156,6 +161,10 @@ export interface AdminOrderDetailDto {
   readonly lastEditedByName: string | null;
   readonly lastEditedOnUtc: string | null;
   readonly supplierRouting: readonly AdminOrderSupplierRoutingDto[];
+  /** Set while the order is parked: 'ManualReview' (flagged by the system) or 'AdminHold'. */
+  readonly holdKind?: string | null;
+  readonly holdReason?: string | null;
+  readonly heldOnUtc?: string | null;
 }
 
 /**

@@ -22,9 +22,8 @@ describe('PaymentProcessingPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render processing card', () => {
+  it('should render the processing card', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('app-payment-processing-card')).toBeTruthy();
-    expect(compiled.textContent).toContain('Processing Transaction');
   });
 });

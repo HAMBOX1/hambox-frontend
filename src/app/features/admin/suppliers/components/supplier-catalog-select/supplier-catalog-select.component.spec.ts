@@ -10,9 +10,23 @@ function flushMicrotasks(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
+const CATALOG_URL = '/api/v1/suppliers/supplier-1/catalog';
+
 describe('SupplierCatalogSelectComponent', () => {
   let fixture: ComponentFixture<SupplierCatalogSelectComponent>;
   let httpMock: HttpTestingController;
+
+  /**
+   * The picker loads an unfiltered first page as soon as the supplier is known, then a debounced request per
+   * search term. Settle the initial page first so each test only asserts on the request it triggered.
+   */
+  function expectSearchRequest() {
+    for (const initial of httpMock.match((r) => r.method === 'GET' && r.url === CATALOG_URL && !r.params.get('search'))) {
+      initial.flush({ isSuccess: true, items: [], message: null });
+    }
+
+    return httpMock.expectOne((r) => r.method === 'GET' && r.url === CATALOG_URL && !!r.params.get('search'));
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -37,7 +51,7 @@ describe('SupplierCatalogSelectComponent', () => {
     await new Promise((resolve) => setTimeout(resolve, 350));
     await flushMicrotasks();
 
-    const req = httpMock.expectOne((r) => r.method === 'GET' && r.url === '/api/v1/suppliers/supplier-1/catalog');
+    const req = expectSearchRequest();
     expect(req.request.params.get('search')).toBe('amazon');
     // The URL asserted above is the only request this component ever issues — structurally, it cannot reach bamboocardportal.com directly.
     req.flush({ isSuccess: true, items: [{ externalProductId: '439685', name: 'Amazon Gift Card $10', brandName: 'Amazon', currency: 'USD', minFaceValue: 10, maxFaceValue: 10, available: true }], message: null });
@@ -56,8 +70,7 @@ describe('SupplierCatalogSelectComponent', () => {
     component.onQueryChange('amazon');
     await new Promise((resolve) => setTimeout(resolve, 350));
     await flushMicrotasks();
-    httpMock
-      .expectOne((r) => r.method === 'GET' && r.url === '/api/v1/suppliers/supplier-1/catalog')
+    expectSearchRequest()
       .flush({ isSuccess: true, items: [{ externalProductId: '439685', name: 'Amazon Gift Card $10', brandName: 'Amazon', currency: 'USD', minFaceValue: 10, maxFaceValue: 10, available: true }], message: null });
     await flushMicrotasks();
     fixture.detectChanges();
@@ -74,8 +87,7 @@ describe('SupplierCatalogSelectComponent', () => {
     component.onQueryChange('anything');
     await new Promise((resolve) => setTimeout(resolve, 350));
     await flushMicrotasks();
-    httpMock
-      .expectOne((r) => r.method === 'GET' && r.url === '/api/v1/suppliers/supplier-1/catalog')
+    expectSearchRequest()
       .flush({ isSuccess: false, items: [], message: 'Manual supplier has no browsable catalog.' });
     await flushMicrotasks();
 
@@ -89,8 +101,7 @@ describe('SupplierCatalogSelectComponent', () => {
     component.onQueryChange('amazon');
     await new Promise((resolve) => setTimeout(resolve, 350));
     await flushMicrotasks();
-    httpMock
-      .expectOne((r) => r.method === 'GET' && r.url === '/api/v1/suppliers/supplier-1/catalog')
+    expectSearchRequest()
       .flush('error', { status: 500, statusText: 'Server Error' });
     await flushMicrotasks();
 

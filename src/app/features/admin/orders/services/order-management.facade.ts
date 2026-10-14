@@ -321,6 +321,29 @@ export class OrderManagementFacade {
     }
   }
 
+  async holdOrder(orderId: string, reason: string): Promise<boolean> {
+    return this.postOrderAction(orderId, ORDERS_API.hold(orderId), { reason });
+  }
+
+  async releaseOrderHold(orderId: string, note: string | null): Promise<boolean> {
+    return this.postOrderAction(orderId, ORDERS_API.releaseHold(orderId), { note });
+  }
+
+  private async postOrderAction(orderId: string, path: string, body: unknown): Promise<boolean> {
+    this.actionLoadingState.set(true);
+    try {
+      await firstValueFrom(this.api.post<void>(path, body));
+      await this.loadDetail(orderId);
+      await this.fetchOrders(true);
+      return true;
+    } catch (error) {
+      this.detailErrorState.set(this.toErrorMessage(error));
+      return false;
+    } finally {
+      this.actionLoadingState.set(false);
+    }
+  }
+
   async assignManualCode(
     orderId: string,
     orderItemId: string,

@@ -525,6 +525,38 @@ export class OrderDetailPageComponent implements OnInit {
 
 
 
+  protected readonly holdDialogOpen = signal(false);
+
+  protected readonly holdReason = signal('');
+
+  protected openHoldDialog(): void {
+
+    this.holdReason.set('');
+
+    this.holdDialogOpen.set(true);
+
+  }
+
+  protected async confirmHold(): Promise<void> {
+
+    const reason = this.holdReason().trim();
+
+    if (!reason) return;
+
+    if (await this.facade.holdOrder(this.orderId(), reason)) {
+
+      this.holdDialogOpen.set(false);
+
+    }
+
+  }
+
+  protected async releaseHold(): Promise<void> {
+
+    await this.facade.releaseOrderHold(this.orderId(), null);
+
+  }
+
   protected readonly revealReasonTargetId = signal<string | null>(null);
 
   protected readonly revealReason = signal('');
