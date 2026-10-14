@@ -35,6 +35,7 @@ import {
   InventoryAuditLogDto,
 } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { parseCodeFile } from '../../utils/parse-code-file';
 
 const REVEAL_AUTO_HIDE_MS = 30_000;
 
@@ -349,13 +350,7 @@ export class VariantInventoryPanelComponent {
     const reader = new FileReader();
     reader.onload = () => {
       const text = String(reader.result ?? '');
-      const lines =
-        kind === 'csv'
-          ? text
-              .split(/\r?\n/)
-              .map((line) => line.split(',')[0]?.trim() ?? '')
-              .filter(Boolean)
-          : text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      const lines = parseCodeFile(text, kind);
       this.bulkCodes.set(lines.join('\n'));
       input.value = '';
     };
