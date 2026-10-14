@@ -46,6 +46,15 @@ export interface BlockedEmailDto {
   readonly createdOnUtc: string;
 }
 
+export interface BlockedPhoneDto {
+  readonly id: string;
+  readonly phoneNumber: string;
+  readonly reason: string;
+  readonly notes: string | null;
+  readonly expiresOnUtc: string | null;
+  readonly createdOnUtc: string;
+}
+
 export interface BlockedIpDto {
   readonly id: string;
   readonly cidrOrAddress: string;
@@ -182,6 +191,13 @@ export interface BanUserRequest {
 
 export interface CreateBlockedEmailRequest {
   readonly pattern: string;
+  readonly reason: string;
+  readonly notes?: string | null;
+  readonly expiresOnUtc?: string | null;
+}
+
+export interface CreateBlockedPhoneRequest {
+  readonly phoneNumber: string;
   readonly reason: string;
   readonly notes?: string | null;
   readonly expiresOnUtc?: string | null;

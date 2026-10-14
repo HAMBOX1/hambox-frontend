@@ -18,6 +18,7 @@
       <p-tab value="6">{{ 'ADMIN.SECURITY.TABS.EMAILS' | translate }}</p-tab>
       <p-tab value="7">{{ 'ADMIN.SECURITY.TABS.IPS' | translate }}</p-tab>
       <p-tab value="8">{{ 'ADMIN.SECURITY.TABS.COUNTRIES' | translate }}</p-tab>
+      <p-tab value="9">{{ 'ADMIN.SECURITY.TABS.PHONES' | translate }}</p-tab>
     </p-tablist>
 
     <p-tabpanels>
@@ -350,6 +351,83 @@
         </app-admin-data-table-shell>
       </p-tabpanel>
 
+
+      <!-- Phones -->
+      <p-tabpanel value="9">
+        <app-admin-toolbar>
+          <app-admin-search-bar
+            adminToolbarSearch
+            [value]="phoneSearchTerm()"
+            [placeholder]="'ADMIN.SECURITY.PHONES.SEARCH_PLACEHOLDER' | translate"
+            (searchChange)="onPhoneSearchChange($event)"
+          />
+          <button
+            adminToolbarActions
+            *hamboxHasPermission="permissions.Security.ManageUsers"
+            pButton
+            type="button"
+            class="admin-btn-primary"
+            [label]="'ADMIN.SECURITY.PHONES.ADD' | translate"
+            icon="pi pi-plus"
+            (click)="openPhoneDialog()"
+          ></button>
+        </app-admin-toolbar>
+
+        @if (facade.phonesError()) {
+          <app-admin-error-alert [message]="facade.phonesError()!" />
+        }
+
+        <app-admin-data-table-shell>
+          <p-table
+            class="admin-data-table"
+            [value]="[...phones()]"
+            [loading]="facade.phonesLoading()"
+            [lazy]="true"
+            [paginator]="phonesTotal() > 0"
+            [rows]="phonePageSize()"
+            [totalRecords]="phonesTotal()"
+            [first]="phoneTableFirst()"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            (onLazyLoad)="onPhonePageChange($event)"
+            dataKey="id"
+            scrollable
+            scrollHeight="flex"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>{{ 'ADMIN.SECURITY.PHONES.COLUMNS.NUMBER' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.PHONES.COLUMNS.REASON' | translate }}</th>
+                <th>{{ 'ADMIN.SECURITY.PHONES.COLUMNS.EXPIRES' | translate }}</th>
+                <th style="width: 4rem"></th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-phone>
+              <tr>
+                <td>{{ phone.phoneNumber }}</td>
+                <td>{{ phone.reason }}</td>
+                <td>{{ phone.expiresOnUtc ? (phone.expiresOnUtc | date: 'short') : '—' }}</td>
+                <td>
+                  <app-admin-icon-button
+                    *hamboxHasPermission="permissions.Security.ManageUsers"
+                    icon="pi pi-trash"
+                    [label]="'ADMIN.SECURITY.PHONES.REMOVE' | translate"
+                    (pressed)="requestDeletePhone(phone)"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4">
+                  <app-admin-empty-state icon="pi pi-phone" [title]="'ADMIN.SECURITY.PHONES.EMPTY' | translate" [dense]="true" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </app-admin-data-table-shell>
+      </p-tabpanel>
+
     </p-tabpanels>
   </p-tabs>
 </section>
@@ -434,6 +512,45 @@
   [destructive]="true"
   [loading]="facade.actionLoading()"
   (confirmed)="confirmDeleteEmail()"
+/>
+
+<!-- Create blocked phone dialog -->
+<p-dialog [visible]="phoneDialogOpen()" (visibleChange)="phoneDialogOpen.set($event)" [modal]="true" [style]="{ width: '32rem' }" [header]="'ADMIN.SECURITY.PHONES.ADD' | translate">
+  <div class="security-center-page__form">
+    <label for="security-phone-number">{{ 'ADMIN.SECURITY.PHONES.FORM.NUMBER' | translate }} *</label>
+    <input pInputText id="security-phone-number" type="text" inputmode="tel" placeholder="+201001234567" [ngModel]="phoneNumber()" (ngModelChange)="phoneNumber.set($event)" />
+
+    <label for="security-phone-reason">{{ 'ADMIN.SECURITY.FORM.REASON' | translate }} *</label>
+    <input pInputText id="security-phone-reason" type="text" [ngModel]="actionReason()" (ngModelChange)="actionReason.set($event)" />
+
+    <label for="security-phone-notes">{{ 'ADMIN.SECURITY.FORM.NOTES' | translate }}</label>
+    <textarea pTextarea id="security-phone-notes" rows="3" [ngModel]="actionNotes()" (ngModelChange)="actionNotes.set($event)"></textarea>
+
+    <label for="security-phone-expires">{{ 'ADMIN.SECURITY.FORM.EXPIRES_ON' | translate }}</label>
+    <input id="security-phone-expires" type="date" class="security-center-page__native-date" [ngModel]="actionExpiresOn()" (ngModelChange)="actionExpiresOn.set($event)" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="admin-btn-secondary" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="phoneDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      class="admin-btn-primary"
+      [label]="'ADMIN.CONFIRM.CONFIRM' | translate"
+      [disabled]="!phoneNumber().trim() || !actionReason().trim() || facade.actionLoading()"
+      (click)="confirmCreatePhone()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-admin-confirm-dialog
+  [visible]="deletePhoneDialogOpen()"
+  (visibleChange)="deletePhoneDialogOpen.set($event)"
+  [title]="'ADMIN.SECURITY.PHONES.REMOVE' | translate"
+  [message]="'ADMIN.SECURITY.PHONES.REMOVE_CONFIRM' | translate"
+  [destructive]="true"
+  [loading]="facade.actionLoading()"
+  (confirmed)="confirmDeletePhone()"
 />
 
 <!-- Create blocked IP dialog -->

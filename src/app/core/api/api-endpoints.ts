@@ -574,6 +574,8 @@ export const SECURITY_API = {
     `/api/v1/security/users/${userId}/sessions/${sessionId}`,
   emails: '/api/v1/security/emails',
   email: (id: string) => `/api/v1/security/emails/${id}`,
+  phones: '/api/v1/security/phones',
+  phone: (id: string) => `/api/v1/security/phones/${id}`,
   ips: '/api/v1/security/ips',
   ip: (id: string) => `/api/v1/security/ips/${id}`,
   countries: '/api/v1/security/countries',

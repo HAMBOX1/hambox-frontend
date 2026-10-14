@@ -5294,7 +5294,8 @@
         "USERS": "المستخدمون",
         "EMAILS": "البريد الإلكتروني",
         "IPS": "عناوين IP",
-        "COUNTRIES": "الدول"
+        "COUNTRIES": "الدول",
+        "PHONES": "أرقام الهاتف"
       },
       "STATS": {
         "OPEN_ALERTS": "التنبيهات المفتوحة",
@@ -5478,7 +5479,23 @@
         "ACTION_SUCCEEDED": "تم تنفيذ الإجراء بنجاح.",
         "ACTION_FAILED": "فشل الإجراء.",
         "EMAIL_BLOCKED": "تم حظر البريد الإلكتروني.",
-        "IP_BLOCKED": "تم حظر عنوان IP."
+        "IP_BLOCKED": "تم حظر عنوان IP.",
+        "PHONE_BLOCKED": "تم حظر رقم الهاتف."
+      },
+      "PHONES": {
+        "ADD": "حظر رقم هاتف",
+        "REMOVE": "إزالة",
+        "REMOVE_CONFIRM": "هل تريد إزالة هذا الرقم من قائمة الحظر؟",
+        "SEARCH_PLACEHOLDER": "ابحث في أرقام الهاتف المحظورة...",
+        "EMPTY": "لا توجد أرقام هاتف محظورة.",
+        "COLUMNS": {
+          "NUMBER": "رقم الهاتف",
+          "REASON": "السبب",
+          "EXPIRES": "ينتهي في"
+        },
+        "FORM": {
+          "NUMBER": "رقم الهاتف (بأي صيغة)"
+        }
       }
     },
     "MY_SESSIONS": {

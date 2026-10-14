@@ -8,10 +8,12 @@ import {
   BanUserRequest,
   BlockDeviceRequest,
   BlockedEmailDto,
+  BlockedPhoneDto,
   BlockedIpDto,
   BlockUserRequest,
   CountryRestrictionDto,
   CreateBlockedEmailRequest,
+  CreateBlockedPhoneRequest,
   CreateBlockedIpRequest,
   LoginHistoryDto,
   PagedResult,
@@ -60,6 +62,9 @@ export class SecurityManagementFacade {
   private readonly emailsState = signal<PagedResult<BlockedEmailDto> | null>(null);
   private readonly emailsLoadingState = signal(false);
   private readonly emailsErrorState = signal<string | null>(null);
+  private readonly phonesState = signal<PagedResult<BlockedPhoneDto> | null>(null);
+  private readonly phonesLoadingState = signal(false);
+  private readonly phonesErrorState = signal<string | null>(null);
 
   private readonly ipsState = signal<PagedResult<BlockedIpDto> | null>(null);
   private readonly ipsLoadingState = signal(false);
@@ -102,6 +107,9 @@ export class SecurityManagementFacade {
   readonly emails = this.emailsState.asReadonly();
   readonly emailsLoading = this.emailsLoadingState.asReadonly();
   readonly emailsError = this.emailsErrorState.asReadonly();
+  readonly phones = this.phonesState.asReadonly();
+  readonly phonesLoading = this.phonesLoadingState.asReadonly();
+  readonly phonesError = this.phonesErrorState.asReadonly();
 
   readonly ips = this.ipsState.asReadonly();
   readonly ipsLoading = this.ipsLoadingState.asReadonly();
@@ -213,6 +221,33 @@ export class SecurityManagementFacade {
 
   async deleteBlockedEmail(id: string): Promise<boolean> {
     return this.runAction(() => this.api.delete<void>(SECURITY_API.email(id)), this.emailsErrorState, 'Failed to remove the blocked email.');
+  }
+
+  async loadPhones(pageNumber: number, pageSize: number, searchTerm?: string): Promise<void> {
+    this.phonesLoadingState.set(true);
+    this.phonesErrorState.set(null);
+
+    try {
+      const result = await firstValueFrom(
+        this.api.get<PagedResult<BlockedPhoneDto>>(SECURITY_API.phones, {
+          params: { pageNumber, pageSize, ...(searchTerm?.trim() ? { searchTerm: searchTerm.trim() } : {}) },
+        }),
+      );
+      this.phonesState.set(result);
+    } catch (error) {
+      this.phonesState.set(null);
+      this.phonesErrorState.set(this.toErrorMessage(error, 'Failed to load blocked phone numbers.'));
+    } finally {
+      this.phonesLoadingState.set(false);
+    }
+  }
+
+  async createBlockedPhone(request: CreateBlockedPhoneRequest): Promise<boolean> {
+    return this.runAction(() => this.api.post<string>(SECURITY_API.phones, request), this.phonesErrorState, 'Failed to block the phone number.');
+  }
+
+  async deleteBlockedPhone(id: string): Promise<boolean> {
+    return this.runAction(() => this.api.delete<void>(SECURITY_API.phone(id)), this.phonesErrorState, 'Failed to remove the blocked phone number.');
   }
 
   async loadIps(pageNumber: number, pageSize: number, searchTerm?: string): Promise<void> {

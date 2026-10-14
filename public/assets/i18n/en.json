@@ -5428,7 +5428,8 @@
         "USERS": "Users",
         "EMAILS": "Emails",
         "IPS": "IP Addresses",
-        "COUNTRIES": "Countries"
+        "COUNTRIES": "Countries",
+        "PHONES": "Phones"
       },
       "STATS": {
         "OPEN_ALERTS": "Open Alerts",
@@ -5612,7 +5613,23 @@
         "ACTION_SUCCEEDED": "Action completed successfully.",
         "ACTION_FAILED": "Action failed.",
         "EMAIL_BLOCKED": "Email blocked.",
-        "IP_BLOCKED": "IP address blocked."
+        "IP_BLOCKED": "IP address blocked.",
+        "PHONE_BLOCKED": "Phone number blocked."
+      },
+      "PHONES": {
+        "ADD": "Block phone number",
+        "REMOVE": "Remove",
+        "REMOVE_CONFIRM": "Remove this blocked phone number?",
+        "SEARCH_PLACEHOLDER": "Search blocked phone numbers...",
+        "EMPTY": "No blocked phone numbers.",
+        "COLUMNS": {
+          "NUMBER": "Phone number",
+          "REASON": "Reason",
+          "EXPIRES": "Expires"
+        },
+        "FORM": {
+          "NUMBER": "Phone number (any format)"
+        }
       }
     },
     "MY_SESSIONS": {

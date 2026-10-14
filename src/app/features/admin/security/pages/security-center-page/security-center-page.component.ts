@@ -36,6 +36,7 @@ import { SecurityEventTableComponent } from '../../components/security-event-tab
 import { SessionsDevicesPanelComponent } from '../../components/sessions-devices-panel/sessions-devices-panel.component';
 import {
   BlockedEmailDto,
+  BlockedPhoneDto,
   BlockedIpDto,
   BlockedUserListItemDto,
   CountryRestrictionDto,
@@ -44,7 +45,7 @@ import {
 import { SecurityManagementFacade } from '../../services/security-management.facade';
 
 type UserActionMode = 'block' | 'suspend' | 'ban';
-type TabKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8';
+type TabKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 
 @Component({
   selector: 'app-security-center-page',
@@ -116,6 +117,18 @@ export class SecurityCenterPageComponent implements OnInit {
   protected readonly actionExpiresOn = signal('');
   protected readonly unblockDialogOpen = signal(false);
 
+  // ── Phones tab ────────────────────────────────────────────
+  protected readonly phoneSearchTerm = signal('');
+  protected readonly phonePage = signal(1);
+  protected readonly phonePageSize = signal(10);
+  protected readonly phones = computed(() => this.facade.phones()?.items ?? []);
+  protected readonly phonesTotal = computed(() => this.facade.phones()?.totalCount ?? 0);
+  protected readonly phoneTableFirst = computed(() => (this.phonePage() - 1) * this.phonePageSize());
+  protected readonly phoneDialogOpen = signal(false);
+  protected readonly phoneNumber = signal('');
+  protected readonly deletePhoneTarget = signal<BlockedPhoneDto | null>(null);
+  protected readonly deletePhoneDialogOpen = signal(false);
+
   // ── Emails tab ────────────────────────────────────────────
   protected readonly emailSearchTerm = signal('');
   protected readonly emailPage = signal(1);
@@ -161,6 +174,7 @@ export class SecurityCenterPageComponent implements OnInit {
     if (tab === '6' && !this.facade.emails()) this.reloadEmails();
     if (tab === '7' && !this.facade.ips()) this.reloadIps();
     if (tab === '8' && this.facade.countries().length === 0) this.reloadCountries();
+    if (tab === '9' && !this.facade.phones()) this.reloadPhones();
   }
 
   protected viewUserSessions(user: BlockedUserListItemDto): void {
@@ -367,6 +381,73 @@ export class SecurityCenterPageComponent implements OnInit {
 
   private reloadEmails(): void {
     void this.facade.loadEmails(this.emailPage(), this.emailPageSize(), this.emailSearchTerm());
+  }
+
+  // ── Phones ────────────────────────────────────────────────
+  protected onPhoneSearchChange(term: string): void {
+    this.phoneSearchTerm.set(term);
+    this.phonePage.set(1);
+    this.reloadPhones();
+  }
+
+  protected onPhonePageChange(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.phonePageSize();
+    const first = event.first ?? 0;
+    this.phonePageSize.set(rows);
+    this.phonePage.set(Math.floor(first / rows) + 1);
+    this.reloadPhones();
+  }
+
+  protected openPhoneDialog(): void {
+    this.phoneNumber.set('');
+    this.actionReason.set('');
+    this.actionNotes.set('');
+    this.actionExpiresOn.set('');
+    this.phoneDialogOpen.set(true);
+  }
+
+  protected async confirmCreatePhone(): Promise<void> {
+    const phoneNumber = this.phoneNumber().trim();
+    const reason = this.actionReason().trim();
+    if (!phoneNumber || !reason) return;
+
+    const success = await this.facade.createBlockedPhone({
+      phoneNumber,
+      reason,
+      notes: this.actionNotes().trim() || null,
+      expiresOnUtc: this.actionExpiresOn() ? new Date(this.actionExpiresOn()).toISOString() : null,
+    });
+
+    this.phoneDialogOpen.set(false);
+    if (success) {
+      this.messageService.add({ severity: 'success', summary: this.translate.instant('ADMIN.SECURITY.MESSAGES.PHONE_BLOCKED'), life: 4000 });
+      this.reloadPhones();
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('ADMIN.SECURITY.MESSAGES.ACTION_FAILED'),
+        detail: this.facade.phonesError() ?? '',
+        life: 5000,
+      });
+    }
+  }
+
+  protected requestDeletePhone(phone: BlockedPhoneDto): void {
+    this.deletePhoneTarget.set(phone);
+    this.deletePhoneDialogOpen.set(true);
+  }
+
+  protected async confirmDeletePhone(): Promise<void> {
+    const phone = this.deletePhoneTarget();
+    if (!phone) return;
+
+    const success = await this.facade.deleteBlockedPhone(phone.id);
+    this.deletePhoneDialogOpen.set(false);
+    if (success) this.reloadPhones();
+  }
+
+  private reloadPhones(): void {
+    void this.facade.loadPhones(this.phonePage(), this.phonePageSize(), this.phoneSearchTerm());
   }
 
   // ── IPs ───────────────────────────────────────────────────
