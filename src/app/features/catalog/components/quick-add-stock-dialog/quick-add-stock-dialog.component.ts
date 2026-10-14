@@ -82,6 +82,53 @@ export class QuickAddStockDialogComponent {
     });
   }
 
+  /**
+   * A product with no variant has nothing to attach codes to. Rather than sending the admin to another page,
+   * give it one plain, Active default variant (the product's own price applies) and carry on in this dialog.
+   */
+  protected async createDefaultVariant(): Promise<void> {
+    const product = this.product();
+    if (!product || this.saving()) {
+      return;
+    }
+
+    this.saving.set(true);
+    this.error.set(null);
+    try {
+      const slug = (product.nameEn ?? 'product')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60) || 'PRODUCT';
+      const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+      const sku = `${slug}-${suffix}`;
+
+      const variantId = await firstValueFrom(
+        this.inventoryApi.createVariant(product.id, { sku, sortOrder: 0, lowStockThreshold: 5, optionIds: [] }),
+      );
+      await firstValueFrom(
+        this.inventoryApi.updateVariant(variantId, {
+          sku,
+          sortOrder: 0,
+          status: 'Active',
+          isVisible: true,
+          lowStockThreshold: 5,
+          optionIds: [],
+        }),
+      );
+      await this.loadVariants(product.id, variantId);
+      this.stockAdded.emit();
+    } catch (error) {
+      this.error.set(
+        error instanceof ApiError && error.message
+          ? error.message
+          : 'Could not create a default variant. Use the full editor to set the product up.',
+      );
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   protected openEditor(): void {
     const product = this.product();
     this.closed.emit();

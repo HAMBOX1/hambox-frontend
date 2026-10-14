@@ -13,10 +13,22 @@
     <p class="admin-dialog__hint">Loading variants…</p>
   } @else if (variants().length === 0) {
     <p class="admin-dialog__hint">
-      This product has no variants yet, so there is nothing to attach codes to. Create a variant first in the full editor.
+      This product has no variant yet, so there is nothing to attach codes to. Create a default one here and add the
+      codes straight away — it uses the product's own price and you can rename or split it later in the full editor.
     </p>
+    @if (error(); as message) {
+      <p class="admin-dialog__error" role="alert">{{ message }}</p>
+    }
     <div class="admin-dialog__actions">
-      <button pButton type="button" label="Open full editor" icon="pi pi-external-link" (click)="openEditor()"></button>
+      <button pButton type="button" class="admin-btn-secondary" severity="secondary" label="Full editor" (click)="openEditor()"></button>
+      <button
+        pButton
+        type="button"
+        label="Create default variant & add stock"
+        icon="pi pi-plus"
+        [loading]="saving()"
+        (click)="createDefaultVariant()"
+      ></button>
     </div>
   } @else {
     <div class="admin-field">
