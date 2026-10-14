@@ -17,7 +17,7 @@ import { CheckoutFacade } from '../../services/checkout.facade';
 import { MembershipCheckoutFacade } from '../../services/membership-checkout.facade';
 import { CartFacade } from '../../../cart/services/cart.facade';
 import { ThemeEngineService } from '../../../../core/theme/theme-engine.service';
-import { isDotFawryWallet, isDotWallet } from '../../models/checkout';
+import { DOT_WALLET_OPERATOR, isDotFawryWallet, isDotWallet } from '../../models/checkout';
 
 const CHECKOUT_STAGES = [
   'Authorizing payment',
@@ -248,13 +248,19 @@ export class PaymentProcessingPageComponent implements OnInit {
     // Production has no synchronous card processor: a membership is paid through a hosted gateway and
     // activated by the server once the gateway confirms, exactly like a cart order.
     const method = this.checkout.paymentMethod();
-    if (method === 'crypto' || method === 'oxapay') {
+    if (method === 'crypto' || method === 'oxapay' || method === 'dot' || isDotWallet(method)) {
       this.stageLabel.set('Preparing secure payment');
       this.progress.set(20);
       try {
-        const paymentUrl = await this.membershipCheckout.submitHostedCheckout(
-          method === 'crypto' ? 'cryptomus' : 'oxapay',
-        );
+        const paymentUrl =
+          method === 'crypto'
+            ? await this.membershipCheckout.submitHostedCheckout('cryptomus')
+            : method === 'oxapay'
+              ? await this.membershipCheckout.submitHostedCheckout('oxapay')
+              : await this.membershipCheckout.submitHostedCheckout(
+                  'dot',
+                  isDotWallet(method) ? DOT_WALLET_OPERATOR[method] : 'OrangeCash',
+                );
         this.stageLabel.set('Redirecting to payment page');
         this.progress.set(90);
         window.location.href = paymentUrl;
@@ -269,7 +275,7 @@ export class PaymentProcessingPageComponent implements OnInit {
     }
 
     if (method !== 'development') {
-      this.error.set('Membership can currently be paid with crypto only. Please choose a crypto payment method.');
+      this.error.set('Membership can be paid with a crypto gateway or an Orange / Vodafone Cash wallet. Please choose one of them.');
       this.stageLabel.set('Payment method unavailable');
       return;
     }

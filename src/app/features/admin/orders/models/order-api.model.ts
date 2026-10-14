@@ -169,6 +169,8 @@ export interface AdminOrderDetailDto {
   readonly refundSettlement?: string | null;
   readonly refundGatewayReference?: string | null;
   readonly refundSettledOnUtc?: string | null;
+  /** Lifecycle stage: Created, Payment Confirmed, Queued, API Retry, Pending Manual Review, On Hold, ... */
+  readonly fulfillmentStage?: string | null;
 }
 
 /**

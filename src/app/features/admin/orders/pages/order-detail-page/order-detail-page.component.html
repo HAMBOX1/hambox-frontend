@@ -342,6 +342,13 @@
       }
     </app-admin-section-card>
 
+    @if (order.fulfillmentStage) {
+      <p class="order-detail-page__stage">
+        <strong>Stage:</strong>
+        <app-admin-status-badge [label]="order.fulfillmentStage" [tone]="statusTone(order.fulfillmentStage)" />
+      </p>
+    }
+
     @if (order.refundSettlement === 'AwaitingGatewayRefund') {
       <app-admin-section-card title="Refund owed to the customer">
         <p>

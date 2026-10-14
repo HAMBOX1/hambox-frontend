@@ -182,7 +182,7 @@ export class MembershipCheckoutFacade {
    * Starts a membership purchase through a hosted crypto gateway. Resolves with the gateway's payment URL; the
    * caller navigates the browser there. The subscription is activated by the server once the gateway confirms.
    */
-  async submitHostedCheckout(gateway: 'cryptomus' | 'oxapay'): Promise<string> {
+  async submitHostedCheckout(gateway: 'cryptomus' | 'oxapay' | 'dot', wallet?: string): Promise<string> {
     const planId = this.planIdState();
     const billing = this.billingDetailsState();
 
@@ -203,6 +203,7 @@ export class MembershipCheckoutFacade {
           planId,
           action: this.actionState(),
           gateway,
+          wallet,
           email: billing.email.trim(),
           country: billing.country,
         }),

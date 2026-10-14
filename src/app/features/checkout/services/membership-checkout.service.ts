@@ -29,7 +29,9 @@ export interface MembershipCheckoutRequestApiDto {
 export interface MembershipHostedCheckoutRequestApiDto {
   readonly planId: string;
   readonly action: string;
-  readonly gateway: 'cryptomus' | 'oxapay';
+  readonly gateway: 'cryptomus' | 'oxapay' | 'dot';
+  /** Required for 'dot': OrangeCash or VodafoneCash. */
+  readonly wallet?: string;
   readonly email: string;
   readonly country: string;
 }
