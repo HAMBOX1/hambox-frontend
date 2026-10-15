@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../../../core/analytics/analytics.service';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -25,6 +26,7 @@ const EMPTY_SUMMARY: CartSummary = {
 })
 export class CartFacade {
   private readonly cartService = inject(CartService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly guestSession = inject(GuestCartSessionService);
   private readonly authSession = inject(AuthSessionService);
 
@@ -72,6 +74,13 @@ export class CartFacade {
         this.cartService.addItem({ productId, quantity, productVariantId }),
       );
       await this.applyCartResponse(cart);
+
+      const line = this.itemsState().find(
+        (item) => item.productId === productId && (item.productVariantId ?? null) === (productVariantId ?? null),
+      );
+      if (line) {
+        this.analytics.addToCart({ id: line.productId, name: line.title, price: line.price, quantity }, 'USD');
+      }
     } catch (error) {
       this.errorState.set(this.toErrorMessage(error, 'Unable to add this item to your cart.'));
       throw error;

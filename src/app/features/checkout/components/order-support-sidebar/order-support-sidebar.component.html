@@ -1,6 +1,7 @@
 <aside class="support-sidebar" aria-label="Support and security">
   <section class="support-sidebar__card">
     <h2 class="support-sidebar__title">Need Assistance?</h2>
+    <app-whatsapp-support-button context="order-success" [orderNumber]="orderNumber()" />
     <button type="button" (click)="openAssistant()" class="support-sidebar__link">
       <div class="support-sidebar__link-icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

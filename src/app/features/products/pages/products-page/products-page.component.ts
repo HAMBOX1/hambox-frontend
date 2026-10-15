@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../../../../core/analytics/analytics.service';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,6 +45,7 @@ import { resolveNavSection } from '../../../../shared/utils/storefront-nav.utils
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductsPageComponent implements OnInit {
+  private readonly analytics = inject(AnalyticsService);
   private readonly facade = inject(ProductsFacade);
   private readonly home = inject(Home);
   private readonly filterPanel = inject(StorefrontFilterPanelService);
@@ -95,6 +97,10 @@ export class ProductsPageComponent implements OnInit {
 
       if (!this.initialized || searchTerm !== previousSearch || categoryId !== previousCategory) {
         this.initialized = true;
+        if (searchTerm.trim() && searchTerm !== previousSearch) {
+          this.analytics.search(searchTerm.trim());
+        }
+
         void this.facade.initialize(searchTerm, categoryId, section);
         return;
       }

@@ -80,6 +80,7 @@ import { HasPermissionDirective } from '../../../../../shared/directives/has-per
 import { AdminOrderDetailDto, AdminOrderItemDto, ORDER_STATUS_OPTIONS } from '../../models/order-api.model';
 
 import { OrderManagementFacade } from '../../services/order-management.facade';
+import { exportOrderLogToCsv } from '../../utils/order-export.util';
 
 
 
@@ -707,6 +708,11 @@ export class OrderDetailPageComponent implements OnInit {
         command: () => this.copyText(order.paymentTransactionId),
       },
       { label: t('ADMIN.ORDERS.ACTIONS.PRINT'), icon: 'pi pi-print', command: () => this.printInvoice() },
+      {
+        label: 'Export order log (CSV)',
+        icon: 'pi pi-download',
+        command: () => exportOrderLogToCsv(order.orderNumber, order.auditHistory),
+      },
     ];
 
     if (this.permissionService.hasPermission(this.permissions.Orders.Edit)) {

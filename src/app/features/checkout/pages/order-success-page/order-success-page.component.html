@@ -29,7 +29,7 @@
         </div>
 
         <aside class="order-success__sidebar">
-          <app-order-support-sidebar />
+          <app-order-support-sidebar [orderNumber]="orderDetails()!.orderId" />
         </aside>
       </div>
     }

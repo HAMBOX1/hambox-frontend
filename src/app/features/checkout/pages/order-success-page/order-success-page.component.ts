@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../../../../core/analytics/analytics.service';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
@@ -41,6 +42,7 @@ export class OrderSuccessPageComponent implements OnInit {
   private readonly checkoutFacade = inject(CheckoutFacade);
   private readonly products = inject(Products);
   private readonly translation = inject(TranslationService);
+  private readonly analytics = inject(AnalyticsService);
 
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly orderDetails = signal<OrderSuccessDetails | null>(null);
@@ -72,6 +74,12 @@ export class OrderSuccessPageComponent implements OnInit {
     try {
       const details = await this.checkoutFacade.loadOrder(orderId);
       this.orderDetails.set(details);
+      this.analytics.purchase(
+        details.orderId,
+        details.total,
+        'USD',
+        details.items.map((item) => ({ id: item.id, name: item.title, price: item.price })),
+      );
 
       try {
         const productPage = await this.products.getActiveProducts({ pageNumber: 1, pageSize: 8 });

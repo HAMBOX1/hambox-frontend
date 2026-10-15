@@ -27,6 +27,8 @@ import {
 
 import { environment } from '../environments/environment';
 import { HAMBOX_API_BASE_URL } from '../environments/api-url';
+import { AnalyticsService } from './core/analytics/analytics.service';
+import { SeoService } from './core/seo/seo.service';
 
 import { Auth } from './features/auth/services/auth';
 
@@ -132,6 +134,8 @@ export const appConfig: ApplicationConfig = {
 
       theme.init();
       void themeEngine.init();
+      void inject(SeoService).init();
+      void inject(AnalyticsService).init();
 
       const maintenanceReady = maintenance.init();
 

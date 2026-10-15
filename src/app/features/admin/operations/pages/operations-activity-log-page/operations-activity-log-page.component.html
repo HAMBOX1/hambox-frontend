@@ -1,0 +1,83 @@
+<section class="activity-log">
+  <header class="activity-log__header">
+    <h1>Activity log</h1>
+    <button pButton type="button" icon="pi pi-download" label="Export CSV" severity="secondary" (click)="exportCsv()"></button>
+  </header>
+
+  <form class="activity-log__filters" (ngSubmit)="applyFilters()">
+    <input
+      pInputText
+      name="search"
+      placeholder="Search event, description, actor, reason, IP…"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+    />
+    <p-select
+      name="source"
+      [options]="sources"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="source()"
+      (ngModelChange)="source.set($event)"
+    />
+    <input
+      pInputText
+      name="entityId"
+      placeholder="Order / entity id"
+      [ngModel]="entityId()"
+      (ngModelChange)="entityId.set($event)"
+    />
+    <input pInputText type="date" name="from" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event)" />
+    <input pInputText type="date" name="to" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event)" />
+    <button pButton type="submit" label="Search"></button>
+    <button pButton type="button" severity="secondary" [text]="true" label="Clear" (click)="clearFilters()"></button>
+  </form>
+
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+  }
+
+  <p-table [value]="[...entries()]" [loading]="loading()" styleClass="admin-data-table">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Time</th>
+        <th>Source</th>
+        <th>Event</th>
+        <th>Details</th>
+        <th>Actor</th>
+        <th>Entity</th>
+        <th>Change</th>
+        <th>Reason</th>
+        <th>Origin</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-entry>
+      <tr>
+        <td>{{ entry.occurredOnUtc | date: 'medium' }}</td>
+        <td>{{ entry.source }}</td>
+        <td>{{ entry.eventType }}</td>
+        <td>{{ entry.description }}</td>
+        <td>{{ entry.actorName || entry.actorUserId || 'System' }}</td>
+        <td>{{ entry.entityType }} {{ entry.entityId }}</td>
+        <td>
+          @if (entry.oldValue || entry.newValue) {
+            {{ entry.oldValue || '-' }} &rarr; {{ entry.newValue || '-' }}
+          }
+        </td>
+        <td>{{ entry.reason }}</td>
+        <td [title]="entry.userAgent || ''">{{ entry.ipAddress }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9">No activity matches these filters.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <footer class="activity-log__pager">
+    <button pButton type="button" severity="secondary" [text]="true" label="Previous" [disabled]="pageNumber() <= 1" (click)="changePage(-1)"></button>
+    <span>Page {{ pageNumber() }} · {{ totalCount() }} entries</span>
+    <button pButton type="button" severity="secondary" [text]="true" label="Next" [disabled]="pageNumber() * pageSize >= totalCount()" (click)="changePage(1)"></button>
+  </footer>
+</section>

@@ -1,3 +1,4 @@
+import { AnalyticsService } from '../../../../core/analytics/analytics.service';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { StorefrontNavComponent } from '../../../../shared/components/storefront-nav/storefront-nav.component';
@@ -28,6 +29,7 @@ import { CheckoutOrderSummaryComponent } from '../../components/checkout-order-s
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutPageComponent implements OnInit {
+  private readonly analytics = inject(AnalyticsService);
   private readonly cartFacade = inject(CartFacade);
   private readonly checkoutFacade = inject(CheckoutFacade);
   private readonly router = inject(Router);
@@ -57,5 +59,16 @@ export class CheckoutPageComponent implements OnInit {
     if (this.cartFacade.isEmpty()) {
       return;
     }
+
+    this.analytics.beginCheckout(
+      this.cartFacade.items().map((item) => ({
+        id: item.productId,
+        name: item.title,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      this.cartFacade.summary().total,
+      'USD',
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { AdminOrderListItemDto } from '../models/order-api.model';
+import { AdminOrderAuditEntryDto, AdminOrderListItemDto } from '../models/order-api.model';
 
 function escapeCsv(value: string | number | null | undefined): string {
   const raw = value == null ? '' : String(value);
@@ -87,4 +87,45 @@ function downloadTextFile(content: string, filename: string, mimeType: string): 
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
+}
+
+/** One order's complete action log as a CSV — who did what, when, from where, and what changed (audit R56). */
+export function exportOrderLogToCsv(orderNumber: string, entries: readonly AdminOrderAuditEntryDto[]): void {
+  const headers = [
+    'Time (UTC)',
+    'Event',
+    'Description',
+    'Actor',
+    'Reason',
+    'Old value',
+    'New value',
+    'IP address',
+    'User agent',
+  ];
+
+  // A cell starting with = + - @ would be evaluated as a formula by a spreadsheet; neutralise it.
+  const safe = (value: string | null | undefined): string =>
+    value && /^[=+\-@\t\r]/.test(value) ? `'${value}` : (value ?? '');
+
+  const rows = entries.map((entry) =>
+    [
+      entry.occurredOnUtc,
+      entry.eventType,
+      safe(entry.description),
+      safe(entry.actorDisplayName ?? 'System'),
+      safe(entry.reason),
+      safe(entry.oldValue),
+      safe(entry.newValue),
+      entry.ipAddress ?? '',
+      safe(entry.userAgent),
+    ]
+      .map(escapeCsv)
+      .join(','),
+  );
+
+  downloadTextFile(
+    '﻿' + [headers.join(','), ...rows].join('\n'),
+    `order-${orderNumber}-log.csv`,
+    'text/csv;charset=utf-8;',
+  );
 }

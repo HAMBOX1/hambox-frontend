@@ -510,6 +510,23 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       ...fieldKeys('COMMERCE.REFUND_WINDOW_DAYS'),
     },
     { key: 'invoicePrefix', control: 'text', ...fieldKeys('COMMERCE.INVOICE_PREFIX') },
+    // Purchase limits (audit R57): per-product caps live on each product; these are the account-level risk gates.
+    {
+      key: 'velocityOrdersPerHour',
+      control: 'stepper',
+      min: 1,
+      max: 100,
+      validators: { min: 1, max: 100 },
+      ...fieldKeys('COMMERCE.VELOCITY_ORDERS_PER_HOUR'),
+    },
+    {
+      key: 'failedPaymentsPerDay',
+      control: 'stepper',
+      min: 1,
+      max: 100,
+      validators: { min: 1, max: 100 },
+      ...fieldKeys('COMMERCE.FAILED_PAYMENTS_PER_DAY'),
+    },
     {
       key: 'defaultSupplierMarginPercent',
       control: 'slider',
@@ -664,6 +681,34 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     { key: 'useExponentialBackoff', control: 'toggle', ...fieldKeys('RETRY_POLICIES.USE_EXPONENTIAL_BACKOFF') },
     { key: 'retryScheduleSeconds', control: 'text', ...fieldKeys('RETRY_POLICIES.RETRY_SCHEDULE_SECONDS') },
     { key: 'useJitter', control: 'toggle', ...fieldKeys('RETRY_POLICIES.USE_JITTER') },
+    // Supplier rate limits (audit R57 / R41): how hard we may call a supplier and how long we stay silent after a 429.
+    {
+      key: 'supplierMaxRequestsPerSecond',
+      control: 'number',
+      min: 0,
+      max: 100,
+      step: 0.5,
+      validators: { min: 0, max: 100 },
+      ...fieldKeys('RETRY_POLICIES.SUPPLIER_MAX_REQUESTS_PER_SECOND'),
+    },
+    {
+      key: 'supplierDefaultCooldownSeconds',
+      control: 'stepper',
+      min: 1,
+      max: 3600,
+      unit: 'seconds',
+      validators: { min: 1, max: 3600 },
+      ...fieldKeys('RETRY_POLICIES.SUPPLIER_DEFAULT_COOLDOWN_SECONDS'),
+    },
+    {
+      key: 'supplierMaxCooldownSeconds',
+      control: 'stepper',
+      min: 1,
+      max: 86400,
+      unit: 'seconds',
+      validators: { min: 1, max: 86400 },
+      ...fieldKeys('RETRY_POLICIES.SUPPLIER_MAX_COOLDOWN_SECONDS'),
+    },
   ],
   notifications: [
     { key: 'emailEnabled', control: 'toggle', ...fieldKeys('NOTIFICATIONS.EMAIL_ENABLED') },
@@ -690,13 +735,43 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     // imageCompressionEnabled and thumbnailSmallPx/MediumPx/LargePx removed — no image
     // compression or thumbnail generation exists in the backend to read them.
   ],
-  // `seo` category removed entirely — no Angular code reads publicSettings.seo to set meta tags,
-  // <title>, or Open Graph/Twitter Card data; the fields round-trip to storage only.
-  // `analytics` category removed entirely — no Angular code reads publicSettings.analytics to
-  // inject a GA/GTM/Meta Pixel script; enableTracking is a no-op toggle today.
+  // `seo` and `analytics` are real again (audit R54/R55): SeoService writes the meta/OG/canonical tags from
+  // publicSettings.seo, the backend serves robots.txt/sitemap.xml from it, and AnalyticsService injects the
+  // GA4/GTM/Meta Pixel scripts (after the visitor consents) from publicSettings.analytics.
+  seo: [
+    { key: 'metaTitle', control: 'text', validators: { maxLength: 70 }, ...fieldKeys('SEO.META_TITLE') },
+    { key: 'metaDescription', control: 'textarea', rows: 3, validators: { maxLength: 320 }, ...fieldKeys('SEO.META_DESCRIPTION') },
+    { key: 'openGraphImageUrl', control: 'text', ...fieldKeys('SEO.OPEN_GRAPH_IMAGE_URL') },
+    {
+      key: 'twitterCardType',
+      control: 'select',
+      options: [
+        { value: 'summary_large_image', label: 'summary_large_image' },
+        { value: 'summary', label: 'summary' },
+      ],
+      ...fieldKeys('SEO.TWITTER_CARD_TYPE'),
+    },
+    {
+      key: 'robotsDirective',
+      control: 'select',
+      dangerous: true,
+      options: [
+        { value: 'index,follow', label: 'index,follow' },
+        { value: 'noindex,nofollow', label: 'noindex,nofollow' },
+      ],
+      ...fieldKeys('SEO.ROBOTS_DIRECTIVE'),
+    },
+    { key: 'canonicalBaseUrl', control: 'url', validators: { format: 'url' }, ...fieldKeys('SEO.CANONICAL_BASE_URL') },
+  ],
+  analytics: [
+    { key: 'enableTracking', control: 'toggle', ...fieldKeys('ANALYTICS.ENABLE_TRACKING') },
+    { key: 'googleAnalyticsId', control: 'text', validators: { maxLength: 40 }, ...fieldKeys('ANALYTICS.GOOGLE_ANALYTICS_ID') },
+    { key: 'googleTagManagerId', control: 'text', validators: { maxLength: 40 }, ...fieldKeys('ANALYTICS.GOOGLE_TAG_MANAGER_ID') },
+    { key: 'metaPixelId', control: 'text', validators: { maxLength: 40 }, ...fieldKeys('ANALYTICS.META_PIXEL_ID') },
+  ],
   // `integrations` category removed entirely — Stripe/PayPal/webhooks have no real backend
   // implementation; the fields round-trip to storage only.
-  // See HIDDEN_CATEGORY_KEYS for all three.
+  // See HIDDEN_CATEGORY_KEYS.
   maintenance: [
     { key: 'enabled', control: 'toggle', dangerous: true, ...fieldKeys('MAINTENANCE.ENABLED') },
     { key: 'message', control: 'textarea', rows: 3, ...fieldKeys('MAINTENANCE.MESSAGE') },
@@ -727,7 +802,5 @@ export const HIDDEN_CATEGORY_KEYS: readonly string[] = [
   'theme',
   'checkout',
   'memberships',
-  'seo',
-  'analytics',
   'legal',
 ];

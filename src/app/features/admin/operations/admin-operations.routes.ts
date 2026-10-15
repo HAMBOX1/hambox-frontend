@@ -66,6 +66,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'activity-log',
+    canActivate: [permissionGuard([PERMISSIONS.Operations.View])],
+    loadComponent: () =>
+      import('./pages/operations-activity-log-page/operations-activity-log-page.component').then(
+        (c) => c.OperationsActivityLogPageComponent,
+      ),
+  },
+  {
     path: 'health',
     canActivate: [permissionGuard([PERMISSIONS.Operations.View])],
     loadComponent: () =>

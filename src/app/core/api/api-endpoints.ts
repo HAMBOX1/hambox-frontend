@@ -373,6 +373,15 @@ export const ORDERS_API = {
     `/api/v1/orders/${orderId}/license-keys/${licenseKeyId}/reveal`,
 } as const;
 
+export const SUPPORT_CONTACT_API = {
+  click: '/api/v1/support-contact/click',
+} as const;
+
+export const ACTIVITY_LOG_API = {
+  log: '/api/v1/operations/activity-log',
+  export: '/api/v1/operations/activity-log/export',
+} as const;
+
 export const ADMIN_REVIEWS_API = {
   reviews: '/api/v1/admin/reviews',
   hide: (id: string) => `/api/v1/admin/reviews/${id}/hide`,

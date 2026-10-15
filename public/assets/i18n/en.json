@@ -2578,6 +2578,16 @@
             "LABEL": "Default Supplier Margin",
             "HELP": "The default markup applied over a supplier's acquisition cost to compute the storefront price for supplier-fulfilled products.",
             "TOOLTIP": "Used unless a specific supplier mapping has its own margin override. Changes apply to new pricing calculations, never to existing orders."
+          },
+          "VELOCITY_ORDERS_PER_HOUR": {
+            "LABEL": "Orders per customer per hour",
+            "HELP": "How many orders one customer may place within an hour before the next one is held for review.",
+            "TOOLTIP": "A held order is not delivered until an admin releases it. Per-product quantity limits are set on each product."
+          },
+          "FAILED_PAYMENTS_PER_DAY": {
+            "LABEL": "Failed payments per customer per day",
+            "HELP": "How many failed payments in 24 hours before the customer's next order is held for review.",
+            "TOOLTIP": "Protects against card testing. The order is held, not rejected."
           }
         },
         "CHECKOUT": {
@@ -2752,6 +2762,21 @@
             "LABEL": "Spread retries (jitter)",
             "HELP": "Randomises each retry delay by up to ±20% so a batch of failed jobs does not retry in the same second.",
             "TOOLTIP": "Recommended — avoids hammering a supplier that has just recovered."
+          },
+          "SUPPLIER_MAX_REQUESTS_PER_SECOND": {
+            "LABEL": "Supplier requests per second",
+            "HELP": "Highest sustained request rate to any one supplier. 0 turns spacing off.",
+            "TOOLTIP": "Calls are spaced out so a burst of orders cannot trip a supplier's own rate limit."
+          },
+          "SUPPLIER_DEFAULT_COOLDOWN_SECONDS": {
+            "LABEL": "Pause after a supplier 429",
+            "HELP": "How long to stop calling a supplier that answered \"too many requests\" without saying when to retry.",
+            "TOOLTIP": "When the supplier sends a Retry-After value, that value is used instead."
+          },
+          "SUPPLIER_MAX_COOLDOWN_SECONDS": {
+            "LABEL": "Longest supplier pause",
+            "HELP": "A supplier can never make us stay silent longer than this.",
+            "TOOLTIP": "Caps the Retry-After value a supplier sends."
           }
         },
         "NOTIFICATIONS": {

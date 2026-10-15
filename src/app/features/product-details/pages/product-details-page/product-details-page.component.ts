@@ -1,3 +1,5 @@
+import { AnalyticsService } from '../../../../core/analytics/analytics.service';
+import { SeoService } from '../../../../core/seo/seo.service';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -79,6 +81,9 @@ const BUY_BAR_INSET_PX = 76;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductDetailsPageComponent {
+  private readonly seo = inject(SeoService);
+  private readonly analytics = inject(AnalyticsService);
+
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -474,6 +479,25 @@ export class ProductDetailsPageComponent {
     return 'Unable to add this product to your cart.';
   }
 
+  /** Product metadata for search engines + the GA4/Meta `view_item` event (audit R54/R55). */
+  private reportProductSeoAndView(details: ProductDetailsItem, hasMarketingPage: boolean): void {
+    if (!hasMarketingPage) {
+      this.seo.setProduct({
+        id: details.id,
+        title: details.title,
+        description: details.description,
+        imageUrl: details.imageUrl,
+        price: details.priceUsd,
+        currency: 'USD',
+        inStock: details.canPurchase,
+        categoryId: details.categoryId,
+        categoryName: details.categoryName ?? null,
+      });
+    }
+
+    this.analytics.viewItem({ id: details.id, name: details.title, price: details.priceUsd }, 'USD');
+  }
+
   private async loadProduct(productId: string | null): Promise<void> {
     if (!productId) {
       this.product.set(null);
@@ -512,6 +536,7 @@ export class ProductDetailsPageComponent {
         this.cartFacade.load(),
       ]);
       this.product.set(details);
+      this.reportProductSeoAndView(details, marketingPage !== null);
       this.selectedImageIndex.set(0);
       this.relatedProducts.set([]);
       void this.loadRelatedProducts(details);

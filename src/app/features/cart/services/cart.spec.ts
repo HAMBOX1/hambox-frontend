@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
+import { AnalyticsService } from '../../../core/analytics/analytics.service';
 import { GuestCartSessionService } from '../../../core/cart/guest-cart-session.service';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { CartApiDto } from '../models/cart-api.model';
@@ -77,6 +78,7 @@ describe('CartFacade', () => {
         GuestCartSessionService,
         AuthSessionService,
         { provide: CartService, useValue: cartService },
+        { provide: AnalyticsService, useValue: { addToCart: () => undefined } },
       ],
     });
 

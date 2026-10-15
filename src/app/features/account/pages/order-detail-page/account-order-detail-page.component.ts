@@ -1,3 +1,4 @@
+import { WhatsAppSupportButtonComponent } from '../../../../shared/components/whatsapp-support-button/whatsapp-support-button.component';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -16,7 +17,7 @@ import { TranslationService } from '../../../../core/i18n/translation.service';
 @Component({
   selector: 'app-account-order-detail-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, TranslatePipe, WriteReviewDialogComponent, HamboxTranslateRefreshDirective],
+  imports: [WhatsAppSupportButtonComponent, RouterLink, HamboxCurrencyPipe, HamboxDatePipe, TranslatePipe, WriteReviewDialogComponent, HamboxTranslateRefreshDirective],
   templateUrl: './account-order-detail-page.component.html',
   styleUrl: './account-order-detail-page.component.scss',
 })
