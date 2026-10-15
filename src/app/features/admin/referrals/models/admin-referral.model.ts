@@ -10,6 +10,10 @@ export interface AdminReferralListItemDto {
   readonly qualifiedOnUtc: string | null;
   readonly rewardedOnUtc: string | null;
   readonly expiresOnUtc: string | null;
+  /** True while a suspected-farming referral waits for an admin to clear it. */
+  readonly heldForReview?: boolean;
+  readonly reviewReason?: string | null;
+  readonly registrationIp?: string | null;
 }
 
 export interface AdminReferralAuditEntryDto {

@@ -1287,6 +1287,7 @@
       "PROMOTIONS": "العروض",
       "MEMBERSHIPS": "العضويات",
       "REFERRALS": "الإحالات",
+      "REVIEWS": "التقييمات",
       "THEMES": "السمات",
       "CAMPAIGNS": "الحملات",
       "PAGE_BUILDER": "منشئ الصفحات",
@@ -3765,6 +3766,7 @@
       "ACTIONS": {
         "VIEW": "عرض التفاصيل",
         "VOID": "إبطال الإحالة",
+        "APPROVE": "الموافقة (رفع التعليق)",
         "REVERSE": "عكس الإحالة",
         "CONFIRM_REVERSE": "تأكيد",
         "RETRY": "إعادة المحاولة"
@@ -3794,7 +3796,9 @@
         "REWARDED": "تم منح النقاط",
         "EXPIRED": "منتهية",
         "REVERSED": "معكوسة",
-        "REJECTED": "مرفوضة"
+        "REJECTED": "مرفوضة",
+        "HELDFORREVIEW": "معلّقة للمراجعة",
+        "REVIEWAPPROVED": "تمت الموافقة بعد المراجعة"
       }
     },
     "THEMES": {

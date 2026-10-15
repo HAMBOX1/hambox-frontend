@@ -37,7 +37,7 @@
           severity="danger"
           icon="pi pi-replay"
           [label]="'ADMIN.ORDERS.DETAIL.REFUND' | translate"
-          (click)="refundDialogOpen.set(true)"
+          (click)="openRefundDialog()"
         ></button>
       </div>
     }
@@ -516,6 +516,9 @@
               <strong>{{ entry.eventType }}</strong>
               <span>{{ entry.description }}</span>
               <small>{{ entry.actorDisplayName || 'System' }} · {{ entry.occurredOnUtc | date: 'medium' }}</small>
+              @if (entry.oldValue || entry.newValue) {
+                <small>{{ entry.oldValue || '-' }} &rarr; {{ entry.newValue || '-' }}</small>
+              }
               @if (entry.reason) {
                 <small>Reason: {{ entry.reason }}</small>
               }
@@ -546,22 +549,114 @@
     [ngModel]="selectedStatus()"
     (ngModelChange)="selectedStatus.set($event)"
   />
+  <label class="order-detail-page__field">
+    <span>Reason (required, kept in the audit trail)</span>
+    <textarea
+      pTextarea
+      rows="2"
+      maxlength="500"
+      class="w-full"
+      [ngModel]="actionReason()"
+      (ngModelChange)="actionReason.set($event)"
+    ></textarea>
+  </label>
   <ng-template pTemplate="footer">
     <button pButton type="button" severity="secondary" [text]="true" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="statusDialogOpen.set(false)"></button>
-    <button pButton type="button" [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate" [loading]="actionLoading()" (click)="confirmStatusChange()"></button>
+    <button pButton type="button" [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate" [disabled]="!actionReason().trim()" [loading]="actionLoading()" (click)="confirmStatusChange()"></button>
   </ng-template>
 </p-dialog>
 
-<app-admin-confirm-dialog
+<p-dialog
+  [header]="'ADMIN.ORDERS.DETAIL.REFUND' | translate"
   [visible]="refundDialogOpen()"
   (visibleChange)="refundDialogOpen.set($event)"
-  [title]="'ADMIN.ORDERS.DETAIL.REFUND' | translate"
-  [message]="'ADMIN.ORDERS.DETAIL.REFUND_CONFIRM' | translate"
-  [confirmLabel]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
-  [loading]="actionLoading()"
-  [destructive]="true"
-  (confirmed)="confirmRefund()"
-/>
+  [modal]="true"
+  [dismissableMask]="true"
+  styleClass="admin-dialog"
+>
+  <p>{{ 'ADMIN.ORDERS.DETAIL.REFUND_CONFIRM' | translate }}</p>
+  <label class="order-detail-page__field">
+    <span>Reason (required, kept in the audit trail)</span>
+    <textarea
+      pTextarea
+      rows="2"
+      maxlength="500"
+      class="w-full"
+      [ngModel]="actionReason()"
+      (ngModelChange)="actionReason.set($event)"
+    ></textarea>
+  </label>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" severity="secondary" [text]="true" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="refundDialogOpen.set(false)"></button>
+    <button pButton type="button" severity="danger" [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate" [disabled]="!actionReason().trim()" [loading]="actionLoading()" (click)="confirmRefund()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Mark as delivered (manual)"
+  [visible]="markDeliveredDialogOpen()"
+  (visibleChange)="markDeliveredDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  styleClass="admin-dialog"
+>
+  <p>Use this only when the customer already received what they paid for outside the system. A reason and the proof of delivery are both required and are stored in the audit trail.</p>
+  <label class="order-detail-page__field">
+    <span>Reason (required, kept in the audit trail)</span>
+    <textarea
+      pTextarea
+      rows="2"
+      maxlength="500"
+      class="w-full"
+      [ngModel]="actionReason()"
+      (ngModelChange)="actionReason.set($event)"
+    ></textarea>
+  </label>
+  <label class="order-detail-page__field">
+    <span>Evidence (chat / ticket reference, what was sent)</span>
+    <textarea
+      pTextarea
+      rows="2"
+      maxlength="500"
+      class="w-full"
+      [ngModel]="deliveryEvidence()"
+      (ngModelChange)="deliveryEvidence.set($event)"
+    ></textarea>
+  </label>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" severity="secondary" [text]="true" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="markDeliveredDialogOpen.set(false)"></button>
+    <button pButton type="button" label="Mark as delivered" [disabled]="!actionReason().trim() || !deliveryEvidence().trim()" [loading]="actionLoading()" (click)="confirmMarkDelivered()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Contact customer"
+  [visible]="contactDialogOpen()"
+  (visibleChange)="contactDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  styleClass="admin-dialog"
+>
+  <label class="order-detail-page__field">
+    <span>Subject</span>
+    <input pInputText maxlength="200" [ngModel]="contactSubject()" (ngModelChange)="contactSubject.set($event)" />
+  </label>
+  <label class="order-detail-page__field">
+    <span>Message</span>
+    <textarea
+      pTextarea
+      rows="4"
+      maxlength="2000"
+      class="w-full"
+      [ngModel]="contactMessage()"
+      (ngModelChange)="contactMessage.set($event)"
+    ></textarea>
+  </label>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" severity="secondary" [text]="true" [label]="'ADMIN.CONFIRM.CANCEL' | translate" (click)="contactDialogOpen.set(false)"></button>
+    <button pButton type="button" label="Send" [disabled]="!contactSubject().trim() || !contactMessage().trim()" [loading]="actionLoading()" (click)="confirmContact()"></button>
+  </ng-template>
+</p-dialog>
 
 <app-admin-confirm-dialog
   [visible]="resendDialogOpen()"
@@ -610,6 +705,17 @@
       [placeholder]="'ADMIN.ORDERS.DETAIL.MANUAL_CODE_PLACEHOLDER' | translate"
     />
   </label>
+  <label class="order-detail-page__field">
+    <span>Reason (required, kept in the audit trail)</span>
+    <textarea
+      pTextarea
+      rows="2"
+      maxlength="500"
+      class="w-full"
+      [ngModel]="actionReason()"
+      (ngModelChange)="actionReason.set($event)"
+    ></textarea>
+  </label>
   <ng-template pTemplate="footer">
     <button
       pButton
@@ -623,6 +729,7 @@
       pButton
       type="button"
       [label]="'ADMIN.ORDERS.DETAIL.CONFIRM' | translate"
+      [disabled]="!actionReason().trim()"
       [loading]="actionLoading()"
       (click)="confirmManualCode()"
     ></button>

@@ -92,6 +92,9 @@ export interface AdminOrderAuditEntryDto {
   readonly reason?: string | null;
   readonly ipAddress?: string | null;
   readonly userAgent?: string | null;
+  /** The value before / after a manual change (e.g. the order status). */
+  readonly oldValue?: string | null;
+  readonly newValue?: string | null;
 }
 
 export interface AdminOrderPaymentCallbackDto {

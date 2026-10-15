@@ -241,6 +241,7 @@ export const ACCOUNT_API = {
   myReviews: '/api/v1/account/reviews/mine',
   reviews: '/api/v1/account/reviews',
   review: (reviewId: string) => `/api/v1/account/reviews/${reviewId}`,
+  reviewVote: (reviewId: string) => `/api/v1/account/reviews/${reviewId}/vote`,
   notifications: '/api/v1/account/notifications',
   unreadCount: '/api/v1/account/notifications/unread-count',
   markNotificationRead: (id: string) => `/api/v1/account/notifications/${id}/read`,
@@ -364,16 +365,25 @@ export const ORDERS_API = {
   releaseHold: (orderId: string) => `/api/v1/orders/${orderId}/hold/release`,
   settleRefund: (orderId: string) => `/api/v1/orders/${orderId}/refund/settle`,
   manualCode: (orderId: string) => `/api/v1/orders/${orderId}/manual-code`,
+  markDelivered: (orderId: string) => `/api/v1/orders/${orderId}/mark-delivered`,
+  contactCustomer: (orderId: string) => `/api/v1/orders/${orderId}/contact`,
   notes: (orderId: string) => `/api/v1/orders/${orderId}/notes`,
   note: (orderId: string, noteId: string) => `/api/v1/orders/${orderId}/notes/${noteId}`,
   revealLicenseKey: (orderId: string, licenseKeyId: string) =>
     `/api/v1/orders/${orderId}/license-keys/${licenseKeyId}/reveal`,
 } as const;
 
+export const ADMIN_REVIEWS_API = {
+  reviews: '/api/v1/admin/reviews',
+  hide: (id: string) => `/api/v1/admin/reviews/${id}/hide`,
+  unhide: (id: string) => `/api/v1/admin/reviews/${id}/unhide`,
+} as const;
+
 export const ADMIN_REFERRALS_API = {
   referrals: '/api/v1/admin/referrals',
   referral: (id: string) => `/api/v1/admin/referrals/${id}`,
   reverse: (id: string) => `/api/v1/admin/referrals/${id}/reverse`,
+  approve: (id: string) => `/api/v1/admin/referrals/${id}/approve`,
 } as const;
 
 export const PROMOTIONS_API = {

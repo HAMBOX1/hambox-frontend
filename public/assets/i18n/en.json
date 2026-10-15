@@ -1304,6 +1304,7 @@
       "PROMOTIONS": "Promotions",
       "MEMBERSHIPS": "Memberships",
       "REFERRALS": "Referrals",
+      "REVIEWS": "Reviews",
       "THEMES": "Themes",
       "CAMPAIGNS": "Campaigns",
       "PAGE_BUILDER": "Page Builder",
@@ -5018,6 +5019,7 @@
       "ACTIONS": {
         "VIEW": "View details",
         "VOID": "Void referral",
+        "APPROVE": "Approve (clear review hold)",
         "REVERSE": "Reverse referral",
         "CONFIRM_REVERSE": "Confirm",
         "RETRY": "Retry"
@@ -5047,7 +5049,9 @@
         "REWARDED": "Points awarded",
         "EXPIRED": "Expired",
         "REVERSED": "Reversed",
-        "REJECTED": "Rejected"
+        "REJECTED": "Rejected",
+        "HELDFORREVIEW": "Held for review",
+        "REVIEWAPPROVED": "Review approved"
       }
     },
     "MEMBERSHIPS": {

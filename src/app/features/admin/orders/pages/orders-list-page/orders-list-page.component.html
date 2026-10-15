@@ -267,6 +267,17 @@
       *hamboxHasPermission="permissions.Orders.Edit"
       pButton
       type="button"
+      label="Hold"
+      icon="pi pi-pause"
+      severity="secondary"
+      size="small"
+      [disabled]="actionLoading()"
+      (click)="bulkAction('hold')"
+    ></button>
+    <button
+      *hamboxHasPermission="permissions.Orders.Edit"
+      pButton
+      type="button"
       [label]="'ADMIN.ORDERS.ACTIONS.BULK_CANCEL' | translate"
       icon="pi pi-times"
       severity="danger"
@@ -275,6 +286,35 @@
       (click)="bulkAction('cancel')"
     ></button>
   </app-admin-bulk-bar>
+
+  <p-dialog
+    header="Reason for this bulk action"
+    [visible]="bulkReasonAction() !== null"
+    (visibleChange)="$event ? null : bulkReasonAction.set(null)"
+    [modal]="true"
+    [dismissableMask]="true"
+    styleClass="admin-dialog"
+  >
+    <p>One reason is recorded in the audit trail of every selected order.</p>
+    <textarea
+      pTextarea
+      rows="3"
+      maxlength="500"
+      class="w-full"
+      [ngModel]="bulkReason()"
+      (ngModelChange)="bulkReason.set($event)"
+    ></textarea>
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        type="button"
+        label="Apply"
+        [disabled]="!bulkReason().trim()"
+        [loading]="actionLoading()"
+        (click)="confirmBulk()"
+      ></button>
+    </ng-template>
+  </p-dialog>
 
   <div class="orders-list-page__table-wrap">
     <app-admin-data-table-shell>

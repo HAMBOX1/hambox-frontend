@@ -221,6 +221,14 @@ export class OrderDetailPageComponent implements OnInit {
 
   protected readonly manualCodeValue = signal('');
 
+  /** Every manual action on an order needs a reason; one field is shared by the dialogs (only one is open at a time). */
+  protected readonly actionReason = signal('');
+  protected readonly markDeliveredDialogOpen = signal(false);
+  protected readonly deliveryEvidence = signal('');
+  protected readonly contactDialogOpen = signal(false);
+  protected readonly contactSubject = signal('');
+  protected readonly contactMessage = signal('');
+
 
 
   protected readonly itemsNeedingCodes = computed(() => {
@@ -362,6 +370,7 @@ export class OrderDetailPageComponent implements OnInit {
 
 
   protected openStatusDialog(): void {
+    this.actionReason.set('');
 
     this.selectedStatus.set(this.detail()?.orderStatus ?? 'Completed');
 
@@ -378,6 +387,7 @@ export class OrderDetailPageComponent implements OnInit {
     this.manualCodeItemId.set(first?.id ?? null);
 
     this.manualCodeValue.set('');
+    this.actionReason.set('');
 
     this.manualCodeDialogOpen.set(true);
 
@@ -389,7 +399,9 @@ export class OrderDetailPageComponent implements OnInit {
 
     const id = this.orderId();
 
-    const ok = await this.facade.updateStatus(id, this.selectedStatus());
+    const reason = this.actionReason().trim();
+    if (!reason) return;
+    const ok = await this.facade.updateStatus(id, this.selectedStatus(), reason);
 
     this.statusDialogOpen.set(false);
 
@@ -407,7 +419,9 @@ export class OrderDetailPageComponent implements OnInit {
 
     const id = this.orderId();
 
-    const ok = await this.facade.refundOrder(id);
+    const reason = this.actionReason().trim();
+    if (!reason) return;
+    const ok = await this.facade.refundOrder(id, reason);
 
     this.refundDialogOpen.set(false);
 
@@ -477,7 +491,9 @@ export class OrderDetailPageComponent implements OnInit {
 
 
 
-    const ok = await this.facade.assignManualCode(this.orderId(), itemId, code);
+    const reason = this.actionReason().trim();
+    if (!reason) return;
+    const ok = await this.facade.assignManualCode(this.orderId(), itemId, code, reason);
 
     this.manualCodeDialogOpen.set(false);
 
@@ -490,6 +506,45 @@ export class OrderDetailPageComponent implements OnInit {
   }
 
 
+
+  protected openRefundDialog(): void {
+    this.actionReason.set('');
+    this.refundDialogOpen.set(true);
+  }
+
+  protected openMarkDeliveredDialog(): void {
+    this.actionReason.set('');
+    this.deliveryEvidence.set('');
+    this.markDeliveredDialogOpen.set(true);
+  }
+
+  protected async confirmMarkDelivered(): Promise<void> {
+    const reason = this.actionReason().trim();
+    const evidence = this.deliveryEvidence().trim();
+    if (!reason || !evidence) return;
+
+    if (await this.facade.markDelivered(this.orderId(), reason, evidence)) {
+      this.markDeliveredDialogOpen.set(false);
+      this.messageService.add({ severity: 'success', summary: 'Order marked as delivered' });
+    }
+  }
+
+  protected openContactDialog(): void {
+    this.contactSubject.set(`About your order ${this.detail()?.orderNumber ?? ''}`.trim());
+    this.contactMessage.set('');
+    this.contactDialogOpen.set(true);
+  }
+
+  protected async confirmContact(): Promise<void> {
+    const subject = this.contactSubject().trim();
+    const message = this.contactMessage().trim();
+    if (!subject || !message) return;
+
+    if (await this.facade.contactCustomer(this.orderId(), subject, message)) {
+      this.contactDialogOpen.set(false);
+      this.messageService.add({ severity: 'success', summary: 'Message sent to the customer' });
+    }
+  }
 
   protected async saveNote(): Promise<void> {
 
@@ -666,6 +721,17 @@ export class OrderDetailPageComponent implements OnInit {
           icon: 'pi pi-refresh',
           disabled: !this.canRetryFulfillment(),
           command: () => this.retryDialogOpen.set(true),
+        },
+        {
+          label: 'Mark as delivered (manual)',
+          icon: 'pi pi-check-circle',
+          disabled: order.paymentStatus !== 'Paid' || order.orderStatus === 'Completed',
+          command: () => this.openMarkDeliveredDialog(),
+        },
+        {
+          label: 'Contact customer',
+          icon: 'pi pi-envelope',
+          command: () => this.openContactDialog(),
         },
         {
           label: t('ADMIN.ORDERS.DETAIL.ASSIGN_MANUAL_CODE'),

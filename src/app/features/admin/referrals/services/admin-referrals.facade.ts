@@ -113,6 +113,25 @@ export class AdminReferralsFacade {
     }
   }
 
+  async approveReferral(referralId: string): Promise<boolean> {
+    this.actionLoadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const detail = await firstValueFrom(
+        this.api.post<AdminReferralDetailDto>(ADMIN_REFERRALS_API.approve(referralId), {}),
+      );
+      this.detailState.set(detail);
+      this.updateListItem(detail.referral);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to approve this referral.'));
+      return false;
+    } finally {
+      this.actionLoadingState.set(false);
+    }
+  }
+
   private updateListItem(updated: AdminReferralListItemDto): void {
     this.referralsState.update((items) =>
       items.map((item) => (item.id === updated.id ? updated : item)),

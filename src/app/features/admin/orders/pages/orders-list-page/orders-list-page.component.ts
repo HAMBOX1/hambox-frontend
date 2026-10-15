@@ -19,6 +19,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 
 import { CurrencyService } from '../../../../../core/currency/currency.service';
@@ -70,6 +71,7 @@ import { exportOrdersToCsv, exportOrdersToExcel } from '../../utils/order-export
     MultiSelectModule,
     SelectModule,
     TableModule,
+    TextareaModule,
     ToastModule,
     HamboxCurrencyPipe,
     AdminPageHeaderComponent,
@@ -252,9 +254,32 @@ export class OrdersListPageComponent implements OnInit {
     this.selectedOrders.set([]);
   }
 
-  protected async bulkAction(action: string): Promise<void> {
+  protected readonly bulkReasonAction = signal<string | null>(null);
+  protected readonly bulkReason = signal('');
+
+  /** Re-sending codes is harmless; every other bulk action is a manual change and must carry a reason. */
+  protected bulkAction(action: string): void {
+    if (action === 'resend-codes') {
+      void this.runBulk(action, null);
+      return;
+    }
+
+    this.bulkReason.set('');
+    this.bulkReasonAction.set(action);
+  }
+
+  protected async confirmBulk(): Promise<void> {
+    const action = this.bulkReasonAction();
+    const reason = this.bulkReason().trim();
+    if (!action || !reason) return;
+
+    this.bulkReasonAction.set(null);
+    await this.runBulk(action, reason);
+  }
+
+  private async runBulk(action: string, reason: string | null): Promise<void> {
     const ids = this.selectedOrders().map((o) => o.id);
-    const result = await this.facade.bulkOrders(action, ids);
+    const result = await this.facade.bulkOrders(action, ids, reason);
     if (!result) return;
 
     if (result.failureCount === 0) {

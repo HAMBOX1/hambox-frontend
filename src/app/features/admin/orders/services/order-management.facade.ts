@@ -194,11 +194,11 @@ export class OrderManagementFacade {
     }
   }
 
-  async updateStatus(orderId: string, status: string): Promise<boolean> {
+  async updateStatus(orderId: string, status: string, reason: string): Promise<boolean> {
     this.actionLoadingState.set(true);
     try {
       const detail = await firstValueFrom(
-        this.api.patch<AdminOrderDetailDto>(ORDERS_API.status(orderId), { status }),
+        this.api.patch<AdminOrderDetailDto>(ORDERS_API.status(orderId), { status, reason }),
       );
       this.detailState.set(detail);
       await this.fetchOrders(true);
@@ -212,11 +212,11 @@ export class OrderManagementFacade {
     }
   }
 
-  async refundOrder(orderId: string): Promise<boolean> {
+  async refundOrder(orderId: string, reason: string): Promise<boolean> {
     this.actionLoadingState.set(true);
     try {
       const detail = await firstValueFrom(
-        this.api.post<AdminOrderDetailDto>(ORDERS_API.refund(orderId), {}),
+        this.api.post<AdminOrderDetailDto>(ORDERS_API.refund(orderId), { reason }),
       );
       this.detailState.set(detail);
       await this.fetchOrders(true);
@@ -276,6 +276,7 @@ export class OrderManagementFacade {
   async bulkOrders(
     action: string,
     orderIds: readonly string[],
+    reason: string | null = null,
   ): Promise<BulkAdminOrdersResultDto | null> {
     if (orderIds.length === 0) {
       return null;
@@ -287,6 +288,7 @@ export class OrderManagementFacade {
         this.api.post<BulkAdminOrdersResultDto>(ORDERS_API.bulk, {
           action,
           orderIds,
+          reason,
         }),
       );
       await this.fetchOrders(true);
@@ -325,6 +327,14 @@ export class OrderManagementFacade {
     return this.postOrderAction(orderId, ORDERS_API.hold(orderId), { reason });
   }
 
+  async markDelivered(orderId: string, reason: string, evidence: string): Promise<boolean> {
+    return this.postOrderAction(orderId, ORDERS_API.markDelivered(orderId), { reason, evidence });
+  }
+
+  async contactCustomer(orderId: string, subject: string, message: string): Promise<boolean> {
+    return this.postOrderAction(orderId, ORDERS_API.contactCustomer(orderId), { subject, message });
+  }
+
   async settleRefund(orderId: string, gatewayReference: string, note: string | null): Promise<boolean> {
     return this.postOrderAction(orderId, ORDERS_API.settleRefund(orderId), { gatewayReference, note });
   }
@@ -352,6 +362,7 @@ export class OrderManagementFacade {
     orderId: string,
     orderItemId: string,
     licenseKey: string,
+    reason: string,
   ): Promise<boolean> {
     this.actionLoadingState.set(true);
     try {
@@ -359,6 +370,7 @@ export class OrderManagementFacade {
         this.api.post<AdminOrderDetailDto>(ORDERS_API.manualCode(orderId), {
           orderItemId,
           licenseKey,
+          reason,
         }),
       );
       this.detailState.set(detail);

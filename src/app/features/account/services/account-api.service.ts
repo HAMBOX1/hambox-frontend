@@ -16,6 +16,7 @@ import {
   OrderDetailApiDto,
   OrderSummaryApiDto,
   ProductReviewApiDto,
+  ReviewVoteSummaryApiDto,
   CommunicationPreferencesApiDto,
   NotificationQuery,
   ReferralDashboardApiDto,
@@ -101,6 +102,14 @@ export class AccountApiService {
 
   updateReview(reviewId: string, request: UpdateReviewRequest): Observable<ProductReviewApiDto> {
     return this.api.put<ProductReviewApiDto>(ACCOUNT_API.review(reviewId), request);
+  }
+
+  voteOnReview(reviewId: string, vote: 'helpful' | 'not_helpful'): Observable<ReviewVoteSummaryApiDto> {
+    return this.api.put<ReviewVoteSummaryApiDto>(ACCOUNT_API.reviewVote(reviewId), { vote });
+  }
+
+  removeReviewVote(reviewId: string): Observable<ReviewVoteSummaryApiDto> {
+    return this.api.delete<ReviewVoteSummaryApiDto>(ACCOUNT_API.reviewVote(reviewId));
   }
 
   deleteReview(reviewId: string): Observable<void> {

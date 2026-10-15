@@ -138,6 +138,18 @@ export class AdminReferralsListPageComponent implements OnInit {
     return referral.status === 'Pending' || referral.status === 'Qualified' || referral.status === 'Rewarded';
   }
 
+  protected async approve(referral: AdminReferralListItemDto): Promise<void> {
+    const success = await this.facade.approveReferral(referral.id);
+    this.messageService.add({
+      severity: success ? 'success' : 'error',
+      summary: this.translate.instant(
+        success ? 'ADMIN.REFERRALS.TOAST.REVERSED' : 'ADMIN.REFERRALS.TOAST.REVERSE_FAILED',
+      ),
+      detail: success ? undefined : (this.facade.error() ?? undefined),
+      life: 4000,
+    });
+  }
+
   protected openDetail(referral: AdminReferralListItemDto): void {
     void this.facade.loadDetail(referral.id);
   }
@@ -204,6 +216,14 @@ export class AdminReferralsListPageComponent implements OnInit {
         command: () => this.openDetail(referral),
       },
     ];
+
+    if (referral.heldForReview && this.permissionService.hasPermission(this.permissions.Referral.Manage)) {
+      items.push({
+        label: this.translate.instant('ADMIN.REFERRALS.ACTIONS.APPROVE'),
+        icon: 'pi pi-check',
+        command: () => void this.approve(referral),
+      });
+    }
 
     if (this.canReverse(referral) && this.permissionService.hasPermission(this.permissions.Referral.Manage)) {
       items.push({

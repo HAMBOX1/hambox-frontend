@@ -74,6 +74,9 @@
           </td>
           <td>
             <app-admin-status-badge [label]="referral.status" [tone]="statusTone(referral.status)" />
+            @if (referral.heldForReview) {
+              <app-admin-status-badge label="Held for review" tone="danger" [title]="referral.reviewReason || ''" />
+            }
           </td>
           <td>{{ referral.pointsEarned }}</td>
           <td>{{ referral.createdOnUtc | hamboxDate:'short' }}</td>

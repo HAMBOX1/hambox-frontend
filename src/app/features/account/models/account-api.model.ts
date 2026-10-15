@@ -219,6 +219,21 @@ export interface ProductReviewApiDto {
   readonly comment: string;
   readonly createdOnUtc: string;
   readonly modifiedOnUtc: string | null;
+  /** Helpful / not-helpful votes from other shoppers. */
+  readonly helpfulCount?: number;
+  readonly notHelpfulCount?: number;
+  /** The signed-in shopper's own vote: 'helpful' | 'not_helpful' | null. */
+  readonly myVote?: 'helpful' | 'not_helpful' | null;
+  /** True when a moderator took the review off the storefront (still shown to its author). */
+  readonly isHidden?: boolean;
+  readonly hiddenReason?: string | null;
+}
+
+export interface ReviewVoteSummaryApiDto {
+  readonly reviewId: string;
+  readonly helpfulCount: number;
+  readonly notHelpfulCount: number;
+  readonly myVote: 'helpful' | 'not_helpful' | null;
 }
 
 export interface UserNotificationApiDto {

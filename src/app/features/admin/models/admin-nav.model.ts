@@ -13,6 +13,7 @@ export type AdminNavId =
   | 'promotions'
   | 'memberships'
   | 'referrals'
+  | 'reviews'
   | 'themes'
   | 'campaigns'
   | 'page-builder'
@@ -123,6 +124,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/referrals',
     icon: 'pi pi-share-alt',
     permission: PERMISSIONS.Referral.View,
+  },
+  {
+    id: 'reviews',
+    labelKey: 'ADMIN.NAV.REVIEWS',
+    route: '/admin/reviews',
+    icon: 'pi pi-star',
+    permission: PERMISSIONS.Reviews.View,
   },
   {
     id: 'themes',
