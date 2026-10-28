@@ -86,3 +86,14 @@
     display: inline;
   }
 }
+
+// Very narrow phones: keep all four view buttons on screen by dropping the "Filters" word (the icon and badge stay).
+@media (max-width: 360px) {
+  .store-view-modes__filter-label {
+    display: none;
+  }
+
+  .store-view-modes {
+    gap: 6px;
+  }
+}
