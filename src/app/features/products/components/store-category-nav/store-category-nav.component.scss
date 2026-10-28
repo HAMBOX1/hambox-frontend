@@ -131,3 +131,19 @@
     display: none;
   }
 }
+
+// A category with a picture shows it as a small transparent-edged icon before the name.
+.category-nav__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-nav__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  border-radius: 0.4rem;
+  object-fit: contain;
+  background: transparent;
+}

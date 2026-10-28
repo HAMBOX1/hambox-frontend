@@ -11,7 +11,7 @@
     background var(--admin-transition, 180ms ease);
 
   .p-button-icon {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
 
   &:not(:disabled):hover {
@@ -21,5 +21,17 @@
 
   &:not(:disabled):active {
     transform: translateY(0);
+  }
+}
+
+// Touch screens: bigger targets and glyphs, so the icons are easy to see and hit on a phone.
+@media (max-width: 768px), (pointer: coarse) {
+  :host ::ng-deep .admin-icon-button.p-button {
+    width: 2.875rem;
+    height: 2.875rem;
+
+    .p-button-icon {
+      font-size: 1.4rem;
+    }
   }
 }

@@ -30,6 +30,8 @@ export class StoreProductCardComponent {
 
   product = input.required<StoreProduct>();
   compact = input(false);
+  /** Three-per-row phone layout: only the picture, the name and the price are kept. */
+  dense = input(false);
 
   protected readonly cartIconSrc = 'assets/images/top-nav/cart-icon.svg';
   protected readonly addError = signal<string | null>(null);

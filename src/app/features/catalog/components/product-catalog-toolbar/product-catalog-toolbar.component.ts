@@ -46,6 +46,8 @@ export class ProductCatalogToolbarComponent {
   readonly searchTerm = input('');
   readonly statusFilter = input('');
   readonly collectionFilter = input<string | null>(null);
+  readonly categoryFilter = input<string | null>(null);
+  readonly categoryOptions = input<readonly { id: string; label: string }[]>([]);
   readonly collectionOptions = input<readonly CollectionOption[]>([]);
   readonly supplierMappingFilter = input('');
   readonly searchPlaceholder = input('Search products…');
@@ -54,6 +56,7 @@ export class ProductCatalogToolbarComponent {
   readonly searchChange = output<string>();
   readonly statusChange = output<ProductStatus | ''>();
   readonly collectionChange = output<string | null>();
+  readonly categoryChange = output<string | null>();
   readonly supplierMappingChange = output<string>();
   readonly clearFilters = output<void>();
   readonly viewModeChange = output<AdminProductsViewMode>();
@@ -67,6 +70,10 @@ export class ProductCatalogToolbarComponent {
 
   protected onStatusChange(value: string): void {
     this.statusChange.emit(value as ProductStatus | '');
+  }
+
+  protected onCategoryChange(value: string | null): void {
+    this.categoryChange.emit(value);
   }
 
   protected onCollectionChange(value: string | null): void {

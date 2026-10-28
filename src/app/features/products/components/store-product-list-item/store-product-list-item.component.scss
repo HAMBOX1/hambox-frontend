@@ -316,3 +316,84 @@
     display: none;
   }
 }
+
+.store-list-card__btn-icon {
+  display: none;
+}
+
+// Phones and small tablets: a compact horizontal row. The picture sits on the side, then name / type / price,
+// and Add to cart / Buy now collapse to round icon buttons.
+@media (max-width: 991px) {
+  .store-list-card {
+    grid-template-columns: 84px minmax(0, 1fr) auto;
+    grid-template-areas: 'media body aside';
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .store-list-card__media {
+    grid-area: media;
+    width: 84px;
+    height: 84px;
+  }
+
+  .store-list-card__body {
+    grid-area: body;
+    min-width: 0;
+  }
+
+  .store-list-card__title {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .store-list-card__category,
+  .store-list-card__rating {
+    display: none;
+  }
+
+  .store-list-card__aside {
+    grid-area: aside;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    width: auto;
+  }
+
+  .store-list-card__pricing {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+  }
+
+  .store-list-card__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .store-list-card__actions .store-list-card__btn {
+    flex: 0 0 auto;
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .store-list-card__btn-icon {
+    display: inline-block;
+    font-size: 1.1rem;
+  }
+
+  .store-list-card__btn-label {
+    display: none;
+  }
+
+  .store-list-card__wishlist {
+    display: none;
+  }
+}

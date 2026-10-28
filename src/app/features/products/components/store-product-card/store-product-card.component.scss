@@ -601,3 +601,52 @@
     --store-card-gap-before-footer: 18px;
   }
 }
+
+// Dense (three per row on a phone): picture, name and price only.
+.store-card--dense {
+  .store-card__badge,
+  .store-card__platform,
+  .store-card__rating,
+  .store-card__tag,
+  .store-card__favorite,
+  .store-card__discover,
+  .store-card__original {
+    display: none;
+  }
+
+  .store-card__stock-badge {
+    font-size: 0.55rem;
+    padding: 2px 5px;
+  }
+
+  .store-card__title {
+    font-size: 0.72rem;
+    line-height: 1.25;
+    -webkit-line-clamp: 2;
+  }
+
+  .store-card__price {
+    font-size: 0.8rem;
+  }
+
+  .store-card__footer {
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .store-card__cta {
+    min-width: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+
+    img {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .store-card__cta--notify {
+    display: none;
+  }
+}

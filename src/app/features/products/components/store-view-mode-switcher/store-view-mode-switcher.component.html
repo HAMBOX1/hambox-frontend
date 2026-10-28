@@ -22,10 +22,7 @@
       (click)="setMode('comfortable')"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-        <rect x="1" y="1" width="7" height="7" rx="1.25" fill="currentColor" />
-        <rect x="10" y="1" width="7" height="7" rx="1.25" fill="currentColor" />
-        <rect x="1" y="10" width="7" height="7" rx="1.25" fill="currentColor" />
-        <rect x="10" y="10" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="1.5" y="1.5" width="15" height="15" rx="2" fill="currentColor" />
       </svg>
     </button>
     <button
@@ -35,6 +32,21 @@
       [attr.aria-label]="'PRODUCTS.VIEW_MODE.COMPACT' | translate"
       [attr.aria-pressed]="mode() === 'compact'"
       (click)="setMode('compact')"
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="10" y="1" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="1" y="10" width="7" height="7" rx="1.25" fill="currentColor" />
+        <rect x="10" y="10" width="7" height="7" rx="1.25" fill="currentColor" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="store-view-modes__btn"
+      [class.store-view-modes__btn--active]="mode() === 'dense'"
+      [attr.aria-label]="'PRODUCTS.VIEW_MODE.DENSE' | translate"
+      [attr.aria-pressed]="mode() === 'dense'"
+      (click)="setMode('dense')"
     >
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
         <rect x="1" y="1" width="4.5" height="4.5" rx="0.9" fill="currentColor" />

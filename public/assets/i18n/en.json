@@ -264,7 +264,8 @@
       "GROUP_LABEL": "Product view mode",
       "COMFORTABLE": "Comfortable grid",
       "COMPACT": "Compact grid",
-      "LIST": "List view"
+      "LIST": "List view",
+      "DENSE": "Small cards (3 per row)"
     },
     "FILTERS": {
       "OPEN": "Filters",

@@ -578,3 +578,33 @@
   color: var(--admin-text-secondary);
   font-size: 0.8125rem;
 }
+
+// Bigger glyphs for the row toggles (expand / favourite) and the stock and delivery icons.
+.product-catalog-table__variant-expander,
+.product-catalog-table__favorite-toggle {
+  width: 2rem;
+  height: 2rem;
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.product-catalog-table__variant-expander-placeholder {
+  width: 2rem;
+}
+
+.product-catalog-table__chat-delivery-icon {
+  font-size: 1.15rem;
+}
+
+// The row actions (⋮ menu, edit) stay pinned to the right edge while the wide table scrolls sideways, so on a phone
+// they are always on screen instead of being a long swipe away.
+:host ::ng-deep .product-catalog-table .p-datatable-tbody > tr > td:last-child,
+:host ::ng-deep .product-catalog-table .p-datatable-thead > tr > th:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: var(--admin-bg-surface, var(--color-surface, #16181d));
+  box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.45);
+}

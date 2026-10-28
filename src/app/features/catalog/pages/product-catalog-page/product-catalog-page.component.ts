@@ -159,6 +159,7 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly categoryOptions = this.facade.categoryOptions;
   protected readonly collectionOptions = this.facade.collectionOptions;
   protected readonly collectionFilter = this.facade.collectionFilter;
+  protected readonly categoryFilter = this.facade.categoryFilter;
   protected readonly supplierMappingFilter = this.facade.supplierMappingFilter;
   protected readonly mappingStatusByProductId = this.facade.mappingStatusByProductId;
   protected readonly viewMode = this.viewModeService.mode;
@@ -367,6 +368,10 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected async onToggleFavorite(product: Product): Promise<void> {
     await this.facade.toggleFavorite(product.id, !product.isFavorite);
+  }
+
+  protected onCategoryFilterChange(categoryId: string | null): void {
+    this.facade.setCategoryFilter(categoryId);
   }
 
   protected onCollectionFilterChange(collectionId: string | null): void {

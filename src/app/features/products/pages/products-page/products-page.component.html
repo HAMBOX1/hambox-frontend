@@ -94,11 +94,13 @@
               <div
                 class="storefront-store__grid"
                 [class.storefront-store__grid--compact]="viewMode() === 'compact'"
+                [class.storefront-store__grid--dense]="viewMode() === 'dense'"
               >
                 @for (product of products(); track product.id) {
                   <app-store-product-card
                     [product]="product"
-                    [compact]="viewMode() === 'compact'"
+                    [compact]="viewMode() === 'compact' || viewMode() === 'dense'"
+                    [dense]="viewMode() === 'dense'"
                   />
                 }
               </div>

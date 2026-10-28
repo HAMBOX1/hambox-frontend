@@ -9,6 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { ApiError } from '../../../../core/models/api-error.model';
 import { ImportCodesResultDto, ProductVariantDto } from '../../models/inventory-api.model';
 import { Product } from '../../models/product.model';
+import { parseCodeFile } from '../../utils/parse-code-file';
 import { InventoryApiService } from '../../services/inventory-api.service';
 
 interface VariantChoice {
@@ -51,11 +52,14 @@ export class QuickAddStockDialogComponent {
 
   protected readonly choices = computed<VariantChoice[]>(() =>
     this.variants().map((variant) => ({
-      label: `${variant.sku} — ${variant.fulfillmentMode === 'ChatDelivery' ? 'On-Delivery' : `${variant.availableStock} in stock`}`,
+      label: `${variant.sku} — ${variant.fulfillmentMode === 'ChatDelivery' ? 'On-Delivery (will switch to Instant stock)' : `${variant.availableStock} in stock`}`,
       value: variant.id,
-      disabled: variant.fulfillmentMode === 'ChatDelivery',
+      disabled: false,
     })),
   );
+
+  /** True when the chosen variant is On-Delivery: adding codes switches it to instant stock, so say so. */
+  protected readonly willSwitchToInstant = computed(() => this.selectedVariant()?.fulfillmentMode === 'ChatDelivery');
 
   protected readonly selectedVariant = computed(() => this.variants().find((v) => v.id === this.variantId()) ?? null);
 
@@ -137,6 +141,26 @@ export class QuickAddStockDialogComponent {
     }
   }
 
+  /** Fills the box from a TXT / CSV file (first CSV column is the code) so nothing has to be pasted by hand. */
+  protected async onFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const kind = file.name.toLowerCase().endsWith('.csv') ? 'csv' : 'txt';
+      const codes = this.multiLine() ? [text.trim()] : parseCodeFile(text, kind);
+      this.codesText.set(codes.join('\n'));
+      this.error.set(null);
+    } catch {
+      this.error.set('Could not read that file.');
+    }
+  }
+
   protected async add(): Promise<void> {
     const variant = this.selectedVariant();
     const raw = this.codesText().trim();
@@ -151,6 +175,11 @@ export class QuickAddStockDialogComponent {
     this.saving.set(true);
     this.error.set(null);
     try {
+      if (variant.fulfillmentMode === 'ChatDelivery') {
+        // Codes only sell in a code-based mode, so adding them turns an On-Delivery variant into instant stock.
+        await firstValueFrom(this.inventoryApi.setVariantFulfillmentMode(variant.id, { fulfillmentMode: 'ManualOnly' }));
+      }
+
       const batchId = await firstValueFrom(
         this.inventoryApi.createBatch(variant.id, {
           name: `Import ${new Date().toISOString()}`,
@@ -175,9 +204,9 @@ export class QuickAddStockDialogComponent {
     try {
       const variants = await firstValueFrom(this.inventoryApi.getProductVariants(productId));
       this.variants.set(variants);
-      const usable = variants.filter((v) => v.fulfillmentMode !== 'ChatDelivery');
-      const keep = keepSelected && usable.some((v) => v.id === keepSelected) ? keepSelected : null;
-      this.variantId.set(keep ?? (usable.length === 1 ? usable[0].id : null));
+      // A product with a single variant needs no choosing — pick it, whatever its delivery mode.
+      const keep = keepSelected && variants.some((v) => v.id === keepSelected) ? keepSelected : null;
+      this.variantId.set(keep ?? (variants.length === 1 ? variants[0].id : null));
     } catch {
       this.error.set('Could not load this product\'s variants.');
     } finally {

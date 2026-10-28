@@ -302,3 +302,19 @@
     line-height: 34px;
   }
 }
+
+// Phones: a wide banner, not a full-screen block with an oversized picture.
+@media (max-width: 640px) {
+  .hero-grid {
+    min-height: 430px;
+    padding: 72px 0 28px;
+  }
+
+  .hero-grid__image--overlay {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    object-fit: cover;
+  }
+}

@@ -3,6 +3,7 @@
   [class.store-card--highlighted]="product().highlighted"
   [class.store-card--out-of-stock]="product().outOfStock"
   [class.store-card--compact]="compact()"
+  [class.store-card--dense]="dense()"
 >
   <a class="store-card__link" [routerLink]="['/products', product().id]">
     <div class="store-card__media">

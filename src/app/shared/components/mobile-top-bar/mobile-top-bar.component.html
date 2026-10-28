@@ -26,7 +26,7 @@
       <h1 class="mobile-top-bar__title">{{ mobile.pageTitleKey()! | translate }}</h1>
     } @else {
       <a class="mobile-top-bar__logo" routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate">
-        <img [src]="logoSrc" alt="HAMBOX" width="120" height="28" />
+        <app-brand-wordmark />
       </a>
     }
 

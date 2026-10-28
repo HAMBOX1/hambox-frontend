@@ -16,6 +16,18 @@
   />
   <p-select
     adminToolbarFilters
+    [options]="[...categoryOptions()]"
+    optionLabel="label"
+    optionValue="id"
+    placeholder="Filter category"
+    [showClear]="true"
+    [filter]="true"
+    filterBy="label"
+    [ngModel]="categoryFilter()"
+    (ngModelChange)="onCategoryChange($event)"
+  />
+  <p-select
+    adminToolbarFilters
     [options]="[...collectionOptions()]"
     optionLabel="label"
     optionValue="id"

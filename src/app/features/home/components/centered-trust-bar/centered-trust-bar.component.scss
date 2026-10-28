@@ -92,3 +92,21 @@
     padding: 0 var(--sf-container-px-mobile);
   }
 }
+
+// Phones: four compact tiles side by side (icon + title); descriptions are dropped to fit.
+@media (max-width: 767px) {
+  .centered-trust__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .centered-trust__title {
+    font-size: 0.68rem;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
+  .centered-trust__description {
+    display: none;
+  }
+}

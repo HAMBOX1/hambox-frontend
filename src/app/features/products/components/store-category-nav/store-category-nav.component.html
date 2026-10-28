@@ -31,7 +31,10 @@
           [attr.aria-selected]="activeCategoryId() === category.id"
           (click)="select(category.id)"
         >
-          {{ category.label }}
+          @if (category.imageUrl) {
+            <img class="category-nav__icon" [src]="category.imageUrl" alt="" aria-hidden="true" loading="lazy" />
+          }
+          <span>{{ category.label }}</span>
         </button>
       }
     </div>

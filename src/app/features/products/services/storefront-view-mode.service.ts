@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type StorefrontViewMode = 'comfortable' | 'compact' | 'list';
+export type StorefrontViewMode = 'comfortable' | 'compact' | 'dense' | 'list';
 
 const STORAGE_KEY = 'hambox.storefront.viewMode';
 
@@ -34,7 +34,7 @@ export class StorefrontViewModeService {
     if (stored === 'large') {
       return 'comfortable';
     }
-    if (stored === 'comfortable' || stored === 'compact' || stored === 'list') {
+    if (stored === 'comfortable' || stored === 'compact' || stored === 'dense' || stored === 'list') {
       return stored;
     }
 

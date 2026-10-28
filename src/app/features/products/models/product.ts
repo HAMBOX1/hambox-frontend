@@ -37,6 +37,8 @@ export interface StoreProduct {
 export interface StoreCategoryPill {
   id: string;
   label: string;
+  /** Category picture shown beside the name (Gamivo-style); absent for "All Items" and picture-less categories. */
+  imageUrl?: string | null;
 }
 
 export interface StoreSortOption {

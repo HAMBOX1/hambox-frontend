@@ -21,7 +21,7 @@
   border: 1px solid var(--color-panel-border);
   border-bottom: 0;
   border-radius: var(--sf-radius-lg) var(--sf-radius-lg) 0 0;
-  background: var(--color-panel-bg);
+  background: var(--color-dropdown-bg, var(--color-surface));
   box-shadow: var(--color-shadow-lg, 0 -8px 32px rgba(0, 0, 0, 0.24));
   animation: hambox-sheet-slide-up 280ms cubic-bezier(0.22, 1, 0.36, 1);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -107,7 +107,7 @@
   flex-shrink: 0;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-panel-border);
-  background: var(--color-panel-bg);
+  background: var(--color-dropdown-bg, var(--color-surface));
 }
 
 @keyframes hambox-sheet-slide-up {

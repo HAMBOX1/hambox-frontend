@@ -7,7 +7,7 @@
   <div class="storefront-nav__container">
     <div class="storefront-nav__grid">
       <a class="storefront-nav__logo-link" routerLink="/home" [attr.aria-label]="'NAVBAR.HOME_ARIA' | translate">
-        <img class="storefront-nav__logo" [src]="logoSrc" alt="HAMBOX" width="216" height="64" />
+        <app-brand-wordmark size="large" />
       </a>
 
       @if (mode() === 'checkout') {

@@ -70,16 +70,32 @@
 
       @switch (product().cta) {
         @case ('cart') {
-          <button type="button" class="store-list-card__btn store-list-card__btn--secondary" (click)="addToCart($event)">
-            {{ 'PRODUCT.ADD_TO_CART' | translate }}
+          <button
+            type="button"
+            class="store-list-card__btn store-list-card__btn--secondary"
+            [attr.aria-label]="'PRODUCT.ADD_TO_CART' | translate"
+            (click)="addToCart($event)"
+          >
+            <i class="pi pi-shopping-cart store-list-card__btn-icon" aria-hidden="true"></i>
+            <span class="store-list-card__btn-label">{{ 'PRODUCT.ADD_TO_CART' | translate }}</span>
           </button>
-          <a class="store-list-card__btn store-list-card__btn--primary" [routerLink]="['/products', product().id]">
-            {{ 'PRODUCT.BUY_NOW' | translate }}
+          <a
+            class="store-list-card__btn store-list-card__btn--primary"
+            [attr.aria-label]="'PRODUCT.BUY_NOW' | translate"
+            [routerLink]="['/products', product().id]"
+          >
+            <i class="pi pi-bolt store-list-card__btn-icon" aria-hidden="true"></i>
+            <span class="store-list-card__btn-label">{{ 'PRODUCT.BUY_NOW' | translate }}</span>
           </a>
         }
         @case ('buy-now') {
-          <a class="store-list-card__btn store-list-card__btn--primary" [routerLink]="['/products', product().id]">
-            {{ 'PRODUCT.BUY_NOW' | translate }}
+          <a
+            class="store-list-card__btn store-list-card__btn--primary"
+            [attr.aria-label]="'PRODUCT.BUY_NOW' | translate"
+            [routerLink]="['/products', product().id]"
+          >
+            <i class="pi pi-bolt store-list-card__btn-icon" aria-hidden="true"></i>
+            <span class="store-list-card__btn-label">{{ 'PRODUCT.BUY_NOW' | translate }}</span>
           </a>
         }
         @case ('notify-me') {

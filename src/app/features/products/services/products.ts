@@ -79,6 +79,7 @@ export class Products {
       ...categories.map((category) => ({
         id: category.id,
         label: resolveLocalizedText(category.nameEn, category.nameAr, lang),
+        imageUrl: category.imageUrl ?? null,
       })),
     ];
   }

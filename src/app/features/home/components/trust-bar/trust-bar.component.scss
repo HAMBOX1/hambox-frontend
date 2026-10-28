@@ -101,3 +101,41 @@
     padding: 0 var(--sf-container-px-mobile);
   }
 }
+
+// Phones: the four trust points sit side by side as compact tiles (icon over title) instead of a long vertical list;
+// the descriptions stay on tablet and desktop where there is room for them.
+@media (max-width: 767px) {
+  .trust-bar__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .trust-bar__item {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px;
+    min-height: 0;
+    padding: 6px 2px;
+    text-align: center;
+  }
+
+  .trust-bar__icon {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .trust-bar__copy {
+    align-items: center;
+  }
+
+  .trust-bar__title {
+    font-size: 0.68rem;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
+  .trust-bar__description {
+    display: none;
+  }
+}

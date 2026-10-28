@@ -1,3 +1,4 @@
+import { BrandWordmarkComponent } from '../../../../shared/components/brand-wordmark/brand-wordmark.component';
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -14,6 +15,7 @@ import { isStorefrontNavLinkActive, navLinkQueryParams } from '../../../../share
   selector: 'app-top-nav-guest',
   standalone: true,
   imports: [
+    BrandWordmarkComponent,
     RouterLink,
     CartNavWidgetComponent,
     ThemeToggleComponent,

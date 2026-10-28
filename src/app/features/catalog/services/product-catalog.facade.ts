@@ -60,6 +60,7 @@ export class ProductCatalogFacade {
   private readonly collectionOptionsState = signal<readonly CollectionOption[]>([]);
   private collectionOptionsLoaded = false;
   private readonly collectionFilterState = signal<string | null>(null);
+  private readonly categoryFilterState = signal<string | null>(null);
   private readonly supplierMappingFilterState = signal('');
   private readonly supplierMappingFilterProductIdsState = signal<readonly string[] | null>(null);
   private readonly mappingStatusByProductIdState = signal<ReadonlyMap<string, ProductSupplierMappingStatusDto>>(new Map());
@@ -87,6 +88,8 @@ export class ProductCatalogFacade {
   readonly categoryOptions = this.categoryOptionsState.asReadonly();
   readonly collectionOptions = this.collectionOptionsState.asReadonly();
   readonly collectionFilter = this.collectionFilterState.asReadonly();
+  /** Main (public) category filter, separate from the internal-category (collection) filter. */
+  readonly categoryFilter = this.categoryFilterState.asReadonly();
   readonly supplierMappingFilter = this.supplierMappingFilterState.asReadonly();
   readonly mappingStatusByProductId = this.mappingStatusByProductIdState.asReadonly();
   readonly error = this.errorState.asReadonly();
@@ -104,6 +107,7 @@ export class ProductCatalogFacade {
       this.hasActiveSearch() ||
       this.statusFilterState().trim().length > 0 ||
       this.collectionFilterState() !== null ||
+      this.categoryFilterState() !== null ||
       this.pendingMergeOnlyState() ||
       this.favoritesOnlyState(),
   );
@@ -204,6 +208,12 @@ export class ProductCatalogFacade {
     void this.fetchProducts();
   }
 
+  setCategoryFilter(categoryId: string | null): void {
+    this.categoryFilterState.set(categoryId);
+    this.pageNumberState.set(1);
+    void this.fetchProducts();
+  }
+
   clearFilters(): void {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
@@ -214,6 +224,7 @@ export class ProductCatalogFacade {
     this.pendingMergeOnlyState.set(false);
     this.favoritesOnlyState.set(false);
     this.collectionFilterState.set(null);
+    this.categoryFilterState.set(null);
     this.supplierMappingFilterState.set('');
     this.supplierMappingFilterProductIdsState.set(null);
     this.pageNumberState.set(1);
@@ -847,6 +858,7 @@ export class ProductCatalogFacade {
         this.api.getProductStatusCounts({
           searchTerm: this.searchTermState().trim() || undefined,
           collectionId: this.collectionFilterState() ?? undefined,
+          categoryId: this.categoryFilterState() ?? undefined,
         }),
       );
       this.statusCountsState.set(counts);

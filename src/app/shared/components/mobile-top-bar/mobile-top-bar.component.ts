@@ -1,3 +1,4 @@
+import { BrandWordmarkComponent } from '../brand-wordmark/brand-wordmark.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,6 +24,7 @@ import { HamboxBottomSheetComponent } from '../hambox-bottom-sheet/hambox-bottom
   selector: 'app-mobile-top-bar',
   standalone: true,
   imports: [
+    BrandWordmarkComponent,
     RouterLink,
     TranslatePipe,
     StorefrontSearchComponent,
