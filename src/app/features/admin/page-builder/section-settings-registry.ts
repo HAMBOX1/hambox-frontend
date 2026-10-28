@@ -13,6 +13,7 @@ import { HeroEditorialSpotlightSettingsFormComponent } from './components/sectio
 import { HeroGridShowcaseSettingsFormComponent } from './components/section-settings-forms/hero-grid-showcase-settings-form.component';
 import { HeroSectionSettingsFormComponent } from './components/section-settings-forms/hero-section-settings-form.component';
 import { LatestArrivalsSettingsFormComponent } from './components/section-settings-forms/latest-arrivals-settings-form.component';
+import { ImageBannerSettingsFormComponent } from './components/section-settings-forms/image-banner-settings-form.component';
 import { PlatformSelectorSettingsFormComponent } from './components/section-settings-forms/platform-selector-settings-form.component';
 import { PopularCategoriesSettingsFormComponent } from './components/section-settings-forms/popular-categories-settings-form.component';
 import { PromoBannerSettingsFormComponent } from './components/section-settings-forms/promo-banner-settings-form.component';
@@ -38,6 +39,7 @@ const SECTION_SETTINGS_FORM_REGISTRY: Readonly<Record<string, SectionSettingsFor
   'Features:trust-bar': TrustBarSettingsFormComponent,
   'Features:centered-trust': TrustBarSettingsFormComponent,
   'Promotions:promo-banner': PromoBannerSettingsFormComponent,
+  'Promotions:image-banner': ImageBannerSettingsFormComponent,
   'Promotions:seasonal-campaign': SeasonalCampaignBannerSettingsFormComponent,
   'Categories:popular-categories': PopularCategoriesSettingsFormComponent,
   'Products:flash-deals': FlashDealsSettingsFormComponent,

@@ -198,3 +198,20 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+// "Add" must be visible without hovering (there is no hover on a phone): a permanent button in the thumbnail's
+// corner, so adding a section is one clear tap and never needs the preview step.
+.section-library-card__quick-add-row {
+  inset: auto;
+  inset-block-end: 0.5rem;
+  inset-inline-end: 0.5rem;
+  background: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.section-library-card__quick-add {
+  min-height: 2.5rem;
+  padding: 0.5rem 1.1rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}

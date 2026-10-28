@@ -29,6 +29,8 @@ import {
 import { resolveSectionVariant } from '../../../../home/section-registry/section-variant-registry';
 import { LandingPageSectionEntry } from '../../models/page-builder.model';
 import { resolveSectionSettingsForm } from '../../section-settings-registry';
+import { SectionCommonConfig, readSectionCommon } from '../../../../home/section-registry/models/section-common.model';
+import { SectionCommonSettingsComponent } from '../section-common-settings/section-common-settings.component';
 
 /**
  * Settings panel for the currently selected section. Mounts the variant's real settings-form
@@ -39,7 +41,13 @@ import { resolveSectionSettingsForm } from '../../section-settings-registry';
 @Component({
   selector: 'app-section-settings-panel',
   standalone: true,
-  imports: [TranslatePipe, AdminSectionCardComponent, AdminEmptyStateComponent, AdminErrorAlertComponent],
+  imports: [
+    TranslatePipe,
+    AdminSectionCardComponent,
+    AdminEmptyStateComponent,
+    AdminErrorAlertComponent,
+    SectionCommonSettingsComponent,
+  ],
   templateUrl: './section-settings-panel.component.html',
   styleUrl: './section-settings-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,6 +76,11 @@ export class SectionSettingsPanelComponent {
   private formRef: ComponentRef<SectionSettingsFormInstance> | null = null;
   private formOutputSub: ReturnType<OutputEmitterRef<unknown>['subscribe']> | null = null;
 
+  /** Options every section shares (`_common`): heading style, a button, and the Products source. */
+  protected readonly commonConfig = computed<SectionCommonConfig>(() =>
+    readSectionCommon(this.parseConfig(this.entry()?.configJson ?? '')),
+  );
+
   protected readonly draftJson = signal('');
   protected readonly jsonError = signal<string | null>(null);
 
@@ -90,6 +103,18 @@ export class SectionSettingsPanelComponent {
     });
 
     inject(DestroyRef).onDestroy(() => this.destroyForm());
+  }
+
+  protected onCommonChange(common: SectionCommonConfig): void {
+    const current = this.entry();
+    if (!current) {
+      return;
+    }
+
+    const base = this.parseConfig(current.configJson) as Record<string, unknown>;
+    const json = JSON.stringify({ ...base, _common: common });
+    this.draftJson.set(json);
+    this.configChange.emit({ instanceId: current.instanceId, configJson: json });
   }
 
   protected onJsonInput(value: string): void {
@@ -128,7 +153,10 @@ export class SectionSettingsPanelComponent {
       if (!target) {
         return;
       }
-      const json = JSON.stringify(value);
+      // The variant's own form knows nothing about `_common`; carry it over so its edits never drop those options.
+      const existingCommon = (this.parseConfig(target.configJson) as { _common?: unknown })._common;
+      const merged = existingCommon ? { ...(value as Record<string, unknown>), _common: existingCommon } : value;
+      const json = JSON.stringify(merged);
       this.draftJson.set(json);
       this.jsonError.set(null);
       this.configChange.emit({ instanceId: target.instanceId, configJson: json });

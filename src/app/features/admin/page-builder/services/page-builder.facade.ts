@@ -19,6 +19,9 @@ export interface SeoOverrides {
 
 const EMPTY_SEO: SeoOverrides = { seoTitle: null, seoDescription: null, seoOgImageUrl: null };
 
+/** Edits are saved to the draft this long after the last change, so they survive a logout or a closed tab. */
+const AUTOSAVE_DELAY_MS = 1500;
+
 @Injectable()
 export class PageBuilderFacade {
   private readonly api = inject(PageBuilderApiService);
@@ -60,6 +63,14 @@ export class PageBuilderFacade {
   readonly publishing = this.publishingState.asReadonly();
   readonly deletingId = this.deletingIdState.asReadonly();
 
+  /** True while a background autosave is in flight; `lastAutoSavedAt` powers the "saved automatically" hint. */
+  private readonly autoSavingState = signal(false);
+  private readonly lastAutoSavedAtState = signal<number | null>(null);
+  private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
+
+  readonly autoSaving = this.autoSavingState.asReadonly();
+  readonly lastAutoSavedAt = this.lastAutoSavedAtState.asReadonly();
+
   readonly draftSections = this.draftSectionsState.asReadonly();
   readonly draftSeo = this.draftSeoState.asReadonly();
 
@@ -72,6 +83,60 @@ export class PageBuilderFacade {
 
   updateSeo(seo: Partial<SeoOverrides>): void {
     this.draftSeoState.set({ ...this.draftSeoState(), ...seo });
+    this.scheduleAutoSave();
+  }
+
+  /**
+   * Debounced background save of the working copy to the server-side draft (never publishes). Without it every
+   * edit lived only in the browser until "Save draft" was pressed, so logging out or closing the tab silently threw
+   * the edits away. The save baseline becomes exactly what was sent, so anything typed while the request is in flight
+   * stays dirty and goes out on the next round.
+   */
+  private scheduleAutoSave(): void {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+
+    this.autoSaveTimer = setTimeout(() => {
+      this.autoSaveTimer = null;
+      void this.autoSave();
+    }, AUTOSAVE_DELAY_MS);
+  }
+
+  private async autoSave(): Promise<void> {
+    const template = this.selectedTemplateState();
+    if (!template || !this.dirty()) {
+      return;
+    }
+
+    if (this.savingState() || this.publishingState() || this.autoSavingState()) {
+      this.scheduleAutoSave();
+      return;
+    }
+
+    const sections = this.draftSectionsState();
+    const seo = this.draftSeoState();
+    this.autoSavingState.set(true);
+
+    try {
+      await firstValueFrom(this.api.saveDraft(template.id, sections, seo));
+      this.savedSectionsState.set(sections);
+      this.savedSeoState.set(seo);
+      this.selectedTemplateState.update((current) =>
+        current && current.id === template.id ? { ...current, hasUnpublishedChanges: true } : current,
+      );
+      this.templatesState.update((list) =>
+        list.map((item) => (item.id === template.id ? { ...item, hasUnpublishedChanges: true } : item)),
+      );
+      this.lastAutoSavedAtState.set(Date.now());
+    } catch {
+      // Stay dirty: the manual Save draft button (and the next autosave round) still apply.
+    } finally {
+      this.autoSavingState.set(false);
+      if (this.dirty()) {
+        this.scheduleAutoSave();
+      }
+    }
   }
 
   /** Switches the active scope tab (Homepage/Product/Category) and reloads the list filtered to it. */
@@ -255,6 +320,7 @@ export class PageBuilderFacade {
       configJson: '{}',
     };
     this.draftSectionsState.set([...sections, entry]);
+    this.scheduleAutoSave();
   }
 
   removeSection(instanceId: string): void {
@@ -262,6 +328,7 @@ export class PageBuilderFacade {
       (section) => section.instanceId !== instanceId,
     );
     this.draftSectionsState.set(this.renumber(remaining));
+    this.scheduleAutoSave();
   }
 
   duplicateSection(instanceId: string): void {
@@ -274,6 +341,7 @@ export class PageBuilderFacade {
     const clone: LandingPageSectionEntry = { ...sections[index], instanceId: crypto.randomUUID() };
     const next = [...sections.slice(0, index + 1), clone, ...sections.slice(index + 1)];
     this.draftSectionsState.set(this.renumber(next));
+    this.scheduleAutoSave();
   }
 
   toggleVisibility(instanceId: string): void {
@@ -282,6 +350,7 @@ export class PageBuilderFacade {
         section.instanceId === instanceId ? { ...section, isVisible: !section.isVisible } : section,
       ),
     );
+    this.scheduleAutoSave();
   }
 
   reorderSections(previousIndex: number, currentIndex: number): void {
@@ -292,6 +361,7 @@ export class PageBuilderFacade {
     const sections = [...this.draftSectionsState()];
     moveItemInArray(sections, previousIndex, currentIndex);
     this.draftSectionsState.set(this.renumber(sections));
+    this.scheduleAutoSave();
   }
 
   updateSectionConfig(instanceId: string, configJson: string): void {
@@ -300,6 +370,7 @@ export class PageBuilderFacade {
         section.instanceId === instanceId ? { ...section, configJson } : section,
       ),
     );
+    this.scheduleAutoSave();
   }
 
   /**
@@ -309,6 +380,7 @@ export class PageBuilderFacade {
    */
   restoreDraftSections(sections: readonly LandingPageSectionEntry[]): void {
     this.draftSectionsState.set(sections);
+    this.scheduleAutoSave();
   }
 
   private async saveDraftFor(id: string, manageOwnLoadingState = true): Promise<boolean> {

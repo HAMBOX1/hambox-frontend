@@ -50,5 +50,12 @@
         <p class="section-settings-panel__json-error">{{ jsonError()! | translate }}</p>
       }
     }
+
+    <app-section-common-settings
+      [config]="commonConfig()"
+      [showProducts]="entry()!.category === 'Products'"
+      [disabled]="!editable()"
+      (configChange)="onCommonChange($event)"
+    />
   }
 </app-admin-section-card>

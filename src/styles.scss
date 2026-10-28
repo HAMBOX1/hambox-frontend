@@ -374,3 +374,14 @@ body.hambox-mobile-shell {
     background: var(--color-surface);
   }
 }
+
+// Page Builder: per-section heading size / colour (set from a section's "Appearance" settings). `!important` is
+// needed because each section component styles its own headings with higher-specificity scoped selectors.
+.section-title-size :is(h1, h2, h3) {
+  font-size: var(--section-title-size) !important;
+  line-height: 1.2 !important;
+}
+
+.section-title-color :is(h1, h2, h3) {
+  color: var(--section-title-color) !important;
+}

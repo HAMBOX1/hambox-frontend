@@ -4875,6 +4875,24 @@
               "LABEL": "Section title",
               "HELP": "Heading shown above the FAQ accordion."
             }
+          },
+          "IMAGE_BANNER": {
+            "IMAGE_URL": {
+              "LABEL": "Banner image",
+              "HELP": "The picture shown across the page."
+            },
+            "MOBILE_IMAGE_URL": {
+              "LABEL": "Phone image (optional)",
+              "HELP": "A separate picture for phones; the banner image is used if empty."
+            },
+            "ALT_TEXT": {
+              "LABEL": "Image description",
+              "HELP": "Describes the picture for screen readers and search engines."
+            },
+            "LINK_URL": {
+              "LABEL": "Where it links (optional)",
+              "HELP": "Page the picture opens when tapped."
+            }
           }
         }
       },

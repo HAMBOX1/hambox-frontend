@@ -1,6 +1,7 @@
 import { SectionVariantDefinition } from './models/section-variant.model';
 import { placeholderImage } from './preview/section-preview-data';
 import {
+  ImageBannerSectionConfig,
   AiAssistantSectionConfig,
   ArenaBriefingsSectionConfig,
   CollectionShowcaseSectionConfig,
@@ -37,6 +38,7 @@ import { HeroVariantKineticGlassComponent } from './variants/hero-variant-kineti
 import { LatestArrivalsVariantDefaultComponent } from './variants/latest-arrivals-variant-default.component';
 import { PlatformSelectorVariantDefaultComponent } from './variants/platform-selector-variant-default.component';
 import { PopularCategoriesVariantDefaultComponent } from './variants/popular-categories-variant-default.component';
+import { ImageBannerVariantDefaultComponent } from './variants/image-banner-variant-default.component';
 import { PromoBannerVariantDefaultComponent } from './variants/promo-banner-variant-default.component';
 import { PromoBannerVariantSeasonalCampaignComponent } from './variants/promo-banner-variant-seasonal-campaign.component';
 import { PulseFeedVariantDefaultComponent } from './variants/pulse-feed-variant-default.component';
@@ -247,6 +249,22 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
       countdownEndsAtUtc: null,
       backgroundColor: '#341F97',
     } satisfies PromoBannerSectionConfig,
+  },
+  {
+    category: 'Promotions',
+    variantKey: 'image-banner',
+    displayName: 'Image Banner',
+    renderComponent: ImageBannerVariantDefaultComponent,
+    description: 'Just a picture across the page, optionally linking to a product, category or page.',
+    tags: ['promotion', 'banner', 'image', 'picture'],
+    badge: 'new',
+    supportedBreakpoints: ALL_BREAKPOINTS,
+    previewConfig: {
+      imageUrl: placeholderImage('Image Banner', 1600, 420),
+      mobileImageUrl: null,
+      altText: 'Buy 2 products, get 20% off',
+      linkUrl: '/products',
+    } satisfies ImageBannerSectionConfig,
   },
   {
     category: 'Promotions',

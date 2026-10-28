@@ -187,6 +187,14 @@ export class PageBuilderPageComponent implements OnInit {
   }
 
   /** Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo — matches the browser-native shortcuts. */
+  /** Last line of defence: edits not yet autosaved (the first second or two after a change) trigger the browser's leave warning. */
+  @HostListener('window:beforeunload', ['$event'])
+  protected onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.dirty()) {
+      event.preventDefault();
+    }
+  }
+
   @HostListener('window:keydown', ['$event'])
   protected onKeydown(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();

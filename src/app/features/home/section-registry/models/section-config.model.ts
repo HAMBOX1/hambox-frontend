@@ -69,6 +69,16 @@ export interface PlatformSelectorSectionConfig {
   readonly items: readonly PlatformSelectorItemConfig[];
 }
 
+/** A section that is only a picture, optionally linking somewhere — the Gamivo-style promo strip. */
+export interface ImageBannerSectionConfig {
+  readonly imageUrl: string;
+  /** Optional separate picture for phones; falls back to `imageUrl`. */
+  readonly mobileImageUrl: string | null;
+  readonly altText: string;
+  /** Where a tap on the picture goes (internal path or full URL); null = not clickable. */
+  readonly linkUrl: string | null;
+}
+
 export interface PromoBannerSectionConfig {
   readonly title: string;
   readonly subtitle: string;
@@ -299,6 +309,7 @@ export type SectionConfig =
   | CollectionShowcaseSectionConfig
   | LatestArrivalsSectionConfig
   | PromoBannerSectionConfig
+  | ImageBannerSectionConfig
   | SeasonalCampaignBannerConfig
   | PopularCategoriesSectionConfig
   | FlashDealsSectionConfig
