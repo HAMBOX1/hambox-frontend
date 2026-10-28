@@ -474,7 +474,8 @@
       "REVEAL_OTP_TITLE": "أدخل رمز التحقق",
       "REVEAL_OTP_BODY": "أرسلنا رمزًا إلى {{email}} لإظهار كود {{product}}.",
       "REVEAL_OTP_SENDING": "جارٍ إرسال رمز التحقق إلى بريدك الإلكتروني…",
-      "REVEAL_OTP_RESEND": "إرسال رمز جديد"
+      "REVEAL_OTP_RESEND": "إرسال رمز جديد",
+      "DOWNLOAD_IMAGE": "تنزيل الصورة"
     },
     "INSTRUCTIONS_PAGE": {
       "ESTIMATED_TIME": "الوقت التقديري",

@@ -161,6 +161,44 @@ export class QuickAddStockDialogComponent {
     }
   }
 
+  /**
+   * Adds the chosen pictures as stock, one code per picture (the customer receives the picture itself). Like a text
+   * import it needs a batch behind the scenes, and an On-Delivery variant is switched to instant stock first.
+   */
+  protected async onImagesSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    const variant = this.selectedVariant();
+    if (!variant || files.length === 0 || this.saving()) {
+      return;
+    }
+
+    this.saving.set(true);
+    this.error.set(null);
+    try {
+      if (variant.fulfillmentMode === 'ChatDelivery') {
+        await firstValueFrom(this.inventoryApi.setVariantFulfillmentMode(variant.id, { fulfillmentMode: 'ManualOnly' }));
+      }
+
+      const batchId = await firstValueFrom(
+        this.inventoryApi.createBatch(variant.id, {
+          name: `Images ${new Date().toISOString()}`,
+          currency: 'USD',
+          purchaseCost: 0,
+        }),
+      );
+      const result = await firstValueFrom(this.inventoryApi.importImageCodes(variant.id, batchId, files));
+      this.result.set(result);
+      this.stockAdded.emit();
+      await this.loadVariants(variant.productId, variant.id);
+    } catch (error) {
+      this.error.set(error instanceof ApiError && error.message ? error.message : 'Could not upload the pictures. Please try again.');
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   protected async add(): Promise<void> {
     const variant = this.selectedVariant();
     const raw = this.codesText().trim();

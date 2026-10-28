@@ -686,3 +686,33 @@
   color: var(--color-danger, #dc2626);
   font-size: 0.875rem;
 }
+
+// A picture-type code: shown as the picture itself, with a download button underneath.
+.library-card__image {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  img {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--sf-radius-sm);
+    object-fit: contain;
+    background: var(--color-surface);
+  }
+}
+
+.library-card__image-download {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--sf-radius-pill);
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}

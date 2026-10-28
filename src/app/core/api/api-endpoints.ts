@@ -147,6 +147,8 @@ export const INVENTORY_API = {
   variantBatches: (variantId: string) => `/api/v1/inventory/variants/${variantId}/batches`,
   batchImport: (variantId: string, batchId: string) =>
     `/api/v1/inventory/variants/${variantId}/batches/${batchId}/import`,
+  batchImportImages: (variantId: string, batchId: string) =>
+    `/api/v1/inventory/variants/${variantId}/batches/${batchId}/import-images`,
   variantCodes: (variantId: string) => `/api/v1/inventory/variants/${variantId}/codes`,
   variantCodesExport: (variantId: string) => `/api/v1/inventory/variants/${variantId}/codes/export`,
   variantCodesBulkDisable: (variantId: string) =>
@@ -262,6 +264,7 @@ export const ACCOUNT_API = {
   library: '/api/v1/account/library',
   revealLibraryKey: (id: string) => `/api/v1/account/library/${id}/reveal`,
   requestRevealOtp: (id: string) => `/api/v1/account/library/${id}/reveal/otp`,
+  libraryImage: (id: string) => `/api/v1/account/library/${id}/image`,
   libraryItemInstructions: (orderItemId: string) =>
     `/api/v1/account/library/${orderItemId}/instructions`,
   wallet: '/api/v1/account/wallet',

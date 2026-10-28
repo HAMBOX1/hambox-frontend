@@ -10,6 +10,10 @@ import { resolveWishlistItemImageUrl } from '../utils/wishlist-image.util';
 const SEARCH_DEBOUNCE_MS = 300;
 const REVEAL_TIMEOUT_MS = 30_000;
 
+/** A picture-type code is stored as `img:<file>`; revealing it shows the picture, never that text. */
+const IMAGE_CODE_PREFIX = 'img:';
+const IMAGE_CODE_LABEL = '[image]';
+
 export interface RevealOutcome {
   readonly key: string | null;
   readonly needsOtp: boolean;
@@ -33,6 +37,9 @@ export class AccountLibraryFacade {
   private readonly pageNumberState = signal(1);
   private readonly pageSizeState = signal(12);
   private readonly revealedKeysState = signal<ReadonlyMap<string, string>>(new Map());
+  /** Object URLs of revealed pictures, by library item id; released when the item is hidden again. */
+  private readonly revealedImagesState = signal<ReadonlyMap<string, string>>(new Map());
+  readonly revealedImages = this.revealedImagesState.asReadonly();
   private readonly revealingIdsState = signal<ReadonlySet<string>>(new Set());
   private readonly highlightItemIdState = signal<string | null>(null);
 
@@ -149,13 +156,22 @@ export class AccountLibraryFacade {
       const result = await firstValueFrom(
         otpCode ? this.api.revealLibraryKeyWithOtp(itemId, otpCode) : this.api.revealLibraryKey(itemId),
       );
+      let shownKey = result.licenseKey;
+      if (result.licenseKey.startsWith(IMAGE_CODE_PREFIX)) {
+        // Fetched through an authenticated request right after the reveal; the file path itself is never shown.
+        const blob = await firstValueFrom(this.api.getLibraryImage(itemId));
+        const url = URL.createObjectURL(blob);
+        this.revealedImagesState.update((current) => new Map(current).set(itemId, url));
+        shownKey = IMAGE_CODE_LABEL;
+      }
+
       this.revealedKeysState.update((current) => {
         const next = new Map(current);
-        next.set(itemId, result.licenseKey);
+        next.set(itemId, shownKey);
         return next;
       });
       this.scheduleHide(itemId);
-      return { key: result.licenseKey, needsOtp: false, error: null };
+      return { key: shownKey, needsOtp: false, error: null };
     } catch (error) {
       if (error instanceof ApiError && error.code === 'Commerce.RevealOtpRequired' && !otpCode) {
         return { key: null, needsOtp: true, error: null };
@@ -198,6 +214,20 @@ export class AccountLibraryFacade {
       next.delete(itemId);
       return next;
     });
+
+    const imageUrl = this.revealedImagesState().get(itemId);
+    if (imageUrl) {
+      URL.revokeObjectURL(imageUrl);
+      this.revealedImagesState.update((current) => {
+        const next = new Map(current);
+        next.delete(itemId);
+        return next;
+      });
+    }
+  }
+
+  getRevealedImage(itemId: string): string | null {
+    return this.revealedImagesState().get(itemId) ?? null;
   }
 
   async copyKey(itemId: string): Promise<boolean> {

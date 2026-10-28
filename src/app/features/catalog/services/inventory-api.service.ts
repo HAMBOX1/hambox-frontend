@@ -280,6 +280,16 @@ export class InventoryApiService {
     return this.api.post<string>(INVENTORY_API.variantBatches(variantId), request);
   }
 
+  /** Uploads pictures as stock: every image becomes one code the customer later receives as that picture. */
+  importImageCodes(variantId: string, batchId: string, files: readonly File[]): Observable<ImportCodesResultDto> {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file, file.name);
+    }
+
+    return this.http.post<ImportCodesResultDto>(this.resolveUrl(INVENTORY_API.batchImportImages(variantId, batchId)), formData);
+  }
+
   importCodes(variantId: string, batchId: string, request: ImportCodesRequest): Observable<ImportCodesResultDto> {
     return this.api.post<ImportCodesResultDto>(INVENTORY_API.batchImport(variantId, batchId), request);
   }

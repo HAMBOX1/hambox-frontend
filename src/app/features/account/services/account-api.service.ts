@@ -1,8 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { ACCOUNT_API, AUTH_API, COMMUNICATION_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
+import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import { PagedResult } from '../../catalog/models/category.model';
 import {
   AccountDashboardApiDto,
@@ -45,6 +47,8 @@ const MOCK_WALLET: WalletApiDto = {
 })
 export class AccountApiService {
   private readonly api = inject(ApiClientService);
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
 
   getProfile(): Observable<UserProfileApiDto> {
     return this.api.get<UserProfileApiDto>(AUTH_API.me);
@@ -216,6 +220,13 @@ export class AccountApiService {
   /** Reveals a key with the e-mailed code; the code travels in the body, never the URL. */
   revealLibraryKeyWithOtp(libraryItemId: string, otpCode: string): Observable<RevealCustomerLibraryKeyApiDto> {
     return this.api.post<RevealCustomerLibraryKeyApiDto>(ACCOUNT_API.revealLibraryKey(libraryItemId), { otpCode });
+  }
+
+  /** The picture of a picture-type code, only available right after revealing it. */
+  getLibraryImage(libraryItemId: string): Observable<Blob> {
+    return this.http.get(`${this.apiBaseUrl.replace(/\/$/, '')}${ACCOUNT_API.libraryImage(libraryItemId)}`, {
+      responseType: 'blob',
+    });
   }
 
   requestRevealOtp(libraryItemId: string): Observable<RevealOtpChallengeApiDto> {

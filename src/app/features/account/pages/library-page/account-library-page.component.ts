@@ -250,6 +250,10 @@ export class AccountLibraryPageComponent implements OnInit {
     return this.displayKey(item).includes('\n') || item.maskedLicenseKey.includes('(multi-line)');
   }
 
+  protected revealedImage(item: CustomerLibraryItemApiDto): string | null {
+    return this.facade.getRevealedImage(item.id);
+  }
+
   protected displayKey(item: CustomerLibraryItemApiDto): string {
     return this.isKeyRevealed(item.id)
       ? (this.facade.getRevealedKey(item.id) ?? item.maskedLicenseKey)

@@ -58,6 +58,18 @@
         <span>Upload TXT / CSV / Excel</span>
         <input type="file" accept=".txt,.csv,.xlsx,.xls,text/plain,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none" (change)="onFileSelected($event)" />
       </label>
+      <label style="display:inline-flex;align-items:center;gap:.4rem;margin:0 0 .5rem 1rem;cursor:pointer" [style.opacity]="variantId() ? 1 : .5">
+        <i class="pi pi-image" aria-hidden="true"></i>
+        <span>Upload pictures (each picture = one item the customer receives as an image)</span>
+        <input
+          type="file"
+          multiple
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          style="display:none"
+          [disabled]="!variantId() || saving()"
+          (change)="onImagesSelected($event)"
+        />
+      </label>
       <textarea
         id="quick-stock-codes"
         class="admin-field__input"

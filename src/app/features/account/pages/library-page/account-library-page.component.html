@@ -209,6 +209,16 @@
       </button>
     </div>
 
+    @if (revealedImage(item); as imageUrl) {
+      <div class="library-card__image">
+        <img [src]="imageUrl" [alt]="item.productNameEn" />
+        <a class="library-card__image-download" [href]="imageUrl" [download]="item.productNameEn + '.png'">
+          <i class="pi pi-download" aria-hidden="true"></i>
+          {{ 'ACCOUNT.LIBRARY_UI.DOWNLOAD_IMAGE' | translate }}
+        </a>
+      </div>
+    }
+
     @if (isKeyRevealed(item.id)) {
       <span class="library-card__reveal-hint">{{ 'ACCOUNT.LIBRARY_UI.AUTO_HIDE' | translate }}</span>
     }

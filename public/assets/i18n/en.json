@@ -474,7 +474,8 @@
       "REVEAL_OTP_TITLE": "Enter your verification code",
       "REVEAL_OTP_BODY": "We sent a code to {{email}} to show the code for {{product}}.",
       "REVEAL_OTP_SENDING": "Sending a verification code to your e-mail…",
-      "REVEAL_OTP_RESEND": "Send a new code"
+      "REVEAL_OTP_RESEND": "Send a new code",
+      "DOWNLOAD_IMAGE": "Download image"
     },
     "INSTRUCTIONS_PAGE": {
       "ESTIMATED_TIME": "Estimated time",
