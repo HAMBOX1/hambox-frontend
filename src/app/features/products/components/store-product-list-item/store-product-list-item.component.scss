@@ -321,21 +321,25 @@
   display: none;
 }
 
-// Phones and small tablets: a compact horizontal row. The picture sits on the side, then name / type / price,
-// and Add to cart / Buy now collapse to round icon buttons.
+// Phones and small tablets: a compact horizontal row. The picture sits on the side; to its right the name and type,
+// and under them the price with Add to cart / Buy now as round icon buttons.
 @media (max-width: 991px) {
   .store-list-card {
-    grid-template-columns: 84px minmax(0, 1fr) auto;
-    grid-template-areas: 'media body aside';
+    grid-template-columns: 76px minmax(0, 1fr);
+    grid-template-areas:
+      'media body'
+      'media aside';
     align-items: center;
-    gap: 12px;
+    column-gap: 12px;
+    row-gap: 6px;
     padding: 10px;
   }
 
   .store-list-card__media {
     grid-area: media;
-    width: 84px;
-    height: 84px;
+    width: 76px;
+    height: 76px;
+    align-self: start;
   }
 
   .store-list-card__body {
@@ -358,17 +362,17 @@
 
   .store-list-card__aside {
     grid-area: aside;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 8px;
-    width: auto;
+    width: 100%;
   }
 
   .store-list-card__pricing {
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
   }
 
   .store-list-card__actions {
@@ -378,15 +382,15 @@
 
   .store-list-card__actions .store-list-card__btn {
     flex: 0 0 auto;
-    width: 40px;
-    min-height: 40px;
+    width: 38px;
+    min-height: 38px;
     padding: 0;
     border-radius: 50%;
   }
 
   .store-list-card__btn-icon {
     display: inline-block;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 
   .store-list-card__btn-label {

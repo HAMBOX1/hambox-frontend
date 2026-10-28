@@ -168,9 +168,17 @@
     gap: 1rem;
   }
 
-  .storefront-store__grid,
-  .storefront-store__grid--compact {
+  // Phones: comfortable = 1 card per row, compact = 2, dense = 3 (each toggle really changes the layout).
+  .storefront-store__grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .storefront-store__grid--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .storefront-store__grid--dense {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
