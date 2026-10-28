@@ -440,6 +440,34 @@ export class ProductCatalogTableComponent {
 
   /** Only multi-variant products get an expand arrow — a simple 0/1-variant product has nothing
    * distinct to drill into (mirrors the same threshold the On-Delivery quick action uses). */
+  /** Products whose "details" row (category, stock, prices...) is open — the phone-friendly home for everything the
+   * table can't fit as a column. */
+  protected readonly expandedDetailIds = signal<ReadonlySet<string>>(new Set());
+
+  protected isDetailsOpen(productId: string): boolean {
+    return this.expandedDetailIds().has(productId);
+  }
+
+  protected toggleDetails(product: Product, event: Event): void {
+    event.stopPropagation();
+    this.expandedDetailIds.update((ids) => {
+      const next = new Set(ids);
+      if (!next.delete(product.id)) {
+        next.add(product.id);
+      }
+      return next;
+    });
+  }
+
+  /** One line describing how this product is stocked: codes, On-Delivery capacity, or nothing yet. */
+  protected stockSummary(product: Product): string {
+    const available = product.availableStock ?? 0;
+    if (product.hasChatDeliveryVariant) {
+      return `${available} available (On-Delivery: support chat)`;
+    }
+    return available > 0 ? `${available} in stock (instant codes)` : 'No stock yet';
+  }
+
   protected hasExpandableVariants(product: Product): boolean {
     return (product.variantCount ?? 0) > 1;
   }

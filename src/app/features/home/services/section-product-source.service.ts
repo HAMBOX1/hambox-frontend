@@ -58,6 +58,28 @@ export class SectionProductSourceService {
   private readonly translation = inject(TranslationService);
 
   /**
+   * Honours a Products section's own "Maximum products" setting when the page-wide featured set is smaller:
+   * the platform default only loads a handful, so a section set to 8 would otherwise stay stuck at that handful.
+   */
+  async resolveDefaultLimit(limit: number, sortMethod: string | undefined, defaults: readonly FlashDeal[]): Promise<readonly FlashDeal[] | null> {
+    if (!Number.isFinite(limit) || limit <= defaults.length) {
+      return null;
+    }
+
+    const sortBy = sortMethod === 'Newest' || sortMethod === 'PriceAsc' || sortMethod === 'PriceDesc' ? sortMethod : 'PriceDesc';
+
+    try {
+      const page = await firstValueFrom(
+        this.productApi.getProducts({ pageNumber: 1, pageSize: Math.min(Math.round(limit), 24), status: 'Active', sortBy }),
+      );
+      const lang = this.translation.language();
+      return page.items.map((product, index) => mapProductToFlashDeal(product, lang, index));
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Returns the section's products, or `null` to keep the platform default (also when a lookup fails: a broken
    * source must never blank a section that has perfectly good default content).
    */

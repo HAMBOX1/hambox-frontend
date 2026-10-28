@@ -73,6 +73,15 @@ export class ProductTableColumnsService {
     this.persist();
   }
 
+  private isPhone(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth < 768;
+  }
+
+  /** First visit on a phone: name, stock, price and status only; the details arrow shows the rest. */
+  private phoneSet(): Set<ProductColumnId> {
+    return new Set<ProductColumnId>(['stock', 'salePrice', 'status']);
+  }
+
   private defaultSet(): Set<ProductColumnId> {
     return new Set(this.definitions.filter((def) => def.defaultVisible).map((def) => def.id));
   }
@@ -81,7 +90,7 @@ export class ProductTableColumnsService {
     try {
       const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
       if (raw === null) {
-        return this.defaultSet();
+        return this.isPhone() ? this.phoneSet() : this.defaultSet();
       }
 
       const ids = JSON.parse(raw) as string[];

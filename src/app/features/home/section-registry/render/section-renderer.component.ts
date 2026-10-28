@@ -132,12 +132,27 @@ export class SectionRendererComponent {
       const isProductsSection = this.entry().category === 'Products';
       const defaults = this.context().featuredProducts;
 
-      if (!products || !isProductsSection) {
+      if (!isProductsSection) {
         untracked(() => this.productOverride.set(null));
         return;
       }
 
       let cancelled = false;
+
+      if (!products) {
+        // No custom source: still honour the section's own "Maximum products" when the default set is smaller.
+        const raw = this.config() as { maximumProducts?: number; sortMethod?: string };
+        void this.productSource.resolveDefaultLimit(Number(raw.maximumProducts), raw.sortMethod, defaults).then((resolved) => {
+          if (!cancelled) {
+            this.productOverride.set(resolved);
+          }
+        });
+        onCleanup(() => {
+          cancelled = true;
+        });
+        return;
+      }
+
       void this.productSource.resolve(products, defaults).then((resolved) => {
         if (!cancelled) {
           this.productOverride.set(resolved);

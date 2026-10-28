@@ -9,7 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { ApiError } from '../../../../core/models/api-error.model';
 import { ImportCodesResultDto, ProductVariantDto } from '../../models/inventory-api.model';
 import { Product } from '../../models/product.model';
-import { parseCodeFile } from '../../utils/parse-code-file';
+import { readCodeFile } from '../../utils/read-code-file';
 import { InventoryApiService } from '../../services/inventory-api.service';
 
 interface VariantChoice {
@@ -141,7 +141,7 @@ export class QuickAddStockDialogComponent {
     }
   }
 
-  /** Fills the box from a TXT / CSV file (first CSV column is the code) so nothing has to be pasted by hand. */
+  /** Fills the box from a TXT / CSV / Excel file (first CSV column is the code) so nothing has to be pasted by hand. */
   protected async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -151,9 +151,9 @@ export class QuickAddStockDialogComponent {
     }
 
     try {
-      const text = await file.text();
-      const kind = file.name.toLowerCase().endsWith('.csv') ? 'csv' : 'txt';
-      const codes = this.multiLine() ? [text.trim()] : parseCodeFile(text, kind);
+      const isSheet = /\.xlsx?$/i.test(file.name);
+      // Multi-line mode keeps a plain text file as ONE entry; a spreadsheet is always read cell by cell.
+      const codes = this.multiLine() && !isSheet ? [(await file.text()).trim()] : await readCodeFile(file);
       this.codesText.set(codes.join('\n'));
       this.error.set(null);
     } catch {

@@ -135,6 +135,18 @@
               }
               <button
                 type="button"
+                class="product-catalog-table__favorite-toggle product-catalog-table__details-toggle"
+                [class.product-catalog-table__favorite-toggle--active]="isDetailsOpen(product.id)"
+                [attr.aria-expanded]="isDetailsOpen(product.id)"
+                [attr.aria-label]="(isDetailsOpen(product.id) ? 'Hide' : 'Show') + ' details for ' + product.nameEn"
+                [pTooltip]="isDetailsOpen(product.id) ? 'Hide details' : 'Show details'"
+                tooltipPosition="top"
+                (click)="toggleDetails(product, $event)"
+              >
+                <i class="pi" [class.pi-angle-down]="!isDetailsOpen(product.id)" [class.pi-angle-up]="isDetailsOpen(product.id)" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
                 class="product-catalog-table__favorite-toggle"
                 [class.product-catalog-table__favorite-toggle--active]="product.isFavorite"
                 [pTooltip]="product.isFavorite ? 'Remove from favorites' : 'Add to favorites'"
@@ -457,6 +469,56 @@
             </div>
           </td>
         </tr>
+
+        @if (isDetailsOpen(product.id)) {
+          <tr class="product-catalog-table__details-row">
+            <td [attr.colspan]="tableColspan()">
+              <dl class="product-catalog-table__details">
+                <div>
+                  <dt>Category</dt>
+                  <dd>{{ product.categoryName || '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Internal categories</dt>
+                  <dd>
+                    @let detailLabels = productCategoryLabels(product);
+                    {{ detailLabels.length ? detailLabels.join(', ') : '—' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Stock</dt>
+                  <dd>{{ stockSummary(product) }}</dd>
+                </div>
+                <div>
+                  <dt>Sale price</dt>
+                  <dd>{{ tierRange(product.priceTiers?.saleMin ?? product.price, product.priceTiers?.saleMax ?? product.price) }}</dd>
+                </div>
+                <div>
+                  <dt>Cost</dt>
+                  <dd>{{ tierRange(product.priceTiers?.costMin, product.priceTiers?.costMax) }}</dd>
+                </div>
+                <div>
+                  <dt>Member price</dt>
+                  <dd>{{ tierRange(product.priceTiers?.memberMin, product.priceTiers?.memberMax) }}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{{ product.status }}</dd>
+                </div>
+                <div>
+                  <dt>Variants</dt>
+                  <dd>{{ product.variantCount ?? 0 }}</dd>
+                </div>
+                @if (product.lastEditedByName) {
+                  <div>
+                    <dt>Last edited</dt>
+                    <dd>{{ product.lastEditedByName }}</dd>
+                  </div>
+                }
+              </dl>
+            </td>
+          </tr>
+        }
 
         @if (hasExpandableVariants(product) && isVariantsExpanded(product.id)) {
           @if (isVariantsLoading(product.id)) {
