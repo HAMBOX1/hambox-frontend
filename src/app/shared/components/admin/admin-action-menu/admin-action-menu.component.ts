@@ -13,6 +13,8 @@ import { MenuItem } from 'primeng/api';
 export class AdminActionMenuComponent {
   readonly items = input.required<MenuItem[]>();
   readonly label = input('Actions');
+  /** PrimeIcons class of the trigger button (defaults to the vertical ellipsis). */
+  readonly icon = input('pi pi-ellipsis-v');
   readonly disabled = input(false);
 
   private readonly menu = viewChild<Menu>('menu');

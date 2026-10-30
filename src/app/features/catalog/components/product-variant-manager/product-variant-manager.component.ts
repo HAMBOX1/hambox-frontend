@@ -179,6 +179,11 @@ export class ProductVariantManagerComponent {
   protected readonly searchTerm = signal('');
   protected readonly statusFilter = signal('');
   protected readonly quickFilter = signal<VariantFilter>('all');
+  /** Deactivated / archived variants are hidden from the list by default (they are not sold anyway); this brings them back. */
+  protected readonly showHidden = signal(false);
+  protected readonly hiddenVariantCount = computed(
+    () => this.variants().filter((variant) => this.isHiddenVariant(variant.status)).length,
+  );
   /** Set, not array — O(1) toggle/lookup regardless of variant count (an array + `.includes()`
    * check per row is an O(n²) scan across the whole table on every render). */
   protected readonly selectedVariantIds = signal<ReadonlySet<string>>(new Set());
@@ -330,10 +335,15 @@ export class ProductVariantManagerComponent {
       : `${result.createdCount} variant(s) created`;
   });
 
+  private isHiddenVariant(status: string): boolean {
+    return status === 'Inactive' || status === 'Archived';
+  }
+
   protected readonly variantsTable = computed(() => {
     const search = this.searchTerm().trim().toLowerCase();
     const status = this.statusFilter();
     const quick = this.quickFilter();
+    const showHidden = this.showHidden();
 
     return this.variants()
       .map((variant) => ({
@@ -343,6 +353,11 @@ export class ProductVariantManagerComponent {
       }))
       .filter((variant) => {
         if (status && variant.status !== status) {
+          return false;
+        }
+
+        // Without an explicit status filter, variants the admin hid (Inactive / Archived) stay out of the list.
+        if (!status && !showHidden && this.isHiddenVariant(variant.status)) {
           return false;
         }
 

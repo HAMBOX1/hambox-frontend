@@ -17,7 +17,7 @@
     <div class="product-catalog-table__columns-popover-content">
       <h4 class="product-catalog-table__category-popover-title">{{ 'ADMIN.CATALOG_PAGE.COLUMNS.BUTTON' | translate }}</h4>
       <ul class="product-catalog-table__columns-list">
-        @for (def of columns.definitions; track def.id) {
+        @for (def of columns.orderedDefinitions(); track def.id) {
           <li class="product-catalog-table__columns-list-item">
             <p-checkbox
               [binary]="true"
@@ -28,6 +28,20 @@
             <label class="product-catalog-table__category-list-label" [for]="'column-check-' + def.id">{{
               def.labelKey | translate
             }}</label>
+            <span class="product-catalog-table__columns-move">
+              <button
+                type="button"
+                [disabled]="!columns.canMove(def.id, -1)"
+                [attr.aria-label]="('ADMIN.CATALOG_PAGE.COLUMNS.MOVE_UP' | translate) + ': ' + (def.labelKey | translate)"
+                (click)="columns.move(def.id, -1)"
+              ><i class="pi pi-arrow-up" aria-hidden="true"></i></button>
+              <button
+                type="button"
+                [disabled]="!columns.canMove(def.id, 1)"
+                [attr.aria-label]="('ADMIN.CATALOG_PAGE.COLUMNS.MOVE_DOWN' | translate) + ': ' + (def.labelKey | translate)"
+                (click)="columns.move(def.id, 1)"
+              ><i class="pi pi-arrow-down" aria-hidden="true"></i></button>
+            </span>
           </li>
         }
       </ul>
@@ -72,35 +86,61 @@
             <p-checkbox [binary]="true" [ngModel]="allPageSelected()" (onChange)="onBulkToggleAllPage()" />
           </th>
           <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
-          @if (columns.isVisible('stock')) {
-            <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
-          }
-          @if (columns.isVisible('sku')) {
-            <th>SKU</th>
-          }
-          @for (field of visiblePriceFields(); track field) {
+          @for (colId of orderedColumns(); track colId) {
+            @if (isPriceColumn(colId)) {
+              @let field = priceFieldOf(colId);
+
             @if (field === 'sale') {
               <th pSortableColumn="price" class="product-catalog-table__price-head">
                 {{ priceFieldLabel(field) }} <p-sortIcon field="price" />
               </th>
+            } @else if (field === 'cost') {
+              <th pSortableColumn="costPrice" class="product-catalog-table__tier-head">
+                {{ priceFieldLabel(field) }} <p-sortIcon field="costPrice" />
+              </th>
             } @else {
               <th class="product-catalog-table__tier-head">{{ priceFieldLabel(field) }}</th>
             }
-          }
-          @if (columns.isVisible('margin')) {
-            <th class="product-catalog-table__tier-head">Margin</th>
-          }
-          @if (columns.isVisible('category')) {
+
+            } @else {
+              @switch (colId) {
+                @case ('stock') {
+
+            <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
+
+                }
+                @case ('sku') {
+
+            <th>SKU</th>
+
+                }
+                @case ('margin') {
+
+            <th pSortableColumn="margin" class="product-catalog-table__tier-head">Margin <p-sortIcon field="margin" /></th>
+
+                }
+                @case ('category') {
+
             <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
-          }
-          @if (columns.isVisible('internalCategories')) {
+
+                }
+                @case ('internalCategories') {
+
             <th>Internal Categories</th>
-          }
-          @if (columns.isVisible('status')) {
+
+                }
+                @case ('status') {
+
             <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
-          }
-          @if (columns.isVisible('supplier')) {
+
+                }
+                @case ('supplier') {
+
             <th>Supplier</th>
+
+                }
+              }
+            }
           }
           <th style="width: 5.5rem"></th>
         </tr>
@@ -197,63 +237,18 @@
               }
             </div>
           </td>
-          @if (columns.isVisible('stock')) {
-            <td (click)="onStockClick(product, $event)">
-              <div class="product-catalog-table__stock-cell">
-                <app-admin-status-badge
-                  class="product-catalog-table__stock-badge"
-                  [label]="(product.availableStock ?? 0) > 0
-                    ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
-                    : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
-                  [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
-                />
-                @if (product.hasChatDeliveryVariant) {
-                  <i
-                    class="pi pi-comments product-catalog-table__chat-delivery-icon"
-                    pTooltip="On-Delivery — delivered manually via support chat"
-                    tooltipPosition="top"
-                    aria-hidden="true"
-                  ></i>
-                } @else if ((product.variantCount ?? 0) <= 1) {
-                  <button
-                    *hamboxHasPermission="permissions.Catalog.Inventory.Create"
-                    type="button"
-                    class="product-catalog-table__quick-chat-delivery"
-                    pTooltip="Quick-set as On-Delivery (no codes needed)"
-                    tooltipPosition="top"
-                    (click)="$event.stopPropagation(); setChatDeliveryRequested.emit(product)"
-                  >
-                    <i class="pi pi-comments" aria-hidden="true"></i>
-                  </button>
-                }
-              </div>
-            </td>
-          }
-          @if (columns.isVisible('sku')) {
-            <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
-              <span
-                class="admin-cell-primary"
-                [pTooltip]="(product.variantCount ?? 0) > 1 ? 'Representative SKU (first variant)' : undefined"
-                tooltipPosition="top"
-                >{{ skuText(product) }}</span
-              >
-            </td>
-          }
-          @for (field of visiblePriceFields(); track field) {
+          @for (colId of orderedColumns(); track colId) {
+            @if (isPriceColumn(colId)) {
+              @let field = priceFieldOf(colId);
+
             @if (field === 'sale') {
               <td class="product-catalog-table__price-cell" (click)="$event.stopPropagation()">
                 @if (isEditing(product.id, 'price')) {
-                  <p-inputNumber
-                    class="product-catalog-table__edit-number"
-                    [ngModel]="editDraftNumber()"
-                    (ngModelChange)="editDraftNumber.set($event)"
-                    (keydown.enter)="saveEdit(product)"
-                    (keydown.escape)="cancelEdit()"
-                    (onBlur)="saveEdit(product)"
-                    mode="currency"
-                    currency="USD"
-                    [minFractionDigits]="2"
-                    autofocus
+                  <app-admin-money-input
+                    [value]="editDraftNumber()"
+                    (valueChange)="editDraftNumber.set($event)"
+                    (committed)="saveEdit(product)"
+                    (cancelled)="cancelEdit()"
                   />
                 } @else {
                   <span class="admin-cell-primary" (click)="startEdit(product, 'price', $event)">{{
@@ -264,19 +259,12 @@
             } @else {
             <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
               @if (isEditingTier(product.id, field)) {
-                <p-inputNumber
-                  class="product-catalog-table__edit-number"
-                  [ngModel]="editDraftNumber()"
-                  (ngModelChange)="editDraftNumber.set($event)"
-                  (keydown.enter)="saveEdit(product)"
-                  (keydown.escape)="cancelEdit()"
-                  (onBlur)="saveEdit(product)"
-                  mode="currency"
-                  currency="USD"
-                  [minFractionDigits]="2"
-                  [min]="0"
-                  autofocus
-                />
+                <app-admin-money-input
+                    [value]="editDraftNumber()"
+                    (valueChange)="editDraftNumber.set($event)"
+                    (committed)="saveEdit(product)"
+                    (cancelled)="cancelEdit()"
+                  />
               } @else {
                 <span
                   class="admin-cell-primary product-catalog-table__tier-value"
@@ -291,15 +279,72 @@
               }
             </td>
             }
-          }
-          @if (columns.isVisible('margin')) {
+
+            } @else {
+              @switch (colId) {
+                @case ('stock') {
+
+            <td (click)="$event.stopPropagation()">
+              <div class="product-catalog-table__stock-cell">
+                <app-admin-status-badge
+                  class="product-catalog-table__stock-badge"
+                  [label]="(product.availableStock ?? 0) > 0
+                    ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
+                    : ('ADMIN.CATALOG_PAGE.STOCK.OUT_OF_STOCK' | translate)"
+                  [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
+                />
+                <button
+                  *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+                  type="button"
+                  class="product-catalog-table__quick-chat-delivery product-catalog-table__stock-add"
+                  [pTooltip]="'ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate"
+                  tooltipPosition="top"
+                  [attr.aria-label]="'ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate"
+                  (click)="onStockClick(product, $event)"
+                >
+                  <i class="pi pi-plus" aria-hidden="true"></i>
+                </button>
+                <app-admin-action-menu
+                  *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+                  icon="pi pi-truck"
+                  label="Delivery type"
+                  [items]="deliveryMenuItems(product)"
+                />
+                @if (product.hasChatDeliveryVariant) {
+                  <i
+                    class="pi pi-comments product-catalog-table__chat-delivery-icon"
+                    pTooltip="On-Delivery — delivered manually via support chat"
+                    tooltipPosition="top"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </div>
+            </td>
+
+                }
+                @case ('sku') {
+
+            <td class="product-catalog-table__tier-cell" (click)="$event.stopPropagation()">
+              <span
+                class="admin-cell-primary"
+                [pTooltip]="(product.variantCount ?? 0) > 1 ? 'Representative SKU (first variant)' : undefined"
+                tooltipPosition="top"
+                >{{ skuText(product) }}</span
+              >
+            </td>
+
+                }
+                @case ('margin') {
+
             <td class="product-catalog-table__tier-cell">
               <span class="admin-cell-primary product-catalog-table__tier-value product-catalog-table__tier-value--disabled">{{
                 marginText(product)
               }}</span>
             </td>
-          }
-          @if (columns.isVisible('category')) {
+
+                }
+                @case ('category') {
+
           <td
             class="product-catalog-table__category-cell"
             [class.product-catalog-table__category-cell--active]="isCategoryPopoverOpenFor(product.id)"
@@ -352,8 +397,10 @@
               }
             </div>
           </td>
-          }
-          @if (columns.isVisible('internalCategories')) {
+
+                }
+                @case ('internalCategories') {
+
           <td
             class="product-catalog-table__category-cell product-catalog-table__collection-cell"
             [class.product-catalog-table__category-cell--active]="isCollectionPopoverOpenFor(product.id)"
@@ -411,8 +458,10 @@
               }
             </div>
           </td>
-          }
-          @if (columns.isVisible('status')) {
+
+                }
+                @case ('status') {
+
           <td (click)="$event.stopPropagation()">
             <p-select
               class="product-catalog-table__status-select"
@@ -435,8 +484,10 @@
               </div>
             }
           </td>
-          }
-          @if (columns.isVisible('supplier')) {
+
+                }
+                @case ('supplier') {
+
           <td (click)="$event.stopPropagation()">
             @if (mappingStatusFor(product.id); as mapping) {
               @if (mapping.status === 'Unmapped') {
@@ -453,6 +504,10 @@
               }
             }
           </td>
+
+                }
+              }
+            }
           }
           <td (click)="onActionsCellClick($event)">
             <div class="admin-actions-row">
@@ -573,16 +628,56 @@
                     }
                   </div>
                 </td>
-                @if (columns.isVisible('stock')) {
-                <td (click)="onStockClick(product, $event)">
+                @for (colId of orderedColumns(); track colId) {
+                  @if (isPriceColumn(colId)) {
+                    @let field = priceFieldOf(colId);
+
+                  <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
+                    @if (isEditingVariantPrice(variant.id, field)) {
+                      <app-admin-money-input
+                        [value]="variantPriceDraft()"
+                        (valueChange)="variantPriceDraft.set($event)"
+                        (committed)="saveVariantPrice(product, variant)"
+                        (cancelled)="cancelVariantPrice()"
+                      />
+                    } @else {
+                      @let priceValue = variantPriceDisplay(variant, product, field);
+                      <span
+                        class="product-catalog-table__variant-price-value"
+                        [class.product-catalog-table__variant-price-value--inherited]="field === 'sale' && variant.priceOverride == null"
+                        role="button"
+                        tabindex="0"
+                        (click)="startEditVariantPrice(product, variant, field, $event)"
+                        (keydown.enter)="startEditVariantPrice(product, variant, field, $event)"
+                        >{{ priceValue == null ? '—' : (priceValue | hamboxCurrency) }}</span
+                      >
+                    }
+                  </td>
+
+                  } @else {
+                    @switch (colId) {
+                      @case ('stock') {
+
+                <td (click)="$event.stopPropagation()">
                   <div class="product-catalog-table__stock-cell">
                     <app-admin-status-badge
                       class="product-catalog-table__stock-badge"
                       [label]="variant.availableStock > 0
                         ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: variant.availableStock })
-                        : ('ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate)"
+                        : ('ADMIN.CATALOG_PAGE.STOCK.OUT_OF_STOCK' | translate)"
                       [tone]="variant.availableStock > 0 ? 'success' : 'danger'"
                     />
+                    <button
+                      *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+                      type="button"
+                      class="product-catalog-table__quick-chat-delivery product-catalog-table__stock-add"
+                      [pTooltip]="'ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate"
+                      tooltipPosition="top"
+                      [attr.aria-label]="'ADMIN.CATALOG_PAGE.STOCK.ADD_STOCK' | translate"
+                      (click)="onStockClick(product, $event)"
+                    >
+                      <i class="pi pi-plus" aria-hidden="true"></i>
+                    </button>
                     @if (variant.fulfillmentMode === 'ChatDelivery') {
                       <i
                         class="pi pi-comments product-catalog-table__chat-delivery-icon"
@@ -604,52 +699,32 @@
                     }
                   </div>
                 </td>
-                }
-                @if (columns.isVisible('sku')) {
+
+                      }
+                      @case ('sku') {
+
                   <td (click)="$event.stopPropagation()">
                     <span class="admin-cell-primary">{{ variant.sku }}</span>
                   </td>
-                }
-                @for (field of visiblePriceFields(); track field) {
-                  <td class="product-catalog-table__variant-price-cell" (click)="$event.stopPropagation()">
-                    @if (isEditingVariantPrice(variant.id, field)) {
-                      <p-inputNumber
-                        class="product-catalog-table__edit-number"
-                        [ngModel]="variantPriceDraft()"
-                        (ngModelChange)="variantPriceDraft.set($event)"
-                        (keydown.enter)="saveVariantPrice(product, variant)"
-                        (keydown.escape)="cancelVariantPrice()"
-                        (onBlur)="saveVariantPrice(product, variant)"
-                        mode="currency"
-                        currency="USD"
-                        [minFractionDigits]="2"
-                        [min]="0"
-                        autofocus
-                      />
-                    } @else {
-                      @let priceValue = variantPriceDisplay(variant, product, field);
-                      <span
-                        class="product-catalog-table__variant-price-value"
-                        [class.product-catalog-table__variant-price-value--inherited]="field === 'sale' && variant.priceOverride == null"
-                        role="button"
-                        tabindex="0"
-                        (click)="startEditVariantPrice(product, variant, field, $event)"
-                        (keydown.enter)="startEditVariantPrice(product, variant, field, $event)"
-                        >{{ priceValue == null ? '—' : (priceValue | hamboxCurrency) }}</span
-                      >
-                    }
-                  </td>
-                }
-                @if (columns.isVisible('margin')) {
+
+                      }
+                      @case ('margin') {
+
                   <td></td>
-                }
-                @if (columns.isVisible('category')) {
+
+                      }
+                      @case ('category') {
+
                   <td></td>
-                }
-                @if (columns.isVisible('internalCategories')) {
+
+                      }
+                      @case ('internalCategories') {
+
                   <td></td>
-                }
-                @if (columns.isVisible('status')) {
+
+                      }
+                      @case ('status') {
+
                   <td
                     class="product-catalog-table__variant-status-cell"
                     role="button"
@@ -660,9 +735,15 @@
                   >
                     <app-admin-status-badge [label]="variantStatusLabel(variant.status)" [tone]="variantStatusTone(variant.status)" />
                   </td>
-                }
-                @if (columns.isVisible('supplier')) {
+
+                      }
+                      @case ('supplier') {
+
                   <td></td>
+
+                      }
+                    }
+                  }
                 }
                 <td (click)="$event.stopPropagation()">
                   <div class="admin-actions-row">
@@ -833,15 +914,13 @@
       ></button>
 
       <div class="product-catalog-table__category-popover-actions">
-        <button pButton type="button" label="Cancel" severity="secondary" text (click)="cancelCollectionPopover()"></button>
         <button
           pButton
           type="button"
-          label="Save"
+          label="Done"
           icon="pi pi-check"
-          [disabled]="actionLoading()"
           [loading]="actionLoading()"
-          (click)="saveCollectionPopover()"
+          (click)="cancelCollectionPopover()"
         ></button>
       </div>
     </div>

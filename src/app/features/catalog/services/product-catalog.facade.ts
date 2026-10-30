@@ -11,6 +11,7 @@ import {
   BulkProductsResult,
   CreateProductRequest,
   MergeProductsResult,
+  BulkFulfillmentMode,
   PriceAdjustmentMode,
   Product,
   ProductBulkSelection,
@@ -539,6 +540,44 @@ export class ProductCatalogFacade {
   async bulkAdjustPrice(priceMode: PriceAdjustmentMode, priceValue: number): Promise<BulkProductsResult | null> {
     return this.runBulkAction(() =>
       this.api.bulkProducts(this.currentBulkSelection(), 'adjust-price', { priceMode, priceValue }),
+    );
+  }
+
+  /** Adds / removes one product to one internal category through the light assign/remove endpoint. */
+  async setProductCollection(productId: string, collectionId: string, assigned: boolean): Promise<boolean> {
+    return this.runProductAction(productId, async () => {
+      await firstValueFrom(
+        this.api.bulkProducts(
+          { productIds: [productId], selectAllMatching: false },
+          assigned ? 'assign-collection' : 'remove-collection',
+          { targetCollectionId: collectionId },
+        ),
+      );
+    });
+  }
+
+  /** Switches every variant of one product to Manual or Supplier delivery (the stock cell's delivery menu). */
+  async setProductFulfillment(productId: string, mode: BulkFulfillmentMode): Promise<boolean> {
+    return this.runProductAction(productId, async () => {
+      await firstValueFrom(
+        this.api.bulkProducts({ productIds: [productId], selectAllMatching: false }, 'set-fulfillment', {
+          targetFulfillmentMode: mode,
+        }),
+      );
+    });
+  }
+
+  /** Sets how every variant of the selected products is delivered (On-Delivery / Manual / Supplier). */
+  async bulkSetFulfillment(targetFulfillmentMode: BulkFulfillmentMode): Promise<BulkProductsResult | null> {
+    return this.runBulkAction(() =>
+      this.api.bulkProducts(this.currentBulkSelection(), 'set-fulfillment', { targetFulfillmentMode }),
+    );
+  }
+
+  /** Sets the sale price of the selected products so that `(sale − cost) / sale` equals `marginPercent`. */
+  async bulkSetMargin(marginPercent: number): Promise<BulkProductsResult | null> {
+    return this.runBulkAction(() =>
+      this.api.bulkProducts(this.currentBulkSelection(), 'set-margin', { priceValue: marginPercent }),
     );
   }
 

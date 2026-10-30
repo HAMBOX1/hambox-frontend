@@ -210,6 +210,8 @@
       (manageStock)="navigateToStock($event)"
       (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
       (setVariantChatDeliveryRequested)="openVariantChatDeliveryDialog($event)"
+      (setFulfillmentRequested)="onSetFulfillment($event)"
+      (collectionToggled)="onCollectionToggled($event)"
       (fieldEdit)="onFieldEdit($event)"
       (productPricesChanged)="reloadProducts()"
       (statusEdit)="onStatusEdit($event)"
@@ -602,6 +604,87 @@
       [disabled]="bulkPriceValue() === null"
       [loading]="bulkActionLoading()"
       (click)="confirmBulkPriceAdjust()"
+    ></button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.FULFILLMENT_TITLE' | translate"
+  [visible]="bulkFulfillmentDialogOpen()"
+  (visibleChange)="bulkFulfillmentDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.FULFILLMENT_HINT' | translate }}</p>
+  <div class="admin-field">
+    <div class="product-catalog-page__price-mode-options">
+      <label>
+        <p-radioButton name="bulkFulfillmentMode" value="ChatDelivery" [ngModel]="bulkFulfillmentMode()" (ngModelChange)="bulkFulfillmentMode.set($event)" />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.FULFILLMENT_ON_DELIVERY' | translate }}
+      </label>
+      <label>
+        <p-radioButton name="bulkFulfillmentMode" value="ManualOnly" [ngModel]="bulkFulfillmentMode()" (ngModelChange)="bulkFulfillmentMode.set($event)" />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.FULFILLMENT_MANUAL' | translate }}
+      </label>
+      <label>
+        <p-radioButton name="bulkFulfillmentMode" value="SupplierOnly" [ngModel]="bulkFulfillmentMode()" (ngModelChange)="bulkFulfillmentMode.set($event)" />
+        {{ 'ADMIN.CATALOG_PAGE.BULK.FULFILLMENT_SUPPLIER' | translate }}
+      </label>
+    </div>
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkFulfillmentDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
+      icon="pi pi-check"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkFulfillment()"
+    ></button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.MARGIN_TITLE' | translate"
+  [visible]="bulkMarginDialogOpen()"
+  (visibleChange)="bulkMarginDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.MARGIN_HINT' | translate }}</p>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-margin-value">{{ 'ADMIN.CATALOG_PAGE.BULK.MARGIN_LABEL' | translate }}</label>
+    <p-inputNumber
+      inputId="bulk-margin-value"
+      [ngModel]="bulkMarginValue()"
+      (ngModelChange)="bulkMarginValue.set($event)"
+      mode="decimal"
+      suffix=" %"
+      [min]="0"
+      [max]="99.99"
+      [maxFractionDigits]="2"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkMarginDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
+      icon="pi pi-check"
+      [disabled]="bulkMarginValue() === null"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkMargin()"
     ></button>
   </div>
 </p-dialog>

@@ -633,3 +633,48 @@
     word-break: break-word;
   }
 }
+
+// Column order picker: a pair of arrows at the end of every row.
+.product-catalog-table__columns-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-catalog-table__columns-move {
+  display: inline-flex;
+  gap: 2px;
+  margin-inline-start: auto;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid var(--color-border, #333);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-secondary, #bbb);
+    font-size: 0.7rem;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+}
+
+// Stock cell: the count, then explicit "add stock" and "delivery type" buttons.
+.product-catalog-table__stock-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.product-catalog-table__stock-add {
+  display: inline-grid;
+  place-items: center;
+}

@@ -5,7 +5,7 @@
   [disabled]="disabled()"
   (click)="toggle($event)"
 >
-  <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
+  <i [class]="icon()" aria-hidden="true"></i>
 </button>
 
 <p-menu #menu [model]="items()" [popup]="true" appendTo="body" styleClass="admin-action-menu__panel" />

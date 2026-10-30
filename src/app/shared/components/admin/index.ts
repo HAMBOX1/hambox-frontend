@@ -24,6 +24,8 @@ export { AdminIconButtonComponent } from './admin-icon-button/admin-icon-button.
 
 export { AdminStatusBadgeComponent } from './admin-status-badge/admin-status-badge.component';
 
+export { AdminMoneyInputComponent } from './admin-money-input/admin-money-input.component';
+
 export type { AdminStatusTone } from './admin-status-badge/admin-status-badge.component';
 
 export { AdminBulkBarComponent } from './admin-bulk-bar/admin-bulk-bar.component';

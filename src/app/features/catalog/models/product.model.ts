@@ -18,7 +18,11 @@ export type ProductSortBy =
   | 'StatusAsc'
   | 'StatusDesc'
   | 'StockAsc'
-  | 'StockDesc';
+  | 'StockDesc'
+  | 'CostAsc'
+  | 'CostDesc'
+  | 'MarginAsc'
+  | 'MarginDesc';
 
 export interface ProductImage {
   readonly id: string;
@@ -237,7 +241,12 @@ export type BulkProductAction =
   | 'change-category'
   | 'adjust-price'
   | 'assign-collection'
-  | 'remove-collection';
+  | 'remove-collection'
+  | 'set-fulfillment'
+  | 'set-margin';
+
+/** Fulfillment modes the bulk "delivery" action offers (backend `FulfillmentMode` names). */
+export type BulkFulfillmentMode = 'ChatDelivery' | 'ManualOnly' | 'SupplierOnly';
 
 export type PriceAdjustmentMode = 'IncreasePercent' | 'DecreasePercent' | 'SetFixed';
 

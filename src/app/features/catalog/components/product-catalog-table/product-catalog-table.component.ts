@@ -32,6 +32,7 @@ import {
   AdminEmptyStateComponent,
   AdminIconButtonComponent,
   AdminLoadingSkeletonComponent,
+  AdminMoneyInputComponent,
   AdminSearchBarComponent,
   AdminStatusBadgeComponent,
   AdminStatusTone,
@@ -110,6 +111,7 @@ export interface ProductStatusEdit {
     AdminLoadingSkeletonComponent,
     AdminIconButtonComponent,
     AdminActionMenuComponent,
+    AdminMoneyInputComponent,
     AdminSearchBarComponent,
     CategoryCreateFormComponent,
     CollectionCreateFormComponent,
@@ -175,6 +177,10 @@ export class ProductCatalogTableComponent {
   readonly setChatDeliveryRequested = output<Product>();
   /** Same On-Delivery quick action, for one sub-product (variant) of a product. */
   readonly setVariantChatDeliveryRequested = output<{ product: Product; variant: ProductVariantDto }>();
+  /** Switches every variant of a product to Manual or Supplier delivery (On-Delivery has its own dialog). */
+  readonly setFulfillmentRequested = output<{ product: Product; mode: 'ManualOnly' | 'SupplierOnly' }>();
+  /** One internal category was ticked or unticked in the popover; applied right away, no Save step. */
+  readonly collectionToggled = output<{ product: Product; collectionId: string; assigned: boolean }>();
   /** The star toggle next to the product name — a personal admin bookmark, unrelated to status. */
   readonly favoriteToggle = output<Product>();
   readonly fieldEdit = output<ProductFieldEdit>();
@@ -233,6 +239,38 @@ export class ProductCatalogTableComponent {
 
   /** Which of Sale / Cost / Member show as columns — driven by the unified "Columns" picker
    * (`columns`), not a dedicated mode of their own anymore. */
+  /** Visible columns in the order the admin arranged them (see the Columns picker). */
+  protected readonly orderedColumns = this.columns.orderedVisible;
+
+  protected isPriceColumn(id: ProductColumnId): boolean {
+    return id === 'salePrice' || id === 'costPrice' || id === 'memberPrice';
+  }
+
+  protected priceFieldOf(id: ProductColumnId): VariantPriceField {
+    return id === 'costPrice' ? 'cost' : id === 'memberPrice' ? 'member' : 'sale';
+  }
+
+  /** The stock cell's delivery-type menu: On-Delivery / Manual / Supplier for the product's variants. */
+  protected deliveryMenuItems(product: Product): MenuItem[] {
+    return [
+      {
+        label: 'On-Delivery (support chat)',
+        icon: 'pi pi-comments',
+        command: () => this.setChatDeliveryRequested.emit(product),
+      },
+      {
+        label: 'Manual (codes from stock)',
+        icon: 'pi pi-key',
+        command: () => this.setFulfillmentRequested.emit({ product, mode: 'ManualOnly' }),
+      },
+      {
+        label: 'Supplier (automatic)',
+        icon: 'pi pi-cloud-download',
+        command: () => this.setFulfillmentRequested.emit({ product, mode: 'SupplierOnly' }),
+      },
+    ];
+  }
+
   protected readonly visiblePriceFields = computed<readonly VariantPriceField[]>(() => {
     const fields: VariantPriceField[] = [];
     if (this.columns.isVisible('salePrice')) {
@@ -1238,10 +1276,17 @@ export class ProductCatalogTableComponent {
     }
   }
 
+  /** Internal categories are admin-only tags, so a tick is applied immediately (no Save / Cancel). */
   protected toggleCollectionDraft(collectionId: string, checked: boolean): void {
+    const product = this.collectionPopoverProductState();
+    if (!product || this.collectionDraftIdsState().includes(collectionId) === checked) {
+      return;
+    }
+
     this.collectionDraftIdsState.update((ids) =>
       checked ? [...ids, collectionId] : ids.filter((id) => id !== collectionId),
     );
+    this.collectionToggled.emit({ product, collectionId, assigned: checked });
   }
 
   protected cancelCollectionPopover(): void {
@@ -1292,7 +1337,7 @@ export class ProductCatalogTableComponent {
         label: request.name,
         parentId: request.parentId ?? null,
       });
-      this.collectionDraftIdsState.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
+      this.toggleCollectionDraft(id, true);
       this.collectionDialogOpen.set(false);
       this.collectionCreated.emit();
     } catch (error) {

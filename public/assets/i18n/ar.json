@@ -989,7 +989,9 @@
         "CATEGORY": "الفئة",
         "INTERNAL_CATEGORIES": "الفئات الداخلية",
         "STATUS": "الحالة",
-        "SUPPLIER": "المورد"
+        "SUPPLIER": "المورد",
+        "MOVE_UP": "تحريك لأعلى",
+        "MOVE_DOWN": "تحريك لأسفل"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "إضافة ربط مورد",
@@ -1052,6 +1054,16 @@
         "PRICE_FIXED": "تحديد قيمة ثابتة",
         "PRICE_PERCENT_LABEL": "النسبة المئوية",
         "PRICE_NEW_LABEL": "السعر الجديد",
+        "SET_MARGIN": "تحديد الهامش",
+        "MARGIN_TITLE": "تحديد الهامش",
+        "MARGIN_LABEL": "الهامش (%)",
+        "MARGIN_HINT": "يصبح سعر البيع = التكلفة ÷ (1 − الهامش). المنتجات بدون تكلفة، أو التي لها سعر بيع خاص لكل Variant، يتم تخطيها.",
+        "SET_FULFILLMENT": "تحديد طريقة التسليم",
+        "FULFILLMENT_TITLE": "تحديد طريقة التسليم",
+        "FULFILLMENT_HINT": "تُطبَّق على كل Variants المنتجات المحددة.",
+        "FULFILLMENT_ON_DELIVERY": "عند الطلب On-Delivery (التسليم عبر الدعم)",
+        "FULFILLMENT_MANUAL": "يدوي (أكواد من المخزون)",
+        "FULFILLMENT_SUPPLIER": "مورّد (تلقائي)",
         "APPLY": "تطبيق",
         "MERGE": "دمج في منتج واحد",
         "MERGE_TITLE": "دمج المنتجات",
@@ -1094,7 +1106,8 @@
       "SHOW_ALL_CONFIRM_MESSAGE": "ده هيحمّل كل الـ {{count}} منتج المطابق في صفحة واحدة، وممكن يبقى بطيء. تحب تكمل؟",
       "STOCK": {
         "IN_STOCK": "{{count}}",
-        "ADD_STOCK": "انقر لإضافة مخزون",
+        "ADD_STOCK": "إضافة مخزون",
+        "OUT_OF_STOCK": "نفد المخزون",
         "ARIA_LABEL": "عرض المخزون والمتغيرات لـ {{name}}"
       },
       "TOAST": {

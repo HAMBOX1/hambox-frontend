@@ -59,6 +59,18 @@
             >
               Draft
             </button>
+            @if (hiddenVariantCount() > 0) {
+              <button
+                type="button"
+                class="admin-filter-chip"
+                [class.admin-filter-chip--active]="showHidden()"
+                [attr.aria-pressed]="showHidden()"
+                (click)="showHidden.set(!showHidden())"
+              >
+                <i class="pi" [class.pi-eye]="showHidden()" [class.pi-eye-slash]="!showHidden()" aria-hidden="true"></i>
+                {{ showHidden() ? 'Hide' : 'Show' }} hidden ({{ hiddenVariantCount() }})
+              </button>
+            }
           </div>
         </div>
 

@@ -41,6 +41,7 @@ import {
   ProductMergeTarget,
 } from '../../components/product-merge-dialog/product-merge-dialog.component';
 import {
+  BulkFulfillmentMode,
   PriceAdjustmentMode,
   Product,
   ProductSortBy,
@@ -76,6 +77,8 @@ const SORT_FIELD_TO_ENUM: Record<string, { asc: ProductSortBy; desc: ProductSort
   price: { asc: 'PriceAsc', desc: 'PriceDesc' },
   status: { asc: 'StatusAsc', desc: 'StatusDesc' },
   availableStock: { asc: 'StockAsc', desc: 'StockDesc' },
+  costPrice: { asc: 'CostAsc', desc: 'CostDesc' },
+  margin: { asc: 'MarginAsc', desc: 'MarginDesc' },
 };
 
 const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: number }>> = {
@@ -89,6 +92,10 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
   StatusDesc: { field: 'status', order: -1 },
   StockAsc: { field: 'availableStock', order: 1 },
   StockDesc: { field: 'availableStock', order: -1 },
+  CostAsc: { field: 'costPrice', order: 1 },
+  CostDesc: { field: 'costPrice', order: -1 },
+  MarginAsc: { field: 'margin', order: 1 },
+  MarginDesc: { field: 'margin', order: -1 },
 };
 
 @Component({
@@ -216,6 +223,10 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkDuplicateDialogOpen = signal(false);
   protected readonly bulkCategoryDialogOpen = signal(false);
   protected readonly bulkPriceDialogOpen = signal(false);
+  protected readonly bulkFulfillmentDialogOpen = signal(false);
+  protected readonly bulkFulfillmentMode = signal<BulkFulfillmentMode>('ChatDelivery');
+  protected readonly bulkMarginDialogOpen = signal(false);
+  protected readonly bulkMarginValue = signal<number | null>(null);
   protected readonly bulkAssignCollectionDialogOpen = signal(false);
   protected readonly bulkRemoveCollectionDialogOpen = signal(false);
   protected readonly bulkCreateCollectionDialogOpen = signal(false);
@@ -269,6 +280,16 @@ export class ProductCatalogPageComponent implements OnInit {
         label: t('ADMIN.CATALOG_PAGE.BULK.ADJUST_PRICE'),
         icon: 'pi pi-dollar',
         command: () => this.bulkPriceDialogOpen.set(true),
+      });
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.SET_MARGIN'),
+        icon: 'pi pi-percentage',
+        command: () => this.bulkMarginDialogOpen.set(true),
+      });
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.SET_FULFILLMENT'),
+        icon: 'pi pi-comments',
+        command: () => this.bulkFulfillmentDialogOpen.set(true),
       });
       if (this.canBulkMerge()) {
         items.push({
@@ -1058,6 +1079,45 @@ export class ProductCatalogPageComponent implements OnInit {
       'Prices updated',
     );
     this.bulkPriceDialogOpen.set(false);
+  }
+
+  protected async onCollectionToggled(event: { product: Product; collectionId: string; assigned: boolean }): Promise<void> {
+    const ok = await this.facade.setProductCollection(event.product.id, event.collectionId, event.assigned);
+    if (!ok) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Update failed',
+        detail: this.facade.error() ?? 'Could not update the internal category.',
+        life: 5000,
+      });
+    }
+  }
+
+  protected async onSetFulfillment(event: { product: Product; mode: 'ManualOnly' | 'SupplierOnly' }): Promise<void> {
+    const ok = await this.facade.setProductFulfillment(event.product.id, event.mode);
+    this.messageService.add(
+      ok
+        ? { severity: 'success', summary: 'Delivery type updated', detail: event.product.nameEn, life: 3000 }
+        : { severity: 'error', summary: 'Could not update delivery type', detail: this.facade.error() ?? 'Please try again.', life: 5000 },
+    );
+  }
+
+  protected async confirmBulkFulfillment(): Promise<void> {
+    await this.runBulkAction(
+      () => this.facade.bulkSetFulfillment(this.bulkFulfillmentMode()),
+      'Delivery mode updated',
+    );
+    this.bulkFulfillmentDialogOpen.set(false);
+  }
+
+  protected async confirmBulkMargin(): Promise<void> {
+    const value = this.bulkMarginValue();
+    if (value === null) {
+      return;
+    }
+
+    await this.runBulkAction(() => this.facade.bulkSetMargin(value), 'Margin applied');
+    this.bulkMarginDialogOpen.set(false);
   }
 
   protected navigateToExport(): void {

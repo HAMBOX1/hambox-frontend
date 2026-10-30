@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 
 /** Optional/toggleable columns in the Admin Products table. `product` (name/thumbnail) and the
  * actions column are always shown — they're the row's identity and primary action, not data to
@@ -36,6 +36,7 @@ export const PRODUCT_TABLE_COLUMNS: readonly ProductColumnDef[] = [
 ];
 
 const STORAGE_KEY = 'hambox.admin.products.columns';
+const ORDER_STORAGE_KEY = 'hambox.admin.products.columns.order';
 
 /**
  * Root-scoped (like `AdminProductsViewModeService`) so the admin's column choices survive
@@ -50,6 +51,43 @@ export class ProductTableColumnsService {
 
   private readonly visibleState = signal<ReadonlySet<ProductColumnId>>(this.readInitial());
   readonly visible = this.visibleState.asReadonly();
+
+  /** Left-to-right order of the columns (hidden ones keep their slot, so un-hiding restores the place). */
+  private readonly orderState = signal<readonly ProductColumnId[]>(this.readOrder());
+  readonly order = this.orderState.asReadonly();
+
+  /** The column definitions in the admin's chosen order — what the Columns picker lists. */
+  readonly orderedDefinitions = computed<readonly ProductColumnDef[]>(() =>
+    this.orderState()
+      .map((id) => this.definitions.find((def) => def.id === id))
+      .filter((def): def is ProductColumnDef => def !== undefined),
+  );
+
+  /** Visible columns in the chosen order — what the table renders. */
+  readonly orderedVisible = computed<readonly ProductColumnId[]>(() =>
+    this.orderState().filter((id) => this.visibleState().has(id)),
+  );
+
+  canMove(id: ProductColumnId, delta: -1 | 1): boolean {
+    const index = this.orderState().indexOf(id);
+    const target = index + delta;
+    return index !== -1 && target >= 0 && target < this.orderState().length;
+  }
+
+  /** Swaps a column with its neighbour (one step left or right in the table). */
+  move(id: ProductColumnId, delta: -1 | 1): void {
+    if (!this.canMove(id, delta)) {
+      return;
+    }
+
+    this.orderState.update((current) => {
+      const next = [...current];
+      const index = next.indexOf(id);
+      [next[index], next[index + delta]] = [next[index + delta], next[index]];
+      return next;
+    });
+    this.persistOrder();
+  }
 
   isVisible(id: ProductColumnId): boolean {
     return this.visibleState().has(id);
@@ -70,7 +108,9 @@ export class ProductTableColumnsService {
 
   resetToDefaults(): void {
     this.visibleState.set(this.defaultSet());
+    this.orderState.set(this.definitions.map((def) => def.id));
     this.persist();
+    this.persistOrder();
   }
 
   private isPhone(): boolean {
@@ -98,6 +138,32 @@ export class ProductTableColumnsService {
       return new Set(ids.filter((id): id is ProductColumnId => known.has(id as ProductColumnId)));
     } catch {
       return this.defaultSet();
+    }
+  }
+
+  private readOrder(): readonly ProductColumnId[] {
+    const defaults = this.definitions.map((def) => def.id);
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(ORDER_STORAGE_KEY) : null;
+      if (raw === null) {
+        return defaults;
+      }
+
+      const saved = (JSON.parse(raw) as string[]).filter((id): id is ProductColumnId => defaults.includes(id as ProductColumnId));
+      // Columns added after the order was saved go to the end, in their default order.
+      return [...saved, ...defaults.filter((id) => !saved.includes(id))];
+    } catch {
+      return defaults;
+    }
+  }
+
+  private persistOrder(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify([...this.orderState()]));
+      }
+    } catch {
+      // Best effort only.
     }
   }
 

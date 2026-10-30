@@ -989,7 +989,9 @@
         "CATEGORY": "Category",
         "INTERNAL_CATEGORIES": "Internal Categories",
         "STATUS": "Status",
-        "SUPPLIER": "Supplier"
+        "SUPPLIER": "Supplier",
+        "MOVE_UP": "Move left",
+        "MOVE_DOWN": "Move right"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "Add Supplier Mapping",
@@ -1052,6 +1054,16 @@
         "PRICE_FIXED": "Set fixed value",
         "PRICE_PERCENT_LABEL": "Percent",
         "PRICE_NEW_LABEL": "New price",
+        "SET_MARGIN": "Set margin",
+        "MARGIN_TITLE": "Set margin",
+        "MARGIN_LABEL": "Margin (%)",
+        "MARGIN_HINT": "The sale price becomes cost ÷ (1 − margin). Products without a cost price, or whose variants carry their own sale price, are skipped.",
+        "SET_FULFILLMENT": "Set delivery mode",
+        "FULFILLMENT_TITLE": "Set delivery mode",
+        "FULFILLMENT_HINT": "Applies to every variant of the selected products.",
+        "FULFILLMENT_ON_DELIVERY": "On-Delivery (delivered via support chat)",
+        "FULFILLMENT_MANUAL": "Manual (codes from stock)",
+        "FULFILLMENT_SUPPLIER": "Supplier (automatic)",
         "APPLY": "Apply",
         "MERGE": "Merge into one product",
         "MERGE_TITLE": "Merge products",
@@ -1094,7 +1106,8 @@
       "SHOW_ALL_CONFIRM_MESSAGE": "This will load all {{count}} matching products on one page, which can be slow to render. Continue?",
       "STOCK": {
         "IN_STOCK": "{{count}}",
-        "ADD_STOCK": "Click to add stock",
+        "ADD_STOCK": "Add stock",
+        "OUT_OF_STOCK": "Out of stock",
         "ARIA_LABEL": "View stock and variants for {{name}}"
       },
       "TOAST": {
