@@ -7,7 +7,7 @@
     [breadcrumbs]="breadcrumbs"
   >
     @if (permissions.Promotions.Create | hamboxHasPermission) {
-      <button pButton type="button" label="New floating ad" icon="pi pi-plus" (click)="openCreate()"></button>
+      <button adminHeaderActions pButton type="button" label="New floating ad" icon="pi pi-plus" (click)="openCreate()"></button>
     }
   </app-admin-page-header>
 
