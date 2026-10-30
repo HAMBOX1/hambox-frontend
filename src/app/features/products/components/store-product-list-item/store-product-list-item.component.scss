@@ -365,7 +365,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px 8px;
     width: 100%;
   }
 
@@ -377,7 +378,9 @@
 
   .store-list-card__actions {
     display: flex;
+    flex-wrap: nowrap;
     gap: 8px;
+    margin-inline-start: auto;
   }
 
   .store-list-card__actions .store-list-card__btn {
@@ -397,7 +400,15 @@
     display: none;
   }
 
+  // The wishlist heart stays next to the cart button as a round icon of the same family.
   .store-list-card__wishlist {
-    display: none;
+    display: grid;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+  }
+
+  .store-list-card__actions {
+    gap: 6px;
   }
 }

@@ -22,7 +22,7 @@
       />
     </section>
 
-    <section class="storefront-store__toolbar-section">
+    <section #toolbarSection class="storefront-store__toolbar-section">
       <app-store-toolbar
         [sortOptions]="sortOptions()"
         [selectedSort]="selectedSort()"
@@ -32,6 +32,38 @@
         (openFilters)="onOpenMobileFilters()"
       />
     </section>
+
+    <!-- Phones and tablets: once the bar scrolls away it stays out of the way as a small tab on the side. -->
+    @if (!toolbarVisible() || quickPanelOpen()) {
+      <div class="storefront-store__quick">
+        @if (quickPanelOpen()) {
+          <div class="storefront-store__quick-backdrop" (click)="closeQuickPanel()"></div>
+          <div class="storefront-store__quick-panel" role="dialog" [attr.aria-label]="'PRODUCTS.FILTERS.OPEN' | translate">
+            <app-store-toolbar
+              [sortOptions]="sortOptions()"
+              [selectedSort]="selectedSort()"
+              [activeFilterCount]="activeFilterCount()"
+              [resultCount]="totalCount()"
+              (sortChange)="onSortChange($event)"
+              (openFilters)="onOpenMobileFilters()"
+            />
+          </div>
+        }
+        <button
+          type="button"
+          class="storefront-store__quick-tab"
+          [class.storefront-store__quick-tab--open]="quickPanelOpen()"
+          [attr.aria-label]="'PRODUCTS.FILTERS.OPEN' | translate"
+          [attr.aria-expanded]="quickPanelOpen()"
+          (click)="toggleQuickPanel()"
+        >
+          <i class="pi" [class.pi-sliders-h]="!quickPanelOpen()" [class.pi-times]="quickPanelOpen()" aria-hidden="true"></i>
+          @if (activeFilterCount() > 0 && !quickPanelOpen()) {
+            <span class="storefront-store__quick-badge">{{ activeFilterCount() }}</span>
+          }
+        </button>
+      </div>
+    }
 
     <div
       class="storefront-store__content"

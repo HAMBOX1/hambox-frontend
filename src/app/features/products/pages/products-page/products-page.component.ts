@@ -1,7 +1,18 @@
 import { AnalyticsService } from '../../../../core/analytics/analytics.service';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 
 import { Home } from '../../../home/services/home';
@@ -27,6 +38,7 @@ import { resolveNavSection } from '../../../../shared/utils/storefront-nav.utils
   standalone: true,
   imports: [
     PaginatorModule,
+    TranslatePipe,
     StorefrontNavComponent,
     StorefrontFooterComponent,
     EmptyStateComponent,
@@ -52,7 +64,14 @@ export class ProductsPageComponent implements OnInit {
   private readonly viewModeService = inject(StorefrontViewModeService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   private initialized = false;
+
+  private readonly toolbarSection = viewChild<ElementRef<HTMLElement>>('toolbarSection');
+
+  /** The sort / filter / view bar is in view; once it scrolls away a small side tab takes its place. */
+  protected readonly toolbarVisible = signal(true);
+  protected readonly quickPanelOpen = signal(false);
 
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
 
@@ -109,6 +128,26 @@ export class ProductsPageComponent implements OnInit {
         this.facade.setSection(section);
       }
     });
+
+    afterNextRender(() => {
+      const section = this.toolbarSection()?.nativeElement;
+      if (!section || typeof IntersectionObserver === 'undefined') {
+        return;
+      }
+
+      // The top bar covers the first 56px, so the bar counts as gone once it slides under it.
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          this.toolbarVisible.set(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            this.quickPanelOpen.set(false);
+          }
+        },
+        { rootMargin: '-56px 0px 0px 0px' },
+      );
+      observer.observe(section);
+      this.destroyRef.onDestroy(() => observer.disconnect());
+    });
   }
 
   ngOnInit(): void {
@@ -129,6 +168,15 @@ export class ProductsPageComponent implements OnInit {
 
   protected onSortChange(sort: string): void {
     this.facade.setSort(sort);
+    this.quickPanelOpen.set(false);
+  }
+
+  protected toggleQuickPanel(): void {
+    this.quickPanelOpen.update((open) => !open);
+  }
+
+  protected closeQuickPanel(): void {
+    this.quickPanelOpen.set(false);
   }
 
   protected onFiltersChange(filters: StorefrontClientFilters): void {
@@ -148,6 +196,7 @@ export class ProductsPageComponent implements OnInit {
   }
 
   protected onOpenMobileFilters(): void {
+    this.quickPanelOpen.set(false);
     this.filterPanel.openMobileDrawer();
   }
 

@@ -189,15 +189,80 @@
   }
 }
 
-// Phones and tablets: the sort / filter / view-mode bar stays pinned under the top bar while scrolling, so the
-// filter is always one tap away instead of a scroll back to the top of a long product list.
+// The sort / filter / view-mode bar scrolls away with the page. On phones and tablets a small tab on the side then
+// stands in for it, and opens the same bar as a floating panel (tap again or outside to close).
+.storefront-store__quick {
+  display: none;
+}
+
 @media (max-width: 991px) {
-  .storefront-store__toolbar-section {
-    position: sticky;
-    top: calc(56px + env(safe-area-inset-top, 0px));
-    z-index: 90;
-    padding-block: 6px;
-    background: var(--color-bg, var(--color-section));
-    box-shadow: 0 6px 10px -8px rgba(0, 0, 0, 0.5);
+  .storefront-store__quick {
+    display: block;
+  }
+
+  .storefront-store__quick-tab {
+    position: fixed;
+    inset-inline-end: 0;
+    top: 38%;
+    z-index: 95;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid var(--color-border-subtle);
+    border-inline-end: 0;
+    border-radius: 14px 0 0 14px;
+    background: var(--color-primary);
+    color: var(--color-on-primary, #07130d);
+    font-size: 1.05rem;
+    box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+
+    &:dir(rtl) {
+      border-radius: 0 14px 14px 0;
+      border-inline-end: 1px solid var(--color-border-subtle);
+      border-inline-start: 0;
+    }
+  }
+
+  .storefront-store__quick-tab--open {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+
+  .storefront-store__quick-badge {
+    position: absolute;
+    top: 4px;
+    inset-inline-start: 4px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--color-text-primary);
+    color: var(--color-bg, #000);
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 17px;
+    text-align: center;
+  }
+
+  .storefront-store__quick-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 93;
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .storefront-store__quick-panel {
+    position: fixed;
+    inset-inline: 12px 52px;
+    top: calc(38% - 10px);
+    z-index: 94;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 16px;
+    background: var(--color-surface, var(--color-bg));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
   }
 }

@@ -242,21 +242,24 @@
   }
 }
 
+// Footer actions: the wishlist heart sits right beside the add-to-cart button.
+.store-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
 .store-card__favorite {
-  position: absolute;
-  z-index: 3;
-  top: var(--store-card-media-inset);
-  inset-inline-end: var(--store-card-media-inset);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--store-card-favorite-size);
-  height: var(--store-card-favorite-size);
-  max-width: 44px;
-  max-height: 44px;
+  width: var(--store-card-cta-size);
+  height: var(--store-card-cta-size);
   padding: 0;
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--sf-radius-pill);
+  border-radius: var(--sf-radius-md);
   background: var(--color-favorite-bg);
   color: var(--color-text-secondary);
   box-shadow: var(--color-shadow-sm);
@@ -608,7 +611,6 @@
   .store-card__platform,
   .store-card__rating,
   .store-card__tag,
-  .store-card__favorite,
   .store-card__discover,
   .store-card__original {
     display: none;
@@ -632,6 +634,16 @@
   .store-card__footer {
     padding: 6px;
     gap: 4px;
+  }
+
+  .store-card__actions {
+    gap: 4px;
+  }
+
+  .store-card__favorite {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
   }
 
   .store-card__cta {

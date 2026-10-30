@@ -58,28 +58,6 @@
         {{ stockLabelKey(product()) | translate }}
       </span>
 
-      @if (!product().outOfStock) {
-        <button
-          type="button"
-          class="store-card__favorite"
-          [class.store-card__favorite--active]="wishlistAdded()"
-          [attr.aria-label]="
-            (wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate
-          "
-          [attr.aria-pressed]="wishlistAdded()"
-          (click)="toggleWishlist($event)"
-        >
-          <svg width="16" height="15" viewBox="0 0 17 16" fill="none" aria-hidden="true">
-            <path
-              d="M8.5 14.5l-1.1-1C3.7 10.1 1.5 8.1 1.5 5.5 1.5 3.6 3 2 4.9 2c1.1 0 2.1.5 2.8 1.3L8.5 4.2l.8-0.9C10 2.5 11 2 12.1 2 14 2 15.5 3.6 15.5 5.5c0 2.6-2.2 4.6-5.9 8l-1.1 1z"
-              stroke="currentColor"
-              stroke-width="1.2"
-              fill="none"
-            />
-          </svg>
-        </button>
-      }
-
       @if (product().outOfStock) {
         <div class="store-card__stock-overlay">
           <span class="store-card__stock-label">{{ 'PRODUCT.OUT_OF_STOCK' | translate }}</span>
@@ -134,30 +112,54 @@
       <span class="store-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
     </div>
 
-    @switch (product().cta) {
-      @case ('cart') {
+    <div class="store-card__actions">
+      @if (!product().outOfStock) {
         <button
           type="button"
-          class="store-card__cta store-card__cta--icon"
-          [attr.aria-label]="(cartDisabledReasonKey() ?? 'PRODUCT.ADD_TO_CART') | translate"
-          [pTooltip]="(cartDisabledReasonKey() | translate)"
-          [tooltipDisabled]="!cartDisabledReasonKey()"
-          tooltipPosition="top"
-          [disabled]="!!cartDisabledReasonKey()"
-          (click)="addToCart($event)"
+          class="store-card__favorite"
+          [class.store-card__favorite--active]="wishlistAdded()"
+          [attr.aria-label]="
+            (wishlistAdded() ? 'PRODUCT.WISHLIST_ADDED' : 'PRODUCT.ADD_TO_WISHLIST') | translate
+          "
+          [attr.aria-pressed]="wishlistAdded()"
+          (click)="toggleWishlist($event)"
         >
-          <img [src]="cartIconSrc" alt="" aria-hidden="true" />
+          <svg width="16" height="15" viewBox="0 0 17 16" fill="none" aria-hidden="true">
+            <path
+              d="M8.5 14.5l-1.1-1C3.7 10.1 1.5 8.1 1.5 5.5 1.5 3.6 3 2 4.9 2c1.1 0 2.1.5 2.8 1.3L8.5 4.2l.8-0.9C10 2.5 11 2 12.1 2 14 2 15.5 3.6 15.5 5.5c0 2.6-2.2 4.6-5.9 8l-1.1 1z"
+              stroke="currentColor"
+              stroke-width="1.2"
+              fill="none"
+            />
+          </svg>
         </button>
       }
-      @case ('notify-me') {
-        <button
-          type="button"
-          class="store-card__cta store-card__cta--notify"
-          (click)="notifyMe($event)"
-        >
-          {{ 'PRODUCT.NOTIFY_ME' | translate }}
-        </button>
+
+      @switch (product().cta) {
+        @case ('cart') {
+          <button
+            type="button"
+            class="store-card__cta store-card__cta--icon"
+            [attr.aria-label]="(cartDisabledReasonKey() ?? 'PRODUCT.ADD_TO_CART') | translate"
+            [pTooltip]="(cartDisabledReasonKey() | translate)"
+            [tooltipDisabled]="!cartDisabledReasonKey()"
+            tooltipPosition="top"
+            [disabled]="!!cartDisabledReasonKey()"
+            (click)="addToCart($event)"
+          >
+            <img [src]="cartIconSrc" alt="" aria-hidden="true" />
+          </button>
+        }
+        @case ('notify-me') {
+          <button
+            type="button"
+            class="store-card__cta store-card__cta--notify"
+            (click)="notifyMe($event)"
+          >
+            {{ 'PRODUCT.NOTIFY_ME' | translate }}
+          </button>
+        }
       }
-    }
+    </div>
   </footer>
 </article>
