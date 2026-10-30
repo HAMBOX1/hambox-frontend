@@ -620,3 +620,12 @@ export const SECURITY_API = {
   blockDevice: (id: string) => `/api/v1/security/devices/${id}/block`,
   unblockDevice: (id: string) => `/api/v1/security/devices/${id}/unblock`,
 } as const;
+
+export const FLOATING_ADS_API = {
+  /** Storefront: the ads the current visitor should see. */
+  active: '/api/v1/floating-ads',
+  admin: '/api/v1/admin/floating-ads',
+  adminItem: (id: string) => `/api/v1/admin/floating-ads/${id}`,
+  activate: (id: string) => `/api/v1/admin/floating-ads/${id}/activate`,
+  deactivate: (id: string) => `/api/v1/admin/floating-ads/${id}/deactivate`,
+} as const;

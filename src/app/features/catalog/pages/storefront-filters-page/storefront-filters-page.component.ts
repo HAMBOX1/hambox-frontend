@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { firstValueFrom } from 'rxjs';
@@ -40,6 +41,7 @@ interface CategoryRow {
     FormsModule,
     ButtonModule,
     InputTextModule,
+    MultiSelectModule,
     SelectModule,
     ToastModule,
     HasPermissionPipe,
@@ -116,6 +118,29 @@ export class StorefrontFiltersPageComponent implements OnInit {
     this.patchItem(index, { isVisible: visible });
   }
 
+  /** Filters this one can depend on: any other filter in the same list. */
+  protected parentChoices(index: number): readonly { groupKey: string; name: string }[] {
+    return this.items()
+      .filter((_, i) => i !== index)
+      .map((i) => ({ groupKey: i.groupKey, name: i.displayNameEn?.trim() || i.defaultName }));
+  }
+
+  protected valueChoices(groupKey: string | null): readonly { value: string; label: string }[] {
+    if (!groupKey) {
+      return [];
+    }
+
+    return this.config()?.groupValues.find((g) => g.groupKey === groupKey)?.values ?? [];
+  }
+
+  protected setDependsOnGroup(index: number, groupKey: string | null): void {
+    this.patchItem(index, { dependsOnGroupKey: groupKey, dependsOnValues: [] });
+  }
+
+  protected setDependsOnValues(index: number, values: readonly string[] | null): void {
+    this.patchItem(index, { dependsOnValues: values ?? [] });
+  }
+
   protected move(index: number, delta: number): void {
     const target = index + delta;
     const list = [...this.items()];
@@ -149,6 +174,8 @@ export class StorefrontFiltersPageComponent implements OnInit {
         displayNameAr: null,
         isVisible: true,
         productCount: group.productCount,
+        dependsOnGroupKey: null,
+        dependsOnValues: [],
       },
     ]);
     this.addKey.set(null);
@@ -166,6 +193,8 @@ export class StorefrontFiltersPageComponent implements OnInit {
             displayNameEn: i.displayNameEn?.trim() || null,
             displayNameAr: i.displayNameAr?.trim() || null,
             isVisible: i.isVisible,
+            dependsOnGroupKey: i.dependsOnGroupKey && i.dependsOnValues.length > 0 ? i.dependsOnGroupKey : null,
+            dependsOnValues: i.dependsOnGroupKey ? i.dependsOnValues : [],
           })),
         ),
       );

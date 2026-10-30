@@ -18,6 +18,14 @@ export interface CategoryFilterItem {
   readonly displayNameAr: string | null;
   readonly isVisible: boolean;
   readonly productCount: number;
+  /** When set, customers only see this filter after picking one of `dependsOnValues` in that filter group. */
+  readonly dependsOnGroupKey: string | null;
+  readonly dependsOnValues: readonly string[];
+}
+
+export interface FilterGroupValues {
+  readonly groupKey: string;
+  readonly values: readonly { readonly value: string; readonly label: string }[];
 }
 
 export interface AvailableFilterGroup {
@@ -33,6 +41,8 @@ export interface CategoryFilterConfig {
   readonly inheritedFromDefault: boolean;
   readonly items: readonly CategoryFilterItem[];
   readonly availableGroups: readonly AvailableFilterGroup[];
+  /** Every value of every filter group, for the "show only when ..." picker. */
+  readonly groupValues: readonly FilterGroupValues[];
 }
 
 export interface CategoryFilterInput {
@@ -40,6 +50,8 @@ export interface CategoryFilterInput {
   readonly displayNameEn: string | null;
   readonly displayNameAr: string | null;
   readonly isVisible: boolean;
+  readonly dependsOnGroupKey?: string | null;
+  readonly dependsOnValues?: readonly string[];
 }
 
 export interface CategoryTreeItem extends Category {

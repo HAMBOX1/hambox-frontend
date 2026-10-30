@@ -11,6 +11,7 @@ export type AdminNavId =
   | 'roles'
   | 'security'
   | 'promotions'
+  | 'floating-ads'
   | 'memberships'
   | 'referrals'
   | 'reviews'
@@ -109,6 +110,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     labelKey: 'ADMIN.NAV.PROMOTIONS',
     route: '/admin/promotions',
     icon: 'pi pi-percentage',
+    permission: PERMISSIONS.Promotions.View,
+  },
+  {
+    id: 'floating-ads',
+    labelKey: 'ADMIN.NAV.FLOATING_ADS',
+    route: '/admin/floating-ads',
+    icon: 'pi pi-megaphone',
     permission: PERMISSIONS.Promotions.View,
   },
   {

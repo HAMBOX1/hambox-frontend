@@ -1,0 +1,139 @@
+<p-toast position="top-right" />
+
+<section class="admin-page floating-ads">
+  <app-admin-page-header
+    title="Floating ads"
+    subtitle="A small offer card that floats over the store while customers browse. Choose who sees it, for how long, and where its button leads."
+    [breadcrumbs]="breadcrumbs"
+  >
+    @if (permissions.Promotions.Create | hamboxHasPermission) {
+      <button pButton type="button" label="New floating ad" icon="pi pi-plus" (click)="openCreate()"></button>
+    }
+  </app-admin-page-header>
+
+  @if (loading() && ads().length === 0) {
+    <p class="floating-ads__note">Loading…</p>
+  } @else if (ads().length === 0) {
+    <p class="floating-ads__note">No floating ads yet. Create one to show an offer to your customers.</p>
+  } @else {
+    <ul class="floating-ads__list">
+      @for (ad of ads(); track ad.id) {
+        <li class="floating-ads__item" [class.is-off]="!ad.isActive">
+          <div class="floating-ads__main">
+            <strong>{{ ad.titleEn }}</strong>
+            @if (ad.messageEn) {
+              <span class="floating-ads__message">{{ ad.messageEn }}</span>
+            }
+            <span class="floating-ads__meta">
+              <i class="pi pi-users" aria-hidden="true"></i> {{ audienceLabel(ad.audience) }}
+              · <i class="pi pi-calendar" aria-hidden="true"></i> {{ schedule(ad) }}
+              @if (ad.linkUrl) {
+                · <i class="pi pi-link" aria-hidden="true"></i> {{ ad.linkUrl }}
+              }
+            </span>
+          </div>
+          <div class="floating-ads__actions">
+            <span class="floating-ads__state" [class.is-on]="ad.isActive">{{ ad.isActive ? 'Active' : 'Off' }}</span>
+            @if (permissions.Promotions.Publish | hamboxHasPermission) {
+              <button pButton type="button" size="small" severity="secondary" [text]="true" [label]="ad.isActive ? 'Turn off' : 'Turn on'" (click)="toggleActive(ad)"></button>
+            }
+            @if (permissions.Promotions.Edit | hamboxHasPermission) {
+              <button pButton type="button" size="small" severity="secondary" [text]="true" icon="pi pi-pencil" aria-label="Edit" (click)="openEdit(ad)"></button>
+            }
+            @if (permissions.Promotions.Delete | hamboxHasPermission) {
+              <button pButton type="button" size="small" severity="danger" [text]="true" icon="pi pi-trash" aria-label="Delete" (click)="remove(ad)"></button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>
+
+<p-dialog
+  [header]="form().id ? 'Edit floating ad' : 'New floating ad'"
+  [visible]="dialogOpen()"
+  (visibleChange)="dialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(36rem, 94vw)' }"
+  styleClass="admin-dialog"
+>
+  <div class="floating-ads__form">
+    <label class="floating-ads__field">
+      <span>Title (English) *</span>
+      <input pInputText type="text" maxlength="200" [ngModel]="form().titleEn" (ngModelChange)="patch('titleEn', $event)" />
+    </label>
+    <label class="floating-ads__field">
+      <span>العنوان (عربي)</span>
+      <input pInputText type="text" dir="rtl" maxlength="200" [ngModel]="form().titleAr" (ngModelChange)="patch('titleAr', $event)" />
+    </label>
+    <label class="floating-ads__field">
+      <span>Message (English)</span>
+      <textarea pTextarea rows="2" maxlength="1000" [ngModel]="form().messageEn" (ngModelChange)="patch('messageEn', $event)"></textarea>
+    </label>
+    <label class="floating-ads__field">
+      <span>الرسالة (عربي)</span>
+      <textarea pTextarea rows="2" dir="rtl" maxlength="1000" [ngModel]="form().messageAr" (ngModelChange)="patch('messageAr', $event)"></textarea>
+    </label>
+    <div class="floating-ads__row">
+      <label class="floating-ads__field">
+        <span>Button text (English)</span>
+        <input pInputText type="text" maxlength="100" [ngModel]="form().buttonLabelEn" (ngModelChange)="patch('buttonLabelEn', $event)" />
+      </label>
+      <label class="floating-ads__field">
+        <span>نص الزر (عربي)</span>
+        <input pInputText type="text" dir="rtl" maxlength="100" [ngModel]="form().buttonLabelAr" (ngModelChange)="patch('buttonLabelAr', $event)" />
+      </label>
+    </div>
+    <label class="floating-ads__field">
+      <span>Button link (e.g. /memberships or https://…)</span>
+      <input pInputText type="text" maxlength="500" [ngModel]="form().linkUrl" (ngModelChange)="patch('linkUrl', $event)" />
+    </label>
+    <label class="floating-ads__field">
+      <span>Who sees it</span>
+      <p-select
+        [options]="[...audienceOptions]"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [ngModel]="form().audience"
+        (ngModelChange)="patch('audience', $event)"
+      />
+    </label>
+    <div class="floating-ads__row">
+      <label class="floating-ads__field">
+        <span>Starts (optional)</span>
+        <input pInputText type="datetime-local" [ngModel]="form().startsOn" (ngModelChange)="patch('startsOn', $event)" />
+      </label>
+      <label class="floating-ads__field">
+        <span>Ends (optional)</span>
+        <input pInputText type="datetime-local" [ngModel]="form().endsOn" (ngModelChange)="patch('endsOn', $event)" />
+      </label>
+    </div>
+    <div class="floating-ads__row">
+      <label class="floating-ads__field">
+        <span>Order (lower shows first)</span>
+        <p-inputNumber [ngModel]="form().sortOrder" (ngModelChange)="patch('sortOrder', $event ?? 0)" [min]="0" [useGrouping]="false" />
+      </label>
+      <label class="floating-ads__field">
+        <span>Hide for (hours) after a visitor closes it</span>
+        <p-inputNumber [ngModel]="form().dismissHours" (ngModelChange)="patch('dismissHours', $event ?? 24)" [min]="1" [max]="720" [useGrouping]="false" />
+      </label>
+    </div>
+    <label class="floating-ads__check">
+      <p-checkbox [binary]="true" [ngModel]="form().isActive" (ngModelChange)="patch('isActive', $event)" />
+      Active (shown to the audience above)
+    </label>
+
+    @if (formError(); as error) {
+      <p class="floating-ads__error">{{ error }}</p>
+    }
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" label="Cancel" severity="secondary" (click)="dialogOpen.set(false)"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" [loading]="saving()" (click)="save()"></button>
+  </div>
+</p-dialog>

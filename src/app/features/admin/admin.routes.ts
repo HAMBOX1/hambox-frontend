@@ -154,6 +154,11 @@ export const routes: Routes = [
       import('./promotions/admin-promotions.routes').then((m) => m.routes),
   },
   {
+    path: 'floating-ads',
+    loadChildren: () =>
+      import('./floating-ads/admin-floating-ads.routes').then((m) => m.routes),
+  },
+  {
     path: 'memberships',
     loadChildren: () =>
       import('./memberships/admin-memberships.routes').then((m) => m.routes),

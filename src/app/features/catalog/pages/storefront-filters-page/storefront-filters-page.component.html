@@ -61,6 +61,35 @@
                   (ngModelChange)="rename(i, 'displayNameAr', $event)"
                 />
               </div>
+              <div class="store-filters__condition">
+                <span class="store-filters__condition-label">Show only when</span>
+                <p-select
+                  class="store-filters__condition-select"
+                  [options]="[...parentChoices(i)]"
+                  optionLabel="name"
+                  optionValue="groupKey"
+                  [showClear]="true"
+                  placeholder="Always shown"
+                  appendTo="body"
+                  [ngModel]="item.dependsOnGroupKey"
+                  (ngModelChange)="setDependsOnGroup(i, $event)"
+                />
+                @if (item.dependsOnGroupKey) {
+                  <span class="store-filters__condition-label">is</span>
+                  <p-multiSelect
+                    class="store-filters__condition-select"
+                    [options]="[...valueChoices(item.dependsOnGroupKey)]"
+                    optionLabel="label"
+                    optionValue="value"
+                    display="chip"
+                    [filter]="true"
+                    placeholder="Pick one or more values"
+                    appendTo="body"
+                    [ngModel]="item.dependsOnValues"
+                    (ngModelChange)="setDependsOnValues(i, $event)"
+                  />
+                }
+              </div>
               <div class="store-filters__item-actions">
                 <label class="store-filters__visible">
                   <input type="checkbox" [checked]="item.isVisible" (change)="toggleVisible(i, $any($event.target).checked)" />

@@ -171,3 +171,22 @@
   justify-content: flex-end;
   gap: 0.5rem;
 }
+
+// "Show only when <filter> is <values>" row on every filter.
+.store-filters__condition {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.store-filters__condition-label {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted, #9aa0a6);
+}
+
+.store-filters__condition-select {
+  min-width: 12rem;
+  max-width: 100%;
+}
