@@ -180,6 +180,8 @@ export class ProductApiService {
       priceValue?: number;
       targetCollectionId?: string;
       targetFulfillmentMode?: string;
+      badgeTextEn?: string | null;
+      badgeTextAr?: string | null;
     },
   ): Observable<BulkProductsResult> {
     return this.api.post<BulkProductsResult>(CATALOG_API.productsBulk, {
@@ -190,6 +192,8 @@ export class ProductApiService {
       priceValue: extra?.priceValue ?? null,
       targetCollectionId: extra?.targetCollectionId ?? null,
       targetFulfillmentMode: extra?.targetFulfillmentMode ?? null,
+      badgeTextEn: extra?.badgeTextEn ?? null,
+      badgeTextAr: extra?.badgeTextAr ?? null,
     });
   }
 

@@ -92,6 +92,9 @@ export interface Product {
    * variant" concept, so this is just a representative value. Null if the product has no variants.
    * Admin-only, like `priceTiers`. */
   readonly representativeSku?: string | null;
+  /** Short text (e.g. "+3 Elite points") shown on the storefront card and page; null = none. */
+  readonly badgeTextEn?: string | null;
+  readonly badgeTextAr?: string | null;
 }
 
 export interface ProductPriceTiers {
@@ -243,7 +246,8 @@ export type BulkProductAction =
   | 'assign-collection'
   | 'remove-collection'
   | 'set-fulfillment'
-  | 'set-margin';
+  | 'set-margin'
+  | 'set-badge';
 
 /** Fulfillment modes the bulk "delivery" action offers (backend `FulfillmentMode` names). */
 export type BulkFulfillmentMode = 'ChatDelivery' | 'ManualOnly' | 'SupplierOnly';

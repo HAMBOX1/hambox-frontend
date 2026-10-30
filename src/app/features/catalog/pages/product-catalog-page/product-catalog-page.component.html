@@ -211,6 +211,7 @@
       (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
       (setVariantChatDeliveryRequested)="openVariantChatDeliveryDialog($event)"
       (setFulfillmentRequested)="onSetFulfillment($event)"
+      (badgeRequested)="openBadgeDialog($event)"
       (collectionToggled)="onCollectionToggled($event)"
       (fieldEdit)="onFieldEdit($event)"
       (productPricesChanged)="reloadProducts()"
@@ -604,6 +605,41 @@
       [disabled]="bulkPriceValue() === null"
       [loading]="bulkActionLoading()"
       (click)="confirmBulkPriceAdjust()"
+    ></button>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.BADGE_TITLE' | translate"
+  [visible]="badgeDialogOpen()"
+  (visibleChange)="badgeDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">
+    {{ (badgeTarget() ? 'ADMIN.CATALOG_PAGE.BULK.BADGE_HINT_ONE' : 'ADMIN.CATALOG_PAGE.BULK.BADGE_HINT') | translate }}
+  </p>
+  <div class="admin-field">
+    <label class="admin-field__label" for="badge-en">{{ 'ADMIN.CATALOG_PAGE.BULK.BADGE_EN' | translate }}</label>
+    <input id="badge-en" pInputText type="text" maxlength="60" style="width: 100%" placeholder="+3 Elite points" [ngModel]="badgeTextEn()" (ngModelChange)="badgeTextEn.set($event)" />
+  </div>
+  <div class="admin-field">
+    <label class="admin-field__label" for="badge-ar">{{ 'ADMIN.CATALOG_PAGE.BULK.BADGE_AR' | translate }}</label>
+    <input id="badge-ar" pInputText type="text" dir="rtl" maxlength="60" style="width: 100%" placeholder="+3 نقاط" [ngModel]="badgeTextAr()" (ngModelChange)="badgeTextAr.set($event)" />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="badgeDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
+      icon="pi pi-check"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBadge()"
     ></button>
   </div>
 </p-dialog>

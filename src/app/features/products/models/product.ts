@@ -14,6 +14,8 @@ export interface StoreProduct {
   rating?: number;
   discountLabel?: string;
   featuredBadge?: boolean;
+  /** Per-product text chosen in the admin (e.g. "+3 Elite points"), in the viewer's language. */
+  badgeText?: string;
   instantDigital?: boolean;
   originalPriceUsd?: number;
   priceUsd: number;

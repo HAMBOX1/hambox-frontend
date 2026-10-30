@@ -28,6 +28,11 @@ const KEY = (path: string) => sectionFieldKeys('IMAGE_BANNER', path);
         <label>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.IMAGE_BANNER.LINK_URL.LABEL' | translate }}</label>
         <app-route-picker [value]="localConfig().linkUrl" [disabled]="disabled()" (valueChange)="setField('linkUrl', $event)" />
       </div>
+
+      <div class="section-settings-form__link">
+        <label>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.IMAGE_BANNER.BUTTON_URL.LABEL' | translate }}</label>
+        <app-route-picker [value]="localConfig().buttonUrl ?? null" [disabled]="disabled()" (valueChange)="setField('buttonUrl', $event)" />
+      </div>
     </div>
   `,
   styles: `
@@ -55,6 +60,9 @@ export class ImageBannerSettingsFormComponent {
     { key: 'imageUrl', control: 'media', recommendedSize: '1600x420px, JPG/WebP', ...KEY('IMAGE_URL') },
     { key: 'mobileImageUrl', control: 'media', recommendedSize: '800x600px, JPG/WebP', ...KEY('MOBILE_IMAGE_URL') },
     { key: 'altText', control: 'text', ...KEY('ALT_TEXT') },
+    { key: 'title', control: 'text', ...KEY('TITLE') },
+    { key: 'subtitle', control: 'text', ...KEY('SUBTITLE') },
+    { key: 'buttonText', control: 'text', ...KEY('BUTTON_TEXT') },
   ];
 
   protected fieldValue(key: string): unknown {
@@ -62,7 +70,8 @@ export class ImageBannerSettingsFormComponent {
   }
 
   protected setField(key: string, value: unknown): void {
-    const next = value === '' && (key === 'mobileImageUrl' || key === 'linkUrl') ? null : value;
+    const nullable = ['mobileImageUrl', 'linkUrl', 'title', 'subtitle', 'buttonText', 'buttonUrl'];
+    const next = value === '' && nullable.includes(key) ? null : value;
     const updated = { ...this.localConfig(), [key]: next };
     this.localConfig.set(updated);
     this.configChange.emit(updated);

@@ -72,6 +72,7 @@ export function mapProductToStoreProduct(
     listIndex: index,
     isMembersOnly: product.isMembersOnly,
     isComingSoon: product.canPurchase === false && !!product.publicReleaseOnUtc,
+    badgeText: resolveLocalizedText(product.badgeTextEn ?? '', product.badgeTextAr ?? '', lang) || undefined,
   };
 }
 
@@ -97,5 +98,6 @@ export function mapProductToDetailsItem(product: Product, lang: SupportedLanguag
     isMembersOnly: !!product.isMembersOnly,
     canPurchase: product.canPurchase !== false,
     requiredPlanNames: product.requiredPlanNames ?? [],
+    badgeText: resolveLocalizedText(product.badgeTextEn ?? '', product.badgeTextAr ?? '', lang) || undefined,
   };
 }

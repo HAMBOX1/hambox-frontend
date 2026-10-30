@@ -22,6 +22,10 @@
     <div class="store-list-card__meta">
       <span class="store-list-card__platform">{{ product().platformLabel }}</span>
 
+      @if (product().badgeText) {
+        <span class="store-list-card__reward">{{ product().badgeText }}</span>
+      }
+
       @if (product().instantDigital) {
         <span class="store-list-card__tag">{{ 'PRODUCT.INSTANT_DIGITAL' | translate }}</span>
       }

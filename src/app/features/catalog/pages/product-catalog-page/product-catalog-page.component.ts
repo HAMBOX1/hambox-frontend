@@ -226,6 +226,11 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkFulfillmentDialogOpen = signal(false);
   protected readonly bulkFulfillmentMode = signal<BulkFulfillmentMode>('ChatDelivery');
   protected readonly bulkMarginDialogOpen = signal(false);
+  /** The storefront-badge dialog: one product (row menu) or the whole bulk selection (`badgeTarget` null). */
+  protected readonly badgeDialogOpen = signal(false);
+  protected readonly badgeTarget = signal<Product | null>(null);
+  protected readonly badgeTextEn = signal('');
+  protected readonly badgeTextAr = signal('');
   protected readonly bulkMarginValue = signal<number | null>(null);
   protected readonly bulkAssignCollectionDialogOpen = signal(false);
   protected readonly bulkRemoveCollectionDialogOpen = signal(false);
@@ -280,6 +285,11 @@ export class ProductCatalogPageComponent implements OnInit {
         label: t('ADMIN.CATALOG_PAGE.BULK.ADJUST_PRICE'),
         icon: 'pi pi-dollar',
         command: () => this.bulkPriceDialogOpen.set(true),
+      });
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.SET_BADGE'),
+        icon: 'pi pi-tag',
+        command: () => this.openBadgeDialog(null),
       });
       items.push({
         label: t('ADMIN.CATALOG_PAGE.BULK.SET_MARGIN'),
@@ -1100,6 +1110,32 @@ export class ProductCatalogPageComponent implements OnInit {
         ? { severity: 'success', summary: 'Delivery type updated', detail: event.product.nameEn, life: 3000 }
         : { severity: 'error', summary: 'Could not update delivery type', detail: this.facade.error() ?? 'Please try again.', life: 5000 },
     );
+  }
+
+  protected openBadgeDialog(product: Product | null): void {
+    this.badgeTarget.set(product);
+    this.badgeTextEn.set(product?.badgeTextEn ?? '');
+    this.badgeTextAr.set(product?.badgeTextAr ?? '');
+    this.badgeDialogOpen.set(true);
+  }
+
+  protected async confirmBadge(): Promise<void> {
+    const product = this.badgeTarget();
+    const en = this.badgeTextEn().trim();
+    const ar = this.badgeTextAr().trim();
+
+    if (product) {
+      const ok = await this.facade.setProductBadge(product.id, en, ar);
+      this.messageService.add(
+        ok
+          ? { severity: 'success', summary: en || ar ? 'Badge saved' : 'Badge cleared', detail: product.nameEn, life: 3000 }
+          : { severity: 'error', summary: 'Could not save the badge', detail: this.facade.error() ?? 'Please try again.', life: 5000 },
+      );
+    } else {
+      await this.runBulkAction(() => this.facade.bulkSetBadge(en, ar), en || ar ? 'Badge saved' : 'Badge cleared');
+    }
+
+    this.badgeDialogOpen.set(false);
   }
 
   protected async confirmBulkFulfillment(): Promise<void> {

@@ -72,6 +72,9 @@
           <section class="pdp__details" aria-labelledby="pdp-title">
             <div class="pdp__title-row">
               <h1 id="pdp-title" class="pdp__title">{{ product()!.title }}</h1>
+              @if (product()!.badgeText) {
+                <span class="pdp__reward">{{ product()!.badgeText }}</span>
+              }
               @if (product()!.rating !== undefined) {
                 <div class="pdp__rating">
                   <span class="pdp__rating-value">{{ product()!.rating }}</span>

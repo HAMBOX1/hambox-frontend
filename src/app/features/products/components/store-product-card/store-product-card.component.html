@@ -93,6 +93,10 @@
         }
       </div>
 
+      @if (product().badgeText) {
+        <span class="store-card__reward">{{ product().badgeText }}</span>
+      }
+
       @if (product().instantDigital) {
         <span class="store-card__tag">
           <svg width="8" height="10" viewBox="0 0 8 10" fill="currentColor" aria-hidden="true">

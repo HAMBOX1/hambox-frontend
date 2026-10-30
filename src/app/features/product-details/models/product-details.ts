@@ -36,4 +36,6 @@ export interface ProductDetailsItem {
   canPurchase: boolean;
   /** When isMembersOnly is true, the plan(s) that grant access — drives the upgrade CTA copy. */
   requiredPlanNames: readonly string[];
+  /** Per-product text chosen in the admin (e.g. "+3 Elite points"). */
+  badgeText?: string;
 }

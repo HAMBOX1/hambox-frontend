@@ -1054,6 +1054,12 @@
         "PRICE_FIXED": "Set fixed value",
         "PRICE_PERCENT_LABEL": "Percent",
         "PRICE_NEW_LABEL": "New price",
+        "SET_BADGE": "Set badge",
+        "BADGE_TITLE": "Storefront badge",
+        "BADGE_HINT": "A short text customers see on the card and page of every selected product (e.g. +3 Elite points). Leave both empty to remove the badge.",
+        "BADGE_HINT_ONE": "A short text customers see on this product's card and page (e.g. +3 Elite points). Leave both empty to remove it.",
+        "BADGE_EN": "Text (English)",
+        "BADGE_AR": "النص (عربي)",
         "SET_MARGIN": "Set margin",
         "MARGIN_TITLE": "Set margin",
         "MARGIN_LABEL": "Margin (%)",
@@ -4904,6 +4910,21 @@
             "ALT_TEXT": {
               "LABEL": "Image description",
               "HELP": "Describes the picture for screen readers and search engines."
+            },
+            "TITLE": {
+              "LABEL": "Title over the picture (optional)",
+              "HELP": "Big text shown on the picture."
+            },
+            "SUBTITLE": {
+              "LABEL": "Text under the title (optional)",
+              "HELP": "A short line under the title."
+            },
+            "BUTTON_TEXT": {
+              "LABEL": "Button text (optional)",
+              "HELP": "Adds a button on the picture; it goes to the link below (or the picture link)."
+            },
+            "BUTTON_URL": {
+              "LABEL": "Where the button goes"
             },
             "LINK_URL": {
               "LABEL": "Where it links (optional)",

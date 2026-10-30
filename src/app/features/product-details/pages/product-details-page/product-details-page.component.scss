@@ -739,3 +739,14 @@
     opacity: 1;
   }
 }
+
+.pdp__reward {
+  align-self: center;
+  padding: 5px 12px;
+  border: 1px solid var(--color-primary-border, rgba(60, 220, 150, 0.4));
+  border-radius: var(--sf-radius-pill, 999px);
+  background: var(--color-primary-muted, rgba(60, 220, 150, 0.14));
+  color: var(--color-primary, #3cdc96);
+  font-size: 0.85rem;
+  font-weight: 700;
+}

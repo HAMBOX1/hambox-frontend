@@ -77,6 +77,12 @@ export interface ImageBannerSectionConfig {
   readonly altText: string;
   /** Where a tap on the picture goes (internal path or full URL); null = not clickable. */
   readonly linkUrl: string | null;
+  /** Optional text laid over the picture (all four are optional, so older banners are unchanged). */
+  readonly title?: string | null;
+  readonly subtitle?: string | null;
+  /** A real button over the picture; when set it is the click target instead of the whole picture. */
+  readonly buttonText?: string | null;
+  readonly buttonUrl?: string | null;
 }
 
 export interface PromoBannerSectionConfig {
