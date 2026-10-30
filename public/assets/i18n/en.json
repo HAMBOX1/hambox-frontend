@@ -235,6 +235,7 @@
     "DELIVERY_ESTIMATE": "Estimated delivery: Instant after payment",
     "VARIANTS_CONFIGURING": "Variants for this product are being configured. Check back soon.",
     "OPTION_IMPORTANT_INFORMATION": "Important information",
+    "IMPORTANT_INFO_HINT": "{{count}} note(s) for the options you chose — please read before buying",
     "HOW_TO_REDEEM": "How to Redeem",
     "REDEEM_SUBTITLE": "Follow these simple steps to access your digital purchase after checkout.",
     "CATEGORY_INSTRUCTIONS": "Good to know",

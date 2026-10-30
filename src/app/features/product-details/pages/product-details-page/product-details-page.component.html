@@ -178,12 +178,24 @@
             [options]="variantFacade.optionsForGroup(group)"
             [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
             [groupDescriptionHtml]="group.descriptionHtml ?? null"
+            [inlineInstructions]="false"
             (optionSelected)="onOptionChange(group.id, $event)"
-            (instructionsRequested)="openInstructions($event)"
           />
         }
       } @else if (variantFacade.hasOptionGroups()) {
         <p class="pdp__config-hint">{{ 'PRODUCT.VARIANTS_CONFIGURING' | translate }}</p>
+      }
+
+      <!-- One clear button for everything the customer picked: the notes of every chosen option, together. -->
+      @if (importantInfoSections().length > 0) {
+        <button type="button" class="pdp__important-info" (click)="instructionsOpen.set(true)">
+          <i class="pi pi-info-circle pdp__important-info-icon" aria-hidden="true"></i>
+          <span class="pdp__important-info-text">
+            <strong>{{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}</strong>
+            <small>{{ 'PRODUCT.IMPORTANT_INFO_HINT' | translate: { count: importantInfoSections().length } }}</small>
+          </span>
+          <i class="pi pi-angle-right" aria-hidden="true"></i>
+        </button>
       }
     </div>
 
@@ -311,7 +323,7 @@
   <app-storefront-footer />
 
   <p-dialog
-    [visible]="instructionsDialog() !== null"
+    [visible]="instructionsOpen()"
     (visibleChange)="!$event && closeInstructions()"
     [modal]="true"
     [dismissableMask]="true"
@@ -324,12 +336,19 @@
   >
     <ng-template pTemplate="header">
       <div class="pdp__instructions-dialog-header">
-        <span class="pdp__instructions-dialog-group">{{ instructionsDialog()?.groupLabel }}</span>
-        @if (instructionsDialog()?.optionLabel) {
-          <span class="pdp__instructions-dialog-option">{{ instructionsDialog()?.optionLabel }}</span>
-        }
+        <span class="pdp__instructions-dialog-group">{{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}</span>
       </div>
     </ng-template>
-    <div class="pdp__instructions-dialog-body" [innerHTML]="instructionsDialog()?.descriptionHtml"></div>
+    @for (section of importantInfoSections(); track $index) {
+      <section class="pdp__instructions-section">
+        <h4 class="pdp__instructions-section-title">
+          {{ section.groupLabel }}
+          @if (section.optionLabel) {
+            <span class="pdp__instructions-dialog-option">{{ section.optionLabel }}</span>
+          }
+        </h4>
+        <div class="pdp__instructions-dialog-body" [innerHTML]="section.descriptionHtml"></div>
+      </section>
+    }
   </p-dialog>
 </div>

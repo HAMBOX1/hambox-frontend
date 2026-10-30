@@ -461,14 +461,32 @@ export class ProductDetailsPageComponent {
   }
 
   /** Purely informational popup — never touches option selection, variant resolution, or pricing. */
-  protected readonly instructionsDialog = signal<VariantOptionInstructionsRequest | null>(null);
+  protected readonly instructionsOpen = signal(false);
 
-  protected openInstructions(request: VariantOptionInstructionsRequest): void {
-    this.instructionsDialog.set(request);
-  }
+  /**
+   * The notes of everything the customer has picked, in one list: a group's own note, then the note of its selected
+   * value (e.g. Region → United States, Account type → Home Account). Empty when nothing carries a note.
+   */
+  protected readonly importantInfoSections = computed<readonly VariantOptionInstructionsRequest[]>(() => {
+    const selected = this.variantFacade.selectedByGroup();
+    const sections: VariantOptionInstructionsRequest[] = [];
+
+    for (const group of this.variantFacade.visibleGroups()) {
+      if (group.descriptionHtml) {
+        sections.push({ groupLabel: group.displayName, optionLabel: null, descriptionHtml: group.descriptionHtml });
+      }
+
+      const chosen = this.variantFacade.optionsForGroup(group).find((option) => option.id === selected[group.id]);
+      if (chosen?.descriptionHtml) {
+        sections.push({ groupLabel: group.displayName, optionLabel: chosen.label, descriptionHtml: chosen.descriptionHtml });
+      }
+    }
+
+    return sections;
+  });
 
   protected closeInstructions(): void {
-    this.instructionsDialog.set(null);
+    this.instructionsOpen.set(false);
   }
 
   private toCartErrorMessage(error: unknown): string {

@@ -750,3 +750,66 @@
   font-size: 0.85rem;
   font-weight: 700;
 }
+
+// One prominent button for the notes of everything the customer picked, so it is hard to miss.
+.pdp__important-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-warning, #f5b840) 55%, transparent);
+  border-radius: var(--sf-radius-md, 12px);
+  background: color-mix(in srgb, var(--color-warning, #f5b840) 14%, transparent);
+  color: var(--color-text-primary);
+  font-family: var(--sf-font-body);
+  text-align: start;
+  cursor: pointer;
+  animation: pdp-important-pulse 2.4s ease-in-out 2;
+}
+
+.pdp__important-info-icon {
+  font-size: 1.3rem;
+  color: var(--color-warning, #f5b840);
+}
+
+.pdp__important-info-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+
+  strong {
+    font-size: 0.95rem;
+  }
+
+  small {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+.pdp__instructions-section + .pdp__instructions-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.12));
+}
+
+.pdp__instructions-section-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+
+@keyframes pdp-important-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-warning, #f5b840) 25%, transparent);
+  }
+}

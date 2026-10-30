@@ -1,7 +1,7 @@
 <div class="variant-option-group">
   <div class="variant-option-group__heading">
     <span class="variant-option-group__label">{{ groupLabel() }}</span>
-    @if (groupDescriptionHtml()) {
+    @if (inlineInstructions() && groupDescriptionHtml()) {
       <button type="button" class="variant-option-group__instructions" (click)="openGroupInstructions()">
         {{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}
       </button>
@@ -24,7 +24,7 @@
     }
   </div>
 
-  @if (selectedOption()?.descriptionHtml) {
+  @if (inlineInstructions() && selectedOption()?.descriptionHtml) {
     <button type="button" class="variant-option-group__instructions" (click)="openInstructions()">
       {{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}
     </button>

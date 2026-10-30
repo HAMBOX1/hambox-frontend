@@ -28,6 +28,9 @@ export class VariantOptionGroupComponent {
   readonly selectedId = input<string>('');
   readonly groupDescriptionHtml = input<string | null>(null);
 
+  /** When false the small per-group "Important information" links are hidden (the page shows one combined button). */
+  readonly inlineInstructions = input(true);
+
   readonly optionSelected = output<string>();
   /** Purely informational — never touches selection/variant-resolution state. */
   readonly instructionsRequested = output<VariantOptionInstructionsRequest>();
