@@ -116,7 +116,7 @@ export class StorefrontVariantFacade {
 
 
 
-  async load(productId: string, preview = false): Promise<void> {
+  async load(productId: string, preview = false, preselectVariantId: string | null = null): Promise<void> {
 
     this.loadingState.set(true);
 
@@ -132,7 +132,9 @@ export class StorefrontVariantFacade {
 
       this.selectedByGroupState.set(
 
-        configuration.variants.length > 0 ? defaultSelections(configuration) : {},
+        configuration.variants.length > 0
+          ? this.selectionsFor(configuration, preselectVariantId) ?? defaultSelections(configuration)
+          : {},
 
       );
 
@@ -167,6 +169,27 @@ export class StorefrontVariantFacade {
   }
 
 
+
+  /** The option choice (one per group) that matches a given variant, or null when the variant is unknown. */
+  private selectionsFor(
+    configuration: StorefrontProductConfigurationDto,
+    variantId: string | null,
+  ): Record<string, string> | null {
+    const variant = variantId ? configuration.variants.find((entry) => entry.id === variantId) : undefined;
+    if (!variant) {
+      return null;
+    }
+
+    const selections: Record<string, string> = {};
+    for (const group of configuration.optionGroups) {
+      const match = group.options.find((option) => variant.optionIds.includes(option.id));
+      if (match) {
+        selections[group.id] = match.id;
+      }
+    }
+
+    return selections;
+  }
 
   setGroupSelection(groupId: string, optionId: string): void {
 

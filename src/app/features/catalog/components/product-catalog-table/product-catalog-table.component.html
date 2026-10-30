@@ -747,6 +747,23 @@
                 }
                 <td (click)="$event.stopPropagation()">
                   <div class="admin-actions-row">
+                    <button
+                      type="button"
+                      class="product-catalog-table__variant-price-edit"
+                      pTooltip="Customer instructions for this variant"
+                      tooltipPosition="top"
+                      aria-label="Customer instructions for this variant"
+                      (click)="openVariantInstructions(product.id, variant, $event)"
+                    ><i class="pi pi-info-circle" aria-hidden="true"></i></button>
+                    <a
+                      class="product-catalog-table__variant-price-edit"
+                      [href]="variantPreviewLink(product.id, variant)"
+                      target="_blank"
+                      rel="noopener"
+                      pTooltip="Open this variant as a full product page"
+                      tooltipPosition="top"
+                      aria-label="Open this variant as a full product page"
+                      ><i class="pi pi-external-link" aria-hidden="true"></i></a>
                     <a
                       class="product-catalog-table__variant-price-edit"
                       [routerLink]="'/admin/products/' + product.id + '/edit'"
@@ -946,4 +963,13 @@
       (cancelled)="closeCollectionCreateDialog()"
     />
   </p-dialog>
+}
+
+@if (instructionsTarget(); as target) {
+  <app-variant-instructions-dialog
+    [visible]="true"
+    [productId]="target.productId"
+    [variant]="target.variant"
+    (visibleChange)="!$event && instructionsTarget.set(null)"
+  />
 }

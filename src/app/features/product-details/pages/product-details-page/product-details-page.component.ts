@@ -550,7 +550,7 @@ export class ProductDetailsPageComponent {
         marketingRequested
           ? firstValueFrom(this.pageBuilderPublicApi.getPublishedForProduct(productId))
           : Promise.resolve(null),
-        this.variantFacade.load(productId, preview),
+        this.variantFacade.load(productId, preview, this.route.snapshot.queryParamMap.get('variant')),
         this.cartFacade.load(),
       ]);
       this.product.set(details);

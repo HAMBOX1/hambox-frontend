@@ -1093,6 +1093,24 @@ export class ProductEditorFacade {
 
 
 
+  /** Hide / show an option value (deactivates / reactivates its variants) — the safe alternative to deleting. */
+  async setOptionVisibility(optionId: string, visible: boolean): Promise<boolean> {
+    const productId = this.productId();
+    if (!productId) {
+      return false;
+    }
+
+    this.optionActionErrorState.set(null);
+    try {
+      await firstValueFrom(this.inventoryApi.setOptionVisibility(optionId, visible));
+      await this.syncVariants(productId);
+      return true;
+    } catch (error) {
+      this.optionActionErrorState.set(this.toErrorMessage(error, 'Could not change this option.'));
+      return false;
+    }
+  }
+
   async deleteOption(optionId: string, force = false): Promise<boolean> {
 
     const productId = this.productId();

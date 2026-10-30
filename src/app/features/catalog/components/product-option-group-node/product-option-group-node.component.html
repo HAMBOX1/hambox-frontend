@@ -67,7 +67,7 @@
   <app-admin-confirm-dialog
     [visible]="deleteOptionDialogOpen()"
     title="Delete option value"
-    [message]="deleteOptionError() ?? ('Delete \'' + (deleteOptionTarget()?.label ?? '') + '\'? Any variants using this value will also be removed, along with their inventory codes. This cannot be undone.')"
+    [message]="deleteOptionError() ?? ('Delete \'' + (deleteOptionTarget()?.label ?? '') + '\'? Any variants using this value will also be removed, along with their inventory codes. This cannot be undone. If it has already been sold, use the eye icon to hide it instead.')"
     [destructive]="true"
     [loading]="saving()"
     (visibleChange)="deleteOptionDialogOpen.set($event)"
@@ -306,6 +306,12 @@
                 </button>
                 <button type="button" class="answer-row__icon-btn" (click)="startEditOption(option)" aria-label="Edit option">
                   <i class="pi pi-pencil"></i>
+                </button>
+                <button type="button" class="answer-row__icon-btn" (click)="setOptionVisible(option, false)" aria-label="Hide option" title="Hide this option (its variants are switched off, nothing is deleted)">
+                  <i class="pi pi-eye-slash"></i>
+                </button>
+                <button type="button" class="answer-row__icon-btn" (click)="setOptionVisible(option, true)" aria-label="Show option" title="Show this option again">
+                  <i class="pi pi-eye"></i>
                 </button>
                 <button type="button" class="answer-row__icon-btn" (click)="requestDeleteOption(option)" aria-label="Delete option">
                   <i class="pi pi-trash"></i>

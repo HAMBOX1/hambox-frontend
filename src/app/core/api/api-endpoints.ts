@@ -134,6 +134,7 @@ export const INVENTORY_API = {
   optionGroupOptionsReorder: (groupId: string) =>
     `/api/v1/inventory/option-groups/${groupId}/options/reorder`,
   option: (optionId: string) => `/api/v1/inventory/options/${optionId}`,
+  optionVisibility: (optionId: string) => `/api/v1/inventory/options/${optionId}/visibility`,
   optionGroupTemplates: '/api/v1/inventory/option-group-templates',
   optionGroupTemplate: (templateId: string) => `/api/v1/inventory/option-group-templates/${templateId}`,
   saveOptionGroupAsTemplate: (groupId: string) =>

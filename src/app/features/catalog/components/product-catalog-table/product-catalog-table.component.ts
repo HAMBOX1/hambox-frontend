@@ -40,6 +40,7 @@ import {
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { CategoryCreateFormComponent } from '../category-create-form/category-create-form.component';
+import { VariantInstructionsDialogComponent } from '../variant-instructions-dialog/variant-instructions-dialog.component';
 import { CollectionCreateFormComponent } from '../collection-create-form/collection-create-form.component';
 import { ProductSupplierMappingStatusDto } from '../../../admin/suppliers/models/supplier.model';
 import { CategoryOption, CreateCategoryRequest } from '../../models/category.model';
@@ -115,6 +116,7 @@ export interface ProductStatusEdit {
     AdminSearchBarComponent,
     CategoryCreateFormComponent,
     CollectionCreateFormComponent,
+    VariantInstructionsDialogComponent,
   ],
   templateUrl: './product-catalog-table.component.html',
   styleUrl: './product-catalog-table.component.scss',
@@ -304,6 +306,19 @@ export class ProductCatalogTableComponent {
    * `bulkSelectedIds` (which is scoped to product ids), so a variant-level bulk activate/deactivate
    * here never interacts with the product-level bulk bar. */
   protected readonly selectedVariantIds = signal<ReadonlySet<string>>(new Set());
+
+  /** The variant whose customer instructions are open in a dialog (the row's "Instructions" button). */
+  protected readonly instructionsTarget = signal<{ productId: string; variant: ProductVariantDto } | null>(null);
+
+  protected openVariantInstructions(productId: string, variant: ProductVariantDto, event: Event): void {
+    event.stopPropagation();
+    this.instructionsTarget.set({ productId, variant });
+  }
+
+  /** The store page of the product with this variant already chosen (opens in a new tab). */
+  protected variantPreviewLink(productId: string, variant: ProductVariantDto): string {
+    return `/products/${productId}?preview=1&variant=${variant.id}`;
+  }
 
   protected readonly editingCell = signal<{ productId: string; field: EditableField } | null>(null);
   protected readonly editDraftText = signal('');

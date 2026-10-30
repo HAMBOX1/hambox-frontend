@@ -198,6 +198,11 @@ export class InventoryApiService {
     return this.api.put<void>(INVENTORY_API.option(optionId), request);
   }
 
+  /** Hides / shows an option value by deactivating / reactivating the variants that use it (nothing is deleted). */
+  setOptionVisibility(optionId: string, visible: boolean): Observable<void> {
+    return this.api.post<void>(INVENTORY_API.optionVisibility(optionId), { visible });
+  }
+
   deleteOption(optionId: string, force = false): Observable<void> {
     return this.api.delete<void>(INVENTORY_API.option(optionId), { params: { force } });
   }

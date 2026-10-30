@@ -377,6 +377,19 @@ export class ProductOptionGroupNodeComponent {
     }
   }
 
+  /** Hide / show an option without deleting it: its variants are deactivated / reactivated. */
+  protected async setOptionVisible(option: ProductOptionDto, visible: boolean): Promise<void> {
+    this.saving.set(true);
+    try {
+      const ok = await this.facade.setOptionVisibility(option.id, visible);
+      if (!ok) {
+        window.alert(this.facade.optionActionError() ?? 'Could not change this option.');
+      }
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   protected requestDeleteOption(option: ProductOptionDto): void {
     this.deleteOptionError.set(null);
     this.deleteOptionTarget.set(option);
