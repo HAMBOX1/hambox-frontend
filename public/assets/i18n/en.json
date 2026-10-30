@@ -282,7 +282,8 @@
       "AVAILABILITY": "Availability",
       "IN_STOCK_ONLY": "In stock only",
       "RESET": "Reset",
-      "APPLY": "Apply"
+      "APPLY": "Apply",
+      "SHOW_RESULTS": "Show {{count}} results"
     }
   },
   "CART": {

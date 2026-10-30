@@ -22,6 +22,7 @@ import { EmptyStateComponent } from '../../../../shared/components/empty-state/e
 import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton.component';
 import { StoreFiltersSidebarComponent } from '../../components/store-filters-sidebar/store-filters-sidebar.component';
 import { StoreToolbarComponent } from '../../components/store-toolbar/store-toolbar.component';
+import { StoreViewModeSwitcherComponent } from '../../components/store-view-mode-switcher/store-view-mode-switcher.component';
 import { StoreCategoryNavComponent } from '../../components/store-category-nav/store-category-nav.component';
 import { StoreFlashHeroComponent } from '../../components/store-flash-hero/store-flash-hero.component';
 import { StoreProductCardComponent } from '../../components/store-product-card/store-product-card.component';
@@ -45,6 +46,7 @@ import { resolveNavSection } from '../../../../shared/utils/storefront-nav.utils
     LoadingSkeletonComponent,
     StoreFiltersSidebarComponent,
     StoreToolbarComponent,
+    StoreViewModeSwitcherComponent,
     StoreCategoryNavComponent,
     StoreFlashHeroComponent,
     StoreProductCardComponent,

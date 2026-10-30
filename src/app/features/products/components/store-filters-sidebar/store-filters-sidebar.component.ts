@@ -31,6 +31,8 @@ export class StoreFiltersSidebarComponent {
   readonly collapsed = input(false);
   readonly mobileOpen = input(false);
   readonly activeFilterCount = input(0);
+  /** Live number of matching products; shown on the apply button of the phone drawer. */
+  readonly resultCount = input<number | null>(null);
 
   readonly filtersChange = output<StorefrontClientFilters>();
   readonly resetFilters = output<void>();

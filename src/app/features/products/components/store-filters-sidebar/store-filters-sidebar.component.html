@@ -182,7 +182,11 @@
           {{ 'PRODUCTS.FILTERS.RESET' | translate }}
         </button>
         <button type="button" class="store-filters__footer-btn store-filters__footer-btn--primary" (click)="onApplyMobile()">
-          {{ 'PRODUCTS.FILTERS.APPLY' | translate }}
+          @if (resultCount() !== null) {
+            {{ 'PRODUCTS.FILTERS.SHOW_RESULTS' | translate: { count: resultCount() } }}
+          } @else {
+            {{ 'PRODUCTS.FILTERS.APPLY' | translate }}
+          }
         </button>
       </footer>
     }

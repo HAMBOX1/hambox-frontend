@@ -306,6 +306,7 @@
     max-width: none;
   }
 
+  // A fixed side panel: solid (the glass panel colour is see-through), docked to the left edge.
   .store-filters {
     display: none;
     position: fixed;
@@ -314,8 +315,10 @@
     z-index: 120;
     width: min(20rem, 88vw);
     height: 100vh;
+    height: 100dvh;
     max-height: none;
     border-radius: 0;
+    background: var(--color-dropdown-bg, var(--color-surface));
   }
 
   .store-filters--mobile-open {
@@ -329,7 +332,8 @@
     z-index: 110;
     padding: 0;
     border: 0;
-    background: var(--color-overlay, rgba(0, 0, 0, 0.45));
+    // Light on purpose: the product list stays visible on the right and updates as filters change.
+    background: rgba(0, 0, 0, 0.18);
     cursor: pointer;
   }
 
@@ -347,23 +351,21 @@
     display: none;
   }
 
+  // Phones: the same docked left panel as on tablets (not a floating bottom sheet), a little narrower so the
+  // list on the right stays in view while filters are changed.
   .store-filters {
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: auto;
-    max-height: min(92vh, 720px);
-    border: 1px solid var(--color-panel-border);
-    border-bottom: 0;
-    border-radius: var(--sf-radius-lg) var(--sf-radius-lg) 0 0;
-    transform: translateY(0);
-    animation: store-filters-sheet-up 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    width: min(17rem, 74vw);
+    border: 0;
+    border-inline-end: 1px solid var(--color-panel-border);
+    box-shadow: 8px 0 24px rgba(0, 0, 0, 0.4);
+    animation: store-filters-slide-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .store-filters__body {
-    max-height: calc(92vh - 8rem);
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
   }
 
   .store-filters__mobile-footer {
@@ -383,12 +385,12 @@
   }
 }
 
-@keyframes store-filters-sheet-up {
+@keyframes store-filters-slide-in {
   from {
-    transform: translateY(100%);
+    transform: translateX(-100%);
   }
 
   to {
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }

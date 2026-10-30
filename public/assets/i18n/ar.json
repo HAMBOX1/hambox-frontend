@@ -282,7 +282,8 @@
       "AVAILABILITY": "التوفر",
       "IN_STOCK_ONLY": "المتوفر فقط",
       "RESET": "إعادة تعيين",
-      "APPLY": "تطبيق"
+      "APPLY": "تطبيق",
+      "SHOW_RESULTS": "عرض {{count}} نتيجة"
     }
   },
   "CART": {

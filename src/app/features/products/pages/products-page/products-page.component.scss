@@ -189,8 +189,8 @@
   }
 }
 
-// The sort / filter / view-mode bar scrolls away with the page. On phones and tablets a small tab on the side then
-// stands in for it, and opens the same bar as a floating panel (tap again or outside to close).
+// The sort / filter / view-mode bar scrolls away with the page. On phones and tablets a small tab on the left edge
+// then stands in for it and slides out the full menu as a side panel (tap the tab, the X or outside to close).
 .storefront-store__quick {
   display: none;
 }
@@ -202,31 +202,30 @@
 
   .storefront-store__quick-tab {
     position: fixed;
-    inset-inline-end: 0;
-    top: 38%;
-    z-index: 95;
+    inset-inline-start: 0;
+    top: 40%;
+    z-index: 97;
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 48px;
+    width: 38px;
+    height: 52px;
     padding: 0;
-    border: 1px solid var(--color-border-subtle);
-    border-inline-end: 0;
-    border-radius: 14px 0 0 14px;
+    border: 0;
+    border-radius: 0 14px 14px 0;
     background: var(--color-primary);
     color: var(--color-on-primary, #07130d);
     font-size: 1.05rem;
-    box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.35);
+    box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.35);
     cursor: pointer;
 
     &:dir(rtl) {
-      border-radius: 0 14px 14px 0;
-      border-inline-end: 1px solid var(--color-border-subtle);
-      border-inline-start: 0;
+      border-radius: 14px 0 0 14px;
+      box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.35);
     }
   }
 
   .storefront-store__quick-tab--open {
+    inset-inline-start: min(86vw, 320px);
     background: var(--color-surface);
     color: var(--color-text-primary);
   }
@@ -234,7 +233,7 @@
   .storefront-store__quick-badge {
     position: absolute;
     top: 4px;
-    inset-inline-start: 4px;
+    inset-inline-end: 3px;
     min-width: 17px;
     height: 17px;
     padding: 0 4px;
@@ -250,19 +249,98 @@
   .storefront-store__quick-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 93;
-    background: rgba(0, 0, 0, 0.35);
+    z-index: 95;
+    background: rgba(0, 0, 0, 0.45);
   }
 
   .storefront-store__quick-panel {
     position: fixed;
-    inset-inline: 12px 52px;
-    top: calc(38% - 10px);
-    z-index: 94;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 96;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: min(86vw, 320px);
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    border-inline-end: 1px solid var(--color-border-subtle);
+    background: var(--color-surface, var(--color-bg));
+    box-shadow: 12px 0 32px rgba(0, 0, 0, 0.5);
+    animation: storefront-quick-in 180ms ease-out;
+  }
+
+  .storefront-store__quick-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .storefront-store__quick-count {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .storefront-store__quick-close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .storefront-store__quick-title {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .storefront-store__quick-sort {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .storefront-store__quick-sort-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--color-border-subtle);
-    border-radius: 16px;
-    background: var(--color-surface, var(--color-bg));
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    text-align: start;
+    cursor: pointer;
+
+    &--active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+}
+
+@keyframes storefront-quick-in {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

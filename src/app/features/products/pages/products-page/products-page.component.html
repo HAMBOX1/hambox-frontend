@@ -33,21 +33,41 @@
       />
     </section>
 
-    <!-- Phones and tablets: once the bar scrolls away it stays out of the way as a small tab on the side. -->
+    <!-- Phones and tablets: once the bar scrolls away it stays out of the way as a small tab on the left edge,
+         which opens the full menu (sort, view, filters) as a side panel. -->
     @if (!toolbarVisible() || quickPanelOpen()) {
       <div class="storefront-store__quick">
         @if (quickPanelOpen()) {
           <div class="storefront-store__quick-backdrop" (click)="closeQuickPanel()"></div>
-          <div class="storefront-store__quick-panel" role="dialog" [attr.aria-label]="'PRODUCTS.FILTERS.OPEN' | translate">
-            <app-store-toolbar
-              [sortOptions]="sortOptions()"
-              [selectedSort]="selectedSort()"
-              [activeFilterCount]="activeFilterCount()"
-              [resultCount]="totalCount()"
-              (sortChange)="onSortChange($event)"
-              (openFilters)="onOpenMobileFilters()"
-            />
-          </div>
+          <aside class="storefront-store__quick-panel" role="dialog" [attr.aria-label]="'PRODUCTS.FILTERS.OPEN' | translate">
+            <header class="storefront-store__quick-header">
+              <span class="storefront-store__quick-count">{{ 'PRODUCT.RESULT_COUNT' | translate: { count: totalCount() } }}</span>
+              <button type="button" class="storefront-store__quick-close" [attr.aria-label]="'PRODUCTS.FILTERS.OPEN' | translate" (click)="closeQuickPanel()">
+                <i class="pi pi-times" aria-hidden="true"></i>
+              </button>
+            </header>
+
+            <app-store-view-mode-switcher [filterCount]="activeFilterCount()" (openFilters)="onOpenMobileFilters()" />
+
+            <h3 class="storefront-store__quick-title">{{ 'MOBILE_NAV.SORT' | translate }}</h3>
+            <ul class="storefront-store__quick-sort">
+              @for (option of sortOptions(); track option.value) {
+                <li>
+                  <button
+                    type="button"
+                    class="storefront-store__quick-sort-option"
+                    [class.storefront-store__quick-sort-option--active]="selectedSort() === option.value"
+                    (click)="onSortChange(option.value)"
+                  >
+                    {{ option.label }}
+                    @if (selectedSort() === option.value) {
+                      <i class="pi pi-check" aria-hidden="true"></i>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          </aside>
         }
         <button
           type="button"
@@ -57,7 +77,7 @@
           [attr.aria-expanded]="quickPanelOpen()"
           (click)="toggleQuickPanel()"
         >
-          <i class="pi" [class.pi-sliders-h]="!quickPanelOpen()" [class.pi-times]="quickPanelOpen()" aria-hidden="true"></i>
+          <i class="pi" [class.pi-sliders-h]="!quickPanelOpen()" [class.pi-chevron-left]="quickPanelOpen()" aria-hidden="true"></i>
           @if (activeFilterCount() > 0 && !quickPanelOpen()) {
             <span class="storefront-store__quick-badge">{{ activeFilterCount() }}</span>
           }
@@ -75,6 +95,7 @@
         [collapsed]="filtersCollapsed()"
         [mobileOpen]="filtersMobileOpen()"
         [activeFilterCount]="activeFilterCount()"
+        [resultCount]="totalCount()"
         (filtersChange)="onFiltersChange($event)"
         (resetFilters)="onFiltersReset()"
         (toggleCollapse)="onToggleFiltersCollapse()"
