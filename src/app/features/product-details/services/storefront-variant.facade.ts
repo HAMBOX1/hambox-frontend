@@ -255,7 +255,7 @@ export class StorefrontVariantFacade {
 
 
 
-  optionsForGroup(group: ProductOptionGroupDto): readonly { id: string; label: string; disabled: boolean; descriptionHtml?: string | null }[] {
+  optionsForGroup(group: ProductOptionGroupDto): readonly { id: string; label: string; disabled: boolean; descriptionHtml?: string | null; showDescriptionInline?: boolean }[] {
 
     const configuration = this.configurationState();
 

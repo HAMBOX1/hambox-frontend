@@ -5,6 +5,8 @@ export interface ProductOptionDto {
   readonly label: string;
   readonly sortOrder: number;
   readonly descriptionHtml?: string | null;
+  /** Show this value's instructions directly on the product page (not behind the button). */
+  readonly showDescriptionInline?: boolean;
 }
 
 export interface ProductOptionGroupDto {
@@ -17,6 +19,7 @@ export interface ProductOptionGroupDto {
   readonly isRequired: boolean;
   readonly options: readonly ProductOptionDto[];
   readonly descriptionHtml?: string | null;
+  readonly showDescriptionInline?: boolean;
 }
 
 /** Matches backend `HAMBOX.Modules.Catalog.Domain.Enums.FulfillmentMode`. */
@@ -330,12 +333,14 @@ export interface UpdateOptionGroupRequest {
   readonly sortOrder: number;
   readonly isRequired: boolean;
   readonly descriptionHtml?: string | null;
+  readonly showDescriptionInline?: boolean;
 }
 
 export interface UpdateOptionRequest {
   readonly label: string;
   readonly sortOrder: number;
   readonly descriptionHtml?: string | null;
+  readonly showDescriptionInline?: boolean;
 }
 
 export interface OptionGroupTemplateSummaryDto {

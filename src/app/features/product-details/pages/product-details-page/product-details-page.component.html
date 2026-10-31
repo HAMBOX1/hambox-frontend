@@ -117,7 +117,7 @@
           @if (product()!.categoryInstructionsHtml) {
             <div class="pdp__category-instructions">
               <h3 class="pdp__step-title">{{ 'PRODUCT.CATEGORY_INSTRUCTIONS' | translate }}</h3>
-              <div class="pdp__step-text" [innerHTML]="product()!.categoryInstructionsHtml"></div>
+              <div class="pdp__step-text" [innerHTML]="product()!.categoryInstructionsHtml | instructionHtml"></div>
             </div>
           }
         </section>
@@ -187,12 +187,25 @@
       }
 
       <!-- One clear button for everything the customer picked: the notes of every chosen option, together. -->
-      @if (importantInfoSections().length > 0) {
+      @for (section of inlineInfoSections(); track $index) {
+        <section class="pdp__inline-info">
+          <h4 class="pdp__inline-info-title">
+            <i class="pi pi-info-circle" aria-hidden="true"></i>
+            {{ section.groupLabel }}
+            @if (section.optionLabel) {
+              <span class="pdp__instructions-dialog-option">{{ section.optionLabel }}</span>
+            }
+          </h4>
+          <div class="pdp__instructions-dialog-body" [innerHTML]="section.descriptionHtml | instructionHtml"></div>
+        </section>
+      }
+
+      @if (popupInfoSections().length > 0) {
         <button type="button" class="pdp__important-info" (click)="instructionsOpen.set(true)">
           <i class="pi pi-info-circle pdp__important-info-icon" aria-hidden="true"></i>
           <span class="pdp__important-info-text">
             <strong>{{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}</strong>
-            <small>{{ 'PRODUCT.IMPORTANT_INFO_HINT' | translate: { count: importantInfoSections().length } }}</small>
+            <small>{{ 'PRODUCT.IMPORTANT_INFO_HINT' | translate: { count: popupInfoSections().length } }}</small>
           </span>
           <i class="pi pi-angle-right" aria-hidden="true"></i>
         </button>
@@ -339,7 +352,7 @@
         <span class="pdp__instructions-dialog-group">{{ 'PRODUCT.OPTION_IMPORTANT_INFORMATION' | translate }}</span>
       </div>
     </ng-template>
-    @for (section of importantInfoSections(); track $index) {
+    @for (section of popupInfoSections(); track $index) {
       <section class="pdp__instructions-section">
         <h4 class="pdp__instructions-section-title">
           {{ section.groupLabel }}
@@ -347,7 +360,7 @@
             <span class="pdp__instructions-dialog-option">{{ section.optionLabel }}</span>
           }
         </h4>
-        <div class="pdp__instructions-dialog-body" [innerHTML]="section.descriptionHtml"></div>
+        <div class="pdp__instructions-dialog-body" [innerHTML]="section.descriptionHtml | instructionHtml"></div>
       </section>
     }
   </p-dialog>

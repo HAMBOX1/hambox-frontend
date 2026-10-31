@@ -28,6 +28,7 @@ import { StorefrontNavLinksService } from '../../../home/services/storefront-nav
 import { ProductDetailsItem } from '../../models/product-details';
 import { ProductDetails } from '../../services/product-details';
 import { StorefrontVariantFacade } from '../../services/storefront-variant.facade';
+import { InstructionHtmlPipe } from '../../../../shared/pipes/instruction-html.pipe';
 import { VariantOptionGroupComponent, VariantOptionInstructionsRequest } from '../../components/variant-option-group/variant-option-group.component';
 import { ApiError } from '../../../../core/models/api-error.model';
 import { CartFacade } from '../../../cart/services/cart.facade';
@@ -64,6 +65,7 @@ const BUY_BAR_INSET_PX = 76;
   imports: [
     RouterLink,
     NgTemplateOutlet,
+    InstructionHtmlPipe,
     StorefrontNavComponent,
     StorefrontFooterComponent,
     VariantOptionGroupComponent,
@@ -473,17 +475,33 @@ export class ProductDetailsPageComponent {
 
     for (const group of this.variantFacade.visibleGroups()) {
       if (group.descriptionHtml) {
-        sections.push({ groupLabel: group.displayName, optionLabel: null, descriptionHtml: group.descriptionHtml });
+        sections.push({
+          groupLabel: group.displayName,
+          optionLabel: null,
+          descriptionHtml: group.descriptionHtml,
+          inline: group.showDescriptionInline ?? false,
+        });
       }
 
       const chosen = this.variantFacade.optionsForGroup(group).find((option) => option.id === selected[group.id]);
       if (chosen?.descriptionHtml) {
-        sections.push({ groupLabel: group.displayName, optionLabel: chosen.label, descriptionHtml: chosen.descriptionHtml });
+        sections.push({
+          groupLabel: group.displayName,
+          optionLabel: chosen.label,
+          descriptionHtml: chosen.descriptionHtml,
+          inline: chosen.showDescriptionInline ?? false,
+        });
       }
     }
 
     return sections;
   });
+
+  /** Notes the admin marked "important": shown straight under the options. */
+  protected readonly inlineInfoSections = computed(() => this.importantInfoSections().filter((section) => section.inline));
+
+  /** Everything else sits behind the single "Important information" button. */
+  protected readonly popupInfoSections = computed(() => this.importantInfoSections().filter((section) => !section.inline));
 
   protected closeInstructions(): void {
     this.instructionsOpen.set(false);

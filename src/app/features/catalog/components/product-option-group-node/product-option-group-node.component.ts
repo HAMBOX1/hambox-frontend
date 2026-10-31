@@ -92,6 +92,9 @@ export class ProductOptionGroupNodeComponent {
 
   protected readonly instructionsOptionId = signal<string | null>(null);
   protected readonly instructionsDraft = signal('');
+  /** "Important": show the open option's instructions right on the product page. */
+  protected readonly instructionsInline = signal(false);
+  protected readonly groupInstructionsInline = signal(false);
   protected readonly savingInstructions = signal(false);
 
   protected readonly descriptionTemplateQuery = signal<string | OptionDescriptionTemplateDto>('');
@@ -188,6 +191,7 @@ export class ProductOptionGroupNodeComponent {
 
   protected openGroupInstructions(): void {
     this.groupInstructionsDraft.set(this.group().descriptionHtml ?? '');
+    this.groupInstructionsInline.set(this.group().showDescriptionInline ?? false);
     this.groupInstructionsOpen.set(true);
   }
 
@@ -204,6 +208,7 @@ export class ProductOptionGroupNodeComponent {
         sortOrder: this.group().sortOrder,
         isRequired: this.group().isRequired,
         descriptionHtml: this.groupInstructionsDraft().trim() || null,
+        showDescriptionInline: this.groupInstructionsInline(),
       });
       this.closeGroupInstructions();
     } finally {
@@ -277,6 +282,7 @@ export class ProductOptionGroupNodeComponent {
   protected openInstructions(option: ProductOptionDto): void {
     this.instructionsOptionId.set(option.id);
     this.instructionsDraft.set(option.descriptionHtml ?? '');
+    this.instructionsInline.set(option.showDescriptionInline ?? false);
     this.descriptionTemplateQuery.set('');
     this.descriptionTemplateSuggestions.set([]);
   }
@@ -341,6 +347,7 @@ export class ProductOptionGroupNodeComponent {
         label: option.label,
         sortOrder: option.sortOrder,
         descriptionHtml: this.instructionsDraft().trim() || null,
+        showDescriptionInline: this.instructionsInline(),
       });
       this.closeInstructions();
     } finally {

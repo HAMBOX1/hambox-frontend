@@ -6,12 +6,15 @@ export interface VariantOptionChip {
   readonly label: string;
   readonly disabled: boolean;
   readonly descriptionHtml?: string | null;
+  readonly showDescriptionInline?: boolean;
 }
 
 export interface VariantOptionInstructionsRequest {
   readonly groupLabel: string;
   readonly optionLabel: string | null;
   readonly descriptionHtml: string;
+  /** Show right under the options instead of behind the "Important information" button. */
+  readonly inline?: boolean;
 }
 
 @Component({

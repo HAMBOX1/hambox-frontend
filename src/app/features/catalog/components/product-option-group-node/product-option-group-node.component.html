@@ -91,6 +91,10 @@
       (ngModelChange)="groupInstructionsDraft.set($event)"
       [style]="{ height: '180px' }"
     />
+    <label class="instructions-dialog__inline-toggle">
+      <p-checkbox [binary]="true" [ngModel]="groupInstructionsInline()" (ngModelChange)="groupInstructionsInline.set($event)" />
+      Important: show this directly on the product page (not behind the button). A YouTube link in the text plays as a video.
+    </label>
     <div class="admin-dialog__actions">
       <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingGroupInstructions()" (click)="closeGroupInstructions()"></button>
       <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingGroupInstructions()" (click)="saveGroupInstructions()"></button>
@@ -182,6 +186,10 @@
       (ngModelChange)="instructionsDraft.set($event)"
       [style]="{ height: '180px' }"
     />
+    <label class="instructions-dialog__inline-toggle">
+      <p-checkbox [binary]="true" [ngModel]="instructionsInline()" (ngModelChange)="instructionsInline.set($event)" />
+      Important: show this directly on the product page (not behind the button). A YouTube link in the text plays as a video.
+    </label>
     <div class="admin-dialog__actions">
       <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
       <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>
