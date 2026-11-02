@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -53,7 +53,13 @@ import {
 } from '../../services/category-api.service';
 import { CollectionApiService } from '../../services/collection-api.service';
 import { InventoryApiService } from '../../services/inventory-api.service';
-import { ProductColumnId, ProductTableColumnsService } from '../../services/product-table-columns.service';
+import { MobileViewportService } from '../../../../shared/services/mobile-viewport.service';
+import {
+  NAME_WIDTH_MAX_REM,
+  NAME_WIDTH_MIN_REM,
+  ProductColumnId,
+  ProductTableColumnsService,
+} from '../../services/product-table-columns.service';
 import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
@@ -130,6 +136,11 @@ export class ProductCatalogTableComponent {
   private readonly inventoryApi = inject(InventoryApiService);
   private readonly messageService = inject(MessageService);
   protected readonly columns = inject(ProductTableColumnsService);
+  private readonly router = inject(Router);
+  protected readonly isMobile = inject(MobileViewportService).isMobile;
+
+  protected readonly nameWidthMin = NAME_WIDTH_MIN_REM;
+  protected readonly nameWidthMax = NAME_WIDTH_MAX_REM;
 
   protected readonly permissions = PERMISSIONS;
 
@@ -505,6 +516,10 @@ export class ProductCatalogTableComponent {
 
   protected toggleDetails(product: Product, event: Event): void {
     event.stopPropagation();
+    this.toggleDetailsFor(product);
+  }
+
+  private toggleDetailsFor(product: Product): void {
     this.expandedDetailIds.update((ids) => {
       const next = new Set(ids);
       if (!next.delete(product.id)) {
@@ -1001,13 +1016,36 @@ export class ProductCatalogTableComponent {
       ];
     }
 
-    const items: MenuItem[] = [
-      {
-        label: t('ADMIN.CATALOG_PAGE.ACTIONS.PREVIEW'),
-        icon: 'pi pi-external-link',
-        command: () => this.previewProduct.emit(product),
-      },
-    ];
+    const items: MenuItem[] = [];
+
+    // On a phone the pinned name and actions have to stay slim, so Edit, the details toggle and the favorite star live
+    // in this menu instead of next to the name.
+    if (this.isMobile()) {
+      if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Edit)) {
+        items.push({
+          label: t('ADMIN.CATALOG_PAGE.ACTIONS.EDIT'),
+          icon: 'pi pi-pencil',
+          command: () => void this.router.navigate(['/admin/products', product.id, 'edit']),
+        });
+      }
+
+      items.push({
+        label: t(this.isDetailsOpen(product.id) ? 'ADMIN.CATALOG_PAGE.ACTIONS.HIDE_DETAILS' : 'ADMIN.CATALOG_PAGE.ACTIONS.SHOW_DETAILS'),
+        icon: this.isDetailsOpen(product.id) ? 'pi pi-angle-up' : 'pi pi-angle-down',
+        command: () => this.toggleDetailsFor(product),
+      });
+      items.push({
+        label: t(product.isFavorite ? 'ADMIN.CATALOG_PAGE.ACTIONS.REMOVE_FAVORITE' : 'ADMIN.CATALOG_PAGE.ACTIONS.ADD_FAVORITE'),
+        icon: product.isFavorite ? 'pi pi-star-fill' : 'pi pi-star',
+        command: () => this.favoriteToggle.emit(product),
+      });
+    }
+
+    items.push({
+      label: t('ADMIN.CATALOG_PAGE.ACTIONS.PREVIEW'),
+      icon: 'pi pi-external-link',
+      command: () => this.previewProduct.emit(product),
+    });
 
     if (this.permissionService.hasPermission(this.permissions.Catalog.Products.Create)) {
       items.push({
@@ -1061,6 +1099,15 @@ export class ProductCatalogTableComponent {
     }
 
     return items;
+  }
+
+  /** Where the name-width slider starts when the admin has not picked a width (matches the stylesheet caps). */
+  protected defaultNameWidthRem(): number {
+    return this.isMobile() ? 7 : 16;
+  }
+
+  protected onNameWidthInput(event: Event): void {
+    this.columns.setNameWidth(Number((event.target as HTMLInputElement).value));
   }
 
   protected onActionsCellClick(event: Event): void {

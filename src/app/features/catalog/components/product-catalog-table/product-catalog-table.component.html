@@ -16,6 +16,38 @@
   <p-popover #columnsPopover appendTo="body" styleClass="product-catalog-table__columns-popover">
     <div class="product-catalog-table__columns-popover-content">
       <h4 class="product-catalog-table__category-popover-title">{{ 'ADMIN.CATALOG_PAGE.COLUMNS.BUTTON' | translate }}</h4>
+      <div class="product-catalog-table__layout-options">
+        <label class="product-catalog-table__layout-option">
+          <p-checkbox
+            [binary]="true"
+            inputId="pin-name-column"
+            [ngModel]="columns.pinName()"
+            (ngModelChange)="columns.setPinName($event)"
+          />
+          <span>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.PIN_NAME' | translate }}</span>
+        </label>
+        <label class="product-catalog-table__layout-option">
+          <p-checkbox
+            [binary]="true"
+            inputId="pin-actions-column"
+            [ngModel]="columns.pinActions()"
+            (ngModelChange)="columns.setPinActions($event)"
+          />
+          <span>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.PIN_ACTIONS' | translate }}</span>
+        </label>
+        <label class="product-catalog-table__layout-option product-catalog-table__layout-option--width">
+          <span>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.NAME_WIDTH' | translate }}</span>
+          <input
+            type="range"
+            [min]="nameWidthMin"
+            [max]="nameWidthMax"
+            step="1"
+            [value]="columns.nameWidth() ?? defaultNameWidthRem()"
+            [attr.aria-label]="'ADMIN.CATALOG_PAGE.COLUMNS.NAME_WIDTH' | translate"
+            (input)="onNameWidthInput($event)"
+          />
+        </label>
+      </div>
       <ul class="product-catalog-table__columns-list">
         @for (def of columns.orderedDefinitions(); track def.id) {
           <li class="product-catalog-table__columns-list-item">
@@ -61,6 +93,8 @@
   <app-admin-data-table-shell>
     <p-table
       class="admin-data-table product-catalog-table"
+      [class.product-catalog-table--pin-name]="columns.pinName()"
+      [class.product-catalog-table--pin-actions]="columns.pinActions()"
       [value]="[...products()]"
       [loading]="loading()"
       [lazy]="true"
@@ -85,7 +119,7 @@
           <th style="width: 3rem" (click)="$event.stopPropagation()">
             <p-checkbox [binary]="true" [ngModel]="allPageSelected()" (onChange)="onBulkToggleAllPage()" />
           </th>
-          <th pSortableColumn="nameEn">Product <p-sortIcon field="nameEn" /></th>
+          <th pSortableColumn="nameEn" class="product-catalog-table__name-cell">Product <p-sortIcon field="nameEn" /></th>
           @for (colId of orderedColumns(); track colId) {
             @if (isPriceColumn(colId)) {
               @let field = priceFieldOf(colId);
@@ -142,7 +176,7 @@
               }
             }
           }
-          <th style="width: 5.5rem"></th>
+          <th class="product-catalog-table__actions-cell"></th>
         </tr>
       </ng-template>
 
@@ -155,7 +189,7 @@
               (onChange)="onBulkCheckboxClick(product, $event.originalEvent)"
             />
           </td>
-          <td>
+          <td class="product-catalog-table__name-cell">
             <div class="product-catalog-table__product">
               @if (hasExpandableVariants(product)) {
                 <button
@@ -173,6 +207,7 @@
               } @else {
                 <span class="product-catalog-table__variant-expander-placeholder" aria-hidden="true"></span>
               }
+              @if (!isMobile()) {
               <button
                 type="button"
                 class="product-catalog-table__favorite-toggle product-catalog-table__details-toggle"
@@ -197,6 +232,7 @@
               >
                 <i [class]="product.isFavorite ? 'pi pi-star-fill' : 'pi pi-star'" aria-hidden="true"></i>
               </button>
+              }
               <span class="product-catalog-table__thumb">
                 @if (product.displayImageUrl && !isImageFailed(product.id)) {
                   <img
@@ -225,6 +261,7 @@
               } @else {
                 <span
                   class="admin-cell-primary product-catalog-table__product-name"
+                  [style.max-width.rem]="columns.nameWidth()"
                   [pTooltip]="product.nameEn"
                   tooltipPosition="top"
                   (click)="$event.stopPropagation()"
@@ -509,18 +546,20 @@
               }
             }
           }
-          <td (click)="onActionsCellClick($event)">
+          <td class="product-catalog-table__actions-cell" (click)="onActionsCellClick($event)">
             <div class="admin-actions-row">
               @let menuItems = productActionMenuItems(product);
               @if (menuItems.length > 0) {
                 <app-admin-action-menu [items]="menuItems" />
               }
-              <app-admin-icon-button
-                *hamboxHasPermission="permissions.Catalog.Products.Edit"
-                icon="pi pi-pencil"
-                [label]="'ADMIN.CATALOG_PAGE.ACTIONS.EDIT' | translate"
-                [routerLink]="'/admin/products/' + product.id + '/edit'"
-              />
+              @if (!isMobile()) {
+                <app-admin-icon-button
+                  *hamboxHasPermission="permissions.Catalog.Products.Edit"
+                  icon="pi pi-pencil"
+                  [label]="'ADMIN.CATALOG_PAGE.ACTIONS.EDIT' | translate"
+                  [routerLink]="'/admin/products/' + product.id + '/edit'"
+                />
+              }
             </div>
           </td>
         </tr>

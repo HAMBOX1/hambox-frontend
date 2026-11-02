@@ -992,7 +992,10 @@
         "STATUS": "الحالة",
         "SUPPLIER": "المورد",
         "MOVE_UP": "تحريك لأعلى",
-        "MOVE_DOWN": "تحريك لأسفل"
+        "MOVE_DOWN": "تحريك لأسفل",
+        "PIN_NAME": "تثبيت اسم المنتج",
+        "PIN_ACTIONS": "تثبيت عمود الإجراءات",
+        "NAME_WIDTH": "عرض الاسم"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "إضافة ربط مورد",
@@ -1022,7 +1025,11 @@
         "DUPLICATE": "نسخ",
         "ARCHIVE": "أرشفة",
         "DELETE": "حذف",
-        "MARKETING_PAGE": "صفحة تسويقية"
+        "MARKETING_PAGE": "صفحة تسويقية",
+        "SHOW_DETAILS": "عرض التفاصيل",
+        "HIDE_DETAILS": "إخفاء التفاصيل",
+        "ADD_FAVORITE": "إضافة إلى المفضلة",
+        "REMOVE_FAVORITE": "إزالة من المفضلة"
       },
       "BULK": {
         "PUBLISH": "نشر",

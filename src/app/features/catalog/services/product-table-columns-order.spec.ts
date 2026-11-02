@@ -74,3 +74,62 @@ describe('ProductTableColumnsService column order', () => {
     expect(service.order()[0]).toBe('stock');
   });
 });
+
+describe('ProductTableColumnsService pinning and name width', () => {
+  const LAYOUT_KEY = 'hambox.admin.products.columns.layout';
+
+  beforeEach(() => localStorage.clear());
+  afterEach(() => localStorage.clear());
+
+  it('pins the name and actions by default, with the default name width', () => {
+    const service = createService();
+
+    expect(service.pinName()).toBe(true);
+    expect(service.pinActions()).toBe(true);
+    expect(service.nameWidth()).toBeNull();
+  });
+
+  it('lets the admin unpin each column and remembers it across reloads', () => {
+    const service = createService();
+
+    service.setPinName(false);
+    service.setPinActions(false);
+
+    const reloaded = createService();
+    expect(reloaded.pinName()).toBe(false);
+    expect(reloaded.pinActions()).toBe(false);
+  });
+
+  it('keeps the chosen name width inside the allowed range', () => {
+    const service = createService();
+
+    service.setNameWidth(1);
+    expect(service.nameWidth()).toBe(5);
+    service.setNameWidth(99);
+    expect(service.nameWidth()).toBe(24);
+    service.setNameWidth(12);
+    expect(createService().nameWidth()).toBe(12);
+    service.setNameWidth(null);
+    expect(service.nameWidth()).toBeNull();
+  });
+
+  it('ignores a corrupted saved layout and falls back to the defaults', () => {
+    localStorage.setItem(LAYOUT_KEY, '{"pinName":"yes","nameWidth":"wide"}');
+
+    const service = createService();
+
+    expect(service.pinName()).toBe(true);
+    expect(service.nameWidth()).toBeNull();
+  });
+
+  it('resets the layout together with columns', () => {
+    const service = createService();
+    service.setPinName(false);
+    service.setNameWidth(8);
+
+    service.resetToDefaults();
+
+    expect(service.pinName()).toBe(true);
+    expect(service.nameWidth()).toBeNull();
+  });
+});

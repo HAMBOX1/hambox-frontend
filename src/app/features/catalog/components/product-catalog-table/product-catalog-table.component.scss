@@ -296,7 +296,35 @@
 
 @media (max-width: 767px) {
   .product-catalog-table__product-name {
-    max-width: 10rem;
+    max-width: 7rem;
+  }
+
+  // Compact name cell: the name is pinned on a phone, so every control in front of it has to stay small.
+  .product-catalog-table__product .product-catalog-table__variant-expander,
+  .product-catalog-table__product .product-catalog-table__variant-expander-placeholder,
+  .product-catalog-table__product .product-catalog-table__favorite-toggle {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .product-catalog-table__product .product-catalog-table__thumb {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  // Tighter rows so more products fit on screen; the 44px touch targets inside the cells are kept.
+  :host ::ng-deep .product-catalog-table .p-datatable-tbody > tr > td {
+    padding-block: 0.25rem;
+  }
+
+  :host ::ng-deep .product-catalog-table .p-datatable-tbody > tr > td.product-catalog-table__actions-cell,
+  :host ::ng-deep .product-catalog-table .p-datatable-thead > tr > th.product-catalog-table__actions-cell {
+    padding-inline: 0.25rem;
+  }
+
+  :host ::ng-deep .product-catalog-table .p-datatable-tbody > tr > td.product-catalog-table__name-cell,
+  :host ::ng-deep .product-catalog-table .p-datatable-thead > tr > th.product-catalog-table__name-cell {
+    padding-inline: 0.5rem;
   }
 }
 
@@ -598,12 +626,12 @@
   font-size: 1.15rem;
 }
 
-// The row actions (⋮ menu, edit) stay pinned to the right edge while the wide table scrolls sideways, so on a phone
-// they are always on screen instead of being a long swipe away.
-:host ::ng-deep .product-catalog-table .p-datatable-tbody > tr > td:last-child,
-:host ::ng-deep .product-catalog-table .p-datatable-thead > tr > th:last-child {
+// The row actions (⋮ menu, edit) stay pinned to the end edge while the wide table scrolls sideways, so on a phone
+// they are always on screen instead of being a long swipe away. The admin can turn this off from the Columns popover.
+:host ::ng-deep .product-catalog-table--pin-actions .p-datatable-tbody > tr > td:last-child,
+:host ::ng-deep .product-catalog-table--pin-actions .p-datatable-thead > tr > th:last-child {
   position: sticky;
-  right: 0;
+  inset-inline-end: 0;
   z-index: 2;
   background: var(--admin-bg-surface, var(--color-surface, #16181d));
   box-shadow: -8px 0 8px -8px rgba(0, 0, 0, 0.45);
@@ -666,15 +694,89 @@
   }
 }
 
-// Stock cell: the count, then explicit "add stock" and "delivery type" buttons.
+// Stock cell: the count, then explicit "add stock" and "delivery type" buttons, all on one line so a row stays one
+// button tall instead of stacking into a three-line cell.
 .product-catalog-table__stock-cell {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .product-catalog-table__stock-add {
   display: inline-grid;
   place-items: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  font-size: 0.875rem;
+}
+
+.product-catalog-table__stock-cell ::ng-deep .admin-action-menu__trigger {
+  width: 1.875rem;
+  height: 1.875rem;
+  font-size: 0.95rem;
+}
+
+.product-catalog-table__stock-cell .product-catalog-table__chat-delivery-icon {
+  font-size: 1.25rem;
+}
+
+// Layout choices in the Columns popover: pin switches and the name width slider.
+.product-catalog-table__layout-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--admin-border-default);
+}
+
+.product-catalog-table__layout-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  &--width {
+    justify-content: space-between;
+
+    input[type='range'] {
+      flex: 1 1 auto;
+      max-width: 9rem;
+      accent-color: var(--admin-accent-blue);
+    }
+  }
+}
+
+// Pinned product name: stays at the start edge while the wide table scrolls sideways. The checkbox column in front of
+// it scrolls away underneath, so only the name (not the checkbox too) takes up room on a phone.
+:host ::ng-deep .product-catalog-table--pin-name {
+  .p-datatable-tbody > tr > td.product-catalog-table__name-cell,
+  .p-datatable-thead > tr > th.product-catalog-table__name-cell {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    background: var(--admin-bg-surface, var(--color-surface, #16181d));
+    box-shadow: 8px 0 8px -8px rgba(0, 0, 0, 0.45);
+  }
+
+  .p-datatable-thead > tr > th.product-catalog-table__name-cell {
+    z-index: 3;
+  }
+}
+
+.product-catalog-table__actions-cell {
+  width: 5.5rem;
+}
+
+@media (max-width: 767px) {
+  // Only the ⋮ button is left in the actions column on a phone (Edit is inside its menu).
+  .product-catalog-table__actions-cell {
+    width: 3.25rem;
+  }
+
+  .product-catalog-table__product {
+    gap: 0.375rem;
+  }
 }

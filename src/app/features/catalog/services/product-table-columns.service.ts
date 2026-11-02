@@ -37,6 +37,17 @@ export const PRODUCT_TABLE_COLUMNS: readonly ProductColumnDef[] = [
 
 const STORAGE_KEY = 'hambox.admin.products.columns';
 const ORDER_STORAGE_KEY = 'hambox.admin.products.columns.order';
+const LAYOUT_STORAGE_KEY = 'hambox.admin.products.columns.layout';
+
+/** Bounds of the product-name width the admin can choose, in rem. */
+export const NAME_WIDTH_MIN_REM = 5;
+export const NAME_WIDTH_MAX_REM = 24;
+
+interface ColumnsLayout {
+  pinName: boolean;
+  pinActions: boolean;
+  nameWidth: number | null;
+}
 
 /**
  * Root-scoped (like `AdminProductsViewModeService`) so the admin's column choices survive
@@ -55,6 +66,17 @@ export class ProductTableColumnsService {
   /** Left-to-right order of the columns (hidden ones keep their slot, so un-hiding restores the place). */
   private readonly orderState = signal<readonly ProductColumnId[]>(this.readOrder());
   readonly order = this.orderState.asReadonly();
+
+  private readonly layoutState = signal<ColumnsLayout>(this.readLayout());
+
+  /** Keeps the product name in view while the wide table scrolls sideways. */
+  readonly pinName = computed(() => this.layoutState().pinName);
+
+  /** Keeps the row's ⋮ menu (and edit button on wide screens) in view while the table scrolls sideways. */
+  readonly pinActions = computed(() => this.layoutState().pinActions);
+
+  /** Chosen width of the product name in rem, or null for the stylesheet default. */
+  readonly nameWidth = computed(() => this.layoutState().nameWidth);
 
   /** The column definitions in the admin's chosen order — what the Columns picker lists. */
   readonly orderedDefinitions = computed<readonly ProductColumnDef[]>(() =>
@@ -106,11 +128,70 @@ export class ProductTableColumnsService {
     this.persist();
   }
 
+  setPinName(value: boolean): void {
+    this.updateLayout({ pinName: value });
+  }
+
+  setPinActions(value: boolean): void {
+    this.updateLayout({ pinActions: value });
+  }
+
+  /** `null` goes back to the default width; anything else is clamped to the allowed range. */
+  setNameWidth(rem: number | null): void {
+    const width = rem === null || !Number.isFinite(rem)
+      ? null
+      : Math.min(NAME_WIDTH_MAX_REM, Math.max(NAME_WIDTH_MIN_REM, Math.round(rem)));
+    this.updateLayout({ nameWidth: width });
+  }
+
   resetToDefaults(): void {
     this.visibleState.set(this.defaultSet());
     this.orderState.set(this.definitions.map((def) => def.id));
+    this.layoutState.set(this.defaultLayout());
     this.persist();
     this.persistOrder();
+    this.persistLayout();
+  }
+
+  private defaultLayout(): ColumnsLayout {
+    return { pinName: true, pinActions: true, nameWidth: null };
+  }
+
+  private updateLayout(change: Partial<ColumnsLayout>): void {
+    this.layoutState.update((current) => ({ ...current, ...change }));
+    this.persistLayout();
+  }
+
+  private readLayout(): ColumnsLayout {
+    const defaults = this.defaultLayout();
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LAYOUT_STORAGE_KEY) : null;
+      if (raw === null) {
+        return defaults;
+      }
+
+      const saved = JSON.parse(raw) as Partial<ColumnsLayout>;
+      const width = typeof saved.nameWidth === 'number' && Number.isFinite(saved.nameWidth)
+        ? Math.min(NAME_WIDTH_MAX_REM, Math.max(NAME_WIDTH_MIN_REM, saved.nameWidth))
+        : null;
+      return {
+        pinName: typeof saved.pinName === 'boolean' ? saved.pinName : defaults.pinName,
+        pinActions: typeof saved.pinActions === 'boolean' ? saved.pinActions : defaults.pinActions,
+        nameWidth: width,
+      };
+    } catch {
+      return defaults;
+    }
+  }
+
+  private persistLayout(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(this.layoutState()));
+      }
+    } catch {
+      // Best effort only.
+    }
   }
 
   private isPhone(): boolean {
