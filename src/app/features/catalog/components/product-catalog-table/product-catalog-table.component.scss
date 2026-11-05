@@ -722,6 +722,13 @@
   font-size: 1.25rem;
 }
 
+// A product delivered through support chat (On-Delivery) shows its delivery-type truck in green.
+.product-catalog-table__delivery-menu--chat ::ng-deep .admin-action-menu__trigger {
+  border-color: color-mix(in srgb, var(--admin-accent-green, var(--color-success, #22c55e)) 55%, transparent);
+  background: color-mix(in srgb, var(--admin-accent-green, var(--color-success, #22c55e)) 14%, transparent);
+  color: var(--admin-accent-green, var(--color-success, #22c55e));
+}
+
 // Layout choices in the Columns popover: pin switches and the name width slider.
 .product-catalog-table__layout-options {
   display: flex;

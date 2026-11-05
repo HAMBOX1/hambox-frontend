@@ -343,18 +343,14 @@
                 </button>
                 <app-admin-action-menu
                   *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+                  class="product-catalog-table__delivery-menu"
+                  [class.product-catalog-table__delivery-menu--chat]="product.hasChatDeliveryVariant"
                   icon="pi pi-truck"
-                  label="Delivery type"
+                  [label]="product.hasChatDeliveryVariant ? 'Delivery type: On-Delivery' : 'Delivery type'"
+                  [pTooltip]="product.hasChatDeliveryVariant ? 'On-Delivery — delivered manually via support chat' : 'Delivery type'"
+                  tooltipPosition="top"
                   [items]="deliveryMenuItems(product)"
                 />
-                @if (product.hasChatDeliveryVariant) {
-                  <i
-                    class="pi pi-comments product-catalog-table__chat-delivery-icon"
-                    pTooltip="On-Delivery — delivered manually via support chat"
-                    tooltipPosition="top"
-                    aria-hidden="true"
-                  ></i>
-                }
               </div>
             </td>
 
