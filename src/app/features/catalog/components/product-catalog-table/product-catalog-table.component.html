@@ -327,7 +327,7 @@
                   class="product-catalog-table__stock-badge"
                   [label]="(product.availableStock ?? 0) > 0
                     ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: product.availableStock ?? 0 })
-                    : ('ADMIN.CATALOG_PAGE.STOCK.OUT_OF_STOCK' | translate)"
+                    : '0'"
                   [tone]="(product.availableStock ?? 0) > 0 ? 'success' : 'danger'"
                 />
                 <button
@@ -699,7 +699,7 @@
                       class="product-catalog-table__stock-badge"
                       [label]="variant.availableStock > 0
                         ? ('ADMIN.CATALOG_PAGE.STOCK.IN_STOCK' | translate: { count: variant.availableStock })
-                        : ('ADMIN.CATALOG_PAGE.STOCK.OUT_OF_STOCK' | translate)"
+                        : '0'"
                       [tone]="variant.availableStock > 0 ? 'success' : 'danger'"
                     />
                     <button
