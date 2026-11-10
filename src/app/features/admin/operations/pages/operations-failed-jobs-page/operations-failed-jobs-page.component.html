@@ -61,8 +61,8 @@
             <td>{{ job.jobType }}</td>
             <td>{{ job.lastError || '—' }}</td>
             <td>{{ job.attempts }}/{{ job.maxAttempts }}</td>
-            <td>{{ job.createdOnUtc | date: 'short' }}</td>
-            <td>{{ job.lastRetryOnUtc ? (job.lastRetryOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ job.createdOnUtc | hamboxDate: 'short' }}</td>
+            <td>{{ job.lastRetryOnUtc ? (job.lastRetryOnUtc | hamboxDate: 'short') : '—' }}</td>
             <td><app-admin-status-badge [label]="job.status" tone="danger" /></td>
             <td class="admin-page__actions">
               <button

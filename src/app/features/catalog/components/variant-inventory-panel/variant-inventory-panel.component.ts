@@ -37,7 +37,9 @@ import {
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { parseCodeFile } from '../../utils/parse-code-file';
 
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 const REVEAL_AUTO_HIDE_MS = 30_000;
+const MAX_CODE_FILE_BYTES = 5 * 1024 * 1024;
 
 const CODE_STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'All statuses', value: '' },
@@ -76,7 +78,7 @@ const IMPORT_ACTIONS = new Set(['CodeImported', 'BatchImported']);
 @Component({
   selector: 'app-variant-inventory-panel',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     DatePipe,
     SlicePipe,
     FormsModule,
@@ -102,6 +104,7 @@ const IMPORT_ACTIONS = new Set(['CodeImported', 'BatchImported']);
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VariantInventoryPanelComponent {
+  private readonly translate = inject(TranslateService);
   private readonly facade = inject(ProductEditorFacade);
   private readonly messageService = inject(MessageService);
   private revealTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
@@ -280,8 +283,8 @@ export class VariantInventoryPanelComponent {
       } else {
         this.messageService.add({
           severity: 'error',
-          summary: 'Import failed',
-          detail: this.facade.error() ?? 'Unable to import codes.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.IMPORT_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.IMPORT_CODES_FAILED'),
         });
       }
     } finally {
@@ -315,8 +318,8 @@ export class VariantInventoryPanelComponent {
     await navigator.clipboard.writeText(result.duplicates.map((d) => d.code).join('\n'));
     this.messageService.add({
       severity: 'success',
-      summary: 'Copied',
-      detail: `${result.duplicates.length} duplicate code(s) copied to clipboard.`,
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.COPIED'),
+      detail: this.translate.instant('ADMIN.CATALOG_TOASTS.DUP_CODES_COPIED', { p0: result.duplicates.length }),
     });
   }
 
@@ -344,6 +347,20 @@ export class VariantInventoryPanelComponent {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) {
+      return;
+    }
+
+    // `accept` is only a hint in the picker; refuse a wrong or huge file rather than load binary junk as "codes".
+    const wrongType = !file.name.toLowerCase().endsWith(`.${kind}`);
+    if (wrongType || file.size > MAX_CODE_FILE_BYTES) {
+      input.value = '';
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('ADMIN.CATALOG_UI.FILE_REJECTED'),
+        detail: this.translate.instant(wrongType ? 'ADMIN.CATALOG_UI.FILE_WRONG_TYPE' : 'ADMIN.CATALOG_UI.FILE_TOO_LARGE', {
+          type: `.${kind}`,
+        }),
+      });
       return;
     }
 
@@ -424,10 +441,22 @@ export class VariantInventoryPanelComponent {
     }
   }
 
-  protected async deleteCode(code: DigitalInventoryCodeDto): Promise<void> {
+  protected readonly deleteTargetCode = signal<DigitalInventoryCodeDto | null>(null);
+
+  protected requestDelete(code: DigitalInventoryCodeDto): void {
+    this.deleteTargetCode.set(code);
+  }
+
+  protected async confirmDelete(): Promise<void> {
+    const code = this.deleteTargetCode();
+    if (!code) {
+      return;
+    }
+
     this.actionLoading.set(true);
     try {
       await this.facade.deleteCode(code.id);
+      this.deleteTargetCode.set(null);
     } finally {
       this.actionLoading.set(false);
     }
@@ -540,8 +569,8 @@ export class VariantInventoryPanelComponent {
     await navigator.clipboard.writeText(value);
     this.messageService.add({
       severity: 'success',
-      summary: 'Copied',
-      detail: 'Inventory code copied to clipboard.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.COPIED'),
+      detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CODE_COPIED'),
     });
   }
 

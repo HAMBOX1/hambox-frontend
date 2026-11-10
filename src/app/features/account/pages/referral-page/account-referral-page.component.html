@@ -9,6 +9,9 @@
   } @else if (error()) {
     <p class="referral-page__state">{{ error() }}</p>
   } @else if (dashboard(); as data) {
+    @if (data.programEnabled === false) {
+      <p class="referral-page__notice" role="status">{{ 'ACCOUNT.REFERRAL_UI.PAUSED' | translate }}</p>
+    }
     <div class="referral-page__stats">
       <div class="referral-page__stat">
         <p class="referral-page__label">{{ 'ACCOUNT.REFERRAL_UI.POINTS_BALANCE' | translate }}</p>
@@ -32,6 +35,7 @@
     </div>
 
     <div class="referral-page__grid">
+      @if (data.programEnabled !== false) {
       <section class="referral-page__card">
         <h3>{{ 'ACCOUNT.REFERRAL_UI.INVITE_FRIENDS' | translate }}</h3>
         <p class="referral-page__code">{{ 'ACCOUNT.REFERRAL_UI.CODE' | translate }}: <strong>{{ data.referralCode }}</strong></p>
@@ -40,6 +44,7 @@
           {{ copied() ? ('ACCOUNT.REFERRAL_UI.COPIED' | translate) : ('ACCOUNT.REFERRAL_UI.COPY_INVITE' | translate) }}
         </button>
       </section>
+      }
 
       <section class="referral-page__card">
         <h3>{{ 'ACCOUNT.REFERRAL_UI.RECENT_REFERRALS' | translate }}</h3>
@@ -48,7 +53,12 @@
             @for (entry of data.recentHistory; track entry.id) {
               <li>
                 <span>{{ entry.friendName }}</span>
-                <strong>{{ 'ACCOUNT.REFERRAL_UI.POINTS_GAINED' | translate:{ points: entry.pointsEarned } }}</strong>
+                <!-- A reversed/expired referral earned nothing, so show its status instead of the original points. -->
+                @if (entry.status === 'Rewarded' || entry.status === 'Qualified') {
+                  <strong>{{ 'ACCOUNT.REFERRAL_UI.POINTS_GAINED' | translate:{ points: entry.pointsEarned } }}</strong>
+                } @else {
+                  <strong>{{ 'ACCOUNT.REFERRAL_UI.STATUS_' + entry.status.toUpperCase() | translate }}</strong>
+                }
                 <span>{{ entry.createdOnUtc | hamboxDate:'mediumDate' }}</span>
               </li>
             }

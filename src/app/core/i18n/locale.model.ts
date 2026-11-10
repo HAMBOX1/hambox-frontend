@@ -28,7 +28,8 @@ export const AVAILABLE_LANGUAGES: readonly LanguageDefinition[] = [
     nativeName: 'العربية',
     flagEmoji: '🇪🇬',
     direction: 'rtl',
-    angularLocale: 'ar-EG',
+    // `-u-nu-latn`: Latin digits, matching the plain counts/IDs rendered elsewhere in the UI.
+    angularLocale: 'ar-EG-u-nu-latn',
   },
 ] as const;
 

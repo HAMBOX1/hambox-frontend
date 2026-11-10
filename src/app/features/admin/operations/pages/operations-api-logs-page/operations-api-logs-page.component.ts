@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -28,7 +28,7 @@ import { OperationsFacade } from '../../services/operations.facade';
   selector: 'app-operations-api-logs-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     TranslatePipe,
     ButtonModule,

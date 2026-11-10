@@ -9,12 +9,13 @@
   <div class="basic-info-form__grid">
     @if (section() === 'general' || section() === 'full') {
       <div class="basic-info-form__field basic-info-form__field--full">
-        <label class="basic-info-form__label" for="product-name-en">Product Name (EN)</label>
+        <label class="basic-info-form__label" for="product-name-en">{{ 'ADMIN.CATALOG_UI.PRODUCT_NAME_EN' | translate }}</label>
         <input
           pInputText
           id="product-name-en"
           class="basic-info-form__input"
           type="text"
+          maxlength="200"
           formControlName="nameEn"
           autocomplete="off"
           [disabled]="disabled()"
@@ -26,11 +27,11 @@
 
       <div class="basic-info-form__field basic-info-form__field--full">
         <div class="basic-info-form__label-row">
-          <label class="basic-info-form__label" for="product-category">Category</label>
+          <label class="basic-info-form__label" for="product-category">{{ 'ADMIN.CATALOG_UI.CATEGORY' | translate }}</label>
           <button
             pButton
             type="button"
-            label="Create Category"
+            [label]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
             icon="pi pi-plus"
             severity="secondary"
             text
@@ -51,11 +52,11 @@
           display="comma"
           filter="true"
           filterPlaceHolder="Search categories..."
-          placeholder="Select one or more categories"
+          [placeholder]="'ADMIN.CATALOG_UI.SELECT_ONE_OR_MORE_CATEGORIES' | translate"
           [loading]="categoriesLoading()"
           [disabled]="disabled() || categoriesLoading()"
         />
-        <p class="basic-info-form__hint">Star the category that should be the primary one.</p>
+        <p class="basic-info-form__hint">{{ 'ADMIN.CATALOG_UI.STAR_THE_CATEGORY_THAT_SHOULD_BE_THE_PRIMARY' | translate }}</p>
         @if (fieldError('categoryId'); as error) {
           <p class="basic-info-form__error">{{ error }}</p>
         }
@@ -98,12 +99,12 @@
       <div class="basic-info-form__field basic-info-form__field--full">
         <div class="basic-info-form__label-row">
           <label class="basic-info-form__label" for="product-collections"
-            >Internal Categories <span class="admin-field__optional">(optional, internal-only)</span></label
+            >{{ 'ADMIN.CATALOG_UI.INTERNAL_CATEGORIES' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL_INTERNAL_ONLY' | translate }}</span></label
           >
           <button
             pButton
             type="button"
-            label="+ New Internal Category"
+            [label]="'ADMIN.CATALOG_UI.NEW_INTERNAL_CATEGORY' | translate"
             icon="pi pi-plus"
             severity="secondary"
             text
@@ -124,11 +125,11 @@
           display="comma"
           filter="true"
           filterPlaceHolder="Search internal categories..."
-          placeholder="Assign one or more internal categories"
+          [placeholder]="'ADMIN.CATALOG_UI.ASSIGN_ONE_OR_MORE_INTERNAL_CATEGORIES' | translate"
           [loading]="collectionsLoading()"
           [disabled]="disabled() || collectionsLoading()"
         />
-        <p class="basic-info-form__hint">Internal organization only — never shown on the storefront.</p>
+        <p class="basic-info-form__hint">{{ 'ADMIN.CATALOG_UI.INTERNAL_ORGANIZATION_ONLY_NEVER_SHOWN_ON_TH' | translate }}</p>
 
         @if (selectedCollectionChips().length > 0) {
           <div class="basic-info-form__category-chips">
@@ -153,7 +154,7 @@
 
     @if (section() === 'pricing' || section() === 'full') {
       <div class="basic-info-form__field">
-        <label class="basic-info-form__label" for="product-price">Base price</label>
+        <label class="basic-info-form__label" for="product-price">{{ 'ADMIN.CATALOG_UI.BASE_PRICE' | translate }}</label>
         <p-inputNumber
           inputId="product-price"
           class="basic-info-form__number"
@@ -162,6 +163,7 @@
           currency="USD"
           locale="en-US"
           [min]="0"
+          [max]="10000000"
           [minFractionDigits]="2"
           [maxFractionDigits]="2"
           [disabled]="disabled()"
@@ -174,7 +176,7 @@
 
     @if (section() === 'general' || section() === 'full') {
       <div class="basic-info-form__field basic-info-form__field--full">
-        <label class="basic-info-form__label" for="product-description-en">Description (Optional)</label>
+        <label class="basic-info-form__label" for="product-description-en">{{ 'ADMIN.CATALOG_UI.DESCRIPTION_OPTIONAL' | translate }}</label>
         <textarea
           pTextarea
           id="product-description-en"
@@ -209,12 +211,12 @@
       } @else {
         <div class="basic-info-form__arabic-fields basic-info-form__field--reveal">
           <div class="basic-info-form__arabic-header">
-            <span class="basic-info-form__label">Arabic Translation</span>
+            <span class="basic-info-form__label">{{ 'ADMIN.CATALOG_UI.ARABIC_TRANSLATION_2' | translate }}</span>
             <button
               pButton
               type="button"
               class="basic-info-form__hide-arabic-btn"
-              label="Hide"
+              [label]="'ADMIN.CATALOG_UI.HIDE' | translate"
               icon="pi pi-times"
               severity="secondary"
               text
@@ -224,7 +226,7 @@
           </div>
 
           <div class="basic-info-form__field">
-            <label class="basic-info-form__label" for="product-name-ar">Product Name (AR)</label>
+            <label class="basic-info-form__label" for="product-name-ar">{{ 'ADMIN.CATALOG_UI.PRODUCT_NAME_AR' | translate }}</label>
             <input
               pInputText
               id="product-name-ar"
@@ -241,7 +243,7 @@
           </div>
 
           <div class="basic-info-form__field">
-            <label class="basic-info-form__label" for="product-description-ar">Description (AR)</label>
+            <label class="basic-info-form__label" for="product-description-ar">{{ 'ADMIN.CATALOG_UI.DESCRIPTION_AR' | translate }}</label>
             <textarea
               pTextarea
               id="product-description-ar"
@@ -262,7 +264,7 @@
 </form>
 
 <p-dialog
-  header="Create Category"
+  [header]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
   [visible]="categoryDialogOpen()"
   (visibleChange)="onCategoryDialogVisibleChange($event)"
   [modal]="true"
@@ -284,7 +286,7 @@
 </p-dialog>
 
 <p-dialog
-  header="Create Internal Category"
+  [header]="'ADMIN.CATALOG_UI.CREATE_INTERNAL_CATEGORY' | translate"
   [visible]="collectionDialogOpen()"
   (visibleChange)="onCollectionDialogVisibleChange($event)"
   [modal]="true"

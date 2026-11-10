@@ -3,7 +3,7 @@
     pButton
     type="button"
     class="product-form-footer__btn product-form-footer__btn--ghost"
-    label="Cancel"
+    [label]="'ADMIN.CATALOG_UI.CANCEL' | translate"
     severity="secondary"
     [disabled]="submitting()"
     (click)="onCancel()"
@@ -14,7 +14,7 @@
       pButton
       type="button"
       class="product-form-footer__btn"
-      label="Save Draft"
+      [label]="'ADMIN.CATALOG_UI.SAVE_DRAFT' | translate"
       icon="pi pi-save"
       severity="secondary"
       [outlined]="true"
@@ -26,7 +26,7 @@
       pButton
       type="button"
       class="product-form-footer__btn"
-      label="Next Step"
+      [label]="'ADMIN.CATALOG_UI.NEXT_STEP' | translate"
       icon="pi pi-arrow-right"
       iconPos="right"
       severity="secondary"
@@ -39,7 +39,7 @@
       pButton
       type="button"
       class="product-form-footer__btn product-form-footer__btn--primary"
-      label="Create Product"
+      [label]="'ADMIN.CATALOG_UI.CREATE_PRODUCT' | translate"
       icon="pi pi-check"
       [loading]="submitting()"
       [disabled]="submitting()"

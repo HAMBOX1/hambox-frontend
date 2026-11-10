@@ -22,8 +22,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   border: 0;
   border-radius: 0.5rem;
   background: transparent;
@@ -149,8 +149,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2rem;
+  height: 2rem;
   border: 0;
   border-radius: 0.375rem;
   background: transparent;
@@ -219,8 +219,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 1.875rem;
-  height: 1.875rem;
+  width: 2rem;
+  height: 2rem;
   border: 0;
   border-radius: 0.5rem;
   background: transparent;
@@ -305,6 +305,7 @@
 .answer-item__add-followup-btn {
   display: inline-flex;
   align-items: center;
+  min-height: 2rem;
   gap: 0.375rem;
   padding: 0.25rem 0.5rem;
   border: 0;

@@ -145,6 +145,7 @@ export interface CreateTicketInput {
   readonly subject: string;
   readonly descriptionHtml: string;
   readonly relatedOrderNumber?: string | null;
+  readonly relatedOrderId?: string | null;
   readonly relatedProductName?: string | null;
 }
 

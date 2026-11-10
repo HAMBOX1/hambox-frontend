@@ -247,7 +247,7 @@
                           [tone]="version.isPublished ? 'success' : 'info'"
                         />
                       </td>
-                      <td>{{ version.publishedOnUtc ? (version.publishedOnUtc | date: 'medium') : '—' }}</td>
+                      <td>{{ version.publishedOnUtc ? (version.publishedOnUtc | hamboxDate: 'medium') : '—' }}</td>
                       <td>
                         @if (!version.isPublished && permissionServicePublic.hasPermission(permissions.Legal.Publish)) {
                           <button
@@ -289,7 +289,7 @@
                     <tr>
                       <td>{{ entry.action }}</td>
                       <td>{{ entry.actorUserId || '—' }}</td>
-                      <td>{{ entry.createdOnUtc | date: 'medium' }}</td>
+                      <td>{{ entry.createdOnUtc | hamboxDate: 'medium' }}</td>
                     </tr>
                   </ng-template>
                 </p-table>

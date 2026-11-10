@@ -53,7 +53,7 @@ export class CommunicationTemplatesPageComponent implements OnInit {
   private readonly translate = inject(TranslateService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Communication', route: '/admin/communication' }, { label: 'Templates' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.COMMUNICATION', route: '/admin/communication' }, { label: 'ADMIN.PAGE_BUILDER.TEMPLATES.TITLE' });
   protected readonly categories = [...COMMUNICATION_CATEGORIES];
   protected readonly channels = [...COMMUNICATION_CHANNELS];
 

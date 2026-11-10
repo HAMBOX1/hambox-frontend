@@ -92,7 +92,7 @@ export class MembershipsListPageComponent implements OnInit {
   protected readonly mobileViewport = inject(MobileViewportService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Memberships' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.MEMBERSHIPS' });
   protected readonly statusOptions = [...MEMBERSHIP_STATUS_OPTIONS];
 
   protected readonly plans = this.facade.plans;

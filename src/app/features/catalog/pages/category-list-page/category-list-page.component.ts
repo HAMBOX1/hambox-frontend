@@ -25,11 +25,12 @@ import {
   AdminSearchBarComponent,
 } from '../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
-
+
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-category-list-page',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     ButtonModule,
     DialogModule,
     DrawerModule,
@@ -49,12 +50,13 @@ import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-brea
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryListPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly facade = inject(CategoryListFacade);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Categories' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.CATEGORIES' });
 
   protected readonly totalCount = this.facade.totalCount;
   protected readonly loading = this.facade.loading;
@@ -153,8 +155,8 @@ export class CategoryListPageComponent implements OnInit {
     if (created) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Category created',
-        detail: `"${request.nameEn}" was added to the catalog.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_CREATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_ADDED', { p0: request.nameEn }),
         life: 4000,
       });
       return;
@@ -162,8 +164,8 @@ export class CategoryListPageComponent implements OnInit {
 
     this.messageService.add({
       severity: 'error',
-      summary: 'Create failed',
-      detail: this.facade.createError() ?? 'Unable to create category.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CREATE_CATEGORY_FAILED'),
+      detail: this.facade.createError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.CREATE_CATEGORY_UNABLE'),
       life: 5000,
     });
   }
@@ -174,8 +176,8 @@ export class CategoryListPageComponent implements OnInit {
     if (updated) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Category updated',
-        detail: `"${request.nameEn}" was saved.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_UPDATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_SAVED', { p0: request.nameEn }),
         life: 4000,
       });
       return;
@@ -183,8 +185,8 @@ export class CategoryListPageComponent implements OnInit {
 
     this.messageService.add({
       severity: 'error',
-      summary: 'Update failed',
-      detail: this.facade.updateError() ?? 'Unable to update category.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATE_FAILED'),
+      detail: this.facade.updateError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATE_CATEGORY_UNABLE'),
       life: 5000,
     });
   }
@@ -211,8 +213,8 @@ export class CategoryListPageComponent implements OnInit {
     if (success) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Category deleted',
-        detail: `"${category.nameEn}" was removed.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_DELETED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_REMOVED', { p0: category.nameEn }),
         life: 4000,
       });
       this.deleteDialogOpen.set(false);
@@ -221,8 +223,8 @@ export class CategoryListPageComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Delete failed',
-        detail: this.facade.error() ?? 'Unable to delete category.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELETE_FAILED'),
+        detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.DELETE_CATEGORY_UNABLE'),
         life: 5000,
       });
     }

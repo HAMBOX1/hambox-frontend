@@ -3,13 +3,16 @@
 <section class="admin-page product-edit-page">
   @if (loading()) {
     <app-admin-loading-skeleton variant="detail" />
-  } @else if (error()) {
-    <app-admin-error-alert [message]="error()!" />
-    <button pButton type="button" label="Back to products" class="product-edit-page__back" (click)="onCancel()"></button>
+  } @else if (loadFailed()) {
+    <app-admin-error-alert [message]="error() ?? ''" />
+    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.BACK_TO_PRODUCTS' | translate" class="product-edit-page__back" (click)="onCancel()"></button>
   } @else {
+    @if (error()) {
+      <app-admin-error-alert [message]="error()!" />
+    }
     <header class="product-edit-page__hero">
-      <nav class="product-edit-page__breadcrumb" aria-label="Breadcrumb">
-        <a routerLink="/admin/products">Products</a>
+      <nav class="product-edit-page__breadcrumb" [attr.aria-label]="'ADMIN.CATALOG_UI.BREADCRUMB' | translate">
+        <a routerLink="/admin/products">{{ 'ADMIN.NAV.PRODUCTS' | translate }}</a>
         <span aria-hidden="true">/</span>
         <span>{{ product() ? 'Edit Product' : 'Create Product' }}</span>
       </nav>
@@ -28,9 +31,9 @@
               {{ (current.images?.length ?? 0) }} image(s)
             </p>
           } @else {
-            <h1>New Product</h1>
+            <h1>{{ 'ADMIN.CATALOG_UI.NEW_PRODUCT' | translate }}</h1>
             <p class="product-edit-page__meta">
-              Enter a name and category below — HAMBOX saves it as a draft automatically.
+              {{ 'ADMIN.CATALOG_UI.ENTER_A_NAME_AND_CATEGORY_BELOW_HAMBOX_SAVES' | translate }}
             </p>
           }
         </div>
@@ -50,12 +53,12 @@
           }
 
           <div class="product-edit-page__hero-buttons">
-            <button pButton type="button" label="Cancel" severity="secondary" (click)="onCancel()"></button>
+            <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" (click)="onCancel()"></button>
             @if (product()) {
               <button
                 pButton
                 type="button"
-                label="Preview"
+                [label]="'ADMIN.CATALOG_UI.PREVIEW' | translate"
                 icon="pi pi-eye"
                 severity="secondary"
                 [outlined]="true"
@@ -67,7 +70,7 @@
               <button
                 pButton
                 type="button"
-                label="Save"
+                [label]="'ADMIN.CATALOG_UI.SAVE' | translate"
                 severity="secondary"
                 [disabled]="!dirty()"
                 [loading]="submitting()"
@@ -79,7 +82,7 @@
               <button
                 pButton
                 type="button"
-                label="Publish"
+                [label]="'ADMIN.CATALOG_UI.PUBLISH' | translate"
                 icon="pi pi-check"
                 [loading]="submitting()"
                 *hamboxHasPermission="permissions.Catalog.Products.Edit"
@@ -92,7 +95,7 @@
     </header>
 
     <div class="product-edit-page__setup">
-      <app-admin-section-card title="General" [compact]="true">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.GENERAL' | translate" [compact]="true">
         <app-product-basic-info-form
           #productForm
           section="full"
@@ -177,6 +180,8 @@
       }
 
       <app-product-instructions-panel [productId]="productId()" />
+
+      <app-product-purchase-controls-panel />
     </div>
 
     <div

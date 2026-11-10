@@ -13,9 +13,8 @@ interface StatusTab {
 }
 
 /**
- * A faster alternative to the toolbar's status dropdown: four status tabs (All/Draft/Live/Archived
- * — the same four statuses that dropdown exposes minus "Inactive", which stays dropdown-only) plus
- * a fifth "Pending Merge" tab, orthogonal to status (see `ProductCatalogFacade.pendingMergeOnly`).
+ * A faster alternative to the toolbar's status dropdown: one tab per status (All/Draft/Active/Inactive/Archived)
+ * plus a "Favorites" and a "Pending Merge" tab, orthogonal to status (see `ProductCatalogFacade.pendingMergeOnly`).
  * Purely a view over the facade's filter state — the page component still owns
  * `setStatusFilter`/`setPendingMergeOnly`, so clicking a tab behaves identically to picking it from
  * the dropdown.
@@ -45,6 +44,7 @@ export class ProductCatalogStatusTabsComponent {
       { value: '', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.ALL', count: counts?.all ?? null },
       { value: 'Draft', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.DRAFT', count: counts?.draft ?? null },
       { value: 'Active', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.LIVE', count: counts?.active ?? null },
+      { value: 'Inactive', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.INACTIVE', count: counts?.inactive ?? null },
       { value: 'Archived', labelKey: 'ADMIN.CATALOG_PAGE.STATUS_TABS.ARCHIVED', count: counts?.archived ?? null },
       {
         value: FAVORITES_TAB,

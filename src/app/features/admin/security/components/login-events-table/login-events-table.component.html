@@ -61,7 +61,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-event>
       <tr [pSelectableRow]="event" class="login-events-table__row">
-        <td>{{ event.occurredOnUtc | date: 'short' }}</td>
+        <td>{{ event.occurredOnUtc | hamboxDate: 'short' }}</td>
         <td>{{ event.userEmail ?? '—' }}</td>
         <td>{{ event.ipAddress }}</td>
         <td>{{ flag(event.countryCode) }} {{ event.city ? event.city + ', ' : '' }}{{ event.countryCode ?? '—' }}</td>
@@ -104,7 +104,7 @@
   @if (detailTarget(); as detail) {
     <dl class="login-events-table__detail">
       <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.TIMESTAMP' | translate }}</dt>
-      <dd>{{ detail.occurredOnUtc | date: 'medium' }}</dd>
+      <dd>{{ detail.occurredOnUtc | hamboxDate: 'medium' }}</dd>
 
       <dt>{{ 'ADMIN.SECURITY.LOGIN_EVENTS.COLUMNS.USER' | translate }}</dt>
       <dd>{{ detail.userEmail ?? '—' }}</dd>

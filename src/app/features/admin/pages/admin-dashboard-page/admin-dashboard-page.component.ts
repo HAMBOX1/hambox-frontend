@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -34,7 +34,7 @@ import { AdminDashboardAlertsDto } from '../../models/admin-dashboard.model';
   standalone: true,
   imports: [
     RouterLink,
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     ButtonModule,
     TableModule,
@@ -58,7 +58,7 @@ export class AdminDashboardPageComponent implements OnInit {
   private readonly currencyService = inject(CurrencyService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Dashboard' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.DASHBOARD' });
   protected readonly dashboard = this.facade.dashboard;
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;

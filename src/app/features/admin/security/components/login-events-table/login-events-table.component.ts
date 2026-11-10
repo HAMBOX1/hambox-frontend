@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -29,7 +29,7 @@ function countryFlag(code: string | null): string {
   selector: 'app-login-events-table',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     TranslatePipe,
     DialogModule,

@@ -28,7 +28,7 @@ import { ReportsFacade } from '../../services/reports.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReportsShellPageComponent {
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Reports' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.REPORTS' });
 
   protected readonly navItems = [
     { path: './', labelKey: 'ADMIN.REPORTS.NAV.LIBRARY', exact: true },

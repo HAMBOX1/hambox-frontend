@@ -23,7 +23,7 @@
     (click)="onRowActivate($event)"
   >
     <div class="category-tree-node__actions" (click)="$event.stopPropagation()">
-      <app-admin-action-menu [items]="menuItems()" label="Category actions" />
+      <app-admin-action-menu [items]="menuItems()" [label]="'ADMIN.CATALOG_UI.CATEGORY_ACTIONS' | translate" />
     </div>
 
     <div class="category-tree-node__primary">
@@ -61,7 +61,7 @@
 
     <div class="category-tree-node__meta">
       @if (!node().isActive) {
-        <span class="category-tree-node__inactive-badge">Inactive</span>
+        <span class="category-tree-node__inactive-badge">{{ 'ADMIN.CATALOG_UI.INACTIVE' | translate }}</span>
       }
       @if (node().childrenCount > 0) {
         <span class="category-tree-node__count category-tree-node__count--children" title="{{ node().childrenCount }} child categories">

@@ -33,6 +33,7 @@ import {
 import { UiButtonComponent, UiFieldComponent, UiInputComponent } from '../../../../shared/components/ui';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { ProductVariantDto } from '../../models/inventory-api.model';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
 function escapeCsvField(value: string): string {
@@ -42,7 +43,7 @@ function escapeCsvField(value: string): string {
 @Component({
   selector: 'app-variant-codes-page',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     ButtonModule,
     InputTextModule,

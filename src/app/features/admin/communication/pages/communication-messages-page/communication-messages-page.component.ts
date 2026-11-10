@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -23,7 +23,7 @@ import { CommunicationFacade } from '../../services/communication.facade';
   selector: 'app-communication-messages-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     TranslatePipe,
     SelectModule,
@@ -42,7 +42,7 @@ import { CommunicationFacade } from '../../services/communication.facade';
 })
 export class CommunicationMessagesPageComponent implements OnInit {
   protected readonly facade = inject(CommunicationFacade);
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Communication', route: '/admin/communication' }, { label: 'Notifications' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.COMMUNICATION', route: '/admin/communication' }, { label: 'ADMIN.COMMUNICATION.MESSAGES.TITLE' });
 
   protected readonly statusOptions = [...COMMUNICATION_STATUS_OPTIONS];
   protected readonly channelOptions = [{ label: 'All', value: 'all' }, ...COMMUNICATION_CHANNELS.map((c) => ({ label: c, value: c }))];

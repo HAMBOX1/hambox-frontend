@@ -17,6 +17,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
 import { LongPressDirective } from '../../../../shared/directives/long-press.directive';
 import { OptionDescriptionTemplateDto, ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { TranslatePipe } from '@ngx-translate/core';
 import { slugify } from '../../utils/product-display.utils';
 
 /**
@@ -28,7 +29,7 @@ import { slugify } from '../../utils/product-display.utils';
 @Component({
   selector: 'app-option-mobile-group-card',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     AutoCompleteModule,
     ButtonModule,

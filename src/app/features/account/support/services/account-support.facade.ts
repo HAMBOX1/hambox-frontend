@@ -100,10 +100,13 @@ export class AccountSupportFacade {
     const dto = await firstValueFrom(
       this.api.createTicket({
         subject: input.subject,
-        body: htmlToPlainText(input.descriptionHtml),
+        // There is no product picker (the field is free text), so the name travels in the message for the agent.
+        body:
+          htmlToPlainText(input.descriptionHtml) +
+          (input.relatedProductName ? `\n\nRelated product: ${input.relatedProductName}` : ''),
         categoryId: input.categoryId,
         priorityId: input.priorityId,
-        relatedOrderId: null,
+        relatedOrderId: input.relatedOrderId ?? null,
         relatedProductId: null,
         customerCountry: null,
         customerBrowser: navigator.userAgent,

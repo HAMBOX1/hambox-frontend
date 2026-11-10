@@ -22,7 +22,7 @@ import { CommunicationFacade } from '../../services/communication.facade';
 })
 export class CommunicationDashboardPageComponent implements OnInit {
   protected readonly facade = inject(CommunicationFacade);
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Communication' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.COMMUNICATION' });
 
   protected readonly navLinks = [
     {

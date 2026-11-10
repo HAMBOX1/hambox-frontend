@@ -52,7 +52,7 @@ export class PaymentGatewayDetailPageComponent implements OnInit {
 
   protected readonly permissions = PERMISSIONS;
   protected readonly gatewayKey = signal('');
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Payment Gateways', route: '/admin/payment-gateways' }, { label: 'Gateway' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.PAYMENT_GATEWAYS', route: '/admin/payment-gateways' }, { label: 'ADMIN.NAV.GATEWAY' });
 
   protected readonly detail = this.facade.detail;
   protected readonly detailLoading = this.facade.detailLoading;

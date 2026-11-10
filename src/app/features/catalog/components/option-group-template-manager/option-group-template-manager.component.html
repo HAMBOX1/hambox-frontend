@@ -1,5 +1,5 @@
 <p-dialog
-  header="Saved Option Groups"
+  [header]="'ADMIN.CATALOG_UI.SAVED_OPTION_GROUPS' | translate"
   [visible]="visible()"
   (visibleChange)="visibleChange.emit($event)"
   [modal]="true"
@@ -12,7 +12,7 @@
 >
   @if (editingTemplateId() || creatingNew()) {
     <div class="admin-field">
-      <label class="admin-field__label" for="template-manager-name">Name</label>
+      <label class="admin-field__label" for="template-manager-name">{{ 'ADMIN.CATALOG_UI.NAME' | translate }}</label>
       <input
         pInputText
         id="template-manager-name"
@@ -31,7 +31,7 @@
             [ngModel]="row.label"
             (ngModelChange)="updateRowLabel(row.tempId, $event)"
           />
-          <button type="button" class="template-manager__row-remove" aria-label="Remove value" (click)="removeRow(row.tempId)">
+          <button type="button" class="template-manager__row-remove" [attr.aria-label]="'ADMIN.CATALOG_UI.REMOVE_VALUE' | translate" (click)="removeRow(row.tempId)">
             <i class="pi pi-times"></i>
           </button>
         </li>
@@ -41,12 +41,12 @@
     <div class="template-manager__add-row">
       <input
         pInputText
-        placeholder="Add a value"
+        [placeholder]="'ADMIN.CATALOG_UI.ADD_A_VALUE' | translate"
         [ngModel]="newRowLabel()"
         (ngModelChange)="newRowLabel.set($event)"
         (keyup.enter)="addRow()"
       />
-      <button pButton type="button" label="Add" icon="pi pi-plus" severity="secondary" (click)="addRow()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ADD' | translate" icon="pi pi-plus" severity="secondary" (click)="addRow()"></button>
     </div>
 
     @if (saveError()) {
@@ -54,18 +54,18 @@
     }
 
     <div class="admin-dialog__actions">
-      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="saving()" (click)="cancelEdit()"></button>
-      <button pButton type="button" label="Save Changes" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="saving()" (click)="cancelEdit()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE_CHANGES' | translate" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
     </div>
   } @else {
     <div class="template-manager__toolbar">
       <app-admin-search-bar
         class="template-manager__search"
         [value]="searchTerm()"
-        placeholder="Search saved groups..."
+        [placeholder]="'ADMIN.CATALOG_UI.SEARCH_SAVED_GROUPS' | translate"
         (searchChange)="onSearchChange($event)"
       />
-      <button pButton type="button" label="New" icon="pi pi-plus" (click)="startCreate()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.NEW' | translate" icon="pi pi-plus" (click)="startCreate()"></button>
     </div>
 
     @if (loading()) {
@@ -73,8 +73,8 @@
     } @else if (templates().length === 0) {
       <app-admin-empty-state
         icon="pi pi-bookmark"
-        title="No saved groups yet"
-        description="Save an existing option group as reusable from the product editor to see it here."
+        [title]="'ADMIN.CATALOG_UI.NO_SAVED_GROUPS_YET' | translate"
+        [description]="'ADMIN.CATALOG_UI.SAVE_AN_EXISTING_OPTION_GROUP_AS_REUSABLE_FR' | translate"
       />
     } @else {
       <ul class="template-manager__list">
@@ -85,8 +85,8 @@
               <span class="template-manager__list-item-count">{{ template.optionCount }} value{{ template.optionCount === 1 ? '' : 's' }}</span>
             </div>
             <div class="template-manager__list-item-actions">
-              <app-admin-icon-button icon="pi pi-pencil" label="Edit" (pressed)="startEdit(template)" />
-              <app-admin-icon-button icon="pi pi-trash" label="Delete" severity="danger" (pressed)="requestDelete(template)" />
+              <app-admin-icon-button icon="pi pi-pencil" [label]="'ADMIN.CATALOG_UI.EDIT' | translate" (pressed)="startEdit(template)" />
+              <app-admin-icon-button icon="pi pi-trash" [label]="'ADMIN.CATALOG_UI.DELETE' | translate" severity="danger" (pressed)="requestDelete(template)" />
             </div>
           </li>
         }
@@ -97,7 +97,7 @@
 
 <app-admin-confirm-dialog
   [visible]="deleteDialogOpen()"
-  title="Delete saved group"
+  [title]="'ADMIN.CATALOG_UI.DELETE_SAVED_GROUP' | translate"
   [message]="'Delete \'' + (deleteTarget()?.name ?? '') + '\'? Products that already imported it keep their own copy — only future imports of this saved group are affected.'"
   [destructive]="true"
   [loading]="deleting()"

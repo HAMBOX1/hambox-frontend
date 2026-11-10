@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -11,7 +11,7 @@ import { LegalManagementFacade } from '../../services/legal-management.facade';
 @Component({
   selector: 'app-legal-acceptance-tracking-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, TranslatePipe, TableModule, AdminPageHeaderComponent, AdminDataTableShellComponent, AdminEmptyStateComponent],
+  imports: [HamboxDatePipe, RouterLink, TranslatePipe, TableModule, AdminPageHeaderComponent, AdminDataTableShellComponent, AdminEmptyStateComponent],
   providers: [LegalManagementFacade],
   templateUrl: './legal-acceptance-tracking-page.component.html',
   styleUrl: './legal-acceptance-tracking-page.component.scss',
@@ -20,7 +20,7 @@ import { LegalManagementFacade } from '../../services/legal-management.facade';
 export class LegalAcceptanceTrackingPageComponent implements OnInit {
   protected readonly facade = inject(LegalManagementFacade);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Legal Center' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.LEGAL.DASHBOARD.TITLE' });
   protected readonly sections = this.facade.documents;
   protected readonly loading = this.facade.documentsLoading;
 

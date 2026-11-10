@@ -60,7 +60,7 @@
         </ng-template>
         <ng-template pTemplate="body" let-log>
           <tr>
-            <td>{{ log.timestampUtc | date: 'short' }}</td>
+            <td>{{ log.timestampUtc | hamboxDate: 'short' }}</td>
             <td>{{ log.path }}</td>
             <td>{{ log.method }}</td>
             <td>{{ log.durationMs }}ms</td>

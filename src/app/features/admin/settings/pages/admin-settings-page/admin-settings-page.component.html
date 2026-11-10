@@ -219,7 +219,7 @@
                   @if (entry.actorDisplayName) {
                     <span>{{ 'ADMIN.SETTINGS.AUDIT.BY' | translate: { name: entry.actorDisplayName } }}</span>
                   }
-                  <time>{{ entry.occurredOnUtc | date: 'medium' }}</time>
+                  <time>{{ entry.occurredOnUtc | hamboxDate: 'medium' }}</time>
                 </li>
               }
             </ul>

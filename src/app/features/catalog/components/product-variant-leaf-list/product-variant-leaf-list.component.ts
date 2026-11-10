@@ -9,6 +9,7 @@ import { TagModule } from 'primeng/tag';
 import { AdminIconButtonComponent } from '../../../../shared/components/admin';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
 import { MobileViewportService } from '../../../../shared/services/mobile-viewport.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { VariantTreeCallbacks, VariantTreeNode } from '../../utils/variant-tree.utils';
 
 /**
@@ -31,7 +32,7 @@ const MAX_VISIBLE_ROWS = 8;
 @Component({
   selector: 'app-variant-leaf-list',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     NgTemplateOutlet,
     FormsModule,
     CheckboxModule,

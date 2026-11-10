@@ -206,6 +206,12 @@ export const STORE_STATUS_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('STORE_STATUS.CLOSED'), value: 'Closed' },
 ];
 
+/** Values match PurchasePointsAmountBasis in PlatformSettingsContracts.cs. */
+export const PURCHASE_POINTS_AMOUNT_BASIS_OPTIONS: SettingsFieldOption[] = [
+  { label: OPT('PURCHASE_POINTS_AMOUNT_BASIS.NET_OF_TAX'), value: 'NetOfTax' },
+  { label: OPT('PURCHASE_POINTS_AMOUNT_BASIS.TOTAL'), value: 'Total' },
+];
+
 export const CUSTOMER_REVEAL_OTP_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CUSTOMER_REVEAL_OTP.OFF'), value: 'Off' },
   { label: OPT('CUSTOMER_REVEAL_OTP.FIRST_REVEAL'), value: 'FirstReveal' },
@@ -598,6 +604,25 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
       unit: 'days',
       validators: { min: 1 },
       ...fieldKeys('REFERRAL.REWARD_EXPIRY_DAYS'),
+    },
+  ],
+  purchasePoints: [
+    { key: 'enabled', control: 'toggle', ...fieldKeys('PURCHASE_POINTS.ENABLED') },
+    {
+      key: 'pointsPerUsd',
+      control: 'number',
+      min: 0,
+      max: 10000,
+      step: 0.01,
+      unit: 'points',
+      validators: { min: 0, max: 10000 },
+      ...fieldKeys('PURCHASE_POINTS.POINTS_PER_USD'),
+    },
+    {
+      key: 'amountBasis',
+      control: 'select',
+      options: PURCHASE_POINTS_AMOUNT_BASIS_OPTIONS,
+      ...fieldKeys('PURCHASE_POINTS.AMOUNT_BASIS'),
     },
   ],
   inventory: [

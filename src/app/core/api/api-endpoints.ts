@@ -255,6 +255,8 @@ export const ACCOUNT_API = {
   notificationsHub: '/hubs/notifications',
   referral: '/api/v1/account/referral',
   referralHistory: '/api/v1/account/referral/history',
+  points: '/api/v1/account/points',
+  pointsHistory: '/api/v1/account/points/history',
   membership: '/api/v1/account/membership',
   membershipHistory: '/api/v1/account/membership/history',
   membershipTransactions: '/api/v1/account/membership/transactions',

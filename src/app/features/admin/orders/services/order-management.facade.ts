@@ -45,6 +45,8 @@ export class OrderManagementFacade {
   private readonly detailState = signal<AdminOrderDetailDto | null>(null);
   private readonly detailLoadingState = signal(false);
   private readonly detailErrorState = signal<string | null>(null);
+  private actionErrorSeq = 0;
+  private readonly actionErrorState = signal<{ message: string; seq: number } | null>(null);
 
   private readonly actionLoadingState = signal(false);
 
@@ -74,6 +76,8 @@ export class OrderManagementFacade {
   readonly detail = this.detailState.asReadonly();
   readonly detailLoading = this.detailLoadingState.asReadonly();
   readonly detailError = this.detailErrorState.asReadonly();
+  /** The latest failed admin action (status change, refund, note…). Kept apart from `detailError` so a rejected action never replaces the order the admin is looking at. */
+  readonly actionError = this.actionErrorState.asReadonly();
   readonly actionLoading = this.actionLoadingState.asReadonly();
 
   readonly hasActiveFilters = computed(
@@ -205,7 +209,7 @@ export class OrderManagementFacade {
       await this.fetchStatistics();
       return true;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return false;
     } finally {
       this.actionLoadingState.set(false);
@@ -223,7 +227,7 @@ export class OrderManagementFacade {
       await this.fetchStatistics();
       return true;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return false;
     } finally {
       this.actionLoadingState.set(false);
@@ -237,7 +241,7 @@ export class OrderManagementFacade {
       await this.loadDetail(orderId);
       return true;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return false;
     } finally {
       this.actionLoadingState.set(false);
@@ -255,7 +259,7 @@ export class OrderManagementFacade {
       await this.loadDetail(orderId);
       return true;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return false;
     } finally {
       this.actionLoadingState.set(false);
@@ -316,7 +320,7 @@ export class OrderManagementFacade {
       await this.fetchStatistics();
       return result;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return null;
     } finally {
       this.actionLoadingState.set(false);
@@ -351,7 +355,7 @@ export class OrderManagementFacade {
       await this.fetchOrders(true);
       return true;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return false;
     } finally {
       this.actionLoadingState.set(false);
@@ -377,7 +381,7 @@ export class OrderManagementFacade {
       await this.fetchOrders(true);
       return true;
     } catch (error) {
-      this.detailErrorState.set(this.toErrorMessage(error));
+      this.failAction(error);
       return false;
     } finally {
       this.actionLoadingState.set(false);
@@ -465,6 +469,10 @@ export class OrderManagementFacade {
     this.searchDebounceTimer = setTimeout(() => {
       void this.fetchOrders();
     }, SEARCH_DEBOUNCE_MS);
+  }
+
+  private failAction(error: unknown): void {
+    this.actionErrorState.set({ message: this.toErrorMessage(error), seq: ++this.actionErrorSeq });
   }
 
   private toErrorMessage(error: unknown): string {

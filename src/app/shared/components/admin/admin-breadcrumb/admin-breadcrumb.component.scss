@@ -16,6 +16,9 @@
 }
 
 .admin-breadcrumb__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
   color: var(--admin-text-muted);
   font-size: var(--admin-type-caption);
   font-weight: 600;

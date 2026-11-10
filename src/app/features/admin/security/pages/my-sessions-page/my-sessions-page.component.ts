@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
@@ -31,7 +31,7 @@ import { MySessionsFacade } from '../../services/my-sessions.facade';
   selector: 'app-my-sessions-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     ButtonModule,
     TableModule,

@@ -1,4 +1,5 @@
-import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
+import { DecimalPipe, SlicePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -39,7 +40,7 @@ import {
   selector: 'app-operations-jobs-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     DecimalPipe,
     SlicePipe,
     FormsModule,

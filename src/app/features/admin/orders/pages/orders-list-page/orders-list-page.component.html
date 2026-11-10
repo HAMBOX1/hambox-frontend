@@ -101,7 +101,7 @@
 
         <p-select
           class="orders-list-page__field orders-list-page__field--status"
-          [options]="statusOptions"
+          [options]="statusOptions()"
           optionLabel="label"
           optionValue="value"
           [ngModel]="orderStatusFilter()"
@@ -111,7 +111,7 @@
 
         <p-select
           class="orders-list-page__field orders-list-page__field--payment"
-          [options]="paymentOptions"
+          [options]="paymentOptions()"
           optionLabel="label"
           optionValue="value"
           [ngModel]="paymentStatusFilter()"
@@ -121,7 +121,7 @@
 
         <p-select
           class="orders-list-page__field orders-list-page__field--delivery"
-          [options]="deliveryOptions"
+          [options]="deliveryOptions()"
           optionLabel="label"
           optionValue="value"
           [ngModel]="deliveryStatusFilter()"
@@ -131,7 +131,7 @@
 
         <p-select
           class="orders-list-page__field orders-list-page__field--date"
-          [options]="dateRangeOptions"
+          [options]="dateRangeOptions()"
           optionLabel="label"
           optionValue="value"
           [ngModel]="dateRangeFilter()"
@@ -141,7 +141,7 @@
 
         <p-select
           class="orders-list-page__field orders-list-page__field--sort"
-          [options]="sortOptions"
+          [options]="sortOptions()"
           optionLabel="label"
           optionValue="value"
           [ngModel]="sort()"
@@ -151,7 +151,7 @@
 
         <p-select
           class="orders-list-page__field orders-list-page__field--page-size"
-          [options]="pageSizeOptions"
+          [options]="pageSizeOptions()"
           optionLabel="label"
           optionValue="value"
           [ngModel]="pageSize()"
@@ -173,7 +173,7 @@
           <div class="orders-list-page__advanced-panel">
             <p-multiSelect
               class="orders-list-page__field orders-list-page__field--columns"
-              [options]="columnOptions"
+              [options]="columnOptions()"
               optionLabel="label"
               optionValue="value"
               [ngModel]="visibleColumns()"
@@ -420,7 +420,7 @@
             @if (isColumnVisible('paymentStatus')) {
               <td>
                 <app-admin-status-badge
-                  [label]="order.paymentStatus"
+                  [label]="valueLabel(order.paymentStatus)"
                   [tone]="statusTone(order.paymentStatus)"
                 />
               </td>
@@ -428,18 +428,18 @@
             @if (isColumnVisible('orderStatus')) {
               <td>
                 <app-admin-status-badge
-                  [label]="order.orderStatus"
+                  [label]="valueLabel(order.orderStatus)"
                   [tone]="statusTone(order.orderStatus)"
                 />
               </td>
             }
             @if (isColumnVisible('purchaseDate')) {
-              <td>{{ order.purchaseDate | date: 'medium' }}</td>
+              <td>{{ order.purchaseDate | hamboxDate: 'medium' }}</td>
             }
             @if (isColumnVisible('deliveryStatus')) {
               <td>
                 <app-admin-status-badge
-                  [label]="order.deliveryStatus"
+                  [label]="valueLabel(order.deliveryStatus)"
                   [tone]="statusTone(order.deliveryStatus)"
                 />
               </td>
@@ -455,7 +455,7 @@
                 @if (order.lastEditedOnUtc) {
                   <span class="admin-cell-primary">{{ order.lastEditedByName || '—' }}</span>
                   <br />
-                  <span class="admin-cell-secondary">{{ order.lastEditedOnUtc | date: 'medium' }}</span>
+                  <span class="admin-cell-secondary">{{ order.lastEditedOnUtc | hamboxDate: 'medium' }}</span>
                 } @else {
                   <span class="admin-cell-secondary">—</span>
                 }

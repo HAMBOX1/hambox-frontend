@@ -23,6 +23,7 @@ import { slugify } from '../../utils/product-display.utils';
 import { OptionDescriptionTemplateManagerComponent } from '../option-description-template-manager/option-description-template-manager.component';
 import { OptionGroupTemplateManagerComponent } from '../option-group-template-manager/option-group-template-manager.component';
 import { ProductOptionGroupNodeComponent } from '../product-option-group-node/product-option-group-node.component';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProductOptionMobileNavComponent } from '../product-option-mobile-nav/product-option-mobile-nav.component';
 
 interface TemplateSelectionRow {
@@ -40,7 +41,7 @@ interface TemplateSelectionRow {
 @Component({
   selector: 'app-product-option-groups-panel',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     AutoCompleteModule,
     ButtonModule,

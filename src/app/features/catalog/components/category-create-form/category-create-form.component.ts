@@ -24,6 +24,7 @@ import { AdminErrorAlertComponent, AdminSectionCardComponent } from '../../../..
 import { Category, CategoryOption, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
 import { CategoryApiService } from '../../services/category-api.service';
 import { slugify } from '../../utils/product-display.utils';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   isAllowedProductImage,
   PRODUCT_IMAGE_MAX_BYTES,
@@ -41,7 +42,7 @@ const FIELD_LABELS = {
 @Component({
   selector: 'app-category-create-form',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     ReactiveFormsModule,
     InputTextModule,
     ButtonModule,

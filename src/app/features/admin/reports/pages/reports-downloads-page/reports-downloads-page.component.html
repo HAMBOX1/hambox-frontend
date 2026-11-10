@@ -36,7 +36,7 @@
             <td>{{ row.reportType }}</td>
             <td>{{ row.format }}</td>
             <td>{{ formatBytes(row.fileSizeBytes) }}</td>
-            <td>{{ row.createdOnUtc | date: 'short' }}</td>
+            <td>{{ row.createdOnUtc | hamboxDate: 'short' }}</td>
           </tr>
         </ng-template>
       </p-table>

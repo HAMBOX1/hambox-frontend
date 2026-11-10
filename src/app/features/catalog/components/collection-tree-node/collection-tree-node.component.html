@@ -22,7 +22,7 @@
     (click)="onRowActivate($event)"
   >
     <div class="collection-tree-node__actions" (click)="$event.stopPropagation()">
-      <app-admin-action-menu [items]="menuItems()" label="Internal category actions" />
+      <app-admin-action-menu [items]="menuItems()" [label]="'ADMIN.CATALOG_UI.INTERNAL_CATEGORY_ACTIONS' | translate" />
     </div>
 
     <div class="collection-tree-node__primary">
@@ -56,7 +56,7 @@
 
     <div class="collection-tree-node__meta">
       @if (node().isSystem) {
-        <span class="collection-tree-node__system-badge">System</span>
+        <span class="collection-tree-node__system-badge">{{ 'ADMIN.CATALOG_UI.SYSTEM' | translate }}</span>
       }
       @if (node().childrenCount > 0) {
         <span class="collection-tree-node__count collection-tree-node__count--children" title="{{ node().childrenCount }} child internal categories">

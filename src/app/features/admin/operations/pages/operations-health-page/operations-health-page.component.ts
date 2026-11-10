@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -19,7 +19,7 @@ import { OperationsFacade } from '../../services/operations.facade';
   selector: 'app-operations-health-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     ButtonModule,
     TableModule,

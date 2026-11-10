@@ -1,6 +1,6 @@
 <aside
   class="detail-panel"
-  aria-label="Selected product details"
+  [attr.aria-label]="'ADMIN.CATALOG_UI.SELECTED_PRODUCT_DETAILS' | translate"
   tabindex="-1"
   (keydown.escape)="onClose()"
 >
@@ -14,7 +14,7 @@
             class="detail-panel__thumb-link"
             [routerLink]="['/admin/products', selected.id, 'edit']"
             fragment="images"
-            aria-label="Edit product images"
+            [attr.aria-label]="'ADMIN.CATALOG_UI.EDIT_PRODUCT_IMAGES' | translate"
           >
             <img
               class="detail-panel__thumb"
@@ -27,7 +27,7 @@
             class="detail-panel__thumb-link"
             [routerLink]="['/admin/products', selected.id, 'edit']"
             fragment="images"
-            aria-label="Add product images"
+            [attr.aria-label]="'ADMIN.CATALOG_UI.ADD_PRODUCT_IMAGES' | translate"
           >
             <span class="detail-panel__thumb detail-panel__thumb--placeholder" aria-hidden="true">
               <i class="pi pi-box"></i>
@@ -56,51 +56,51 @@
           [routerLink]="['/admin/products', selected.id, 'edit']"
         >
           <i class="pi pi-pencil" aria-hidden="true"></i>
-          Edit
+          {{ 'ADMIN.CATALOG_UI.EDIT' | translate }}
         </a>
-        <button type="button" class="detail-panel__close" aria-label="Close product details" (click)="onClose()">
+        <button type="button" class="detail-panel__close" [attr.aria-label]="'ADMIN.CATALOG_UI.CLOSE_PRODUCT_DETAILS' | translate" (click)="onClose()">
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>
       </div>
     </header>
 
     <div class="detail-panel__body">
-      <app-admin-section-card title="General Information">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.GENERAL_INFORMATION' | translate">
         <dl class="detail-panel__facts">
           <div class="detail-panel__fact">
-            <dt>Category</dt>
+            <dt>{{ 'ADMIN.CATALOG_UI.CATEGORY' | translate }}</dt>
             <dd>{{ selected.categoryName || 'Uncategorized' }}</dd>
           </div>
           <div class="detail-panel__fact">
-            <dt>Status</dt>
+            <dt>{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</dt>
             <dd>{{ statusLabel(selected.status) }}</dd>
           </div>
           @if (selected.createdOnUtc) {
             <div class="detail-panel__fact">
-              <dt>Created</dt>
+              <dt>{{ 'ADMIN.CATALOG_UI.CREATED' | translate }}</dt>
               <dd>{{ selected.createdOnUtc | date: 'mediumDate' }}</dd>
             </div>
           }
           @if (selected.lastEditedOnUtc) {
             <div class="detail-panel__fact">
-              <dt>Last edited</dt>
+              <dt>{{ 'ADMIN.CATALOG_UI.LAST_EDITED' | translate }}</dt>
               <dd>{{ selected.lastEditedOnUtc | date: 'medium' }}@if (selected.lastEditedByName) {<span> by {{ selected.lastEditedByName }}</span>}</dd>
             </div>
           }
         </dl>
       </app-admin-section-card>
 
-      <app-admin-section-card title="Pricing">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.PRICING' | translate">
         <div class="detail-panel__price-display">
           <span class="detail-panel__price-value">{{ selected.price | hamboxCurrency }}</span>
-          <span class="detail-panel__price-label">Storefront price (USD)</span>
+          <span class="detail-panel__price-label">{{ 'ADMIN.CATALOG_UI.STOREFRONT_PRICE_USD' | translate }}</span>
         </div>
       </app-admin-section-card>
 
-      <app-admin-section-card title="Identifiers">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.IDENTIFIERS' | translate">
         <dl class="detail-panel__facts">
           <div class="detail-panel__fact detail-panel__fact--id">
-            <dt>Product ID</dt>
+            <dt>{{ 'ADMIN.CATALOG_UI.PRODUCT_ID' | translate }}</dt>
             <dd>
               <button
                 type="button"
@@ -116,7 +116,7 @@
             </dd>
           </div>
           <div class="detail-panel__fact detail-panel__fact--id">
-            <dt>Category ID</dt>
+            <dt>{{ 'ADMIN.CATALOG_UI.CATEGORY_ID' | translate }}</dt>
             <dd>
               <button
                 type="button"
@@ -134,7 +134,7 @@
         </dl>
       </app-admin-section-card>
 
-      <app-admin-section-card title="Description">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.DESCRIPTION' | translate">
         <p
           class="detail-panel__description"
           [class.detail-panel__description--clamped]="isLongDescription() && !descriptionExpanded()"
@@ -153,7 +153,7 @@
         }
       </app-admin-section-card>
 
-      <app-admin-section-card title="Storefront">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.STOREFRONT' | translate">
         <div class="detail-panel__storefront">
           <a
             class="detail-panel__storefront-link"
@@ -162,7 +162,7 @@
             rel="noopener"
           >
             <i class="pi pi-external-link" aria-hidden="true"></i>
-            Open product page
+            {{ 'ADMIN.CATALOG_UI.OPEN_PRODUCT_PAGE' | translate }}
           </a>
           <button type="button" class="detail-panel__storefront-copy" (click)="copyValue(storefrontUrl(), 'url')">
             <i [class]="copiedField() === 'url' ? 'pi pi-check' : 'pi pi-link'" aria-hidden="true"></i>
@@ -171,19 +171,19 @@
         </div>
 
         @if (selected.status === 'Active') {
-          <p class="detail-panel__status-hint">This product is visible on the storefront.</p>
+          <p class="detail-panel__status-hint">{{ 'ADMIN.CATALOG_UI.THIS_PRODUCT_IS_VISIBLE_ON_THE_STOREFRONT' | translate }}</p>
         } @else if (selected.status === 'Draft') {
           <p class="detail-panel__status-hint">
-            Draft products are hidden from the storefront. Publish to make them available to customers.
+            {{ 'ADMIN.CATALOG_UI.DRAFT_PRODUCTS_ARE_HIDDEN_FROM_THE_STOREFRON' | translate }}
           </p>
         } @else if (selected.status === 'Inactive') {
           <p class="detail-panel__status-hint">
-            This product is hidden from the storefront. Publish to show it again.
+            {{ 'ADMIN.CATALOG_UI.THIS_PRODUCT_IS_HIDDEN_FROM_THE_STOREFRONT_P' | translate }}
           </p>
         }
       </app-admin-section-card>
 
-      <app-admin-section-card title="Actions">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.ACTIONS' | translate">
         @if (statusError()) {
           <app-admin-error-alert [message]="statusError()!" [showRetry]="false" />
         }
@@ -194,7 +194,7 @@
           [routerLink]="['/admin/products', selected.id, 'edit']"
         >
           <i class="pi pi-pencil" aria-hidden="true"></i>
-          Edit Product
+          {{ 'ADMIN.CATALOG_UI.EDIT_PRODUCT' | translate }}
         </a>
 
         <div class="detail-panel__action-row">
@@ -202,7 +202,7 @@
             *hamboxHasPermission="permissions.Support.View"
             pButton
             type="button"
-            label="Support Tickets"
+            [label]="'ADMIN.CATALOG_UI.SUPPORT_TICKETS' | translate"
             icon="pi pi-ticket"
             severity="secondary"
             class="detail-panel__action-btn"
@@ -215,7 +215,7 @@
               *hamboxHasPermission="permissions.Catalog.Products.Edit"
               pButton
               type="button"
-              label="Publish"
+              [label]="'ADMIN.CATALOG_UI.PUBLISH' | translate"
               icon="pi pi-globe"
               severity="secondary"
               class="detail-panel__action-btn"
@@ -230,7 +230,7 @@
               *hamboxHasPermission="permissions.Catalog.Products.Edit"
               pButton
               type="button"
-              label="Hide"
+              [label]="'ADMIN.CATALOG_UI.HIDE' | translate"
               icon="pi pi-eye-slash"
               severity="secondary"
               class="detail-panel__action-btn"
@@ -244,7 +244,7 @@
             *hamboxHasPermission="permissions.Catalog.Products.Create"
             pButton
             type="button"
-            label="Duplicate"
+            [label]="'ADMIN.CATALOG_UI.DUPLICATE' | translate"
             icon="pi pi-copy"
             severity="secondary"
             class="detail-panel__action-btn"
@@ -254,14 +254,14 @@
         </div>
 
         <div class="detail-panel__danger-zone">
-          <span class="detail-panel__danger-label">Danger zone</span>
+          <span class="detail-panel__danger-label">{{ 'ADMIN.CATALOG_UI.DANGER_ZONE' | translate }}</span>
           <div class="detail-panel__action-row">
             @if (canArchive(selected.status)) {
               <button
                 *hamboxHasPermission="permissions.Catalog.Products.Edit"
                 pButton
                 type="button"
-                label="Archive"
+                [label]="'ADMIN.CATALOG_UI.ARCHIVE' | translate"
                 icon="pi pi-inbox"
                 severity="secondary"
                 class="detail-panel__action-btn"
@@ -274,7 +274,7 @@
               *hamboxHasPermission="permissions.Catalog.Products.Delete"
               pButton
               type="button"
-              label="Delete"
+              [label]="'ADMIN.CATALOG_UI.DELETE' | translate"
               icon="pi pi-trash"
               severity="danger"
               class="detail-panel__action-btn"
@@ -288,8 +288,8 @@
   } @else {
     <app-admin-empty-state
       icon="pi pi-arrow-left"
-      title="Select a product"
-      description="Choose a row from the catalog table to inspect product details."
+      [title]="'ADMIN.CATALOG_UI.SELECT_A_PRODUCT' | translate"
+      [description]="'ADMIN.CATALOG_UI.CHOOSE_A_ROW_FROM_THE_CATALOG_TABLE_TO_INSPE' | translate"
     />
   }
 </aside>

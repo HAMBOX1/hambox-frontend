@@ -67,7 +67,7 @@
           <td>{{ message.channel }}</td>
           <td>{{ message.category }}</td>
           <td><app-admin-status-badge [label]="message.status" [tone]="statusTone(message.status)" /></td>
-          <td>{{ message.createdOnUtc | date: 'medium' }}</td>
+          <td>{{ message.createdOnUtc | hamboxDate: 'medium' }}</td>
         </tr>
       </ng-template>
 

@@ -314,3 +314,12 @@
     max-inline-size: 88%;
   }
 }
+
+.ticket-detail__error,
+.ticket-detail__confirm {
+  color: var(--color-danger);
+}
+
+.ticket-detail__error {
+  margin: 0 0 1rem;
+}

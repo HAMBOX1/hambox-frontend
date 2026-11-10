@@ -30,6 +30,7 @@ export const APP_ROUTE_REGISTRY: readonly AppRouteOption[] = [
   { labelKey: KEY('ORDERS'), path: '/account/orders', group: 'ACCOUNT' },
   { labelKey: KEY('WISHLIST'), path: '/account/wishlist', group: 'ACCOUNT' },
   { labelKey: KEY('MEMBERSHIP'), path: '/account/membership', group: 'ACCOUNT' },
+  { labelKey: KEY('POINTS'), path: '/account/points', group: 'ACCOUNT' },
   { labelKey: KEY('REFERRAL'), path: '/account/referral', group: 'ACCOUNT' },
   { labelKey: KEY('NOTIFICATIONS'), path: '/account/notifications', group: 'ACCOUNT' },
   { labelKey: KEY('PROFILE'), path: '/account/profile', group: 'ACCOUNT' },

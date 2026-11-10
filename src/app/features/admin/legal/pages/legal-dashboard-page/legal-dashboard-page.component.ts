@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -50,7 +50,7 @@ const TRI_STATE_OPTIONS: { label: string; value: boolean | null }[] = [
   selector: 'app-legal-dashboard-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     RouterLink,
     FormsModule,
     TranslatePipe,
@@ -89,7 +89,7 @@ export class LegalDashboardPageComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Legal Center' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.LEGAL.DASHBOARD.TITLE' });
   protected readonly triStateOptions = TRI_STATE_OPTIONS;
   protected readonly categoryOptions = [
     { label: 'All', value: null },

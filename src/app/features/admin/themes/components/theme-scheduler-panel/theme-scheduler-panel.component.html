@@ -39,9 +39,9 @@
     <ul class="theme-scheduler-panel__list">
       @for (item of schedules(); track item.id) {
         <li>
-          <strong>{{ item.startsAtUtc | date: 'medium' }}</strong>
+          <strong>{{ item.startsAtUtc | hamboxDate: 'medium' }}</strong>
           @if (item.endsAtUtc) {
-            <span> → {{ item.endsAtUtc | date: 'medium' }}</span>
+            <span> → {{ item.endsAtUtc | hamboxDate: 'medium' }}</span>
           }
           @if (item.recurrenceRule) {
             <span class="theme-scheduler-panel__recurrence">{{ item.recurrenceRule }}</span>

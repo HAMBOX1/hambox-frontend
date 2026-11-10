@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-product-form-footer',
   standalone: true,
-  imports: [ButtonModule],
+  imports: [TranslatePipe, ButtonModule],
   templateUrl: './product-form-footer.component.html',
   styleUrl: './product-form-footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

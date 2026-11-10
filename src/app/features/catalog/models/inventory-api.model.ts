@@ -139,10 +139,11 @@ export interface InventoryStatisticsDto {
   readonly expired: number;
   readonly lowStockVariants: number;
   readonly outOfStockVariants: number;
-  readonly inventoryValue: number;
-  readonly purchaseCost: number;
-  readonly estimatedRevenue: number;
-  readonly estimatedProfit: number;
+  /** Cost-derived figures are null unless the user holds Catalog.Inventory.ViewCosts. */
+  readonly inventoryValue: number | null;
+  readonly purchaseCost: number | null;
+  readonly estimatedRevenue: number | null;
+  readonly estimatedProfit: number | null;
 }
 
 export interface InventoryReservationDto {

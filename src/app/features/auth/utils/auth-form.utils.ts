@@ -1,5 +1,7 @@
 import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+import { TranslateService } from '@ngx-translate/core';
+
 import { ApiError } from '../../../core/models/api-error.model';
 
 const SERVER_FIELD_MAP: Record<string, string> = {
@@ -32,7 +34,7 @@ export function applyServerValidationErrors(form: FormGroup, error: ApiError): v
 export function getControlErrorMessage(
   controlName: string,
   form: FormGroup,
-  labels: Record<string, string>,
+  translate: TranslateService,
 ): string | null {
   const control = form.get(controlName);
   if (!control || !control.touched || !control.errors) {
@@ -44,19 +46,19 @@ export function getControlErrorMessage(
     return String(errors['server']);
   }
   if (errors['required']) {
-    return `${labels[controlName] ?? controlName} is required.`;
+    return translate.instant('VALIDATION.FIELD_REQUIRED');
   }
   if (errors['email']) {
-    return 'Enter a valid email address.';
+    return translate.instant('VALIDATION.EMAIL');
   }
   if (errors['minlength']) {
-    return `${labels[controlName] ?? controlName} must be at least ${errors['minlength'].requiredLength} characters.`;
+    return translate.instant('VALIDATION.FIELD_MIN_LENGTH', { min: errors['minlength'].requiredLength });
   }
   if (errors['passwordMismatch']) {
-    return 'Passwords do not match.';
+    return translate.instant('VALIDATION.PASSWORD_MISMATCH');
   }
 
-  return 'Invalid value.';
+  return translate.instant('VALIDATION.INVALID');
 }
 
 export const passwordsMatchValidator: ValidatorFn = (control: AbstractControl) => {

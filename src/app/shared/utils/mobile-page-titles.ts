@@ -15,6 +15,7 @@ const MOBILE_PAGE_TITLE_RULES: readonly MobilePageTitleRule[] = [
   { match: (url) => url.startsWith('/account/notifications'), titleKey: 'ACCOUNT_MENU.NOTIFICATIONS' },
   { match: (url) => url.startsWith('/account/profile'), titleKey: 'ACCOUNT_MENU.SETTINGS' },
   { match: (url) => url.startsWith('/account/referral'), titleKey: 'ACCOUNT.REFERRAL' },
+  { match: (url) => url.startsWith('/account/points'), titleKey: 'ACCOUNT.POINTS_UI.TITLE' },
   { match: (url) => url.startsWith('/account'), titleKey: 'MOBILE_NAV.ACCOUNT' },
   { match: (url) => /^\/products\/[^/]+/.test(url), titleKey: 'MOBILE_NAV.PRODUCT_DETAILS' },
   { match: (url) => url.startsWith('/cart'), titleKey: 'MOBILE_NAV.CART' },

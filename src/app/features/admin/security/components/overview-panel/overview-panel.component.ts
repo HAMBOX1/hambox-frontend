@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -24,7 +24,7 @@ export interface RankedCountryFailure extends CountryFailureCountDto {
   selector: 'app-security-overview-panel',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     NgApexchartsModule,
     AdminErrorAlertComponent,

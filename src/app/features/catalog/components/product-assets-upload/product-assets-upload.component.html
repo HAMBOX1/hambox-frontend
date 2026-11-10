@@ -16,13 +16,13 @@
   />
 
   <div class="assets-upload__row">
-    <span class="assets-upload__label">Images <span class="assets-upload__count">{{ assets().length }}/{{ maxCount }}</span></span>
+    <span class="assets-upload__label">{{ 'ADMIN.CATALOG_UI.IMAGES' | translate }} <span class="assets-upload__count">{{ assets().length }}/{{ maxCount }}</span></span>
 
     <div
       class="assets-upload__strip"
       cdkDropList
       cdkDropListOrientation="horizontal"
-      aria-label="Product image previews"
+      [attr.aria-label]="'ADMIN.CATALOG_UI.PRODUCT_IMAGE_PREVIEWS' | translate"
       (cdkDropListDropped)="onAssetDrop($event)"
     >
       @if (assets().length === 0 && resolvedFallbackImageUrl() && fallbackBadgeLabel(); as badgeLabel) {
@@ -42,7 +42,7 @@
       >
         <i class="pi pi-plus" aria-hidden="true"></i>
         @if (assets().length === 0) {
-          <span>Upload Image</span>
+          <span>{{ 'ADMIN.CATALOG_UI.UPLOAD_IMAGE' | translate }}</span>
         }
       </button>
 
@@ -64,7 +64,7 @@
           </button>
 
           @if (asset.isPrimary) {
-            <span class="assets-upload__primary-badge" title="Primary image">
+            <span class="assets-upload__primary-badge" [title]="'ADMIN.CATALOG_UI.PRIMARY_IMAGE' | translate">
               <i class="pi pi-star-fill" aria-hidden="true"></i>
             </span>
           }
@@ -72,7 +72,7 @@
           <button
             type="button"
             class="assets-upload__remove"
-            aria-label="Remove image"
+            [attr.aria-label]="'ADMIN.CATALOG_UI.REMOVE_IMAGE' | translate"
             [disabled]="uploading()"
             (click)="removeAsset(asset.id)"
           >
@@ -88,11 +88,11 @@
   }
 
   @if (uploading()) {
-    <p class="assets-upload__status">Uploading images...</p>
+    <p class="assets-upload__status">{{ 'ADMIN.CATALOG_UI.UPLOADING_IMAGES' | translate }}</p>
   }
 
   @if (isDragOver()) {
-    <div class="assets-upload__drag-overlay">Drop images to upload</div>
+    <div class="assets-upload__drag-overlay">{{ 'ADMIN.CATALOG_UI.DROP_IMAGES_TO_UPLOAD' | translate }}</div>
   }
 </section>
 
@@ -128,7 +128,7 @@
           <button
             pButton
             type="button"
-            label="Set primary"
+            [label]="'ADMIN.CATALOG_UI.SET_PRIMARY' | translate"
             icon="pi pi-star"
             severity="secondary"
             size="small"
@@ -139,7 +139,7 @@
         <button
           pButton
           type="button"
-          label="Remove"
+          [label]="'ADMIN.CATALOG_UI.REMOVE' | translate"
           icon="pi pi-trash"
           severity="danger"
           size="small"

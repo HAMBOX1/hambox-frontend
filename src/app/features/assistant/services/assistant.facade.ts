@@ -11,7 +11,7 @@ import {
   MessageRole,
   QuickAction,
 } from '../models/assistant.models';
-import { FLOWS, SEED_HISTORY } from '../data/assistant-flows.data';
+import { FLOWS } from '../data/assistant-flows.data';
 import { AUTH_CONTEXT } from '../../../core/auth/auth-context';
 import { AuthSessionService } from '../../../core/auth/auth-session.service';
 import { ProductDetails } from '../../product-details/services/product-details';
@@ -129,7 +129,7 @@ export class AssistantFacade {
   private readonly streamingMessageState = signal<AssistantMessage | null>(null);
   private readonly thinkingState = signal(false);
   private readonly errorShownState = signal(false);
-  private readonly historyState = signal<HistoryItem[]>([...SEED_HISTORY]);
+  private readonly historyState = signal<HistoryItem[]>([]);
   private readonly historyLoadingState = signal(false);
   private readonly contextProductIdState = signal<string | null>(null);
   private readonly contextProductNameState = signal<string | null>(null);

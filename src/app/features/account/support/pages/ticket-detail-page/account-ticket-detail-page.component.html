@@ -29,13 +29,25 @@
       </div>
       <div class="ticket-detail__header-actions">
         @if (ticket.status !== 'closed') {
-          <button type="button" (click)="closeTicket()">{{ 'SUPPORT.DETAIL.CLOSE' | translate }}</button>
+          @if (confirmingClose()) {
+            <span class="ticket-detail__confirm" role="alertdialog">
+              {{ 'SUPPORT.DETAIL.CLOSE_CONFIRM' | translate }}
+              <button type="button" (click)="confirmClose()">{{ 'SUPPORT.DETAIL.CLOSE_CONFIRM_YES' | translate }}</button>
+              <button type="button" (click)="confirmingClose.set(false)">{{ 'SUPPORT.DETAIL.CLOSE_CONFIRM_NO' | translate }}</button>
+            </span>
+          } @else {
+            <button type="button" (click)="closeTicket()">{{ 'SUPPORT.DETAIL.CLOSE' | translate }}</button>
+          }
         }
         @if (ticket.status === 'resolved') {
           <button type="button" (click)="reopenTicket()">{{ 'SUPPORT.DETAIL.REOPEN' | translate }}</button>
         }
       </div>
     </header>
+
+    @if (actionError()) {
+      <p class="ticket-detail__error" role="alert">{{ actionError() }}</p>
+    }
 
     <details class="ticket-detail__timeline">
       <summary>{{ 'SUPPORT.DETAIL.TIMELINE' | translate }}</summary>

@@ -98,7 +98,7 @@ export class AdminSupportTicketsPageComponent {
   // keyboard instead of above it. Tracking window.visualViewport is the standard fix.
   protected readonly composerBottomOffsetPx = signal(0);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Support' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.SUPPORT' });
   protected readonly statusMeta = TICKET_STATUS_META;
   protected readonly statusOptions = Object.entries(TICKET_STATUS_META).map(([value, meta]) => ({ value, labelKey: meta.labelKey }));
   protected readonly categories = this.store.categories;

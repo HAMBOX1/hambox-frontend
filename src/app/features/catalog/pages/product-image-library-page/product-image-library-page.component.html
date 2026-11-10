@@ -2,8 +2,8 @@
 
 <section class="admin-page image-library">
   <app-admin-page-header
-    title="Image Library"
-    subtitle="Every product image in one place — replace, delete or copy pictures without opening each product."
+    [title]="'ADMIN.CATALOG_UI.IMAGE_LIBRARY' | translate"
+    [subtitle]="'ADMIN.CATALOG_UI.EVERY_PRODUCT_IMAGE_IN_ONE_PLACE_REPLACE_DEL' | translate"
     [breadcrumbs]="breadcrumbs"
   />
 
@@ -12,7 +12,7 @@
       pInputText
       type="search"
       class="image-library__search"
-      placeholder="Search by product name…"
+      [placeholder]="'ADMIN.CATALOG_UI.SEARCH_BY_PRODUCT_NAME' | translate"
       [ngModel]="searchTerm()"
       (ngModelChange)="onSearch($event)"
     />
@@ -25,7 +25,7 @@
       filterBy="nameEn,nameAr"
       [showClear]="true"
       appendTo="body"
-      placeholder="All categories"
+      [placeholder]="'ADMIN.CATALOG_UI.ALL_CATEGORIES' | translate"
       [ngModel]="categoryId()"
       (ngModelChange)="onCategoryChange($event)"
     />
@@ -36,13 +36,13 @@
         [ngModel]="withoutImages()"
         (ngModelChange)="onWithoutImagesChange($event)"
       />
-      <span>Products without images</span>
+      <span>{{ 'ADMIN.CATALOG_UI.PRODUCTS_WITHOUT_IMAGES' | translate }}</span>
     </label>
     <span class="image-library__count">{{ totalCount() }} {{ withoutImages() ? 'product(s)' : 'image(s)' }}</span>
   </div>
 
   @if (loading() && items().length === 0) {
-    <p class="image-library__status">Loading…</p>
+    <p class="image-library__status">{{ 'ADMIN.CATALOG_UI.LOADING' | translate }}</p>
   } @else if (items().length === 0) {
     <p class="image-library__status">{{ withoutImages() ? 'Every matching product has an image.' : 'No images found.' }}</p>
   } @else {
@@ -56,7 +56,7 @@
               <span class="image-library__placeholder"><i class="pi pi-image" aria-hidden="true"></i></span>
             }
             @if (item.isPrimary) {
-              <span class="image-library__primary">Primary</span>
+              <span class="image-library__primary">{{ 'ADMIN.CATALOG_UI.PRIMARY' | translate }}</span>
             }
           </div>
 
@@ -69,24 +69,24 @@
 
           <div class="image-library__actions">
             @if (item.imageId) {
-              <label class="image-library__action" title="Replace this picture">
-                <i class="pi pi-sync" aria-hidden="true"></i> Replace
+              <label class="image-library__action" [title]="'ADMIN.CATALOG_UI.REPLACE_THIS_PICTURE' | translate">
+                <i class="pi pi-sync" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.REPLACE' | translate }}
                 <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="replaceImage(item, $event)" />
               </label>
               @if (!item.isPrimary) {
-                <button type="button" class="image-library__action" (click)="makePrimary(item)" title="Use as the product's main image">
-                  <i class="pi pi-star" aria-hidden="true"></i> Primary
+                <button type="button" class="image-library__action" (click)="makePrimary(item)" [title]="'ADMIN.CATALOG_UI.USE_AS_THE_PRODUCT_S_MAIN_IMAGE' | translate">
+                  <i class="pi pi-star" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.PRIMARY' | translate }}
                 </button>
               }
-              <button type="button" class="image-library__action" (click)="openApply(item)" title="Copy this picture onto other products">
-                <i class="pi pi-copy" aria-hidden="true"></i> Use for others
+              <button type="button" class="image-library__action" (click)="openApply(item)" [title]="'ADMIN.CATALOG_UI.COPY_THIS_PICTURE_ONTO_OTHER_PRODUCTS' | translate">
+                <i class="pi pi-copy" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.USE_FOR_OTHERS' | translate }}
               </button>
-              <button type="button" class="image-library__action image-library__action--danger" (click)="askDelete(item)" title="Delete this picture">
+              <button type="button" class="image-library__action image-library__action--danger" (click)="askDelete(item)" [title]="'ADMIN.CATALOG_UI.DELETE_THIS_PICTURE' | translate">
                 <i class="pi pi-trash" aria-hidden="true"></i>
               </button>
             } @else {
-              <label class="image-library__action" title="Upload a picture for this product">
-                <i class="pi pi-upload" aria-hidden="true"></i> Upload
+              <label class="image-library__action" [title]="'ADMIN.CATALOG_UI.UPLOAD_A_PICTURE_FOR_THIS_PRODUCT' | translate">
+                <i class="pi pi-upload" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.UPLOAD' | translate }}
                 <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden (change)="uploadImage(item, $event)" />
               </label>
             }
@@ -96,17 +96,17 @@
     </div>
 
     @if (pageCount() > 1) {
-      <nav class="image-library__pager" aria-label="Pages">
-        <button type="button" pButton severity="secondary" size="small" label="Previous" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"></button>
+      <nav class="image-library__pager" [attr.aria-label]="'ADMIN.CATALOG_UI.PAGES' | translate">
+        <button type="button" pButton severity="secondary" size="small" [label]="'ADMIN.CATALOG_UI.PREVIOUS' | translate" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"></button>
         <span>Page {{ page() }} of {{ pageCount() }}</span>
-        <button type="button" pButton severity="secondary" size="small" label="Next" [disabled]="page() >= pageCount()" (click)="goToPage(page() + 1)"></button>
+        <button type="button" pButton severity="secondary" size="small" [label]="'ADMIN.CATALOG_UI.NEXT' | translate" [disabled]="page() >= pageCount()" (click)="goToPage(page() + 1)"></button>
       </nav>
     }
   }
 </section>
 
 <p-dialog
-  header="Delete image"
+  [header]="'ADMIN.CATALOG_UI.DELETE_IMAGE' | translate"
   [visible]="deleteTarget() !== null"
   (visibleChange)="!$event && deleteTarget.set(null)"
   [modal]="true"
@@ -115,13 +115,13 @@
 >
   <p>Delete this picture of “{{ deleteTarget()?.productName }}”? This cannot be undone.</p>
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="deleteTarget.set(null)" />
-    <p-button label="Delete" severity="danger" icon="pi pi-trash" (onClick)="confirmDelete()" />
+    <p-button [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [text]="true" (onClick)="deleteTarget.set(null)" />
+    <p-button [label]="'ADMIN.CATALOG_UI.DELETE' | translate" severity="danger" icon="pi pi-trash" (onClick)="confirmDelete()" />
   </ng-template>
 </p-dialog>
 
 <p-dialog
-  header="Use this image for other products"
+  [header]="'ADMIN.CATALOG_UI.USE_THIS_IMAGE_FOR_OTHER_PRODUCTS' | translate"
   [visible]="applySource() !== null"
   (visibleChange)="!$event && closeApply()"
   [modal]="true"
@@ -133,14 +133,14 @@
       @if (source.imageUrl) {
         <img [src]="source.imageUrl" [alt]="source.productName" />
       }
-      <span>Copies this picture onto each product you pick (each gets its own copy, added as an extra image).</span>
+      <span>{{ 'ADMIN.CATALOG_UI.COPIES_THIS_PICTURE_ONTO_EACH_PRODUCT_YOU_PI' | translate }}</span>
     </div>
 
     <input
       pInputText
       type="search"
       class="image-library__search"
-      placeholder="Search products…"
+      [placeholder]="'ADMIN.CATALOG_UI.SEARCH_PRODUCTS' | translate"
       [ngModel]="applySearch()"
       (ngModelChange)="onApplySearch($event)"
     />
@@ -164,7 +164,7 @@
   }
 
   <ng-template #footer>
-    <p-button label="Cancel" severity="secondary" [text]="true" [disabled]="applying()" (onClick)="closeApply()" />
+    <p-button [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [text]="true" [disabled]="applying()" (onClick)="closeApply()" />
     <p-button
       icon="pi pi-copy"
       [label]="'Apply to ' + applySelected().size + ' product(s)'"

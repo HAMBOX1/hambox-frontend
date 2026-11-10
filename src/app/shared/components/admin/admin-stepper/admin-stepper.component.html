@@ -1,6 +1,6 @@
 <ol class="admin-stepper" role="list">
   @for (step of steps(); track step.label; let index = $index; let last = $last) {
-    <li class="admin-stepper__item" [class.admin-stepper__item--last]="last">
+    <li class="admin-stepper__item">
       <div class="admin-stepper__marker" [attr.data-state]="stateOf(index)">
         @if (stateOf(index) === 'done') {
           <i class="pi pi-check"></i>

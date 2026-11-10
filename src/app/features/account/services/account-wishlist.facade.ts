@@ -1,6 +1,8 @@
 import { inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { parseApiError } from '../../../core/models/api-error.model';
 import { CartFacade } from '../../cart/services/cart.facade';
 import { WishlistItemApiDto } from '../models/account-api.model';
 import { AccountApiService } from './account-api.service';
@@ -11,6 +13,7 @@ import { AccountApiService } from './account-api.service';
 export class AccountWishlistFacade {
   private readonly api = inject(AccountApiService);
   private readonly cartFacade = inject(CartFacade);
+  private readonly router = inject(Router);
 
   private readonly itemsState = signal<readonly WishlistItemApiDto[]>([]);
   private readonly loadingState = signal(false);
@@ -71,7 +74,12 @@ export class AccountWishlistFacade {
       await firstValueFrom(this.api.moveWishlistToCart(productId));
       await this.cartFacade.load();
       this.itemsState.update((items) => items.filter((i) => i.productId !== productId));
-    } catch {
+    } catch (error) {
+      // A product with variants can't be added without choosing one: send the customer to its page to pick.
+      if (parseApiError(error).code === 'Inventory.VariantRequired') {
+        void this.router.navigate(['/products', productId]);
+        return;
+      }
       this.actionState.set('Unable to move item to cart.');
     }
   }

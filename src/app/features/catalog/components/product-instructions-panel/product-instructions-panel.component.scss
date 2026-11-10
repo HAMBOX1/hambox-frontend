@@ -50,3 +50,12 @@
 .product-instructions-panel__preview-title {
   margin-bottom: var(--hambox-spacing-4);
 }
+
+.product-instructions-panel__live-warning {
+  display: flex;
+  align-items: center;
+  gap: var(--hambox-spacing-2);
+  margin: 0 0 var(--hambox-spacing-3);
+  color: var(--color-warning);
+  font-size: var(--hambox-font-size-sm);
+}

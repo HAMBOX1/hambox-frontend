@@ -75,6 +75,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'points',
+        loadComponent: () =>
+          import('./pages/points-page/account-points-page.component').then(
+            (c) => c.AccountPointsPageComponent,
+          ),
+      },
+      {
         path: 'membership',
         loadComponent: () =>
           import('./pages/membership-page/account-membership-page.component').then(

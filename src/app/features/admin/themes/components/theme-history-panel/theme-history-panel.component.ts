@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { TableModule } from 'primeng/table';
@@ -16,7 +16,7 @@ import { ThemeHistoryEntryDto } from '../../models/theme-api.model';
   selector: 'app-theme-history-panel',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     TableModule,
     AdminSectionCardComponent,

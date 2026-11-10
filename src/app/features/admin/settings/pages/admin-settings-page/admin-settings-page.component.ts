@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -83,6 +83,7 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
   promotions: 'ADMIN.SETTINGS.NAV.CATEGORY_PROMOTIONS',
   memberships: 'ADMIN.SETTINGS.NAV.CATEGORY_MEMBERSHIPS',
   referral: 'ADMIN.SETTINGS.NAV.CATEGORY_REFERRAL',
+  purchasePoints: 'ADMIN.SETTINGS.NAV.CATEGORY_PURCHASE_POINTS',
   inventory: 'ADMIN.SETTINGS.NAV.CATEGORY_INVENTORY',
   queue: 'ADMIN.SETTINGS.NAV.CATEGORY_QUEUE',
   retryPolicies: 'ADMIN.SETTINGS.NAV.CATEGORY_RETRY_POLICIES',
@@ -99,7 +100,7 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
   selector: 'app-admin-settings-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     RouterLink,
     ButtonModule,

@@ -105,7 +105,7 @@ export class PromotionsListPageComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Promotions' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.PROMOTIONS.LIST.TITLE' });
   protected readonly statusOptions = [...PROMOTION_STATUS_OPTIONS];
   protected readonly typeOptions = [...PROMOTION_TYPE_OPTIONS];
 

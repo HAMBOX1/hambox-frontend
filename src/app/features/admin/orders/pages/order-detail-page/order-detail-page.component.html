@@ -84,13 +84,13 @@
         <dl class="admin-meta-grid">
           <div>
             <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.PURCHASE_DATE' | translate }}</dt>
-            <dd>{{ order.createdOnUtc | date: 'medium' }}</dd>
+            <dd>{{ order.createdOnUtc | hamboxDate: 'medium' }}</dd>
           </div>
           @if (order.lastEditedOnUtc) {
             <div>
               <dt>{{ 'ADMIN.ORDERS.LIST.COLUMNS.LAST_EDITED' | translate }}</dt>
               <dd>
-                {{ order.lastEditedOnUtc | date: 'medium' }}
+                {{ order.lastEditedOnUtc | hamboxDate: 'medium' }}
                 @if (order.lastEditedByName) {
                   <span>{{ 'ADMIN.ORDERS.DETAIL.LAST_EDITED_BY' | translate: { name: order.lastEditedByName } }}</span>
                 }
@@ -162,7 +162,7 @@
             <li>
               <strong>{{ event.eventType }}</strong>
               <span>{{ event.description }}</span>
-              <time>{{ event.occurredOnUtc | date: 'medium' }}</time>
+              <time>{{ event.occurredOnUtc | hamboxDate: 'medium' }}</time>
             </li>
           }
         </ol>
@@ -203,7 +203,7 @@
             <td>{{ item.deliveredCodesCount }}</td>
             <td>
               <app-admin-status-badge
-                [label]="item.deliveryStatus"
+                [label]="valueLabel(item.deliveryStatus)"
                 [tone]="statusTone(item.deliveryStatus)"
               />
             </td>
@@ -265,7 +265,7 @@
               <div>
                 <strong>{{ license.productName }}</strong>
                 <app-admin-status-badge
-                  [label]="license.deliveryStatus"
+                  [label]="valueLabel(license.deliveryStatus)"
                   [tone]="statusTone(license.deliveryStatus)"
                 />
               </div>
@@ -318,9 +318,9 @@
               <td>{{ row.orderNumber }}</td>
               <td>{{ row.totalAmount | hamboxCurrency }}</td>
               <td>
-                <app-admin-status-badge [label]="row.orderStatus" [tone]="statusTone(row.orderStatus)" />
+                <app-admin-status-badge [label]="valueLabel(row.orderStatus)" [tone]="statusTone(row.orderStatus)" />
               </td>
-              <td>{{ row.purchaseDate | date: 'short' }}</td>
+              <td>{{ row.purchaseDate | hamboxDate: 'short' }}</td>
               <td>
                 <a
                   pButton
@@ -345,7 +345,7 @@
     @if (order.fulfillmentStage) {
       <p class="order-detail-page__stage">
         <strong>Stage:</strong>
-        <app-admin-status-badge [label]="order.fulfillmentStage" [tone]="statusTone(order.fulfillmentStage)" />
+        <app-admin-status-badge [label]="valueLabel(order.fulfillmentStage)" [tone]="statusTone(order.fulfillmentStage)" />
       </p>
     }
 
@@ -384,7 +384,7 @@
     } @else if (order.refundSettlement === 'Settled') {
       <app-admin-section-card title="Refund returned">
         <p>
-          Returned to the customer on {{ order.refundSettledOnUtc | date: 'medium' }} — reference
+          Returned to the customer on {{ order.refundSettledOnUtc | hamboxDate: 'medium' }} — reference
           {{ order.refundGatewayReference }}.
         </p>
       </app-admin-section-card>
@@ -423,8 +423,8 @@
             <article class="order-detail-page__callback-card">
               <header>
                 <strong>{{ callback.eventType }}</strong>
-                <app-admin-status-badge [label]="callback.status" [tone]="statusTone(callback.status)" />
-                <small>{{ callback.occurredOnUtc | date: 'medium' }}</small>
+                <app-admin-status-badge [label]="valueLabel(callback.status)" [tone]="statusTone(callback.status)" />
+                <small>{{ callback.occurredOnUtc | hamboxDate: 'medium' }}</small>
               </header>
               <dl class="admin-meta-grid">
                 <div>
@@ -484,7 +484,7 @@
             <li>
               <p>{{ note.body }}</p>
               <small>
-                {{ note.authorDisplayName }} · {{ note.createdOnUtc | date: 'medium' }}
+                {{ note.authorDisplayName }} · {{ note.createdOnUtc | hamboxDate: 'medium' }}
                 @if (note.modifiedOnUtc) {
                   · {{ 'ADMIN.ORDERS.DETAIL.EDITED' | translate }}
                 }
@@ -515,7 +515,7 @@
             <li>
               <strong>{{ entry.eventType }}</strong>
               <span>{{ entry.description }}</span>
-              <small>{{ entry.actorDisplayName || 'System' }} · {{ entry.occurredOnUtc | date: 'medium' }}</small>
+              <small>{{ entry.actorDisplayName || 'System' }} · {{ entry.occurredOnUtc | hamboxDate: 'medium' }}</small>
               @if (entry.oldValue || entry.newValue) {
                 <small>{{ entry.oldValue || '-' }} &rarr; {{ entry.newValue || '-' }}</small>
               }
@@ -543,6 +543,7 @@
 >
   <p>{{ 'ADMIN.ORDERS.DETAIL.STATUS_CONFIRM' | translate }}</p>
   <p-select
+    styleClass="w-full"
     [options]="statusOptions"
     optionLabel="label"
     optionValue="value"

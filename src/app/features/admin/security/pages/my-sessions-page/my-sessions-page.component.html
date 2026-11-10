@@ -47,8 +47,8 @@
             <tr>
               <td>{{ deviceLabel(session) }}</td>
               <td>{{ session.ipAddress }}</td>
-              <td>{{ session.startedOnUtc | date: 'short' }}</td>
-              <td>{{ session.lastActivityOnUtc | date: 'short' }}</td>
+              <td>{{ session.startedOnUtc | hamboxDate: 'short' }}</td>
+              <td>{{ session.lastActivityOnUtc | hamboxDate: 'short' }}</td>
               <td>
                 @if (session.isCurrent) {
                   <app-admin-status-badge [label]="'ADMIN.MY_SESSIONS.STATUS.CURRENT' | translate" tone="success" />

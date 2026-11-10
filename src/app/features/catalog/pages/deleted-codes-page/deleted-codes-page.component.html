@@ -2,8 +2,8 @@
 
 <section class="admin-page deleted-codes">
   <app-admin-page-header
-    title="Deleted Codes"
-    subtitle="Every inventory code that was deleted is kept here. Only the primary admin can see this page — customers and other admins cannot."
+    [title]="'ADMIN.CATALOG_UI.DELETED_CODES' | translate"
+    [subtitle]="'ADMIN.CATALOG_UI.EVERY_INVENTORY_CODE_THAT_WAS_DELETED_IS_KEP' | translate"
     [breadcrumbs]="breadcrumbs"
   />
 
@@ -12,7 +12,7 @@
       pInputText
       type="search"
       class="deleted-codes__search"
-      placeholder="Search by product name or variant SKU…"
+      [placeholder]="'ADMIN.CATALOG_UI.SEARCH_BY_PRODUCT_NAME_OR_VARIANT_SKU' | translate"
       [ngModel]="searchTerm()"
       (ngModelChange)="onSearch($event)"
     />
@@ -20,7 +20,7 @@
   </div>
 
   @if (loading() && items().length === 0) {
-    <p class="deleted-codes__status">Loading…</p>
+    <p class="deleted-codes__status">{{ 'ADMIN.CATALOG_UI.LOADING' | translate }}</p>
   } @else if (items().length === 0) {
     <p class="deleted-codes__status">No deleted codes{{ searchTerm() ? ' match this search' : ' yet' }}.</p>
   } @else {
@@ -52,7 +52,7 @@
               [disabled]="busyId() === item.id"
               (click)="restore(item)"
             >
-              <i class="pi pi-undo" aria-hidden="true"></i> Restore to stock
+              <i class="pi pi-undo" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.RESTORE_TO_STOCK' | translate }}
             </button>
           </div>
         </article>
@@ -60,10 +60,10 @@
     </div>
 
     @if (pageCount() > 1) {
-      <nav class="deleted-codes__pager" aria-label="Pages">
-        <button type="button" pButton severity="secondary" size="small" label="Previous" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"></button>
+      <nav class="deleted-codes__pager" [attr.aria-label]="'ADMIN.CATALOG_UI.PAGES' | translate">
+        <button type="button" pButton severity="secondary" size="small" [label]="'ADMIN.CATALOG_UI.PREVIOUS' | translate" [disabled]="page() <= 1" (click)="goToPage(page() - 1)"></button>
         <span>Page {{ page() }} of {{ pageCount() }}</span>
-        <button type="button" pButton severity="secondary" size="small" label="Next" [disabled]="page() >= pageCount()" (click)="goToPage(page() + 1)"></button>
+        <button type="button" pButton severity="secondary" size="small" [label]="'ADMIN.CATALOG_UI.NEXT' | translate" [disabled]="page() >= pageCount()" (click)="goToPage(page() + 1)"></button>
       </nav>
     }
   }

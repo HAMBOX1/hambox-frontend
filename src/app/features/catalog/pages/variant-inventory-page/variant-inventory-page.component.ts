@@ -21,12 +21,13 @@ import {
 import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { ProductVariantDto } from '../../models/inventory-api.model';
 import { VariantInventoryPanelComponent } from '../../components/variant-inventory-panel/variant-inventory-panel.component';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
 @Component({
   selector: 'app-variant-inventory-page',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     TagModule,
     AdminPageHeaderComponent,
     AdminStatCardComponent,
@@ -61,7 +62,7 @@ export class VariantInventoryPageComponent implements OnInit {
     const variant = this.variant();
 
     return adminBreadcrumbs(
-      { label: 'Products', route: '/admin/products' },
+      { label: 'ADMIN.NAV.PRODUCTS', route: '/admin/products' },
       {
         label: product?.nameEn ?? 'Product',
         route: product ? `/admin/products/${product.id}/edit` : null,

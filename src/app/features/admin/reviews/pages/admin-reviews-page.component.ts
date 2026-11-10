@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -12,6 +12,8 @@ import { firstValueFrom, Observable } from 'rxjs';
 
 import { ADMIN_REVIEWS_API } from '../../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../../core/api/api-client.service';
+import { AdminPageHeaderComponent } from '../../../../shared/components/admin';
+import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { ApiError } from '../../../../core/models/api-error.model';
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
@@ -44,9 +46,9 @@ const FILTERS: { value: ReviewFilter; label: string }[] = [
 @Component({
   selector: 'app-admin-reviews-page',
   standalone: true,
-  imports: [
+  imports: [AdminPageHeaderComponent,
     FormsModule,
-    DatePipe,
+    HamboxDatePipe,
     ButtonModule,
     DialogModule,
     SelectModule,
@@ -60,6 +62,7 @@ const FILTERS: { value: ReviewFilter; label: string }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminReviewsPageComponent implements OnInit {
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.REVIEWS' });
   private readonly api = inject(ApiClientService);
   private readonly messageService = inject(MessageService);
 

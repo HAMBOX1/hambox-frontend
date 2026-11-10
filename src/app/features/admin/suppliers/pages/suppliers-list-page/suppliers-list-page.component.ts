@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -33,7 +33,7 @@ import { SuppliersManagementFacade } from '../../services/suppliers-management.f
   selector: 'app-suppliers-list-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     RouterLink,
     TranslatePipe,
@@ -66,7 +66,7 @@ export class SuppliersListPageComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Suppliers' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.SUPPLIERS.LIST.TITLE' });
   protected readonly statusOptions = [...SUPPLIER_STATUS_OPTIONS];
 
   protected readonly list = this.facade.list;

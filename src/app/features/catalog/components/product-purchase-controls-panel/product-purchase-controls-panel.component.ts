@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiClientService } from '../../../../core/api/api-client.service';
@@ -116,6 +118,8 @@ interface ProductPurchaseControls {
 export class ProductPurchaseControlsPanelComponent {
   private readonly facade = inject(ProductEditorFacade);
   private readonly api = inject(ApiClientService);
+  private readonly messageService = inject(MessageService);
+  private readonly translate = inject(TranslateService);
 
   protected readonly permissions = PERMISSIONS;
   protected readonly product = this.facade.product;
@@ -158,6 +162,11 @@ export class ProductPurchaseControlsPanelComponent {
           requiresManualReview: this.requiresReview(),
         }),
       );
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PURCHASE_LIMITS_SAVED'),
+        life: 3000,
+      });
     } catch {
       this.error.set('Could not save the purchase controls.');
     } finally {

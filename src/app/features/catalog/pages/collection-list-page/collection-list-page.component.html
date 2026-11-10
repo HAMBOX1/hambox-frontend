@@ -2,7 +2,7 @@
 
 <section class="admin-page collection-list-page">
   <app-admin-page-header
-    title="Internal Categories"
+    [title]="'ADMIN.CATALOG_UI.INTERNAL_CATEGORIES' | translate"
     [subtitle]="subtitle()"
     [breadcrumbs]="breadcrumbs"
     [compactActions]="true"
@@ -11,7 +11,7 @@
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Collections.Create"
       icon="pi pi-plus"
-      label="Create Internal Category"
+      [label]="'ADMIN.CATALOG_UI.CREATE_INTERNAL_CATEGORY' | translate"
       severity="primary"
       (pressed)="openCreateDialog()"
     />
@@ -20,7 +20,7 @@
   <app-admin-search-bar
     class="collection-list-page__search"
     [value]="searchTerm()"
-    placeholder="Search internal categories..."
+    [placeholder]="'ADMIN.CATALOG_UI.SEARCH_INTERNAL_CATEGORIES_2' | translate"
     (searchChange)="onSearchChange($event)"
   />
 
@@ -38,7 +38,7 @@
 </section>
 
 <p-dialog
-  header="Create Internal Category"
+  [header]="'ADMIN.CATALOG_UI.CREATE_INTERNAL_CATEGORY' | translate"
   [visible]="createDialogOpen()"
   (visibleChange)="onCreateDialogVisibleChange($event)"
   [modal]="true"
@@ -64,7 +64,7 @@
 <p-drawer
   [visible]="editDialogOpen()"
   (visibleChange)="onEditDialogVisibleChange($event)"
-  header="Edit Internal Category"
+  [header]="'ADMIN.CATALOG_UI.EDIT_INTERNAL_CATEGORY' | translate"
   position="right"
   [modal]="true"
   [dismissible]="true"
@@ -86,7 +86,7 @@
 
 <app-admin-confirm-dialog
   [visible]="deleteDialogOpen()"
-  title="Delete internal category"
+  [title]="'ADMIN.CATALOG_UI.DELETE_INTERNAL_CATEGORY' | translate"
   [message]="deleteDialogMessage()"
   [destructive]="true"
   [loading]="deleting()"

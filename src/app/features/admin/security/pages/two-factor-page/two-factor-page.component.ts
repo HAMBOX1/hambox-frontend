@@ -65,7 +65,7 @@ export class TwoFactorPageComponent implements OnInit {
   private readonly api = inject(ApiClientService);
   private readonly messages = inject(MessageService);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Two-factor authentication' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.TWO_FACTOR' });
 
   protected readonly status = signal<TotpStatus | null>(null);
   protected readonly loading = signal(false);

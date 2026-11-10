@@ -60,7 +60,6 @@ import {
   ProductColumnId,
   ProductTableColumnsService,
 } from '../../services/product-table-columns.service';
-import { productStatusLabel } from '../../utils/product-display.utils';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
 type EditableField = 'name' | 'price' | 'cost' | 'member';
@@ -175,6 +174,7 @@ export class ProductCatalogTableComponent {
   readonly previewProduct = output<Product>();
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
+  readonly unarchiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
   /** Row actions for a product parked as a pending merge (see `pendingMergeIntoProductId`) — runs
    * the actual merge (existing `MergeProductsCommand`, single source) / unlinks it back to normal. */
@@ -216,7 +216,9 @@ export class ProductCatalogTableComponent {
     return this.products().find((product) => product.id === selectedId) ?? null;
   });
 
-  protected readonly statusLabel = productStatusLabel;
+  protected statusLabel(status: ProductStatus): string {
+    return this.translate.instant(`ADMIN.CATALOG_PAGE.STATUS_VALUES.${status}`);
+  }
   protected readonly resolveImageUrl = resolveProductImageUrl;
   protected readonly failedImageIds = signal<ReadonlySet<string>>(new Set());
   protected readonly statusOptions = STATUS_EDIT_OPTIONS;
@@ -247,9 +249,9 @@ export class ProductCatalogTableComponent {
    * the product name's dblclick-to-edit above, scoped to variant ids instead of product ids. */
   protected readonly editingVariantId = signal<string | null>(null);
   protected readonly priceFieldOptions: readonly { id: VariantPriceField; label: string }[] = [
-    { id: 'sale', label: 'Sale' },
-    { id: 'cost', label: 'Cost' },
-    { id: 'member', label: 'Member' },
+    { id: 'sale', label: 'ADMIN.CATALOG_PAGE.COLUMNS.SALE' },
+    { id: 'cost', label: 'ADMIN.CATALOG_PAGE.COLUMNS.COST' },
+    { id: 'member', label: 'ADMIN.CATALOG_PAGE.COLUMNS.MEMBER' },
   ];
 
   /** Which of Sale / Cost / Member show as columns — driven by the unified "Columns" picker
@@ -630,7 +632,8 @@ export class ProductCatalogTableComponent {
   }
 
   protected priceFieldLabel(field: VariantPriceField): string {
-    return this.priceFieldOptions.find((option) => option.id === field)?.label ?? field;
+    const key = this.priceFieldOptions.find((option) => option.id === field)?.label;
+    return key ? this.translate.instant(key) : field;
   }
 
   protected isEditingTier(productId: string, field: VariantPriceField): boolean {
@@ -722,7 +725,7 @@ export class ProductCatalogTableComponent {
     } catch (error) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to update price',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PRICE_UPDATE_FAILED'),
         detail: this.errorDetail(error),
         life: 6000,
       });
@@ -780,8 +783,8 @@ export class ProductCatalogTableComponent {
     } catch {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to rename variant',
-        detail: 'Please try again.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.RENAME_VARIANT_FAILED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
       });
     }
   }
@@ -797,8 +800,8 @@ export class ProductCatalogTableComponent {
     } catch {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to update status',
-        detail: 'Please try again.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_STATUS_FAILED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
       });
     }
   }
@@ -854,8 +857,8 @@ export class ProductCatalogTableComponent {
     } catch {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to update status for one or more variants',
-        detail: 'Please try again.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANTS_STATUS_FAILED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
       });
     }
   }
@@ -881,8 +884,8 @@ export class ProductCatalogTableComponent {
       if ((product.variantCount ?? 0) === 0) {
         this.messageService.add({
           severity: 'info',
-          summary: 'Add a variant first',
-          detail: 'Cost and member prices live on the product variants.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.ADD_VARIANT_FIRST'),
+          detail: this.translate.instant('ADMIN.CATALOG_TOASTS.TIER_PRICES_ON_VARIANTS'),
           life: 3500,
         });
         return;
@@ -982,13 +985,13 @@ export class ProductCatalogTableComponent {
       const changed = await firstValueFrom(this.inventoryApi.setProductVariantPrices(product.id, field, value));
       this.messageService.add({
         severity: 'success',
-        summary: `${field === 'cost' ? 'Cost' : 'Member'} price updated`,
-        detail: changed > 1 ? `Applied to ${changed} variants.` : undefined,
+        summary: this.translate.instant(field === 'cost' ? 'ADMIN.CATALOG_TOASTS.PRICE_UPDATED_COST' : 'ADMIN.CATALOG_TOASTS.PRICE_UPDATED_MEMBER'),
+        detail: changed > 1 ? this.translate.instant('ADMIN.CATALOG_TOASTS.APPLIED_TO_VARIANTS', { p0: changed }) : undefined,
         life: 2500,
       });
       this.productPricesChanged.emit();
     } catch (error) {
-      this.messageService.add({ severity: 'error', summary: 'Failed to update the price', detail: this.errorDetail(error), life: 6000 });
+      this.messageService.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.THE_PRICE_UPDATE_FAILED'), detail: this.errorDetail(error), life: 6000 });
     }
   }
 
@@ -1060,9 +1063,20 @@ export class ProductCatalogTableComponent {
       (product.variantCount ?? 0) <= 1
     ) {
       items.push({
-        label: product.hasChatDeliveryVariant ? 'Delivery type (On-Delivery)' : 'Set as On-Delivery / Instant',
+        label: t(product.hasChatDeliveryVariant ? 'ADMIN.CATALOG_PAGE.ACTIONS.DELIVERY_TYPE' : 'ADMIN.CATALOG_PAGE.ACTIONS.SET_DELIVERY'),
         icon: 'pi pi-comments',
         command: () => this.setChatDeliveryRequested.emit(product),
+      });
+    }
+
+    if (
+      this.permissionService.hasPermission(this.permissions.Catalog.Products.Edit) &&
+      product.status === 'Archived'
+    ) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.UNARCHIVE'),
+        icon: 'pi pi-replay',
+        command: () => this.unarchiveProduct.emit(product),
       });
     }
 

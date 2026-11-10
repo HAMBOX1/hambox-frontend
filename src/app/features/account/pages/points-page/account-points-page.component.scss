@@ -1,0 +1,208 @@
+.points-page__header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-primary);
+    font-family: var(--sf-font-heading);
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+}
+
+.points-page__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.points-page__stat {
+  padding: 1.25rem;
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-panel-bg);
+}
+
+.points-page__label {
+  margin: 0 0 0.5rem;
+  color: var(--color-text-caption);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.points-page__stat-value {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.points-page__stat-sub {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}
+
+.points-page__state,
+.points-page__empty {
+  padding: 2.5rem;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-section);
+  color: var(--color-text-secondary);
+  text-align: center;
+
+  p {
+    margin: 0 0 1rem;
+  }
+}
+
+.points-page__retry {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-section);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.points-page__history {
+  padding: 1.5rem;
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--sf-radius-lg);
+  background: var(--color-panel-bg);
+}
+
+.points-history__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-weight: 700;
+  }
+}
+
+.points-history__type-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--color-section);
+  color: var(--color-text-primary);
+}
+
+.points-history__table-wrap {
+  overflow-x: auto;
+}
+
+.points-history__table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: start;
+    border-bottom: 1px solid var(--color-divider);
+    white-space: nowrap;
+  }
+
+  th {
+    color: var(--color-text-caption);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  td {
+    color: var(--color-text-secondary);
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+}
+
+.points-history__num {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--color-success);
+
+  &--negative {
+    color: var(--color-danger);
+  }
+}
+
+.points-history__type {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--sf-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  &--earned {
+    background: var(--color-success-muted);
+    color: var(--color-success);
+  }
+
+  &--reversed {
+    background: var(--color-danger-muted);
+    color: var(--color-danger);
+  }
+}
+
+.points-history__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--sf-radius-sm);
+    background: var(--color-section);
+    color: var(--color-text-primary);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .points-page__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 479px) {
+  .points-page__stats {
+    grid-template-columns: 1fr;
+  }
+}

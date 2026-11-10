@@ -65,7 +65,7 @@ export class ImportExportJobsPageComponent implements OnInit, OnDestroy {
 
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs(
-    { label: 'Products', route: '/admin/products' },
+    { label: 'ADMIN.NAV.PRODUCTS', route: '/admin/products' },
     { label: 'Import/Export Jobs' },
   );
 

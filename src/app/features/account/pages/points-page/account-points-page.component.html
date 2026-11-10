@@ -1,0 +1,144 @@
+<section class="points-page" hamboxTranslateRefresh>
+  <header class="points-page__header">
+    <h1>{{ 'ACCOUNT.POINTS_UI.TITLE' | translate }}</h1>
+    <p>{{ 'ACCOUNT.POINTS_UI.SUBTITLE' | translate }}</p>
+  </header>
+
+  @if (loading()) {
+    <p class="points-page__state" role="status">{{ 'ACCOUNT.POINTS_UI.LOADING' | translate }}</p>
+  } @else if (error()) {
+    <div class="points-page__state" role="alert">
+      <p>{{ 'ACCOUNT.POINTS_UI.ERROR' | translate }}</p>
+      <button type="button" class="points-page__retry" (click)="reload()">
+        {{ 'ACCOUNT.POINTS_UI.RETRY' | translate }}
+      </button>
+    </div>
+  } @else if (summary(); as data) {
+    <div class="points-page__stats">
+      <div class="points-page__stat">
+        <p class="points-page__label">{{ 'ACCOUNT.POINTS_UI.BALANCE' | translate }}</p>
+        <p class="points-page__stat-value">{{ data.balance | number }}</p>
+      </div>
+      <div class="points-page__stat">
+        <p class="points-page__label">{{ 'ACCOUNT.POINTS_UI.TOTAL_EARNED' | translate }}</p>
+        <p class="points-page__stat-value">{{ data.totalEarned | number }}</p>
+      </div>
+      <div class="points-page__stat">
+        <p class="points-page__label">{{ 'ACCOUNT.POINTS_UI.HOW_YOU_EARN' | translate }}</p>
+        @if (data.enabled) {
+          <p class="points-page__stat-sub">
+            {{
+              'ACCOUNT.POINTS_UI.EARN_RATE'
+                | translate: { rate: (data.pointsPerUsd | number: '1.0-4') }
+            }}
+          </p>
+        } @else {
+          <p class="points-page__stat-sub">{{ 'ACCOUNT.POINTS_UI.PAUSED' | translate }}</p>
+        }
+      </div>
+    </div>
+
+    <section class="points-page__history">
+      <div class="points-history__toolbar">
+        <h3>{{ 'ACCOUNT.POINTS_UI.HISTORY_TITLE' | translate }}</h3>
+        <select
+          class="points-history__type-select"
+          [value]="typeFilter()"
+          (change)="onTypeFilterChange($event)"
+          [attr.aria-label]="'ACCOUNT.POINTS_UI.FILTER_ARIA' | translate"
+        >
+          @for (option of typeOptions; track option.value) {
+            <option [value]="option.value">{{ option.labelKey | translate }}</option>
+          }
+        </select>
+      </div>
+
+      @if (historyLoading()) {
+        <p class="points-page__state" role="status">
+          {{ 'ACCOUNT.POINTS_UI.LOADING' | translate }}
+        </p>
+      } @else if (historyError()) {
+        <div class="points-page__state" role="alert">
+          <p>{{ 'ACCOUNT.POINTS_UI.ERROR' | translate }}</p>
+          <button type="button" class="points-page__retry" (click)="reload()">
+            {{ 'ACCOUNT.POINTS_UI.RETRY' | translate }}
+          </button>
+        </div>
+      } @else if (history().length === 0) {
+        <p class="points-page__empty">{{ 'ACCOUNT.POINTS_UI.EMPTY_HISTORY' | translate }}</p>
+      } @else {
+        <div class="points-history__table-wrap">
+          <table class="points-history__table">
+            <thead>
+              <tr>
+                <th>{{ 'ACCOUNT.POINTS_UI.COL_DATE' | translate }}</th>
+                <th>{{ 'ACCOUNT.POINTS_UI.COL_TYPE' | translate }}</th>
+                <th>{{ 'ACCOUNT.POINTS_UI.COL_ORDER' | translate }}</th>
+                <th>{{ 'ACCOUNT.POINTS_UI.COL_DESCRIPTION' | translate }}</th>
+                <th class="points-history__num">
+                  {{ 'ACCOUNT.POINTS_UI.COL_POINTS' | translate }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of history(); track entry.id) {
+                <tr>
+                  <td>{{ entry.occurredOnUtc | hamboxDate: 'mediumDate' }}</td>
+                  <td>
+                    <span
+                      [class]="
+                        'points-history__type points-history__type--' + entry.type.toLowerCase()
+                      "
+                    >
+                      {{ 'ACCOUNT.POINTS_UI.TYPE_' + entry.type.toUpperCase() | translate }}
+                    </span>
+                  </td>
+                  <td>
+                    <a [routerLink]="['/account/orders', entry.orderId]">{{ entry.orderNumber }}</a>
+                  </td>
+                  <td [attr.title]="entry.description">
+                    {{
+                      'ACCOUNT.POINTS_UI.REASON_' + entry.type.toUpperCase()
+                        | translate: { order: entry.orderNumber }
+                    }}
+                  </td>
+                  <td
+                    class="points-history__num"
+                    [class.points-history__num--negative]="entry.points < 0"
+                  >
+                    {{ entry.points > 0 ? '+' : '' }}{{ entry.points | number }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav
+            class="points-history__pagination"
+            [attr.aria-label]="'ACCOUNT.POINTS_UI.PAGINATION_ARIA' | translate"
+          >
+            <button
+              type="button"
+              [disabled]="pageNumber() <= 1"
+              (click)="goToPage(pageNumber() - 1)"
+            >
+              {{ 'ACCOUNT.POINTS_UI.PREVIOUS' | translate }}
+            </button>
+            <span>{{
+              'ACCOUNT.POINTS_UI.PAGE_OF' | translate: { page: pageNumber(), total: totalPages() }
+            }}</span>
+            <button
+              type="button"
+              [disabled]="pageNumber() >= totalPages()"
+              (click)="goToPage(pageNumber() + 1)"
+            >
+              {{ 'ACCOUNT.POINTS_UI.NEXT' | translate }}
+            </button>
+          </nav>
+        }
+      }
+    </section>
+  }
+</section>

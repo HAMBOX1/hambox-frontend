@@ -5,7 +5,7 @@
     }
 
     <div class="admin-field">
-      <label class="admin-field__label" for="collection-name">Name</label>
+      <label class="admin-field__label" for="collection-name">{{ 'ADMIN.CATALOG_UI.NAME' | translate }}</label>
       <input
         pInputText
         id="collection-name"
@@ -13,7 +13,7 @@
         type="text"
         formControlName="name"
         autocomplete="off"
-        placeholder="e.g. Supplier Bamboo"
+        [placeholder]="'ADMIN.CATALOG_UI.E_G_SUPPLIER_BAMBOO' | translate"
       />
       @if (fieldError('name'); as error) {
         <p class="collection-create-form__error">{{ error }}</p>
@@ -22,7 +22,7 @@
 
     <div class="admin-field">
       <label class="admin-field__label" for="collection-description"
-        >Description <span class="admin-field__optional">(optional)</span></label
+        >{{ 'ADMIN.CATALOG_UI.DESCRIPTION' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></label
       >
       <textarea
         pTextarea
@@ -36,7 +36,7 @@
 
     <div class="admin-field">
       <label class="admin-field__label" for="collection-parent"
-        >Parent internal category <span class="admin-field__optional">(optional)</span></label
+        >{{ 'ADMIN.CATALOG_UI.PARENT_INTERNAL_CATEGORY' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></label
       >
       <p-select
         inputId="collection-parent"
@@ -44,12 +44,12 @@
         [options]="parentDropdownOptions()"
         optionLabel="label"
         optionValue="value"
-        placeholder="No parent (top-level)"
+        [placeholder]="'ADMIN.CATALOG_UI.NO_PARENT_TOP_LEVEL' | translate"
       />
     </div>
 
     <div class="admin-field">
-      <span class="admin-field__label">Color <span class="admin-field__optional">(optional)</span></span>
+      <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.COLOR' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></span>
       <div class="collection-create-form__swatches">
         @for (preset of colorPresets; track preset.key) {
           <button
@@ -66,7 +66,7 @@
     </div>
 
     <div class="admin-field">
-      <span class="admin-field__label">Icon <span class="admin-field__optional">(optional)</span></span>
+      <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.ICON' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></span>
       <div class="collection-create-form__icons">
         @for (icon of iconPresets; track icon) {
           <button
@@ -89,7 +89,7 @@
       pButton
       type="button"
       class="admin-btn-secondary"
-      label="Cancel"
+      [label]="'ADMIN.CATALOG_UI.CANCEL' | translate"
       severity="secondary"
       [disabled]="submitting()"
       (click)="cancel()"

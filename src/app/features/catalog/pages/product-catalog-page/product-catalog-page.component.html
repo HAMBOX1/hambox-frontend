@@ -188,7 +188,7 @@
       [pageSize]="pageSize()"
       [first]="tableFirst()"
       [selectedProductId]="selectedProductId()"
-      [searchActive]="hasActiveSearch()"
+      [searchActive]="hasActiveFilters()"
       [categoryOptions]="categoryOptions()"
       [collectionOptions]="collectionOptions()"
       [mappingStatusByProductId]="mappingStatusByProductId()"
@@ -204,6 +204,7 @@
       (previewProduct)="onPreviewProduct($event)"
       (duplicateProduct)="openDuplicateDialog($event)"
       (archiveProduct)="onRowArchive($event)"
+      (unarchiveProduct)="onRowUnarchive($event)"
       (deleteProduct)="requestDelete($event)"
       (mappingOpenRequested)="onMappingOpenRequested($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
@@ -231,7 +232,7 @@
       [totalRecords]="totalCount()"
       [pageSize]="pageSize()"
       [first]="tableFirst()"
-      [searchActive]="hasActiveSearch()"
+      [searchActive]="hasActiveFilters()"
       [bulkSelectedIds]="bulkSelectedIds()"
       [selectAllMatchingActive]="selectAllMatchingActive()"
       [collectionOptions]="collectionOptions()"
@@ -242,6 +243,7 @@
       (previewProduct)="onPreviewProduct($event)"
       (duplicateProduct)="openDuplicateDialog($event)"
       (archiveProduct)="onRowArchive($event)"
+      (unarchiveProduct)="onRowUnarchive($event)"
       (deleteProduct)="requestDelete($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
       (manageStock)="navigateToStock($event)"
@@ -302,6 +304,7 @@
       pInputText
       id="duplicate-suffix"
       class="admin-field__input"
+      maxlength="60"
       [ngModel]="duplicateNameSuffix()"
       (ngModelChange)="duplicateNameSuffix.set($event)"
     />
@@ -332,7 +335,7 @@
 />
 
 <p-dialog
-  header="Delivery type"
+  [header]="'ADMIN.CATALOG_UI.DELIVERY_TYPE' | translate"
   [visible]="chatDeliveryDialogOpen()"
   (visibleChange)="chatDeliveryDialogOpen.set($event)"
   [modal]="true"
@@ -343,24 +346,24 @@
   styleClass="admin-dialog"
 >
   <div class="admin-field">
-    <label class="admin-field__label">How is it delivered?</label>
+    <label class="admin-field__label">{{ 'ADMIN.CATALOG_UI.HOW_IS_IT_DELIVERED' | translate }}</label>
     <div class="" style="display:flex;flex-direction:column;gap:.5rem">
       <label style="display:flex;align-items:center;gap:.5rem">
         <input type="radio" name="deliveryKind" [checked]="deliveryKind() === 'chat'" (change)="deliveryKind.set('chat')" />
-        <span>On-Delivery — support chat after payment</span>
+        <span>{{ 'ADMIN.CATALOG_UI.ON_DELIVERY_SUPPORT_CHAT_AFTER_PAYMENT' | translate }}</span>
       </label>
       <label style="display:flex;align-items:center;gap:.5rem">
         <input type="radio" name="deliveryKind" [checked]="deliveryKind() === 'instant'" (change)="deliveryKind.set('instant')" />
-        <span>Instant stock — codes delivered immediately</span>
+        <span>{{ 'ADMIN.CATALOG_UI.INSTANT_STOCK_CODES_DELIVERED_IMMEDIATELY' | translate }}</span>
       </label>
     </div>
   </div>
   @if (deliveryKind() === 'chat') {
   <p class="admin-dialog__hint">
-    Delivered manually over a support chat opened right after payment, instead of an instant digital code. Set how many units can be sold before this runs out — you can top it up again anytime.
+    {{ 'ADMIN.CATALOG_UI.DELIVERED_MANUALLY_OVER_A_SUPPORT_CHAT_OPENE' | translate }}
   </p>
   <div class="admin-field">
-    <label class="admin-field__label" for="chat-delivery-capacity">Capacity</label>
+    <label class="admin-field__label" for="chat-delivery-capacity">{{ 'ADMIN.CATALOG_UI.CAPACITY' | translate }}</label>
     <p-inputNumber
       inputId="chat-delivery-capacity"
       class="admin-field__input"
@@ -372,7 +375,7 @@
   </div>
   } @else {
     <p class="admin-dialog__hint">
-      Delivered instantly from the product's stocked digital codes. Import codes from the product's stock page; with no codes it shows as out of stock.
+      {{ 'ADMIN.CATALOG_UI.DELIVERED_INSTANTLY_FROM_THE_PRODUCT_S_STOCK' | translate }}
     </p>
   }
   @if (hidesInstantStock()) {
@@ -384,7 +387,7 @@
       </p>
       <label style="display:flex;align-items:center;gap:.5rem">
         <input type="checkbox" [checked]="instantStockAcknowledged()" (change)="instantStockAcknowledged.set($any($event.target).checked)" />
-        <span>I understand, switch to On-Delivery</span>
+        <span>{{ 'ADMIN.CATALOG_UI.I_UNDERSTAND_SWITCH_TO_ON_DELIVERY' | translate }}</span>
       </label>
     </div>
   }
@@ -402,7 +405,7 @@
     <button
       pButton
       type="button"
-      label="Save"
+      [label]="'ADMIN.CATALOG_UI.SAVE' | translate"
       icon="pi pi-check"
       [loading]="actionLoading()"
       [disabled]="hidesInstantStock() && !instantStockAcknowledged()"
@@ -459,6 +462,7 @@
       pInputText
       id="bulk-duplicate-suffix"
       class="admin-field__input"
+      maxlength="60"
       [ngModel]="bulkDuplicateSuffix()"
       (ngModelChange)="bulkDuplicateSuffix.set($event)"
     />
@@ -586,6 +590,7 @@
       [mode]="bulkPriceMode() === 'SetFixed' ? 'currency' : 'decimal'"
       currency="USD"
       [min]="0"
+      [max]="bulkPriceMode() === 'DecreasePercent' ? 100 : 10000000"
       [style]="{ width: '100%' }"
     />
   </div>
@@ -602,7 +607,7 @@
       type="button"
       [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
       icon="pi pi-check"
-      [disabled]="bulkPriceValue() === null"
+      [disabled]="bulkPriceInvalid()"
       [loading]="bulkActionLoading()"
       (click)="confirmBulkPriceAdjust()"
     ></button>
@@ -850,7 +855,7 @@
       class="admin-field__input"
       [ngModel]="bulkNewCollectionName()"
       (ngModelChange)="bulkNewCollectionName.set($event)"
-      placeholder="e.g. Homepage Featured"
+      [placeholder]="'ADMIN.CATALOG_UI.E_G_HOMEPAGE_FEATURED' | translate"
     />
     <p class="admin-field__hint">
       {{

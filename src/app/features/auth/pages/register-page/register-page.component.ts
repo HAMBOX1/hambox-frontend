@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { finalize } from 'rxjs';
 
@@ -22,14 +23,6 @@ import {
   passwordsMatchValidator,
 } from '../../utils/auth-form.utils';
 
-const FIELD_LABELS = {
-  fullName: 'Username',
-  email: 'Email',
-  phone: 'Phone number',
-  password: 'Password',
-  confirmPassword: 'Confirm password',
-  referralCode: 'Referral code',
-};
 
 @Component({
   selector: 'app-register-page',
@@ -44,6 +37,7 @@ export class RegisterPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly legal = inject(LegalService);
   private readonly route = inject(ActivatedRoute);
+  private readonly translate = inject(TranslateService);
 
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
@@ -51,6 +45,8 @@ export class RegisterPageComponent {
   protected readonly showPassword = signal(false);
   protected readonly showConfirmPassword = signal(false);
   protected readonly legalDialogVisible = signal(false);
+  /** Once the legal documents are accepted, later submits (e.g. after a failed attempt) skip the dialog. */
+  private readonly legalAccepted = signal(false);
   protected readonly requiredLegalSlugs = computed(() =>
     this.legal.documents().filter((d) => d.requireAcceptance).map((d) => d.slug),
   );
@@ -106,7 +102,7 @@ export class RegisterPageComponent {
   );
 
   protected fieldError(controlName: string): string | null {
-    return getControlErrorMessage(controlName, this.form, FIELD_LABELS);
+    return getControlErrorMessage(controlName, this.form, this.translate);
   }
 
   protected togglePasswordVisibility(): void {
@@ -123,6 +119,7 @@ export class RegisterPageComponent {
 
   protected onLegalAccepted(): void {
     this.legalDialogVisible.set(false);
+    this.legalAccepted.set(true);
     this.register();
   }
 
@@ -132,6 +129,11 @@ export class RegisterPageComponent {
     this.form.markAllAsTouched();
 
     if (this.form.invalid || this.isSubmitting() || !this.turnstileToken()) {
+      return;
+    }
+
+    if (this.legalAccepted()) {
+      this.register();
       return;
     }
 
@@ -146,6 +148,8 @@ export class RegisterPageComponent {
     const turnstileToken = this.turnstileToken();
 
     if (!turnstileToken) {
+      // The Cloudflare token expires while the legal dialog is open; say so instead of doing nothing.
+      this.errorMessage.set(this.translate.instant('AUTH.CAPTCHA_EXPIRED'));
       return;
     }
 

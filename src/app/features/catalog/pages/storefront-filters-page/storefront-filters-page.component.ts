@@ -19,7 +19,8 @@ import {
   CategoryTreeItem,
 } from '../../models/category.model';
 import { CategoryApiService } from '../../services/category-api.service';
-
+
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 /** The all-zero id addresses the store-wide default list on the backend. */
 const DEFAULT_LIST_ID = '00000000-0000-0000-0000-000000000000';
 
@@ -37,7 +38,7 @@ interface CategoryRow {
 @Component({
   selector: 'app-storefront-filters-page',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     ButtonModule,
     InputTextModule,
@@ -53,11 +54,12 @@ interface CategoryRow {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StorefrontFiltersPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly messages = inject(MessageService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Storefront Filters' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.STOREFRONT_FILTERS' });
   protected readonly defaultListId = DEFAULT_LIST_ID;
 
   protected readonly rows = signal<readonly CategoryRow[]>([]);
@@ -198,10 +200,10 @@ export class StorefrontFiltersPageComponent implements OnInit {
           })),
         ),
       );
-      this.messages.add({ severity: 'success', summary: 'Filters saved', life: 3000 });
+      this.messages.add({ severity: 'success', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.FILTERS_SAVED'), life: 3000 });
       await this.loadConfig(this.selectedId());
     } catch {
-      this.messages.add({ severity: 'error', summary: 'Could not save the filters', detail: 'Please try again.', life: 5000 });
+      this.messages.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.FILTERS_SAVE_FAILED'), detail: this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'), life: 5000 });
     } finally {
       this.saving.set(false);
     }
@@ -211,10 +213,10 @@ export class StorefrontFiltersPageComponent implements OnInit {
     this.saving.set(true);
     try {
       await firstValueFrom(this.categoryApi.resetCategoryFilterConfig(this.selectedId()));
-      this.messages.add({ severity: 'success', summary: 'List removed', detail: 'This category now inherits again.', life: 3000 });
+      this.messages.add({ severity: 'success', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.LIST_REMOVED'), detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_INHERITS'), life: 3000 });
       await this.loadConfig(this.selectedId());
     } catch {
-      this.messages.add({ severity: 'error', summary: 'Could not reset the list', life: 5000 });
+      this.messages.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.LIST_RESET_FAILED'), life: 5000 });
     } finally {
       this.saving.set(false);
     }
@@ -239,7 +241,7 @@ export class StorefrontFiltersPageComponent implements OnInit {
     } catch {
       this.config.set(null);
       this.items.set([]);
-      this.messages.add({ severity: 'error', summary: 'Could not load the filters', life: 5000 });
+      this.messages.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.FILTERS_LOAD_FAILED'), life: 5000 });
     } finally {
       this.loading.set(false);
     }

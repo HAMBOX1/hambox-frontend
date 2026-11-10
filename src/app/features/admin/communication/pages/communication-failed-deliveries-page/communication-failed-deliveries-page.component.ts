@@ -42,7 +42,7 @@ export class CommunicationFailedDeliveriesPageComponent implements OnInit {
 
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs(
-    { label: 'Communication', route: '/admin/communication' },
+    { label: 'ADMIN.NAV.COMMUNICATION', route: '/admin/communication' },
     { label: 'Failed Deliveries' },
   );
 

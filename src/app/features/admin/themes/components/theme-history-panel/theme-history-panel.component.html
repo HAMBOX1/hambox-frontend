@@ -19,7 +19,7 @@
           <tr>
             <td>{{ entry.action }}</td>
             <td>{{ entry.actorUserId || '—' }}</td>
-            <td>{{ entry.createdOnUtc | date: 'medium' }}</td>
+            <td>{{ entry.createdOnUtc | hamboxDate: 'medium' }}</td>
           </tr>
         </ng-template>
       </p-table>

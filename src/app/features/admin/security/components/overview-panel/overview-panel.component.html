@@ -47,7 +47,7 @@
         <span class="overview-panel__status-activity">
           {{ 'ADMIN.SECURITY.STATUS_BAR.LAST_ACTIVITY' | translate }}:
           @if (lastActivity(); as activity) {
-            {{ activity.description }} · {{ activity.occurredOnUtc | date: 'short' }}
+            {{ activity.description }} · {{ activity.occurredOnUtc | hamboxDate: 'short' }}
           } @else {
             {{ 'ADMIN.SECURITY.STATUS_BAR.NO_RECENT_ACTIVITY' | translate }}
           }
@@ -128,7 +128,7 @@
               <span class="overview-panel__alert-desc">{{ alert.description }}</span>
               <span class="overview-panel__alert-resource">{{ affectedResource(alert) }}</span>
             </div>
-            <span class="overview-panel__alert-date">{{ alert.occurredOnUtc | date: 'short' }}</span>
+            <span class="overview-panel__alert-date">{{ alert.occurredOnUtc | hamboxDate: 'short' }}</span>
             <i class="pi pi-chevron-right overview-panel__alert-chevron" aria-hidden="true"></i>
           </li>
         }

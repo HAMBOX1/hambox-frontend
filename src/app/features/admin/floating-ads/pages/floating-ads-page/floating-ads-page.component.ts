@@ -106,7 +106,7 @@ export class FloatingAdsPageComponent implements OnInit {
   private readonly messages = inject(MessageService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Floating ads' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.FLOATING_ADS' });
   protected readonly audienceOptions = AUDIENCE_OPTIONS;
 
   protected readonly ads = signal<readonly FloatingAdAdmin[]>([]);

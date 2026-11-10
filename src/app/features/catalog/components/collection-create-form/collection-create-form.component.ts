@@ -13,6 +13,7 @@ import {
   UpdateCollectionRequest,
 } from '../../models/collection.model';
 import { COLLECTION_COLOR_PRESETS, COLLECTION_ICON_PRESETS } from '../../utils/collection-presets.util';
+import { TranslatePipe } from '@ngx-translate/core';
 
 const FIELD_LABELS = {
   name: 'Name',
@@ -24,7 +25,7 @@ const FIELD_LABELS = {
 @Component({
   selector: 'app-collection-create-form',
   standalone: true,
-  imports: [ReactiveFormsModule, InputTextModule, TextareaModule, SelectModule, ButtonModule, AdminErrorAlertComponent],
+  imports: [TranslatePipe, ReactiveFormsModule, InputTextModule, TextareaModule, SelectModule, ButtonModule, AdminErrorAlertComponent],
   templateUrl: './collection-create-form.component.html',
   styleUrl: './collection-create-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

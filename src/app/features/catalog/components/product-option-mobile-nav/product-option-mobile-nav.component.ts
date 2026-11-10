@@ -9,6 +9,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
 import { ProductOptionGroupDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 import { slugify } from '../../utils/product-display.utils';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ProductOptionMobileGroupCardComponent } from '../product-option-mobile-group-card/product-option-mobile-group-card.component';
 
 /**
@@ -21,7 +22,7 @@ import { ProductOptionMobileGroupCardComponent } from '../product-option-mobile-
 @Component({
   selector: 'app-option-mobile-nav',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     ButtonModule,
     InputTextModule,

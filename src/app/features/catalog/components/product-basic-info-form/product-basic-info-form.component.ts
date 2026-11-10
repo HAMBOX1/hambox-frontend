@@ -25,6 +25,7 @@ import { CategoryOption, CreateCategoryRequest } from '../../models/category.mod
 import { CollectionOption, CreateCollectionRequest } from '../../models/collection.model';
 import { CreateProductRequest, ProductDraftFormSnapshot } from '../../models/product.model';
 import { CategoryApiService, createCategoryWithHierarchy } from '../../services/category-api.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CollectionApiService } from '../../services/collection-api.service';
 
 const FIELD_LABELS = {
@@ -39,7 +40,7 @@ const FIELD_LABELS = {
 @Component({
   selector: 'app-product-basic-info-form',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     ReactiveFormsModule,
     FormsModule,
     InputTextModule,
@@ -161,7 +162,7 @@ export class ProductBasicInfoFormComponent {
     nameAr: ['', [Validators.maxLength(200)]],
     descriptionEn: [''],
     descriptionAr: [''],
-    price: [0, [Validators.required, Validators.min(0)]],
+    price: [0, [Validators.required, Validators.min(0), Validators.max(10_000_000)]],
     categoryId: ['', [Validators.required]],
     additionalCategoryIds: this.fb.nonNullable.control<readonly string[]>([]),
     collectionIds: this.fb.nonNullable.control<readonly string[]>([]),
@@ -370,6 +371,10 @@ export class ProductBasicInfoFormComponent {
 
     if (control.errors['min']) {
       return 'Price must be zero or greater.';
+    }
+
+    if (control.errors['max']) {
+      return 'Price must not exceed 10,000,000.';
     }
 
     return 'Invalid value.';

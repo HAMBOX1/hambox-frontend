@@ -31,7 +31,7 @@
     @if (nextCampaign(); as next) {
       <span class="campaigns-list-page__status-line">
         <i class="pi pi-clock"></i>
-        {{ 'ADMIN.CAMPAIGNS.LIST.NEXT_UP' | translate: { name: next.name, date: (next.startsAtUtc | date: 'medium') } }}
+        {{ 'ADMIN.CAMPAIGNS.LIST.NEXT_UP' | translate: { name: next.name, date: (next.startsAtUtc | hamboxDate: 'medium') } }}
       </span>
     }
   </div>
@@ -109,7 +109,7 @@
           </td>
           <td>
             <span class="admin-cell-secondary">
-              {{ campaign.startsAtUtc | date: 'mediumDate' }} → {{ campaign.endsAtUtc | date: 'mediumDate' }}
+              {{ campaign.startsAtUtc | hamboxDate: 'mediumDate' }} → {{ campaign.endsAtUtc | hamboxDate: 'mediumDate' }}
             </span>
           </td>
           <td>

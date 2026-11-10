@@ -176,7 +176,7 @@
           <app-variant-option-group
             [groupLabel]="group.displayName"
             [options]="variantFacade.optionsForGroup(group)"
-            [selectedId]="variantFacade.selectedByGroup()[group.id] ?? ''"
+            [selectedId]="variantFacade.selectedByGroup()[group.id]"
             [groupDescriptionHtml]="group.descriptionHtml ?? null"
             [inlineInstructions]="false"
             (optionSelected)="onOptionChange(group.id, $event)"

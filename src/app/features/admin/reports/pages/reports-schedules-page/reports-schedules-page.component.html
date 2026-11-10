@@ -130,8 +130,8 @@
                 [tone]="schedule.isEnabled ? 'success' : 'neutral'"
               />
             </td>
-            <td>{{ schedule.nextRunOnUtc ? (schedule.nextRunOnUtc | date: 'short') : '—' }}</td>
-            <td>{{ schedule.lastRunOnUtc ? (schedule.lastRunOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ schedule.nextRunOnUtc ? (schedule.nextRunOnUtc | hamboxDate: 'short') : '—' }}</td>
+            <td>{{ schedule.lastRunOnUtc ? (schedule.lastRunOnUtc | hamboxDate: 'short') : '—' }}</td>
             <td>
               <div class="reports-schedules__actions" (click)="$event.stopPropagation()">
                 <button
@@ -202,8 +202,8 @@
               />
             </td>
             <td>{{ execution.triggeredBy }}</td>
-            <td>{{ execution.startedOnUtc ? (execution.startedOnUtc | date: 'short') : '—' }}</td>
-            <td>{{ execution.finishedOnUtc ? (execution.finishedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ execution.startedOnUtc ? (execution.startedOnUtc | hamboxDate: 'short') : '—' }}</td>
+            <td>{{ execution.finishedOnUtc ? (execution.finishedOnUtc | hamboxDate: 'short') : '—' }}</td>
             <td>{{ execution.error || '—' }}</td>
           </tr>
         </ng-template>

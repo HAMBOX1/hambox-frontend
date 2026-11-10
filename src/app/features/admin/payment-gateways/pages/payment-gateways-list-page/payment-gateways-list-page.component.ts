@@ -38,7 +38,7 @@ export class PaymentGatewaysListPageComponent implements OnInit {
   protected readonly facade = inject(PaymentGatewaysManagementFacade);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Payment Gateways' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.PAYMENT_GATEWAYS.LIST.TITLE' });
 
   protected readonly gateways = this.facade.list;
   protected readonly loading = this.facade.listLoading;

@@ -1,8 +1,7 @@
-<section class="activity-log">
-  <header class="activity-log__header">
-    <h1>Activity log</h1>
-    <button pButton type="button" icon="pi pi-download" label="Export CSV" severity="secondary" (click)="exportCsv()"></button>
-  </header>
+<section class="admin-page activity-log">
+  <app-admin-page-header title="Activity log" [breadcrumbs]="breadcrumbs">
+    <button adminHeaderActions pButton type="button" icon="pi pi-download" label="Export CSV" severity="secondary" (click)="exportCsv()"></button>
+  </app-admin-page-header>
 
   <form class="activity-log__filters" (ngSubmit)="applyFilters()">
     <input
@@ -53,7 +52,7 @@
     </ng-template>
     <ng-template pTemplate="body" let-entry>
       <tr>
-        <td>{{ entry.occurredOnUtc | date: 'medium' }}</td>
+        <td>{{ entry.occurredOnUtc | hamboxDate: 'medium' }}</td>
         <td>{{ entry.source }}</td>
         <td>{{ entry.eventType }}</td>
         <td>{{ entry.description }}</td>

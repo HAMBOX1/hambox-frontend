@@ -6,6 +6,8 @@ import {
 
   computed,
 
+  effect,
+
   inject,
 
   OnInit,
@@ -18,7 +20,8 @@ import { FormsModule } from '@angular/forms';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -96,7 +99,7 @@ import { exportOrderLogToCsv } from '../../utils/order-export.util';
 
     RouterLink,
 
-    DatePipe,
+    HamboxDatePipe,
 
     CurrencyPipe,
 
@@ -166,11 +169,24 @@ export class OrderDetailPageComponent implements OnInit {
 
   private readonly permissionService = inject(PermissionService);
 
+  constructor() {
+    // Failed actions surface as a toast; the order itself stays on screen.
+    effect(() => {
+      const failure = this.facade.actionError();
+      if (failure) {
+        this.messageService.add({ severity: 'error', summary: failure.message });
+      }
+    });
+  }
+
 
 
   protected readonly permissions = PERMISSIONS;
 
-  protected readonly statusOptions = ORDER_STATUS_OPTIONS.filter((o) => o.value !== 'all');
+  protected readonly statusOptions = ORDER_STATUS_OPTIONS.filter((o) => o.value !== 'all').map((o) => ({
+    label: this.valueLabel(o.label),
+    value: o.value,
+  }));
 
 
 
@@ -190,7 +206,7 @@ export class OrderDetailPageComponent implements OnInit {
 
     adminBreadcrumbs(
 
-      { label: 'Orders', route: '/admin/orders' },
+      { label: 'ADMIN.NAV.ORDERS', route: '/admin/orders' },
 
       { label: this.detail()?.orderNumber ?? 'Order', route: null },
 
@@ -216,7 +232,7 @@ export class OrderDetailPageComponent implements OnInit {
 
   protected readonly editingNoteId = signal<string | null>(null);
 
-  protected readonly revealedKeys = signal<Record<string, string>>({});
+  protected readonly revealedKeys = signal<Record<string, string | undefined>>({});
 
   protected readonly manualCodeItemId = signal<string | null>(null);
 
@@ -309,6 +325,12 @@ export class OrderDetailPageComponent implements OnInit {
   }
 
 
+
+  protected valueLabel(raw: string): string {
+    const key = `ADMIN.ORDERS.VALUES.${raw.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`;
+    const text = this.translate.instant(key);
+    return text === key ? raw : text;
+  }
 
   protected statusTone(status: string): AdminStatusTone {
 

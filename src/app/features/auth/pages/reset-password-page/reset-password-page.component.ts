@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -13,10 +14,6 @@ import {
   passwordsMatchValidator,
 } from '../../utils/auth-form.utils';
 
-const FIELD_LABELS = {
-  newPassword: 'New password',
-  confirmPassword: 'Confirm password',
-};
 
 @Component({
   selector: 'app-reset-password-page',
@@ -27,6 +24,7 @@ const FIELD_LABELS = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly auth = inject(Auth);
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
@@ -53,7 +51,7 @@ export class ResetPasswordPageComponent implements OnInit {
   }
 
   protected fieldError(controlName: string): string | null {
-    return getControlErrorMessage(controlName, this.form, FIELD_LABELS);
+    return getControlErrorMessage(controlName, this.form, this.translate);
   }
 
   protected submit(): void {

@@ -1,14 +1,13 @@
-<section class="admin-reviews">
-  <header class="admin-reviews__header">
-    <h1>Reviews</h1>
-    <p-select
+<section class="admin-page admin-reviews">
+  <app-admin-page-header title="Reviews" [breadcrumbs]="breadcrumbs">
+    <p-select adminHeaderActions
       [options]="filterOptions"
       optionLabel="label"
       optionValue="value"
       [ngModel]="filter()"
       (ngModelChange)="setFilter($event)"
     />
-  </header>
+  </app-admin-page-header>
 
   @if (error()) {
     <p role="alert">{{ error() }}</p>
@@ -32,7 +31,7 @@
         <td>{{ review.comment }}</td>
         <td>{{ review.helpfulCount }}</td>
         <td>{{ review.notHelpfulCount }}</td>
-        <td>{{ review.createdOnUtc | date: 'medium' }}</td>
+        <td>{{ review.createdOnUtc | hamboxDate: 'medium' }}</td>
         <td>
           @if (review.isHidden) {
             <span [title]="review.hiddenReason || ''">Hidden</span>

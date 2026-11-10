@@ -50,6 +50,7 @@ export class AccountLibraryPageComponent implements OnInit {
   protected readonly totalCount = this.facade.totalCount;
   protected readonly pageNumber = this.facade.pageNumber;
   protected readonly isEmpty = this.facade.isEmpty;
+  protected readonly hasActiveFilters = this.facade.hasActiveFilters;
   protected readonly recentItems = this.facade.recentItems;
   protected readonly olderItems = this.facade.olderItems;
   protected readonly showGroupedSections = this.facade.showGroupedSections;
@@ -134,6 +135,10 @@ export class AccountLibraryPageComponent implements OnInit {
 
   protected setGroup(group: '' | 'recent' | 'older'): void {
     this.facade.setGroupFilter(group);
+  }
+
+  protected clearFilters(): void {
+    this.facade.clearFilters();
   }
 
   protected retry(): void {

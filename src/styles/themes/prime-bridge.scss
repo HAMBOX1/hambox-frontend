@@ -49,6 +49,14 @@ html[data-theme='hambox-light'] {
   --p-editor-toolbar-item-color: var(--text-secondary);
   --p-editor-toolbar-item-hover-color: var(--primary);
   --p-editor-toolbar-item-active-color: var(--primary);
+  --p-select-overlay-background: var(--color-card);
+  --p-select-overlay-border-color: var(--border);
+  --p-select-overlay-color: var(--text-primary);
+  --p-select-overlay-shadow: var(--admin-shadow-panel);
+  --p-multiselect-overlay-background: var(--color-card);
+  --p-multiselect-overlay-border-color: var(--border);
+  --p-multiselect-overlay-color: var(--text-primary);
+  --p-multiselect-overlay-shadow: var(--admin-shadow-panel);
   --p-editor-overlay-background: var(--color-card);
   --p-editor-overlay-border-color: var(--border);
   --p-editor-overlay-border-radius: var(--admin-radius-md);

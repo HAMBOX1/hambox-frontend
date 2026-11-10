@@ -24,13 +24,14 @@ import {
   AdminSearchBarComponent,
 } from '../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
-
+
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 /** Mirrors `CategoryListPageComponent` — Collections management gets its own tree page inside
  * Product Catalog, exactly like Categories, but never touches storefront/customer-facing data. */
 @Component({
   selector: 'app-collection-list-page',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     ButtonModule,
     DialogModule,
     DrawerModule,
@@ -50,12 +51,13 @@ import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-brea
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CollectionListPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly facade = inject(CollectionListFacade);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Internal Categories' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.COLLECTIONS' });
 
   protected readonly totalCount = this.facade.totalCount;
   protected readonly loading = this.facade.loading;
@@ -132,8 +134,8 @@ export class CollectionListPageComponent implements OnInit {
     if (created) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Internal category created',
-        detail: `"${request.name}" was added.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_CREATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.ITEM_ADDED', { p0: request.name }),
         life: 4000,
       });
       return;
@@ -141,8 +143,8 @@ export class CollectionListPageComponent implements OnInit {
 
     this.messageService.add({
       severity: 'error',
-      summary: 'Create failed',
-      detail: this.facade.createError() ?? 'Unable to create internal category.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CREATE_CATEGORY_FAILED'),
+      detail: this.facade.createError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_CREATE_UNABLE'),
       life: 5000,
     });
   }
@@ -153,8 +155,8 @@ export class CollectionListPageComponent implements OnInit {
     if (updated) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Internal category updated',
-        detail: `"${request.name}" was saved.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_UPDATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_SAVED', { p0: request.name }),
         life: 4000,
       });
       return;
@@ -162,8 +164,8 @@ export class CollectionListPageComponent implements OnInit {
 
     this.messageService.add({
       severity: 'error',
-      summary: 'Update failed',
-      detail: this.facade.updateError() ?? 'Unable to update internal category.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATE_FAILED'),
+      detail: this.facade.updateError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_UPDATE_UNABLE'),
       life: 5000,
     });
   }
@@ -183,8 +185,8 @@ export class CollectionListPageComponent implements OnInit {
     if (success) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Internal category deleted',
-        detail: `"${collection.name}" was removed.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_DELETED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_REMOVED', { p0: collection.name }),
         life: 4000,
       });
       this.deleteDialogOpen.set(false);
@@ -192,8 +194,8 @@ export class CollectionListPageComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Delete failed',
-        detail: this.facade.error() ?? 'Unable to delete internal category.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELETE_FAILED'),
+        detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_DELETE_UNABLE'),
         life: 5000,
       });
     }

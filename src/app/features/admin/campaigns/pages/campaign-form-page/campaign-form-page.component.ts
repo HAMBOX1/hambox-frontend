@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -41,7 +41,7 @@ import { CampaignManagementFacade } from '../../services/campaign-management.fac
   selector: 'app-campaign-form-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     RouterLink,
     TranslatePipe,

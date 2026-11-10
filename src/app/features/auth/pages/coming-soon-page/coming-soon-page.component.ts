@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -35,6 +36,7 @@ let hasAutoRedirected = false;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComingSoonPageComponent {
+  private readonly translate = inject(TranslateService);
   private readonly bypass = inject(MaintenanceBypassService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
@@ -95,9 +97,7 @@ export class ComingSoonPageComponent {
   }
 
   protected fieldError(controlName: string): string | null {
-    return getControlErrorMessage(controlName, this.form, {
-      password: 'Password',
-    });
+    return getControlErrorMessage(controlName, this.form, this.translate);
   }
 
   protected async submit(): Promise<void> {

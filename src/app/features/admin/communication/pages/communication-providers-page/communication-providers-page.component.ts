@@ -45,7 +45,7 @@ export class CommunicationProvidersPageComponent implements OnInit {
   private readonly translate = inject(TranslateService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Communication', route: '/admin/communication' }, { label: 'Providers' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.COMMUNICATION', route: '/admin/communication' }, { label: 'ADMIN.COMMUNICATION.NAV.PROVIDERS' });
 
   protected readonly providers = this.facade.providers;
   protected readonly loading = this.facade.providersLoading;

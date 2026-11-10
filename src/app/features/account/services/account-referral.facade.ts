@@ -136,7 +136,12 @@ export class AccountReferralFacade {
       return;
     }
 
-    await navigator.clipboard.writeText(link);
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      // Clipboard access denied (permissions policy / insecure context): nothing was copied, so don't claim it was.
+      return;
+    }
     this.copiedState.set(true);
     setTimeout(() => this.copiedState.set(false), 2000);
   }

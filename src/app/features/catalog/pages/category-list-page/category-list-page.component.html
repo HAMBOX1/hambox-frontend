@@ -2,7 +2,7 @@
 
 <section class="admin-page category-list-page">
   <app-admin-page-header
-    title="Categories"
+    [title]="'ADMIN.CATALOG_UI.CATEGORIES' | translate"
     [subtitle]="subtitle()"
     [breadcrumbs]="breadcrumbs"
     [compactActions]="true"
@@ -10,7 +10,7 @@
     <app-admin-icon-button
       adminHeaderActions
       icon="pi pi-download"
-      label="Export Categories"
+      [label]="'ADMIN.CATALOG_UI.EXPORT_CATEGORIES' | translate"
       severity="secondary"
       (pressed)="exportCategories()"
     />
@@ -18,7 +18,7 @@
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Categories.Create"
       icon="pi pi-plus"
-      label="Create Category"
+      [label]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
       severity="primary"
       (pressed)="openCreateDialog()"
     />
@@ -27,7 +27,7 @@
   <app-admin-search-bar
     class="category-list-page__search"
     [value]="searchTerm()"
-    placeholder="Search the category tree..."
+    [placeholder]="'ADMIN.CATALOG_UI.SEARCH_THE_CATEGORY_TREE' | translate"
     (searchChange)="onSearchChange($event)"
   />
 
@@ -45,7 +45,7 @@
 </section>
 
 <p-dialog
-  header="Create Category"
+  [header]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
   [visible]="createDialogOpen()"
   (visibleChange)="onCreateDialogVisibleChange($event)"
   [modal]="true"
@@ -71,7 +71,7 @@
 <p-drawer
   [visible]="editDialogOpen()"
   (visibleChange)="onEditDialogVisibleChange($event, editForm)"
-  header="Edit Category"
+  [header]="'ADMIN.CATALOG_UI.EDIT_CATEGORY' | translate"
   position="right"
   [modal]="true"
   [dismissible]="true"
@@ -96,7 +96,7 @@
 
 <app-admin-confirm-dialog
   [visible]="deleteDialogOpen()"
-  title="Delete category"
+  [title]="'ADMIN.CATALOG_UI.DELETE_CATEGORY_2' | translate"
   [message]="deleteDialogMessage()"
   [destructive]="true"
   [loading]="deleting()"
@@ -106,10 +106,10 @@
 
 <app-admin-confirm-dialog
   [visible]="discardChangesDialogOpen()"
-  title="Discard your changes?"
-  message="You have unsaved changes that will be lost if you leave now."
-  confirmLabel="Discard"
-  cancelLabel="Stay Editing"
+  [title]="'ADMIN.CATALOG_UI.DISCARD_YOUR_CHANGES' | translate"
+  [message]="'ADMIN.CATALOG_UI.YOU_HAVE_UNSAVED_CHANGES_THAT_WILL_BE_LOST_I' | translate"
+  [confirmLabel]="'ADMIN.CATALOG_UI.DISCARD' | translate"
+  [cancelLabel]="'ADMIN.CATALOG_UI.STAY_EDITING' | translate"
   [destructive]="true"
   (visibleChange)="discardChangesDialogOpen.set($event)"
   (confirmed)="confirmDiscardChanges()"

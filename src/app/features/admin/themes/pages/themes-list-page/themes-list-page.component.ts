@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -45,7 +45,7 @@ import { ThemeManagementFacade } from '../../services/theme-management.facade';
   selector: 'app-themes-list-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     RouterLink,
     TranslatePipe,
@@ -83,7 +83,7 @@ export class ThemesListPageComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Themes' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.THEMES.LIST.TITLE' });
   protected readonly statusOptions = [...THEME_STATUS_OPTIONS];
 
   protected readonly themes = this.facade.themes;

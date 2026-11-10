@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -23,10 +24,6 @@ interface LegalAcceptanceStatusDto {
   staleSlugs: readonly string[];
 }
 
-const FIELD_LABELS = {
-  email: 'Email or phone',
-  password: 'Password',
-};
 
 @Component({
   selector: 'app-login-page',
@@ -37,6 +34,7 @@ const FIELD_LABELS = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPageComponent {
+  private readonly translate = inject(TranslateService);
   private readonly auth = inject(Auth);
   private readonly googleIdentity = inject(GoogleIdentityService);
   private readonly cartFacade = inject(CartFacade);
@@ -76,7 +74,7 @@ export class LoginPageComponent {
   });
 
   protected fieldError(controlName: string): string | null {
-    return getControlErrorMessage(controlName, this.form, FIELD_LABELS);
+    return getControlErrorMessage(controlName, this.form, this.translate);
   }
 
   protected togglePasswordVisibility(): void {

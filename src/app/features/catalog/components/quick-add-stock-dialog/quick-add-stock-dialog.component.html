@@ -10,21 +10,20 @@
   styleClass="admin-dialog"
 >
   @if (loading()) {
-    <p class="admin-dialog__hint">Loading variants…</p>
+    <p class="admin-dialog__hint">{{ 'ADMIN.CATALOG_UI.LOADING_VARIANTS' | translate }}</p>
   } @else if (variants().length === 0) {
     <p class="admin-dialog__hint">
-      This product has no variant yet, so there is nothing to attach codes to. Create a default one here and add the
-      codes straight away — it uses the product's own price and you can rename or split it later in the full editor.
+      {{ 'ADMIN.CATALOG_UI.THIS_PRODUCT_HAS_NO_VARIANT_YET_SO_THERE_IS' | translate }}
     </p>
     @if (error(); as message) {
       <p class="admin-dialog__error" role="alert">{{ message }}</p>
     }
     <div class="admin-dialog__actions">
-      <button pButton type="button" class="admin-btn-secondary" severity="secondary" label="Full editor" (click)="openEditor()"></button>
+      <button pButton type="button" class="admin-btn-secondary" severity="secondary" [label]="'ADMIN.CATALOG_UI.FULL_EDITOR' | translate" (click)="openEditor()"></button>
       <button
         pButton
         type="button"
-        label="Create default variant & add stock"
+        [label]="'ADMIN.CATALOG_UI.CREATE_DEFAULT_VARIANT_ADD_STOCK' | translate"
         icon="pi pi-plus"
         [loading]="saving()"
         (click)="createDefaultVariant()"
@@ -32,7 +31,7 @@
     </div>
   } @else {
     <div class="admin-field">
-      <label class="admin-field__label" for="quick-stock-variant">Variant</label>
+      <label class="admin-field__label" for="quick-stock-variant">{{ 'ADMIN.CATALOG_UI.VARIANT' | translate }}</label>
       <p-select
         inputId="quick-stock-variant"
         class="admin-field__input"
@@ -40,7 +39,7 @@
         optionLabel="label"
         optionValue="value"
         optionDisabled="disabled"
-        placeholder="Choose a variant"
+        [placeholder]="'ADMIN.CATALOG_UI.CHOOSE_A_VARIANT' | translate"
         appendTo="body"
         [ngModel]="variantId()"
         (ngModelChange)="variantId.set($event)"
@@ -48,19 +47,19 @@
     </div>
 
     @if (willSwitchToInstant()) {
-      <p class="admin-dialog__hint">This variant is On-Delivery. Adding codes switches it to Instant stock (delivered immediately from the codes).</p>
+      <p class="admin-dialog__hint">{{ 'ADMIN.CATALOG_UI.THIS_VARIANT_IS_ON_DELIVERY_ADDING_CODES_SWI' | translate }}</p>
     }
 
     <div class="admin-field">
-      <label class="admin-field__label" for="quick-stock-codes">Codes</label>
+      <label class="admin-field__label" for="quick-stock-codes">{{ 'ADMIN.CATALOG_UI.CODES' | translate }}</label>
       <label style="display:inline-flex;align-items:center;gap:.4rem;margin-bottom:.5rem;cursor:pointer">
         <i class="pi pi-upload" aria-hidden="true"></i>
-        <span>Upload TXT / CSV / Excel</span>
+        <span>{{ 'ADMIN.CATALOG_UI.UPLOAD_TXT_CSV_EXCEL' | translate }}</span>
         <input type="file" accept=".txt,.csv,.xlsx,.xls,text/plain,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none" (change)="onFileSelected($event)" />
       </label>
       <label style="display:inline-flex;align-items:center;gap:.4rem;margin:0 0 .5rem 1rem;cursor:pointer" [style.opacity]="variantId() ? 1 : .5">
         <i class="pi pi-image" aria-hidden="true"></i>
-        <span>Upload pictures (each picture = one item the customer receives as an image)</span>
+        <span>{{ 'ADMIN.CATALOG_UI.UPLOAD_PICTURES_EACH_PICTURE_ONE_ITEM_THE_CU' | translate }}</span>
         <input
           type="file"
           multiple
@@ -81,7 +80,7 @@
       ></textarea>
       <label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem">
         <input type="checkbox" [checked]="multiLine()" (change)="multiLine.set($any($event.target).checked)" />
-        <span>The whole text is ONE entry (e.g. account with email + password lines)</span>
+        <span>{{ 'ADMIN.CATALOG_UI.THE_WHOLE_TEXT_IS_ONE_ENTRY_E_G_ACCOUNT_WITH' | translate }}</span>
       </label>
     </div>
 
@@ -95,8 +94,8 @@
     }
 
     <div class="admin-dialog__actions">
-      <button pButton type="button" label="Full editor" severity="secondary" (click)="openEditor()"></button>
-      <button pButton type="button" label="Close" severity="secondary" (click)="closed.emit()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.FULL_EDITOR' | translate" severity="secondary" (click)="openEditor()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CLOSE' | translate" severity="secondary" (click)="closed.emit()"></button>
       <button
         pButton
         type="button"

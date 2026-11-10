@@ -48,6 +48,7 @@
         <span class="variant-manager__row-check" (click)="$event.stopPropagation()">
           <p-checkbox
             [binary]="true"
+            [ariaLabel]="'Select ' + node.label"
             [ngModel]="callbacks().isSelected(node.variant!.id)"
             (onChange)="callbacks().toggleSelect(node.variant!.id, $event.checked, isShiftClick($event.originalEvent))"
           />
@@ -73,7 +74,7 @@
             <ng-container [ngTemplateOutlet]="priceField" />
           }
           @if (node.variant!.fulfillmentMode === 'SupplierOnly') {
-            <span class="variant-manager__row-available" title="Price and availability come from the supplier">Supplier stock</span>
+            <span class="variant-manager__row-available" [title]="'ADMIN.CATALOG_UI.PRICE_AND_AVAILABILITY_COME_FROM_THE_SUPPLIE' | translate">{{ 'ADMIN.CATALOG_UI.SUPPLIER_STOCK' | translate }}</span>
           } @else {
             <span class="variant-manager__row-available">
               Available {{ node.variant!.availableStock }}
@@ -88,17 +89,17 @@
       <span class="variant-manager__row-actions" (click)="$event.stopPropagation()">
         <app-admin-icon-button
           icon="pi pi-box"
-          label="Manage stock"
+          [label]="'ADMIN.CATALOG_UI.MANAGE_STOCK' | translate"
           (pressed)="callbacks().openVariant(node.variant!)"
         />
         <app-admin-icon-button
           icon="pi pi-pencil"
-          label="Edit details"
+          [label]="'ADMIN.CATALOG_UI.EDIT_DETAILS' | translate"
           (pressed)="callbacks().editVariant(node.variant!)"
         />
         <app-admin-icon-button
           icon="pi pi-file-edit"
-          label="Instructions"
+          [label]="'ADMIN.CATALOG_UI.INSTRUCTIONS' | translate"
           (pressed)="callbacks().editInstructions(node.variant!)"
         />
       </span>

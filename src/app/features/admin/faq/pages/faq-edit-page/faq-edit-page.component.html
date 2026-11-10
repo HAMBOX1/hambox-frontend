@@ -69,7 +69,7 @@
 
       <app-admin-section-card [title]="'ADMIN.FAQ.EDIT.SECTION_ORGANIZATION' | translate">
         <div class="admin-form-grid">
-          <label class="admin-field">
+          <div class="admin-field">
             <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.CATEGORY' | translate }}*</span>
             <div class="faq-edit-page__category-row">
               <p-select
@@ -92,7 +92,7 @@
                 (click)="openQuickAddCategory()"
               ></button>
             </div>
-          </label>
+          </div>
 
           <label class="admin-field">
             <span class="admin-field__label">{{ 'ADMIN.FAQ.EDIT.SCOPE' | translate }}*</span>
@@ -137,7 +137,7 @@
       </app-admin-section-card>
     </div>
 
-    <app-admin-sticky-save-bar [dirty]="hasUnsavedChanges()">
+    <app-admin-sticky-save-bar [dirty]="hasUnsavedChanges()" [hint]="missingHint()">
       <a
         pButton
         routerLink="/admin/faqs"

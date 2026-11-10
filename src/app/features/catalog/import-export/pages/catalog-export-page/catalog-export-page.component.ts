@@ -16,7 +16,8 @@ import {
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { CatalogPackageFormat, CatalogPackageOptions, defaultCatalogPackageOptions } from '../../models/import-export.model';
 import { CatalogImportExportFacade } from '../../services/catalog-import-export.facade';
-
+
+import { TranslateService } from '@ngx-translate/core';
 type ExportScopeMode = 'entire' | 'filtered' | 'selected';
 
 @Component({
@@ -229,11 +230,12 @@ type ExportScopeMode = 'entire' | 'filtered' | 'selected';
   `,
 })
 export class CatalogExportPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly facade = inject(CatalogImportExportFacade);
   private readonly route = inject(ActivatedRoute);
   private readonly messageService = inject(MessageService);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Products', route: '/admin/products' }, { label: 'Export', route: null });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.PRODUCTS', route: '/admin/products' }, { label: 'ADMIN.NAV.PRODUCTS_EXPORT', route: null });
 
   protected readonly scopeMode = signal<ExportScopeMode>('entire');
   protected readonly searchTerm = signal('');
@@ -270,8 +272,8 @@ export class CatalogExportPageComponent implements OnInit {
     if ((this.encryptCodes() || this.passwordProtect()) && this.packagePassword().length < 6) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Password required',
-        detail: 'Enter a package password of at least 6 characters.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PASSWORD_REQUIRED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PACKAGE_PASSWORD_HINT'),
         life: 4000,
       });
       return;
@@ -290,7 +292,7 @@ export class CatalogExportPageComponent implements OnInit {
     });
 
     if (this.exportState().status === 'error') {
-      this.messageService.add({ severity: 'error', summary: 'Export failed', detail: this.exportState().error ?? '', life: 5000 });
+      this.messageService.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.EXPORT_FAILED'), detail: this.exportState().error ?? '', life: 5000 });
     }
   }
 

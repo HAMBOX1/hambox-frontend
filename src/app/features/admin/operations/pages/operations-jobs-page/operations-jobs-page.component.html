@@ -85,9 +85,9 @@
           <tr>
             <td class="admin-mono">{{ job.id | slice: 0:8 }}</td>
             <td>{{ job.jobType }}</td>
-            <td>{{ job.createdOnUtc | date: 'short' }}</td>
-            <td>{{ job.startedOnUtc ? (job.startedOnUtc | date: 'short') : '—' }}</td>
-            <td>{{ job.finishedOnUtc ? (job.finishedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ job.createdOnUtc | hamboxDate: 'short' }}</td>
+            <td>{{ job.startedOnUtc ? (job.startedOnUtc | hamboxDate: 'short') : '—' }}</td>
+            <td>{{ job.finishedOnUtc ? (job.finishedOnUtc | hamboxDate: 'short') : '—' }}</td>
             <td>{{ job.durationSeconds != null ? (job.durationSeconds | number: '1.0-1') + 's' : '—' }}</td>
             <td>{{ job.attempts }}/{{ job.maxAttempts }}</td>
             <td><app-admin-status-badge [label]="job.status" [tone]="statusTone(job.status)" /></td>
@@ -177,7 +177,7 @@
             <tr>
               <td>{{ attempt.attemptNumber }}</td>
               <td><app-admin-status-badge [label]="attempt.status" [tone]="statusTone(attempt.status)" /></td>
-              <td>{{ attempt.startedOnUtc | date: 'short' }}</td>
+              <td>{{ attempt.startedOnUtc | hamboxDate: 'short' }}</td>
               <td>{{ attempt.durationMs != null ? (attempt.durationMs / 1000 | number: '1.0-1') + 's' : '—' }}</td>
               <td>{{ attempt.workerId || '—' }}</td>
             </tr>

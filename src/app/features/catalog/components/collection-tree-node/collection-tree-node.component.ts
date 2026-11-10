@@ -5,6 +5,7 @@ import { MenuItem } from 'primeng/api';
 import { AdminActionMenuComponent } from '../../../../shared/components/admin';
 import { CollectionTreeNode } from '../../models/collection.model';
 import { CollectionTreeCallbacks } from '../../utils/collection-tree-callbacks.model';
+import { TranslatePipe } from '@ngx-translate/core';
 import { collectionColorVar } from '../../utils/collection-presets.util';
 
 /** Recursive tree row for Collections — mirrors `app-category-tree-node` exactly, minus the
@@ -12,7 +13,7 @@ import { collectionColorVar } from '../../utils/collection-presets.util';
 @Component({
   selector: 'app-collection-tree-node',
   standalone: true,
-  imports: [DragDropModule, AdminActionMenuComponent, CollectionTreeNodeComponent],
+  imports: [TranslatePipe, DragDropModule, AdminActionMenuComponent, CollectionTreeNodeComponent],
   templateUrl: './collection-tree-node.component.html',
   styleUrl: './collection-tree-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

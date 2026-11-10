@@ -3,25 +3,25 @@
 } @else if (selectedVariant(); as variant) {
   <div class="variant-inventory-panel__stats">
     <span class="variant-inventory-panel__stat variant-inventory-panel__stat--available">
-      Available <strong>{{ variant.availableStock }}</strong>
+      {{ 'ADMIN.CATALOG_UI.AVAILABLE' | translate }} <strong>{{ variant.availableStock }}</strong>
     </span>
-    <span class="variant-inventory-panel__stat">Reserved <strong>{{ variant.reservedStock }}</strong></span>
-    <span class="variant-inventory-panel__stat">Sold <strong>{{ variant.soldStock }}</strong></span>
+    <span class="variant-inventory-panel__stat">{{ 'ADMIN.CATALOG_UI.RESERVED' | translate }} <strong>{{ variant.reservedStock }}</strong></span>
+    <span class="variant-inventory-panel__stat">{{ 'ADMIN.CATALOG_UI.SOLD' | translate }} <strong>{{ variant.soldStock }}</strong></span>
   </div>
 
   <app-admin-section-card
-    title="Import Codes"
-    description="Paste or upload digital codes for this variant."
+    [title]="'ADMIN.CATALOG_UI.IMPORT_CODES' | translate"
+    [description]="'ADMIN.CATALOG_UI.PASTE_OR_UPLOAD_DIGITAL_CODES_FOR_THIS_VARIA' | translate"
   >
     <div class="variant-inventory-panel__import" *hamboxHasPermission="permissions.Catalog.Inventory.Import">
       <div class="variant-inventory-panel__upload-row">
         <label class="variant-inventory-panel__file-btn">
           <input type="file" accept=".txt,text/plain" (change)="onFileSelected($event, 'txt')" hidden />
-          <span><i class="pi pi-file" aria-hidden="true"></i> Upload TXT</span>
+          <span><i class="pi pi-file" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.UPLOAD_TXT' | translate }}</span>
         </label>
         <label class="variant-inventory-panel__file-btn">
           <input type="file" accept=".csv,text/csv" (change)="onFileSelected($event, 'csv')" hidden />
-          <span><i class="pi pi-file-excel" aria-hidden="true"></i> Upload CSV</span>
+          <span><i class="pi pi-file-excel" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.UPLOAD_CSV' | translate }}</span>
         </label>
       </div>
 
@@ -39,10 +39,10 @@
 
       <label class="variant-inventory-panel__multiline-toggle" for="multi-line-code">
         <p-checkbox inputId="multi-line-code" [binary]="true" [ngModel]="multiLine()" (ngModelChange)="multiLine.set($event)" />
-        <span>Multi-line code: treat everything above as ONE code (one product), not one code per line</span>
+        <span>{{ 'ADMIN.CATALOG_UI.MULTI_LINE_CODE_TREAT_EVERYTHING_ABOVE_AS_ON' | translate }}</span>
       </label>
 
-      <label for="code-note">Note for these codes (optional, internal)</label>
+      <label for="code-note">{{ 'ADMIN.CATALOG_UI.NOTE_FOR_THESE_CODES_OPTIONAL_INTERNAL' | translate }}</label>
       <input
         id="code-note"
         pInputText
@@ -59,13 +59,13 @@
         (click)="toggleAdvanced()"
       >
         <i class="pi" [class.pi-chevron-down]="!advancedOpen()" [class.pi-chevron-up]="advancedOpen()"></i>
-        Advanced
+        {{ 'ADMIN.CATALOG_UI.ADVANCED' | translate }}
       </button>
 
       @if (advancedOpen()) {
         <div class="variant-inventory-panel__advanced" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
           <div class="variant-inventory-panel__advanced-field">
-            <label for="import-supplier">Supplier (optional)</label>
+            <label for="import-supplier">{{ 'ADMIN.CATALOG_UI.SUPPLIER_OPTIONAL' | translate }}</label>
             <p-select
               inputId="import-supplier"
               [options]="supplierOptions()"
@@ -73,7 +73,7 @@
               optionValue="value"
               [ngModel]="supplierId()"
               (ngModelChange)="supplierId.set($event)"
-              placeholder="No supplier"
+              [placeholder]="'ADMIN.CATALOG_UI.NO_SUPPLIER' | translate"
               [showClear]="true"
             />
           </div>
@@ -85,15 +85,15 @@
               [ngModel]="groupIntoBatch()"
               (ngModelChange)="groupIntoBatch.set($event)"
             />
-            <label for="group-into-batch">Group import into batch</label>
+            <label for="group-into-batch">{{ 'ADMIN.CATALOG_UI.GROUP_IMPORT_INTO_BATCH' | translate }}</label>
           </div>
 
           <div class="variant-inventory-panel__advanced-field">
-            <label for="import-batch-name">Batch name</label>
+            <label for="import-batch-name">{{ 'ADMIN.CATALOG_UI.BATCH_NAME' | translate }}</label>
             <input
               pInputText
               id="import-batch-name"
-              placeholder="e.g. Supplier A — March"
+              [placeholder]="'ADMIN.CATALOG_UI.E_G_SUPPLIER_A_MARCH' | translate"
               [ngModel]="batchName()"
               (ngModelChange)="batchName.set($event)"
               [disabled]="!groupIntoBatch()"
@@ -101,7 +101,7 @@
           </div>
 
           <div class="variant-inventory-panel__advanced-field">
-            <label for="import-notes">Notes (optional)</label>
+            <label for="import-notes">{{ 'ADMIN.CATALOG_UI.NOTES_OPTIONAL' | translate }}</label>
             <textarea
               id="import-notes"
               pTextarea
@@ -116,7 +116,7 @@
       <button
         pButton
         type="button"
-        label="Import"
+        [label]="'ADMIN.CATALOG_UI.IMPORT' | translate"
         icon="pi pi-upload"
         [loading]="importing()"
         [disabled]="!canImport()"
@@ -125,11 +125,11 @@
     </div>
   </app-admin-section-card>
 
-  <app-admin-section-card title="Digital Codes" description="Search, filter, and manage imported codes.">
+  <app-admin-section-card [title]="'ADMIN.CATALOG_UI.DIGITAL_CODES' | translate" [description]="'ADMIN.CATALOG_UI.SEARCH_FILTER_AND_MANAGE_IMPORTED_CODES' | translate">
     <div class="variant-inventory-panel__toolbar">
       <input
         pInputText
-        placeholder="Search codes"
+        [placeholder]="'ADMIN.CATALOG_UI.SEARCH_CODES' | translate"
         [ngModel]="searchTerm()"
         (ngModelChange)="searchTerm.set($event)"
         (keyup.enter)="applyFilters()"
@@ -138,15 +138,15 @@
         [options]="statusOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Filter status"
+        [placeholder]="'ADMIN.CATALOG_UI.FILTER_STATUS' | translate"
         [ngModel]="statusFilter()"
         (ngModelChange)="statusFilter.set($event)"
       />
-      <button pButton type="button" label="Apply Filters" severity="secondary" (click)="applyFilters()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.APPLY_FILTERS' | translate" severity="secondary" (click)="applyFilters()"></button>
       <button
         pButton
         type="button"
-        label="Export CSV"
+        [label]="'ADMIN.CATALOG_UI.EXPORT_CSV' | translate"
         icon="pi pi-download"
         severity="secondary"
         [loading]="actionLoading()"
@@ -160,7 +160,7 @@
         <button
           pButton
           type="button"
-          label="Disable"
+          [label]="'ADMIN.CATALOG_UI.DISABLE' | translate"
           severity="secondary"
           size="small"
           [loading]="actionLoading()"
@@ -170,7 +170,7 @@
         <button
           pButton
           type="button"
-          label="Delete"
+          [label]="'ADMIN.CATALOG_UI.DELETE' | translate"
           severity="danger"
           size="small"
           [loading]="actionLoading()"
@@ -192,13 +192,13 @@
                   (ngModelChange)="toggleSelectAll($event)"
                 />
               </th>
-              <th>Code</th>
-              <th>Batch</th>
-              <th>Status</th>
-              <th>Reserved</th>
-              <th>Order</th>
-              <th>Imported</th>
-              <th>Expires</th>
+              <th>{{ 'ADMIN.CATALOG_UI.CODE' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.BATCH' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.RESERVED' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.ORDER' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.IMPORTED' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.EXPIRES' | translate }}</th>
               <th></th>
             </tr>
           </ng-template>
@@ -220,7 +220,7 @@
                     icon="pi pi-copy"
                     size="small"
                     [text]="true"
-                    aria-label="Copy code"
+                    [attr.aria-label]="'ADMIN.CATALOG_UI.COPY_CODE' | translate"
                     (click)="copyRevealed()"
                   ></button>
                   <button
@@ -229,7 +229,7 @@
                     icon="pi pi-eye-slash"
                     size="small"
                     [text]="true"
-                    aria-label="Hide code"
+                    [attr.aria-label]="'ADMIN.CATALOG_UI.HIDE_CODE' | translate"
                     (click)="hideRevealed()"
                   ></button>
                 } @else {
@@ -238,7 +238,7 @@
                     pButton
                     type="button"
                     icon="pi pi-eye"
-                    label="Reveal"
+                    [label]="'ADMIN.CATALOG_UI.REVEAL' | translate"
                     size="small"
                     severity="secondary"
                     [text]="true"
@@ -269,7 +269,8 @@
                       icon="pi pi-exclamation-triangle"
                       size="small"
                       severity="warn"
-                      title="Mark as failed"
+                      [title]="'ADMIN.CATALOG_UI.MARK_AS_FAILED' | translate"
+                      [attr.aria-label]="'ADMIN.CATALOG_UI.MARK_AS_FAILED' | translate"
                       *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
                       [loading]="actionLoading()"
                       (click)="requestMarkFailed(code)"
@@ -282,7 +283,9 @@
                       icon="pi pi-check"
                       size="small"
                       severity="secondary"
-                      *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+                      [attr.aria-label]="'ADMIN.CATALOG_UI.ENABLE' | translate"
+                      [title]="'ADMIN.CATALOG_UI.ENABLE' | translate"
+                                            *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
                       [loading]="actionLoading()"
                       (click)="enableCode(code)"
                     ></button>
@@ -293,7 +296,9 @@
                       icon="pi pi-ban"
                       size="small"
                       severity="secondary"
-                      *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
+                      [attr.aria-label]="'ADMIN.CATALOG_UI.DISABLE' | translate"
+                      [title]="'ADMIN.CATALOG_UI.DISABLE' | translate"
+                                            *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
                       [loading]="actionLoading()"
                       (click)="disableCode(code)"
                     ></button>
@@ -304,9 +309,11 @@
                     icon="pi pi-trash"
                     size="small"
                     severity="danger"
+                    [attr.aria-label]="'ADMIN.CATALOG_UI.DELETE' | translate"
+                    [title]="'ADMIN.CATALOG_UI.DELETE' | translate"
                     *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
                     [loading]="actionLoading()"
-                    (click)="deleteCode(code)"
+                    (click)="requestDelete(code)"
                   ></button>
                 </div>
               </td>
@@ -316,22 +323,22 @@
       </app-admin-data-table-shell>
 
       <div class="variant-inventory-panel__pagination">
-        <button pButton type="button" label="Previous" severity="secondary" size="small" [disabled]="codesPage() <= 1" (click)="previousPage()"></button>
+        <button pButton type="button" [label]="'ADMIN.CATALOG_UI.PREVIOUS' | translate" severity="secondary" size="small" [disabled]="codesPage() <= 1" (click)="previousPage()"></button>
         <span>Page {{ codesPage() }}</span>
-        <button pButton type="button" label="Next" severity="secondary" size="small" [disabled]="!codesHasMore()" (click)="nextPage()"></button>
+        <button pButton type="button" [label]="'ADMIN.CATALOG_UI.NEXT' | translate" severity="secondary" size="small" [disabled]="!codesHasMore()" (click)="nextPage()"></button>
       </div>
     } @else {
       <app-admin-empty-state
         icon="pi pi-key"
-        title="No codes imported"
-        description="Paste codes above or adjust your search filters."
+        [title]="'ADMIN.CATALOG_UI.NO_CODES_IMPORTED' | translate"
+        [description]="'ADMIN.CATALOG_UI.PASTE_CODES_ABOVE_OR_ADJUST_YOUR_SEARCH_FILT' | translate"
       />
     }
   </app-admin-section-card>
 
   <app-admin-section-card
-    title="Import History"
-    description="Recent import activity for this variant."
+    [title]="'ADMIN.CATALOG_UI.IMPORT_HISTORY' | translate"
+    [description]="'ADMIN.CATALOG_UI.RECENT_IMPORT_ACTIVITY_FOR_THIS_VARIANT' | translate"
     [collapsible]="true"
     [collapsed]="historyCollapsed()"
     (collapsedChange)="onHistoryCollapsedChange($event)"
@@ -374,8 +381,8 @@
     } @else {
       <app-admin-empty-state
         icon="pi pi-history"
-        title="No activity yet"
-        description="Imports and code changes for this variant will show up here."
+        [title]="'ADMIN.CATALOG_UI.NO_ACTIVITY_YET' | translate"
+        [description]="'ADMIN.CATALOG_UI.IMPORTS_AND_CODE_CHANGES_FOR_THIS_VARIANT_WI' | translate"
       />
     }
   </app-admin-section-card>
@@ -383,18 +390,28 @@
 
 <app-admin-confirm-dialog
   [visible]="bulkDeleteDialogOpen()"
-  title="Delete selected codes"
-  [message]="'Permanently delete ' + selectedCodeIds().length + ' selected code(s)?'"
+  [title]="'ADMIN.CATALOG_UI.DELETE_SELECTED_CODES' | translate"
+  [message]="'ADMIN.CATALOG_UI.DELETE_SELECTED_MESSAGE' | translate: { count: selectedCodeIds().length }"
   [destructive]="true"
   [loading]="actionLoading()"
   (visibleChange)="bulkDeleteDialogOpen.set($event)"
   (confirmed)="confirmBulkDelete()"
 />
 
+<app-admin-confirm-dialog
+  [visible]="deleteTargetCode() !== null"
+  [title]="'ADMIN.CATALOG_UI.DELETE_CODE_TITLE' | translate"
+  [message]="'ADMIN.CATALOG_UI.DELETE_CODE_MESSAGE' | translate"
+  [destructive]="true"
+  [loading]="actionLoading()"
+  (visibleChange)="$event || deleteTargetCode.set(null)"
+  (confirmed)="confirmDelete()"
+/>
+
 <p-dialog
   [visible]="revealDialogOpen()"
   (visibleChange)="revealDialogOpen.set($event); revealTargetCode.set(null)"
-  header="Reveal inventory code"
+  [header]="'ADMIN.CATALOG_UI.REVEAL_INVENTORY_CODE' | translate"
   [modal]="true"
   [dismissableMask]="true"
   [draggable]="false"
@@ -404,14 +421,13 @@
   styleClass="admin-dialog"
 >
   <p>
-    This reveals a sensitive inventory code. State why you need it — the reason, your account, IP and device are
-    written to the audit trail.
+    {{ 'ADMIN.CATALOG_UI.THIS_REVEALS_A_SENSITIVE_INVENTORY_CODE_STAT' | translate }}
   </p>
   <textarea
     pTextarea
     rows="3"
     maxlength="500"
-    placeholder="Reason (required)"
+    [placeholder]="'ADMIN.CATALOG_UI.REASON_REQUIRED' | translate"
     class="w-full"
     [ngModel]="revealReason()"
     (ngModelChange)="revealReason.set($event)"
@@ -420,7 +436,7 @@
     <button
       pButton
       type="button"
-      label="Reveal"
+      [label]="'ADMIN.CATALOG_UI.REVEAL' | translate"
       [disabled]="!revealReason().trim()"
       [loading]="revealing()"
       (click)="confirmReveal()"
@@ -431,7 +447,7 @@
 <p-dialog
   [visible]="importResultDialogOpen()"
   (visibleChange)="importResultDialogOpen.set($event)"
-  header="Import completed"
+  [header]="'ADMIN.CATALOG_UI.IMPORT_COMPLETED' | translate"
   [modal]="true"
   [dismissableMask]="true"
   [draggable]="false"
@@ -502,16 +518,16 @@
             @for (dup of result.duplicates; track $index) {
               <li class="variant-inventory-panel__import-duplicate">
                 <code class="variant-inventory-panel__code" title="{{ dup.code }}">{{ dup.code }}</code>
-                <span class="variant-inventory-panel__import-duplicate-reason">Already exists</span>
+                <span class="variant-inventory-panel__import-duplicate-reason">{{ 'ADMIN.CATALOG_UI.ALREADY_EXISTS' | translate }}</span>
                 <span class="variant-inventory-panel__import-duplicate-meta">
-                  Product: <strong>{{ dup.productName }}</strong>
+                  {{ 'ADMIN.CATALOG_UI.PRODUCT' | translate }} <strong>{{ dup.productName }}</strong>
                 </span>
                 <span class="variant-inventory-panel__import-duplicate-meta">
-                  Variant: <strong>{{ dup.variantName }}</strong>
+                  {{ 'ADMIN.CATALOG_UI.VARIANT_2' | translate }} <strong>{{ dup.variantName }}</strong>
                 </span>
                 @if (dup.batchName) {
                   <span class="variant-inventory-panel__import-duplicate-meta">
-                    Batch: <strong>{{ dup.batchName }}</strong>
+                    {{ 'ADMIN.CATALOG_UI.BATCH_2' | translate }} <strong>{{ dup.batchName }}</strong>
                   </span>
                 }
               </li>
@@ -522,7 +538,7 @@
             <button
               pButton
               type="button"
-              label="Copy duplicate list"
+              [label]="'ADMIN.CATALOG_UI.COPY_DUPLICATE_LIST' | translate"
               icon="pi pi-copy"
               severity="secondary"
               size="small"
@@ -531,7 +547,7 @@
             <button
               pButton
               type="button"
-              label="Export .txt"
+              [label]="'ADMIN.CATALOG_UI.EXPORT_TXT' | translate"
               icon="pi pi-download"
               severity="secondary"
               size="small"
@@ -543,7 +559,7 @@
     }
 
     <div class="variant-inventory-panel__import-result-footer">
-      <button pButton type="button" label="Done" (click)="closeImportResultDialog()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.DONE' | translate" (click)="closeImportResultDialog()"></button>
     </div>
   }
 </p-dialog>
@@ -553,7 +569,7 @@
 <p-dialog
   [visible]="failTargetCode() !== null"
   (visibleChange)="$event ? null : failTargetCode.set(null)"
-  header="Mark code as failed"
+  [header]="'ADMIN.CATALOG_UI.MARK_CODE_AS_FAILED' | translate"
   [modal]="true"
   [dismissableMask]="true"
   [draggable]="false"
@@ -562,12 +578,12 @@
   [style]="{ width: 'min(28rem, 92vw)' }"
   styleClass="admin-dialog"
 >
-  <p>The code leaves stock and is kept with this reason (for example the platform said it is invalid or already used).</p>
+  <p>{{ 'ADMIN.CATALOG_UI.THE_CODE_LEAVES_STOCK_AND_IS_KEPT_WITH_THIS' | translate }}</p>
   <textarea
     pTextarea
     rows="3"
     maxlength="500"
-    placeholder="Failure reason (required)"
+    [placeholder]="'ADMIN.CATALOG_UI.FAILURE_REASON_REQUIRED' | translate"
     class="w-full"
     [ngModel]="failReason()"
     (ngModelChange)="failReason.set($event)"
@@ -576,7 +592,7 @@
     <button
       pButton
       type="button"
-      label="Mark failed"
+      [label]="'ADMIN.CATALOG_UI.MARK_FAILED' | translate"
       severity="warn"
       [disabled]="!failReason().trim()"
       [loading]="actionLoading()"

@@ -8,6 +8,7 @@ import { map } from 'rxjs';
 
 import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { HamboxTranslateRefreshDirective } from '../../../../../shared/directives/hambox-translate-refresh.directive';
+import { parseApiError } from '../../../../../core/models/api-error.model';
 import { TICKET_STATUS_META } from '../../../../../core/support/support.model';
 import { AccountSupportFacade } from '../../services/account-support.facade';
 import { SupportChipComponent } from '../../components/support-chip/support-chip.component';
@@ -53,6 +54,9 @@ export class AccountTicketDetailPageComponent {
   protected readonly messages = computed(() => this.ticket()?.messages.filter((m) => !m.internal) ?? []);
   protected readonly agentTyping = this.facade.agentTyping;
   protected readonly connectionState = this.facade.connectionState;
+  protected readonly actionError = signal<string | null>(null);
+  /** Closing is final (a closed ticket cannot be reopened), so it asks first. */
+  protected readonly confirmingClose = signal(false);
 
   constructor() {
     effect((onCleanup) => {
@@ -101,27 +105,44 @@ export class AccountTicketDetailPageComponent {
     clearTimeout(this.typingStopTimer);
     this.facade.notifyStopTyping(this.ticketId());
     this.sending.set(true);
+    this.actionError.set(null);
     try {
       await this.facade.reply(this.ticketId(), html);
       this.replyHtml.set('');
+    } catch (error) {
+      this.actionError.set(parseApiError(error).message);
     } finally {
       this.sending.set(false);
     }
   }
 
-  protected async closeTicket(): Promise<void> {
-    await this.facade.close(this.ticketId());
+  protected closeTicket(): void {
+    this.confirmingClose.set(true);
+  }
+
+  protected async confirmClose(): Promise<void> {
+    this.confirmingClose.set(false);
+    await this.runAction(() => this.facade.close(this.ticketId()));
   }
 
   protected async reopenTicket(): Promise<void> {
-    await this.facade.reopen(this.ticketId());
+    await this.runAction(() => this.facade.reopen(this.ticketId()));
+  }
+
+  private async runAction(action: () => Promise<void>): Promise<void> {
+    this.actionError.set(null);
+    try {
+      await action();
+    } catch (error) {
+      this.actionError.set(parseApiError(error).message);
+    }
   }
 
   protected async submitRating(): Promise<void> {
     if (this.ratingScore() < 1) {
       return;
     }
-    await this.facade.rate(this.ticketId(), this.ratingScore(), this.ratingComment().trim() || null);
+    await this.runAction(() => this.facade.rate(this.ticketId(), this.ratingScore(), this.ratingComment().trim() || null));
   }
 
   protected backToList(): void {

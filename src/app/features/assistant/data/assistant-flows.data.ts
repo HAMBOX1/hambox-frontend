@@ -1,4 +1,4 @@
-import { ConversationFlow, FlowKey, HistoryItem, SuggestionChip } from '../models/assistant.models';
+import { ConversationFlow, FlowKey, SuggestionChip } from '../models/assistant.models';
 
 export const SUGGESTIONS: readonly SuggestionChip[] = [
   { label: 'ASSISTANT.SUGGESTION_FIND', icon: 'search', flow: 'find' },
@@ -134,49 +134,3 @@ export const FLOWS: Record<FlowKey, ConversationFlow> = {
     retryNote: 'Here is that ticket update again.',
   },
 };
-
-export const SEED_HISTORY: readonly HistoryItem[] = [
-  {
-    id: 'h1',
-    group: 'Today',
-    title: 'Refund on Steam Wallet Code',
-    time: '10:42 AM',
-    flow: 'refund',
-  },
-  {
-    id: 'h2',
-    group: 'Today',
-    title: 'Comparing Plus vs Pro',
-    time: '9:15 AM',
-    flow: 'compare',
-    pinned: true,
-  },
-  {
-    id: 'h3',
-    group: 'Yesterday',
-    title: 'Activation help — Elden Ring key',
-    time: '6:03 PM',
-    flow: 'activate',
-  },
-  {
-    id: 'h4',
-    group: 'Last 7 Days',
-    title: 'Order #HB-20214 tracking',
-    time: 'Jul 21',
-    flow: 'track',
-  },
-  {
-    id: 'h5',
-    group: 'Last 7 Days',
-    title: 'Gift card recommendations',
-    time: 'Jul 19',
-    flow: 'find',
-  },
-  {
-    id: 'h6',
-    group: 'Last Month',
-    title: 'Referral program question',
-    time: 'Jun 30',
-    flow: 'support',
-  },
-];

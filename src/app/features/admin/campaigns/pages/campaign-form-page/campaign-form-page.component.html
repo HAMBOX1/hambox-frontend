@@ -52,7 +52,7 @@
 
     <app-admin-section-card [title]="'ADMIN.CAMPAIGNS.FORM.DETAILS' | translate">
       <div class="campaign-form-page__grid">
-        <label class="campaign-form-page__field">
+        <label class="campaign-form-page__field campaign-form-page__field--wide">
           <span>{{ 'ADMIN.CAMPAIGNS.FORM.NAME' | translate }}</span>
           <input pInputText [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required />
         </label>
@@ -104,7 +104,7 @@
             @for (entry of history(); track entry.id) {
               <li>
                 <strong>{{ ('ADMIN.CAMPAIGNS.HISTORY_ACTION.' + entry.action.toUpperCase()) | translate }}</strong>
-                <span class="campaign-form-page__history-date">{{ entry.createdOnUtc | date: 'medium' }}</span>
+                <span class="campaign-form-page__history-date">{{ entry.createdOnUtc | hamboxDate: 'medium' }}</span>
               </li>
             }
           </ul>

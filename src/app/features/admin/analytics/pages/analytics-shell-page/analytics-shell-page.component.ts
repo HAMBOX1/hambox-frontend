@@ -28,7 +28,7 @@ import { AnalyticsFacade } from '../../services/analytics.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnalyticsShellPageComponent {
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Analytics' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.ANALYTICS' });
 
   protected readonly navItems = [
     { path: 'overview', labelKey: 'ADMIN.ANALYTICS.NAV.OVERVIEW' },

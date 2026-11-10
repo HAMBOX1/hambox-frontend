@@ -10,7 +10,10 @@
     <p class="profile-page__state profile-page__state--error">{{ error() }}</p>
   } @else if (profile(); as current) {
     @if (success()) {
-      <p class="profile-page__success">{{ success() }}</p>
+      <p class="profile-page__success" role="status">{{ success() }}</p>
+    }
+    @if (formError() || actionError()) {
+      <p class="profile-page__error" role="alert">{{ formError() || actionError() }}</p>
     }
 
     <div class="profile-page__grid">

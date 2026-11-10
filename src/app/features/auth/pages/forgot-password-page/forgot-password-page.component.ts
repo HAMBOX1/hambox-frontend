@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -10,7 +11,6 @@ import { UiTurnstileComponent } from '../../../../shared/components/ui';
 import { Auth } from '../../services/auth';
 import { applyServerValidationErrors, getControlErrorMessage } from '../../utils/auth-form.utils';
 
-const FIELD_LABELS = { email: 'Email' };
 
 @Component({
   selector: 'app-forgot-password-page',
@@ -21,6 +21,7 @@ const FIELD_LABELS = { email: 'Email' };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordPageComponent {
+  private readonly translate = inject(TranslateService);
   private readonly auth = inject(Auth);
   private readonly fb = inject(FormBuilder);
 
@@ -36,7 +37,7 @@ export class ForgotPasswordPageComponent {
   });
 
   protected fieldError(controlName: string): string | null {
-    return getControlErrorMessage(controlName, this.form, FIELD_LABELS);
+    return getControlErrorMessage(controlName, this.form, this.translate);
   }
 
   protected submit(): void {

@@ -5,7 +5,7 @@
     }
 
     <div class="admin-field">
-      <label class="admin-field__label" for="category-name-en">Category name</label>
+      <label class="admin-field__label" for="category-name-en">{{ 'ADMIN.CATALOG_UI.CATEGORY_NAME' | translate }}</label>
       <input
         pInputText
         id="category-name-en"
@@ -22,7 +22,7 @@
 
     @if (mode() === 'edit') {
       <div class="admin-field">
-        <span class="admin-field__label">Category image <span class="admin-field__optional">(optional)</span></span>
+        <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.CATEGORY_IMAGE' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></span>
         <div class="category-create-form__image">
           @if (imagePreviewUrl(); as preview) {
             <img [src]="preview" alt="" class="category-create-form__image-preview" />
@@ -55,7 +55,7 @@
               <button
                 pButton
                 type="button"
-                label="Remove"
+                [label]="'ADMIN.CATALOG_UI.REMOVE' | translate"
                 icon="pi pi-trash"
                 severity="danger"
                 text
@@ -74,15 +74,15 @@
 
     @if (mode() === 'create') {
       <div class="admin-field">
-        <span class="admin-field__label">Category type</span>
+        <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.CATEGORY_TYPE' | translate }}</span>
         <div class="category-create-form__type-toggle">
           <label class="category-create-form__type-option">
             <input type="radio" formControlName="categoryType" value="root" (change)="onCategoryTypeChange()" />
-            Root Category
+            {{ 'ADMIN.CATALOG_UI.ROOT_CATEGORY' | translate }}
           </label>
           <label class="category-create-form__type-option">
             <input type="radio" formControlName="categoryType" value="child" (change)="onCategoryTypeChange()" />
-            Child Category
+            {{ 'ADMIN.CATALOG_UI.CHILD_CATEGORY' | translate }}
           </label>
         </div>
       </div>
@@ -90,14 +90,14 @@
 
     @if (mode() === 'edit' || isChildCategory()) {
       <div class="admin-field">
-        <label class="admin-field__label" for="category-parent">Parent category <span class="admin-field__optional">(optional)</span></label>
+        <label class="admin-field__label" for="category-parent">{{ 'ADMIN.CATALOG_UI.PARENT_CATEGORY' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></label>
         <p-select
           inputId="category-parent"
           formControlName="parentId"
           [options]="parentDropdownOptions()"
           optionLabel="label"
           optionValue="value"
-          placeholder="No parent (root category)"
+          [placeholder]="'ADMIN.CATALOG_UI.NO_PARENT_ROOT_CATEGORY' | translate"
           (onChange)="onParentChange()"
         />
         @if (parentFieldError(); as error) {
@@ -108,10 +108,10 @@
 
     @if (mode() === 'create' && isChildCategory() && isCreatingNewParent()) {
       <div class="category-create-form__new-parent" [formGroup]="form.controls.newParent">
-        <p class="category-create-form__new-parent-title">New parent category</p>
+        <p class="category-create-form__new-parent-title">{{ 'ADMIN.CATALOG_UI.NEW_PARENT_CATEGORY' | translate }}</p>
 
         <div class="admin-field">
-          <label class="admin-field__label" for="new-parent-name-en">English name</label>
+          <label class="admin-field__label" for="new-parent-name-en">{{ 'ADMIN.CATALOG_UI.ENGLISH_NAME' | translate }}</label>
           <input
             pInputText
             id="new-parent-name-en"
@@ -127,7 +127,7 @@
         </div>
 
         <div class="admin-field">
-          <label class="admin-field__label" for="new-parent-name-ar">Arabic name <span class="admin-field__optional">(optional)</span></label>
+          <label class="admin-field__label" for="new-parent-name-ar">{{ 'ADMIN.CATALOG_UI.ARABIC_NAME' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></label>
           <input
             pInputText
             id="new-parent-name-ar"
@@ -140,7 +140,7 @@
         </div>
 
         <div class="admin-field">
-          <label class="admin-field__label" for="new-parent-slug">Slug</label>
+          <label class="admin-field__label" for="new-parent-slug">{{ 'ADMIN.CATALOG_UI.SLUG' | translate }}</label>
           <input
             pInputText
             id="new-parent-slug"
@@ -159,14 +159,14 @@
 
     <div class="admin-field">
       <label class="admin-field__label" for="category-description">
-        Customer instructions <span class="admin-field__optional">(optional)</span>
+        {{ 'ADMIN.CATALOG_UI.CUSTOMER_INSTRUCTIONS' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span>
       </label>
       <p-editor
         id="category-description"
         formControlName="descriptionHtml"
         [style]="{ height: '160px' }"
       />
-      <p class="admin-field__hint">Shown to customers browsing this category — e.g. regional requirements or usage notes.</p>
+      <p class="admin-field__hint">{{ 'ADMIN.CATALOG_UI.SHOWN_TO_CUSTOMERS_BROWSING_THIS_CATEGORY_E' | translate }}</p>
     </div>
 
     <div class="category-create-form__arabic-section">
@@ -184,11 +184,11 @@
       } @else {
         <div class="category-create-form__arabic-fields">
           <div class="category-create-form__arabic-header">
-            <span class="admin-field__label">Arabic translation</span>
+            <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.ARABIC_TRANSLATION' | translate }}</span>
             <button
               pButton
               type="button"
-              label="Hide"
+              [label]="'ADMIN.CATALOG_UI.HIDE' | translate"
               icon="pi pi-times"
               severity="secondary"
               text
@@ -198,7 +198,7 @@
           </div>
 
           <div class="admin-field">
-            <label class="admin-field__label" for="category-name-ar">Arabic name</label>
+            <label class="admin-field__label" for="category-name-ar">{{ 'ADMIN.CATALOG_UI.ARABIC_NAME' | translate }}</label>
             <input
               pInputText
               id="category-name-ar"
@@ -216,17 +216,17 @@
     @if (mode() === 'create') {
       <div class="category-create-form__subcategories">
         @if (isChildCategory()) {
-          <span class="admin-field__label">Additional categories <span class="admin-field__optional">(optional)</span></span>
-          <p class="admin-field__hint">Create more categories under the same parent.</p>
+          <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.ADDITIONAL_CATEGORIES' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></span>
+          <p class="admin-field__hint">{{ 'ADMIN.CATALOG_UI.CREATE_MORE_CATEGORIES_UNDER_THE_SAME_PARENT' | translate }}</p>
         } @else {
-          <span class="admin-field__label">Subcategories <span class="admin-field__optional">(optional)</span></span>
-          <p class="admin-field__hint">Create child categories together with this root category.</p>
+          <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.SUBCATEGORIES' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></span>
+          <p class="admin-field__hint">{{ 'ADMIN.CATALOG_UI.CREATE_CHILD_CATEGORIES_TOGETHER_WITH_THIS_R' | translate }}</p>
         }
 
         @for (group of subcategories.controls; track $index; let i = $index) {
           <div class="category-create-form__subcategory-row" [formGroup]="group">
             <div class="admin-field">
-              <label class="admin-field__label" [for]="'subcategory-name-en-' + i">English name</label>
+              <label class="admin-field__label" [for]="'subcategory-name-en-' + i">{{ 'ADMIN.CATALOG_UI.ENGLISH_NAME' | translate }}</label>
               <input
                 pInputText
                 [id]="'subcategory-name-en-' + i"
@@ -242,7 +242,7 @@
             </div>
 
             <div class="admin-field">
-              <label class="admin-field__label" [for]="'subcategory-name-ar-' + i">Arabic name <span class="admin-field__optional">(optional)</span></label>
+              <label class="admin-field__label" [for]="'subcategory-name-ar-' + i">{{ 'ADMIN.CATALOG_UI.ARABIC_NAME' | translate }} <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></label>
               <input
                 pInputText
                 [id]="'subcategory-name-ar-' + i"
@@ -255,7 +255,7 @@
             </div>
 
             <div class="admin-field">
-              <label class="admin-field__label" [for]="'subcategory-slug-' + i">Slug</label>
+              <label class="admin-field__label" [for]="'subcategory-slug-' + i">{{ 'ADMIN.CATALOG_UI.SLUG' | translate }}</label>
               <input
                 pInputText
                 [id]="'subcategory-slug-' + i"
@@ -275,7 +275,7 @@
               type="button"
               class="category-create-form__subcategory-remove"
               icon="pi pi-trash"
-              label="Remove"
+              [label]="'ADMIN.CATALOG_UI.REMOVE' | translate"
               severity="danger"
               text
               (click)="removeSubcategory(i)"
@@ -296,9 +296,9 @@
       </div>
     }
 
-    <app-admin-section-card title="Advanced" [collapsible]="true" [(collapsed)]="advancedCollapsed">
+    <app-admin-section-card [title]="'ADMIN.CATALOG_UI.ADVANCED' | translate" [collapsible]="true" [(collapsed)]="advancedCollapsed">
       <div class="admin-field">
-        <label class="admin-field__label" for="category-slug">Slug</label>
+        <label class="admin-field__label" for="category-slug">{{ 'ADMIN.CATALOG_UI.SLUG' | translate }}</label>
         <input
           pInputText
           id="category-slug"
@@ -311,7 +311,7 @@
         @if (fieldError('slug'); as error) {
           <p class="category-create-form__error">{{ error }}</p>
         }
-        <p class="admin-field__hint">Lowercase URL segment used in storefront routes. Auto-generated from the name.</p>
+        <p class="admin-field__hint">{{ 'ADMIN.CATALOG_UI.LOWERCASE_URL_SEGMENT_USED_IN_STOREFRONT_ROU' | translate }}</p>
       </div>
     </app-admin-section-card>
   </div>
@@ -321,7 +321,7 @@
       <div class="category-create-form__actions-start">
         <div class="admin-field admin-field--checkbox category-create-form__visibility">
           <p-checkbox formControlName="isActive" inputId="category-active" [binary]="true" />
-          <label for="category-active">Visible on storefront</label>
+          <label for="category-active">{{ 'ADMIN.CATALOG_UI.VISIBLE_ON_STOREFRONT' | translate }}</label>
         </div>
 
         <button
@@ -332,8 +332,8 @@
           severity="danger"
           text
           [disabled]="submitting()"
-          aria-label="Delete Category"
-          pTooltip="Delete Category"
+          [attr.aria-label]="'ADMIN.CATALOG_UI.DELETE_CATEGORY' | translate"
+          [pTooltip]="'ADMIN.CATALOG_UI.DELETE_CATEGORY' | translate"
           tooltipPosition="top"
           (click)="requestDelete()"
         ></button>
@@ -343,7 +343,7 @@
         pButton
         type="submit"
         class="admin-btn-primary"
-        label="Save"
+        [label]="'ADMIN.CATALOG_UI.SAVE' | translate"
         icon="pi pi-check"
         severity="success"
         [loading]="submitting()"
@@ -356,7 +356,7 @@
         pButton
         type="button"
         class="admin-btn-secondary"
-        label="Cancel"
+        [label]="'ADMIN.CATALOG_UI.CANCEL' | translate"
         severity="secondary"
         [disabled]="submitting()"
         (click)="cancel()"

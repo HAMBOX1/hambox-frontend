@@ -1,14 +1,16 @@
 <p-toast position="top-right" />
 
-<app-admin-section-card title="Instructions" description="Private setup/usage documentation, shown to customers only after purchase." [compact]="true">
+<app-admin-section-card [title]="'ADMIN.CATALOG_UI.INSTRUCTIONS' | translate" [description]="'ADMIN.CATALOG_UI.PRIVATE_SETUP_USAGE_DOCUMENTATION_SHOWN_TO_C' | translate" [compact]="true">
   @if (!productId()) {
-    <p class="product-instructions-panel__hint">Save the product first to start writing instructions.</p>
+    <p class="product-instructions-panel__hint">{{ 'ADMIN.CATALOG_UI.SAVE_THE_PRODUCT_FIRST_TO_START_WRITING_INST' | translate }}</p>
   } @else {
     <div class="product-instructions-panel__toolbar">
       <input
         pInputText
         class="product-instructions-panel__title"
-        placeholder="Title (e.g. How to Activate Your Product)"
+        [maxlength]="maxTitleLength"
+        [attr.aria-label]="'ADMIN.CATALOG_UI.INSTRUCTION_TITLE' | translate"
+        [placeholder]="'ADMIN.CATALOG_UI.TITLE_E_G_HOW_TO_ACTIVATE_YOUR_PRODUCT' | translate"
         [ngModel]="titleState()"
         (ngModelChange)="onTitleChange($event)"
       />
@@ -16,28 +18,34 @@
       <div class="product-instructions-panel__meta">
         @if (instructions(); as current) {
           <app-admin-status-badge
-            [label]="current.isPublished ? 'Published' : 'Draft'"
+            [label]="(current.isPublished ? 'ADMIN.CATALOG_UI.PUBLISHED' : 'ADMIN.CATALOG_UI.DRAFT') | translate"
             [tone]="current.isPublished ? 'success' : 'neutral'"
           />
           <span class="product-instructions-panel__version">v{{ current.version }}</span>
           @if (current.updatedOnUtc) {
-            <span class="product-instructions-panel__updated">Updated {{ current.updatedOnUtc | hamboxDate: 'medium' }}</span>
+            <span class="product-instructions-panel__updated">{{ 'ADMIN.CATALOG_UI.UPDATED' | translate }} {{ current.updatedOnUtc | hamboxDate: 'medium' }}</span>
           }
         }
 
         @if (saving()) {
-          <span class="product-instructions-panel__status"><i class="pi pi-spin pi-spinner"></i> Saving…</span>
+          <span class="product-instructions-panel__status"><i class="pi pi-spin pi-spinner"></i> {{ 'ADMIN.CATALOG_UI.SAVING' | translate }}</span>
         } @else if (dirty()) {
           <span class="product-instructions-panel__status product-instructions-panel__status--dirty">
-            <i class="pi pi-circle-fill"></i> Unsaved changes
+            <i class="pi pi-circle-fill"></i> {{ 'ADMIN.CATALOG_UI.UNSAVED_CHANGES' | translate }}
           </span>
         } @else {
           <span class="product-instructions-panel__status product-instructions-panel__status--saved">
-            <i class="pi pi-check-circle"></i> Saved
+            <i class="pi pi-check-circle"></i> {{ 'ADMIN.CATALOG_UI.SAVED' | translate }}
           </span>
         }
       </div>
     </div>
+
+    @if (instructions()?.isPublished) {
+      <p class="product-instructions-panel__live-warning" role="status">
+        <i class="pi pi-exclamation-triangle"></i> {{ 'ADMIN.CATALOG_UI.INSTRUCTIONS_LIVE_WARNING' | translate }}
+      </p>
+    }
 
     <p-editor
       [ngModel]="contentState()"
@@ -47,13 +55,13 @@
     />
 
     <div class="product-instructions-panel__actions">
-      <button pButton type="button" label="Preview" icon="pi pi-eye" severity="secondary" [outlined]="true" (click)="previewOpen.set(true)"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.PREVIEW' | translate" icon="pi pi-eye" severity="secondary" [outlined]="true" (click)="previewOpen.set(true)"></button>
 
       @if (instructions()?.isPublished) {
         <button
           pButton
           type="button"
-          label="Unpublish"
+          [label]="'ADMIN.CATALOG_UI.UNPUBLISH' | translate"
           icon="pi pi-eye-slash"
           severity="secondary"
           *hamboxHasPermission="permissions.Catalog.Products.Edit"
@@ -64,7 +72,7 @@
         <button
           pButton
           type="button"
-          label="Publish"
+          [label]="'ADMIN.CATALOG_UI.PUBLISH' | translate"
           icon="pi pi-check"
           *hamboxHasPermission="permissions.Catalog.Products.Edit"
           [loading]="publishing()"
@@ -76,24 +84,24 @@
   }
 </app-admin-section-card>
 
-<p-dialog header="Preview" [(visible)]="previewOpen" [modal]="true" [style]="{ width: '860px', maxWidth: '95vw' }">
-  <h2 class="product-instructions-panel__preview-title">{{ titleState() || 'Untitled' }}</h2>
+<p-dialog [header]="'ADMIN.CATALOG_UI.PREVIEW' | translate" [(visible)]="previewOpen" [modal]="true" [style]="{ width: '860px', maxWidth: '95vw' }">
+  <h2 class="product-instructions-panel__preview-title">{{ titleState() || ('ADMIN.CATALOG_UI.UNTITLED' | translate) }}</h2>
   <app-rich-content-viewer [html]="contentState()" [showToc]="false" />
 </p-dialog>
 
 <app-admin-confirm-dialog
   [(visible)]="publishConfirmOpen"
-  title="Publish instructions?"
-  message="Customers who purchased this product will immediately be able to view these instructions."
-  confirmLabel="Publish"
+  [title]="'ADMIN.CATALOG_UI.PUBLISH_INSTRUCTIONS' | translate"
+  [message]="'ADMIN.CATALOG_UI.CUSTOMERS_WHO_PURCHASED_THIS_PRODUCT_WILL_IM' | translate"
+  [confirmLabel]="'ADMIN.CATALOG_UI.PUBLISH' | translate"
   (confirmed)="onPublish()"
 />
 
 <app-admin-confirm-dialog
   [(visible)]="unpublishConfirmOpen"
-  title="Unpublish instructions?"
-  message="Customers will lose access to these instructions until you publish again."
-  confirmLabel="Unpublish"
+  [title]="'ADMIN.CATALOG_UI.UNPUBLISH_INSTRUCTIONS' | translate"
+  [message]="'ADMIN.CATALOG_UI.CUSTOMERS_WILL_LOSE_ACCESS_TO_THESE_INSTRUCT' | translate"
+  [confirmLabel]="'ADMIN.CATALOG_UI.UNPUBLISH' | translate"
   [destructive]="true"
   (confirmed)="onUnpublish()"
 />

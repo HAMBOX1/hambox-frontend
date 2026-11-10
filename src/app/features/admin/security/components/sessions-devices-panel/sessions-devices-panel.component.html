@@ -53,7 +53,7 @@
           <td>{{ device.displayName }}</td>
           <td>{{ device.userEmail ?? '—' }}</td>
           <td>{{ device.lastCity ? device.lastCity + ', ' : '' }}{{ device.lastCountryCode ?? '—' }} · {{ device.lastIpAddress }}</td>
-          <td>{{ device.lastSeenUtc | date: 'short' }}</td>
+          <td>{{ device.lastSeenUtc | hamboxDate: 'short' }}</td>
           <td>{{ device.loginCount }}</td>
           <td><app-admin-status-badge [label]="deviceStatusLabel(device)" [tone]="deviceStatusTone(device)" /></td>
           <td>
@@ -110,8 +110,8 @@
           <tr>
             <td>{{ session.browserName ?? 'Unknown' }} · {{ session.deviceName ?? 'Unknown' }}</td>
             <td>{{ session.ipAddress }}</td>
-            <td>{{ session.startedOnUtc | date: 'short' }}</td>
-            <td>{{ session.lastActivityOnUtc | date: 'short' }}</td>
+            <td>{{ session.startedOnUtc | hamboxDate: 'short' }}</td>
+            <td>{{ session.lastActivityOnUtc | hamboxDate: 'short' }}</td>
             <td>
               <app-admin-status-badge
                 [label]="session.isActive ? ('ADMIN.SECURITY.SESSIONS.STATUS.ACTIVE' | translate) : ('ADMIN.SECURITY.SESSIONS.STATUS.ENDED' | translate)"

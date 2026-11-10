@@ -12,7 +12,8 @@ import { AdminPageHeaderComponent } from '../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { DeletedInventoryCodeDto } from '../../models/inventory-api.model';
 import { InventoryApiService } from '../../services/inventory-api.service';
-
+
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 const PAGE_SIZE = 25;
 
 /**
@@ -22,17 +23,18 @@ const PAGE_SIZE = 25;
 @Component({
   selector: 'app-deleted-codes-page',
   standalone: true,
-  imports: [DatePipe, FormsModule, ButtonModule, InputTextModule, ToastModule, AdminPageHeaderComponent],
+  imports: [TranslatePipe, DatePipe, FormsModule, ButtonModule, InputTextModule, ToastModule, AdminPageHeaderComponent],
   providers: [MessageService],
   templateUrl: './deleted-codes-page.component.html',
   styleUrl: './deleted-codes-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeletedCodesPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly inventoryApi = inject(InventoryApiService);
   private readonly messages = inject(MessageService);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Deleted Codes' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.DELETED_CODES' });
 
   protected readonly items = signal<readonly DeletedInventoryCodeDto[]>([]);
   protected readonly totalCount = signal(0);
@@ -103,13 +105,13 @@ export class DeletedCodesPageComponent implements OnInit {
     this.busyId.set(item.id);
     try {
       await firstValueFrom(this.inventoryApi.restoreDeletedCode(item.id));
-      this.messages.add({ severity: 'success', summary: 'Code restored to stock', life: 3500 });
+      this.messages.add({ severity: 'success', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CODE_RESTORED'), life: 3500 });
       await this.load();
     } catch (error) {
       this.messages.add({
         severity: 'error',
-        summary: 'Could not restore the code',
-        detail: error instanceof ApiError && error.message ? error.message : 'Please try again.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CODE_RESTORE_FAILED'),
+        detail: error instanceof ApiError && error.message ? error.message : this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         life: 7000,
       });
     } finally {
@@ -129,7 +131,7 @@ export class DeletedCodesPageComponent implements OnInit {
     } catch {
       this.items.set([]);
       this.totalCount.set(0);
-      this.messages.add({ severity: 'error', summary: 'Could not load the deleted codes', life: 5000 });
+      this.messages.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELETED_CODES_LOAD_FAILED'), life: 5000 });
     } finally {
       this.loading.set(false);
     }

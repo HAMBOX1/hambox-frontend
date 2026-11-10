@@ -10,7 +10,7 @@ describe('PaymentProcessingPageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PaymentProcessingPageComponent],
-      providers: [provideRouter([]), provideApiTestBed()],
+      providers: [provideRouter([{ path: '**', children: [] }]), provideApiTestBed()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentProcessingPageComponent);

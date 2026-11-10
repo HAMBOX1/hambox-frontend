@@ -78,7 +78,7 @@
         <td>{{ event.description }}</td>
         <td>{{ event.ipAddress ?? '—' }}</td>
         <td>{{ event.city ? event.city + ', ' : '' }}{{ event.country ?? '—' }}</td>
-        <td>{{ event.occurredOnUtc | date: 'short' }}</td>
+        <td>{{ event.occurredOnUtc | hamboxDate: 'short' }}</td>
         @if (isAlerts()) {
           <td>
             @let menuItems = rowActionMenuItems(event);

@@ -51,18 +51,27 @@ import { ProductVariantUsageDialogComponent } from '../product-variant-usage-dia
 import { VariantFulfillmentPanelComponent } from '../variant-fulfillment-panel/variant-fulfillment-panel.component';
 import { VariantInstructionsDialogComponent } from '../variant-instructions-dialog/variant-instructions-dialog.component';
 import { VariantInventoryPanelComponent } from '../variant-inventory-panel/variant-inventory-panel.component';
-
+
+import { toSignal } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 const VARIANT_STATUS_OPTIONS = [
-  { label: 'Draft', value: 'Draft' },
-  { label: 'Active', value: 'Active' },
-  { label: 'Inactive', value: 'Inactive' },
-  { label: 'Archived', value: 'Archived' },
+  { key: 'ADMIN.CATALOG_PAGE.STATUS_VALUES.Draft', value: 'Draft' },
+  { key: 'ADMIN.CATALOG_PAGE.STATUS_VALUES.Active', value: 'Active' },
+  { key: 'ADMIN.CATALOG_PAGE.STATUS_VALUES.Inactive', value: 'Inactive' },
+  { key: 'ADMIN.CATALOG_PAGE.STATUS_VALUES.Archived', value: 'Archived' },
 ];
 
-const STATUS_FILTER_OPTIONS = [
-  { label: 'All statuses', value: '' },
-  ...VARIANT_STATUS_OPTIONS,
+const STATUS_FILTER_OPTIONS = [{ key: 'ADMIN.CATALOG_UI.ALL_STATUSES', value: '' }, ...VARIANT_STATUS_OPTIONS];
+
+const PRICE_MODE_OPTIONS = [
+  { key: 'ADMIN.CATALOG_UI.PRICE_MODE_MANUAL', value: 'manual' as const },
+  { key: 'ADMIN.CATALOG_UI.PRICE_MODE_PERCENT', value: 'percent' as const },
 ];
+
+// Mirror the backend limits so the dialog stops bad input instead of failing the save.
+const MAX_PRICE = 10_000_000;
+const MAX_SKU_LENGTH = 100;
 
 type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
 
@@ -70,7 +79,7 @@ type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
 @Component({
   selector: 'app-product-variant-manager',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     ButtonModule,
     CheckboxModule,
@@ -97,12 +106,14 @@ type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
     VariantFulfillmentPanelComponent,
     VariantInstructionsDialogComponent,
   ],
-  providers: [MessageService],
+  // No private MessageService: toasts must reach the edit page's <p-toast> (a component-level provider would be a
+  // different instance that nothing displays).
   templateUrl: './product-variant-manager.component.html',
   styleUrl: './product-variant-manager.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductVariantManagerComponent {
+  private readonly translate = inject(TranslateService);
   private readonly facade = inject(ProductEditorFacade);
   private readonly messageService = inject(MessageService);
   private readonly permissionService = inject(PermissionService);
@@ -116,8 +127,19 @@ export class ProductVariantManagerComponent {
   protected readonly product = this.facade.product;
   protected readonly productId = this.facade.productId;
   protected readonly loading = this.facade.loading;
-  protected readonly statusOptions = VARIANT_STATUS_OPTIONS;
-  protected readonly statusFilterOptions = STATUS_FILTER_OPTIONS;
+  // Re-evaluates the translated option labels whenever the language changes.
+  private readonly language = toSignal(this.translate.onLangChange.pipe(startWith(null)));
+  protected readonly statusOptions = computed(() => this.translateOptions(VARIANT_STATUS_OPTIONS));
+  protected readonly statusFilterOptions = computed(() => this.translateOptions(STATUS_FILTER_OPTIONS));
+  protected readonly priceModeOptions = computed(() => this.translateOptions(PRICE_MODE_OPTIONS));
+  protected readonly maxPrice = MAX_PRICE;
+  protected readonly maxSkuLength = MAX_SKU_LENGTH;
+  protected readonly skuError = signal(false);
+
+  private translateOptions<T extends string>(options: { key: string; value: T }[]): { label: string; value: T }[] {
+    this.language();
+    return options.map((option) => ({ label: this.translate.instant(option.key), value: option.value }));
+  }
   protected readonly variantGenerationResult = this.facade.variantGenerationResult;
 
   /**
@@ -155,11 +177,6 @@ export class ProductVariantManagerComponent {
   protected readonly salePricePercent = signal<number | null>(null);
   protected readonly memberPriceMode = signal<'manual' | 'percent'>('manual');
   protected readonly memberPricePercent = signal<number | null>(null);
-
-  protected readonly priceModeOptions = [
-    { label: 'Manual', value: 'manual' as const },
-    { label: '% over cost', value: 'percent' as const },
-  ];
 
   protected readonly computedSalePrice = computed(() =>
     this.computePriceFromCost(this.editCostPrice(), this.salePricePercent()),
@@ -313,7 +330,7 @@ export class ProductVariantManagerComponent {
       if (message) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Variant sync failed',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_SYNC_FAILED'),
           detail: message,
         });
       }
@@ -403,6 +420,7 @@ export class ProductVariantManagerComponent {
 
   protected openEditDialog(variant: ProductVariantDto): void {
     this.editTarget.set(variant);
+    this.skuError.set(false);
     this.editSku.set(variant.sku);
     this.editPriceOverride.set(variant.priceOverride);
     this.editComparePrice.set(variant.comparePrice);
@@ -461,8 +479,8 @@ export class ProductVariantManagerComponent {
     if (!success) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to update status',
-        detail: this.facade.variantSyncError() ?? 'Please try again.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_STATUS_FAILED'),
+        detail: this.facade.variantSyncError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
       });
     }
   }
@@ -498,8 +516,8 @@ export class ProductVariantManagerComponent {
     if (!success) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to update price',
-        detail: this.facade.variantSyncError() ?? 'Failed to update the variant price.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PRICE_UPDATE_FAILED'),
+        detail: this.facade.variantSyncError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_PRICE_FAILED'),
       });
     }
   }
@@ -513,7 +531,12 @@ export class ProductVariantManagerComponent {
   protected async saveEdit(): Promise<void> {
     const variant = this.editTarget();
     const sku = this.editSku().trim();
-    if (!variant || !sku) {
+    if (!variant) {
+      return;
+    }
+
+    if (!sku) {
+      this.skuError.set(true);
       return;
     }
 
@@ -523,8 +546,8 @@ export class ProductVariantManagerComponent {
     if (this.salePriceMode() === 'percent' && priceOverride == null) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Cannot compute sale price',
-        detail: 'Enter both a cost price and a percentage.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CANNOT_COMPUTE_SALE'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.ENTER_COST_AND_PERCENT'),
       });
       return;
     }
@@ -532,8 +555,8 @@ export class ProductVariantManagerComponent {
     if (this.memberPriceMode() === 'percent' && memberPrice == null) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Cannot compute member price',
-        detail: 'Enter both a cost price and a percentage.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CANNOT_COMPUTE_MEMBER'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.ENTER_COST_AND_PERCENT'),
       });
       return;
     }
@@ -559,8 +582,8 @@ export class ProductVariantManagerComponent {
       } else {
         this.messageService.add({
           severity: 'error',
-          summary: 'Failed to save variant',
-          detail: this.facade.variantSyncError() ?? 'Failed to update the variant. Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_SAVE_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_UPDATE_FAILED'),
         });
       }
     } finally {
@@ -584,8 +607,8 @@ export class ProductVariantManagerComponent {
       if (!usage) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Could not check variant usage',
-          detail: this.facade.error() ?? 'Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.USAGE_CHECK_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         });
         return;
       }
@@ -625,8 +648,8 @@ export class ProductVariantManagerComponent {
       if (!usage) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Cleanup failed',
-          detail: this.facade.error() ?? 'Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CLEANUP_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         });
         return;
       }
@@ -636,8 +659,8 @@ export class ProductVariantManagerComponent {
       this.variantUsage.set(usage);
       this.messageService.add({
         severity: 'success',
-        summary: 'Cleaned up',
-        detail: 'Removable data cleared. Usage has been refreshed.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CLEANED_UP'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CLEANED_UP_DETAIL'),
       });
     } finally {
       this.usageCleanupLoading.set(false);
@@ -656,16 +679,16 @@ export class ProductVariantManagerComponent {
       if (!archived) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Could not archive variant',
-          detail: this.facade.error() ?? 'Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_ARCHIVE_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         });
         return;
       }
 
       this.messageService.add({
         severity: 'success',
-        summary: 'Archived',
-        detail: `Variant "${variant.sku}" archived.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.ARCHIVED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_ARCHIVED', { p0: variant.sku }),
       });
       this.closeUsageDialog();
     } finally {
@@ -688,8 +711,8 @@ export class ProductVariantManagerComponent {
         // dialog showed zero blocking usage a moment ago. Refresh rather than assume anything.
         this.messageService.add({
           severity: 'error',
-          summary: 'Could not delete variant',
-          detail: this.facade.error() ?? 'This variant is now in use.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_DELETE_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_IN_USE'),
         });
         const refreshed = await this.facade.getVariantUsage(variant.id);
         if (refreshed) {
@@ -700,8 +723,8 @@ export class ProductVariantManagerComponent {
 
       this.messageService.add({
         severity: 'success',
-        summary: 'Deleted',
-        detail: `Variant "${variant.sku}" deleted.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELETED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_DELETED', { p0: variant.sku }),
       });
       this.selectedVariantIds.update((ids) => {
         const next = new Set(ids);
@@ -726,8 +749,8 @@ export class ProductVariantManagerComponent {
       if (!deleted) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Could not delete variant',
-          detail: this.facade.error() ?? 'Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_DELETE_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         });
         return;
       }
@@ -741,8 +764,8 @@ export class ProductVariantManagerComponent {
       });
       this.messageService.add({
         severity: 'success',
-        summary: 'Deleted',
-        detail: `Variant "${variant.sku}" deleted.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELETED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_DELETED', { p0: variant.sku }),
       });
     } finally {
       this.saving.set(false);
@@ -768,8 +791,8 @@ export class ProductVariantManagerComponent {
       if (!created) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Could not create variant',
-          detail: this.facade.error() ?? 'Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANT_CREATE_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         });
         return;
       }
@@ -857,8 +880,8 @@ export class ProductVariantManagerComponent {
     if (this.bulkPrice() === null && !this.bulkStatus()) {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Nothing to update',
-        detail: 'Choose a bulk price or status first.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.NOTHING_TO_UPDATE'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CHOOSE_BULK_FIRST'),
       });
       return;
     }
@@ -873,8 +896,8 @@ export class ProductVariantManagerComponent {
 
       this.messageService.add({
         severity: 'success',
-        summary: 'Variants updated',
-        detail: `Updated ${updated} variant(s).`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VARIANTS_UPDATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATED_N_VARIANTS', { p0: updated }),
       });
       this.bulkPriceStatusDialogOpen.set(false);
       this.bulkPrice.set(null);
@@ -905,7 +928,7 @@ export class ProductVariantManagerComponent {
     this.bulkActionLoading.set(true);
     try {
       const updated = await this.facade.bulkUpdateVariants({ variantIds, priceOverride: null, status });
-      this.messageService.add({ severity: 'success', summary: verb, detail: `${updated} variant(s) updated.` });
+      this.messageService.add({ severity: 'success', summary: verb, detail: this.translate.instant('ADMIN.CATALOG_TOASTS.N_VARIANTS_UPDATED', { p0: updated }) });
     } finally {
       this.bulkActionLoading.set(false);
     }
@@ -927,8 +950,8 @@ export class ProductVariantManagerComponent {
       if (!result) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Bulk delete failed',
-          detail: this.facade.error() ?? 'Please try again.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.BULK_DELETE_FAILED'),
+          detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'),
         });
         return;
       }
@@ -939,20 +962,20 @@ export class ProductVariantManagerComponent {
       if (result.errorCount === 0) {
         this.messageService.add({
           severity: 'success',
-          summary: 'Deleted',
-          detail: `${result.successCount} variant(s) deleted.`,
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELETED'),
+          detail: this.translate.instant('ADMIN.CATALOG_TOASTS.N_VARIANTS_DELETED', { p0: result.successCount }),
         });
       } else if (result.successCount === 0) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Bulk delete blocked',
-          detail: `None of the ${result.errorCount} selected variant(s) could be deleted — they're still in use.`,
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.BULK_DELETE_BLOCKED'),
+          detail: this.translate.instant('ADMIN.CATALOG_TOASTS.NONE_DELETED', { p0: result.errorCount }),
         });
       } else {
         this.messageService.add({
           severity: 'warn',
-          summary: 'Partially deleted',
-          detail: `${result.successCount} variant(s) deleted. ${result.errorCount} could not be deleted — they're still in use.`,
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PARTIALLY_DELETED'),
+          detail: this.translate.instant('ADMIN.CATALOG_TOASTS.SOME_DELETED', { p0: result.successCount, p1: result.errorCount }),
         });
       }
 
@@ -989,8 +1012,8 @@ export class ProductVariantManagerComponent {
       const duplicated = await this.facade.bulkDuplicateVariants(variantIds);
       this.messageService.add({
         severity: 'success',
-        summary: 'Duplicated',
-        detail: `${duplicated} variant(s) duplicated.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DUPLICATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.N_VARIANTS_DUPLICATED', { p0: duplicated }),
       });
       this.clearBulkSelection();
     } finally {
@@ -1027,8 +1050,8 @@ export class ProductVariantManagerComponent {
     if (variantIds.length !== 1) {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Select one variant',
-        detail: 'Inventory management opens one variant at a time — narrow your selection to exactly one.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.SELECT_ONE_VARIANT'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.ONE_VARIANT_AT_A_TIME'),
       });
       return;
     }

@@ -82,9 +82,15 @@
   } @else if (isEmpty()) {
     <div class="library-page__empty">
       <i class="pi pi-inbox" aria-hidden="true"></i>
-      <h2>{{ 'ACCOUNT.LIBRARY.EMPTY_TITLE' | translate }}</h2>
-      <p>{{ 'ACCOUNT.LIBRARY.EMPTY_HINT' | translate }}</p>
-      <a routerLink="/products">{{ 'ACCOUNT.LIBRARY.BROWSE' | translate }}</a>
+      @if (hasActiveFilters()) {
+        <h2>{{ 'ACCOUNT.LIBRARY.NO_MATCH_TITLE' | translate }}</h2>
+        <p>{{ 'ACCOUNT.LIBRARY.NO_MATCH_HINT' | translate }}</p>
+        <button type="button" (click)="clearFilters()">{{ 'ACCOUNT.LIBRARY.CLEAR_FILTERS' | translate }}</button>
+      } @else {
+        <h2>{{ 'ACCOUNT.LIBRARY.EMPTY_TITLE' | translate }}</h2>
+        <p>{{ 'ACCOUNT.LIBRARY.EMPTY_HINT' | translate }}</p>
+        <a routerLink="/products">{{ 'ACCOUNT.LIBRARY.BROWSE' | translate }}</a>
+      }
     </div>
   } @else {
     <div class="library-page__results">

@@ -257,6 +257,11 @@ export class ProductEditorFacade {
 
   readonly error = this.errorState.asReadonly();
 
+  /** True only when the editor itself could not be loaded; a failed action (import, delete…) must not hide the editor. */
+  private readonly loadFailedState = signal(false);
+
+  readonly loadFailed = this.loadFailedState.asReadonly();
+
   readonly submitting = this.submittingState.asReadonly();
 
   readonly templateActionError = this.templateActionErrorState.asReadonly();
@@ -352,7 +357,7 @@ export class ProductEditorFacade {
    * admin has entered enough to save (name + category — the backend's minimum valid product).
    * Idempotent and dedupes concurrent callers so rapid typing can't create two products.
    */
-  async createDraft(input: { nameEn: string; nameAr: string; categoryId: string }): Promise<string | null> {
+  async createDraft(input: CreateProductRequest): Promise<string | null> {
     const existingId = this.productId();
     if (existingId) {
       return existingId;
@@ -362,14 +367,9 @@ export class ProductEditorFacade {
       return this.draftCreationInFlight;
     }
 
-    const request: CreateProductRequest = {
-      nameEn: input.nameEn,
-      nameAr: input.nameAr,
-      descriptionEn: '',
-      descriptionAr: '',
-      price: 0,
-      categoryId: input.categoryId,
-    };
+    // Carry everything already typed into the draft, so the form that re-binds to the saved
+    // product does not wipe the price/description the admin entered before choosing a category.
+    const request: CreateProductRequest = input;
 
     this.draftCreationInFlight = (async () => {
       try {
@@ -401,6 +401,8 @@ export class ProductEditorFacade {
     this.loadingState.set(true);
 
     this.errorState.set(null);
+
+    this.loadFailedState.set(false);
 
 
 
@@ -479,6 +481,8 @@ export class ProductEditorFacade {
       this.statisticsState.set(null);
 
       this.errorState.set(this.toErrorMessage(error, 'Failed to load product editor.'));
+
+      this.loadFailedState.set(true);
 
     } finally {
 

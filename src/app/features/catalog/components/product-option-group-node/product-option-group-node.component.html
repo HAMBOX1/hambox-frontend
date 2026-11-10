@@ -34,8 +34,8 @@
 
     <div class="question-card__actions" *hamboxHasPermission="permissions.Catalog.Inventory.Edit">
       @if (editingGroup()) {
-        <app-admin-icon-button icon="pi pi-check" label="Save" [loading]="saving()" (pressed)="saveEditGroup()" />
-        <app-admin-icon-button icon="pi pi-times" label="Cancel" (pressed)="cancelEditGroup()" />
+        <app-admin-icon-button icon="pi pi-check" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" [loading]="saving()" (pressed)="saveEditGroup()" />
+        <app-admin-icon-button icon="pi pi-times" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" (pressed)="cancelEditGroup()" />
       } @else {
         <app-admin-icon-button
           icon="pi pi-info-circle"
@@ -44,19 +44,19 @@
         />
         <app-admin-icon-button
           icon="pi pi-bookmark"
-          label="Save as reusable group"
+          [label]="'ADMIN.CATALOG_UI.SAVE_AS_REUSABLE_GROUP' | translate"
           [disabled]="hasAnyFollowUps()"
           (pressed)="openSaveTemplateDialog()"
         />
-        <app-admin-icon-button icon="pi pi-pencil" label="Edit option group" (pressed)="startEditGroup()" />
-        <app-admin-icon-button icon="pi pi-trash" label="Delete option group" severity="danger" [loading]="saving()" (pressed)="requestDeleteGroup()" />
+        <app-admin-icon-button icon="pi pi-pencil" [label]="'ADMIN.CATALOG_UI.EDIT_OPTION_GROUP' | translate" (pressed)="startEditGroup()" />
+        <app-admin-icon-button icon="pi pi-trash" [label]="'ADMIN.CATALOG_UI.DELETE_OPTION_GROUP' | translate" severity="danger" [loading]="saving()" (pressed)="requestDeleteGroup()" />
       }
     </div>
   </header>
 
   <app-admin-confirm-dialog
     [visible]="deleteDialogOpen()"
-    title="Delete option group"
+    [title]="'ADMIN.CATALOG_UI.DELETE_OPTION_GROUP' | translate"
     [message]="deleteGroupError() ?? ('Delete \'' + group().displayName + '\' and all its options? Any variants using these options will also be removed, along with their inventory codes. This cannot be undone.')"
     [destructive]="true"
     [loading]="saving()"
@@ -66,7 +66,7 @@
 
   <app-admin-confirm-dialog
     [visible]="deleteOptionDialogOpen()"
-    title="Delete option value"
+    [title]="'ADMIN.CATALOG_UI.DELETE_OPTION_VALUE' | translate"
     [message]="deleteOptionError() ?? ('Delete \'' + (deleteOptionTarget()?.label ?? '') + '\'? Any variants using this value will also be removed, along with their inventory codes. This cannot be undone. If it has already been sold, use the eye icon to hide it instead.')"
     [destructive]="true"
     [loading]="saving()"
@@ -93,16 +93,16 @@
     />
     <label class="instructions-dialog__inline-toggle">
       <p-checkbox [binary]="true" [ngModel]="groupInstructionsInline()" (ngModelChange)="groupInstructionsInline.set($event)" />
-      Important: show this directly on the product page (not behind the button). A YouTube link in the text plays as a video.
+      {{ 'ADMIN.CATALOG_UI.IMPORTANT_SHOW_THIS_DIRECTLY_ON_THE_PRODUCT' | translate }}
     </label>
     <div class="admin-dialog__actions">
-      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingGroupInstructions()" (click)="closeGroupInstructions()"></button>
-      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingGroupInstructions()" (click)="saveGroupInstructions()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="savingGroupInstructions()" (click)="closeGroupInstructions()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" icon="pi pi-check" [loading]="savingGroupInstructions()" (click)="saveGroupInstructions()"></button>
     </div>
   </p-dialog>
 
   <p-dialog
-    header="Save as reusable group"
+    [header]="'ADMIN.CATALOG_UI.SAVE_AS_REUSABLE_GROUP' | translate"
     [visible]="saveTemplateDialogOpen()"
     (visibleChange)="saveTemplateDialogOpen.set($event)"
     [modal]="true"
@@ -114,7 +114,7 @@
     styleClass="admin-dialog"
   >
     <div class="admin-field">
-      <label class="admin-field__label" for="save-template-name">Name</label>
+      <label class="admin-field__label" for="save-template-name">{{ 'ADMIN.CATALOG_UI.NAME' | translate }}</label>
       <input
         pInputText
         id="save-template-name"
@@ -128,8 +128,8 @@
       <p class="question-card__save-template-error">{{ saveTemplateError() }}</p>
     }
     <div class="admin-dialog__actions">
-      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingTemplate()" (click)="saveTemplateDialogOpen.set(false)"></button>
-      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingTemplate()" (click)="confirmSaveTemplate()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="savingTemplate()" (click)="saveTemplateDialogOpen.set(false)"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" icon="pi pi-check" [loading]="savingTemplate()" (click)="confirmSaveTemplate()"></button>
     </div>
   </p-dialog>
 
@@ -188,11 +188,11 @@
     />
     <label class="instructions-dialog__inline-toggle">
       <p-checkbox [binary]="true" [ngModel]="instructionsInline()" (ngModelChange)="instructionsInline.set($event)" />
-      Important: show this directly on the product page (not behind the button). A YouTube link in the text plays as a video.
+      {{ 'ADMIN.CATALOG_UI.IMPORTANT_SHOW_THIS_DIRECTLY_ON_THE_PRODUCT' | translate }}
     </label>
     <div class="admin-dialog__actions">
-      <button pButton type="button" label="Cancel" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
-      <button pButton type="button" label="Save" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>
     </div>
   </p-dialog>
 
@@ -244,7 +244,7 @@
   @if (editingGroup() && group().parentOptionId !== null) {
     <label class="question-card__required-toggle">
       <p-checkbox [binary]="true" [ngModel]="editingGroupRequired()" (ngModelChange)="editingGroupRequired.set($event)" />
-      Required (uncheck to let the previous option stay valid without this follow-up)
+      {{ 'ADMIN.CATALOG_UI.REQUIRED_UNCHECK_TO_LET_THE_PREVIOUS_OPTION' | translate }}
     </label>
   }
 
@@ -255,7 +255,7 @@
         <li class="answer-item" cdkDrag>
           <div class="answer-row">
             @if (editingOptionId() === option.id) {
-              <button type="button" class="answer-row__drag-handle" cdkDragHandle aria-label="Reorder option" disabled>
+              <button type="button" class="answer-row__drag-handle" cdkDragHandle [attr.aria-label]="'ADMIN.CATALOG_UI.REORDER_OPTION' | translate" disabled>
                 <i class="pi pi-bars"></i>
               </button>
               <input
@@ -266,15 +266,15 @@
                 (keyup.enter)="saveEditOption(option)"
               />
               <div class="answer-row__actions">
-                <button type="button" class="answer-row__icon-btn" (click)="saveEditOption(option)" aria-label="Save option">
+                <button type="button" class="answer-row__icon-btn" (click)="saveEditOption(option)" [attr.aria-label]="'ADMIN.CATALOG_UI.SAVE_OPTION' | translate">
                   <i class="pi pi-check"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="cancelEditOption()" aria-label="Cancel">
+                <button type="button" class="answer-row__icon-btn" (click)="cancelEditOption()" [attr.aria-label]="'ADMIN.CATALOG_UI.CANCEL' | translate">
                   <i class="pi pi-times"></i>
                 </button>
               </div>
             } @else {
-              <button type="button" class="answer-row__drag-handle" cdkDragHandle aria-label="Reorder option">
+              <button type="button" class="answer-row__drag-handle" cdkDragHandle [attr.aria-label]="'ADMIN.CATALOG_UI.REORDER_OPTION' | translate">
                 <i class="pi pi-bars"></i>
               </button>
               <i class="answer-row__bullet pi pi-circle-fill" aria-hidden="true"></i>
@@ -306,22 +306,22 @@
                 >
                   <i class="pi pi-info-circle"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="moveOption(option, -1)" aria-label="Move option up">
+                <button type="button" class="answer-row__icon-btn" (click)="moveOption(option, -1)" [attr.aria-label]="'ADMIN.CATALOG_UI.MOVE_OPTION_UP' | translate">
                   <i class="pi pi-chevron-up"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="moveOption(option, 1)" aria-label="Move option down">
+                <button type="button" class="answer-row__icon-btn" (click)="moveOption(option, 1)" [attr.aria-label]="'ADMIN.CATALOG_UI.MOVE_OPTION_DOWN' | translate">
                   <i class="pi pi-chevron-down"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="startEditOption(option)" aria-label="Edit option">
+                <button type="button" class="answer-row__icon-btn" (click)="startEditOption(option)" [attr.aria-label]="'ADMIN.CATALOG_UI.EDIT_OPTION' | translate">
                   <i class="pi pi-pencil"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="setOptionVisible(option, false)" aria-label="Hide option" title="Hide this option (its variants are switched off, nothing is deleted)">
+                <button type="button" class="answer-row__icon-btn" (click)="setOptionVisible(option, false)" [attr.aria-label]="'ADMIN.CATALOG_UI.HIDE_OPTION' | translate" [title]="'ADMIN.CATALOG_UI.HIDE_THIS_OPTION_ITS_VARIANTS_ARE_SWITCHED_O' | translate">
                   <i class="pi pi-eye-slash"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="setOptionVisible(option, true)" aria-label="Show option" title="Show this option again">
+                <button type="button" class="answer-row__icon-btn" (click)="setOptionVisible(option, true)" [attr.aria-label]="'ADMIN.CATALOG_UI.SHOW_OPTION' | translate" [title]="'ADMIN.CATALOG_UI.SHOW_THIS_OPTION_AGAIN' | translate">
                   <i class="pi pi-eye"></i>
                 </button>
-                <button type="button" class="answer-row__icon-btn" (click)="requestDeleteOption(option)" aria-label="Delete option">
+                <button type="button" class="answer-row__icon-btn" (click)="requestDeleteOption(option)" [attr.aria-label]="'ADMIN.CATALOG_UI.DELETE_OPTION' | translate">
                   <i class="pi pi-trash"></i>
                 </button>
               </div>
@@ -344,7 +344,7 @@
                 </span>
                 <input
                   pInputText
-                  placeholder="Follow-up option group (e.g. Account Type)"
+                  [placeholder]="'ADMIN.CATALOG_UI.FOLLOW_UP_OPTION_GROUP_E_G_ACCOUNT_TYPE' | translate"
                   [ngModel]="newChildGroupLabel()"
                   (ngModelChange)="newChildGroupLabel.set($event)"
                   (keyup.enter)="createChildGroup(option.id)"
@@ -354,13 +354,13 @@
                   Required (uncheck to let "{{ option.label }}" stay valid without an option here)
                 </label>
                 <div class="followup-form__actions">
-                  <button pButton type="button" label="Add Follow-up Option Group" icon="pi pi-plus" [loading]="creatingChildGroup()" (click)="createChildGroup(option.id)"></button>
-                  <button pButton type="button" label="Cancel" severity="secondary" text="true" (click)="cancelAddChildGroup()"></button>
+                  <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ADD_FOLLOW_UP_OPTION_GROUP' | translate" icon="pi pi-plus" [loading]="creatingChildGroup()" (click)="createChildGroup(option.id)"></button>
+                  <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" text="true" (click)="cancelAddChildGroup()"></button>
                 </div>
               </div>
             } @else {
               <button type="button" class="answer-item__add-followup-btn" (click)="startAddChildGroup(option.id)">
-                <i class="pi pi-plus"></i> Add Follow-up Option Group
+                <i class="pi pi-plus"></i> {{ 'ADMIN.CATALOG_UI.ADD_FOLLOW_UP_OPTION_GROUP' | translate }}
               </button>
             }
           </div>
@@ -369,15 +369,16 @@
     </ul>
 
     <div class="new-answer-box" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
-      <span class="new-answer-box__label">New Option</span>
+      <span class="new-answer-box__label">{{ 'ADMIN.CATALOG_UI.NEW_OPTION' | translate }}</span>
       <input
         pInputText
-        placeholder="e.g. Digital Code"
+        [attr.aria-label]="'ADMIN.CATALOG_UI.OPTION_NAME' | translate"
+        [placeholder]="'ADMIN.CATALOG_UI.E_G_DIGITAL_CODE' | translate"
         [ngModel]="pendingOption()"
         (ngModelChange)="pendingOption.set($event)"
         (keyup.enter)="addOption()"
       />
-      <button pButton type="button" label="Add Option" icon="pi pi-plus" severity="secondary" (click)="addOption()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ADD_OPTION' | translate" icon="pi pi-plus" severity="secondary" (click)="addOption()"></button>
     </div>
   </div>
   }

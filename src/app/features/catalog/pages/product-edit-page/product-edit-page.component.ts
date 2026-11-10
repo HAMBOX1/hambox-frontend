@@ -39,11 +39,14 @@ import { SuppliersManagementFacade } from '../../../admin/suppliers/services/sup
 import { ProductAssetsUploadComponent } from '../../components/product-assets-upload/product-assets-upload.component';
 import { ProductBasicInfoFormComponent } from '../../components/product-basic-info-form/product-basic-info-form.component';
 import { ProductInstructionsPanelComponent } from '../../components/product-instructions-panel/product-instructions-panel.component';
+import { ProductPurchaseControlsPanelComponent } from '../../components/product-purchase-controls-panel/product-purchase-controls-panel.component';
 import { ProductOptionGroupsPanelComponent } from '../../components/product-option-groups-panel/product-option-groups-panel.component';
 import { ProductVariantManagerComponent } from '../../components/product-variant-manager/product-variant-manager.component';
 import { ProductStatus, UpdateProductRequest } from '../../models/product.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
-
+import { AdminPageTitleService } from '../../../admin/services/admin-page-title.service';
+
+import { TranslateService } from '@ngx-translate/core';
 const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
   { label: 'Draft', value: 'Draft' },
   { label: 'Active', value: 'Active' },
@@ -71,6 +74,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
     ProductOptionGroupsPanelComponent,
     ProductVariantManagerComponent,
     ProductInstructionsPanelComponent,
+    ProductPurchaseControlsPanelComponent,
     SupplierCatalogSearchDrawerComponent,
   ],
   providers: [ProductEditorFacade, SuppliersManagementFacade, MessageService],
@@ -79,10 +83,12 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductEditPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly facade = inject(ProductEditorFacade);
+  private readonly pageTitle = inject(AdminPageTitleService);
   protected readonly suppliersFacade = inject(SuppliersManagementFacade);
   private readonly messageService = inject(MessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -101,6 +107,7 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly product = this.facade.product;
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;
+  protected readonly loadFailed = this.facade.loadFailed;
   protected readonly categories = this.facade.categories;
   protected readonly categoriesLoading = this.facade.categoriesLoading;
   protected readonly collections = this.facade.collections;
@@ -148,6 +155,7 @@ export class ProductEditPageComponent implements OnInit {
       }
     });
     afterNextRender(() => this.setupAutoDraft());
+    effect(() => this.pageTitle.setTitle(this.product()?.nameEn || 'New Product'));
     effect(() => {
       const id = this.productId();
       if (id && this.loadedMappingsForProductId !== id) {
@@ -278,7 +286,16 @@ export class ProductEditPageComponent implements OnInit {
 
     this.draftCreatingState.set(true);
     try {
-      const id = await this.facade.createDraft({ nameEn, nameAr: snapshot.nameAr.trim(), categoryId });
+      const id = await this.facade.createDraft({
+        nameEn,
+        nameAr: snapshot.nameAr.trim(),
+        descriptionEn: snapshot.descriptionEn.trim(),
+        descriptionAr: snapshot.descriptionAr.trim(),
+        price: snapshot.price,
+        categoryId,
+        additionalCategoryIds: snapshot.additionalCategoryIds,
+        collectionIds: snapshot.collectionIds,
+      });
       if (!id) {
         return;
       }
@@ -324,7 +341,7 @@ export class ProductEditPageComponent implements OnInit {
     }
   }
 
-  protected async onSave(navigateAway = false): Promise<void> {
+  protected async onSave(navigateAway = false): Promise<boolean> {
     const product = this.product();
     const form = this.productForm();
 
@@ -332,13 +349,15 @@ export class ProductEditPageComponent implements OnInit {
     const price = form?.getPriceValue();
 
     if (!generalValue || price === null || price === undefined || !product) {
+      // Reveal the inline message on every invalid field (they only show once touched).
+      form?.validate();
       this.messageService.add({
         severity: 'warn',
-        summary: 'Validation required',
-        detail: 'Complete all required fields before saving.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.VALIDATION_REQUIRED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.FIX_FIELDS'),
         life: 5000,
       });
-      return;
+      return false;
     }
 
     const updateRequest: UpdateProductRequest = {
@@ -356,23 +375,24 @@ export class ProductEditPageComponent implements OnInit {
 
       this.messageService.add({
         severity: 'success',
-        summary: 'Product saved',
-        detail: `"${updateRequest.nameEn}" was updated successfully.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCT_SAVED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCT_SAVED_DETAIL', { p0: updateRequest.nameEn }),
         life: 4000,
       });
       this.flashSaved();
       if (navigateAway) {
         void this.router.navigate(['/admin/products']);
       }
-      return;
+      return true;
     }
 
     this.messageService.add({
       severity: 'error',
-      summary: 'Save failed',
-      detail: this.facade.submitError() ?? 'Unable to update product.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.SAVE_FAILED'),
+      detail: this.facade.submitError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.SAVE_PRODUCT_FAILED'),
       life: 5000,
     });
+    return false;
   }
 
   private flashSaved(): void {
@@ -388,8 +408,8 @@ export class ProductEditPageComponent implements OnInit {
     if (updated) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Status updated',
-        detail: `Product status changed to ${status}.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.STATUS_UPDATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.STATUS_CHANGED_TO', { p0: this.translate.instant(`ADMIN.CATALOG_PAGE.STATUS_VALUES.${status}`) }),
         life: 4000,
       });
       return;
@@ -397,8 +417,8 @@ export class ProductEditPageComponent implements OnInit {
 
     this.messageService.add({
       severity: 'error',
-      summary: 'Status update failed',
-      detail: this.facade.submitError() ?? 'Unable to update product status.',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.STATUS_UPDATE_FAILED'),
+      detail: this.facade.submitError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.STATUS_UPDATE_PRODUCT_FAILED'),
       life: 5000,
     });
   }
@@ -413,15 +433,29 @@ export class ProductEditPageComponent implements OnInit {
   }
 
   protected async onPublish(): Promise<void> {
+    // Publishing acts on what is stored, so pending edits are saved first; if that save fails (or is blocked by
+    // validation) the product is not published with stale values.
+    if (this.dirty() && !(await this.onSave())) {
+      return;
+    }
+
     const saved = await this.facade.publishProduct();
     if (saved) {
       this.messageService.add({
         severity: 'success',
-        summary: 'Product published',
-        detail: 'This product is now active on the storefront.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCT_PUBLISHED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCT_PUBLISHED_DETAIL'),
         life: 4000,
       });
+      return;
     }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PUBLISH_FAILED'),
+      detail: this.facade.submitError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.PUBLISH_PRODUCT_FAILED'),
+      life: 6000,
+    });
   }
 
   protected openMappingDrawer(): void {

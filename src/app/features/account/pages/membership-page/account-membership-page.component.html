@@ -29,7 +29,7 @@
               }
             </h2>
             <p class="membership-current__meta">
-              <p-tag [value]="sub.status" [severity]="statusSeverity(sub.status)" />
+              <p-tag [value]="label('STATUS', sub.status)" [severity]="statusSeverity(sub.status)" />
               <span class="membership-current__dot" aria-hidden="true">·</span>
               {{ 'ACCOUNT.MEMBERSHIP.VALID_UNTIL' | translate }}
               {{ sub.expiresOnUtc | hamboxDate:'mediumDate' }}
@@ -51,7 +51,7 @@
             <span>{{ 'ACCOUNT.MEMBERSHIP.BENEFITS' | translate }}</span>
             <ul>
               @for (benefit of currentPlanBenefitsPreview(); track benefit.displayName + benefit.sortOrder) {
-                <li><i class="pi pi-check-circle" aria-hidden="true"></i>{{ benefit.displayName }}</li>
+                <li><i class="pi pi-check-circle" aria-hidden="true"></i>{{ benefitLabel(benefit) }}</li>
               }
               @if (currentPlanBenefitsMoreCount() > 0) {
                 <li class="membership-current__more">
@@ -91,7 +91,7 @@
 
               <ul class="plan-card__benefits">
                 @for (benefit of planBenefitsPreview(plan); track benefit.displayName + benefit.sortOrder) {
-                  <li><i class="pi pi-check-circle" aria-hidden="true"></i>{{ benefit.displayName }}</li>
+                  <li><i class="pi pi-check-circle" aria-hidden="true"></i>{{ benefitLabel(benefit) }}</li>
                 } @empty {
                   <li class="plan-card__no-benefits">{{ 'ACCOUNT.MEMBERSHIP.NO_BENEFITS' | translate }}</li>
                 }
@@ -189,7 +189,7 @@
               <tbody>
                 @for (entry of pagedHistory(); track entry.id) {
                   <tr>
-                    <td><p-tag [value]="entry.action" [severity]="statusSeverity(entry.action)" /></td>
+                    <td><p-tag [value]="label('ACTION', entry.action)" [severity]="statusSeverity(entry.action)" /></td>
                     <td>{{ entry.planName }}</td>
                     <td>{{ entry.notes || ('ACCOUNT.MEMBERSHIP_UI.NA' | translate) }}</td>
                     <td>{{ entry.occurredOnUtc | hamboxDate:'medium' }}</td>
@@ -241,7 +241,7 @@
                 @for (tx of pagedTransactions(); track tx.id) {
                   <tr>
                     <td>{{ tx.amount | hamboxCurrency }}</td>
-                    <td><p-tag [value]="tx.status" [severity]="statusSeverity(tx.status)" /></td>
+                    <td><p-tag [value]="label('TRANSACTION', tx.status)" [severity]="statusSeverity(tx.status)" /></td>
                     <td>{{ tx.createdOnUtc | hamboxDate:'medium' }}</td>
                   </tr>
                 }

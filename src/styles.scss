@@ -190,6 +190,12 @@ body.hambox-mobile-shell {
   line-height: 1;
 }
 
+// Quill's default toolbar buttons are 28x24; give them a comfortable 32px target.
+body .ql-toolbar.ql-snow button {
+  width: 2rem;
+  height: 2rem;
+}
+
 // PrimeNG's p-editor always renders its own hardcoded default toolbar markup
 // (a plain, iconless `div[data-pc-section="toolbar"].p-editor-toolbar` with
 // header/font/color/background/align controls) *in addition to* the real

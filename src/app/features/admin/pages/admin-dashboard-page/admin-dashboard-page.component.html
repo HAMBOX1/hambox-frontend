@@ -175,7 +175,7 @@
                     [tone]="statusTone(row.orderStatus)"
                   />
                 </td>
-                <td>{{ row.purchaseDate | date: 'short' }}</td>
+                <td>{{ row.purchaseDate | hamboxDate: 'short' }}</td>
                 <td>
                   <a
                     *hamboxHasPermission="permissions.Orders.View"
@@ -218,7 +218,7 @@
                 </td>
                 <td>{{ row.orderCount }}</td>
                 <td>{{ row.totalSpent | hamboxCurrency }}</td>
-                <td>{{ row.lastOrderDate | date: 'short' }}</td>
+                <td>{{ row.lastOrderDate | hamboxDate: 'short' }}</td>
               </tr>
             </ng-template>
           </p-table>

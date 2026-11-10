@@ -2,8 +2,8 @@
   <app-admin-loading-skeleton variant="table" />
 } @else {
   <app-admin-section-card
-    title="Variants"
-    description="Browse by option group. Select a variant to manage stock and codes."
+    [title]="'ADMIN.CATALOG_UI.VARIANTS' | translate"
+    [description]="'ADMIN.CATALOG_UI.BROWSE_BY_OPTION_GROUP_SELECT_A_VARIANT_TO_M' | translate"
     [compact]="compact()"
   >
     <div class="variant-manager">
@@ -11,17 +11,17 @@
         <app-admin-search-bar
           adminToolbarSearch
           [value]="searchTerm()"
-          placeholder="Search SKU or combination…"
+          [placeholder]="'ADMIN.CATALOG_UI.SEARCH_SKU_OR_COMBINATION' | translate"
           (searchChange)="searchTerm.set($event)"
         />
 
         <div adminToolbarFilters class="variant-manager__filters">
           <p-select
             class="variant-manager__status-select"
-            [options]="statusFilterOptions"
+            [options]="statusFilterOptions()"
             optionLabel="label"
             optionValue="value"
-            placeholder="Status"
+            [placeholder]="'ADMIN.CATALOG_UI.STATUS' | translate"
             [ngModel]="statusFilter()"
             (ngModelChange)="statusFilter.set($event)"
           />
@@ -33,7 +33,7 @@
               [class.admin-filter-chip--active]="quickFilter() === 'all'"
               (click)="quickFilter.set('all')"
             >
-              All
+              {{ 'ADMIN.CATALOG_UI.ALL' | translate }}
             </button>
             <button
               type="button"
@@ -41,7 +41,7 @@
               [class.admin-filter-chip--active]="quickFilter() === 'out-of-stock'"
               (click)="quickFilter.set('out-of-stock')"
             >
-              Out of stock
+              {{ 'ADMIN.CATALOG_UI.OUT_OF_STOCK' | translate }}
             </button>
             <button
               type="button"
@@ -49,7 +49,7 @@
               [class.admin-filter-chip--active]="quickFilter() === 'in-stock'"
               (click)="quickFilter.set('in-stock')"
             >
-              In stock
+              {{ 'ADMIN.CATALOG_UI.IN_STOCK' | translate }}
             </button>
             <button
               type="button"
@@ -57,7 +57,7 @@
               [class.admin-filter-chip--active]="quickFilter() === 'draft'"
               (click)="quickFilter.set('draft')"
             >
-              Draft
+              {{ 'ADMIN.CATALOG_UI.DRAFT' | translate }}
             </button>
             @if (hiddenVariantCount() > 0) {
               <button
@@ -83,7 +83,7 @@
           } @else if (optionGroups().length === 0) {
             <span class="variant-manager__generate-hint">
               <i class="pi pi-info-circle" aria-hidden="true"></i>
-              Add option groups with values to generate variants automatically
+              {{ 'ADMIN.CATALOG_UI.ADD_OPTION_GROUPS_WITH_VALUES_TO_GENERATE_VA' | translate }}
             </span>
           }
         </div>
@@ -94,7 +94,7 @@
           *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
           pButton
           type="button"
-          label="Activate"
+          [label]="'ADMIN.CATALOG_UI.ACTIVATE' | translate"
           icon="pi pi-check"
           size="small"
           [disabled]="bulkActionLoading()"
@@ -104,7 +104,7 @@
           *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
           pButton
           type="button"
-          label="Deactivate"
+          [label]="'ADMIN.CATALOG_UI.DEACTIVATE' | translate"
           icon="pi pi-eye-slash"
           severity="secondary"
           size="small"
@@ -115,7 +115,7 @@
           *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
           pButton
           type="button"
-          label="Archive"
+          [label]="'ADMIN.CATALOG_UI.ARCHIVE' | translate"
           icon="pi pi-inbox"
           severity="warn"
           size="small"
@@ -126,7 +126,7 @@
           *hamboxHasPermission="permissions.Catalog.Inventory.Export"
           pButton
           type="button"
-          label="Export codes"
+          [label]="'ADMIN.CATALOG_UI.EXPORT_CODES' | translate"
           icon="pi pi-download"
           severity="secondary"
           size="small"
@@ -137,19 +137,19 @@
           *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
           pButton
           type="button"
-          label="Delete"
+          [label]="'ADMIN.CATALOG_UI.DELETE' | translate"
           icon="pi pi-trash"
           severity="danger"
           size="small"
           [disabled]="bulkActionLoading()"
           (click)="requestBulkDelete()"
         ></button>
-        <app-admin-action-menu label="More" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
+        <app-admin-action-menu [label]="'ADMIN.CATALOG_UI.MORE' | translate" [items]="bulkMoreMenuItems()" [disabled]="bulkActionLoading()" />
       </app-admin-bulk-bar>
 
       @if (hasNoPurchasableVariant()) {
         <app-admin-error-alert
-          message="This product currently has no Active, visible variant — it cannot be purchased on the storefront until one is activated."
+          [message]="'ADMIN.CATALOG_UI.THIS_PRODUCT_CURRENTLY_HAS_NO_ACTIVE_VISIBLE' | translate"
           [showRetry]="false"
         />
       }
@@ -180,14 +180,14 @@
       } @else if (!product()) {
         <app-admin-empty-state
           icon="pi pi-box"
-          title="No variants yet"
-          description="Create option groups to generate variants. Inventory becomes available after the product has been created."
+          [title]="'ADMIN.CATALOG_UI.NO_VARIANTS_YET' | translate"
+          [description]="'ADMIN.CATALOG_UI.CREATE_OPTION_GROUPS_TO_GENERATE_VARIANTS_IN' | translate"
         />
       } @else if (optionGroups().length === 0) {
         <app-admin-empty-state
           icon="pi pi-box"
-          title="Simple product — no options needed?"
-          description="Skip option groups and create a single variant to start pasting stock codes."
+          [title]="'ADMIN.CATALOG_UI.SIMPLE_PRODUCT_NO_OPTIONS_NEEDED' | translate"
+          [description]="'ADMIN.CATALOG_UI.SKIP_OPTION_GROUPS_AND_CREATE_A_SINGLE_VARIA' | translate"
           primaryLabel="Create Variant"
           primaryIcon="pi pi-plus"
           (primaryAction)="createDefaultVariant()"
@@ -195,14 +195,14 @@
       } @else if (variants().length === 0) {
         <app-admin-empty-state
           icon="pi pi-table"
-          title="No variants yet"
-          description="Create option groups to generate variants."
+          [title]="'ADMIN.CATALOG_UI.NO_VARIANTS_YET' | translate"
+          [description]="'ADMIN.CATALOG_UI.CREATE_OPTION_GROUPS_TO_GENERATE_VARIANTS' | translate"
         />
       } @else {
         <app-admin-empty-state
           icon="pi pi-search"
-          title="No matching variants"
-          description="Try a different search term or clear the filters."
+          [title]="'ADMIN.CATALOG_UI.NO_MATCHING_VARIANTS' | translate"
+          [description]="'ADMIN.CATALOG_UI.TRY_A_DIFFERENT_SEARCH_TERM_OR_CLEAR_THE_FIL' | translate"
         />
       }
     </div>
@@ -231,13 +231,13 @@
           <div class="variant-manager__codes-dialog-actions">
             <app-admin-icon-button
               icon="pi pi-pencil"
-              label="Edit variant"
+              [label]="'ADMIN.CATALOG_UI.EDIT_VARIANT' | translate"
               *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
               (pressed)="openEditDialog(selectedVariantForCodes()!)"
             />
             <app-admin-icon-button
               icon="pi pi-trash"
-              label="Delete variant"
+              [label]="'ADMIN.CATALOG_UI.DELETE_VARIANT' | translate"
               severity="danger"
               *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
               [loading]="usageLoading()"
@@ -276,13 +276,13 @@
           <div class="variant-manager__codes-dialog-actions">
             <app-admin-icon-button
               icon="pi pi-pencil"
-              label="Edit variant"
+              [label]="'ADMIN.CATALOG_UI.EDIT_VARIANT' | translate"
               *hamboxHasPermission="permissions.Catalog.Inventory.Edit"
               (pressed)="openEditDialog(selectedVariantForCodes()!)"
             />
             <app-admin-icon-button
               icon="pi pi-trash"
-              label="Delete variant"
+              [label]="'ADMIN.CATALOG_UI.DELETE_VARIANT' | translate"
               severity="danger"
               *hamboxHasPermission="permissions.Catalog.Inventory.Delete"
               [loading]="usageLoading()"
@@ -302,7 +302,7 @@
   <p-dialog
     [visible]="editDialogVisible()"
     (visibleChange)="onEditDialogVisibleChange($event)"
-    header="Edit variant"
+    [header]="'ADMIN.CATALOG_UI.EDIT_VARIANT' | translate"
     [modal]="true"
     [dismissableMask]="true"
     [draggable]="false"
@@ -313,24 +313,34 @@
     @if (editTarget(); as variant) {
       <div class="variant-manager__edit-form">
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-sku">SKU</label>
-          <input id="variant-edit-sku" pInputText [ngModel]="editSku()" (ngModelChange)="editSku.set($event)" />
+          <label for="variant-edit-sku">{{ 'ADMIN.CATALOG_UI.SKU' | translate }}</label>
+          <input
+            id="variant-edit-sku"
+            pInputText
+            [maxlength]="maxSkuLength"
+            [attr.aria-invalid]="skuError()"
+            [ngModel]="editSku()"
+            (ngModelChange)="editSku.set($event); skuError.set(false)"
+          />
+          @if (skuError()) {
+            <small class="variant-manager__edit-error" role="alert">{{ 'ADMIN.CATALOG_UI.SKU_REQUIRED' | translate }}</small>
+          }
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-cost">Cost price</label>
+          <label for="variant-edit-cost">{{ 'ADMIN.CATALOG_UI.COST_PRICE' | translate }}</label>
           <p-inputNumber
             inputId="variant-edit-cost"
-            [ngModel]="editCostPrice()"
+[min]="0" [max]="maxPrice" [maxFractionDigits]="2"             [ngModel]="editCostPrice()"
             (ngModelChange)="editCostPrice.set($event)"
             mode="decimal"
             [minFractionDigits]="2"
-            placeholder="Optional"
+            [placeholder]="'ADMIN.CATALOG_UI.OPTIONAL_2' | translate"
           />
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-price">Sale price</label>
+          <label for="variant-edit-price">{{ 'ADMIN.CATALOG_UI.SALE_PRICE' | translate }}</label>
           <p-select
-            [options]="priceModeOptions"
+            [options]="priceModeOptions()"
             optionLabel="label"
             optionValue="value"
             [ngModel]="salePriceMode()"
@@ -339,38 +349,38 @@
           @if (salePriceMode() === 'manual') {
             <p-inputNumber
               inputId="variant-edit-price"
-              [ngModel]="editPriceOverride()"
+[min]="0.01" [max]="maxPrice" [maxFractionDigits]="2"               [ngModel]="editPriceOverride()"
               (ngModelChange)="editPriceOverride.set($event)"
               mode="decimal"
               [minFractionDigits]="2"
-              placeholder="Uses base price"
+              [placeholder]="'ADMIN.CATALOG_UI.USES_BASE_PRICE' | translate"
             />
           } @else {
             <p-inputNumber
               inputId="variant-edit-price-percent"
-              [ngModel]="salePricePercent()"
+[min]="0" [max]="1000"               [ngModel]="salePricePercent()"
               (ngModelChange)="salePricePercent.set($event)"
               suffix="%"
-              placeholder="e.g. 20"
+              [placeholder]="'ADMIN.CATALOG_UI.EG_20' | translate"
             />
             <span class="variant-manager__computed-price">= {{ computedSalePrice() ?? '—' }}</span>
           }
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-compare">Compare-at price</label>
+          <label for="variant-edit-compare">{{ 'ADMIN.CATALOG_UI.COMPARE_AT_PRICE' | translate }}</label>
           <p-inputNumber
             inputId="variant-edit-compare"
-            [ngModel]="editComparePrice()"
+[min]="0" [max]="maxPrice" [maxFractionDigits]="2"             [ngModel]="editComparePrice()"
             (ngModelChange)="editComparePrice.set($event)"
             mode="decimal"
             [minFractionDigits]="2"
-            placeholder="Optional"
+            [placeholder]="'ADMIN.CATALOG_UI.OPTIONAL_2' | translate"
           />
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-member-price">Member (Elite) sale price</label>
+          <label for="variant-edit-member-price">{{ 'ADMIN.CATALOG_UI.MEMBER_ELITE_SALE_PRICE' | translate }}</label>
           <p-select
-            [options]="priceModeOptions"
+            [options]="priceModeOptions()"
             optionLabel="label"
             optionValue="value"
             [ngModel]="memberPriceMode()"
@@ -379,37 +389,38 @@
           @if (memberPriceMode() === 'manual') {
             <p-inputNumber
               inputId="variant-edit-member-price"
-              [ngModel]="editMemberPrice()"
+[min]="0.01" [max]="maxPrice" [maxFractionDigits]="2"               [ngModel]="editMemberPrice()"
               (ngModelChange)="editMemberPrice.set($event)"
               mode="decimal"
               [minFractionDigits]="2"
-              placeholder="Optional"
+              [placeholder]="'ADMIN.CATALOG_UI.OPTIONAL_2' | translate"
             />
           } @else {
             <p-inputNumber
               inputId="variant-edit-member-price-percent"
-              [ngModel]="memberPricePercent()"
+[min]="0" [max]="1000"               [ngModel]="memberPricePercent()"
               (ngModelChange)="memberPricePercent.set($event)"
               suffix="%"
-              placeholder="e.g. 10"
+              [placeholder]="'ADMIN.CATALOG_UI.EG_10' | translate"
             />
             <span class="variant-manager__computed-price">= {{ computedMemberPrice() ?? '—' }}</span>
           }
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-low-stock">Low stock threshold</label>
+          <label for="variant-edit-low-stock">{{ 'ADMIN.CATALOG_UI.LOW_STOCK_THRESHOLD' | translate }}</label>
           <p-inputNumber
             inputId="variant-edit-low-stock"
+            [max]="1000000"
             [ngModel]="editLowStockThreshold()"
             (ngModelChange)="editLowStockThreshold.set($event)"
             [min]="0"
           />
         </div>
         <div class="variant-manager__edit-field">
-          <label for="variant-edit-status">Status</label>
+          <label for="variant-edit-status">{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</label>
           <p-select
             inputId="variant-edit-status"
-            [options]="statusOptions"
+            [options]="statusOptions()"
             optionLabel="label"
             optionValue="value"
             [ngModel]="editStatus()"
@@ -417,8 +428,8 @@
           />
         </div>
         <div class="variant-manager__edit-actions">
-          <button pButton type="button" label="Cancel" severity="secondary" [disabled]="saving()" (click)="cancelEdit()"></button>
-          <button pButton type="button" label="Save" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
+          <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="saving()" (click)="cancelEdit()"></button>
+          <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" icon="pi pi-check" [loading]="saving()" (click)="saveEdit()"></button>
         </div>
       </div>
     }
@@ -433,7 +444,7 @@
 
   <app-admin-confirm-dialog
     [visible]="deleteDialogOpen()"
-    title="Delete variant"
+    [title]="'ADMIN.CATALOG_UI.DELETE_VARIANT' | translate"
     [message]="deleteDialogMessage()"
     [destructive]="true"
     [loading]="saving()"
@@ -456,7 +467,7 @@
 
   <app-admin-confirm-dialog
     [visible]="bulkDeleteDialogOpen()"
-    title="Delete selected variants"
+    [title]="'ADMIN.CATALOG_UI.DELETE_SELECTED_VARIANTS' | translate"
     [message]="'Delete ' + bulkSelectedCount() + ' variant(s)? This cannot be undone.'"
     [destructive]="true"
     [loading]="bulkActionLoading()"
@@ -467,7 +478,7 @@
   <p-dialog
     [visible]="bulkBlockedVariants().length > 0"
     (visibleChange)="!$event && closeBulkBlockedDialog()"
-    header="These variants are still in use"
+    [header]="'ADMIN.CATALOG_UI.THESE_VARIANTS_ARE_STILL_IN_USE' | translate"
     [modal]="true"
     [dismissableMask]="true"
     [draggable]="false"
@@ -477,8 +488,7 @@
     styleClass="admin-dialog"
   >
     <p class="variant-manager__bulk-blocked-hint">
-      They were skipped by the bulk delete. Open one to see exactly what's referencing it — clean up,
-      archive, or wait until it's safe to delete permanently.
+      {{ 'ADMIN.CATALOG_UI.THEY_WERE_SKIPPED_BY_THE_BULK_DELETE_OPEN_ON' | translate }}
     </p>
     <ul class="variant-manager__bulk-blocked-list">
       @for (variant of bulkBlockedVariants(); track variant.id) {
@@ -487,7 +497,7 @@
           <button
             pButton
             type="button"
-            label="View usage"
+            [label]="'ADMIN.CATALOG_UI.VIEW_USAGE' | translate"
             severity="secondary"
             size="small"
             [text]="true"
@@ -498,14 +508,14 @@
     </ul>
 
     <ng-template pTemplate="footer">
-      <button pButton type="button" label="Close" severity="secondary" [text]="true" (click)="closeBulkBlockedDialog()"></button>
+      <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CLOSE' | translate" severity="secondary" [text]="true" (click)="closeBulkBlockedDialog()"></button>
     </ng-template>
   </p-dialog>
 
   <p-dialog
     [visible]="bulkPriceStatusDialogOpen()"
     (visibleChange)="bulkPriceStatusDialogOpen.set($event)"
-    header="Change price / status"
+    [header]="'ADMIN.CATALOG_UI.CHANGE_PRICE_STATUS' | translate"
     [modal]="true"
     [dismissableMask]="true"
     [draggable]="false"
@@ -515,31 +525,31 @@
   >
     <div class="variant-manager__edit-form">
       <div class="variant-manager__edit-field">
-        <label for="variant-bulk-price">Price override</label>
+        <label for="variant-bulk-price">{{ 'ADMIN.CATALOG_UI.PRICE_OVERRIDE' | translate }}</label>
         <p-inputNumber
           inputId="variant-bulk-price"
           [ngModel]="bulkPrice()"
           (ngModelChange)="bulkPrice.set($event)"
           mode="decimal"
           [minFractionDigits]="2"
-          placeholder="Leave blank to keep current"
+          [placeholder]="'ADMIN.CATALOG_UI.LEAVE_BLANK_TO_KEEP_CURRENT' | translate"
         />
       </div>
       <div class="variant-manager__edit-field">
-        <label for="variant-bulk-status">Status</label>
+        <label for="variant-bulk-status">{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</label>
         <p-select
           inputId="variant-bulk-status"
-          [options]="statusOptions"
+          [options]="statusOptions()"
           optionLabel="label"
           optionValue="value"
-          placeholder="Leave blank to keep current"
+          [placeholder]="'ADMIN.CATALOG_UI.LEAVE_BLANK_TO_KEEP_CURRENT' | translate"
           [ngModel]="bulkStatus()"
           (ngModelChange)="bulkStatus.set($event)"
         />
       </div>
       <div class="variant-manager__edit-actions">
-        <button pButton type="button" label="Cancel" severity="secondary" [disabled]="bulkActionLoading()" (click)="bulkPriceStatusDialogOpen.set(false)"></button>
-        <button pButton type="button" label="Apply" icon="pi pi-check" [loading]="bulkActionLoading()" (click)="confirmBulkPriceStatus()"></button>
+        <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="bulkActionLoading()" (click)="bulkPriceStatusDialogOpen.set(false)"></button>
+        <button pButton type="button" [label]="'ADMIN.CATALOG_UI.APPLY' | translate" icon="pi pi-check" [loading]="bulkActionLoading()" (click)="confirmBulkPriceStatus()"></button>
       </div>
     </div>
   </p-dialog>

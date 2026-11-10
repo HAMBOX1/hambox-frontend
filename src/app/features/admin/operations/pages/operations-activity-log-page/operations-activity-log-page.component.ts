@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -9,6 +9,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { ACTIVITY_LOG_API } from '../../../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../../../core/api/api-client.service';
+import { AdminPageHeaderComponent } from '../../../../../shared/components/admin';
+import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { ApiError } from '../../../../../core/models/api-error.model';
 
 export interface ActivityLogEntryDto {
@@ -50,11 +52,12 @@ const PAGE_SIZE = 50;
 @Component({
   selector: 'app-operations-activity-log-page',
   standalone: true,
-  imports: [FormsModule, DatePipe, ButtonModule, InputTextModule, SelectModule, TableModule],
+  imports: [AdminPageHeaderComponent, FormsModule, HamboxDatePipe, ButtonModule, InputTextModule, SelectModule, TableModule],
   templateUrl: './operations-activity-log-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperationsActivityLogPageComponent implements OnInit {
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.ACTIVITY_LOG' });
   private readonly api = inject(ApiClientService);
 
   protected readonly sources = SOURCES;

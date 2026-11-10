@@ -123,7 +123,7 @@ export class RolesListPageComponent implements OnInit {
   protected readonly mobileViewport = inject(MobileViewportService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Roles' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.ROLES' });
   protected readonly riskLevelFor = riskLevelFor;
   protected readonly riskLabelKey = riskLabelKey;
   protected readonly riskTone = riskTone;

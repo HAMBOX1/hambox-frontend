@@ -27,6 +27,11 @@ import {
 } from '../models/product.model';
 import { productStatusToApi } from '../utils/product-display.utils';
 
+/** Prices are stored with 2 decimals; the API rejects more, so never send more. */
+function roundToCents(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -125,12 +130,13 @@ export class ProductApiService {
   }
 
   createProduct(request: CreateProductRequest): Observable<string> {
-    return this.api.post<string>(CATALOG_API.products, request);
+    return this.api.post<string>(CATALOG_API.products, { ...request, price: roundToCents(request.price) });
   }
 
   updateProduct(id: string, request: UpdateProductRequest): Observable<void> {
     return this.api.put<void>(CATALOG_API.product(id), {
       ...request,
+      price: roundToCents(request.price),
       status: productStatusToApi(request.status),
     });
   }

@@ -21,6 +21,9 @@ import {
   ReviewVoteSummaryApiDto,
   CommunicationPreferencesApiDto,
   NotificationQuery,
+  PointsHistoryQuery,
+  PointsSummaryApiDto,
+  PointsTransactionApiDto,
   ReferralDashboardApiDto,
   ReferralHistoryApiDto,
   ReferralHistoryQuery,
@@ -186,6 +189,23 @@ export class AccountApiService {
     }
 
     return this.api.get(ACCOUNT_API.referralHistory, { params });
+  }
+
+  getPointsSummary(): Observable<PointsSummaryApiDto> {
+    return this.api.get<PointsSummaryApiDto>(ACCOUNT_API.points);
+  }
+
+  getPointsHistory(query: PointsHistoryQuery = {}): Observable<PagedResult<PointsTransactionApiDto>> {
+    const params: Record<string, string | number> = {
+      pageNumber: query.pageNumber ?? 1,
+      pageSize: query.pageSize ?? 10,
+    };
+
+    if (query.type) {
+      params['type'] = query.type;
+    }
+
+    return this.api.get(ACCOUNT_API.pointsHistory, { params });
   }
 
   getLibrary(query: CustomerLibraryQuery = {}): Observable<PagedResult<CustomerLibraryItemApiDto>> {

@@ -39,6 +39,12 @@
 
 .basic-info-form__add-arabic-btn.p-button {
   padding-left: 0;
+  min-height: 2.25rem;
+}
+
+:host ::ng-deep .p-button-sm,
+:host ::ng-deep .p-button.p-button-text {
+  min-height: 2.25rem;
 }
 
 .basic-info-form__arabic-fields {
@@ -155,10 +161,20 @@
 
 .basic-info-form__category-chip-star,
 .basic-info-form__category-chip-remove {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  // 24px target (WCAG 2.5.8 minimum); the ::after widens the clickable area further without changing the chip.
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -0.25rem;
+  }
+
   border: none;
   background: transparent;
   color: var(--admin-text-secondary);

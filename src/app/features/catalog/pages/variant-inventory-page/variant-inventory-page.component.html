@@ -5,7 +5,7 @@
     <app-admin-error-alert [message]="error()!" />
   } @else if (variant(); as current) {
     <app-admin-page-header
-      title="Inventory Manager"
+      [title]="'ADMIN.CATALOG_UI.INVENTORY_MANAGER' | translate"
       [subtitle]="optionSummary(current)"
       [breadcrumbs]="breadcrumbs()"
       [backLink]="'/admin/products/' + productId() + '/edit'"
@@ -14,19 +14,19 @@
 
     <div class="variant-inventory-page__meta">
       <div>
-        <span class="variant-inventory-page__meta-label">Product</span>
+        <span class="variant-inventory-page__meta-label">{{ 'ADMIN.CATALOG_UI.PRODUCT_2' | translate }}</span>
         <strong>{{ product()?.nameEn }}</strong>
       </div>
       <div>
-        <span class="variant-inventory-page__meta-label">Variant</span>
+        <span class="variant-inventory-page__meta-label">{{ 'ADMIN.CATALOG_UI.VARIANT' | translate }}</span>
         <strong>{{ optionSummary(current) }}</strong>
       </div>
       <div>
-        <span class="variant-inventory-page__meta-label">SKU</span>
+        <span class="variant-inventory-page__meta-label">{{ 'ADMIN.CATALOG_UI.SKU' | translate }}</span>
         <strong>{{ current.sku }}</strong>
       </div>
       <div>
-        <span class="variant-inventory-page__meta-label">Status</span>
+        <span class="variant-inventory-page__meta-label">{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</span>
         <app-admin-status-badge [label]="current.status" />
       </div>
     </div>

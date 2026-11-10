@@ -82,7 +82,7 @@ export class FaqEditPageComponent implements OnInit, HasUnsavedChanges {
 
   protected readonly breadcrumbs = computed(() =>
     adminBreadcrumbs(
-      { label: 'FAQ', route: '/admin/faqs' },
+      { label: 'ADMIN.NAV.FAQS', route: '/admin/faqs' },
       { label: this.isCreateMode() ? 'New FAQ' : 'Edit FAQ' },
     ),
   );
@@ -168,6 +168,23 @@ export class FaqEditPageComponent implements OnInit, HasUnsavedChanges {
    * reused as-is per project convention) — keep only the most recently chosen id. */
   protected onCategoryTargetChange(ids: readonly string[]): void {
     this.targetIds.set(ids.length > 0 ? [ids[ids.length - 1]] : []);
+  }
+
+  /** What still blocks saving, so a disabled Save button is never a mystery. */
+  protected missingHint(): string {
+    if (!this.questionEn().trim()) {
+      return 'Enter the question to save.';
+    }
+    if (!this.stripHtml(this.answerEn()).trim()) {
+      return 'Enter the answer to save.';
+    }
+    if (!this.categoryId()) {
+      return 'Select a category to save.';
+    }
+    if (this.scope() !== 'Global' && this.targetIds().length === 0) {
+      return 'Select at least one target for this scope.';
+    }
+    return '';
   }
 
   protected canSubmit(): boolean {

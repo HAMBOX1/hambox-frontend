@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -51,7 +51,7 @@ type TabKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
   selector: 'app-security-center-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     TranslatePipe,
     ButtonModule,
@@ -91,7 +91,7 @@ export class SecurityCenterPageComponent implements OnInit {
   protected readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Security Center' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.SECURITY.TITLE' });
   protected readonly countryStatusOptions: { label: string; value: CountryRestrictionStatus }[] = [
     { label: 'Allowed', value: 'Allowed' },
     { label: 'Blocked', value: 'Blocked' },

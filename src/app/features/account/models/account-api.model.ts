@@ -289,6 +289,31 @@ export interface ReferralHistoryQuery {
   readonly status?: string;
 }
 
+export interface PointsSummaryApiDto {
+  readonly balance: number;
+  readonly totalEarned: number;
+  readonly enabled: boolean;
+  readonly pointsPerUsd: number;
+}
+
+export type PointsTransactionType = 'Earned' | 'Reversed';
+
+export interface PointsTransactionApiDto {
+  readonly id: string;
+  readonly type: PointsTransactionType;
+  readonly points: number;
+  readonly orderId: string;
+  readonly orderNumber: string;
+  readonly description: string;
+  readonly occurredOnUtc: string;
+}
+
+export interface PointsHistoryQuery {
+  readonly pageNumber?: number;
+  readonly pageSize?: number;
+  readonly type?: PointsTransactionType;
+}
+
 export interface ReferralDashboardApiDto {
   readonly referralCode: string;
   readonly tier: string;
@@ -296,6 +321,8 @@ export interface ReferralDashboardApiDto {
   readonly successfulReferrals: number;
   readonly pendingReferrals: number;
   readonly pointValueUsd: number;
+  /** False while the referral program is switched off in Settings. */
+  readonly programEnabled?: boolean;
   readonly availableTiers: readonly ReferralTierApiDto[];
   readonly recentHistory: readonly ReferralHistoryApiDto[];
 }

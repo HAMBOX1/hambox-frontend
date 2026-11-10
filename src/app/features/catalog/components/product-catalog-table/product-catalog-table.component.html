@@ -117,9 +117,14 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 3rem" (click)="$event.stopPropagation()">
-            <p-checkbox [binary]="true" [ngModel]="allPageSelected()" (onChange)="onBulkToggleAllPage()" />
+            <p-checkbox
+              [binary]="true"
+              [ariaLabel]="'ADMIN.CATALOG_PAGE.BULK.SELECT_ALL' | translate"
+              [ngModel]="allPageSelected()"
+              (onChange)="onBulkToggleAllPage()"
+            />
           </th>
-          <th pSortableColumn="nameEn" class="product-catalog-table__name-cell">Product <p-sortIcon field="nameEn" /></th>
+          <th pSortableColumn="nameEn" class="product-catalog-table__name-cell"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.PRODUCT' | translate }} <p-sortIcon field="nameEn" /></th>
           @for (colId of orderedColumns(); track colId) {
             @if (isPriceColumn(colId)) {
               @let field = priceFieldOf(colId);
@@ -140,37 +145,37 @@
               @switch (colId) {
                 @case ('stock') {
 
-            <th pSortableColumn="availableStock">Stock <p-sortIcon field="availableStock" /></th>
+            <th pSortableColumn="availableStock"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.STOCK' | translate }} <p-sortIcon field="availableStock" /></th>
 
                 }
                 @case ('sku') {
 
-            <th>SKU</th>
+            <th>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.SKU' | translate }}</th>
 
                 }
                 @case ('margin') {
 
-            <th pSortableColumn="margin" class="product-catalog-table__tier-head">Margin <p-sortIcon field="margin" /></th>
+            <th pSortableColumn="margin" class="product-catalog-table__tier-head"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.MARGIN' | translate }} <p-sortIcon field="margin" /></th>
 
                 }
                 @case ('category') {
 
-            <th pSortableColumn="categoryName">Category <p-sortIcon field="categoryName" /></th>
+            <th pSortableColumn="categoryName"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.CATEGORY' | translate }} <p-sortIcon field="categoryName" /></th>
 
                 }
                 @case ('internalCategories') {
 
-            <th>Internal Categories</th>
+            <th>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.INTERNAL_CATEGORIES' | translate }}</th>
 
                 }
                 @case ('status') {
 
-            <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+            <th pSortableColumn="status"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.STATUS' | translate }} <p-sortIcon field="status" /></th>
 
                 }
                 @case ('supplier') {
 
-            <th>Supplier</th>
+            <th>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.SUPPLIER' | translate }}</th>
 
                 }
               }
@@ -185,6 +190,7 @@
           <td (click)="$event.stopPropagation()">
             <p-checkbox
               [binary]="true"
+              [ariaLabel]="'ADMIN.CATALOG_PAGE.BULK.SELECT_ROW' | translate: { name: product.nameEn }"
               [ngModel]="isBulkSelected(product.id)"
               (onChange)="onBulkCheckboxClick(product, $event.originalEvent)"
             />
@@ -386,7 +392,7 @@
             @let categoryLabels = productCategoryLabels(product);
             <div class="product-catalog-table__category-chips">
               @if (categoryLabels.length === 0) {
-                <span class="product-catalog-table__category-empty">Uncategorized</span>
+                <span class="product-catalog-table__category-empty">{{ 'ADMIN.CATALOG_UI.UNCATEGORIZED' | translate }}</span>
               } @else if (isRowExpanded(product.id)) {
                 @for (label of categoryLabels; track label) {
                   <span class="product-catalog-table__category-chip">{{ label }}</span>
@@ -395,7 +401,7 @@
                   <button
                     type="button"
                     class="product-catalog-table__category-overflow product-catalog-table__category-toggle"
-                    pTooltip="Show less"
+                    [pTooltip]="'ADMIN.CATALOG_UI.SHOW_LESS' | translate"
                     tooltipPosition="top"
                     (click)="toggleRowExpanded(product.id, $event)"
                   ><i class="pi pi-chevron-up" aria-hidden="true"></i></button>
@@ -442,7 +448,7 @@
             @let collectionLabels = productCollectionLabels(product);
             <div class="product-catalog-table__category-chips">
               @if (collectionLabels.length === 0) {
-                <span class="product-catalog-table__category-empty">None</span>
+                <span class="product-catalog-table__category-empty">{{ 'ADMIN.CATALOG_UI.NONE' | translate }}</span>
               } @else if (isRowExpanded(product.id)) {
                 @for (label of collectionLabels; track label) {
                   <span class="product-catalog-table__category-chip product-catalog-table__category-chip--collection">{{
@@ -453,7 +459,7 @@
                   <button
                     type="button"
                     class="product-catalog-table__category-overflow product-catalog-table__category-toggle"
-                    pTooltip="Show less"
+                    [pTooltip]="'ADMIN.CATALOG_UI.SHOW_LESS' | translate"
                     tooltipPosition="top"
                     (click)="toggleRowExpanded(product.id, $event)"
                   ><i class="pi pi-chevron-up" aria-hidden="true"></i></button>
@@ -565,43 +571,43 @@
             <td [attr.colspan]="tableColspan()">
               <dl class="product-catalog-table__details">
                 <div>
-                  <dt>Category</dt>
+                  <dt>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.CATEGORY' | translate }}</dt>
                   <dd>{{ product.categoryName || '—' }}</dd>
                 </div>
                 <div>
-                  <dt>Internal categories</dt>
+                  <dt>{{ 'ADMIN.CATALOG_PAGE.COLUMNS.INTERNAL_CATEGORIES' | translate }}</dt>
                   <dd>
-                    @let detailLabels = productCategoryLabels(product);
+                    @let detailLabels = productCollectionLabels(product);
                     {{ detailLabels.length ? detailLabels.join(', ') : '—' }}
                   </dd>
                 </div>
                 <div>
-                  <dt>Stock</dt>
+                  <dt>{{ 'ADMIN.CATALOG_UI.STOCK' | translate }}</dt>
                   <dd>{{ stockSummary(product) }}</dd>
                 </div>
                 <div>
-                  <dt>Sale price</dt>
+                  <dt>{{ 'ADMIN.CATALOG_UI.SALE_PRICE' | translate }}</dt>
                   <dd>{{ tierRange(product.priceTiers?.saleMin ?? product.price, product.priceTiers?.saleMax ?? product.price) }}</dd>
                 </div>
                 <div>
-                  <dt>Cost</dt>
+                  <dt>{{ 'ADMIN.CATALOG_UI.COST' | translate }}</dt>
                   <dd>{{ tierRange(product.priceTiers?.costMin, product.priceTiers?.costMax) }}</dd>
                 </div>
                 <div>
-                  <dt>Member price</dt>
+                  <dt>{{ 'ADMIN.CATALOG_UI.MEMBER_PRICE' | translate }}</dt>
                   <dd>{{ tierRange(product.priceTiers?.memberMin, product.priceTiers?.memberMax) }}</dd>
                 </div>
                 <div>
-                  <dt>Status</dt>
-                  <dd>{{ product.status }}</dd>
+                  <dt>{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</dt>
+                  <dd>{{ statusLabel(product.status) }}</dd>
                 </div>
                 <div>
-                  <dt>Variants</dt>
+                  <dt>{{ 'ADMIN.CATALOG_UI.VARIANTS' | translate }}</dt>
                   <dd>{{ product.variantCount ?? 0 }}</dd>
                 </div>
                 @if (product.lastEditedByName) {
                   <div>
-                    <dt>Last edited</dt>
+                    <dt>{{ 'ADMIN.CATALOG_UI.LAST_EDITED' | translate }}</dt>
                     <dd>{{ product.lastEditedByName }}</dd>
                   </div>
                 }
@@ -613,11 +619,11 @@
         @if (hasExpandableVariants(product) && isVariantsExpanded(product.id)) {
           @if (isVariantsLoading(product.id)) {
             <tr class="product-catalog-table__variant-status-row">
-              <td [attr.colspan]="tableColspan()">Loading variants…</td>
+              <td [attr.colspan]="tableColspan()">{{ 'ADMIN.CATALOG_UI.LOADING_VARIANTS' | translate }}</td>
             </tr>
           } @else if (variantsFor(product.id).length === 0) {
             <tr class="product-catalog-table__variant-status-row">
-              <td [attr.colspan]="tableColspan()">No variants found.</td>
+              <td [attr.colspan]="tableColspan()">{{ 'ADMIN.CATALOG_UI.NO_VARIANTS_FOUND' | translate }}</td>
             </tr>
           } @else {
             @if (selectedVariantCountFor(product.id); as selectedCount) {
@@ -625,9 +631,9 @@
                 <td [attr.colspan]="tableColspan()" (click)="$event.stopPropagation()">
                   <div class="product-catalog-table__variant-bulk-bar">
                     <span>{{ selectedCount }} selected</span>
-                    <button pButton type="button" label="Activate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Active')"></button>
-                    <button pButton type="button" label="Deactivate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Inactive')"></button>
-                    <button pButton type="button" label="Clear" size="small" text (click)="clearVariantSelection(product.id)"></button>
+                    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ACTIVATE' | translate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Active')"></button>
+                    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.DEACTIVATE' | translate" size="small" severity="secondary" (click)="bulkSetVariantStatus(product.id, 'Inactive')"></button>
+                    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CLEAR' | translate" size="small" text (click)="clearVariantSelection(product.id)"></button>
                   </div>
                 </td>
               </tr>
@@ -716,7 +722,7 @@
                     @if (variant.fulfillmentMode === 'ChatDelivery') {
                       <i
                         class="pi pi-comments product-catalog-table__chat-delivery-icon"
-                        pTooltip="On-Delivery — delivered manually via support chat"
+                        [pTooltip]="'ADMIN.CATALOG_UI.ON_DELIVERY_DELIVERED_MANUALLY_VIA_SUPPORT_C' | translate"
                         tooltipPosition="top"
                         aria-hidden="true"
                       ></i>
@@ -725,7 +731,7 @@
                         *hamboxHasPermission="permissions.Catalog.Inventory.Create"
                         type="button"
                         class="product-catalog-table__quick-chat-delivery"
-                        pTooltip="Quick-set as On-Delivery (no codes needed)"
+                        [pTooltip]="'ADMIN.CATALOG_UI.QUICK_SET_AS_ON_DELIVERY_NO_CODES_NEEDED' | translate"
                         tooltipPosition="top"
                         (click)="$event.stopPropagation(); setVariantChatDeliveryRequested.emit({ product, variant })"
                       >
@@ -785,9 +791,9 @@
                     <button
                       type="button"
                       class="product-catalog-table__variant-price-edit"
-                      pTooltip="Customer instructions for this variant"
+                      [pTooltip]="'ADMIN.CATALOG_UI.CUSTOMER_INSTRUCTIONS_FOR_THIS_VARIANT' | translate"
                       tooltipPosition="top"
-                      aria-label="Customer instructions for this variant"
+                      [attr.aria-label]="'ADMIN.CATALOG_UI.CUSTOMER_INSTRUCTIONS_FOR_THIS_VARIANT' | translate"
                       (click)="openVariantInstructions(product.id, variant, $event)"
                     ><i class="pi pi-info-circle" aria-hidden="true"></i></button>
                     <a
@@ -795,18 +801,18 @@
                       [href]="variantPreviewLink(product.id, variant)"
                       target="_blank"
                       rel="noopener"
-                      pTooltip="Open this variant as a full product page"
+                      [pTooltip]="'ADMIN.CATALOG_UI.OPEN_THIS_VARIANT_AS_A_FULL_PRODUCT_PAGE' | translate"
                       tooltipPosition="top"
-                      aria-label="Open this variant as a full product page"
+                      [attr.aria-label]="'ADMIN.CATALOG_UI.OPEN_THIS_VARIANT_AS_A_FULL_PRODUCT_PAGE' | translate"
                       ><i class="pi pi-external-link" aria-hidden="true"></i></a>
                     <a
                       class="product-catalog-table__variant-price-edit"
                       [routerLink]="'/admin/products/' + product.id + '/edit'"
                       [queryParams]="{ editVariant: variant.id }"
                       fragment="variants"
-                      pTooltip="Edit variant details"
+                      [pTooltip]="'ADMIN.CATALOG_UI.EDIT_VARIANT_DETAILS' | translate"
                       tooltipPosition="top"
-                      aria-label="Edit variant details"
+                      [attr.aria-label]="'ADMIN.CATALOG_UI.EDIT_VARIANT_DETAILS' | translate"
                       ><i class="pi pi-pencil" aria-hidden="true"></i
                     ></a>
                   </div>
@@ -840,16 +846,16 @@
 
   <p-popover #categoryPopover appendTo="body" styleClass="product-catalog-table__category-popover">
     <div class="product-catalog-table__category-popover-content" (click)="$event.stopPropagation()">
-      <h4 class="product-catalog-table__category-popover-title">Categories</h4>
+      <h4 class="product-catalog-table__category-popover-title">{{ 'ADMIN.CATALOG_UI.CATEGORIES' | translate }}</h4>
 
       <app-admin-search-bar
         [value]="categorySearchTerm()"
-        placeholder="Search..."
-        ariaLabel="Search categories"
+        [placeholder]="'ADMIN.CATALOG_UI.SEARCH' | translate"
+        [ariaLabel]="'ADMIN.CATALOG_UI.SEARCH_CATEGORIES' | translate"
         (searchChange)="categorySearchTerm.set($event)"
       />
 
-      <ul class="product-catalog-table__category-list" role="listbox" aria-label="Categories">
+      <ul class="product-catalog-table__category-list" role="listbox" [attr.aria-label]="'ADMIN.CATALOG_UI.CATEGORIES' | translate">
         @for (option of filteredCategoryPopoverOptions(); track option.id) {
           <li class="product-catalog-table__category-list-item">
             <p-checkbox
@@ -863,7 +869,7 @@
             }}</label>
           </li>
         } @empty {
-          <li class="product-catalog-table__category-list-empty">No categories match your search.</li>
+          <li class="product-catalog-table__category-list-empty">{{ 'ADMIN.CATALOG_UI.NO_CATEGORIES_MATCH_YOUR_SEARCH' | translate }}</li>
         }
       </ul>
 
@@ -874,7 +880,7 @@
       <button
         pButton
         type="button"
-        label="Create Category"
+        [label]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
         icon="pi pi-plus"
         severity="secondary"
         text
@@ -884,11 +890,11 @@
       ></button>
 
       <div class="product-catalog-table__category-popover-actions">
-        <button pButton type="button" label="Cancel" severity="secondary" text (click)="cancelCategoryPopover()"></button>
+        <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" text (click)="cancelCategoryPopover()"></button>
         <button
           pButton
           type="button"
-          label="Save"
+          [label]="'ADMIN.CATALOG_UI.SAVE' | translate"
           icon="pi pi-check"
           [disabled]="actionLoading()"
           [loading]="actionLoading()"
@@ -899,7 +905,7 @@
   </p-popover>
 
   <p-dialog
-    header="Create Category"
+    [header]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
     [visible]="categoryDialogOpen()"
     (visibleChange)="onCategoryCreateDialogVisibleChange($event)"
     [modal]="true"
@@ -922,16 +928,16 @@
 
   <p-popover #collectionPopover appendTo="body" styleClass="product-catalog-table__category-popover">
     <div class="product-catalog-table__category-popover-content" (click)="$event.stopPropagation()">
-      <h4 class="product-catalog-table__category-popover-title">Internal Categories</h4>
+      <h4 class="product-catalog-table__category-popover-title">{{ 'ADMIN.CATALOG_UI.INTERNAL_CATEGORIES' | translate }}</h4>
 
       <app-admin-search-bar
         [value]="collectionSearchTerm()"
-        placeholder="Search..."
-        ariaLabel="Search internal categories"
+        [placeholder]="'ADMIN.CATALOG_UI.SEARCH' | translate"
+        [ariaLabel]="'ADMIN.CATALOG_UI.SEARCH_INTERNAL_CATEGORIES' | translate"
         (searchChange)="collectionSearchTerm.set($event)"
       />
 
-      <ul class="product-catalog-table__category-list" role="listbox" aria-label="Internal Categories">
+      <ul class="product-catalog-table__category-list" role="listbox" [attr.aria-label]="'ADMIN.CATALOG_UI.INTERNAL_CATEGORIES' | translate">
         @for (option of filteredCollectionPopoverOptions(); track option.id) {
           <li class="product-catalog-table__category-list-item">
             <p-checkbox
@@ -945,7 +951,7 @@
             }}</label>
           </li>
         } @empty {
-          <li class="product-catalog-table__category-list-empty">No internal categories match your search.</li>
+          <li class="product-catalog-table__category-list-empty">{{ 'ADMIN.CATALOG_UI.NO_INTERNAL_CATEGORIES_MATCH_YOUR_SEARCH' | translate }}</li>
         }
       </ul>
 
@@ -956,7 +962,7 @@
       <button
         pButton
         type="button"
-        label="+ New Internal Category"
+        [label]="'ADMIN.CATALOG_UI.NEW_INTERNAL_CATEGORY' | translate"
         icon="pi pi-plus"
         severity="secondary"
         text
@@ -969,7 +975,7 @@
         <button
           pButton
           type="button"
-          label="Done"
+          [label]="'ADMIN.CATALOG_UI.DONE' | translate"
           icon="pi pi-check"
           [loading]="actionLoading()"
           (click)="cancelCollectionPopover()"
@@ -979,7 +985,7 @@
   </p-popover>
 
   <p-dialog
-    header="Create Internal Category"
+    [header]="'ADMIN.CATALOG_UI.CREATE_INTERNAL_CATEGORY' | translate"
     [visible]="collectionDialogOpen()"
     (visibleChange)="onCollectionCreateDialogVisibleChange($event)"
     [modal]="true"

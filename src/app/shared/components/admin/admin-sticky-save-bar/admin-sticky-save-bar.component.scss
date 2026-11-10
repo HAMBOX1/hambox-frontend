@@ -15,9 +15,8 @@
   padding: 1rem 1.5rem;
   border: 1px solid var(--admin-border-subtle);
   border-radius: var(--admin-radius-card);
-  background: color-mix(in srgb, var(--admin-bg-panel) 92%, transparent);
+  background: var(--admin-bg-panel);
   box-shadow: var(--admin-shadow-panel);
-  backdrop-filter: blur(12px);
 }
 
 .admin-sticky-save-bar--dirty .admin-sticky-save-bar__inner {

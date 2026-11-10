@@ -11,6 +11,7 @@ import { HasPermissionDirective } from '../../../../shared/directives/has-permis
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 import { copyToClipboard, formatShortGuid } from '../../../../shared/utils/guid-display.util';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   AdminEmptyStateComponent,
   AdminErrorAlertComponent,
@@ -26,7 +27,7 @@ type CopiedField = 'id' | 'categoryId' | 'url' | null;
 @Component({
   selector: 'app-product-detail-panel',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     RouterLink,
     DatePipe,
     ButtonModule,

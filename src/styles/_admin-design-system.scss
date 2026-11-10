@@ -376,6 +376,7 @@
     color: var(--admin-text-primary);
     font-size: var(--admin-type-body);
     font-weight: 600;
+    overflow-wrap: anywhere; /* long e-mail addresses must wrap, not run into the next column */
   }
 }
 
@@ -459,5 +460,32 @@
   .p-multiselect,
   .p-selectbutton {
     min-height: var(--ui-control-height, 2.5rem);
+  }
+}
+
+.admin-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--admin-field-gap, 1rem);
+  margin-block-start: var(--admin-form-gap, 1.5rem);
+}
+
+.admin-form-field {
+  display: grid;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+
+  > label {
+    color: var(--admin-text-secondary);
+    font-size: var(--admin-type-caption, 0.8125rem);
+    font-weight: 600;
+  }
+
+  > input,
+  > textarea,
+  > .p-select,
+  > p-select {
+    width: 100%;
   }
 }

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -17,7 +16,8 @@ import { Category } from '../../models/category.model';
 import { Product, ProductImageLibraryItem } from '../../models/product.model';
 import { CategoryApiService } from '../../services/category-api.service';
 import { ProductApiService } from '../../services/product-api.service';
-
+
+import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 const PAGE_SIZE = 48;
 
 /**
@@ -28,10 +28,9 @@ const PAGE_SIZE = 48;
 @Component({
   selector: 'app-product-image-library-page',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     RouterLink,
-    TranslatePipe,
     ButtonModule,
     CheckboxModule,
     DialogModule,
@@ -46,11 +45,12 @@ const PAGE_SIZE = 48;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductImageLibraryPageComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
   private readonly productApi = inject(ProductApiService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly messages = inject(MessageService);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Image Library' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.IMAGE_LIBRARY' });
 
   protected readonly items = signal<readonly ProductImageLibraryItem[]>([]);
   protected readonly totalCount = signal(0);
@@ -209,14 +209,14 @@ export class ProductImageLibraryPageComponent implements OnInit {
       const result = await firstValueFrom(this.productApi.applyImageToProducts(source.imageId, targets));
       this.messages.add({
         severity: result.skipped > 0 ? 'warn' : 'success',
-        summary: `Image applied to ${result.applied} product(s)`,
-        detail: result.skipped > 0 ? `${result.skipped} skipped (image limit reached or file unavailable).` : undefined,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.IMAGE_APPLIED', { p0: result.applied }),
+        detail: result.skipped > 0 ? this.translate.instant('ADMIN.CATALOG_TOASTS.IMAGE_SKIPPED', { p0: result.skipped }) : undefined,
         life: 5000,
       });
       this.applySource.set(null);
       await this.load();
     } catch {
-      this.messages.add({ severity: 'error', summary: 'Could not apply the image', life: 5000 });
+      this.messages.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.IMAGE_APPLY_FAILED'), life: 5000 });
     } finally {
       this.applying.set(false);
     }
@@ -256,7 +256,7 @@ export class ProductImageLibraryPageComponent implements OnInit {
       this.messages.add({ severity: 'success', summary: successMessage, life: 2500 });
       await this.load();
     } catch {
-      this.messages.add({ severity: 'error', summary: failureMessage, detail: 'Please try again.', life: 5000 });
+      this.messages.add({ severity: 'error', summary: failureMessage, detail: this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'), life: 5000 });
     } finally {
       this.busyKey.set(null);
     }
@@ -279,7 +279,7 @@ export class ProductImageLibraryPageComponent implements OnInit {
     } catch {
       this.items.set([]);
       this.totalCount.set(0);
-      this.messages.add({ severity: 'error', summary: 'Could not load the image library', life: 5000 });
+      this.messages.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.IMAGE_LIBRARY_LOAD_FAILED'), life: 5000 });
     } finally {
       this.loading.set(false);
     }

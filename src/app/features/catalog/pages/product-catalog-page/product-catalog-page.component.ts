@@ -245,6 +245,16 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkTargetCategoryId = signal<string | null>(null);
   protected readonly bulkPriceMode = signal<PriceAdjustmentMode>('IncreasePercent');
   protected readonly bulkPriceValue = signal<number | null>(null);
+  /** A percent change must be above 0 (a decrease at most 100); a fixed price just has to be a number. The server enforces the same rules. */
+  protected readonly bulkPriceInvalid = computed(() => {
+    const value = this.bulkPriceValue();
+    if (value === null || value < 0) {
+      return true;
+    }
+
+    const mode = this.bulkPriceMode();
+    return mode !== 'SetFixed' && (value === 0 || (mode === 'DecreasePercent' && value > 100));
+  });
   protected readonly bulkTargetCollectionId = signal<string | null>(null);
   protected readonly bulkNewCollectionName = signal('');
 
@@ -356,6 +366,18 @@ export class ProductCatalogPageComponent implements OnInit {
   });
 
   protected readonly listStats = computed(() => {
+    // Whole-catalogue counts from the server; the loaded page alone would under-count once the
+    // list spans more than one page.
+    const counts = this.statusCounts();
+    if (counts) {
+      return {
+        total: counts.all,
+        active: counts.active,
+        draft: counts.draft,
+        needsAttention: counts.draft + counts.inactive,
+      };
+    }
+
     const items = this.items();
 
     return {
@@ -519,8 +541,8 @@ export class ProductCatalogPageComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Update failed',
-        detail: this.facade.error() ?? 'Failed to update product.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATE_FAILED'),
+        detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATE_PRODUCT_FAILED'),
         life: 5000,
       });
     }
@@ -636,7 +658,15 @@ export class ProductCatalogPageComponent implements OnInit {
       });
       this.duplicateDialogOpen.set(false);
       void this.router.navigate(['/admin/products', newId, 'edit']);
+      return;
     }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DUPLICATE_FAILED'),
+      detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.DUPLICATE_PRODUCT_FAILED'),
+      life: 5000,
+    });
   }
 
   protected openVariantChatDeliveryDialog(event: { product: Product; variant: ProductVariantDto }): void {
@@ -673,7 +703,7 @@ export class ProductCatalogPageComponent implements OnInit {
     if (success) {
       this.messageService.add({
         severity: 'success',
-        summary: instant ? 'Instant stock' : 'On-Delivery',
+        summary: instant ? this.translate.instant('ADMIN.CATALOG_TOASTS.INSTANT_STOCK') : this.translate.instant('ADMIN.CATALOG_TOASTS.ON_DELIVERY'),
         detail: instant
           ? 'This product now delivers instantly from its stocked codes. Make sure codes are imported.'
           : 'This product is now set to deliver via support chat.',
@@ -743,14 +773,14 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.PENDING_MERGE.PROMOTE_ACTION'),
-        detail: `${result.mergedSourceCount} product(s) merged.`,
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCTS_MERGED', { p0: result.mergedSourceCount }),
         life: 4000,
       });
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Promote failed',
-        detail: this.facade.bulkError() ?? 'Failed to promote product to variant.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PROMOTE_FAILED'),
+        detail: this.facade.bulkError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.PROMOTE_TO_VARIANT_FAILED'),
         life: 5000,
       });
     }
@@ -775,14 +805,14 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.PENDING_MERGE.PROMOTE_ACTION'),
-        detail: `${result.mergedSourceCount} product(s) merged.`,
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCTS_MERGED', { p0: result.mergedSourceCount }),
         life: 4000,
       });
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Promote failed',
-        detail: this.facade.bulkError() ?? 'Failed to promote product to variant.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.PROMOTE_FAILED'),
+        detail: this.facade.bulkError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.PROMOTE_TO_VARIANT_FAILED'),
         life: 5000,
       });
     }
@@ -800,8 +830,8 @@ export class ProductCatalogPageComponent implements OnInit {
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Unlink failed',
-        detail: this.facade.error() ?? 'Failed to unlink pending merge.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UNLINK_FAILED'),
+        detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.UNLINK_PENDING_FAILED'),
         life: 5000,
       });
     }
@@ -819,6 +849,27 @@ export class ProductCatalogPageComponent implements OnInit {
         life: 4000,
       });
     }
+  }
+
+  protected async onRowUnarchive(product: Product): Promise<void> {
+    const success = await this.facade.restoreProduct(product.id);
+    if (success) {
+      this.messageService.add({
+        severity: 'success',
+        summary: this.translate.instant('ADMIN.CATALOG_PAGE.ACTIONS.UNARCHIVE'),
+        detail: this.translate.instant('ADMIN.CATALOG_PAGE.TOAST.UNARCHIVED'),
+        life: 5000,
+      });
+      void this.facade.reload();
+      return;
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UNARCHIVE_FAILED'),
+      detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.UNARCHIVE_PRODUCT_FAILED'),
+      life: 5000,
+    });
   }
 
   protected retryLoad(): void {
@@ -1004,14 +1055,14 @@ export class ProductCatalogPageComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: this.translate.instant('ADMIN.CATALOG_PAGE.BULK.MARK_AS_PENDING_ACTION'),
-          detail: `${event.sourceProductIds.length} product(s) marked as pending merge.`,
+          detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCTS_MARKED_PENDING', { p0: event.sourceProductIds.length }),
           life: 4000,
         });
       } else {
         this.messageService.add({
           severity: 'error',
-          summary: 'Failed to mark as pending merge',
-          detail: this.facade.bulkError() ?? 'Failed to mark products as pending merge.',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.MARK_PENDING_FAILED'),
+          detail: this.facade.bulkError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.MARK_PRODUCTS_PENDING_FAILED'),
           life: 5000,
         });
       }
@@ -1037,14 +1088,14 @@ export class ProductCatalogPageComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: this.translate.instant('ADMIN.CATALOG_PAGE.BULK.MERGE_ACTION'),
-        detail: `${result.mergedSourceCount} product(s) merged.`,
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.PRODUCTS_MERGED', { p0: result.mergedSourceCount }),
         life: 4000,
       });
     } else {
       this.messageService.add({
         severity: 'error',
-        summary: 'Merge failed',
-        detail: this.facade.bulkError() ?? 'Failed to merge products.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.MERGE_FAILED'),
+        detail: this.facade.bulkError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.MERGE_PRODUCTS_FAILED'),
         life: 5000,
       });
     }
@@ -1067,8 +1118,8 @@ export class ProductCatalogPageComponent implements OnInit {
     if (!newId) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Failed to create product',
-        detail: this.facade.bulkError() ?? 'Failed to create the new product.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CREATE_FAILED'),
+        detail: this.facade.bulkError() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.CREATE_NEW_FAILED'),
         life: 5000,
       });
       return null;
@@ -1080,7 +1131,7 @@ export class ProductCatalogPageComponent implements OnInit {
 
   protected async confirmBulkPriceAdjust(): Promise<void> {
     const value = this.bulkPriceValue();
-    if (value === null) {
+    if (value === null || this.bulkPriceInvalid()) {
       return;
     }
 
@@ -1096,8 +1147,8 @@ export class ProductCatalogPageComponent implements OnInit {
     if (!ok) {
       this.messageService.add({
         severity: 'error',
-        summary: 'Update failed',
-        detail: this.facade.error() ?? 'Could not update the internal category.',
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UPDATE_FAILED'),
+        detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.INTERNAL_CATEGORY_FAILED'),
         life: 5000,
       });
     }
@@ -1107,8 +1158,8 @@ export class ProductCatalogPageComponent implements OnInit {
     const ok = await this.facade.setProductFulfillment(event.product.id, event.mode);
     this.messageService.add(
       ok
-        ? { severity: 'success', summary: 'Delivery type updated', detail: event.product.nameEn, life: 3000 }
-        : { severity: 'error', summary: 'Could not update delivery type', detail: this.facade.error() ?? 'Please try again.', life: 5000 },
+        ? { severity: 'success', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELIVERY_UPDATED'), detail: event.product.nameEn, life: 3000 }
+        : { severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELIVERY_UPDATE_FAILED'), detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'), life: 5000 },
     );
   }
 
@@ -1128,8 +1179,8 @@ export class ProductCatalogPageComponent implements OnInit {
       const ok = await this.facade.setProductBadge(product.id, en, ar);
       this.messageService.add(
         ok
-          ? { severity: 'success', summary: en || ar ? 'Badge saved' : 'Badge cleared', detail: product.nameEn, life: 3000 }
-          : { severity: 'error', summary: 'Could not save the badge', detail: this.facade.error() ?? 'Please try again.', life: 5000 },
+          ? { severity: 'success', summary: en || ar ? this.translate.instant('ADMIN.CATALOG_TOASTS.BADGE_SAVED') : this.translate.instant('ADMIN.CATALOG_TOASTS.BADGE_CLEARED'), detail: product.nameEn, life: 3000 }
+          : { severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.BADGE_SAVE_FAILED'), detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'), life: 5000 },
       );
     } else {
       await this.runBulkAction(() => this.facade.bulkSetBadge(en, ar), en || ar ? 'Badge saved' : 'Badge cleared');
@@ -1187,8 +1238,8 @@ export class ProductCatalogPageComponent implements OnInit {
     if (this.selectAllMatchingActive() || ids.length > cap) {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Too many products selected',
-        detail: `Select fewer than ${cap} products to open their inventory individually.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.TOO_MANY_SELECTED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.SELECT_FEWER', { p0: cap }),
       });
       return;
     }
@@ -1196,6 +1247,13 @@ export class ProductCatalogPageComponent implements OnInit {
     for (const id of ids) {
       window.open(`/admin/products/${id}/edit#variants`, '_blank');
     }
+  }
+
+  /** The callers pass an English verb; map it to its translated label (falls back to the raw text). */
+  private bulkVerb(verb: string): string {
+    const keys: Record<string, string> = {"Published":"Published","Unpublished":"Unpublished","Archived":"Archived","Deleted":"Deleted","Duplicated":"Duplicated","Category updated":"CategoryUpdated","Internal category assigned":"InternalCategoryAssigned","Internal category removed":"InternalCategoryRemoved","Internal category created":"InternalCategoryCreated","Prices updated":"PricesUpdated","Delivery mode updated":"DeliveryModeUpdated","Margin applied":"MarginApplied","Badge saved":"BadgeSaved","Badge cleared":"BadgeCleared"};
+    const key = keys[verb];
+    return key ? this.translate.instant(`ADMIN.CATALOG_TOASTS.BULK_VERBS.${key}`) : verb;
   }
 
   private async runBulkAction(
@@ -1214,16 +1272,23 @@ export class ProductCatalogPageComponent implements OnInit {
     if (result.errorCount === 0) {
       this.messageService.add({
         severity: 'success',
-        summary: verb,
-        detail: `${result.successCount} product(s) updated.`,
+        summary: this.bulkVerb(verb),
+        detail: this.translate.instant(
+          verb === 'Deleted' ? 'ADMIN.CATALOG_TOASTS.PRODUCTS_DELETED' : 'ADMIN.CATALOG_TOASTS.PRODUCTS_UPDATED',
+          { p0: result.successCount },
+        ),
         life: 4000,
       });
     } else {
+      // Errors arrive as "<productId>: <reason>"; show the first reason so a refusal is never unexplained.
+      const firstReason = result.errors[0]?.replace(/^[0-9a-f-]{36}:\s*/i, '') ?? '';
       this.messageService.add({
         severity: 'warn',
-        summary: `${verb} with errors`,
-        detail: `${result.successCount} succeeded, ${result.errorCount} failed.`,
-        life: 6000,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.WITH_ERRORS', { p0: this.bulkVerb(verb) }),
+        detail:
+          this.translate.instant('ADMIN.CATALOG_TOASTS.SUCCEEDED_FAILED', { p0: result.successCount, p1: result.errorCount }) +
+          (firstReason ? ` ${firstReason}` : ''),
+        life: 8000,
       });
     }
   }

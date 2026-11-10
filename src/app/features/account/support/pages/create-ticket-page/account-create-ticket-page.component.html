@@ -123,7 +123,10 @@
     </div>
 
     <div class="create-ticket-page__actions">
-      <button type="submit" class="submit-btn" [disabled]="submitting()">
+      @if (submitError()) {
+      <p class="form-error" role="alert">{{ submitError() }}</p>
+    }
+    <button type="submit" class="submit-btn" [disabled]="submitting()">
         @if (submitting()) {
           <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
         }

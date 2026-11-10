@@ -2,15 +2,15 @@
   <app-admin-search-bar
     adminToolbarSearch
     [value]="searchTerm()"
-    [placeholder]="searchPlaceholder()"
+    [placeholder]="searchPlaceholder() || ('ADMIN.CATALOG_PAGE.FILTERS.SEARCH_PLACEHOLDER' | translate)"
     (searchChange)="onSearchChange($event)"
   />
   <p-select
     adminToolbarFilters
-    [options]="statusOptions"
+    [options]="statusOptions()"
     optionLabel="label"
     optionValue="value"
-    placeholder="Filter status"
+    [placeholder]="'ADMIN.CATALOG_PAGE.FILTERS.STATUS' | translate"
     [ngModel]="statusFilter()"
     (ngModelChange)="onStatusChange($event)"
   />
@@ -19,7 +19,7 @@
     [options]="[...categoryOptions()]"
     optionLabel="label"
     optionValue="id"
-    placeholder="Filter category"
+    [placeholder]="'ADMIN.CATALOG_PAGE.FILTERS.CATEGORY' | translate"
     [showClear]="true"
     [filter]="true"
     filterBy="label"
@@ -31,31 +31,31 @@
     [options]="[...collectionOptions()]"
     optionLabel="label"
     optionValue="id"
-    placeholder="Filter internal category"
+    [placeholder]="'ADMIN.CATALOG_PAGE.FILTERS.INTERNAL_CATEGORY' | translate"
     [showClear]="true"
     [ngModel]="collectionFilter()"
     (ngModelChange)="onCollectionChange($event)"
   />
   <p-select
     adminToolbarFilters
-    [options]="supplierMappingOptions"
+    [options]="supplierMappingOptions()"
     optionLabel="label"
     optionValue="value"
-    placeholder="Supplier mapping"
+    [placeholder]="'ADMIN.CATALOG_PAGE.FILTERS.SUPPLIER_MAPPING' | translate"
     [ngModel]="supplierMappingFilter()"
     (ngModelChange)="onSupplierMappingChange($event)"
   />
   <app-admin-icon-button
     adminToolbarActions
     [icon]="viewMode() === 'table' ? 'pi pi-th-large' : 'pi pi-table'"
-    [label]="viewMode() === 'table' ? 'Card view' : 'Table view'"
+    [label]="(viewMode() === 'table' ? 'ADMIN.CATALOG_PAGE.FILTERS.VIEW_CARD' : 'ADMIN.CATALOG_PAGE.FILTERS.VIEW_TABLE') | translate"
     (pressed)="toggleViewMode()"
   />
   @if (hasActiveFilters()) {
     <app-admin-icon-button
       adminToolbarActions
       icon="pi pi-filter-slash"
-      label="Clear filters"
+      [label]="'ADMIN.CATALOG_PAGE.FILTERS.CLEAR_FILTERS' | translate"
       (pressed)="clearFilters.emit()"
     />
   }

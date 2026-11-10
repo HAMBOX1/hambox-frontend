@@ -60,6 +60,7 @@
             adminToolbarFilters
             [options]="[
               { label: 'ADMIN.SECURITY.USERS.FILTER_ALL' | translate, value: 'all' },
+              { label: 'Active', value: 'Active' },
               { label: 'Suspended', value: 'Suspended' },
               { label: 'Blocked', value: 'Blocked' },
               { label: 'Banned', value: 'Banned' },
@@ -108,7 +109,7 @@
                 <td>{{ user.email }}</td>
                 <td><app-admin-status-badge [label]="user.status" [tone]="userStatusTone(user.status)" /></td>
                 <td>{{ user.blockReason ?? '—' }}</td>
-                <td>{{ user.blockExpiresOnUtc ? (user.blockExpiresOnUtc | date: 'short') : '—' }}</td>
+                <td>{{ user.blockExpiresOnUtc ? (user.blockExpiresOnUtc | hamboxDate: 'short') : '—' }}</td>
                 <td>
                   @let menuItems = userActionMenuItems(user);
                   @if (menuItems.length > 0) {
@@ -182,7 +183,7 @@
               <tr>
                 <td>{{ email.pattern }}</td>
                 <td>{{ email.reason }}</td>
-                <td>{{ email.expiresOnUtc ? (email.expiresOnUtc | date: 'short') : '—' }}</td>
+                <td>{{ email.expiresOnUtc ? (email.expiresOnUtc | hamboxDate: 'short') : '—' }}</td>
                 <td>
                   <app-admin-icon-button
                     *hamboxHasPermission="permissions.Security.ManageEmails"
@@ -258,7 +259,7 @@
               <tr>
                 <td>{{ ip.cidrOrAddress }}</td>
                 <td>{{ ip.reason }}</td>
-                <td>{{ ip.expiresOnUtc ? (ip.expiresOnUtc | date: 'short') : '—' }}</td>
+                <td>{{ ip.expiresOnUtc ? (ip.expiresOnUtc | hamboxDate: 'short') : '—' }}</td>
                 <td>
                   <app-admin-icon-button
                     *hamboxHasPermission="permissions.Security.ManageIPs"
@@ -406,7 +407,7 @@
               <tr>
                 <td>{{ phone.phoneNumber }}</td>
                 <td>{{ phone.reason }}</td>
-                <td>{{ phone.expiresOnUtc ? (phone.expiresOnUtc | date: 'short') : '—' }}</td>
+                <td>{{ phone.expiresOnUtc ? (phone.expiresOnUtc | hamboxDate: 'short') : '—' }}</td>
                 <td>
                   <app-admin-icon-button
                     *hamboxHasPermission="permissions.Security.ManageUsers"

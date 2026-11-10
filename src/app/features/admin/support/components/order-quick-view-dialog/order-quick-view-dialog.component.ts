@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -34,7 +34,7 @@ const STATUS_TONE: Record<string, AdminStatusTone> = {
   standalone: true,
   imports: [
     RouterLink,
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     ButtonModule,
     DialogModule,

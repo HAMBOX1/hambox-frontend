@@ -37,7 +37,7 @@
           <span class="hero-grid__button-label">{{ hero().primaryButtonText }}</span>
         </a>
 
-        @if (hero().secondaryButtonText?.trim()) {
+        @if (hero().secondaryButtonText.trim()) {
           <a
             pButton
             [routerLink]="hero().secondaryButtonUrl"

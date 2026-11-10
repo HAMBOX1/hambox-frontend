@@ -205,3 +205,8 @@
     cursor: not-allowed;
   }
 }
+
+.form-error {
+  margin: 0 0 1rem;
+  color: var(--color-danger);
+}

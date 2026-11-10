@@ -61,6 +61,11 @@ export class AccountLibraryFacade {
 
   readonly isEmpty = computed(() => !this.loading() && this.itemsState().length === 0);
 
+  /** True when search/filters are narrowing the list, so an empty result means "no match", not "no purchases". */
+  readonly hasActiveFilters = computed(
+    () => this.searchTermState().trim() !== '' || this.deliveryFilterState() !== '' || this.groupFilterState() !== '',
+  );
+
   readonly recentItems = computed(() => this.itemsState().filter((item) => item.isRecentPurchase));
 
   readonly olderItems = computed(() => this.itemsState().filter((item) => !item.isRecentPurchase));
@@ -103,6 +108,14 @@ export class AccountLibraryFacade {
 
   setDeliveryFilter(status: string): void {
     this.deliveryFilterState.set(status);
+    this.pageNumberState.set(1);
+    void this.load();
+  }
+
+  clearFilters(): void {
+    this.searchTermState.set('');
+    this.deliveryFilterState.set('');
+    this.groupFilterState.set('');
     this.pageNumberState.set(1);
     void this.load();
   }

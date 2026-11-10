@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -26,7 +26,7 @@ import { ScheduleThemeRequest, ThemeScheduleDto } from '../../models/theme-api.m
   selector: 'app-theme-scheduler-panel',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     TranslatePipe,
     ButtonModule,

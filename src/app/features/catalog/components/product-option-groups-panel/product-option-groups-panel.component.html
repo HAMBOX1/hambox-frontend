@@ -2,8 +2,8 @@
   <app-admin-loading-skeleton variant="table" />
 } @else {
   <app-admin-section-card
-    title="Option Groups"
-    description="Define the options customers choose from when configuring this product, like Platform, Region, or Edition."
+    [title]="'ADMIN.CATALOG_UI.OPTION_GROUPS' | translate"
+    [description]="'ADMIN.CATALOG_UI.DEFINE_THE_OPTIONS_CUSTOMERS_CHOOSE_FROM_WHE' | translate"
     [compact]="compact()"
   >
     @if (viewport.isMobile()) {
@@ -17,7 +17,7 @@
         >
           @for (group of sortedRootGroups(); track group.id) {
             <div class="option-groups-panel__group" cdkDrag>
-              <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle aria-label="Reorder option group">
+              <button type="button" class="option-groups-panel__drag-handle" cdkDragHandle [attr.aria-label]="'ADMIN.CATALOG_UI.REORDER_OPTION_GROUP' | translate">
                 <i class="pi pi-bars"></i>
               </button>
               <app-option-group-node [group]="group" [allGroups]="optionGroups()" />
@@ -27,8 +27,8 @@
       } @else {
         <app-admin-empty-state
           icon="pi pi-question-circle"
-          title="No option groups yet"
-          description="Create option groups (like Platform or Region) before adding variants."
+          [title]="'ADMIN.CATALOG_UI.NO_OPTION_GROUPS_YET' | translate"
+          [description]="'ADMIN.CATALOG_UI.CREATE_OPTION_GROUPS_LIKE_PLATFORM_OR_REGION' | translate"
         />
       }
 
@@ -47,18 +47,19 @@
               optionLabel="name"
               [dropdown]="false"
               [forceSelection]="false"
-              placeholder="Option group name (e.g. Platform) — type to search saved groups"
+              [ariaLabel]="'ADMIN.CATALOG_UI.OPTION_GROUP_NAME' | translate"
+              [placeholder]="'ADMIN.CATALOG_UI.OPTION_GROUP_NAME_E_G_PLATFORM_TYPE_TO_SEARC' | translate"
             />
-            <button pButton type="button" label="Add Option Group" icon="pi pi-plus" [loading]="creatingGroup() || importingTemplate()" (click)="createOptionGroup()"></button>
+            <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ADD_OPTION_GROUP' | translate" icon="pi pi-plus" [loading]="creatingGroup() || importingTemplate()" (click)="createOptionGroup()"></button>
           </div>
           @if (importError() && !conflictDialogOpen()) {
             <p class="option-groups-panel__import-error">{{ importError() }}</p>
           }
           <button type="button" class="option-groups-panel__manage-templates" (click)="templateManagerOpen.set(true)">
-            <i class="pi pi-cog"></i> Manage saved groups
+            <i class="pi pi-cog"></i> {{ 'ADMIN.CATALOG_UI.MANAGE_SAVED_GROUPS' | translate }}
           </button>
         } @else {
-          <p class="option-groups-panel__hint">Enter a product name and category above to begin.</p>
+          <p class="option-groups-panel__hint">{{ 'ADMIN.CATALOG_UI.ENTER_A_PRODUCT_NAME_AND_CATEGORY_ABOVE_TO_B' | translate }}</p>
         }
       </div>
     }
@@ -78,17 +79,17 @@
   styleClass="admin-dialog"
 >
   <p class="option-groups-panel__conflict-message">
-    Choose whether to add this saved group as a separate group, or replace the existing one (its current values and any variants built from them will be removed).
+    {{ 'ADMIN.CATALOG_UI.CHOOSE_WHETHER_TO_ADD_THIS_SAVED_GROUP_AS_A' | translate }}
   </p>
   @if (importError()) {
     <p class="option-groups-panel__import-error">{{ importError() }}</p>
   }
   <div class="admin-dialog__actions option-groups-panel__conflict-actions">
-    <button pButton type="button" label="Cancel" severity="secondary" [disabled]="importingTemplate()" (click)="cancelConflict()"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="importingTemplate()" (click)="cancelConflict()"></button>
     <button
       pButton
       type="button"
-      label="Add as separate group"
+      [label]="'ADMIN.CATALOG_UI.ADD_AS_SEPARATE_GROUP' | translate"
       severity="secondary"
       [loading]="importingTemplate()"
       (click)="importTemplate(conflictTemplate()!, 'AddSeparate')"
@@ -96,7 +97,7 @@
     <button
       pButton
       type="button"
-      label="Replace existing"
+      [label]="'ADMIN.CATALOG_UI.REPLACE_EXISTING' | translate"
       severity="danger"
       [loading]="importingTemplate()"
       (click)="importTemplate(conflictTemplate()!, 'Replace')"
@@ -122,20 +123,20 @@
     <app-admin-search-bar
       class="option-groups-panel__selection-search"
       [value]="selectionSearchTerm()"
-      placeholder="Search values..."
+      [placeholder]="'ADMIN.CATALOG_UI.SEARCH_VALUES' | translate"
       (searchChange)="selectionSearchTerm.set($event)"
     />
     <div class="option-groups-panel__selection-toolbar">
       <span>{{ selectedOptionCount() }} of {{ selectionOptions().length }} selected</span>
       <div class="option-groups-panel__selection-toolbar-actions">
-        <button pButton type="button" [text]="true" size="small" label="Select all" (click)="setAllFilteredSelected(true)"></button>
-        <button pButton type="button" [text]="true" size="small" label="Clear" (click)="setAllFilteredSelected(false)"></button>
+        <button pButton type="button" [text]="true" size="small" [label]="'ADMIN.CATALOG_UI.SELECT_ALL' | translate" (click)="setAllFilteredSelected(true)"></button>
+        <button pButton type="button" [text]="true" size="small" [label]="'ADMIN.CATALOG_UI.CLEAR' | translate" (click)="setAllFilteredSelected(false)"></button>
       </div>
     </div>
     <ul class="option-groups-panel__selection-list">
       @for (row of filteredSelectionOptions(); track row.id) {
         <li class="option-groups-panel__selection-row">
-          <p-checkbox [binary]="true" [ngModel]="row.selected" (onChange)="toggleSelectionOption(row.id)" [inputId]="'selopt-' + row.id" />
+          <p-checkbox [binary]="true" [ariaLabel]="'ADMIN.CATALOG_UI.SELECT_OPTION' | translate" [ngModel]="row.selected" (onChange)="toggleSelectionOption(row.id)" [inputId]="'selopt-' + row.id" />
           <label [for]="'selopt-' + row.id">{{ row.label }}</label>
         </li>
       }
@@ -145,11 +146,11 @@
     <p class="option-groups-panel__import-error">{{ importError() }}</p>
   }
   <div class="admin-dialog__actions">
-    <button pButton type="button" label="Cancel" severity="secondary" [disabled]="importingTemplate()" (click)="cancelSelection()"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="importingTemplate()" (click)="cancelSelection()"></button>
     <button
       pButton
       type="button"
-      label="Continue"
+      [label]="'ADMIN.CATALOG_UI.CONTINUE' | translate"
       icon="pi pi-check"
       [disabled]="selectionLoading() || selectedOptionCount() === 0"
       [loading]="importingTemplate()"

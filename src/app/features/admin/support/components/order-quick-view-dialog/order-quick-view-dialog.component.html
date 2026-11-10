@@ -26,7 +26,7 @@
       <dt>{{ 'ADMIN.ORDERS.DETAIL.CUSTOMER' | translate }}</dt>
       <dd>{{ order.customerName }} — {{ order.email }}</dd>
       <dt>{{ 'ADMIN.ORDERS.COLUMNS.PURCHASE_DATE' | translate }}</dt>
-      <dd>{{ order.createdOnUtc | date: 'medium' }}</dd>
+      <dd>{{ order.createdOnUtc | hamboxDate: 'medium' }}</dd>
     </dl>
 
     <p-table [value]="[...order.items]" [scrollable]="true" styleClass="order-quick-view-dialog__table">

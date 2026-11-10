@@ -10,6 +10,7 @@ import { ApiError } from '../../../../core/models/api-error.model';
 import { ImportCodesResultDto, ProductVariantDto } from '../../models/inventory-api.model';
 import { Product } from '../../models/product.model';
 import { readCodeFile } from '../../utils/read-code-file';
+import { TranslatePipe } from '@ngx-translate/core';
 import { InventoryApiService } from '../../services/inventory-api.service';
 
 interface VariantChoice {
@@ -26,7 +27,7 @@ interface VariantChoice {
 @Component({
   selector: 'app-quick-add-stock-dialog',
   standalone: true,
-  imports: [FormsModule, ButtonModule, DialogModule, SelectModule],
+  imports: [TranslatePipe, FormsModule, ButtonModule, DialogModule, SelectModule],
   templateUrl: './quick-add-stock-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -111,7 +111,7 @@
       <p class="admin-field__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_VARIANT_NAMES_HINT' | translate }}</p>
     }
 
-    @if (sourceProducts().length > 0) {
+    @if (mode() === 'merge' && sourceProducts().length > 0) {
       <p class="admin-field__hint">
         {{ 'ADMIN.CATALOG_PAGE.BULK.MERGE_SOURCES_HINT' | translate: { count: sourceProducts().length } }}
       </p>

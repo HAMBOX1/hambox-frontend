@@ -33,7 +33,7 @@
             <td>{{ r.queue }}</td>
             <td>{{ r.priority }}</td>
             <td>{{ r.intervalMinutes | number: '1.0-1' }} min</td>
-            <td>{{ r.lastEnqueuedOnUtc ? (r.lastEnqueuedOnUtc | date: 'short') : '—' }}</td>
+            <td>{{ r.lastEnqueuedOnUtc ? (r.lastEnqueuedOnUtc | hamboxDate: 'short') : '—' }}</td>
           </tr>
         </ng-template>
       </p-table>

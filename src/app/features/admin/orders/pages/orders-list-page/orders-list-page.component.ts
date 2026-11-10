@@ -8,8 +8,9 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslationService } from '../../../../../core/i18n/translation.service';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -61,7 +62,7 @@ import { exportOrdersToCsv, exportOrdersToExcel } from '../../utils/order-export
   imports: [
     FormsModule,
     RouterLink,
-    DatePipe,
+    HamboxDatePipe,
     TranslatePipe,
     ButtonModule,
     CheckboxModule,
@@ -100,12 +101,15 @@ export class OrdersListPageComponent implements OnInit {
   private readonly currencyService = inject(CurrencyService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Orders' });
-  protected readonly statusOptions = [...ORDER_STATUS_OPTIONS];
-  protected readonly deliveryOptions = [...ORDER_DELIVERY_OPTIONS];
-  protected readonly paymentOptions = [...ORDER_PAYMENT_OPTIONS];
-  protected readonly dateRangeOptions = [...ORDER_DATE_RANGE_OPTIONS];
-  protected readonly sortOptions = [...ORDER_SORT_OPTIONS];
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.ORDERS.LIST.TITLE' });
+  /** Bumps on every language switch so the option lists below are rebuilt in the new language. */
+  private readonly language = inject(TranslationService).currentLanguage;
+
+  protected readonly statusOptions = computed(() => this.localized(() => this.translateOptions(ORDER_STATUS_OPTIONS)));
+  protected readonly deliveryOptions = computed(() => this.localized(() => this.translateOptions(ORDER_DELIVERY_OPTIONS)));
+  protected readonly paymentOptions = computed(() => this.localized(() => this.translateOptions(ORDER_PAYMENT_OPTIONS)));
+  protected readonly dateRangeOptions = computed(() => this.localized(() => this.translateOptions(ORDER_DATE_RANGE_OPTIONS)));
+  protected readonly sortOptions = computed(() => this.localized(() => this.translateOptions(ORDER_SORT_OPTIONS)));
 
   protected readonly orders = this.facade.orders;
   protected readonly loading = this.facade.ordersLoading;
@@ -135,11 +139,14 @@ export class OrdersListPageComponent implements OnInit {
   protected readonly filtersOpen = signal(false);
   protected readonly advancedFiltersOpen = signal(false);
 
-  protected readonly pageSizeOptions = [
-    { label: '10 / page', value: 10 },
-    { label: '20 / page', value: 20 },
-    { label: '50 / page', value: 50 },
-  ];
+  protected readonly pageSizeOptions = computed(() =>
+    this.localized(() =>
+      [10, 20, 50].map((count) => ({
+        label: this.translate.instant('ADMIN.ORDERS.VALUES.PER_PAGE', { count }),
+        value: count,
+      })),
+    ),
+  );
 
   private readonly columnLabelKeys: Record<OrderColumnKey, string> = {
     orderNumber: 'ADMIN.ORDERS.LIST.COLUMNS.ORDER_NUMBER',
@@ -158,10 +165,14 @@ export class OrdersListPageComponent implements OnInit {
     lastEdited: 'ADMIN.ORDERS.LIST.COLUMNS.LAST_EDITED',
   };
 
-  protected readonly columnOptions = ORDER_COLUMN_KEYS.map((key) => ({
-    label: this.translate.instant(this.columnLabelKeys[key]),
-    value: key,
-  }));
+  protected readonly columnOptions = computed(() =>
+    this.localized(() =>
+      ORDER_COLUMN_KEYS.map((key) => ({
+        label: this.translate.instant(this.columnLabelKeys[key]),
+        value: key,
+      })),
+    ),
+  );
 
   protected readonly visibleColumns = signal<readonly OrderColumnKey[]>([...ORDER_COLUMN_KEYS]);
 
@@ -172,6 +183,25 @@ export class OrdersListPageComponent implements OnInit {
   ngOnInit(): void {
     this.facade.loadOrders();
     this.facade.loadStatistics();
+  }
+
+  /** Translates a backend/status/option label; falls back to the raw text for values without a key. */
+  /** Runs the builder as a dependency of the current language so computed option lists refresh on a switch. */
+  private localized<T>(build: () => T): T {
+    this.language();
+    return build();
+  }
+
+  protected valueLabel(raw: string): string {
+    const key = `ADMIN.ORDERS.VALUES.${raw.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`;
+    const text = this.translate.instant(key);
+    return text === key ? raw : text;
+  }
+
+  private translateOptions<T extends string>(
+    options: readonly { readonly label: string; readonly value: T }[],
+  ): { label: string; value: T }[] {
+    return options.map((option) => ({ label: this.valueLabel(option.label), value: option.value }));
   }
 
   protected isColumnVisible(key: OrderColumnKey): boolean {

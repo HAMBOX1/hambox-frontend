@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -48,7 +48,7 @@ import { LegalManagementFacade } from '../../services/legal-management.facade';
   selector: 'app-legal-section-detail-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     ReactiveFormsModule,
     TranslatePipe,
     ButtonModule,

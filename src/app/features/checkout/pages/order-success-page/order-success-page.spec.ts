@@ -10,7 +10,7 @@ describe('OrderSuccessPageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [OrderSuccessPageComponent],
-      providers: [provideRouter([]), provideApiTestBed()],
+      providers: [provideRouter([{ path: '**', children: [] }]), provideApiTestBed()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(OrderSuccessPageComponent);

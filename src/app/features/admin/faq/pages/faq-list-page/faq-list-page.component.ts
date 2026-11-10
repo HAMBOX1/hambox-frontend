@@ -79,7 +79,7 @@ export class FaqListPageComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'FAQ' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.FAQ.LIST.TITLE' });
   protected readonly scopeOptions = SCOPE_OPTIONS;
   protected readonly publishedOptions = PUBLISHED_OPTIONS;
 

@@ -6,6 +6,7 @@ import { EditorModule } from 'primeng/editor';
 
 import { HamboxTranslateRefreshDirective } from '../../../../../shared/directives/hambox-translate-refresh.directive';
 import { SupportTicketsStore } from '../../../../../core/support/support-tickets.store';
+import { parseApiError } from '../../../../../core/models/api-error.model';
 import { AccountSupportFacade } from '../../services/account-support.facade';
 import { AccountOrdersFacade } from '../../../services/account-orders.facade';
 import { SupportSubnavComponent } from '../../components/support-subnav/support-subnav.component';
@@ -47,6 +48,7 @@ export class AccountCreateTicketPageComponent {
   protected readonly relatedProductName = signal('');
   protected readonly attachments = signal<readonly File[]>([]);
   protected readonly submitting = signal(false);
+  protected readonly submitError = signal<string | null>(null);
   protected readonly submitted = signal(false);
   protected readonly dragActive = signal(false);
 
@@ -100,21 +102,31 @@ export class AccountCreateTicketPageComponent {
     }
 
     this.submitting.set(true);
+    this.submitError.set(null);
     try {
+      const relatedOrderNumber = this.relatedOrderNumber().trim();
       const ticketId = await this.facade.createTicket({
         categoryId: this.categoryId(),
         priorityId: this.priorityId(),
         subject: this.subject().trim(),
         descriptionHtml: this.descriptionHtml(),
-        relatedOrderNumber: this.relatedOrderNumber().trim() || null,
+        relatedOrderNumber: relatedOrderNumber || null,
+        relatedOrderId: this.orders().find((order) => order.orderNumber === relatedOrderNumber)?.id ?? null,
         relatedProductName: this.relatedProductName().trim() || null,
       });
 
+      // The ticket already exists, so one rejected file must not strand the customer on the form.
       for (const file of this.attachments()) {
-        await this.facade.uploadAttachment(ticketId, file);
+        try {
+          await this.facade.uploadAttachment(ticketId, file);
+        } catch {
+          // Skipped: the customer can attach it again from the ticket.
+        }
       }
 
       void this.router.navigate(['/account/support/tickets', ticketId]);
+    } catch (error) {
+      this.submitError.set(parseApiError(error).message);
     } finally {
       this.submitting.set(false);
     }

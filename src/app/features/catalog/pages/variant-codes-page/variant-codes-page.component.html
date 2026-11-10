@@ -14,7 +14,7 @@
       <div adminHeaderActions>
         <ui-button
           variant="secondary"
-          label="Export CSV"
+          [label]="'ADMIN.CATALOG_UI.EXPORT_CSV' | translate"
           icon="pi pi-download"
           [disabled]="!codesTable().length"
           (clicked)="exportCodes()"
@@ -29,32 +29,32 @@
     </app-admin-stat-grid>
 
     <div class="variant-codes-page__grid">
-      <app-admin-section-card title="Import codes" description="Upload TXT/CSV, paste manually, or create a batch first.">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.IMPORT_CODES_2' | translate" [description]="'ADMIN.CATALOG_UI.UPLOAD_TXT_CSV_PASTE_MANUALLY_OR_CREATE_A_BA' | translate">
         <div class="variant-codes-page__import" *hamboxHasPermission="permissions.Catalog.Inventory.Import">
           <div class="variant-codes-page__upload-row">
             <label class="variant-codes-page__file-btn">
               <input type="file" accept=".txt,text/plain" (change)="onFileSelected($event, 'txt')" hidden />
-              <span><i class="pi pi-file" aria-hidden="true"></i> Upload TXT</span>
+              <span><i class="pi pi-file" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.UPLOAD_TXT' | translate }}</span>
             </label>
             <label class="variant-codes-page__file-btn">
               <input type="file" accept=".csv,text/csv" (change)="onFileSelected($event, 'csv')" hidden />
-              <span><i class="pi pi-file-excel" aria-hidden="true"></i> Upload CSV</span>
+              <span><i class="pi pi-file-excel" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.UPLOAD_CSV' | translate }}</span>
             </label>
           </div>
 
-          <ui-field label="Paste codes" hint="One code per line.">
+          <ui-field [label]="'ADMIN.CATALOG_UI.PASTE_CODES' | translate" [hint]="'ADMIN.CATALOG_UI.ONE_CODE_PER_LINE' | translate">
             <textarea
               pTextarea
               class="variant-codes-page__textarea"
               rows="6"
               [ngModel]="bulkCodes()"
               (ngModelChange)="bulkCodes.set($event)"
-              placeholder="Paste or upload codes here"
+              [placeholder]="'ADMIN.CATALOG_UI.PASTE_OR_UPLOAD_CODES_HERE' | translate"
             ></textarea>
           </ui-field>
 
           <ui-button
-            label="Import codes"
+            [label]="'ADMIN.CATALOG_UI.IMPORT_CODES_2' | translate"
             icon="pi pi-upload"
             [loading]="importing()"
             (clicked)="importCodes()"
@@ -62,25 +62,25 @@
         </div>
       </app-admin-section-card>
 
-      <app-admin-section-card title="Batch management" description="Group imports into batches for traceability.">
+      <app-admin-section-card [title]="'ADMIN.CATALOG_UI.BATCH_MANAGEMENT' | translate" [description]="'ADMIN.CATALOG_UI.GROUP_IMPORTS_INTO_BATCHES_FOR_TRACEABILITY' | translate">
         <div class="variant-codes-page__batch" *hamboxHasPermission="permissions.Catalog.Inventory.ManageBatches">
-          <ui-field label="New batch name">
+          <ui-field [label]="'ADMIN.CATALOG_UI.NEW_BATCH_NAME' | translate">
             <ui-input
               [ngModel]="newBatchName()"
               (ngModelChange)="newBatchName.set($event)"
-              placeholder="e.g. Supplier A — March"
+              [placeholder]="'ADMIN.CATALOG_UI.E_G_SUPPLIER_A_MARCH' | translate"
             />
           </ui-field>
-          <ui-button label="Create batch" icon="pi pi-folder-plus" variant="secondary" (clicked)="createBatch()" />
+          <ui-button [label]="'ADMIN.CATALOG_UI.CREATE_BATCH' | translate" icon="pi pi-folder-plus" variant="secondary" (clicked)="createBatch()" />
         </div>
 
         <app-admin-data-table-shell>
           <p-table class="admin-data-table" [value]="batchesTable()" responsiveLayout="scroll">
             <ng-template pTemplate="header">
               <tr>
-                <th>Batch</th>
-                <th>Currency</th>
-                <th>Cost</th>
+                <th>{{ 'ADMIN.CATALOG_UI.BATCH' | translate }}</th>
+                <th>{{ 'ADMIN.CATALOG_UI.CURRENCY' | translate }}</th>
+                <th>{{ 'ADMIN.CATALOG_UI.COST' | translate }}</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-batch>
@@ -95,8 +95,8 @@
                 <td colspan="3">
                   <app-admin-empty-state
                     icon="pi pi-inbox"
-                    title="No batches yet"
-                    description="Create a batch before importing codes."
+                    [title]="'ADMIN.CATALOG_UI.NO_BATCHES_YET' | translate"
+                    [description]="'ADMIN.CATALOG_UI.CREATE_A_BATCH_BEFORE_IMPORTING_CODES' | translate"
                   />
                 </td>
               </tr>
@@ -106,12 +106,12 @@
       </app-admin-section-card>
     </div>
 
-    <app-admin-section-card title="Codes inventory" description="Search, filter, and review imported digital codes.">
+    <app-admin-section-card [title]="'ADMIN.CATALOG_UI.CODES_INVENTORY' | translate" [description]="'ADMIN.CATALOG_UI.SEARCH_FILTER_AND_REVIEW_IMPORTED_DIGITAL_CO' | translate">
       <app-admin-toolbar>
         <app-admin-search-bar
           adminToolbarSearch
           [value]="codeSearch()"
-          placeholder="Search codes…"
+          [placeholder]="'ADMIN.CATALOG_UI.SEARCH_CODES_2' | translate"
           (searchChange)="codeSearch.set($event)"
         />
 
@@ -120,11 +120,11 @@
             [options]="statusFilterOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="Status"
+            [placeholder]="'ADMIN.CATALOG_UI.STATUS' | translate"
             [ngModel]="codeStatusFilter()"
             (ngModelChange)="codeStatusFilter.set($event)"
           />
-          <ui-button label="Apply filters" variant="secondary" size="sm" (clicked)="applyCodeFilters()" />
+          <ui-button [label]="'ADMIN.CATALOG_UI.APPLY_FILTERS_2' | translate" variant="secondary" size="sm" (clicked)="applyCodeFilters()" />
         </div>
       </app-admin-toolbar>
 
@@ -139,9 +139,9 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th>Code</th>
-              <th>Status</th>
-              <th>Batch</th>
+              <th>{{ 'ADMIN.CATALOG_UI.CODE' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.STATUS' | translate }}</th>
+              <th>{{ 'ADMIN.CATALOG_UI.BATCH' | translate }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-code>
@@ -156,8 +156,8 @@
               <td colspan="3">
                 <app-admin-empty-state
                   icon="pi pi-key"
-                  title="No codes imported"
-                  description="Import codes using TXT, CSV, or paste."
+                  [title]="'ADMIN.CATALOG_UI.NO_CODES_IMPORTED' | translate"
+                  [description]="'ADMIN.CATALOG_UI.IMPORT_CODES_USING_TXT_CSV_OR_PASTE' | translate"
                 />
               </td>
             </tr>

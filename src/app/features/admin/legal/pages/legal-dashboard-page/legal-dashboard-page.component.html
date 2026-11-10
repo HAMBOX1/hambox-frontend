@@ -155,7 +155,7 @@
             <app-admin-status-badge [label]="statusLabel(section)" [tone]="statusTone(section)" />
           </td>
           <td>{{ section.publishedVersionNumber ?? '—' }}</td>
-          <td>{{ section.publishedOnUtc ? (section.publishedOnUtc | date: 'medium') : '—' }}</td>
+          <td>{{ section.publishedOnUtc ? (section.publishedOnUtc | hamboxDate: 'medium') : '—' }}</td>
           <td>
             @let menuItems = sectionActionMenuItems(section);
             <div class="admin-actions-row">

@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -73,7 +73,7 @@ const SCOPE_TABS: readonly { readonly labelKey: string; readonly value: LandingP
   selector: 'app-page-builder-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     TranslatePipe,
     ToastModule,
@@ -117,7 +117,7 @@ export class PageBuilderPageComponent implements OnInit {
   private readonly categoryApi = inject(CategoryApiService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Page Builder' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.PAGE_BUILDER.TITLE' });
 
   protected readonly scopeTabs = SCOPE_TABS;
   protected readonly scope = this.facade.scope;

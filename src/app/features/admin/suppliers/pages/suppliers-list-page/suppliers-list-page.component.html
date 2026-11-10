@@ -86,7 +86,7 @@
               [tone]="supplier.isEnabled ? statusTone(supplier.status) : 'neutral'"
             />
           </td>
-          <td>{{ supplier.createdOnUtc | date: 'medium' }}</td>
+          <td>{{ supplier.createdOnUtc | hamboxDate: 'medium' }}</td>
           <td>
             @let menuItems = actionMenuItems(supplier);
             <div class="admin-actions-row">

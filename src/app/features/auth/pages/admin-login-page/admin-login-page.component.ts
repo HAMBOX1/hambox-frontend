@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import {
   UiAuthCardComponent,
@@ -26,6 +27,7 @@ import {
   imports: [
     ReactiveFormsModule,
     RouterLink,
+    TranslatePipe,
     ButtonModule,
     UiAuthCardComponent,
     UiFieldComponent,
@@ -43,6 +45,7 @@ export class AdminLoginPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly translate = inject(TranslateService);
   protected readonly theme = inject(ThemeService);
 
   protected readonly isSubmitting = signal(false);
@@ -56,10 +59,7 @@ export class AdminLoginPageComponent {
   });
 
   protected fieldError(controlName: string): string | null {
-    return getControlErrorMessage(controlName, this.form, {
-      email: 'Email',
-      password: 'Password',
-    });
+    return getControlErrorMessage(controlName, this.form, this.translate);
   }
 
   protected toggleTheme(): void {
@@ -85,11 +85,7 @@ export class AdminLoginPageComponent {
         next: async (challenge) => {
           if (challenge.token) {
             await this.adminAuth.completeLoginWithToken(challenge.token);
-            this.otpDisabledNotice.set(
-              'Signed in without OTP verification because Admin OTP is currently disabled in ' +
-                'Settings → Authentication (typically because SMTP email delivery is not ' +
-                'configured yet). Re-enable Admin OTP as soon as email is working.',
-            );
+            this.otpDisabledNotice.set(this.translate.instant('AUTH.ADMIN_LOGIN.OTP_DISABLED_NOTICE'));
             setTimeout(() => void this.router.navigateByUrl(returnUrl), 3000);
             return;
           }
@@ -110,7 +106,7 @@ export class AdminLoginPageComponent {
             this.errorMessage.set(error.message);
             return;
           }
-          this.errorMessage.set('Unable to sign in. Please try again.');
+          this.errorMessage.set(this.translate.instant('AUTH.ADMIN_LOGIN.SIGN_IN_FAILED'));
         },
       });
   }

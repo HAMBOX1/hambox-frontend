@@ -13,6 +13,7 @@ import {
 } from '../../../../shared/components/admin';
 import { OptionGroupTemplateOptionInput, OptionGroupTemplateSummaryDto } from '../../models/inventory-api.model';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { TranslatePipe } from '@ngx-translate/core';
 import { slugify } from '../../utils/product-display.utils';
 
 interface EditRow {
@@ -34,7 +35,7 @@ interface EditRow {
 @Component({
   selector: 'app-option-group-template-manager',
   standalone: true,
-  imports: [
+  imports: [TranslatePipe, 
     FormsModule,
     ButtonModule,
     DialogModule,

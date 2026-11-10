@@ -12,23 +12,23 @@
 } @else {
   <app-admin-empty-state
     icon="pi pi-question-circle"
-    title="No option groups yet"
-    description="Create option groups (like Platform or Region) before adding variants."
+    [title]="'ADMIN.CATALOG_UI.NO_OPTION_GROUPS_YET' | translate"
+    [description]="'ADMIN.CATALOG_UI.CREATE_OPTION_GROUPS_LIKE_PLATFORM_OR_REGION' | translate"
   />
 }
 
 <div class="mobile-nav__add-group" *hamboxHasPermission="permissions.Catalog.Inventory.Create">
   @if (productId()) {
-    <span class="mobile-nav__add-group-label">New Option Group</span>
+    <span class="mobile-nav__add-group-label">{{ 'ADMIN.CATALOG_UI.NEW_OPTION_GROUP' | translate }}</span>
     <input
       pInputText
-      placeholder="e.g. Platform"
+      [placeholder]="'ADMIN.CATALOG_UI.E_G_PLATFORM' | translate"
       [ngModel]="newGroupLabel()"
       (ngModelChange)="newGroupLabel.set($event)"
       (keyup.enter)="addGroup()"
     />
-    <button pButton type="button" label="Add Option Group" icon="pi pi-plus" [loading]="creatingGroup()" (click)="addGroup()"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ADD_OPTION_GROUP' | translate" icon="pi pi-plus" [loading]="creatingGroup()" (click)="addGroup()"></button>
   } @else {
-    <p class="mobile-nav__hint">Enter a product name and category above to begin.</p>
+    <p class="mobile-nav__hint">{{ 'ADMIN.CATALOG_UI.ENTER_A_PRODUCT_NAME_AND_CATEGORY_ABOVE_TO_B' | translate }}</p>
   }
 </div>

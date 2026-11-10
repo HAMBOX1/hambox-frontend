@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -39,7 +39,7 @@ import { CampaignManagementFacade } from '../../services/campaign-management.fac
   selector: 'app-campaigns-list-page',
   standalone: true,
   imports: [
-    DatePipe,
+    HamboxDatePipe,
     FormsModule,
     RouterLink,
     TranslatePipe,
@@ -73,7 +73,7 @@ export class CampaignsListPageComponent implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Campaigns' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.CAMPAIGNS.LIST.TITLE' });
   protected readonly statusOptions = [...CAMPAIGN_STATUS_OPTIONS];
 
   protected readonly campaigns = this.facade.campaigns;

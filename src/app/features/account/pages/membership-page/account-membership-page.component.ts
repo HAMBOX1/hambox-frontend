@@ -301,6 +301,23 @@ export class AccountMembershipPageComponent implements OnInit {
 
 
 
+  /**
+   * Status / action / transaction values arrive as English enum names; show them in the customer's language, and fall
+   * back to the raw value for anything not listed (never an untranslated key).
+   */
+  protected label(group: 'STATUS' | 'ACTION' | 'TRANSACTION', value: string): string {
+    const key = `ACCOUNT.MEMBERSHIP_UI.${group}.${value}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? value : translated;
+  }
+
+  /** Benefit text built from its type and value; falls back to the server's display name for custom benefits. */
+  protected benefitLabel(benefit: MembershipBenefitApiDto): string {
+    const key = `ACCOUNT.MEMBERSHIP_UI.BENEFIT.${benefit.type}`;
+    const translated = this.translate.instant(key, { value: benefit.value });
+    return translated === key ? benefit.displayName : translated;
+  }
+
   protected statusSeverity(status: string): 'success' | 'warn' | 'danger' | 'info' {
 
     const normalized = status.toLowerCase();

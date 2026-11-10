@@ -57,7 +57,7 @@
             <tr>
               <td><app-admin-status-badge [label]="alert.severity" [tone]="statusTone(alert.severity)" /></td>
               <td>{{ alert.title }}</td>
-              <td>{{ alert.createdOnUtc | date: 'short' }}</td>
+              <td>{{ alert.createdOnUtc | hamboxDate: 'short' }}</td>
             </tr>
           </ng-template>
         </p-table>

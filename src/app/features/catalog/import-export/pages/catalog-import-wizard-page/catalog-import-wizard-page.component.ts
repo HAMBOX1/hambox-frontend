@@ -33,7 +33,8 @@ import {
 } from '../../models/import-export.model';
 import { CatalogImportExportApiService } from '../../services/catalog-import-export-api.service';
 import { CatalogImportExportFacade, extractErrorDetail } from '../../services/catalog-import-export.facade';
-
+
+import { TranslateService } from '@ngx-translate/core';
 interface CorrectionGroup {
   readonly issueType: string;
   readonly entityType: string;
@@ -576,12 +577,13 @@ const ENTITY_TYPE_OPTIONS: readonly { label: string; value: CatalogImportEntityT
   `,
 })
 export class CatalogImportWizardPageComponent {
+  private readonly translate = inject(TranslateService);
   protected readonly facade = inject(CatalogImportExportFacade);
   private readonly api = inject(CatalogImportExportApiService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly messageService = inject(MessageService);
 
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Products', route: '/admin/products' }, { label: 'Import', route: null });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.PRODUCTS', route: '/admin/products' }, { label: 'ADMIN.NAV.PRODUCTS_IMPORT', route: null });
   protected readonly stepLabels = STEP_LABELS;
   protected readonly entityTypeOptions = ENTITY_TYPE_OPTIONS;
   protected readonly strategyOptions: readonly { value: CatalogDuplicateStrategy; description: string }[] = [
@@ -803,8 +805,8 @@ export class CatalogImportWizardPageComponent {
         } catch {
           this.messageService.add({
             severity: 'warn',
-            summary: 'Category created',
-            detail: 'The image could not be uploaded — add it later from Categories.',
+            summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_CREATED'),
+            detail: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_IMAGE_FAILED'),
             life: 6000,
           });
         }
@@ -815,8 +817,8 @@ export class CatalogImportWizardPageComponent {
       await this.facade.applyCorrection(group.entityType, group.column, group.value, request.slug, false);
       this.messageService.add({
         severity: 'success',
-        summary: 'Category created',
-        detail: `"${request.nameEn}" is now available and applied to ${group.count} ${group.count === 1 ? 'row' : 'rows'}.`,
+        summary: this.translate.instant('ADMIN.CATALOG_TOASTS.CATEGORY_CREATED'),
+        detail: this.translate.instant('ADMIN.CATALOG_TOASTS.IMPORT_ROWS_APPLIED', { p0: request.nameEn, p1: group.count }),
         life: 5000,
       });
     } catch (error) {
@@ -843,7 +845,7 @@ export class CatalogImportWizardPageComponent {
     await this.facade.uploadAndValidate(file);
 
     if (this.state().error) {
-      this.messageService.add({ severity: 'error', summary: 'Upload failed', detail: this.state().error ?? '', life: 5000 });
+      this.messageService.add({ severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.UPLOAD_FAILED'), detail: this.state().error ?? '', life: 5000 });
     }
   }
 

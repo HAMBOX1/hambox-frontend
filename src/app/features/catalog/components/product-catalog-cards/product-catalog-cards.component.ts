@@ -93,6 +93,7 @@ export class ProductCatalogCardsComponent {
   readonly previewProduct = output<Product>();
   readonly duplicateProduct = output<Product>();
   readonly archiveProduct = output<Product>();
+  readonly unarchiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
   readonly manageMarketingPage = output<Product>();
   /** Opens the "set as On-Delivery" capacity dialog — only offered for products with 0 or 1
@@ -335,9 +336,20 @@ export class ProductCatalogCardsComponent {
       (product.variantCount ?? 0) <= 1
     ) {
       items.push({
-        label: product.hasChatDeliveryVariant ? 'Delivery type (On-Delivery)' : 'Set as On-Delivery / Instant',
+        label: t(product.hasChatDeliveryVariant ? 'ADMIN.CATALOG_PAGE.ACTIONS.DELIVERY_TYPE' : 'ADMIN.CATALOG_PAGE.ACTIONS.SET_DELIVERY'),
         icon: 'pi pi-comments',
         command: () => this.setChatDeliveryRequested.emit(product),
+      });
+    }
+
+    if (
+      this.permissionService.hasPermission(this.permissions.Catalog.Products.Edit) &&
+      product.status === 'Archived'
+    ) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.ACTIONS.UNARCHIVE'),
+        icon: 'pi pi-replay',
+        command: () => this.unarchiveProduct.emit(product),
       });
     }
 

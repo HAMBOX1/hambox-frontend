@@ -64,7 +64,7 @@ export class AdminReferralsListPageComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
 
   protected readonly permissions = PERMISSIONS;
-  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'Referrals' });
+  protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.REFERRALS.LIST.TITLE' });
   protected readonly statusOptions = [...REFERRAL_STATUS_OPTIONS];
 
   protected readonly referrals = this.facade.referrals;

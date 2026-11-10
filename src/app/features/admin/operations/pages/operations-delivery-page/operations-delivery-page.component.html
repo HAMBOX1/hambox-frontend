@@ -45,7 +45,7 @@
             <td>{{ item.customerEmail }}</td>
             <td><app-admin-status-badge [label]="item.deliveryStatus" [tone]="tone(item.deliveryStatus)" /></td>
             <td>{{ item.keysDelivered }}/{{ item.itemsCount }}</td>
-            <td>{{ item.createdOnUtc | date: 'short' }}</td>
+            <td>{{ item.createdOnUtc | hamboxDate: 'short' }}</td>
             <td>
               <button
                 *hamboxHasPermission="permissions.Operations.Retry"

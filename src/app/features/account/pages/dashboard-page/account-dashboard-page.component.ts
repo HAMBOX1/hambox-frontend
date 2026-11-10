@@ -7,7 +7,6 @@ import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { HamboxTranslateRefreshDirective } from '../../../../shared/directives/hambox-translate-refresh.directive';
 import { HasFeatureDirective } from '../../../../shared/directives/has-feature.directive';
 import { HamboxCurrencyPipe } from '../../../../shared/pipes/hambox-currency.pipe';
-import { WalletCardComponent } from '../../components/wallet-card/wallet-card.component';
 import { AccountDashboardFacade } from '../../services/account-dashboard.facade';
 import { AccountNotificationsFacade } from '../../services/account-notifications.facade';
 import { AccountWishlistFacade } from '../../services/account-wishlist.facade';
@@ -18,7 +17,7 @@ import { HamboxDatePipe } from '../../../../shared/pipes/hambox-date.pipe';
 @Component({
   selector: 'app-account-dashboard-page',
   standalone: true,
-  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective, HasFeatureDirective, WalletCardComponent],
+  imports: [RouterLink, HamboxCurrencyPipe, HamboxDatePipe, DecimalPipe, TranslatePipe, HamboxTranslateRefreshDirective, HasFeatureDirective],
   templateUrl: './account-dashboard-page.component.html',
   styleUrl: './account-dashboard-page.component.scss',
 })
@@ -80,7 +79,12 @@ export class AccountDashboardPageComponent implements OnInit {
       return;
     }
 
-    await navigator.clipboard.writeText(referralInviteLink(code));
+    try {
+      await navigator.clipboard.writeText(referralInviteLink(code));
+    } catch {
+      // Clipboard access denied (permissions policy / insecure context): nothing was copied, so don't claim it was.
+      return;
+    }
     this.copiedInvite.set(true);
     setTimeout(() => this.copiedInvite.set(false), 2000);
   }

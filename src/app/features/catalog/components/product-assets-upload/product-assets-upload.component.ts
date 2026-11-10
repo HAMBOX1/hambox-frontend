@@ -17,6 +17,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ProductAssetFile, ProductDisplayImageSource, ProductImage } from '../../models/product.model';
 import { ProductApiService } from '../../services/product-api.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   isAllowedProductImage,
   PRODUCT_IMAGE_MAX_BYTES,
@@ -27,7 +28,7 @@ import {
 @Component({
   selector: 'app-product-assets-upload',
   standalone: true,
-  imports: [ButtonModule, DragDropModule, DialogModule],
+  imports: [TranslatePipe, ButtonModule, DragDropModule, DialogModule],
   templateUrl: './product-assets-upload.component.html',
   styleUrl: './product-assets-upload.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

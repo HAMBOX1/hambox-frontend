@@ -5,6 +5,7 @@ import { MenuItem } from 'primeng/api';
 import { AdminActionMenuComponent } from '../../../../shared/components/admin';
 import { CategoryTreeNode } from '../../models/category.model';
 import { CategoryTreeCallbacks } from '../../utils/category-tree-callbacks.model';
+import { TranslatePipe } from '@ngx-translate/core';
 import { resolveProductImageUrl } from '../../utils/product-image.utils';
 
 /** Recursive tree row: renders itself, then (once expanded) hands its children off to more
@@ -14,7 +15,7 @@ import { resolveProductImageUrl } from '../../utils/product-image.utils';
 @Component({
   selector: 'app-category-tree-node',
   standalone: true,
-  imports: [DragDropModule, AdminActionMenuComponent, CategoryTreeNodeComponent],
+  imports: [TranslatePipe, DragDropModule, AdminActionMenuComponent, CategoryTreeNodeComponent],
   templateUrl: './category-tree-node.component.html',
   styleUrl: './category-tree-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
