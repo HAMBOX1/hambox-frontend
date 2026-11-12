@@ -1,12 +1,12 @@
 :host {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
+  // The table takes the height of its rows and the page itself scrolls. It used to be squeezed into
+  // whatever was left under the filters (`scrollHeight="flex"`), which on a small laptop screen left
+  // room for only ~4 rows with a second scrollbar inside the table.
+  flex: 0 0 auto;
   min-width: 0;
-  // Overrides the flex-item default `min-height: auto` (which would size to full content, defeating
-  // `scrollHeight="flex"` below) with a floor instead of 0, so the table stays usably tall even when
-  // the page above it (filters/toolbar) is unusually large.
-  min-height: 24rem;
+  min-height: 0;
 }
 
 :host ::ng-deep .product-catalog-table {
