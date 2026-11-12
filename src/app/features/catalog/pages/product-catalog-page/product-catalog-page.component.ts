@@ -34,6 +34,7 @@ import {
 } from '../../components/product-catalog-table/product-catalog-table.component';
 import { ProductCatalogCardsComponent } from '../../components/product-catalog-cards/product-catalog-cards.component';
 import { ProductDetailPanelComponent } from '../../components/product-detail-panel/product-detail-panel.component';
+import { ProductPromoDialogComponent } from '../../components/product-promo-dialog/product-promo-dialog.component';
 import { QuickAddStockDialogComponent } from '../../components/quick-add-stock-dialog/quick-add-stock-dialog.component';
 import {
   ProductMergeConfirmEvent,
@@ -118,6 +119,7 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
     ProductCatalogCardsComponent,
     ProductDetailPanelComponent,
     QuickAddStockDialogComponent,
+    ProductPromoDialogComponent,
     ProductMergeDialogComponent,
     SupplierCatalogSearchDrawerComponent,
     AdminActionMenuComponent,
@@ -177,6 +179,14 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly duplicateNameSuffix = signal(' Copy');
   protected readonly actionTarget = signal<Product | null>(null);
   protected readonly quickStockProduct = signal<Product | null>(null);
+  /** "Add promo code": open flag, and the single product it is for (null = the bulk selection). */
+  protected readonly promoDialogOpen = signal(false);
+  protected readonly promoProduct = signal<Product | null>(null);
+  /** Resolves the product ids to attach a promo code to — one product, or the (possibly "all matching") selection. */
+  protected readonly promoResolveIds = async (): Promise<readonly string[]> => {
+    const single = this.promoProduct();
+    return single ? [single.id] : this.facade.resolveSelectedProductIds();
+  };
   protected readonly chatDeliveryDialogOpen = signal(false);
   protected readonly chatDeliveryTarget = signal<Product | null>(null);
   protected readonly chatDeliveryCapacity = signal(100);
@@ -318,6 +328,13 @@ export class ProductCatalogPageComponent implements OnInit {
           command: () => this.openBulkMergeDialog(),
         });
       }
+    }
+    if (this.permissionService.hasPermission(this.permissions.Promotions.Edit)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.PROMO.APPLY_PROMO'),
+        icon: 'pi pi-percentage',
+        command: () => this.openPromoDialog(null),
+      });
     }
     if (this.permissionService.hasPermission(this.permissions.Catalog.Collections.Edit)) {
       items.push({
@@ -1161,6 +1178,21 @@ export class ProductCatalogPageComponent implements OnInit {
         ? { severity: 'success', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELIVERY_UPDATED'), detail: event.product.nameEn, life: 3000 }
         : { severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.DELIVERY_UPDATE_FAILED'), detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'), life: 5000 },
     );
+  }
+
+  protected openPromoDialog(product: Product | null): void {
+    this.promoProduct.set(product);
+    this.promoDialogOpen.set(true);
+  }
+
+  protected onPromoApplied(message: string): void {
+    this.promoDialogOpen.set(false);
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translate.instant('ADMIN.CATALOG_PAGE.PROMO.APPLIED'),
+      detail: message,
+      life: 6000,
+    });
   }
 
   protected openBadgeDialog(product: Product | null): void {

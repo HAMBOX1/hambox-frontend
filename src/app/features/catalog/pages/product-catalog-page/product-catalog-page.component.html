@@ -208,6 +208,7 @@
       (deleteProduct)="requestDelete($event)"
       (mappingOpenRequested)="onMappingOpenRequested($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
+      (promoRequested)="openPromoDialog($event)"
       (manageStock)="navigateToStock($event)"
       (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
       (setVariantChatDeliveryRequested)="openVariantChatDeliveryDialog($event)"
@@ -246,6 +247,7 @@
       (unarchiveProduct)="onRowUnarchive($event)"
       (deleteProduct)="requestDelete($event)"
       (manageMarketingPage)="onManageMarketingPage($event)"
+      (promoRequested)="openPromoDialog($event)"
       (manageStock)="navigateToStock($event)"
       (setChatDeliveryRequested)="openChatDeliveryDialog($event)"
       (bulkToggle)="onBulkToggle($event)"
@@ -332,6 +334,16 @@
   [product]="quickStockProduct()"
   (closed)="quickStockProduct.set(null)"
   (stockAdded)="reloadProducts()"
+/>
+
+<app-product-promo-dialog
+  [open]="promoDialogOpen()"
+  [productName]="promoProduct()?.nameEn ?? null"
+  [productCount]="promoProduct() ? 1 : bulkSelectedCount()"
+  [resolveProductIds]="promoResolveIds"
+  [categories]="promoProduct() ? null : categoryOptions()"
+  (closed)="promoDialogOpen.set(false)"
+  (applied)="onPromoApplied($event.message)"
 />
 
 <p-dialog

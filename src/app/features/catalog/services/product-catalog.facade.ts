@@ -820,29 +820,58 @@ export class ProductCatalogFacade {
     }, SEARCH_DEBOUNCE_MS);
   }
 
+  /** The filters (search, status, sort, internal category, …) the list is currently showing. */
+  private currentListFilters() {
+    const status = this.statusFilterState().trim();
+    const sortBy = this.sortByState();
+    const collectionId = this.collectionFilterState();
+    const supplierMappingProductIds = this.supplierMappingFilterProductIdsState();
+    return {
+      searchTerm: this.searchTermState(),
+      ...(status ? { status: status as ProductStatus } : {}),
+      ...(sortBy ? { sortBy } : {}),
+      ...(collectionId ? { collectionId } : {}),
+      ...(supplierMappingProductIds ? { productIds: supplierMappingProductIds } : {}),
+      ...(this.pendingMergeOnlyState() ? { pendingMergeOnly: true } : {}),
+      ...(this.favoritesOnlyState() ? { favoritesOnly: true } : {}),
+    };
+  }
+
+  /**
+   * The ids of the products the admin selected — or, with "select all matching", of every product the current filters
+   * match (pages of 200, capped at `cap`). Used by actions that need the ids themselves, like attaching a promo code.
+   */
+  async resolveSelectedProductIds(cap = 5000): Promise<readonly string[]> {
+    if (!this.selectAllMatchingState()) {
+      return [...this.bulkSelectedIdsState()];
+    }
+
+    const ids: string[] = [];
+    for (let pageNumber = 1; ids.length < cap; pageNumber++) {
+      const page = await firstValueFrom(
+        this.api.getProducts({ pageNumber, pageSize: 200, ...this.currentListFilters() }),
+      );
+      const items = page.items ?? [];
+      ids.push(...items.map((item) => item.id));
+      if (items.length === 0 || ids.length >= (page.totalCount ?? 0)) {
+        break;
+      }
+    }
+
+    return ids.slice(0, cap);
+  }
+
   private async fetchProducts(force = false): Promise<void> {
     this.loadingState.set(true);
     this.errorState.set(null);
 
     try {
-      const status = this.statusFilterState().trim();
-      const sortBy = this.sortByState();
-      const collectionId = this.collectionFilterState();
-      const supplierMappingProductIds = this.supplierMappingFilterProductIdsState();
-      const pendingMergeOnly = this.pendingMergeOnlyState();
-      const favoritesOnly = this.favoritesOnlyState();
       const requestedPageNumber = this.pageNumberState();
       const result = await firstValueFrom(
         this.api.getProducts({
           pageNumber: this.pageNumberState(),
           pageSize: this.pageSizeState(),
-          searchTerm: this.searchTermState(),
-          ...(status ? { status: status as ProductStatus } : {}),
-          ...(sortBy ? { sortBy } : {}),
-          ...(collectionId ? { collectionId } : {}),
-          ...(supplierMappingProductIds ? { productIds: supplierMappingProductIds } : {}),
-          ...(pendingMergeOnly ? { pendingMergeOnly: true } : {}),
-          ...(favoritesOnly ? { favoritesOnly: true } : {}),
+          ...this.currentListFilters(),
         }),
       );
 

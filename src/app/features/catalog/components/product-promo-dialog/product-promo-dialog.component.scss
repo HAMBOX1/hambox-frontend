@@ -1,0 +1,58 @@
+.promo-dialog__target {
+  margin: 0 0 0.85rem;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.promo-dialog__hint {
+  margin: 0.5rem 0 0.85rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+// Two big buttons that switch between options (use an existing code / create a new one, these products / a whole category).
+.promo-dialog__switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.promo-dialog__choice {
+  flex: 1 1 8rem;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--admin-radius-sm, 8px);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &--active {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    color: var(--color-primary);
+  }
+}
+
+.promo-dialog__code {
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.promo-dialog__row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.promo-dialog__value {
+  flex: 1 1 60%;
+}
+
+.promo-dialog__type {
+  flex: 1 1 40%;
+}

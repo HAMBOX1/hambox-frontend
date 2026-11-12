@@ -194,6 +194,8 @@ export class ProductCatalogTableComponent {
   readonly setFulfillmentRequested = output<{ product: Product; mode: 'ManualOnly' | 'SupplierOnly' }>();
   /** Opens the "storefront badge" dialog for one product. */
   readonly badgeRequested = output<Product>();
+  /** Opens "Add promo code" for one product. */
+  readonly promoRequested = output<Product>();
   /** One internal category was ticked or unticked in the popover; applied right away, no Save step. */
   readonly collectionToggled = output<{ product: Product; collectionId: string; assigned: boolean }>();
   /** The star toggle next to the product name — a personal admin bookmark, unrelated to status. */
@@ -1088,6 +1090,14 @@ export class ProductCatalogTableComponent {
         label: t('ADMIN.CATALOG_PAGE.ACTIONS.ARCHIVE'),
         icon: 'pi pi-inbox',
         command: () => this.archiveProduct.emit(product),
+      });
+    }
+
+    if (this.permissionService.hasPermission(this.permissions.Promotions.Edit)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.PROMO.ADD_PROMO'),
+        icon: 'pi pi-percentage',
+        command: () => this.promoRequested.emit(product),
       });
     }
 

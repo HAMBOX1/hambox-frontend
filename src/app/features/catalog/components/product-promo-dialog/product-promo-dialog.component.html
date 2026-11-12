@@ -1,0 +1,142 @@
+<p-dialog
+  [header]="(productName() ? 'ADMIN.CATALOG_PAGE.PROMO.TITLE_ONE' : 'ADMIN.CATALOG_PAGE.PROMO.TITLE_MANY') | translate"
+  [visible]="open()"
+  (visibleChange)="$event || closed.emit()"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(30rem, 94vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="promo-dialog__target">
+    @if (productName(); as name) {
+      {{ 'ADMIN.CATALOG_PAGE.PROMO.FOR_PRODUCT' | translate }} <strong>{{ name }}</strong>
+    } @else if (scope() === 'products') {
+      {{ 'ADMIN.CATALOG_PAGE.PROMO.FOR_SELECTION' | translate: { count: productCount() } }}
+    }
+  </p>
+
+  @if (canChooseCategory()) {
+    <div class="promo-dialog__switch" role="group" [attr.aria-label]="'ADMIN.CATALOG_PAGE.PROMO.APPLY_TO' | translate">
+      <button type="button" class="promo-dialog__choice" [class.promo-dialog__choice--active]="scope() === 'products'" (click)="scope.set('products')">
+        {{ 'ADMIN.CATALOG_PAGE.PROMO.SCOPE_PRODUCTS' | translate: { count: productCount() } }}
+      </button>
+      <button type="button" class="promo-dialog__choice" [class.promo-dialog__choice--active]="scope() === 'category'" (click)="scope.set('category')">
+        {{ 'ADMIN.CATALOG_PAGE.PROMO.SCOPE_CATEGORY' | translate }}
+      </button>
+    </div>
+
+    @if (scope() === 'category') {
+      <div class="admin-field">
+        <label class="admin-field__label" for="promo-category">{{ 'ADMIN.CATALOG_PAGE.PROMO.CATEGORY' | translate }}</label>
+        <p-select
+          inputId="promo-category"
+          class="admin-field__input"
+          [options]="categoryChoices()"
+          optionLabel="label"
+          optionValue="id"
+          [filter]="true"
+          filterBy="label"
+          [placeholder]="'ADMIN.CATALOG_PAGE.PROMO.CHOOSE_CATEGORY' | translate"
+          appendTo="body"
+          [ngModel]="categoryId()"
+          (ngModelChange)="categoryId.set($event)"
+        />
+        <p class="promo-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.PROMO.CATEGORY_HINT' | translate }}</p>
+      </div>
+    }
+  }
+
+  @if (canCreate()) {
+    <div class="promo-dialog__switch" role="group">
+      <button type="button" class="promo-dialog__choice" [class.promo-dialog__choice--active]="mode() === 'existing'" (click)="setMode('existing')">
+        {{ 'ADMIN.CATALOG_PAGE.PROMO.MODE_EXISTING' | translate }}
+      </button>
+      <button type="button" class="promo-dialog__choice" [class.promo-dialog__choice--active]="mode() === 'new'" (click)="setMode('new')">
+        {{ 'ADMIN.CATALOG_PAGE.PROMO.MODE_NEW' | translate }}
+      </button>
+    </div>
+  }
+
+  @if (mode() === 'existing') {
+    <div class="admin-field">
+      <label class="admin-field__label" for="promo-existing">{{ 'ADMIN.CATALOG_PAGE.PROMO.PROMO_CODE' | translate }}</label>
+      <p-select
+        inputId="promo-existing"
+        class="admin-field__input"
+        [options]="promotionOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [loading]="loading()"
+        [placeholder]="'ADMIN.CATALOG_PAGE.PROMO.CHOOSE_CODE' | translate"
+        [emptyMessage]="'ADMIN.CATALOG_PAGE.PROMO.NO_CODES' | translate"
+        appendTo="body"
+        [ngModel]="promotionId()"
+        (ngModelChange)="promotionId.set($event)"
+      />
+    </div>
+  } @else {
+    <div class="admin-field">
+      <label class="admin-field__label" for="promo-code">{{ 'ADMIN.CATALOG_PAGE.PROMO.NEW_CODE' | translate }}</label>
+      <input
+        id="promo-code"
+        type="text"
+        class="admin-field__input promo-dialog__code"
+        maxlength="40"
+        autocomplete="off"
+        [placeholder]="'ADMIN.CATALOG_PAGE.PROMO.NEW_CODE_PLACEHOLDER' | translate"
+        [ngModel]="newCode()"
+        (ngModelChange)="newCode.set($event)"
+      />
+    </div>
+    <div class="promo-dialog__row">
+      <div class="admin-field promo-dialog__value">
+        <label class="admin-field__label" for="promo-value">{{ 'ADMIN.CATALOG_PAGE.PROMO.DISCOUNT' | translate }}</label>
+        <input
+          id="promo-value"
+          type="number"
+          min="0"
+          step="any"
+          class="admin-field__input"
+          [ngModel]="newValue()"
+          (ngModelChange)="newValue.set($event === '' ? null : +$event)"
+        />
+      </div>
+      <div class="admin-field promo-dialog__type">
+        <label class="admin-field__label" for="promo-type">{{ 'ADMIN.CATALOG_PAGE.PROMO.TYPE' | translate }}</label>
+        <p-select
+          inputId="promo-type"
+          class="admin-field__input"
+          [options]="typeOptions"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [ngModel]="newType()"
+          (ngModelChange)="newType.set($event)"
+        />
+      </div>
+    </div>
+  }
+
+  <p class="promo-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.PROMO.ONLY_THESE_HINT' | translate }}</p>
+
+  @if (error(); as message) {
+    <p class="admin-dialog__error" role="alert">{{ message }}</p>
+  }
+
+  <div class="admin-dialog__actions">
+    <button pButton type="button" severity="secondary" [label]="'ADMIN.CATALOG_UI.CLOSE' | translate" (click)="closed.emit()"></button>
+    <button
+      pButton
+      type="button"
+      icon="pi pi-percentage"
+      [label]="'ADMIN.CATALOG_PAGE.PROMO.APPLY' | translate"
+      [loading]="saving()"
+      [disabled]="!canApply()"
+      (click)="apply()"
+    ></button>
+  </div>
+</p-dialog>

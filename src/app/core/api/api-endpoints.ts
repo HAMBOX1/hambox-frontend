@@ -411,6 +411,7 @@ export const PROMOTIONS_API = {
   activate: (promotionId: string) => `/api/v1/promotions/${promotionId}/activate`,
   deactivate: (promotionId: string) => `/api/v1/promotions/${promotionId}/deactivate`,
   archive: (promotionId: string) => `/api/v1/promotions/${promotionId}/archive`,
+  targets: (promotionId: string) => `/api/v1/promotions/${promotionId}/targets`,
   generateCoupons: (promotionId: string) => `/api/v1/promotions/${promotionId}/coupons/generate`,
   coupons: (promotionId: string) => `/api/v1/promotions/${promotionId}/coupons`,
   redemptions: (promotionId: string) => `/api/v1/promotions/${promotionId}/redemptions`,

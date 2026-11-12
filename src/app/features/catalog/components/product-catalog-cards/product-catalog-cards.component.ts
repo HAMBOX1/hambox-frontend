@@ -96,6 +96,8 @@ export class ProductCatalogCardsComponent {
   readonly unarchiveProduct = output<Product>();
   readonly deleteProduct = output<Product>();
   readonly manageMarketingPage = output<Product>();
+  /** Opens "Add promo code" for one product. */
+  readonly promoRequested = output<Product>();
   /** Opens the "set as On-Delivery" capacity dialog — only offered for products with 0 or 1
    * variant, mirrors the desktop table's action menu item. */
   readonly setChatDeliveryRequested = output<Product>();
@@ -361,6 +363,14 @@ export class ProductCatalogCardsComponent {
         label: t('ADMIN.CATALOG_PAGE.ACTIONS.ARCHIVE'),
         icon: 'pi pi-inbox',
         command: () => this.archiveProduct.emit(product),
+      });
+    }
+
+    if (this.permissionService.hasPermission(this.permissions.Promotions.Edit)) {
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.PROMO.ADD_PROMO'),
+        icon: 'pi pi-percentage',
+        command: () => this.promoRequested.emit(product),
       });
     }
 
