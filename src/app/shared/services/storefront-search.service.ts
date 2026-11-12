@@ -1,6 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
 
 import { CategoryApiService } from '../../features/catalog/services/category-api.service';
+import { InventoryApiService } from '../../features/catalog/services/inventory-api.service';
+import { StorefrontProductConfigurationDto } from '../../features/catalog/models/inventory-api.model';
+import { firstValueFrom } from 'rxjs';
 import { Products } from '../../features/products/services/products';
 import { mapProductToStoreProduct } from '../../features/products/utils/storefront-product.mapper';
 import { TranslationService } from '../../core/i18n/translation.service';
@@ -9,8 +12,11 @@ import { SupportedLanguageId } from '../../core/i18n/locale.model';
 const RECENT_SEARCHES_KEY = 'hambox.recent-searches';
 const MAX_RECENT = 6;
 const SUGGESTION_PAGE_SIZE = 8;
+/** At most this many matching variants are listed under one product, and this many in the whole dropdown. */
+const MAX_VARIANTS_PER_PRODUCT = 3;
+const MAX_VARIANT_SUGGESTIONS = 6;
 
-export type StorefrontSearchSuggestionType = 'product' | 'category' | 'recent';
+export type StorefrontSearchSuggestionType = 'product' | 'variant' | 'category' | 'recent';
 
 export interface StorefrontSearchSuggestion {
   readonly type: StorefrontSearchSuggestionType;
@@ -27,6 +33,7 @@ export interface StorefrontSearchSuggestion {
 export class StorefrontSearchService {
   private readonly products = inject(Products);
   private readonly categoryApi = inject(CategoryApiService);
+  private readonly inventoryApi = inject(InventoryApiService);
   private readonly translation = inject(TranslationService);
 
   private readonly recentSearchesState = signal<readonly string[]>(this.readRecentSearches());
@@ -58,15 +65,40 @@ export class StorefrontSearchService {
 
     const lowered = normalized.toLowerCase();
     const lang = this.translation.language();
-    const productSuggestions: StorefrontSearchSuggestion[] = (productResult.items ?? [])
-      .map((product, index) => mapProductToStoreProduct(product, lang, index))
-      .map((product) => ({
-        type: 'product' as const,
-        id: product.id,
-        label: product.title,
-        subtitle: product.platformLabel,
-        route: `/products/${product.id}`,
-      }));
+    const mappedProducts = (productResult.items ?? []).map((product, index) => mapProductToStoreProduct(product, lang, index));
+    const variantsByProduct = await this.matchingVariants(
+      mappedProducts.map((product) => product.id),
+      normalized,
+    );
+
+    // Each product is followed by the variants that matched the words typed, so searching "Essential" lists
+    // "PlayStation Plus — Essential · 1 Month" itself and not only the product that contains it.
+    let variantsLeft = MAX_VARIANT_SUGGESTIONS;
+    const productSuggestions: StorefrontSearchSuggestion[] = mappedProducts.flatMap((product) => {
+      const rows: StorefrontSearchSuggestion[] = [
+        {
+          type: 'product' as const,
+          id: product.id,
+          label: product.title,
+          subtitle: product.platformLabel,
+          route: `/products/${product.id}`,
+        },
+      ];
+      for (const variant of variantsByProduct.get(product.id) ?? []) {
+        if (variantsLeft <= 0) {
+          break;
+        }
+        variantsLeft--;
+        rows.push({
+          type: 'variant' as const,
+          id: `variant-${variant.id}`,
+          label: `${product.title} — ${variant.label}`,
+          subtitle: variant.isOutOfStock ? 'Out of stock' : product.platformLabel,
+          route: `/products/${product.id}?variant=${variant.id}`,
+        });
+      }
+      return rows;
+    });
 
     const categorySuggestions: StorefrontSearchSuggestion[] = categories
       .filter((category) => category.label.toLowerCase().includes(lowered))
@@ -81,6 +113,63 @@ export class StorefrontSearchService {
       }));
 
     return [...productSuggestions, ...categorySuggestions];
+  }
+
+  /**
+   * The variants of the given products that the typed words point at: a variant counts when one of its options (label,
+   * value or group name) or its SKU contains a word, and every word is found somewhere in the product name or the variant.
+   * One batched request covers all products; if it fails the dropdown simply shows the products alone.
+   */
+  private async matchingVariants(
+    productIds: readonly string[],
+    term: string,
+  ): Promise<ReadonlyMap<string, readonly { id: string; label: string; isOutOfStock: boolean }[]>> {
+    const result = new Map<string, readonly { id: string; label: string; isOutOfStock: boolean }[]>();
+    if (productIds.length === 0) {
+      return result;
+    }
+
+    let configurations: readonly StorefrontProductConfigurationDto[];
+    try {
+      configurations = await firstValueFrom(this.inventoryApi.getStorefrontConfigurations(productIds));
+    } catch {
+      return result;
+    }
+
+    const words = term
+      .toLowerCase()
+      .split(/[\s_-]+/)
+      .filter((word) => /[\p{L}\p{N}]/u.test(word));
+    if (words.length === 0) {
+      return result;
+    }
+
+    for (const configuration of configurations) {
+      const optionById = new Map(
+        configuration.optionGroups.flatMap((group) =>
+          group.options.map((option) => [option.id, { label: option.label, value: option.value, group: group.displayName }] as const),
+        ),
+      );
+
+      const matches = configuration.variants
+        .filter((variant) => variant.isCompleteCombination)
+        .map((variant) => {
+          const options = variant.optionIds.map((id) => optionById.get(id)).filter((option) => !!option);
+          const label = options.map((option) => option.label).join(' · ');
+          const variantText = [variant.sku, ...options.flatMap((option) => [option.label, option.value, option.group])].join(' ').toLowerCase();
+          return { id: variant.id, label, variantText, isOutOfStock: variant.isOutOfStock };
+        })
+        // Only a variant whose own text contains at least one typed word is worth listing under its product.
+        .filter((variant) => variant.label && words.some((word) => variant.variantText.includes(word)))
+        .slice(0, MAX_VARIANTS_PER_PRODUCT)
+        .map(({ id, label, isOutOfStock }) => ({ id, label, isOutOfStock }));
+
+      if (matches.length > 0) {
+        result.set(configuration.productId, matches);
+      }
+    }
+
+    return result;
   }
 
   rememberSearch(term: string): void {

@@ -119,6 +119,15 @@
   &--active {
     background: var(--color-table-row-hover);
   }
+
+  // A variant of the product above it: indented a little so it reads as "inside" that product.
+  &--variant {
+    padding-inline-start: 1.75rem;
+
+    .pi {
+      color: var(--color-primary);
+    }
+  }
 }
 
 .storefront-search__option-copy {

@@ -173,6 +173,8 @@ export class StorefrontSearchComponent implements OnInit, OnDestroy {
     switch (type) {
       case 'category':
         return 'pi pi-tags';
+      case 'variant':
+        return 'pi pi-tag';
       case 'recent':
         return 'pi pi-history';
       default:
@@ -201,7 +203,7 @@ export class StorefrontSearchComponent implements OnInit, OnDestroy {
   }
 
   private navigateSuggestion(suggestion: StorefrontSearchSuggestion): void {
-    if (suggestion.type === 'product') {
+    if (suggestion.type === 'product' || suggestion.type === 'variant') {
       void this.router.navigateByUrl(suggestion.route);
     } else {
       const term = suggestion.searchTerm ?? suggestion.label;

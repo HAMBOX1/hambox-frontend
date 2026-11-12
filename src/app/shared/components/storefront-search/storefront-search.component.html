@@ -45,6 +45,7 @@
                 type="button"
                 class="storefront-search__option"
                 [class.storefront-search__option--active]="activeIndex() === index"
+                [class.storefront-search__option--variant]="item.type === 'variant'"
                 role="option"
                 [id]="'storefront-search-option-' + index"
                 [attr.aria-selected]="activeIndex() === index"
