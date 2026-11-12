@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { firstValueFrom, Observable, of } from 'rxjs';
 
 import { CATALOG_API, INVENTORY_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
@@ -342,6 +342,25 @@ export class InventoryApiService {
 
   bulkDeleteCodes(variantId: string, request: BulkCodeIdsRequest): Observable<BulkCodeActionResultDto> {
     return this.api.post<BulkCodeActionResultDto>(INVENTORY_API.variantCodesBulkDelete(variantId), request);
+  }
+
+  /** The real codes as a plain-text file (the CSV export is masked). Pictures cannot be in a text file; their count comes back in `pictureCount`. */
+  async exportCodesText(
+    variantId: string,
+    status?: string,
+  ): Promise<{ readonly blob: Blob; readonly codeCount: number; readonly pictureCount: number }> {
+    const response = await firstValueFrom(
+      this.http.get(this.resolveUrl(INVENTORY_API.variantCodesExportText(variantId)), {
+        params: status ? { status } : {},
+        responseType: 'blob',
+        observe: 'response',
+      }),
+    );
+    return {
+      blob: response.body as Blob,
+      codeCount: Number(response.headers.get('X-Code-Count') ?? 0),
+      pictureCount: Number(response.headers.get('X-Picture-Count') ?? 0),
+    };
   }
 
   exportCodes(variantId: string, status?: string): Observable<Blob> {

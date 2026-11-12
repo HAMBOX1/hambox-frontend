@@ -152,6 +152,7 @@ export const INVENTORY_API = {
     `/api/v1/inventory/variants/${variantId}/batches/${batchId}/import-images`,
   variantCodes: (variantId: string) => `/api/v1/inventory/variants/${variantId}/codes`,
   variantCodesExport: (variantId: string) => `/api/v1/inventory/variants/${variantId}/codes/export`,
+  variantCodesExportText: (variantId: string) => `/api/v1/inventory/variants/${variantId}/codes/export-text`,
   variantCodesBulkDisable: (variantId: string) =>
     `/api/v1/inventory/variants/${variantId}/codes/bulk-disable`,
   variantCodesBulkDelete: (variantId: string) =>

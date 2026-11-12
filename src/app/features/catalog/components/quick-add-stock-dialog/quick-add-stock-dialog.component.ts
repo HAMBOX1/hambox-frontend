@@ -29,6 +29,7 @@ interface VariantChoice {
   standalone: true,
   imports: [TranslatePipe, FormsModule, ButtonModule, DialogModule, SelectModule],
   templateUrl: './quick-add-stock-dialog.component.html',
+  styleUrl: './quick-add-stock-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuickAddStockDialogComponent {
@@ -50,6 +51,8 @@ export class QuickAddStockDialogComponent {
   protected readonly multiLine = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly result = signal<ImportCodesResultDto | null>(null);
+  protected readonly downloading = signal(false);
+  protected readonly downloadNote = signal<string | null>(null);
 
   protected readonly choices = computed<VariantChoice[]>(() =>
     this.variants().map((variant) => ({
@@ -166,6 +169,36 @@ export class QuickAddStockDialogComponent {
    * Adds the chosen pictures as stock, one code per picture (the customer receives the picture itself). Like a text
    * import it needs a batch behind the scenes, and an On-Delivery variant is switched to instant stock first.
    */
+  /** Takes the variant's unsold stock back out as a .txt file (one code per line), e.g. to move it or keep a copy. */
+  protected async downloadStock(): Promise<void> {
+    const variant = this.selectedVariant();
+    if (!variant || this.downloading()) {
+      return;
+    }
+
+    this.downloading.set(true);
+    this.error.set(null);
+    this.downloadNote.set(null);
+    try {
+      const { blob, codeCount, pictureCount } = await this.inventoryApi.exportCodesText(variant.id);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `stock-${variant.sku}.txt`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      this.downloadNote.set(
+        codeCount === 0 && pictureCount === 0
+          ? 'There is no unsold stock to download.'
+          : `Downloaded ${codeCount} ${codeCount === 1 ? 'code' : 'codes'}.${pictureCount ? ` ${pictureCount} pictures are not included — a text file cannot hold pictures.` : ''}`,
+      );
+    } catch (error) {
+      this.error.set(error instanceof ApiError && error.message ? error.message : 'Could not download the stock. Please try again.');
+    } finally {
+      this.downloading.set(false);
+    }
+  }
+
   protected async onImagesSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files ?? []);

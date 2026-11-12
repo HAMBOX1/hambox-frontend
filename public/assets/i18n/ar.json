@@ -6550,6 +6550,8 @@
       "THIS_VARIANT_IS_ON_DELIVERY_ADDING_CODES_SWI": "هذا المتغيّر بنظام التسليم عند الطلب. إضافة أكواد ستحوّله إلى مخزون فوري (يُسلَّم فورًا من الأكواد).",
       "CODES": "الأكواد",
       "UPLOAD_TXT_CSV_EXCEL": "رفع TXT / CSV / Excel",
+      "DOWNLOAD_STOCK_TXT": "تحميل المخزون (TXT)",
+      "DOWNLOAD_STOCK_TXT_HINT": "يحمّل الأكواد غير المباعة لهذا النوع كملف نصي، كل كود في سطر.",
       "UPLOAD_PICTURES_EACH_PICTURE_ONE_ITEM_THE_CU": "رفع صور (كل صورة = عنصر واحد يستلمه العميل كصورة)",
       "THE_WHOLE_TEXT_IS_ONE_ENTRY_E_G_ACCOUNT_WITH": "النص كله إدخال واحد (مثل حساب بسطور البريد وكلمة المرور)",
       "IMPORT_CODES": "استيراد الأكواد",
