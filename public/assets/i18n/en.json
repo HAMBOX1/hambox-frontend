@@ -5139,6 +5139,7 @@
       },
       "SAVE_BAR": {
         "HINT": "You have unsaved changes to this template's sections.",
+        "HINT_UNPUBLISHED": "Your changes are saved as a draft but are NOT live yet. Press Publish to show them on the storefront.",
         "DISCARD": "Discard changes",
         "SAVE": "Save Draft",
         "PUBLISH": "Publish"

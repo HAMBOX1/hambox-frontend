@@ -332,7 +332,7 @@
 <app-admin-sticky-save-bar
   [visible]="stickyBarVisible()"
   [dirty]="dirty()"
-  [hint]="'ADMIN.PAGE_BUILDER.SAVE_BAR.HINT' | translate"
+  [hint]="(dirty() ? 'ADMIN.PAGE_BUILDER.SAVE_BAR.HINT' : 'ADMIN.PAGE_BUILDER.SAVE_BAR.HINT_UNPUBLISHED') | translate"
 >
   <p-button
     [label]="'ADMIN.PAGE_BUILDER.SAVE_BAR.DISCARD' | translate"

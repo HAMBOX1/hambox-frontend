@@ -74,7 +74,7 @@
         </a>
       </ng-template>
 
-      @if (sidebarState.collapsed()) {
+      @if (iconOnly()) {
         @for (item of navItems(); track item.id) {
           <ng-container *ngTemplateOutlet="linkTpl; context: { $implicit: item, nested: false }" />
         }

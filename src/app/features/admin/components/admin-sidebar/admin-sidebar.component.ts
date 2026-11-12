@@ -46,6 +46,11 @@ export class AdminSidebarComponent implements AfterViewInit, OnDestroy {
     ),
   );
 
+  /** Icon-only mode. The phone drawer always shows full labels (and the groups), whatever width the
+   * sidebar was last left at on a bigger screen — that choice is saved per browser, so a phone could
+   * otherwise be stuck on the flat icon list. */
+  protected readonly iconOnly = computed(() => this.sidebarState.collapsed() && !this.mobileOpen());
+
   /** The sidebar as shown when it is wide: plain links and collapsible groups, in the order of `ADMIN_NAV_GROUPS`. */
   protected readonly navEntries = computed<readonly NavEntry[]>(() => {
     const visible = new Map(this.navItems().map((item) => [item.id, item]));
@@ -148,7 +153,7 @@ export class AdminSidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   protected navTooltip(labelKey: string): string | null {
-    return this.sidebarState.collapsed() ? this.translate.instant(labelKey) : null;
+    return this.iconOnly() ? this.translate.instant(labelKey) : null;
   }
 
   protected onNavigate(): void {
