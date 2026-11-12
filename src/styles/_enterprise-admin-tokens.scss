@@ -1,7 +1,13 @@
 // HAMBOX Enterprise Admin — design tokens (scoped; no global element selectors)
 // All color values derive from the global semantic token system.
+// Drawers, dialogs and popovers are portaled to <body> (appendTo="body"), outside .admin-layout, so they need the
+// tokens too — otherwise anything coloured with var(--ui-primary) in them (e.g. the section library's "Quick add"
+// button and active filters) resolves to nothing and shows as dark text on a dark background.
 .admin-layout,
-.ui-auth {
+.ui-auth,
+.p-drawer,
+.p-dialog,
+.p-popover {
   --ui-space-1: 0.25rem; // 4px
   --ui-space-2: 0.5rem; // 8px
   --ui-space-3: 0.75rem; // 12px
