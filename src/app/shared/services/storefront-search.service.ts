@@ -161,6 +161,13 @@ export class StorefrontSearchService {
         })
         // Only a variant whose own text contains at least one typed word is worth listing under its product.
         .filter((variant) => variant.label && words.some((word) => variant.variantText.includes(word)))
+        // Best first: the ones that match the most typed words, and among those the ones that are in stock (a product can
+        // have dozens of matching variants and only a few rows to show them in).
+        .sort(
+          (a, b) =>
+            this.matchedWords(b.variantText, words) - this.matchedWords(a.variantText, words) ||
+            Number(a.isOutOfStock) - Number(b.isOutOfStock),
+        )
         .slice(0, MAX_VARIANTS_PER_PRODUCT)
         .map(({ id, label, isOutOfStock }) => ({ id, label, isOutOfStock }));
 
@@ -170,6 +177,10 @@ export class StorefrontSearchService {
     }
 
     return result;
+  }
+
+  private matchedWords(text: string, words: readonly string[]): number {
+    return words.filter((word) => text.includes(word)).length;
   }
 
   rememberSearch(term: string): void {

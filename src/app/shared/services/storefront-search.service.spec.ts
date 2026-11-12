@@ -83,6 +83,29 @@ describe('StorefrontSearchService variants', () => {
     expect(suggestions[2].subtitle).toBe('Out of stock');
   });
 
+  it('lists the in-stock variants before the out-of-stock ones', async () => {
+    const cfg = configuration();
+    // "Month" matches all three variants equally; make v1 out of stock too (v2 already is), only v3 stays available.
+    const service = setup(() =>
+      of([{ ...cfg, variants: cfg.variants.map((v) => (v.id === 'v1' ? { ...v, isOutOfStock: true } : v)) }]),
+    );
+
+    const variants = (await service.getSuggestions('Month')).filter((s) => s.type === 'variant');
+
+    expect(variants).toHaveLength(3);
+    expect(variants[0].route).toBe(`/products/${PS_PLUS}?variant=v3`);
+    expect(variants.slice(1).every((s) => s.subtitle === 'Out of stock')).toBe(true);
+  });
+
+  it('puts the variants that match more of the typed words first', async () => {
+    const service = setup(() => of([configuration()]));
+
+    // "Extra 1" matches v3 (Extra · 1 Month) on both words, v1 (Essential · 1 Month) and v2 only on "1"/"month".
+    const variants = (await service.getSuggestions('Extra 1')).filter((s) => s.type === 'variant');
+
+    expect(variants[0].route).toBe(`/products/${PS_PLUS}?variant=v3`);
+  });
+
   it('does not list variants when the word only matches the product name', async () => {
     const service = setup(() => of([configuration()]));
 
