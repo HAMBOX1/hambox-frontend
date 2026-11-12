@@ -37,6 +37,7 @@ export class HeroVariantKineticGlassComponent {
       subtitle: config.subtitle || fallbackSubtitle,
       backgroundImageUrl: config.backgroundImageUrl || fallbackImage,
       primaryButtonUrl: config.primaryButtonUrl || fallbackUrl,
+      secondaryButtonText: config.secondaryButtonText ?? '',
       visible: true,
     };
   });

@@ -28,12 +28,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.85rem;
   border-radius: var(--admin-radius-sm, 8px);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  color: var(--color-text);
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -60,12 +60,12 @@
 }
 
 .section-library-drawer__chip {
-  padding: 0.3rem 0.65rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 9999px;
   border: 1px solid var(--color-border);
   background: transparent;
-  color: var(--color-text-secondary);
-  font-size: 0.6875rem;
+  color: var(--color-text);
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -87,6 +87,7 @@
 
 .section-library-drawer__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  /* One card per row on a phone, so each preview and its text are big enough to read. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
   gap: 1rem;
 }

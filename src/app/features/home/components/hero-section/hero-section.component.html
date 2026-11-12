@@ -37,7 +37,7 @@
           <img class="hero__button-icon" [src]="boltIcon" alt="" aria-hidden="true" />
         </a>
 
-        @if (hero().secondaryButtonText?.trim()) {
+        @if (hero().secondaryButtonText.trim()) {
           <a
             pButton
             [routerLink]="hero().secondaryButtonUrl"

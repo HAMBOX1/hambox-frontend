@@ -35,7 +35,7 @@ const KEY = (path: string) => sectionFieldKeys('HERO', path);
 
       <app-button-editor
         [title]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.HERO.SECONDARY_BUTTON.LABEL' | translate"
-        [label]="localConfig().secondaryButtonText"
+        [label]="localConfig().secondaryButtonText ?? ''"
         [url]="localConfig().secondaryButtonUrl"
         [disabled]="disabled()"
         (labelChange)="setField('secondaryButtonText', $event)"

@@ -10,7 +10,8 @@ export interface HeroSectionConfig {
   readonly subtitle: string;
   readonly primaryButtonText: string;
   readonly primaryButtonUrl: string;
-  readonly secondaryButtonText: string;
+  /** Optional: a saved hero may have no secondary button at all (the field is then missing, not empty). */
+  readonly secondaryButtonText?: string;
   readonly secondaryButtonUrl: string;
   readonly backgroundImageUrl: string;
   readonly overlayImageUrl: string | null;
@@ -28,7 +29,8 @@ export interface HeroGridShowcaseConfig {
   readonly subtitle: string;
   readonly primaryButtonText: string;
   readonly primaryButtonUrl: string;
-  readonly secondaryButtonText: string;
+  /** Optional: a saved hero may have no secondary button at all (the field is then missing, not empty). */
+  readonly secondaryButtonText?: string;
   readonly secondaryButtonUrl: string;
   readonly backgroundImageUrl: string;
   readonly overlayImageUrl: string | null;
