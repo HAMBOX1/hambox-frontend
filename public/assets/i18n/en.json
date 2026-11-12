@@ -2449,8 +2449,8 @@
         "BRANDING": {
           "LOGO_URL": {
             "LABEL": "Logo URL",
-            "HELP": "The main logo shown in the storefront header.",
-            "TOOLTIP": "Applies immediately across the storefront. Use a transparent PNG or SVG for best results."
+            "HELP": "Upload a logo image to show it in the storefront header. Leave it empty to show the text logo (HAMBOX).",
+            "TOOLTIP": "Use a transparent PNG or SVG for best results. To go back to the text logo, remove the image and save."
           },
           "FAVICON_URL": {
             "LABEL": "Favicon URL",

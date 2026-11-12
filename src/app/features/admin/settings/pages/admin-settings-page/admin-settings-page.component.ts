@@ -1,3 +1,4 @@
+import { BrandLogoService } from '../../../../../core/branding/brand-logo.service';
 import { HamboxDatePipe } from '../../../../../shared/pipes/hambox-date.pipe';
 import {
   ChangeDetectionStrategy,
@@ -135,6 +136,7 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
   private readonly messageService = inject(MessageService);
   private readonly permissionService = inject(PermissionService);
   private readonly translate = inject(TranslateService);
+  private readonly brandLogo = inject(BrandLogoService);
 
   protected readonly permissions = PERMISSIONS;
   protected readonly fieldConfigs = SETTINGS_FIELD_CONFIGS;
@@ -490,6 +492,10 @@ export class AdminSettingsPageComponent implements OnInit, HasUnsavedChanges {
 
     const ok = await this.facade.saveCategory(this.activeCategoryKey(), this.draftPayload());
     if (ok) {
+      if (this.activeCategoryKey() === 'branding') {
+        const logoUrl = (this.draftPayload() as { logoUrl?: string | null }).logoUrl;
+        this.brandLogo.set(logoUrl ?? null);
+      }
       this.savedSnapshot.set(JSON.stringify(this.draftPayload()));
       this.messageService.add({
         severity: 'success',

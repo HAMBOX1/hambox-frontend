@@ -265,7 +265,16 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     // (also unwired) localization/currency category fields without either being read anywhere.
     { key: 'storeStatus', control: 'select', options: STORE_STATUS_OPTIONS, ...fieldKeys('GENERAL.STORE_STATUS') },
   ],
-  // `branding` category removed from the settings UI by request — see HIDDEN_CATEGORY_KEYS.
+  // Branding: only the header logo is wired (BrandLogoService). Leave it empty to keep the text wordmark.
+  // The other branding fields (favicon, colours, footer/admin logo) still have no consumer, so they stay out.
+  branding: [
+    {
+      key: 'logoUrl',
+      control: 'media',
+      recommendedSize: 'Transparent PNG or SVG, about 400×120px',
+      ...fieldKeys('BRANDING.LOGO_URL'),
+    },
+  ],
   // `localization` category removed entirely — the frontend hardcodes AVAILABLE_LANGUAGES
   // (core/i18n/locale.model.ts) and no backend consumer reads DefaultLanguage/SupportedLanguages/
   // RtlEnabled beyond a discarded health-check probe. See HIDDEN_CATEGORY_KEYS.
@@ -822,7 +831,6 @@ export const ADVANCED_CATEGORY_KEYS: readonly string[] = ['queue', 'retryPolicie
 export const HIDDEN_CATEGORY_KEYS: readonly string[] = [
   'totp',
   'integrations',
-  'branding',
   'localization',
   'theme',
   'checkout',
