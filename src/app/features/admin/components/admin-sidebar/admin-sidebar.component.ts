@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -12,17 +13,19 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs/operators';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { PermissionService } from '../../../../core/permissions/permission.service';
-import { ADMIN_NAV_ITEMS } from '../../models/admin-nav.model';
+import { ADMIN_NAV_GROUPS, ADMIN_NAV_ITEMS, AdminNavGroup, AdminNavItem } from '../../models/admin-nav.model';
 import { AdminSidebarStateService } from '../../services/admin-sidebar-state.service';
 
 @Component({
   selector: 'app-admin-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [NgTemplateOutlet, RouterLink, RouterLinkActive, TranslatePipe],
   templateUrl: './admin-sidebar.component.html',
   styleUrl: './admin-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +46,43 @@ export class AdminSidebarComponent implements AfterViewInit, OnDestroy {
     ),
   );
 
+  /** The sidebar as shown when it is wide: plain links and collapsible groups, in the order of `ADMIN_NAV_GROUPS`. */
+  protected readonly navEntries = computed<readonly NavEntry[]>(() => {
+    const visible = new Map(this.navItems().map((item) => [item.id, item]));
+    const grouped = new Set<string>(ADMIN_NAV_GROUPS.flatMap((group) => group.itemIds));
+    const entries: NavEntry[] = [];
+
+    const dashboard = visible.get('dashboard');
+    if (dashboard) {
+      entries.push({ kind: 'link', item: dashboard });
+    }
+
+    for (const group of ADMIN_NAV_GROUPS) {
+      const items = group.itemIds.map((id) => visible.get(id)).filter((item): item is AdminNavItem => !!item);
+      if (items.length === 1) {
+        entries.push({ kind: 'link', item: items[0] });
+      } else if (items.length > 1) {
+        entries.push({ kind: 'group', group, items });
+      }
+    }
+
+    for (const item of this.navItems()) {
+      if (item.id !== 'dashboard' && item.id !== 'settings' && !grouped.has(item.id)) {
+        entries.push({ kind: 'link', item });
+      }
+    }
+
+    const settings = visible.get('settings');
+    if (settings) {
+      entries.push({ kind: 'link', item: settings });
+    }
+
+    return entries;
+  });
+
+  private readonly router = inject(Router);
+  private readonly openGroups = signal<ReadonlySet<string>>(new Set());
+
   private readonly nav = viewChild<ElementRef<HTMLElement>>('nav');
   private resizeObserver?: ResizeObserver;
 
@@ -54,9 +94,42 @@ export class AdminSidebarComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      this.navItems();
+      this.navEntries();
+      this.openGroups();
       queueMicrotask(() => this.updateScrollState());
     });
+
+    // The group holding the page being viewed is always open, so the active link is never hidden.
+    this.openActiveGroup(this.router.url);
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd), takeUntilDestroyed())
+      .subscribe((event) => this.openActiveGroup(event.urlAfterRedirects));
+  }
+
+  protected isGroupOpen(groupId: string): boolean {
+    return this.openGroups().has(groupId);
+  }
+
+  protected toggleGroup(groupId: string): void {
+    this.openGroups.update((current) => {
+      const next = new Set(current);
+      if (!next.delete(groupId)) {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }
+
+  private openActiveGroup(url: string): void {
+    const group = ADMIN_NAV_GROUPS.find((candidate) =>
+      candidate.itemIds.some((id) => {
+        const item = ADMIN_NAV_ITEMS.find((navItem) => navItem.id === id);
+        return !!item && (url === item.route || url.startsWith(item.route + '/') || url.startsWith(item.route + '?'));
+      }),
+    );
+    if (group && !this.openGroups().has(group.id)) {
+      this.openGroups.update((current) => new Set(current).add(group.id));
+    }
   }
 
   ngAfterViewInit(): void {
@@ -103,3 +176,7 @@ export class AdminSidebarComponent implements AfterViewInit, OnDestroy {
     this.canScrollDown.set(element.scrollTop < maxScrollTop - 1);
   }
 }
+
+type NavEntry =
+  | { readonly kind: 'link'; readonly item: AdminNavItem }
+  | { readonly kind: 'group'; readonly group: AdminNavGroup; readonly items: readonly AdminNavItem[] };

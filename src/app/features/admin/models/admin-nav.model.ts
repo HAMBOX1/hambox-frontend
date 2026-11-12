@@ -246,3 +246,55 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     permission: PERMISSIONS.WhatsAppBot.View,
   },
 ] as const;
+
+export interface AdminNavGroup {
+  readonly id: string;
+  readonly labelKey: string;
+  readonly icon: string;
+  /** Items shown inside the group, in order. Items that belong to no group stay top-level. */
+  readonly itemIds: readonly AdminNavId[];
+}
+
+/**
+ * The sidebar folds its long list into a few collapsible groups so only the section being worked in is open.
+ * The order of `dashboard`, the groups and `settings` below is the order they appear in; any item missing from
+ * every group (a future addition) is appended as a plain link.
+ */
+export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
+  {
+    id: 'catalog',
+    labelKey: 'ADMIN.NAV.GROUP_CATALOG',
+    icon: 'pi pi-shopping-bag',
+    itemIds: ['products', 'categories', 'collections', 'storefront-filters', 'image-library', 'suppliers', 'deleted-codes'],
+  },
+  {
+    id: 'marketing',
+    labelKey: 'ADMIN.NAV.GROUP_MARKETING',
+    icon: 'pi pi-megaphone',
+    itemIds: ['promotions', 'floating-ads', 'campaigns', 'memberships', 'referrals'],
+  },
+  {
+    id: 'storefront',
+    labelKey: 'ADMIN.NAV.GROUP_STOREFRONT',
+    icon: 'pi pi-palette',
+    itemIds: ['page-builder', 'themes', 'faqs', 'legal'],
+  },
+  {
+    id: 'sales',
+    labelKey: 'ADMIN.NAV.GROUP_SALES',
+    icon: 'pi pi-receipt',
+    itemIds: ['orders', 'support', 'reviews', 'payment-gateways', 'communication', 'whatsapp', 'operations'],
+  },
+  {
+    id: 'security',
+    labelKey: 'ADMIN.NAV.GROUP_SECURITY',
+    icon: 'pi pi-shield',
+    itemIds: ['security', 'roles'],
+  },
+  {
+    id: 'insights',
+    labelKey: 'ADMIN.NAV.GROUP_INSIGHTS',
+    icon: 'pi pi-chart-line',
+    itemIds: ['analytics', 'reports'],
+  },
+];

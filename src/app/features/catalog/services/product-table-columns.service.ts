@@ -38,6 +38,29 @@ export const PRODUCT_TABLE_COLUMNS: readonly ProductColumnDef[] = [
 const STORAGE_KEY = 'hambox.admin.products.columns';
 const ORDER_STORAGE_KEY = 'hambox.admin.products.columns.order';
 const LAYOUT_STORAGE_KEY = 'hambox.admin.products.columns.layout';
+const PRESETS_STORAGE_KEY = 'hambox.admin.products.columns.presets';
+
+/** A named set of visible columns the admin can switch to with one tap. */
+export interface ColumnPreset {
+  readonly id: string;
+  /** Translation key of a built-in preset; custom presets carry their own `name` instead. */
+  readonly labelKey?: string;
+  readonly name?: string;
+  readonly columns: readonly ProductColumnId[];
+  readonly builtin: boolean;
+}
+
+/** Built-in views. `default` is filled in from each column's `defaultVisible` flag. */
+const BUILTIN_PRESETS: readonly ColumnPreset[] = [
+  { id: 'default', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.VIEW_DEFAULT', columns: [], builtin: true },
+  {
+    id: 'prices',
+    labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.VIEW_PRICES',
+    columns: ['salePrice', 'costPrice', 'memberPrice', 'margin'],
+    builtin: true,
+  },
+  { id: 'stock', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.VIEW_STOCK', columns: ['stock', 'supplier'], builtin: true },
+];
 
 /** Bounds of the product-name width the admin can choose, in rem. */
 export const NAME_WIDTH_MIN_REM = 5;
@@ -68,6 +91,25 @@ export class ProductTableColumnsService {
   readonly order = this.orderState.asReadonly();
 
   private readonly layoutState = signal<ColumnsLayout>(this.readLayout());
+
+  private readonly customPresets = signal<readonly ColumnPreset[]>(this.readPresets());
+
+  /** Built-in views followed by the ones the admin saved. */
+  readonly presets = computed<readonly ColumnPreset[]>(() => [
+    ...BUILTIN_PRESETS.map((preset) =>
+      preset.id === 'default' ? { ...preset, columns: this.defaultColumns() } : preset,
+    ),
+    ...this.customPresets(),
+  ]);
+
+  /** The preset whose columns are exactly the visible ones right now, if any. */
+  readonly activePresetId = computed<string | null>(() => {
+    const visible = this.visibleState();
+    const match = this.presets().find(
+      (preset) => preset.columns.length === visible.size && preset.columns.every((id) => visible.has(id)),
+    );
+    return match?.id ?? null;
+  });
 
   /** Keeps the product name in view while the wide table scrolls sideways. */
   readonly pinName = computed(() => this.layoutState().pinName);
@@ -128,6 +170,38 @@ export class ProductTableColumnsService {
     this.persist();
   }
 
+  /** Shows exactly the columns of the chosen view; the order the admin arranged is kept. */
+  applyPreset(id: string): void {
+    const preset = this.presets().find((candidate) => candidate.id === id);
+    if (!preset) {
+      return;
+    }
+
+    this.visibleState.set(new Set(preset.columns));
+    this.persist();
+  }
+
+  /** Stores the columns visible right now under a name, so they come back with one tap. Returns the new view's id. */
+  saveCurrentAsPreset(name: string): string | null {
+    const trimmed = name.trim().slice(0, 30);
+    if (!trimmed || this.visibleState().size === 0) {
+      return null;
+    }
+
+    const id = `custom-${Date.now().toString(36)}`;
+    this.customPresets.update((current) => [
+      ...current,
+      { id, name: trimmed, columns: [...this.visibleState()], builtin: false },
+    ]);
+    this.persistPresets();
+    return id;
+  }
+
+  deletePreset(id: string): void {
+    this.customPresets.update((current) => current.filter((preset) => preset.id !== id));
+    this.persistPresets();
+  }
+
   setPinName(value: boolean): void {
     this.updateLayout({ pinName: value });
   }
@@ -151,6 +225,44 @@ export class ProductTableColumnsService {
     this.persist();
     this.persistOrder();
     this.persistLayout();
+  }
+
+  private defaultColumns(): ProductColumnId[] {
+    return this.isPhone() ? [...this.phoneSet()] : this.definitions.filter((def) => def.defaultVisible).map((def) => def.id);
+  }
+
+  private readPresets(): ColumnPreset[] {
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(PRESETS_STORAGE_KEY) : null;
+      if (raw === null) {
+        return [];
+      }
+
+      const known = new Set<string>(this.definitions.map((def) => def.id));
+      return (JSON.parse(raw) as { id?: unknown; name?: unknown; columns?: unknown }[])
+        .filter((entry) => typeof entry.id === 'string' && typeof entry.name === 'string' && Array.isArray(entry.columns))
+        .map((entry) => ({
+          id: entry.id as string,
+          name: entry.name as string,
+          columns: (entry.columns as string[]).filter((id): id is ProductColumnId => known.has(id)),
+          builtin: false,
+        }));
+    } catch {
+      return [];
+    }
+  }
+
+  private persistPresets(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(
+          PRESETS_STORAGE_KEY,
+          JSON.stringify(this.customPresets().map(({ id, name, columns }) => ({ id, name, columns }))),
+        );
+      }
+    } catch {
+      // Best effort only.
+    }
   }
 
   private defaultLayout(): ColumnsLayout {

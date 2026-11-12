@@ -2,6 +2,20 @@
   <app-admin-loading-skeleton variant="table" [rows]="6" />
 } @else {
   <div class="product-catalog-table__toolbar">
+    <div class="product-catalog-table__views" role="group" [attr.aria-label]="'ADMIN.CATALOG_PAGE.COLUMNS.VIEWS' | translate">
+      @for (preset of columns.presets(); track preset.id) {
+        <span class="product-catalog-table__view-chip" [class.product-catalog-table__view-chip--active]="columns.activePresetId() === preset.id">
+          <button type="button" class="product-catalog-table__view-btn" [attr.aria-pressed]="columns.activePresetId() === preset.id" (click)="columns.applyPreset(preset.id)">
+            {{ preset.labelKey ? (preset.labelKey | translate) : preset.name }}
+          </button>
+          @if (!preset.builtin) {
+            <button type="button" class="product-catalog-table__view-remove" [attr.aria-label]="'ADMIN.CATALOG_PAGE.COLUMNS.DELETE_VIEW' | translate" (click)="columns.deletePreset(preset.id)">
+              <i class="pi pi-times" aria-hidden="true"></i>
+            </button>
+          }
+        </span>
+      }
+    </div>
     <button
       pButton
       type="button"
@@ -77,6 +91,18 @@
           </li>
         }
       </ul>
+      <div class="product-catalog-table__save-view">
+        <input
+          type="text"
+          class="product-catalog-table__save-view-input"
+          maxlength="30"
+          [placeholder]="'ADMIN.CATALOG_PAGE.COLUMNS.VIEW_NAME' | translate"
+          [value]="newViewName()"
+          (input)="newViewName.set($any($event.target).value)"
+          (keydown.enter)="onSaveView()"
+        />
+        <button pButton type="button" size="small" icon="pi pi-bookmark" [label]="'ADMIN.CATALOG_PAGE.COLUMNS.SAVE_VIEW' | translate" [disabled]="newViewName().trim().length === 0" (click)="onSaveView()"></button>
+      </div>
       <button
         pButton
         type="button"

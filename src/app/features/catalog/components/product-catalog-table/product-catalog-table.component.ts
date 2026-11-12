@@ -1120,6 +1120,14 @@ export class ProductCatalogTableComponent {
     return this.isMobile() ? 7 : 16;
   }
 
+  protected readonly newViewName = signal('');
+
+  protected onSaveView(): void {
+    if (this.columns.saveCurrentAsPreset(this.newViewName())) {
+      this.newViewName.set('');
+    }
+  }
+
   protected onNameWidthInput(event: Event): void {
     this.columns.setNameWidth(Number((event.target as HTMLInputElement).value));
   }

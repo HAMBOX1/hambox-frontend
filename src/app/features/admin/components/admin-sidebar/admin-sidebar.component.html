@@ -59,9 +59,10 @@
     [class.admin-sidebar__nav-viewport--fade-bottom]="canScrollDown()"
   >
     <nav #nav class="admin-sidebar__nav" (scroll)="onNavScroll()">
-      @for (item of navItems(); track item.id) {
+      <ng-template #linkTpl let-item let-nested="nested">
         <a
           class="admin-sidebar__link"
+          [class.admin-sidebar__link--nested]="nested"
           [routerLink]="item.route"
           routerLinkActive="admin-sidebar__link--active"
           [routerLinkActiveOptions]="{ exact: false }"
@@ -71,6 +72,41 @@
           <i class="admin-sidebar__icon" [class]="item.icon" aria-hidden="true"></i>
           <span class="admin-sidebar__label">{{ item.labelKey | translate }}</span>
         </a>
+      </ng-template>
+
+      @if (sidebarState.collapsed()) {
+        @for (item of navItems(); track item.id) {
+          <ng-container *ngTemplateOutlet="linkTpl; context: { $implicit: item, nested: false }" />
+        }
+      } @else {
+        @for (entry of navEntries(); track entry.kind === 'link' ? entry.item.id : entry.group.id) {
+          @if (entry.kind === 'link') {
+            <ng-container *ngTemplateOutlet="linkTpl; context: { $implicit: entry.item, nested: false }" />
+          } @else {
+            <button
+              type="button"
+              class="admin-sidebar__group"
+              [attr.aria-expanded]="isGroupOpen(entry.group.id)"
+              (click)="toggleGroup(entry.group.id)"
+            >
+              <i class="admin-sidebar__icon" [class]="entry.group.icon" aria-hidden="true"></i>
+              <span class="admin-sidebar__label">{{ entry.group.labelKey | translate }}</span>
+              <i
+                class="pi admin-sidebar__group-chevron"
+                [class.pi-chevron-down]="isGroupOpen(entry.group.id)"
+                [class.pi-chevron-right]="!isGroupOpen(entry.group.id)"
+                aria-hidden="true"
+              ></i>
+            </button>
+            @if (isGroupOpen(entry.group.id)) {
+              <div class="admin-sidebar__group-items">
+                @for (item of entry.items; track item.id) {
+                  <ng-container *ngTemplateOutlet="linkTpl; context: { $implicit: item, nested: true }" />
+                }
+              </div>
+            }
+          }
+        }
       }
     </nav>
 

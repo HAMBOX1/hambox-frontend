@@ -133,3 +133,70 @@ describe('ProductTableColumnsService pinning and name width', () => {
     expect(service.nameWidth()).toBeNull();
   });
 });
+
+describe('ProductTableColumnsService column views', () => {
+  const PRESETS_KEY = 'hambox.admin.products.columns.presets';
+
+  beforeEach(() => localStorage.clear());
+  afterEach(() => localStorage.clear());
+
+  it('offers Default, Prices and Stock, and applying one changes which columns are visible', () => {
+    const service = createService();
+
+    expect(service.presets().map((p) => p.id)).toEqual(['default', 'prices', 'stock']);
+
+    service.applyPreset('prices');
+    expect([...service.orderedVisible()].sort()).toEqual(['costPrice', 'margin', 'memberPrice', 'salePrice']);
+    expect(service.activePresetId()).toBe('prices');
+
+    service.applyPreset('stock');
+    expect([...service.orderedVisible()].sort()).toEqual(['stock', 'supplier']);
+    expect(service.activePresetId()).toBe('stock');
+  });
+
+  it('knows no view is active once the columns no longer match any of them', () => {
+    const service = createService();
+    service.applyPreset('stock');
+
+    service.setVisible('sku', true);
+
+    expect(service.activePresetId()).toBeNull();
+  });
+
+  it('saves the visible columns as a named view that survives a reload and can be removed', () => {
+    const service = createService();
+    service.applyPreset('prices');
+    service.setVisible('sku', true);
+    const id = service.saveCurrentAsPreset('  My prices  ');
+
+    expect(id).not.toBeNull();
+    expect(service.presets().find((p) => p.id === id)?.name).toBe('My prices');
+
+    const reloaded = createService();
+    const saved = reloaded.presets().find((p) => p.id === id);
+    expect(saved?.columns.length).toBe(5);
+
+    reloaded.applyPreset('stock');
+    reloaded.applyPreset(id as string);
+    expect(reloaded.activePresetId()).toBe(id);
+
+    reloaded.deletePreset(id as string);
+    expect(createService().presets().some((p) => p.id === id)).toBe(false);
+  });
+
+  it('refuses to save an empty name or an empty column set', () => {
+    const service = createService();
+
+    expect(service.saveCurrentAsPreset('   ')).toBeNull();
+    for (const def of service.definitions) {
+      service.setVisible(def.id, false);
+    }
+    expect(service.saveCurrentAsPreset('Nothing')).toBeNull();
+  });
+
+  it('ignores a corrupted saved views list', () => {
+    localStorage.setItem(PRESETS_KEY, '{"not":"a list"}');
+
+    expect(createService().presets().map((p) => p.id)).toEqual(['default', 'prices', 'stock']);
+  });
+});
