@@ -60,7 +60,7 @@
       </label>
       <label class="quick-stock__tool quick-stock__tool--image" [class.quick-stock__tool--disabled]="!variantId()">
         <i class="pi pi-image" aria-hidden="true"></i>
-        <span>{{ 'ADMIN.CATALOG_UI.UPLOAD_PICTURES_EACH_PICTURE_ONE_ITEM_THE_CU' | translate }}</span>
+        <span>{{ 'ADMIN.CATALOG_UI.UPLOAD_PICTURES' | translate }}</span>
         <input
           type="file"
           multiple
@@ -82,6 +82,7 @@
         <span>{{ 'ADMIN.CATALOG_UI.DOWNLOAD_STOCK_TXT' | translate }}</span>
       </button>
       </div>
+      <p class="quick-stock__hint">{{ 'ADMIN.CATALOG_UI.UPLOAD_PICTURES_HINT' | translate }}</p>
       <textarea
         id="quick-stock-codes"
         class="admin-field__input"

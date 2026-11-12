@@ -6550,6 +6550,8 @@
       "THIS_VARIANT_IS_ON_DELIVERY_ADDING_CODES_SWI": "This variant is On-Delivery. Adding codes switches it to Instant stock (delivered immediately from the codes).",
       "CODES": "Codes",
       "UPLOAD_TXT_CSV_EXCEL": "Upload TXT / CSV / Excel",
+      "UPLOAD_PICTURES": "Upload pictures",
+      "UPLOAD_PICTURES_HINT": "Each picture is one item that the customer receives as an image.",
       "DOWNLOAD_STOCK_TXT": "Download stock (TXT)",
       "DOWNLOAD_STOCK_TXT_HINT": "Downloads this variant's unsold codes as a text file, one per line.",
       "UPLOAD_PICTURES_EACH_PICTURE_ONE_ITEM_THE_CU": "Upload pictures (each picture = one item the customer receives as an image)",

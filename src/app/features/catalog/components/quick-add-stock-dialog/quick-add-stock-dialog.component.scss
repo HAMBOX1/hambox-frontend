@@ -7,6 +7,12 @@
   margin-bottom: 0.65rem;
 }
 
+.quick-stock__hint {
+  margin: 0 0 0.65rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
 .quick-stock__tool {
   --tool-color: var(--admin-accent-green, #34d399);
 
