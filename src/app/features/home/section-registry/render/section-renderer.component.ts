@@ -90,8 +90,15 @@ import { resolveSectionVariant } from '../section-variant-registry';
     // Under the section's heading text, inside the section (moved there by the renderer), like the hero button.
     .section-common-cta[data-placement='text'] {
       justify-content: flex-start;
-      margin: 14px 0 6px;
+      margin: 0 0 24px;
       padding: 0;
+    }
+
+    // The heading (or its subtitle) that now has the button right under it keeps only a small gap to it, instead of its
+    // usual big gap to the content, so the button reads as part of the heading and not as part of the cards below.
+    :host ::ng-deep h2:has(+ .section-common-cta[data-placement='text']),
+    :host ::ng-deep p:has(+ .section-common-cta[data-placement='text']) {
+      margin-bottom: 12px;
     }
 
     .section-common-cta[data-placement='text'][data-align='center'] {
