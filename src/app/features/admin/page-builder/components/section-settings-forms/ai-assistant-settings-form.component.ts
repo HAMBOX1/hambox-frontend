@@ -51,6 +51,7 @@ export class AiAssistantSettingsFormComponent {
 
   protected readonly fields: SettingsFieldConfig[] = [
     { key: 'statusText', control: 'text', ...KEY('STATUS_TEXT') },
+    { key: 'iconClass', control: 'icon', ...KEY('ICON_CLASS') },
     { key: 'title', control: 'text', validators: { required: true }, ...KEY('TITLE') },
     { key: 'titleAccent', control: 'text', ...KEY('TITLE_ACCENT') },
     { key: 'description', control: 'textarea', rows: 3, ...KEY('DESCRIPTION') },

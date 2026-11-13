@@ -294,7 +294,7 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     displayName: 'Popular Categories',
     renderComponent: PopularCategoriesVariantDefaultComponent,
     description:
-      'A grid of the storefront’s active catalog categories, driven by live data at runtime.',
+      'A grid of tiles — all the store’s active categories, only the categories you pick, or products you choose.',
     tags: ['categories', 'grid', 'catalog'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {
@@ -578,8 +578,9 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     variantKey: 'ai-assistant',
     displayName: 'AI Assistant',
     renderComponent: AiAssistantVariantDefaultComponent,
-    description: 'A promo card introducing the storefront’s AI shopping assistant.',
-    tags: ['assistant', 'ai', 'promo'],
+    description:
+      'A glowing call-to-action card: status pill, headline, text and a button with an icon of your choice. Made for the AI assistant, but all its words are yours — use it for any announcement or campaign.',
+    tags: ['assistant', 'ai', 'promo', 'card', 'highlight', 'announcement'],
     badge: 'new',
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {

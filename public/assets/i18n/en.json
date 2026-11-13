@@ -4944,6 +4944,10 @@
             "REMOVE_ITEM": "Remove item"
           },
           "AI_ASSISTANT": {
+            "ICON_CLASS": {
+              "LABEL": "Button icon",
+              "HELP": "The icon next to the button text. Leave empty for the lightning bolt."
+            },
             "STATUS_TEXT": {
               "LABEL": "Status text",
               "HELP": "Small status pill above the title."

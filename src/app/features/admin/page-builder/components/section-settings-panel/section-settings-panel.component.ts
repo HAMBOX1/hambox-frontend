@@ -54,6 +54,19 @@ import { SectionCommonSettingsComponent } from '../section-common-settings/secti
 })
 export class SectionSettingsPanelComponent {
   readonly entry = input<LandingPageSectionEntry | null>(null);
+
+  /** Products sections, and a Popular Categories section switched to products, let the admin choose the products shown. */
+  protected readonly showsProducts = computed(() => {
+    const entry = this.entry();
+    if (!entry) {
+      return false;
+    }
+    return (
+      entry.category === 'Products' ||
+      (entry.category === 'Categories' &&
+        (this.parseConfig(entry.configJson) as { contentType?: string } | null)?.contentType === 'products')
+    );
+  });
   readonly editable = input(true);
 
   readonly visibilityToggle = output<string>();

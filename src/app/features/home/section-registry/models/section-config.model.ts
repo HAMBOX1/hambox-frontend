@@ -137,6 +137,10 @@ export interface PopularCategoriesSectionConfig {
   readonly sectionTitle: string;
   readonly maximumCategories: number;
   readonly sortOrder: string;
+  /** What the tiles show: the store's categories (the default) or products (chosen under "Products shown"). */
+  readonly contentType?: 'categories' | 'products';
+  /** Categories to show, in this order; empty keeps the store's active categories. */
+  readonly categoryIds?: readonly string[];
 }
 
 export interface FlashDealsSectionConfig {
@@ -265,6 +269,8 @@ export interface ConsoleFavoritesSectionConfig {
 
 /** Figma "Meet HAMBOX Nexus" AI-assistant promo card. */
 export interface AiAssistantSectionConfig {
+  /** Icon on the button (a PrimeIcons class); empty keeps the lightning bolt. */
+  readonly iconClass?: string;
   readonly statusText: string;
   readonly title: string;
   readonly titleAccent: string;

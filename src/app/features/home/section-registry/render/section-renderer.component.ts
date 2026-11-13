@@ -257,7 +257,11 @@ export class SectionRendererComponent implements OnDestroy {
     // Only Products sections consume `featuredProducts`; for them, resolve the admin's chosen source.
     effect((onCleanup) => {
       const products = this.common().products;
-      const isProductsSection = this.entry().category === 'Products';
+      // A Popular Categories section switched to "products" takes its items from the same source options.
+      const isProductsSection =
+        this.entry().category === 'Products' ||
+        (this.entry().category === 'Categories' &&
+          (this.config() as { contentType?: string }).contentType === 'products');
       const defaults = this.context().featuredProducts;
 
       if (!isProductsSection) {

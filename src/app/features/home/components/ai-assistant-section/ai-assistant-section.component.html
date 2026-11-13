@@ -22,7 +22,7 @@
 
         @if (config().buttonText) {
           <a class="ai-assistant__button" [routerLink]="config().buttonUrl">
-            <i class="pi pi-bolt" aria-hidden="true"></i>
+            <i [class]="config().iconClass || 'pi pi-bolt'" aria-hidden="true"></i>
             <span>{{ config().buttonText }}</span>
           </a>
         }

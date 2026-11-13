@@ -53,7 +53,7 @@
 
     <app-section-common-settings
       [config]="commonConfig()"
-      [showProducts]="entry()!.category === 'Products'"
+      [showProducts]="showsProducts()"
       [disabled]="!editable()"
       (configChange)="onCommonChange($event)"
     />
