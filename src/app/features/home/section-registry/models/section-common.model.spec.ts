@@ -20,6 +20,25 @@ describe('readSectionCommon', () => {
     expect(common.buttonAlign).toBe('end');
   });
 
+  it('defaults the button to a medium size tucked close under the section', () => {
+    const common = readSectionCommon({ _common: { buttonLabel: 'Shop', buttonUrl: '/products' } });
+
+    expect(common.buttonSize).toBe('medium');
+    expect(common.buttonSpacing).toBe('close');
+  });
+
+  it('reads the chosen button size and spacing, and ignores anything else', () => {
+    expect(readSectionCommon({ _common: { buttonSize: 'large', buttonSpacing: 'normal' } })).toMatchObject({
+      buttonSize: 'large',
+      buttonSpacing: 'normal',
+    });
+    expect(readSectionCommon({ _common: { buttonSize: 'small' } }).buttonSize).toBe('small');
+    expect(readSectionCommon({ _common: { buttonSize: 'huge', buttonSpacing: 'far' } })).toMatchObject({
+      buttonSize: 'medium',
+      buttonSpacing: 'close',
+    });
+  });
+
   it('ignores a zero or invalid heading size so the design default stays', () => {
     expect(readSectionCommon({ _common: { titleFontSize: 0 } }).titleFontSize).toBeNull();
     expect(readSectionCommon({ _common: { titleFontSize: 'big' } }).titleFontSize).toBeNull();

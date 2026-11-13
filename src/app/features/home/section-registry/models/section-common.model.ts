@@ -7,6 +7,10 @@
 export type SectionProductSource = 'auto' | 'manual' | 'category' | 'internal';
 export type SectionProductRotation = 'none' | 'daily' | 'random';
 export type SectionButtonAlign = 'start' | 'center' | 'end';
+/** Small / Medium match the site's usual buttons; Large matches the big hero buttons. */
+export type SectionButtonSize = 'small' | 'medium' | 'large';
+/** `close` tucks the button right under the section's content; `normal` leaves the section's own spacing. */
+export type SectionButtonSpacing = 'close' | 'normal';
 
 /** Where a Products section gets its items from, how many it shows and how they rotate. */
 export interface SectionProductsConfig {
@@ -33,6 +37,8 @@ export interface SectionCommonConfig {
   readonly buttonLabel: string | null;
   readonly buttonUrl: string | null;
   readonly buttonAlign: SectionButtonAlign;
+  readonly buttonSize: SectionButtonSize;
+  readonly buttonSpacing: SectionButtonSpacing;
   readonly products: SectionProductsConfig | null;
 }
 
@@ -51,6 +57,8 @@ export const DEFAULT_SECTION_COMMON: SectionCommonConfig = {
   buttonLabel: null,
   buttonUrl: null,
   buttonAlign: 'center',
+  buttonSize: 'medium',
+  buttonSpacing: 'close',
   products: null,
 };
 
@@ -70,6 +78,8 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
     buttonLabel: typeof raw.buttonLabel === 'string' && raw.buttonLabel.trim() ? raw.buttonLabel.trim() : null,
     buttonUrl: typeof raw.buttonUrl === 'string' && raw.buttonUrl.trim() ? raw.buttonUrl.trim() : null,
     buttonAlign: raw.buttonAlign === 'start' || raw.buttonAlign === 'end' ? raw.buttonAlign : 'center',
+    buttonSize: raw.buttonSize === 'small' || raw.buttonSize === 'large' ? raw.buttonSize : 'medium',
+    buttonSpacing: raw.buttonSpacing === 'normal' ? 'normal' : 'close',
     products: products
       ? {
           source: ['manual', 'category', 'internal'].includes(products.source as string)

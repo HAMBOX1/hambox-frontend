@@ -83,6 +83,33 @@ import {
             <option value="end">End</option>
           </select>
         </div>
+
+        <div class="common__row">
+          <label for="common-button-size">Button size</label>
+          <select
+            id="common-button-size"
+            [disabled]="disabled()"
+            [ngModel]="config().buttonSize"
+            (ngModelChange)="patch({ buttonSize: $event })"
+          >
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large (same as the hero buttons)</option>
+          </select>
+        </div>
+
+        <div class="common__row">
+          <label for="common-button-spacing">Distance from the section</label>
+          <select
+            id="common-button-spacing"
+            [disabled]="disabled()"
+            [ngModel]="config().buttonSpacing"
+            (ngModelChange)="patch({ buttonSpacing: $event })"
+          >
+            <option value="close">Close to the section</option>
+            <option value="normal">Normal spacing</option>
+          </select>
+        </div>
       }
 
       @if (showProducts()) {

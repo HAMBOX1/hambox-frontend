@@ -50,7 +50,12 @@ import { resolveSectionVariant } from '../section-variant-registry';
         <ng-container *ngComponentOutlet="v.renderComponent; inputs: { context: effectiveContext(), config: config() }" />
 
         @if (common().buttonLabel && common().buttonUrl) {
-          <div class="section-common-cta" [attr.data-align]="common().buttonAlign">
+          <div
+            class="section-common-cta"
+            [attr.data-align]="common().buttonAlign"
+            [attr.data-size]="common().buttonSize"
+            [attr.data-spacing]="common().buttonSpacing"
+          >
             @if (isInternalLink(common().buttonUrl!)) {
               <a class="section-common-cta__button" [routerLink]="common().buttonUrl">{{ common().buttonLabel }}</a>
             } @else {
@@ -66,6 +71,12 @@ import { resolveSectionVariant } from '../section-variant-registry';
       display: flex;
       justify-content: center;
       padding: 0 16px 32px;
+    }
+
+    // Tucked under the section's content instead of floating a full section-gap away from it.
+    .section-common-cta[data-spacing='close'] {
+      margin-top: calc(var(--sf-section-gap, 32px) * -0.5);
+      padding-bottom: calc(var(--sf-section-gap, 32px) * 0.5);
     }
 
     .section-common-cta[data-align='start'] {
@@ -88,6 +99,36 @@ import { resolveSectionVariant } from '../section-variant-registry';
       font-weight: 700;
       text-decoration: none;
       box-shadow: var(--color-shadow-md);
+    }
+
+    .section-common-cta[data-size='small'] .section-common-cta__button {
+      min-height: 38px;
+      padding: 0 20px;
+      font-size: 14px;
+    }
+
+    .section-common-cta[data-size='medium'] .section-common-cta__button {
+      min-height: 48px;
+      padding: 0 28px;
+      font-size: 16px;
+    }
+
+    // Same size and shape as the big hero buttons.
+    .section-common-cta[data-size='large'] .section-common-cta__button {
+      min-height: 62px;
+      padding: 0 40px;
+      border-radius: var(--sf-radius-md, 12px);
+      font-family: var(--sf-font-heading, inherit);
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 767px) {
+      .section-common-cta[data-size='large'] .section-common-cta__button {
+        min-height: 54px;
+        padding: 0 32px;
+        font-size: 18px;
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
