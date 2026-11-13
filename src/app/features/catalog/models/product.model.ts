@@ -51,6 +51,8 @@ export interface Product {
   readonly additionalCategoryIds?: readonly string[];
   readonly collectionIds?: readonly string[];
   readonly primaryImageUrl?: string | null;
+  /** The product's own public "How to use" text (sanitized HTML) - shown on its page instead of the default redeem steps. */
+  readonly usageInstructionsHtml?: string | null;
   readonly images?: readonly ProductImage[] | null;
   readonly createdOnUtc?: string;
   readonly availableStock?: number;

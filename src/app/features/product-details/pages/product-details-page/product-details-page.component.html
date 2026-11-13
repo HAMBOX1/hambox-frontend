@@ -48,7 +48,13 @@
 
         <div class="pdp__product">
           <section class="pdp__gallery" [attr.aria-label]="'PRODUCT.GALLERY_ARIA' | translate">
-            <div class="pdp__hero-image">
+            <div
+              class="pdp__hero-image"
+              (mouseenter)="galleryHovered.set(true)"
+              (mouseleave)="galleryHovered.set(false)"
+              (focusin)="galleryHovered.set(true)"
+              (focusout)="galleryHovered.set(false)"
+            >
               <img [src]="activeGalleryImage()" [alt]="product()!.title" />
               <span class="pdp__badge">{{ 'PRODUCT.INSTANT_DELIVERY_BADGE' | translate }}</span>
             </div>
@@ -105,14 +111,19 @@
           <p class="pdp__redeem-subtitle">
             {{ 'PRODUCT.REDEEM_SUBTITLE' | translate }}
           </p>
-          <ol class="pdp__steps">
-            @for (step of product()!.redeemSteps; track step.id) {
-              <li class="pdp__step">
-                <h3 class="pdp__step-title">{{ step.title }}</h3>
-                <p class="pdp__step-text">{{ step.description }}</p>
-              </li>
-            }
-          </ol>
+          @if (product()!.usageInstructionsHtml) {
+            <!-- The product's own "How to use" text, written by the admin; replaces the standard steps. -->
+            <div class="pdp__usage" [innerHTML]="product()!.usageInstructionsHtml | instructionHtml"></div>
+          } @else {
+            <ol class="pdp__steps">
+              @for (step of product()!.redeemSteps; track step.id) {
+                <li class="pdp__step">
+                  <h3 class="pdp__step-title">{{ step.title }}</h3>
+                  <p class="pdp__step-text">{{ step.description }}</p>
+                </li>
+              }
+            </ol>
+          }
 
           @if (product()!.categoryInstructionsHtml) {
             <div class="pdp__category-instructions">

@@ -57,6 +57,9 @@ import { SectionRendererComponent } from '../../../home/section-registry/render/
 /** Approximate rendered height of `.pdp__mobile-bar` (10px+10px padding + 44px button + border) with
  * a little breathing room — ponytail: a measured constant, not a live `ResizeObserver`, is enough
  * since the bar's own CSS is fixed-height; revisit if that padding/button sizing ever changes. */
+/** How long each picture stays up in the gallery slideshow. */
+const GALLERY_SLIDE_MS = 5000;
+
 const BUY_BAR_INSET_PX = 76;
 
 @Component({
@@ -111,6 +114,10 @@ export class ProductDetailsPageComponent {
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly product = signal<ProductDetailsItem | null>(null);
   protected readonly selectedImageIndex = signal(0);
+  /** True while the pointer or focus is on the main picture: the slideshow waits instead of moving it away. */
+  protected readonly galleryHovered = signal(false);
+  /** Set once the visitor picks a picture themselves: from then on the slideshow leaves their choice alone. */
+  private readonly galleryChosenByVisitor = signal(false);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly cartActionError = signal<string | null>(null);
@@ -306,6 +313,23 @@ export class ProductDetailsPageComponent {
       void this.loadProduct(productId);
     });
 
+    // A product with several pictures changes its main picture by itself every few seconds (a slideshow), so the visitor
+    // sees them all without clicking. It waits while the pointer is on the picture, stops for good once the visitor picks
+    // one, and never runs for people who asked their device to reduce motion.
+    effect((onCleanup) => {
+      const count = this.product()?.galleryImages.length ?? 0;
+      if (
+        count < 2 ||
+        this.galleryHovered() ||
+        this.galleryChosenByVisitor() ||
+        (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
+      ) {
+        return;
+      }
+      const timer = setInterval(() => this.selectedImageIndex.update((index) => (index + 1) % count), GALLERY_SLIDE_MS);
+      onCleanup(() => clearInterval(timer));
+    });
+
     // The buy bar is now persistent (desktop + mobile), so any other fixed-bottom UI — the AI
     // assistant widget in particular — needs to know to lift itself clear rather than render
     // underneath it. `--hambox-buy-bar-inset` mirrors the existing `--hambox-mobile-bottom-inset`
@@ -446,6 +470,7 @@ export class ProductDetailsPageComponent {
   }
 
   protected selectGalleryImage(index: number): void {
+    this.galleryChosenByVisitor.set(true);
     this.selectedImageIndex.set(index);
   }
 

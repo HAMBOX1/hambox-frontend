@@ -516,6 +516,55 @@
   line-height: 1.65;
 }
 
+// The product's own "How to use" text (rich text from the admin editor).
+.pdp__usage {
+  max-width: 672px;
+  color: var(--color-text-secondary);
+  font-family: var(--sf-font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+
+  p,
+  ul,
+  ol {
+    margin: 0 0 0.85rem;
+  }
+
+  ul,
+  ol {
+    padding-inline-start: 1.4rem;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 1.1rem 0 0.5rem;
+    color: var(--color-text-primary);
+    font-family: var(--sf-font-heading);
+  }
+
+  strong,
+  b {
+    color: var(--color-text-primary);
+  }
+
+  a {
+    color: var(--sf-accent);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--sf-radius-md);
+  }
+}
+
 .pdp__category-instructions {
   max-width: 672px;
   margin: 32px auto 0;

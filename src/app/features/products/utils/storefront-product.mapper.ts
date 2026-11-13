@@ -93,6 +93,7 @@ export function mapProductToDetailsItem(product: Product, lang: SupportedLanguag
     categoryId: product.categoryId,
     categoryName: resolveLocalizedText(product.categoryName, product.categoryNameAr, lang),
     categoryInstructionsHtml: product.categoryDescriptionHtml ?? null,
+    usageInstructionsHtml: product.usageInstructionsHtml ?? null,
     ...DEFAULT_PRODUCT_DETAILS_EXTRAS,
     publicReleaseOnUtc: product.publicReleaseOnUtc ?? null,
     isMembersOnly: !!product.isMembersOnly,

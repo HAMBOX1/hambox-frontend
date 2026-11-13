@@ -39,6 +39,7 @@ import { SuppliersManagementFacade } from '../../../admin/suppliers/services/sup
 import { ProductAssetsUploadComponent } from '../../components/product-assets-upload/product-assets-upload.component';
 import { ProductBasicInfoFormComponent } from '../../components/product-basic-info-form/product-basic-info-form.component';
 import { ProductInstructionsPanelComponent } from '../../components/product-instructions-panel/product-instructions-panel.component';
+import { ProductUsageInstructionsCardComponent } from '../../components/product-usage-instructions-card/product-usage-instructions-card.component';
 import { ProductPurchaseControlsPanelComponent } from '../../components/product-purchase-controls-panel/product-purchase-controls-panel.component';
 import { ProductOptionGroupsPanelComponent } from '../../components/product-option-groups-panel/product-option-groups-panel.component';
 import { ProductVariantManagerComponent } from '../../components/product-variant-manager/product-variant-manager.component';
@@ -74,6 +75,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
     ProductOptionGroupsPanelComponent,
     ProductVariantManagerComponent,
     ProductInstructionsPanelComponent,
+    ProductUsageInstructionsCardComponent,
     ProductPurchaseControlsPanelComponent,
     SupplierCatalogSearchDrawerComponent,
   ],

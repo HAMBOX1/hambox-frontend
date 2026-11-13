@@ -179,6 +179,8 @@
         </app-admin-section-card>
       }
 
+      <app-product-usage-instructions-card [productId]="productId()" [html]="product()?.usageInstructionsHtml ?? null" />
+
       <app-product-instructions-panel [productId]="productId()" />
 
       <app-product-purchase-controls-panel />

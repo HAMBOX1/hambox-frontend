@@ -26,6 +26,8 @@ export interface ProductDetailsItem {
   /** The category's own "Customer instructions" (set by the admin on the category, not this
    * product) — shown alongside the redeem steps when present. Raw HTML from a rich-text editor. */
   categoryInstructionsHtml?: string | null;
+  /** The product's own "How to use" text (sanitized HTML from the admin editor); shown instead of the default redeem steps. */
+  usageInstructionsHtml?: string | null;
   trustFeatures: readonly ProductDetailsTrustFeature[];
   redeemSteps: readonly ProductDetailsRedeemStep[];
   /** Null if already public; a future date if gated behind the Early Access membership benefit. */

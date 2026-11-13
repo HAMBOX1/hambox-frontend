@@ -226,6 +226,11 @@ export class ProductApiService {
     return this.api.delete<void>(CATALOG_API.productPendingMerge(productId));
   }
 
+  /** Sets (empty clears) the product's own public "How to use" text shown on its storefront page. */
+  setUsageInstructions(productId: string, html: string): Observable<void> {
+    return this.api.put<void>(CATALOG_API.productUsageInstructions(productId), { html });
+  }
+
   setFavorite(productId: string, isFavorite: boolean): Observable<void> {
     return this.api.put<void>(CATALOG_API.productFavorite(productId), { isFavorite });
   }
