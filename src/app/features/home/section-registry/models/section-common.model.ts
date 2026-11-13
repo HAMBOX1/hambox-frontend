@@ -11,6 +11,8 @@ export type SectionButtonAlign = 'start' | 'center' | 'end';
 export type SectionButtonSize = 'small' | 'medium' | 'large';
 /** `close` tucks the button right under the section's content; `normal` leaves the section's own spacing. */
 export type SectionButtonSpacing = 'close' | 'normal';
+/** `text` puts the button right under the section's heading text (like the hero button); `bottom` after all the content. */
+export type SectionButtonPlacement = 'text' | 'bottom';
 
 /** Where a Products section gets its items from, how many it shows and how they rotate. */
 export interface SectionProductsConfig {
@@ -39,6 +41,7 @@ export interface SectionCommonConfig {
   readonly buttonAlign: SectionButtonAlign;
   readonly buttonSize: SectionButtonSize;
   readonly buttonSpacing: SectionButtonSpacing;
+  readonly buttonPlacement: SectionButtonPlacement;
   readonly products: SectionProductsConfig | null;
 }
 
@@ -59,6 +62,7 @@ export const DEFAULT_SECTION_COMMON: SectionCommonConfig = {
   buttonAlign: 'center',
   buttonSize: 'medium',
   buttonSpacing: 'close',
+  buttonPlacement: 'text',
   products: null,
 };
 
@@ -80,6 +84,7 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
     buttonAlign: raw.buttonAlign === 'start' || raw.buttonAlign === 'end' ? raw.buttonAlign : 'center',
     buttonSize: raw.buttonSize === 'small' || raw.buttonSize === 'large' ? raw.buttonSize : 'medium',
     buttonSpacing: raw.buttonSpacing === 'normal' ? 'normal' : 'close',
+    buttonPlacement: raw.buttonPlacement === 'bottom' ? 'bottom' : 'text',
     products: products
       ? {
           source: ['manual', 'category', 'internal'].includes(products.source as string)

@@ -1,5 +1,17 @@
 import { NgComponentOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ScrollRevealDirective } from '../../../../shared/directives/scroll-reveal.directive';
@@ -51,7 +63,9 @@ import { resolveSectionVariant } from '../section-variant-registry';
 
         @if (common().buttonLabel && common().buttonUrl) {
           <div
+            #cta
             class="section-common-cta"
+            [attr.data-placement]="common().buttonPlacement"
             [attr.data-align]="common().buttonAlign"
             [attr.data-size]="common().buttonSize"
             [attr.data-spacing]="common().buttonSpacing"
@@ -73,8 +87,23 @@ import { resolveSectionVariant } from '../section-variant-registry';
       padding: 0 16px 32px;
     }
 
+    // Under the section's heading text, inside the section (moved there by the renderer), like the hero button.
+    .section-common-cta[data-placement='text'] {
+      justify-content: flex-start;
+      margin: 14px 0 6px;
+      padding: 0;
+    }
+
+    .section-common-cta[data-placement='text'][data-align='center'] {
+      justify-content: center;
+    }
+
+    .section-common-cta[data-placement='text'][data-align='end'] {
+      justify-content: flex-end;
+    }
+
     // Tucked under the section's content instead of floating a full section-gap away from it.
-    .section-common-cta[data-spacing='close'] {
+    .section-common-cta[data-placement='bottom'][data-spacing='close'] {
       margin-top: calc(var(--sf-section-gap, 32px) * -0.5);
       padding-bottom: calc(var(--sf-section-gap, 32px) * 0.5);
     }
@@ -133,8 +162,11 @@ import { resolveSectionVariant } from '../section-variant-registry';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SectionRendererComponent {
+export class SectionRendererComponent implements OnDestroy {
   private readonly productSource = inject(SectionProductSourceService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly cta = viewChild<ElementRef<HTMLElement>>('cta');
+  private placementObserver: MutationObserver | null = null;
 
   readonly entry = input.required<LandingPageSectionEntry>();
   readonly context = input.required<SectionRenderContext>();
@@ -167,6 +199,54 @@ export class SectionRendererComponent {
   });
 
   constructor() {
+    // Where the section button sits: right under the heading text, or after all the content.
+    effect((onCleanup) => {
+      const cta = this.cta()?.nativeElement;
+      const placement = this.common().buttonPlacement;
+      this.placementObserver?.disconnect();
+      this.placementObserver = null;
+      if (!cta) {
+        return;
+      }
+
+      const wrapper = cta.closest('.section-transition') as HTMLElement | null;
+      if (!wrapper) {
+        return;
+      }
+
+      if (placement === 'bottom') {
+        wrapper.appendChild(cta);
+        return;
+      }
+
+      // The variant fills in its own heading a moment after this component renders (and can redraw it later), so keep
+      // watching: place the button under the heading as soon as it exists, and again if the redraw drops it.
+      const place = () => {
+        if (cta.isConnected && cta.parentElement !== wrapper) {
+          return;
+        }
+        const heading = wrapper.querySelector('h2');
+        if (!heading) {
+          return;
+        }
+        const subtitle = heading.nextElementSibling;
+        const anchor = subtitle instanceof HTMLParagraphElement ? subtitle : heading;
+        anchor.after(cta);
+      };
+
+      place();
+      if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(() => {
+          if (!wrapper.contains(cta) || cta.parentElement === wrapper) {
+            place();
+          }
+        });
+        observer.observe(wrapper, { childList: true, subtree: true });
+        this.placementObserver = observer;
+        onCleanup(() => observer.disconnect());
+      }
+    });
+
     // Only Products sections consume `featuredProducts`; for them, resolve the admin's chosen source.
     effect((onCleanup) => {
       const products = this.common().products;
@@ -204,6 +284,10 @@ export class SectionRendererComponent {
         cancelled = true;
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    this.placementObserver?.disconnect();
   }
 
   protected isInternalLink(url: string): boolean {

@@ -39,6 +39,12 @@ describe('readSectionCommon', () => {
     });
   });
 
+  it('puts the button under the heading text by default, and reads the bottom choice', () => {
+    expect(readSectionCommon({ _common: { buttonLabel: 'Shop', buttonUrl: '/p' } }).buttonPlacement).toBe('text');
+    expect(readSectionCommon({ _common: { buttonPlacement: 'bottom' } }).buttonPlacement).toBe('bottom');
+    expect(readSectionCommon({ _common: { buttonPlacement: 'somewhere' } }).buttonPlacement).toBe('text');
+  });
+
   it('ignores a zero or invalid heading size so the design default stays', () => {
     expect(readSectionCommon({ _common: { titleFontSize: 0 } }).titleFontSize).toBeNull();
     expect(readSectionCommon({ _common: { titleFontSize: 'big' } }).titleFontSize).toBeNull();

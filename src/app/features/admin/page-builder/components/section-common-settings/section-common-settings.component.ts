@@ -85,6 +85,19 @@ import {
         </div>
 
         <div class="common__row">
+          <label for="common-button-placement">Button place</label>
+          <select
+            id="common-button-placement"
+            [disabled]="disabled()"
+            [ngModel]="config().buttonPlacement"
+            (ngModelChange)="patch({ buttonPlacement: $event })"
+          >
+            <option value="text">Under the section's heading text</option>
+            <option value="bottom">At the bottom of the section</option>
+          </select>
+        </div>
+
+        <div class="common__row">
           <label for="common-button-size">Button size</label>
           <select
             id="common-button-size"
@@ -109,6 +122,7 @@ import {
             <option value="close">Close to the section</option>
             <option value="normal">Normal spacing</option>
           </select>
+          <small>Only used when the button is at the bottom of the section.</small>
         </div>
       }
 
