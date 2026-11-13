@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import {
   AdminIconButtonComponent,
   IconPickerComponent,
+  MediaPickerComponent,
   RoutePickerComponent,
 } from '../../../../../shared/components/admin';
 import {
@@ -24,6 +25,7 @@ import {
     InputTextModule,
     AdminIconButtonComponent,
     IconPickerComponent,
+    MediaPickerComponent,
     RoutePickerComponent,
   ],
   templateUrl: './platform-selector-settings-form.component.html',

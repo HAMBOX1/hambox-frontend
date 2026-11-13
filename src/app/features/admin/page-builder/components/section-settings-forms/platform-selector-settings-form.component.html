@@ -37,6 +37,16 @@
           </label>
 
           <label class="platform-selector-form__field platform-selector-form__field--wide">
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.ICON_IMAGE' | translate }}</span>
+            <app-media-picker
+              [value]="item.imageUrl ?? null"
+              [disabled]="disabled()"
+              recommendedSize="Square PNG or SVG, transparent background, about 96×96px"
+              (valueChange)="updateItem(i, { imageUrl: $event })"
+            />
+          </label>
+
+          <label class="platform-selector-form__field platform-selector-form__field--wide">
             <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.LINK_URL' | translate }}</span>
             <app-route-picker
               [value]="item.linkUrl"

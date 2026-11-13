@@ -1,14 +1,43 @@
 <section class="platform-selector" aria-label="Shop by platform">
   <div class="platform-selector__inner">
-    <ul class="platform-selector__grid">
-      @for (item of config().items; track item.id) {
-        <li>
-          <a class="platform-selector__item" [routerLink]="item.linkUrl">
-            <i class="{{ item.iconClass }}" aria-hidden="true"></i>
-            <span>{{ item.label }}</span>
-          </a>
-        </li>
+    <div class="platform-selector__strip">
+      @if (canScrollBack()) {
+        <button type="button" class="platform-selector__arrow platform-selector__arrow--back" aria-label="Scroll back" (click)="scrollStrip(-1)">
+          <i class="pi pi-angle-left" aria-hidden="true"></i>
+        </button>
       }
-    </ul>
+
+      <ul #list class="platform-selector__grid" (scroll)="updateArrows()">
+        @for (item of config().items; track item.id) {
+          <li>
+            @let target = linkTarget(item.linkUrl);
+            @if (target.external) {
+              <a class="platform-selector__item" [href]="item.linkUrl" rel="noopener">
+                <ng-container *ngTemplateOutlet="tile; context: { $implicit: item }" />
+              </a>
+            } @else {
+              <a class="platform-selector__item" [routerLink]="target.path" [queryParams]="target.query">
+                <ng-container *ngTemplateOutlet="tile; context: { $implicit: item }" />
+              </a>
+            }
+          </li>
+        }
+      </ul>
+
+      @if (canScrollForward()) {
+        <button type="button" class="platform-selector__arrow platform-selector__arrow--forward" aria-label="Scroll forward" (click)="scrollStrip(1)">
+          <i class="pi pi-angle-right" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
   </div>
 </section>
+
+<ng-template #tile let-item>
+  @if (item.imageUrl) {
+    <span class="platform-selector__image"><img [src]="item.imageUrl" alt="" loading="lazy" /></span>
+  } @else {
+    <i class="{{ item.iconClass }}" aria-hidden="true"></i>
+  }
+  <span class="platform-selector__label">{{ item.label }}</span>
+</ng-template>

@@ -70,7 +70,7 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
     displayName: 'Platform Selector',
     renderComponent: PlatformSelectorVariantDefaultComponent,
     description:
-      'A row of platform icons (PC, PlayStation, Xbox, Mobile) linking into the catalog.',
+      'A swipeable strip of icon tiles you choose (an icon or your own picture, a label and a link) — platforms, gift cards, top-ups…',
     tags: ['navigation', 'icons', 'platforms'],
     supportedBreakpoints: ALL_BREAKPOINTS,
     previewConfig: {

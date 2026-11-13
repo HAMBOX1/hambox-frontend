@@ -4938,6 +4938,7 @@
             "EMPTY": "No platforms yet — add one below.",
             "LABEL": "Label",
             "ICON_CLASS": "PrimeIcons class (e.g. pi pi-desktop)",
+            "ICON_IMAGE": "Icon picture (optional — shown instead of the icon)",
             "LINK_URL": "Link URL",
             "ADD_ITEM": "Add item",
             "REMOVE_ITEM": "Remove item"

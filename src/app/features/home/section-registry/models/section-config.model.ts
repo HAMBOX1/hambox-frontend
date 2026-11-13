@@ -65,6 +65,8 @@ export interface PlatformSelectorItemConfig {
   readonly label: string;
   readonly iconClass: string;
   readonly linkUrl: string;
+  /** Optional picture shown instead of the icon (a brand logo, a coin…); the icon class is the fallback. */
+  readonly imageUrl?: string | null;
 }
 
 export interface PlatformSelectorSectionConfig {
