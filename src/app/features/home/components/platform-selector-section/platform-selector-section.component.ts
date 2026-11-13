@@ -64,8 +64,9 @@ export class PlatformSelectorSectionComponent implements AfterViewInit, OnDestro
     // `scrollLeft` is negative in right-to-left pages, so work with its absolute distance from the start edge.
     const fromStart = Math.abs(element.scrollLeft);
     const maxScroll = element.scrollWidth - element.clientWidth;
-    this.canScrollBack.set(fromStart > 1);
-    this.canScrollForward.set(fromStart < maxScroll - 1);
+    // A few pixels of slack: scroll-snap rests the strip a hair away from its very start/end.
+    this.canScrollBack.set(fromStart > 8);
+    this.canScrollForward.set(fromStart < maxScroll - 8);
   }
 
   protected scrollStrip(direction: -1 | 1): void {
