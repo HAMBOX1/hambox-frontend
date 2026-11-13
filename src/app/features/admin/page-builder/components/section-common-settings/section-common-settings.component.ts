@@ -78,6 +78,7 @@ import {
             [ngModel]="config().buttonAlign"
             (ngModelChange)="patch({ buttonAlign: $event })"
           >
+            <option [ngValue]="null">Automatic</option>
             <option value="start">Start</option>
             <option value="center">Centre</option>
             <option value="end">End</option>

@@ -38,7 +38,8 @@ export interface SectionCommonConfig {
   /** A call-to-action button under the section (e.g. "View all"); shown only when label and link are set. */
   readonly buttonLabel: string | null;
   readonly buttonUrl: string | null;
-  readonly buttonAlign: SectionButtonAlign;
+  /** null = automatic: at the start under the heading text, centred at the bottom of the section. */
+  readonly buttonAlign: SectionButtonAlign | null;
   readonly buttonSize: SectionButtonSize;
   readonly buttonSpacing: SectionButtonSpacing;
   readonly buttonPlacement: SectionButtonPlacement;
@@ -59,7 +60,7 @@ export const DEFAULT_SECTION_COMMON: SectionCommonConfig = {
   titleColor: null,
   buttonLabel: null,
   buttonUrl: null,
-  buttonAlign: 'center',
+  buttonAlign: null,
   buttonSize: 'medium',
   buttonSpacing: 'close',
   buttonPlacement: 'text',
@@ -81,7 +82,7 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
     titleColor: typeof raw.titleColor === 'string' && raw.titleColor.trim() ? raw.titleColor.trim() : null,
     buttonLabel: typeof raw.buttonLabel === 'string' && raw.buttonLabel.trim() ? raw.buttonLabel.trim() : null,
     buttonUrl: typeof raw.buttonUrl === 'string' && raw.buttonUrl.trim() ? raw.buttonUrl.trim() : null,
-    buttonAlign: raw.buttonAlign === 'start' || raw.buttonAlign === 'end' ? raw.buttonAlign : 'center',
+    buttonAlign: raw.buttonAlign === 'start' || raw.buttonAlign === 'center' || raw.buttonAlign === 'end' ? raw.buttonAlign : null,
     buttonSize: raw.buttonSize === 'small' || raw.buttonSize === 'large' ? raw.buttonSize : 'medium',
     buttonSpacing: raw.buttonSpacing === 'normal' ? 'normal' : 'close',
     buttonPlacement: raw.buttonPlacement === 'bottom' ? 'bottom' : 'text',

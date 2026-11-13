@@ -66,7 +66,7 @@ import { resolveSectionVariant } from '../section-variant-registry';
             #cta
             class="section-common-cta"
             [attr.data-placement]="common().buttonPlacement"
-            [attr.data-align]="common().buttonAlign"
+            [attr.data-align]="common().buttonAlign ?? (common().buttonPlacement === 'text' ? 'start' : 'center')"
             [attr.data-size]="common().buttonSize"
             [attr.data-spacing]="common().buttonSpacing"
           >

@@ -45,6 +45,12 @@ describe('readSectionCommon', () => {
     expect(readSectionCommon({ _common: { buttonPlacement: 'somewhere' } }).buttonPlacement).toBe('text');
   });
 
+  it('leaves the button alignment automatic unless the admin picked one', () => {
+    expect(readSectionCommon({ _common: { buttonLabel: 'Shop' } }).buttonAlign).toBeNull();
+    expect(readSectionCommon({ _common: { buttonAlign: 'sideways' } }).buttonAlign).toBeNull();
+    expect(readSectionCommon({ _common: { buttonAlign: 'center' } }).buttonAlign).toBe('center');
+  });
+
   it('ignores a zero or invalid heading size so the design default stays', () => {
     expect(readSectionCommon({ _common: { titleFontSize: 0 } }).titleFontSize).toBeNull();
     expect(readSectionCommon({ _common: { titleFontSize: 'big' } }).titleFontSize).toBeNull();
