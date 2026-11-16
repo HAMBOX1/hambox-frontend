@@ -309,7 +309,7 @@ export class PageBuilderFacade {
     }
   }
 
-  addSection(category: string, variantKey: string): void {
+  addSection(category: string, variantKey: string, configJson = '{}'): void {
     const sections = this.draftSectionsState();
     const entry: LandingPageSectionEntry = {
       instanceId: crypto.randomUUID(),
@@ -317,7 +317,7 @@ export class PageBuilderFacade {
       variantKey,
       sortOrder: sections.length,
       isVisible: true,
-      configJson: '{}',
+      configJson,
     };
     this.draftSectionsState.set([...sections, entry]);
     this.scheduleAutoSave();

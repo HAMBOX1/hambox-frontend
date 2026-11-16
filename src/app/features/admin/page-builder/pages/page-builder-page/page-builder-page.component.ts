@@ -470,7 +470,8 @@ export class PageBuilderPageComponent implements OnInit {
   }
 
   protected onVariantSelected(variant: SectionVariantDefinition): void {
-    this.commandStack.addSection(variant.category, variant.variantKey);
+    // A new section starts with the same starter content its card shows in the library, ready to edit.
+    this.commandStack.addSection(variant.category, variant.variantKey, JSON.stringify(variant.previewConfig ?? {}));
   }
 
   protected onConfigChange(change: { instanceId: string; configJson: string }): void {

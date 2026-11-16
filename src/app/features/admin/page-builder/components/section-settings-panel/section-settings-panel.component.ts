@@ -16,6 +16,7 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { resolveSectionConfig } from '../../../../home/section-registry/section-config-defaults';
 
 import {
   AdminEmptyStateComponent,
@@ -159,7 +160,8 @@ export class SectionSettingsPanelComponent {
     // it can't be structurally typed as `Type<SectionSettingsFormInstance>`) — every registered
     // settings-form component genuinely has this shape, so this cast is safe.
     const ref = host.createComponent(type as unknown as Type<SectionSettingsFormInstance>);
-    ref.setInput('config', this.parseConfig(current.configJson));
+    // The form opens with what the section really shows: its starter content when it was never configured.
+    ref.setInput('config', resolveSectionConfig(this.parseConfig(current.configJson), this.variant()?.previewConfig));
     ref.setInput('disabled', !this.editable());
     this.formOutputSub = ref.instance.configChange.subscribe((value: unknown) => {
       const target = this.entry();

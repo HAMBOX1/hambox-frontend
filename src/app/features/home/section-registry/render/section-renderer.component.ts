@@ -20,7 +20,19 @@ import { FlashDeal } from '../../models/storefront-home';
 import { SectionProductSourceService } from '../../services/section-product-source.service';
 import { readSectionCommon } from '../models/section-common.model';
 import { SectionRenderContext } from '../models/section-variant.model';
+import { resolveSectionConfig } from '../section-config-defaults';
 import { resolveSectionVariant } from '../section-variant-registry';
+
+function parseConfigJson(json: string | null | undefined): unknown {
+  if (!json || !json.trim()) {
+    return {};
+  }
+  try {
+    return JSON.parse(json);
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Renders one published landing-page section entry by looking up its registered variant
@@ -187,15 +199,9 @@ export class SectionRendererComponent implements OnDestroy {
   );
 
   protected readonly config = computed<unknown>(() => {
-    const json = this.entry().configJson;
-    if (!json || !json.trim()) {
-      return {};
-    }
-    try {
-      return JSON.parse(json);
-    } catch {
-      return {};
-    }
+    // Whatever is missing from the saved settings is filled in (see `resolveSectionConfig`), so a section added from the
+    // library and never configured shows its starter content, and a half-filled one can never crash on a missing list.
+    return resolveSectionConfig(parseConfigJson(this.entry().configJson), this.variant()?.previewConfig);
   });
 
   protected readonly common = computed(() => readSectionCommon(this.config()));

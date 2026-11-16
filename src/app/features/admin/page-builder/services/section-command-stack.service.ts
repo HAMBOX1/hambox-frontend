@@ -30,9 +30,9 @@ export class SectionCommandStackService {
     });
   }
 
-  addSection(category: string, variantKey: string): void {
+  addSection(category: string, variantKey: string, configJson = '{}'): void {
     this.snapshot();
-    this.facade.addSection(category, variantKey);
+    this.facade.addSection(category, variantKey, configJson);
   }
 
   removeSection(instanceId: string): void {
