@@ -47,7 +47,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           // (who is allowed through) would be bounced here by a call that simply went out before their token was
           // ready. The route guards decide once startup is done, so only redirect after that.
           const startingUp = !session.initialized(AUTH_CONTEXT.Customer);
-          if (!router.url.startsWith('/coming-soon') && !onAdmin && !startingUp) {
+          // A signed-in administrator is allowed on the store; a refusal of one customer-only call (the cart, say) is not a
+          // reason to throw them out of the page they are previewing.
+          const adminBrowsing = session.isAdminAuthenticated();
+          if (!router.url.startsWith('/coming-soon') && !onAdmin && !startingUp && !adminBrowsing) {
             void router.navigateByUrl('/coming-soon');
           }
         }

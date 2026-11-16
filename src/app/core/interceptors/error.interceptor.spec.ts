@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
+import { fakeJwt } from '../../testing/fake-jwt';
 import { AUTH_CONTEXT } from '../auth/auth-context';
 import { AuthSessionService } from '../auth/auth-session.service';
 import { MaintenanceBypassService } from '../maintenance/maintenance-bypass.service';
@@ -106,5 +107,21 @@ describe('errorInterceptor — maintenance redirect loop', () => {
     );
 
     expect(navigate).toHaveBeenCalledWith('/coming-soon');
+  });
+
+  it('keeps a signed-in administrator on the page when a customer-only call is refused', () => {
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const session = TestBed.inject(AuthSessionService);
+    session.markInitialized(AUTH_CONTEXT.Customer);
+    session.setSession(AUTH_CONTEXT.Admin, { accessToken: fakeJwt('admin'), expiresAt: new Date().toISOString() });
+
+    http.get('/api/v1/cart').subscribe({ error: () => undefined });
+    httpMock.expectOne('/api/v1/cart').flush(
+      { code: 'COMING_SOON', message: '' },
+      { status: 503, statusText: 'Service Unavailable' },
+    );
+
+    expect(navigate).not.toHaveBeenCalled();
   });
 });
