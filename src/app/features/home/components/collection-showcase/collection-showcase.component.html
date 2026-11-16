@@ -48,7 +48,7 @@
               <p class="collection-showcase__card-subtitle">{{ card.subtitle }}</p>
             }
             @if (card.buttonText) {
-              <a class="collection-showcase__card-link" [routerLink]="card.buttonUrl">
+              <a class="collection-showcase__card-link" [hamboxLink]="card.buttonUrl">
                 <span>{{ card.buttonText }}</span>
                 <i class="pi pi-arrow-right" aria-hidden="true"></i>
               </a>

@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 import { ArenaBriefingsSectionConfig } from '../../section-registry/models/section-config.model';
+import { HamboxLinkDirective } from '../../../../shared/directives/hambox-link.directive';
 
 @Component({
   selector: 'app-arena-briefings-section',
   standalone: true,
-  imports: [RouterLink],
+  imports: [HamboxLinkDirective],
   templateUrl: './arena-briefings-section.component.html',
   styleUrl: './arena-briefings-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

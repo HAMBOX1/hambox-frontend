@@ -9,7 +9,7 @@
       </div>
 
       @if (hero().viewAllText) {
-        <a class="hero-editorial__view-all" [routerLink]="hero().viewAllUrl">
+        <a class="hero-editorial__view-all" [hamboxLink]="hero().viewAllUrl">
           <span>{{ hero().viewAllText }}</span>
           <i class="pi pi-arrow-right" aria-hidden="true"></i>
         </a>
@@ -33,7 +33,7 @@
           @if (hero().featuredButtonText) {
             <a
               pButton
-              [routerLink]="hero().featuredButtonUrl"
+              [hamboxLink]="hero().featuredButtonUrl"
               class="hero-editorial__card-button"
               styleClass="hero-editorial__card-button"
             >

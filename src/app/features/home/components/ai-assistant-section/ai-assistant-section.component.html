@@ -21,7 +21,7 @@
         <p class="ai-assistant__description">{{ config().description }}</p>
 
         @if (config().buttonText) {
-          <a class="ai-assistant__button" [routerLink]="config().buttonUrl">
+          <a class="ai-assistant__button" [hamboxLink]="config().buttonUrl">
             <i [class]="config().iconClass || 'pi pi-bolt'" aria-hidden="true"></i>
             <span>{{ config().buttonText }}</span>
           </a>

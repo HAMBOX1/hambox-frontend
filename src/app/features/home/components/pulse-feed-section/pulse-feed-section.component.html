@@ -9,7 +9,7 @@
 
     <div class="pulse-feed__grid">
       @for (item of config().items; track item.id) {
-        <a class="pulse-card" [routerLink]="item.linkUrl">
+        <a class="pulse-card" [hamboxLink]="item.linkUrl">
           <div class="pulse-card__meta">
             <span class="pulse-card__tag pulse-card__tag--{{ item.tagTone }}">{{ item.tagText }}</span>
             <span class="pulse-card__time">

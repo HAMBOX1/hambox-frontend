@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, ElementRef, input, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 import { CollectionShowcaseSectionConfig } from '../../section-registry/models/section-config.model';
+import { HamboxLinkDirective } from '../../../../shared/directives/hambox-link.directive';
 
 @Component({
   selector: 'app-collection-showcase',
   standalone: true,
-  imports: [RouterLink],
+  imports: [HamboxLinkDirective],
   templateUrl: './collection-showcase.component.html',
   styleUrl: './collection-showcase.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

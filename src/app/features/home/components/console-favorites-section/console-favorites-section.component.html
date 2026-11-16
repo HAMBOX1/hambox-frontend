@@ -13,7 +13,7 @@
 
       <div class="console-favorites__controls">
         @if (config().viewAllText && config().viewAllUrl) {
-          <a class="console-favorites__view-all" [routerLink]="config().viewAllUrl">{{ config().viewAllText }}</a>
+          <a class="console-favorites__view-all" [hamboxLink]="config().viewAllUrl">{{ config().viewAllText }}</a>
         }
 
         @if (config().cards.length > 1) {
@@ -56,7 +56,7 @@
           [style.z-index]="cardState(i).zIndex"
           [attr.tabindex]="cardState(i).interactive ? null : -1"
           [attr.aria-hidden]="!cardState(i).interactive"
-          [routerLink]="card.buttonUrl"
+          [hamboxLink]="card.buttonUrl"
           (click)="onCardClick($event)"
         >
           <span class="console-card__corner console-card__corner--start" aria-hidden="true"></span>

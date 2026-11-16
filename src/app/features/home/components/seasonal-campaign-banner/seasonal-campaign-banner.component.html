@@ -19,7 +19,7 @@
 
     <div class="campaign-banner__actions">
       @if (banner().buttonText) {
-        <a class="campaign-banner__button" [routerLink]="banner().buttonUrl">{{ banner().buttonText }}</a>
+        <a class="campaign-banner__button" [hamboxLink]="banner().buttonUrl">{{ banner().buttonText }}</a>
       }
 
       @if (banner().countdownSeconds > 0) {

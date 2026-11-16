@@ -9,16 +9,16 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
 import { interval } from 'rxjs';
 
 import { SeasonalCampaignBannerConfig } from '../../section-registry/models/section-config.model';
 import { computeRemainingSeconds } from '../../../../shared/utils/countdown.util';
+import { HamboxLinkDirective } from '../../../../shared/directives/hambox-link.directive';
 
 @Component({
   selector: 'app-seasonal-campaign-banner',
   standalone: true,
-  imports: [RouterLink],
+  imports: [HamboxLinkDirective],
   templateUrl: './seasonal-campaign-banner.component.html',
   styleUrl: './seasonal-campaign-banner.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

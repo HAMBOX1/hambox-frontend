@@ -29,13 +29,13 @@
 
       <div class="hardware-showcase__actions">
         @if (config().primaryButtonText) {
-          <a class="hardware-showcase__button hardware-showcase__button--primary" [routerLink]="config().primaryButtonUrl">
+          <a class="hardware-showcase__button hardware-showcase__button--primary" [hamboxLink]="config().primaryButtonUrl">
             {{ config().primaryButtonText }}
           </a>
         }
 
         @if (config().secondaryButtonText) {
-          <a class="hardware-showcase__button hardware-showcase__button--secondary" [routerLink]="config().secondaryButtonUrl">
+          <a class="hardware-showcase__button hardware-showcase__button--secondary" [hamboxLink]="config().secondaryButtonUrl">
             {{ config().secondaryButtonText }}
           </a>
         }

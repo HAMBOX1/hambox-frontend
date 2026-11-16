@@ -29,7 +29,7 @@
       <div class="hero-grid__actions" aria-label="Hero actions">
         <a
           pButton
-          [routerLink]="hero().primaryButtonUrl"
+          [hamboxLink]="hero().primaryButtonUrl"
           class="hero-grid__button hero-grid__button--primary"
           styleClass="hero-grid__button hero-grid__button--primary"
         >
@@ -40,7 +40,7 @@
         @if (hero().secondaryButtonText?.trim()) {
           <a
             pButton
-            [routerLink]="hero().secondaryButtonUrl"
+            [hamboxLink]="hero().secondaryButtonUrl"
             class="hero-grid__button hero-grid__button--secondary"
             styleClass="hero-grid__button hero-grid__button--secondary"
           >

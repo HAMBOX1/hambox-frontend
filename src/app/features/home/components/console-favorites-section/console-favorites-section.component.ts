@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { ScrollRevealDirective } from '../../../../shared/directives/scroll-reveal.directive';
 import { ConsoleFavoritesSectionConfig } from '../../section-registry/models/section-config.model';
+import { HamboxLinkDirective } from '../../../../shared/directives/hambox-link.directive';
 
 interface CardVisualState {
   readonly tx: string;
@@ -31,7 +31,7 @@ const SIDE_OPACITY = 0.55;
 @Component({
   selector: 'app-console-favorites-section',
   standalone: true,
-  imports: [RouterLink, ScrollRevealDirective, TranslatePipe],
+  imports: [ScrollRevealDirective, TranslatePipe, HamboxLinkDirective],
   templateUrl: './console-favorites-section.component.html',
   styleUrl: './console-favorites-section.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
