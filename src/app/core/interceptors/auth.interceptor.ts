@@ -21,6 +21,27 @@ function isAuthEndpoint(url: string): boolean {
   );
 }
 
+/**
+ * Endpoints that belong to a customer's own account. An administrator browsing the storefront never sends their admin
+ * token to these (it would act on the wrong person's cart, wallet or orders) - they just see them as a guest.
+ */
+const CUSTOMER_ONLY_URL = /\/(cart|wishlist|favorit|orders?|account|wallet|notification|support|checkout|referral|profile|points|payments?|me)(\/|\?|$)/i;
+
+/**
+ * An administrator signed in to the admin portal can open the storefront to look at it (page-builder preview, a link
+ * they clicked, a product page). Browsing is read-only, and the store may be on "Coming soon", which only lets admin
+ * roles through - so the storefront's catalogue and content reads carry the admin token when there is no customer
+ * session to carry instead.
+ */
+function isAdminBrowsingStorefront(session: AuthSessionService, method: string, requestUrl: string): boolean {
+  return (
+    method === 'GET' &&
+    !session.getAccessToken(AUTH_CONTEXT.Customer) &&
+    !!session.getAccessToken(AUTH_CONTEXT.Admin) &&
+    !CUSTOMER_ONLY_URL.test(requestUrl)
+  );
+}
+
 function resolveAuthContext(routerUrl: string, requestUrl: string): AuthContextType {
   // The product-editor "Preview" button opens a storefront route (/products/:id?preview=1) in a
   // new tab, but the underlying configuration/preview endpoint is Admin-permission-gated — so that
@@ -37,7 +58,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const bootstrap = inject(SessionBootstrapService);
   const router = inject(Router);
 
-  const context = resolveAuthContext(router.url, req.url);
+  let context = resolveAuthContext(router.url, req.url);
+  if (context === AUTH_CONTEXT.Customer && isAdminBrowsingStorefront(session, req.method, req.url)) {
+    context = AUTH_CONTEXT.Admin;
+  }
   const skipAuth = req.context.get(SKIP_AUTH_INTERCEPTOR) || isAuthEndpoint(req.url);
   const accessToken = session.getAccessToken(context);
 

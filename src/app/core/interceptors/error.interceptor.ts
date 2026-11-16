@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 import { parseApiError } from '../models/api-error.model';
+import { AUTH_CONTEXT } from '../auth/auth-context';
+import { AuthSessionService } from '../auth/auth-session.service';
 import { MaintenanceBypassService } from '../maintenance/maintenance-bypass.service';
 import { MaintenanceService } from '../maintenance/maintenance.service';
 
@@ -11,6 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const maintenance = inject(MaintenanceService);
   const bypass = inject(MaintenanceBypassService);
+  const session = inject(AuthSessionService);
 
   return next(req).pipe(
     catchError((error: unknown) => {
@@ -40,7 +43,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           // navigation away from /admin — check the real URL, not router.url, since this can fire
           // before the router's initial navigation has settled.
           const onAdmin = window.location.pathname.startsWith('/admin');
-          if (!router.url.startsWith('/coming-soon') && !onAdmin) {
+          // While the app is still starting, the signed-in session has not been restored yet: an administrator
+          // (who is allowed through) would be bounced here by a call that simply went out before their token was
+          // ready. The route guards decide once startup is done, so only redirect after that.
+          const startingUp = !session.initialized(AUTH_CONTEXT.Customer);
+          if (!router.url.startsWith('/coming-soon') && !onAdmin && !startingUp) {
             void router.navigateByUrl('/coming-soon');
           }
         }

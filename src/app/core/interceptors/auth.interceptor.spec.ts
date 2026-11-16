@@ -113,4 +113,37 @@ describe('authInterceptor', () => {
     httpMock.expectOne('/api/auth/refresh').flush(null, { status: 401, statusText: 'Unauthorized' });
     httpMock.verify();
   });
+
+  describe('an administrator browsing the storefront', () => {
+    beforeEach(() => {
+      session.setSession(AUTH_CONTEXT.Admin, {
+        accessToken: fakeJwt('admin'),
+        expiresAt: new Date().toISOString(),
+      });
+    });
+
+    it('sends the admin token on storefront reads, so a Coming soon store still opens for them', () => {
+      http.get('/api/v1/products?page=1').subscribe();
+      const req = httpMock.expectOne('/api/v1/products?page=1');
+
+      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${session.getAccessToken(AUTH_CONTEXT.Admin)}`);
+      req.flush({});
+    });
+
+    it('never sends it to a customer-only area (cart, wallet, orders, account) or on a write', () => {
+      http.get('/api/v1/cart').subscribe();
+      http.get('/api/v1/account/orders').subscribe();
+      http.get('/api/v1/wallet/balance').subscribe();
+      http.post('/api/v1/products/1/reviews', {}).subscribe();
+
+      for (const url of ['/api/v1/cart', '/api/v1/account/orders', '/api/v1/wallet/balance']) {
+        const req = httpMock.expectOne(url);
+        expect(req.request.headers.has('Authorization')).toBe(false);
+        req.flush({});
+      }
+      const write = httpMock.expectOne('/api/v1/products/1/reviews');
+      expect(write.request.headers.has('Authorization')).toBe(false);
+      write.flush({});
+    });
+  });
 });

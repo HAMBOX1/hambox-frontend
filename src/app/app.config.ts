@@ -138,12 +138,14 @@ export const appConfig: ApplicationConfig = {
       void inject(AnalyticsService).init();
 
       const maintenanceReady = maintenance.init();
+      // Restore the signed-in session right away (it only needs the refresh cookie): an administrator opening the store
+      // while it is on "Coming soon" must have their token ready before the first storefront calls go out.
+      const sessionReady = auth.restoreSession();
 
       return translation.init().then(async () => {
         await maintenanceReady;
+        await sessionReady;
         await currency.init();
-
-        await auth.restoreSession();
 
         await translation.syncFromAuthenticatedUser();
         await currency.syncFromAuthenticatedUser();

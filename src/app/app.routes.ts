@@ -80,7 +80,8 @@ export const routes: Routes = [
   },
   {
     path: '',
-    canActivate: [maintenanceGuard, customerGuard],
+    // Browsing the store is open to everyone, an administrator included; only the customer-only areas below refuse an admin.
+    canActivate: [maintenanceGuard],
     loadComponent: () =>
       import('./layouts/main-layout/main-layout.component').then((c) => c.MainLayoutComponent),
     children: [
@@ -110,6 +111,7 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
+        canActivate: [customerGuard],
         loadChildren: () => import('./features/cart/cart.routes').then((m) => m.routes),
       },
       {
@@ -122,6 +124,7 @@ export const routes: Routes = [
       },
       {
         path: 'checkout',
+        canActivate: [customerGuard],
         loadChildren: () => import('./features/checkout/checkout.routes').then((m) => m.routes),
       },
       {
@@ -146,6 +149,7 @@ export const routes: Routes = [
       },
       {
         path: 'support-chat',
+        canActivate: [customerGuard],
         loadChildren: () =>
           import('./features/support-chat/support-chat.routes').then((m) => m.routes),
       },

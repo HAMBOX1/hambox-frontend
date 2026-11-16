@@ -1,8 +1,10 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 
+import { AUTH_CONTEXT } from '../auth/auth-context';
+import { AuthSessionService } from '../auth/auth-session.service';
 import { MaintenanceBypassService } from '../maintenance/maintenance-bypass.service';
 import { MaintenanceService } from '../maintenance/maintenance.service';
 import { API_BASE_URL } from '../tokens/api-base-url.token';
@@ -80,5 +82,29 @@ describe('errorInterceptor — maintenance redirect loop', () => {
     await ready;
 
     expect(maintenance.enabled()).toBe(true);
+  });
+
+  it('does not bounce to /coming-soon while the app is still starting (an admin session is not restored yet)', async () => {
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+
+    http.get('/api/v1/storefront/content').subscribe({ error: () => undefined });
+    httpMock.expectOne('/api/v1/storefront/content').flush(
+      { code: 'COMING_SOON', message: '' },
+      { status: 503, statusText: 'Service Unavailable' },
+    );
+
+    expect(navigate).not.toHaveBeenCalled();
+
+    // Once startup is done and nobody let this visitor through, the refusal does send them to /coming-soon.
+    const session = TestBed.inject(AuthSessionService);
+    session.markInitialized(AUTH_CONTEXT.Customer);
+    http.get('/api/v1/storefront/content').subscribe({ error: () => undefined });
+    httpMock.expectOne('/api/v1/storefront/content').flush(
+      { code: 'COMING_SOON', message: '' },
+      { status: 503, statusText: 'Service Unavailable' },
+    );
+
+    expect(navigate).toHaveBeenCalledWith('/coming-soon');
   });
 });
