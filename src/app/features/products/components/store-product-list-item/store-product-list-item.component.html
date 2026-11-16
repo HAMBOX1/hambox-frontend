@@ -22,10 +22,6 @@
     <div class="store-list-card__meta">
       <span class="store-list-card__platform">{{ product().platformLabel }}</span>
 
-      @if (product().badgeText) {
-        <span class="store-list-card__reward">{{ product().badgeText }}</span>
-      }
-
       @if (product().instantDigital) {
         <span class="store-list-card__tag">{{ 'PRODUCT.INSTANT_DIGITAL' | translate }}</span>
       }
@@ -55,9 +51,18 @@
   <div class="store-list-card__aside">
     <div class="store-list-card__pricing">
       @if (product().originalPriceUsd) {
-        <span class="store-list-card__original">{{ product().originalPriceUsd | hamboxCurrency }}</span>
+        <span class="store-list-card__original">
+          {{ product().originalPriceUsd | hamboxCurrency }}
+          @if (product().discountPercent) {
+            <span class="store-list-card__off">-{{ product().discountPercent }}%</span>
+          }
+        </span>
       }
       <span class="store-list-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
+      @if (product().badgeText) {
+        <!-- The Elite line the admin wrote for this product. -->
+        <span class="store-list-card__reward"><i class="pi pi-star-fill" aria-hidden="true"></i>{{ product().badgeText }}</span>
+      }
     </div>
 
     <div class="store-list-card__actions">

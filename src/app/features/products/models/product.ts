@@ -18,6 +18,8 @@ export interface StoreProduct {
   badgeText?: string;
   instantDigital?: boolean;
   originalPriceUsd?: number;
+  /** The discount between the old (struck-through) price and the price shown, in whole percent (e.g. 20 = "-20%"). */
+  discountPercent?: number;
   priceUsd: number;
   priceMuted?: boolean;
   cta: StoreProductCta;

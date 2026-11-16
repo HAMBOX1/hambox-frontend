@@ -242,6 +242,8 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly badgeTextEn = signal('');
   protected readonly badgeTextAr = signal('');
   protected readonly bulkMarginValue = signal<number | null>(null);
+  protected readonly bulkOldPriceDialogOpen = signal(false);
+  protected readonly bulkOldPriceValue = signal<number | null>(null);
   protected readonly bulkAssignCollectionDialogOpen = signal(false);
   protected readonly bulkRemoveCollectionDialogOpen = signal(false);
   protected readonly bulkCreateCollectionDialogOpen = signal(false);
@@ -310,6 +312,11 @@ export class ProductCatalogPageComponent implements OnInit {
         label: t('ADMIN.CATALOG_PAGE.BULK.SET_BADGE'),
         icon: 'pi pi-tag',
         command: () => this.openBadgeDialog(null),
+      });
+      items.push({
+        label: t('ADMIN.CATALOG_PAGE.BULK.SET_OLD_PRICE'),
+        icon: 'pi pi-tag',
+        command: () => this.bulkOldPriceDialogOpen.set(true),
       });
       items.push({
         label: t('ADMIN.CATALOG_PAGE.BULK.SET_MARGIN'),
@@ -1227,6 +1234,19 @@ export class ProductCatalogPageComponent implements OnInit {
       'Delivery mode updated',
     );
     this.bulkFulfillmentDialogOpen.set(false);
+  }
+
+  protected async confirmBulkOldPrice(): Promise<void> {
+    const value = this.bulkOldPriceValue();
+    if (value === null) {
+      return;
+    }
+
+    await this.runBulkAction(
+      () => this.facade.bulkSetOldPrice(value),
+      value === 0 ? 'Old price removed' : 'Old price set',
+    );
+    this.bulkOldPriceDialogOpen.set(false);
   }
 
   protected async confirmBulkMargin(): Promise<void> {

@@ -703,6 +703,46 @@
 </p-dialog>
 
 <p-dialog
+  [header]="'ADMIN.CATALOG_PAGE.BULK.OLD_PRICE_TITLE' | translate"
+  [visible]="bulkOldPriceDialogOpen()"
+  (visibleChange)="bulkOldPriceDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.BULK.OLD_PRICE_HINT' | translate }}</p>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-old-price-value">{{ 'ADMIN.CATALOG_PAGE.BULK.OLD_PRICE_LABEL' | translate }}</label>
+    <p-inputNumber
+      inputId="bulk-old-price-value"
+      [ngModel]="bulkOldPriceValue()"
+      (ngModelChange)="bulkOldPriceValue.set($event)"
+      mode="decimal"
+      suffix=" %"
+      [min]="0"
+      [max]="95"
+      [maxFractionDigits]="0"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkOldPriceDialogOpen.set(false)"></button>
+    <button
+      pButton
+      type="button"
+      [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate"
+      icon="pi pi-check"
+      [disabled]="bulkOldPriceValue() === null"
+      [loading]="bulkActionLoading()"
+      (click)="confirmBulkOldPrice()"
+    ></button>
+  </div>
+</p-dialog>
+
+<p-dialog
   [header]="'ADMIN.CATALOG_PAGE.BULK.MARGIN_TITLE' | translate"
   [visible]="bulkMarginDialogOpen()"
   (visibleChange)="bulkMarginDialogOpen.set($event)"

@@ -597,6 +597,16 @@ export class ProductCatalogFacade {
     );
   }
 
+  /**
+   * Gives every variant of the selected products an old price so customers see it struck through with this discount
+   * (20 = "-20%"); 0 removes the old price. The sale price itself is not touched.
+   */
+  async bulkSetOldPrice(discountPercent: number): Promise<BulkProductsResult | null> {
+    return this.runBulkAction(() =>
+      this.api.bulkProducts(this.currentBulkSelection(), 'set-old-price', { priceValue: discountPercent }),
+    );
+  }
+
   async bulkAssignCollection(targetCollectionId: string): Promise<BulkProductsResult | null> {
     return this.runBulkAction(() =>
       this.api.bulkProducts(this.currentBulkSelection(), 'assign-collection', { targetCollectionId }),

@@ -62,6 +62,14 @@ export function productPassesStockFilter(
   return hasPurchasableInventory(configuration, productActive);
 }
 
+/** The cheapest variant a customer can buy right now (the one the card's "from" price comes from), if there is one. */
+export function lowestPurchasableVariant(
+  configuration: StorefrontProductConfigurationDto | null | undefined,
+): StorefrontProductConfigurationDto['variants'][number] | null {
+  const purchasable = configuration?.variants.filter(isPurchasableVariant) ?? [];
+  return purchasable.length ? purchasable.reduce((lowest, variant) => (variant.price < lowest.price ? variant : lowest)) : null;
+}
+
 export function lowestPurchasablePrice(
   configuration: StorefrontProductConfigurationDto | null | undefined,
   basePrice: number,

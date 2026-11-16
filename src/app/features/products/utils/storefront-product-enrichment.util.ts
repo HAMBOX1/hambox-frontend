@@ -4,7 +4,7 @@ import {
   productRequiresOptionSelection,
   resolveDirectCartVariantId,
 } from './storefront-add-to-cart.util';
-import { lowestPurchasablePrice } from './storefront-filter.util';
+import { lowestPurchasablePrice, lowestPurchasableVariant } from './storefront-filter.util';
 import { computeProductStockStatus, hasPurchasableInventory } from './storefront-product-stock.util';
 
 /**
@@ -20,9 +20,15 @@ export function applyStorefrontEnrichment(
   const stockStatus = computeProductStockStatus(configuration, !product.outOfStock);
   const inStock = hasPurchasableInventory(configuration, !product.outOfStock);
 
+  // The old price comes from the same variant the card's price comes from, so the two always belong together.
+  const cheapest = lowestPurchasableVariant(configuration);
+  const oldPrice = cheapest?.comparePrice && cheapest.comparePrice > cheapest.price ? cheapest.comparePrice : undefined;
+
   return {
     ...product,
     priceUsd: configuration ? lowestPurchasablePrice(configuration, product.priceUsd) : product.priceUsd,
+    originalPriceUsd: oldPrice,
+    discountPercent: oldPrice && cheapest ? Math.max(1, Math.round((1 - cheapest.price / oldPrice) * 100)) : undefined,
     stockStatus,
     outOfStock: stockStatus === 'out-of-stock',
     cta: inStock ? product.cta : 'notify-me',

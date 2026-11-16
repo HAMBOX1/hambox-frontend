@@ -130,3 +130,48 @@ describe('applyStorefrontEnrichment', () => {
     expect(enriched.stockStatus).toBe('in-stock');
   });
 });
+
+describe('applyStorefrontEnrichment old price', () => {
+  it('shows the cheapest variant\'s old price struck through, with the discount in whole percent', () => {
+    const config = configuration([
+      variant({ id: 'v1', price: 8, comparePrice: 10 }),
+      variant({ id: 'v2', price: 20, comparePrice: 100 }),
+    ]);
+
+    const enriched = applyStorefrontEnrichment(rawProduct({ priceUsd: 20 }), config);
+
+    // The card shows the cheapest price (8), so its old price (10 -> "-20%") is the one that belongs to it.
+    expect(enriched.priceUsd).toBe(8);
+    expect(enriched.originalPriceUsd).toBe(10);
+    expect(enriched.discountPercent).toBe(20);
+  });
+
+  it('shows no old price when the variant has none, or when it is not higher than the price', () => {
+    const none = applyStorefrontEnrichment(rawProduct(), configuration([variant({ price: 10, comparePrice: null })]));
+    const same = applyStorefrontEnrichment(rawProduct(), configuration([variant({ price: 10, comparePrice: 10 })]));
+    const lower = applyStorefrontEnrichment(rawProduct(), configuration([variant({ price: 10, comparePrice: 5 })]));
+
+    for (const enriched of [none, same, lower]) {
+      expect(enriched.originalPriceUsd).toBeUndefined();
+      expect(enriched.discountPercent).toBeUndefined();
+    }
+  });
+
+  it('ignores the old price of a variant that cannot be bought (out of stock)', () => {
+    const config = configuration([
+      variant({ id: 'out', price: 1, comparePrice: 50, availableStock: 0, isOutOfStock: true }),
+      variant({ id: 'in', price: 9, comparePrice: null }),
+    ]);
+
+    const enriched = applyStorefrontEnrichment(rawProduct(), config);
+
+    expect(enriched.priceUsd).toBe(9);
+    expect(enriched.originalPriceUsd).toBeUndefined();
+  });
+
+  it('never rounds a real discount down to nothing', () => {
+    const config = configuration([variant({ price: 9.99, comparePrice: 10 })]);
+
+    expect(applyStorefrontEnrichment(rawProduct(), config).discountPercent).toBe(1);
+  });
+});

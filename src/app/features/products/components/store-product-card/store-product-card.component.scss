@@ -482,6 +482,28 @@
   gap: 8px;
 }
 
+// The price with the Elite line under it, like the cashback line under Gamivo's price.
+.store-card__price-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+// The "-20%" next to the old price.
+.store-card__off {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--color-danger, #e5484d);
+  color: #fff;
+  font-family: var(--sf-font-body);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .store-card__original {
   color: var(--color-text-muted);
   font-family: var(--sf-font-body);
@@ -665,6 +687,9 @@
 
 // The admin's per-product text (e.g. "+3 Elite points"): a small tinted pill under the title.
 .store-card__reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   align-self: flex-start;
   max-width: 100%;
   padding: 3px 9px;
@@ -678,6 +703,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.store-card__reward .pi {
+  flex-shrink: 0;
+  font-size: 0.7em;
 }
 
 .store-card--dense .store-card__reward {
