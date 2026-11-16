@@ -78,6 +78,14 @@
       <span>الرسالة (عربي)</span>
       <textarea pTextarea rows="2" dir="rtl" maxlength="1000" [ngModel]="form().messageAr" (ngModelChange)="patch('messageAr', $event)"></textarea>
     </label>
+    <div class="floating-ads__field">
+      <span>Picture (optional, shown at the top of the card)</span>
+      <app-media-picker
+        [value]="form().imageUrl || null"
+        recommendedSize="About 600×340px (landscape), JPG, PNG or WebP"
+        (valueChange)="patch('imageUrl', $event ?? '')"
+      />
+    </div>
     <div class="floating-ads__row">
       <label class="floating-ads__field">
         <span>Button text (English)</span>
@@ -123,6 +131,10 @@
         <p-inputNumber [ngModel]="form().dismissHours" (ngModelChange)="patch('dismissHours', $event ?? 24)" [min]="1" [max]="720" [useGrouping]="false" />
       </label>
     </div>
+    <label class="floating-ads__check">
+      <p-checkbox [binary]="true" [ngModel]="form().showCountdown" (ngModelChange)="patch('showCountdown', $event)" />
+      Show a countdown timer (counts down to the "Ends" date above)
+    </label>
     <label class="floating-ads__check">
       <p-checkbox [binary]="true" [ngModel]="form().isActive" (ngModelChange)="patch('isActive', $event)" />
       Active (shown to the audience above)

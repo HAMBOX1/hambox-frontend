@@ -13,6 +13,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiError } from '../../../../../core/models/api-error.model';
 import { FloatingAdAdmin, FloatingAdAudience, FloatingAdInput } from '../../../../../core/models/floating-ad.model';
+import { MediaPickerComponent } from '../../../../../shared/components/admin/media-picker/media-picker.component';
 import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
 import { AdminPageHeaderComponent } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
@@ -57,6 +58,8 @@ interface AdForm {
   endsOn: string;
   sortOrder: number;
   dismissHours: number;
+  imageUrl: string;
+  showCountdown: boolean;
 }
 
 const EMPTY_FORM: AdForm = {
@@ -74,6 +77,8 @@ const EMPTY_FORM: AdForm = {
   endsOn: '',
   sortOrder: 0,
   dismissHours: 24,
+  imageUrl: '',
+  showCountdown: false,
 };
 
 /**
@@ -95,6 +100,7 @@ const EMPTY_FORM: AdForm = {
     ToastModule,
     HasPermissionPipe,
     AdminPageHeaderComponent,
+    MediaPickerComponent,
   ],
   providers: [MessageService],
   templateUrl: './floating-ads-page.component.html',
@@ -157,6 +163,8 @@ export class FloatingAdsPageComponent implements OnInit {
       endsOn: toLocalInput(ad.endsOnUtc),
       sortOrder: ad.sortOrder,
       dismissHours: ad.dismissHours,
+      imageUrl: ad.imageUrl ?? '',
+      showCountdown: ad.showCountdown,
     });
     this.formError.set(null);
     this.dialogOpen.set(true);
@@ -170,6 +178,11 @@ export class FloatingAdsPageComponent implements OnInit {
     const f = this.form();
     if (!f.titleEn.trim()) {
       this.formError.set('A title is required.');
+      return;
+    }
+
+    if (f.showCountdown && !f.endsOn) {
+      this.formError.set('To show a countdown, set the date and time the offer ends (the "Ends" field).');
       return;
     }
 
@@ -187,6 +200,8 @@ export class FloatingAdsPageComponent implements OnInit {
       endsOnUtc: fromLocalInput(f.endsOn),
       sortOrder: f.sortOrder ?? 0,
       dismissHours: f.dismissHours ?? 24,
+      imageUrl: f.imageUrl.trim() || null,
+      showCountdown: f.showCountdown,
     };
 
     this.saving.set(true);

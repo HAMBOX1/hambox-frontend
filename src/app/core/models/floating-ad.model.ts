@@ -12,6 +12,10 @@ export interface FloatingAdPublic {
   readonly buttonLabelAr: string | null;
   readonly linkUrl: string | null;
   readonly dismissHours: number;
+  /** Picture shown at the top of the card. */
+  readonly imageUrl: string | null;
+  /** When set, the card shows a live countdown to this moment. */
+  readonly countdownEndsOnUtc: string | null;
 }
 
 /** An ad as the admin edits it. */
@@ -30,6 +34,8 @@ export interface FloatingAdAdmin {
   readonly endsOnUtc: string | null;
   readonly sortOrder: number;
   readonly dismissHours: number;
+  readonly imageUrl: string | null;
+  readonly showCountdown: boolean;
 }
 
 export type FloatingAdInput = Omit<FloatingAdAdmin, 'id'>;
