@@ -693,10 +693,10 @@
   align-self: flex-start;
   max-width: 100%;
   padding: 3px 9px;
-  border: 1px solid var(--color-primary-border, rgba(60, 220, 150, 0.4));
+  border: 1px solid color-mix(in srgb, var(--note-color, var(--color-primary, #3cdc96)) 45%, transparent);
   border-radius: var(--sf-radius-pill, 999px);
-  background: var(--color-primary-muted, rgba(60, 220, 150, 0.14));
-  color: var(--color-primary, #3cdc96);
+  background: color-mix(in srgb, var(--note-color, var(--color-primary, #3cdc96)) 14%, transparent);
+  color: var(--note-color, var(--color-primary, #3cdc96));
   font-size: 11px;
   font-weight: 700;
   line-height: 1.3;
@@ -713,4 +713,17 @@
 .store-card--dense .store-card__reward {
   padding: 2px 6px;
   font-size: 9.5px;
+}
+
+.store-card__platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.store-card__platform-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
 }

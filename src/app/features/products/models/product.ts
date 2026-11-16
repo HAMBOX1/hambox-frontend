@@ -16,6 +16,10 @@ export interface StoreProduct {
   featuredBadge?: boolean;
   /** Per-product text chosen in the admin (e.g. "+3 Elite points"), in the viewer's language. */
   badgeText?: string;
+  /** The colour (#rrggbb) the admin gave the note under the price; unset = the store's default. */
+  badgeColor?: string;
+  /** The category this product belongs to (its small icon, when it has one, shows on the card). */
+  categoryId?: string;
   instantDigital?: boolean;
   originalPriceUsd?: number;
   /** The discount between the old (struck-through) price and the price shown, in whole percent (e.g. 20 = "-20%"). */

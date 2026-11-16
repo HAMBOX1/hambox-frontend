@@ -56,3 +56,12 @@
 .promo-dialog__type {
   flex: 1 1 40%;
 }
+
+.promo-dialog__show {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}

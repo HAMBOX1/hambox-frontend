@@ -188,6 +188,7 @@ export class ProductApiService {
       targetFulfillmentMode?: string;
       badgeTextEn?: string | null;
       badgeTextAr?: string | null;
+      badgeColor?: string | null;
     },
   ): Observable<BulkProductsResult> {
     return this.api.post<BulkProductsResult>(CATALOG_API.productsBulk, {
@@ -200,6 +201,7 @@ export class ProductApiService {
       targetFulfillmentMode: extra?.targetFulfillmentMode ?? null,
       badgeTextEn: extra?.badgeTextEn ?? null,
       badgeTextAr: extra?.badgeTextAr ?? null,
+      badgeColor: extra?.badgeColor ?? null,
     });
   }
 

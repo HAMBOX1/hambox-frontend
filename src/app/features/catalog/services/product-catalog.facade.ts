@@ -575,17 +575,17 @@ export class ProductCatalogFacade {
   }
 
   /** Sets (or, with both texts empty, clears) the storefront badge of the selected products. */
-  async bulkSetBadge(badgeTextEn: string, badgeTextAr: string): Promise<BulkProductsResult | null> {
+  async bulkSetBadge(badgeTextEn: string, badgeTextAr: string, badgeColor: string | null = null): Promise<BulkProductsResult | null> {
     return this.runBulkAction(() =>
-      this.api.bulkProducts(this.currentBulkSelection(), 'set-badge', { badgeTextEn, badgeTextAr }),
+      this.api.bulkProducts(this.currentBulkSelection(), 'set-badge', { badgeTextEn, badgeTextAr, badgeColor }),
     );
   }
 
   /** Same for a single product (the row menu), without touching the bulk selection. */
-  async setProductBadge(productId: string, badgeTextEn: string, badgeTextAr: string): Promise<boolean> {
+  async setProductBadge(productId: string, badgeTextEn: string, badgeTextAr: string, badgeColor: string | null = null): Promise<boolean> {
     return this.runProductAction(productId, async () => {
       await firstValueFrom(
-        this.api.bulkProducts({ productIds: [productId], selectAllMatching: false }, 'set-badge', { badgeTextEn, badgeTextAr }),
+        this.api.bulkProducts({ productIds: [productId], selectAllMatching: false }, 'set-badge', { badgeTextEn, badgeTextAr, badgeColor }),
       );
     });
   }

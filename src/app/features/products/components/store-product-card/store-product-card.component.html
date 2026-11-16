@@ -64,7 +64,7 @@
         </div>
       }
 
-      <span class="store-card__platform">{{ product().platformLabel }}</span>
+      <span class="store-card__platform">@if (categoryIconUrl(); as icon) {<img class="store-card__platform-icon" [src]="icon" alt="" loading="lazy" />}{{ product().platformLabel }}</span>
 
       @if (product().rating !== undefined) {
         <span class="store-card__rating">
@@ -118,7 +118,7 @@
 
       @if (product().badgeText) {
         <!-- The Elite line the admin wrote for this product ("Get 2 points extra", an Elite price, an extra discount…). -->
-        <span class="store-card__reward"><i class="pi pi-star-fill" aria-hidden="true"></i>{{ product().badgeText }}</span>
+        <span class="store-card__reward" [style.--note-color]="product().badgeColor || null"><i class="pi pi-star-fill" aria-hidden="true"></i>{{ product().badgeText }}</span>
       }
     </div>
 

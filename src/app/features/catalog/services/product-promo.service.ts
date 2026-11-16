@@ -54,11 +54,16 @@ export class ProductPromoService {
     );
   }
 
+  /** Turns the display of a code on the product pages it applies to on or off (it is a setting of the whole code). */
+  async setProductDisplay(promotionId: string, show: boolean): Promise<void> {
+    await firstValueFrom(this.api.post<void>(PROMOTIONS_API.productDisplay(promotionId), { show }));
+  }
+
   /**
    * Creates a new promo code that discounts only the given products/categories. A new promotion starts as a draft, so it
    * is published right away when `publish` is true (otherwise the code would not work yet).
    */
-  async createCode(code: NewPromoCode, targets: PromoTargets, publish: boolean): Promise<PromoApplyResult> {
+  async createCode(code: NewPromoCode, targets: PromoTargets, publish: boolean, showOnProductPages = false): Promise<PromoApplyResult> {
     const request: CreatePromotionRequest = {
       name: code.code,
       type: 'CouponCode',
@@ -78,6 +83,9 @@ export class ProductPromoService {
 
     if (publish) {
       await firstValueFrom(this.api.post<void>(PROMOTIONS_API.publish(promotionId), {}));
+    }
+    if (showOnProductPages) {
+      await this.setProductDisplay(promotionId, true);
     }
 
     return {

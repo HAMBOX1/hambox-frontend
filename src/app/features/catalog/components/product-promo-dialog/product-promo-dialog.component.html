@@ -75,7 +75,7 @@
         [emptyMessage]="'ADMIN.CATALOG_PAGE.PROMO.NO_CODES' | translate"
         appendTo="body"
         [ngModel]="promotionId()"
-        (ngModelChange)="promotionId.set($event)"
+        (ngModelChange)="choosePromotion($event)"
       />
     </div>
   } @else {
@@ -120,6 +120,12 @@
       </div>
     </div>
   }
+
+  <label class="promo-dialog__show">
+    <p-checkbox [binary]="true" [ngModel]="showOnPage()" (ngModelChange)="showOnPage.set($event)" />
+    <span>{{ 'ADMIN.CATALOG_PAGE.PROMO.SHOW_ON_PAGE' | translate }}</span>
+  </label>
+  <p class="promo-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.PROMO.SHOW_ON_PAGE_HINT' | translate }}</p>
 
   <p class="promo-dialog__hint">{{ 'ADMIN.CATALOG_PAGE.PROMO.ONLY_THESE_HINT' | translate }}</p>
 

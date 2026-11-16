@@ -10,6 +10,7 @@ import { addStoreProductToCart } from '../../utils/storefront-add-to-cart.util';
 import { StorefrontProductEnrichmentService } from '../../services/storefront-product-enrichment.service';
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { AccountWishlistFacade } from '../../../account/services/account-wishlist.facade';
+import { CategoryIconService } from '../../services/category-icon.service';
 
 @Component({
   selector: 'app-store-product-card',
@@ -20,6 +21,7 @@ import { AccountWishlistFacade } from '../../../account/services/account-wishlis
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreProductCardComponent {
+  private readonly categoryIcons = inject(CategoryIconService);
   private readonly cartFacade = inject(CartFacade);
   private readonly router = inject(Router);
   private readonly enrichment = inject(StorefrontProductEnrichmentService);
@@ -39,6 +41,9 @@ export class StoreProductCardComponent {
 
   /** Why the icon-only cart button is disabled — the badge on the image explains this visually,
    * but the button itself had no text/tooltip, so a disabled icon looked broken with no reason. */
+  /** The small icon the admin gave this product's category (a platform logo, say), when it has one. */
+  protected readonly categoryIconUrl = computed(() => this.categoryIcons.iconFor(this.product().categoryId));
+
   protected readonly cartDisabledReasonKey = computed(() => {
     const product = this.product();
     if (product.isMembersOnly) {

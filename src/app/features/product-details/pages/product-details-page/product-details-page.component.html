@@ -77,9 +77,12 @@
 
           <section class="pdp__details" aria-labelledby="pdp-title">
             <div class="pdp__title-row">
+              @if (categoryIconUrl(); as icon) {
+                <img class="pdp__category-icon" [src]="icon" alt="" />
+              }
               <h1 id="pdp-title" class="pdp__title">{{ product()!.title }}</h1>
               @if (product()!.badgeText) {
-                <span class="pdp__reward">{{ product()!.badgeText }}</span>
+                <span class="pdp__reward" [style.--note-color]="product()!.badgeColor || null">{{ product()!.badgeText }}</span>
               }
               @if (product()!.rating !== undefined) {
                 <div class="pdp__rating">
@@ -161,6 +164,26 @@
         <span class="pdp__discount">{{ product()!.discountLabel }}</span>
       }
     </div>
+
+    @for (coupon of coupons(); track coupon.code) {
+      <div class="pdp__coupon">
+        <span class="pdp__coupon-label">{{ 'PRODUCT.COUPON_WITH_CODE' | translate }}</span>
+        <button type="button" class="pdp__coupon-code" [attr.aria-label]="'PRODUCT.COUPON_COPY' | translate" (click)="copyCoupon(coupon.code)">
+          <span>{{ coupon.code }}</span>
+          <i class="pi" [class.pi-copy]="copiedCouponCode() !== coupon.code" [class.pi-check]="copiedCouponCode() === coupon.code" aria-hidden="true"></i>
+        </button>
+        <span class="pdp__coupon-off">
+          @if (coupon.discountType === 'Percentage') {
+            -{{ coupon.discountValue }}%
+          } @else {
+            -{{ coupon.discountValue | hamboxCurrency }}
+          }
+        </span>
+        @if (copiedCouponCode() === coupon.code) {
+          <span class="pdp__coupon-copied" role="status">{{ 'PRODUCT.COUPON_COPIED' | translate }}</span>
+        }
+      </div>
+    }
 
     @let stock = stockLabel();
     <p class="pdp__stock" [class.pdp__stock--danger]="stock.isOutOfStock">

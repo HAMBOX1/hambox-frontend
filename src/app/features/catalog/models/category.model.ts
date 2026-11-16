@@ -8,6 +8,8 @@ export interface Category {
   readonly imageUrl?: string | null;
   /** Optional rich-text instructions shown to customers browsing this category. */
   readonly descriptionHtml?: string | null;
+  /** A small icon (e.g. the platform logo) shown on this category's product cards. */
+  readonly iconUrl?: string | null;
 }
 
 /** One filter on a category's storefront filter list (admin). */
@@ -84,6 +86,7 @@ export interface CreateCategoryRequest {
   readonly newParent?: NewParentDraft | null;
   readonly subcategories?: readonly NewParentDraft[] | null;
   readonly descriptionHtml?: string | null;
+  readonly iconUrl?: string | null;
 }
 
 export interface UpdateCategoryRequest {
@@ -93,6 +96,7 @@ export interface UpdateCategoryRequest {
   readonly isActive: boolean;
   readonly parentId?: string | null;
   readonly descriptionHtml?: string | null;
+  readonly iconUrl?: string | null;
 }
 
 export interface CategoryListQuery {

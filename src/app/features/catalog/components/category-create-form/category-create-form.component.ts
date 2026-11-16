@@ -21,6 +21,7 @@ import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AdminErrorAlertComponent, AdminSectionCardComponent } from '../../../../shared/components/admin';
+import { MediaPickerComponent } from '../../../../shared/components/admin/media-picker/media-picker.component';
 import { Category, CategoryOption, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
 import { CategoryApiService } from '../../services/category-api.service';
 import { slugify } from '../../utils/product-display.utils';
@@ -42,7 +43,7 @@ const FIELD_LABELS = {
 @Component({
   selector: 'app-category-create-form',
   standalone: true,
-  imports: [TranslatePipe, 
+  imports: [MediaPickerComponent, TranslatePipe, 
     ReactiveFormsModule,
     InputTextModule,
     ButtonModule,
@@ -116,6 +117,7 @@ export class CategoryCreateFormComponent {
     parentId: this.fb.control<string | null>(null),
     isActive: [true],
     descriptionHtml: [''],
+    iconUrl: this.fb.control<string | null>(null),
     newParent: this.fb.nonNullable.group({
       nameEn: ['', [Validators.required, Validators.maxLength(200)]],
       nameAr: ['', [Validators.maxLength(200)]],
@@ -149,6 +151,7 @@ export class CategoryCreateFormComponent {
           parentId,
           isActive: editing ? category.isActive : true,
           descriptionHtml: editing ? (category.descriptionHtml ?? '') : '',
+          iconUrl: editing ? (category.iconUrl ?? null) : null,
           newParent: { nameEn: '', nameAr: '', slug: '' },
         },
         { emitEvent: false },
@@ -460,6 +463,7 @@ export class CategoryCreateFormComponent {
         isActive: value.isActive,
         parentId: value.parentId,
         descriptionHtml: value.descriptionHtml.trim() || null,
+        iconUrl: value.iconUrl || null,
       });
       return;
     }
@@ -475,6 +479,7 @@ export class CategoryCreateFormComponent {
       parentId,
       newParent,
       descriptionHtml: value.descriptionHtml.trim() || null,
+      iconUrl: value.iconUrl || null,
       // For a root category these become its children; for a child category
       // there's no "root" to nest under, so createCategoryWithHierarchy parents
       // them as siblings under the same parentId instead — see there.

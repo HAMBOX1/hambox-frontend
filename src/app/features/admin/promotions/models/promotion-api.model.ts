@@ -57,6 +57,8 @@ export interface PromotionListItemDto {
   readonly totalRedemptions: number;
   readonly couponCount: number;
   readonly createdOnUtc: string;
+  /** Whether the code is shown to customers on the product pages it applies to. */
+  readonly showOnProductPages?: boolean;
 }
 
 export interface PromotionDetailDto {

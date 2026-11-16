@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -9,6 +9,7 @@ import { addStoreProductToCart } from '../../utils/storefront-add-to-cart.util';
 import { StorefrontProductEnrichmentService } from '../../services/storefront-product-enrichment.service';
 import { AuthSessionService } from '../../../../core/auth/auth-session.service';
 import { AccountWishlistFacade } from '../../../account/services/account-wishlist.facade';
+import { CategoryIconService } from '../../services/category-icon.service';
 
 @Component({
   selector: 'app-store-product-list-item',
@@ -19,6 +20,7 @@ import { AccountWishlistFacade } from '../../../account/services/account-wishlis
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreProductListItemComponent {
+  private readonly categoryIcons = inject(CategoryIconService);
   private readonly cartFacade = inject(CartFacade);
   private readonly router = inject(Router);
   private readonly enrichment = inject(StorefrontProductEnrichmentService);
@@ -27,6 +29,9 @@ export class StoreProductListItemComponent {
   private readonly wishlistFacade = inject(AccountWishlistFacade);
 
   product = input.required<StoreProduct>();
+
+  /** The small icon the admin gave this product's category (a platform logo, say), when it has one. */
+  protected readonly categoryIconUrl = computed(() => this.categoryIcons.iconFor(this.product().categoryId));
 
   protected readonly addError = signal<string | null>(null);
   protected readonly wishlistAdded = signal(false);

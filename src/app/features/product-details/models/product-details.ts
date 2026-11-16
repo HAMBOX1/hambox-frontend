@@ -40,4 +40,6 @@ export interface ProductDetailsItem {
   requiredPlanNames: readonly string[];
   /** Per-product text chosen in the admin (e.g. "+3 Elite points"). */
   badgeText?: string;
+  /** The colour (#rrggbb) the admin gave the note under the price; unset = the store's default. */
+  badgeColor?: string;
 }

@@ -236,6 +236,9 @@
     "GALLERY_ARIA": "صور المنتج",
     "INSTANT_DELIVERY_BADGE": "تسليم فوري",
     "GALLERY_IMAGE_ARIA": "صورة المنتج {{index}}",
+    "COUPON_WITH_CODE": "مع كود الخصم:",
+    "COUPON_COPY": "نسخ كود الخصم",
+    "COUPON_COPIED": "تم النسخ",
     "STOCK_AVAILABLE": "متوفر",
     "STOCK_SELECT_OPTIONS": "اختر الخيارات",
     "STOCK_ALL_IN_CART": "جميع الكمية ({{count}}) في سلتك",
@@ -1164,6 +1167,8 @@
       "DISCOUNT": "قيمة الخصم",
       "TYPE": "النوع",
       "ONLY_THESE_HINT": "الكود يخصم على هذه المنتجات فقط، وليس على باقي السلة.",
+      "SHOW_ON_PAGE": "إظهار هذا الكود في صفحة المنتج",
+      "SHOW_ON_PAGE_HINT": "يرى العميل \"مع كود الخصم: …\" تحت السعر. هذا إعداد للكود نفسه، فيسري على كل المنتجات المرتبطة به.",
       "APPLY": "تطبيق"
       },
       "BULK": {
@@ -1207,6 +1212,9 @@
         "BADGE_HINT_ONE": "نص قصير يظهر للعميل على كارت وصفحة المنتج ده (مثل: +3 نقاط). اترك الخانتين فاضيتين لإزالته.",
         "BADGE_EN": "Text (English)",
         "BADGE_AR": "النص (عربي)",
+        "BADGE_COLOR": "لون الملاحظة",
+        "BADGE_COLOR_DEFAULT": "الافتراضي (أخضر المتجر)",
+        "BADGE_COLOR_CUSTOM": "اختر أي لون",
         "SET_MARGIN": "تحديد الهامش",
         "MARGIN_TITLE": "تحديد الهامش",
         "MARGIN_LABEL": "الهامش (%)",

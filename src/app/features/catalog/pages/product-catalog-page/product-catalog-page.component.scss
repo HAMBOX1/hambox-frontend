@@ -118,3 +118,57 @@
 // `position: fixed` containing-block math for any drawer/overlay nested
 // inside it), which takes it outside this component's DOM subtree and out
 // of reach of :host ::ng-deep.
+
+// The colour choice of the note under the price (Set Elite line dialog).
+.badge-colors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-colors__swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+
+  &--default {
+    background: var(--color-primary, #3cdc96);
+  }
+
+  &--active {
+    border-color: var(--color-text-primary, #fff);
+  }
+}
+
+.badge-colors__custom {
+  width: 34px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.badge-colors__preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 3px 9px;
+  border: 1px solid color-mix(in srgb, var(--note-color, var(--color-primary, #3cdc96)) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--note-color, var(--color-primary, #3cdc96)) 14%, transparent);
+  color: var(--note-color, var(--color-primary, #3cdc96));
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  .pi {
+    font-size: 0.7em;
+  }
+}

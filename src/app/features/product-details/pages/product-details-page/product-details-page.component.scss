@@ -792,10 +792,10 @@
 .pdp__reward {
   align-self: center;
   padding: 5px 12px;
-  border: 1px solid var(--color-primary-border, rgba(60, 220, 150, 0.4));
+  border: 1px solid color-mix(in srgb, var(--note-color, var(--color-primary, #3cdc96)) 45%, transparent);
   border-radius: var(--sf-radius-pill, 999px);
-  background: var(--color-primary-muted, rgba(60, 220, 150, 0.14));
-  color: var(--color-primary, #3cdc96);
+  background: color-mix(in srgb, var(--note-color, var(--color-primary, #3cdc96)) 14%, transparent);
+  color: var(--note-color, var(--color-primary, #3cdc96));
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -883,4 +883,57 @@
   i {
     color: var(--color-warning, #f5b840);
   }
+}
+
+// "With coupon code: X" under the price, when the admin chose to show a code on this product.
+.pdp__coupon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 10px;
+}
+
+.pdp__coupon-label {
+  color: var(--color-text-secondary, #c5c9cc);
+  font-size: 0.9rem;
+}
+
+.pdp__coupon-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px dashed var(--color-primary, #3cdc96);
+  border-radius: var(--sf-radius-sm, 8px);
+  background: color-mix(in srgb, var(--color-primary, #3cdc96) 12%, transparent);
+  color: var(--color-primary, #3cdc96);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-focus-ring, #3cdc96);
+    outline-offset: 2px;
+  }
+}
+
+.pdp__coupon-off {
+  color: var(--color-text-primary, #fff);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.pdp__coupon-copied {
+  color: var(--color-success, #16a34a);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.pdp__category-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }

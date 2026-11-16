@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, ou
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { CheckboxModule } from 'primeng/checkbox';
 import { SelectModule } from 'primeng/select';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -29,7 +30,7 @@ const CODE_PATTERN = /^[A-Za-z0-9_-]{3,40}$/;
 @Component({
   selector: 'app-product-promo-dialog',
   standalone: true,
-  imports: [TranslatePipe, FormsModule, ButtonModule, DialogModule, SelectModule],
+  imports: [TranslatePipe, FormsModule, ButtonModule, CheckboxModule, DialogModule, SelectModule],
   templateUrl: './product-promo-dialog.component.html',
   styleUrl: './product-promo-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,6 +65,8 @@ export class ProductPromoDialogComponent {
   protected readonly newCode = signal('');
   protected readonly newType = signal<'Percentage' | 'FixedAmount'>('Percentage');
   protected readonly newValue = signal<number | null>(null);
+  /** Show the code to customers on the product page ("With coupon code: X"). On by default: it is the point of adding it to a product. */
+  protected readonly showOnPage = signal(true);
 
   protected readonly typeOptions = [
     { label: '%', value: 'Percentage' as const },
@@ -105,6 +108,15 @@ export class ProductPromoDialogComponent {
     });
   }
 
+  /** Picking a code starts the checkbox from that code's current setting. */
+  protected choosePromotion(id: string | null): void {
+    this.promotionId.set(id);
+    const chosen = this.promotions().find((promotion) => promotion.id === id);
+    if (chosen) {
+      this.showOnPage.set(!!chosen.showOnProductPages || this.showOnPage());
+    }
+  }
+
   protected setMode(mode: PromoMode): void {
     this.mode.set(mode);
     this.error.set(null);
@@ -131,6 +143,10 @@ export class ProductPromoDialogComponent {
       if (this.mode() === 'existing') {
         const promotionId = this.promotionId() as string;
         result = await this.promoService.addTargets(promotionId, targets);
+        const chosen = this.promotions().find((promotion) => promotion.id === promotionId);
+        if (chosen && !!chosen.showOnProductPages !== this.showOnPage()) {
+          await this.promoService.setProductDisplay(promotionId, this.showOnPage());
+        }
         code = this.promotions().find((promotion) => promotion.id === promotionId)?.name ?? '';
       } else {
         code = this.newCode().trim().toUpperCase();
@@ -138,6 +154,7 @@ export class ProductPromoDialogComponent {
           { code, discountType: this.newType(), discountValue: this.newValue() as number },
           targets,
           this.canPublish(),
+          this.showOnPage(),
         );
       }
 
@@ -168,6 +185,7 @@ export class ProductPromoDialogComponent {
     this.newCode.set('');
     this.newType.set('Percentage');
     this.newValue.set(null);
+    this.showOnPage.set(true);
     this.error.set(null);
   }
 

@@ -242,6 +242,9 @@
     "GALLERY_ARIA": "Product images",
     "INSTANT_DELIVERY_BADGE": "Instant Delivery",
     "GALLERY_IMAGE_ARIA": "Product image {{index}}",
+    "COUPON_WITH_CODE": "With coupon code:",
+    "COUPON_COPY": "Copy the coupon code",
+    "COUPON_COPIED": "Copied",
     "STOCK_AVAILABLE": "Available",
     "STOCK_SELECT_OPTIONS": "Select options",
     "STOCK_ALL_IN_CART": "All {{count}} in your cart",
@@ -1164,6 +1167,8 @@
       "DISCOUNT": "Discount",
       "TYPE": "Type",
       "ONLY_THESE_HINT": "The code will discount only these products, not the rest of the cart.",
+      "SHOW_ON_PAGE": "Show this code on the product page",
+      "SHOW_ON_PAGE_HINT": "Customers see \"With coupon code: …\" under the price. This is a setting of the code itself, so it applies to every product the code is attached to.",
       "APPLY": "Apply"
       },
       "BULK": {
@@ -1207,6 +1212,9 @@
         "BADGE_HINT_ONE": "A short line customers see under the price on this product's card and page, e.g. \"Get 2 points extra\", \"Elite price $9.50\" or \"Extra 5% off for Elite\". Leave both empty to remove it.",
         "BADGE_EN": "Text (English)",
         "BADGE_AR": "النص (عربي)",
+        "BADGE_COLOR": "Note colour",
+        "BADGE_COLOR_DEFAULT": "Default (store green)",
+        "BADGE_COLOR_CUSTOM": "Pick any colour",
         "SET_MARGIN": "Set margin",
         "MARGIN_TITLE": "Set margin",
         "MARGIN_LABEL": "Margin (%)",

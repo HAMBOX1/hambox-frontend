@@ -97,6 +97,8 @@ export interface Product {
   /** Short text (e.g. "+3 Elite points") shown on the storefront card and page; null = none. */
   readonly badgeTextEn?: string | null;
   readonly badgeTextAr?: string | null;
+  /** The colour (#rrggbb) of the note under the price; null keeps the store's default green. */
+  readonly badgeColor?: string | null;
 }
 
 export interface ProductPriceTiers {

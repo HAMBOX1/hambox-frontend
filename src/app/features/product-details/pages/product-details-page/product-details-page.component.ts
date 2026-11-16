@@ -1,5 +1,7 @@
 import { AnalyticsService } from '../../../../core/analytics/analytics.service';
 import { SeoService } from '../../../../core/seo/seo.service';
+import { ProductCoupon, ProductCouponService } from '../../../../core/promotions/product-coupon.service';
+import { CategoryIconService } from '../../../products/services/category-icon.service';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -107,12 +109,21 @@ export class ProductDetailsPageComponent {
   private readonly translation = inject(TranslationService);
   private readonly pageBuilderPublicApi = inject(PageBuilderPublicApiService);
   private readonly home = inject(Home);
+  private readonly productCoupons = inject(ProductCouponService);
+  private readonly categoryIcons = inject(CategoryIconService);
   private readonly faqService = inject(FaqPublicService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
   protected readonly navLinks = inject(StorefrontNavLinksService).links;
   protected readonly product = signal<ProductDetailsItem | null>(null);
+
+  /** Promo codes the admin chose to show on this product ("With coupon code: X"). */
+  protected readonly coupons = signal<readonly ProductCoupon[]>([]);
+  protected readonly copiedCouponCode = signal<string | null>(null);
+
+  /** The small icon the admin gave this product's category, shown next to the category name. */
+  protected readonly categoryIconUrl = computed(() => this.categoryIcons.iconFor(this.product()?.categoryId));
   protected readonly selectedImageIndex = signal(0);
   /** True while the pointer or focus is on the main picture: the slideshow waits instead of moving it away. */
   protected readonly galleryHovered = signal(false);
@@ -306,7 +317,34 @@ export class ProductDetailsPageComponent {
     return this.resolvedVariant().variant !== null;
   });
 
+  protected async copyCoupon(code: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(code);
+      this.copiedCouponCode.set(code);
+      setTimeout(() => this.copiedCouponCode.update((current) => (current === code ? null : current)), 2000);
+    } catch {
+      // Clipboard can be blocked; the code is still on screen to copy by hand.
+    }
+  }
+
   constructor() {
+    // The codes the admin chose to show for this product, refreshed whenever another product is opened.
+    effect((onCleanup) => {
+      const current = this.product();
+      if (!current) {
+        this.coupons.set([]);
+        return;
+      }
+
+      let stale = false;
+      onCleanup(() => (stale = true));
+      void this.productCoupons.forProduct(current.id, current.categoryId).then((codes) => {
+        if (!stale) {
+          this.coupons.set(codes);
+        }
+      });
+    });
+
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const productId = params.get('id');
       this.isPreview.set(this.route.snapshot.queryParamMap.get('preview') === '1');

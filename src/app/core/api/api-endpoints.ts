@@ -413,6 +413,8 @@ export const PROMOTIONS_API = {
   deactivate: (promotionId: string) => `/api/v1/promotions/${promotionId}/deactivate`,
   archive: (promotionId: string) => `/api/v1/promotions/${promotionId}/archive`,
   targets: (promotionId: string) => `/api/v1/promotions/${promotionId}/targets`,
+  productDisplay: (promotionId: string) => `/api/v1/promotions/${promotionId}/product-display`,
+  productCoupons: '/api/v1/promotions/product-coupons',
   generateCoupons: (promotionId: string) => `/api/v1/promotions/${promotionId}/coupons/generate`,
   coupons: (promotionId: string) => `/api/v1/promotions/${promotionId}/coupons`,
   redemptions: (promotionId: string) => `/api/v1/promotions/${promotionId}/redemptions`,

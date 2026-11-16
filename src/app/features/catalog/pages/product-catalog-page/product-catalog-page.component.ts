@@ -241,6 +241,9 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly badgeTarget = signal<Product | null>(null);
   protected readonly badgeTextEn = signal('');
   protected readonly badgeTextAr = signal('');
+  /** The colour of the note (#rrggbb); null = the store's default green. */
+  protected readonly badgeColor = signal<string | null>(null);
+  protected readonly badgeSwatches: readonly string[] = ['#f5b840', '#ff6b6b', '#4da3ff', '#b58cff', '#ffffff'];
   protected readonly bulkMarginValue = signal<number | null>(null);
   protected readonly bulkOldPriceDialogOpen = signal(false);
   protected readonly bulkOldPriceValue = signal<number | null>(null);
@@ -1206,6 +1209,7 @@ export class ProductCatalogPageComponent implements OnInit {
     this.badgeTarget.set(product);
     this.badgeTextEn.set(product?.badgeTextEn ?? '');
     this.badgeTextAr.set(product?.badgeTextAr ?? '');
+    this.badgeColor.set(product?.badgeColor ?? null);
     this.badgeDialogOpen.set(true);
   }
 
@@ -1215,14 +1219,14 @@ export class ProductCatalogPageComponent implements OnInit {
     const ar = this.badgeTextAr().trim();
 
     if (product) {
-      const ok = await this.facade.setProductBadge(product.id, en, ar);
+      const ok = await this.facade.setProductBadge(product.id, en, ar, this.badgeColor());
       this.messageService.add(
         ok
           ? { severity: 'success', summary: en || ar ? this.translate.instant('ADMIN.CATALOG_TOASTS.BADGE_SAVED') : this.translate.instant('ADMIN.CATALOG_TOASTS.BADGE_CLEARED'), detail: product.nameEn, life: 3000 }
           : { severity: 'error', summary: this.translate.instant('ADMIN.CATALOG_TOASTS.BADGE_SAVE_FAILED'), detail: this.facade.error() ?? this.translate.instant('ADMIN.CATALOG_TOASTS.TRY_AGAIN'), life: 5000 },
       );
     } else {
-      await this.runBulkAction(() => this.facade.bulkSetBadge(en, ar), en || ar ? 'Badge saved' : 'Badge cleared');
+      await this.runBulkAction(() => this.facade.bulkSetBadge(en, ar, this.badgeColor()), en || ar ? 'Badge saved' : 'Badge cleared');
     }
 
     this.badgeDialogOpen.set(false);

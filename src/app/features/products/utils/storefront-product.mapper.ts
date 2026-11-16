@@ -62,6 +62,7 @@ export function mapProductToStoreProduct(
     platformLabel: categoryName,
     platformTone: resolvePlatformTone(product.categoryName),
     categoryName,
+    categoryId: product.categoryId,
     instantDigital: isActive,
     priceUsd: product.price,
     cta: isActive ? 'cart' : 'notify-me',
@@ -73,6 +74,7 @@ export function mapProductToStoreProduct(
     isMembersOnly: product.isMembersOnly,
     isComingSoon: product.canPurchase === false && !!product.publicReleaseOnUtc,
     badgeText: resolveLocalizedText(product.badgeTextEn ?? '', product.badgeTextAr ?? '', lang) || undefined,
+    badgeColor: product.badgeColor || undefined,
   };
 }
 
@@ -100,5 +102,6 @@ export function mapProductToDetailsItem(product: Product, lang: SupportedLanguag
     canPurchase: product.canPurchase !== false,
     requiredPlanNames: product.requiredPlanNames ?? [],
     badgeText: resolveLocalizedText(product.badgeTextEn ?? '', product.badgeTextAr ?? '', lang) || undefined,
+    badgeColor: product.badgeColor || undefined,
   };
 }

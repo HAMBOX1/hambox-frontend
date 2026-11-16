@@ -648,6 +648,41 @@
     <label class="admin-field__label" for="badge-ar">{{ 'ADMIN.CATALOG_PAGE.BULK.BADGE_AR' | translate }}</label>
     <input id="badge-ar" pInputText type="text" dir="rtl" maxlength="60" style="width: 100%" placeholder="+3 نقاط" [ngModel]="badgeTextAr()" (ngModelChange)="badgeTextAr.set($event)" />
   </div>
+  <div class="admin-field">
+    <span class="admin-field__label">{{ 'ADMIN.CATALOG_PAGE.BULK.BADGE_COLOR' | translate }}</span>
+    <div class="badge-colors">
+      <button
+        type="button"
+        class="badge-colors__swatch badge-colors__swatch--default"
+        [class.badge-colors__swatch--active]="!badgeColor()"
+        [attr.aria-label]="'ADMIN.CATALOG_PAGE.BULK.BADGE_COLOR_DEFAULT' | translate"
+        [title]="'ADMIN.CATALOG_PAGE.BULK.BADGE_COLOR_DEFAULT' | translate"
+        (click)="badgeColor.set(null)"
+      ></button>
+      @for (swatch of badgeSwatches; track swatch) {
+        <button
+          type="button"
+          class="badge-colors__swatch"
+          [class.badge-colors__swatch--active]="badgeColor() === swatch"
+          [style.background]="swatch"
+          [attr.aria-label]="swatch"
+          (click)="badgeColor.set(swatch)"
+        ></button>
+      }
+      <input
+        type="color"
+        class="badge-colors__custom"
+        [value]="badgeColor() ?? '#3cdc96'"
+        [attr.aria-label]="'ADMIN.CATALOG_PAGE.BULK.BADGE_COLOR_CUSTOM' | translate"
+        (input)="badgeColor.set($any($event.target).value)"
+      />
+    </div>
+    @if (badgeTextEn().trim() || badgeTextAr().trim()) {
+      <span class="badge-colors__preview" [style.--note-color]="badgeColor()">
+        <i class="pi pi-star-fill" aria-hidden="true"></i>{{ badgeTextEn().trim() || badgeTextAr().trim() }}
+      </span>
+    }
+  </div>
   <div class="admin-dialog__actions">
     <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="badgeDialogOpen.set(false)"></button>
     <button

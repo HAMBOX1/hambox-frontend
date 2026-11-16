@@ -72,6 +72,16 @@
       </div>
     }
 
+    <div class="admin-field">
+      <span class="admin-field__label">Small icon <span class="admin-field__optional">{{ 'ADMIN.CATALOG_UI.OPTIONAL' | translate }}</span></span>
+      <app-media-picker
+        [value]="form.controls.iconUrl.value"
+        recommendedSize="Square PNG or SVG with a transparent background, about 64×64px"
+        (valueChange)="form.controls.iconUrl.setValue($event); form.markAsDirty()"
+      />
+      <p class="category-create-form__hint">Shown next to the category name on its product cards, like a platform logo.</p>
+    </div>
+
     @if (mode() === 'create') {
       <div class="admin-field">
         <span class="admin-field__label">{{ 'ADMIN.CATALOG_UI.CATEGORY_TYPE' | translate }}</span>
