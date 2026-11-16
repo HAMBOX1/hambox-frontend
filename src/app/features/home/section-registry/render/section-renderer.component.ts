@@ -81,6 +81,8 @@ function parseConfigJson(json: string | null | undefined): unknown {
             [attr.data-align]="common().buttonAlign ?? (common().buttonPlacement === 'text' ? 'start' : 'center')"
             [attr.data-size]="common().buttonSize"
             [attr.data-spacing]="common().buttonSpacing"
+            [attr.data-style]="common().buttonStyle"
+            [attr.data-shape]="common().buttonShape"
           >
             @if (isInternalLink(common().buttonUrl!)) {
               <a class="section-common-cta__button" [routerLink]="common().buttonUrl">{{ common().buttonLabel }}</a>
@@ -169,6 +171,33 @@ function parseConfigJson(json: string | null | undefined): unknown {
       font-family: var(--sf-font-heading, inherit);
       font-size: 20px;
       font-weight: 600;
+    }
+
+    // How the button looks: filled (the default), an outline, or a soft tinted one - and its corner shape.
+    .section-common-cta[data-style='outline'] .section-common-cta__button {
+      border: 2px solid var(--color-primary, #3cdc96);
+      background: transparent;
+      color: var(--color-primary, #3cdc96);
+      box-shadow: none;
+    }
+
+    .section-common-cta[data-style='soft'] .section-common-cta__button {
+      border: 1px solid color-mix(in srgb, var(--color-primary, #3cdc96) 40%, transparent);
+      background: color-mix(in srgb, var(--color-primary, #3cdc96) 16%, transparent);
+      color: var(--color-primary, #3cdc96);
+      box-shadow: none;
+    }
+
+    .section-common-cta[data-shape='pill'] .section-common-cta__button {
+      border-radius: 999px;
+    }
+
+    .section-common-cta[data-shape='rounded'] .section-common-cta__button {
+      border-radius: var(--sf-radius-md, 12px);
+    }
+
+    .section-common-cta[data-shape='square'] .section-common-cta__button {
+      border-radius: 4px;
     }
 
     @media (max-width: 767px) {

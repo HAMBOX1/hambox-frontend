@@ -113,6 +113,35 @@ import {
         </div>
 
         <div class="common__row">
+          <label for="common-button-style">Button style</label>
+          <select
+            id="common-button-style"
+            [disabled]="disabled()"
+            [ngModel]="config().buttonStyle"
+            (ngModelChange)="patch({ buttonStyle: $event })"
+          >
+            <option value="filled">Filled</option>
+            <option value="outline">Outline only</option>
+            <option value="soft">Soft tint</option>
+          </select>
+        </div>
+
+        <div class="common__row">
+          <label for="common-button-shape">Button corners</label>
+          <select
+            id="common-button-shape"
+            [disabled]="disabled()"
+            [ngModel]="config().buttonShape"
+            (ngModelChange)="patch({ buttonShape: $event })"
+          >
+            <option value="auto">Automatic (follows the size)</option>
+            <option value="pill">Fully round (pill)</option>
+            <option value="rounded">Rounded corners</option>
+            <option value="square">Almost square</option>
+          </select>
+        </div>
+
+        <div class="common__row">
           <label for="common-button-spacing">Distance from the section</label>
           <select
             id="common-button-spacing"
@@ -128,15 +157,16 @@ import {
       }
 
       @if (showProducts()) {
-        <h4 class="common__title">Products shown</h4>
+        <h4 class="common__title">Cards shown</h4>
 
         <div class="common__row">
-          <label for="common-source">Take products from</label>
+          <label for="common-source">Show</label>
           <select id="common-source" [disabled]="disabled()" [ngModel]="products().source" (ngModelChange)="patchProducts({ source: $event })">
             <option value="auto">Default featured products</option>
             <option value="manual">Products I choose</option>
             <option value="category">A category</option>
             <option value="internal">An internal category</option>
+            <option value="categories">Categories instead of products</option>
           </select>
         </div>
 
@@ -146,6 +176,10 @@ import {
           }
           @case ('category') {
             <app-category-picker [value]="products().categoryIds" [disabled]="disabled()" (valueChange)="patchProducts({ categoryIds: $event })" />
+          }
+          @case ('categories') {
+            <app-category-picker [value]="products().categoryIds" [disabled]="disabled()" (valueChange)="patchProducts({ categoryIds: $event })" />
+            <small>Pick the categories to show as cards (in this order). Leave empty to show all active categories.</small>
           }
           @case ('internal') {
             <div class="common__row">
@@ -178,7 +212,7 @@ import {
           />
         </div>
 
-        @if (products().source !== 'manual') {
+        @if (products().source !== 'manual' && (products().source !== 'categories' || products().categoryIds.length === 0)) {
           <div class="common__row">
             <label for="common-rotation">When there are more than that</label>
             <select id="common-rotation" [disabled]="disabled()" [ngModel]="products().rotation" (ngModelChange)="patchProducts({ rotation: $event })">

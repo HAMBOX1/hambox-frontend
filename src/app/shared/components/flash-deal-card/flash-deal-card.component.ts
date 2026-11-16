@@ -1,7 +1,8 @@
 import { HamboxCurrencyPipe } from '../../pipes/hambox-currency.pipe';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TagModule } from 'primeng/tag';
+import { HamboxLinkDirective } from '../../directives/hambox-link.directive';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { FlashDeal } from '../../../features/home/models/storefront-home';
@@ -14,7 +15,7 @@ import { AccountWishlistFacade } from '../../../features/account/services/accoun
 @Component({
   selector: 'app-flash-deal-card',
   standalone: true,
-  imports: [TagModule, RouterLink, HamboxCurrencyPipe, TranslatePipe],
+  imports: [TagModule, HamboxLinkDirective, HamboxCurrencyPipe, TranslatePipe],
   templateUrl: './flash-deal-card.component.html',
   styleUrl: './flash-deal-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -3,10 +3,11 @@ import { firstValueFrom } from 'rxjs';
 
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { Product } from '../../catalog/models/product.model';
+import { CategoryApiService } from '../../catalog/services/category-api.service';
 import { ProductApiService } from '../../catalog/services/product-api.service';
 import { FlashDeal } from '../models/storefront-home';
 import { SectionProductRotation, SectionProductsConfig } from '../section-registry/models/section-common.model';
-import { mapProductToFlashDeal } from '../utils/storefront-home.mapper';
+import { mapCategoryToStorefrontCategory, mapProductToFlashDeal } from '../utils/storefront-home.mapper';
 
 /** How many products to pull from a category / collection before rotating through them. */
 const POOL_SIZE = 100;
@@ -55,6 +56,7 @@ export function pickRotated<T>(
 @Injectable({ providedIn: 'root' })
 export class SectionProductSourceService {
   private readonly productApi = inject(ProductApiService);
+  private readonly categoryApi = inject(CategoryApiService);
   private readonly translation = inject(TranslationService);
 
   /**
@@ -79,6 +81,33 @@ export class SectionProductSourceService {
     }
   }
 
+  /** The picked categories (or every active one) as plain link cards, in the picked order. */
+  private async resolveCategories(config: SectionProductsConfig): Promise<readonly FlashDeal[]> {
+    const lang = this.translation.language();
+    const page = await firstValueFrom(this.categoryApi.getCategories({ pageNumber: 1, pageSize: 100, activeOnly: true }));
+    const byId = new Map(page.items.map((category) => [category.id, category]));
+    const chosen =
+      config.categoryIds.length > 0
+        ? config.categoryIds.map((id) => byId.get(id)).filter((category) => !!category)
+        : pickRotated(page.items, config.limit, config.rotation);
+
+    return chosen.slice(0, config.limit).map((category) => {
+      const tile = mapCategoryToStorefrontCategory(category, lang);
+      return {
+        id: tile.id,
+        title: tile.title,
+        subtitle: tile.subtitle,
+        imageUrl: tile.imageUrl,
+        discountLabel: '',
+        originalPriceUsd: 0,
+        currentPriceUsd: 0,
+        priceTone: 'green' as const,
+        route: tile.route,
+        tile: true,
+      };
+    });
+  }
+
   /**
    * Returns the section's products, or `null` to keep the platform default (also when a lookup fails: a broken
    * source must never blank a section that has perfectly good default content).
@@ -91,6 +120,10 @@ export class SectionProductSourceService {
         return config.rotation === 'none' && defaults.length <= config.limit
           ? null
           : pickRotated(defaults, config.limit, config.rotation);
+      }
+
+      if (config.source === 'categories') {
+        return await this.resolveCategories(config);
       }
 
       let products: readonly Product[] = [];

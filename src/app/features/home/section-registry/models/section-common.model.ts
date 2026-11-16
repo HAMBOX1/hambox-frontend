@@ -4,7 +4,8 @@
  * `SectionRendererComponent` reads this and applies it around whatever the variant renders.
  */
 
-export type SectionProductSource = 'auto' | 'manual' | 'category' | 'internal';
+/** `categories` swaps the section's cards for category cards (the picked categories, or every active one). */
+export type SectionProductSource = 'auto' | 'manual' | 'category' | 'internal' | 'categories';
 export type SectionProductRotation = 'none' | 'daily' | 'random';
 export type SectionButtonAlign = 'start' | 'center' | 'end';
 /** Small / Medium match the site's usual buttons; Large matches the big hero buttons. */
@@ -13,6 +14,10 @@ export type SectionButtonSize = 'small' | 'medium' | 'large';
 export type SectionButtonSpacing = 'close' | 'normal';
 /** `text` puts the button right under the section's heading text (like the hero button); `bottom` after all the content. */
 export type SectionButtonPlacement = 'text' | 'bottom';
+/** Filled button, an outline, or a soft tinted one. */
+export type SectionButtonStyle = 'filled' | 'outline' | 'soft';
+/** `auto` keeps the shape that goes with the chosen size. */
+export type SectionButtonShape = 'auto' | 'pill' | 'rounded' | 'square';
 
 /** Where a Products section gets its items from, how many it shows and how they rotate. */
 export interface SectionProductsConfig {
@@ -43,6 +48,8 @@ export interface SectionCommonConfig {
   readonly buttonSize: SectionButtonSize;
   readonly buttonSpacing: SectionButtonSpacing;
   readonly buttonPlacement: SectionButtonPlacement;
+  readonly buttonStyle: SectionButtonStyle;
+  readonly buttonShape: SectionButtonShape;
   readonly products: SectionProductsConfig | null;
 }
 
@@ -64,6 +71,8 @@ export const DEFAULT_SECTION_COMMON: SectionCommonConfig = {
   buttonSize: 'medium',
   buttonSpacing: 'close',
   buttonPlacement: 'text',
+  buttonStyle: 'filled',
+  buttonShape: 'auto',
   products: null,
 };
 
@@ -86,9 +95,12 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
     buttonSize: raw.buttonSize === 'small' || raw.buttonSize === 'large' ? raw.buttonSize : 'medium',
     buttonSpacing: raw.buttonSpacing === 'normal' ? 'normal' : 'close',
     buttonPlacement: raw.buttonPlacement === 'bottom' ? 'bottom' : 'text',
+    buttonStyle: raw.buttonStyle === 'outline' || raw.buttonStyle === 'soft' ? raw.buttonStyle : 'filled',
+    buttonShape:
+      raw.buttonShape === 'pill' || raw.buttonShape === 'rounded' || raw.buttonShape === 'square' ? raw.buttonShape : 'auto',
     products: products
       ? {
-          source: ['manual', 'category', 'internal'].includes(products.source as string)
+          source: ['manual', 'category', 'internal', 'categories'].includes(products.source as string)
             ? (products.source as SectionProductSource)
             : 'auto',
           productIds: Array.isArray(products.productIds) ? products.productIds.filter((id) => typeof id === 'string') : [],

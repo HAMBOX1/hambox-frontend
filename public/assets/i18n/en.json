@@ -1218,7 +1218,7 @@
         "SET_MARGIN": "Set margin",
         "MARGIN_TITLE": "Set margin",
         "MARGIN_LABEL": "Margin (%)",
-        "MARGIN_HINT": "The sale price becomes cost ÷ (1 − margin). Products without a cost price, or whose variants carry their own sale price, are skipped.",
+        "MARGIN_HINT": "The sale price becomes cost ÷ (1 − margin). It is applied to every variant of the selected products that has a cost price — including variants with their own sale price. Variants without a cost price are left unchanged.",
         "SET_FULFILLMENT": "Set delivery mode",
         "FULFILLMENT_TITLE": "Set delivery mode",
         "FULFILLMENT_HINT": "Applies to every variant of the selected products.",

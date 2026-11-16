@@ -33,6 +33,10 @@ export interface FlashDeal {
   originalPriceUsd: number;
   currentPriceUsd: number;
   priceTone: StorefrontPriceTone;
+  /** Where the card goes; unset means the product page. */
+  route?: string;
+  /** A plain link card (a category): no price, no wishlist heart, no buy button. */
+  tile?: boolean;
 }
 
 export interface TrendingRankItem {
