@@ -107,6 +107,7 @@ export class ProductsPageComponent implements OnInit {
   protected readonly viewMode = this.viewModeService.mode;
 
   constructor() {
+    this.viewModeService.ensureLoaded();
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const searchTerm = params.get('q') ?? '';
       const categoryId = params.get('category') ?? 'all';

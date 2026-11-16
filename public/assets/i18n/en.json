@@ -2363,6 +2363,12 @@
           "DKK": "DKK — Danish Krone",
           "PLN": "PLN — Polish Złoty"
         },
+        "PRODUCT_VIEW": {
+          "COMFORTABLE": "Large cards (big grid)",
+          "COMPACT": "Medium cards (2 per row on phones)",
+          "DENSE": "Small cards (3 per row)",
+          "LIST": "List (one card per row)"
+        },
         "STORE_STATUS": {
           "OPEN": "Open",
           "COMING_SOON": "Coming Soon",
@@ -2474,6 +2480,26 @@
             "LABEL": "Store Status",
             "HELP": "Controls whether the storefront is open for browsing and purchases.",
             "TOOLTIP": "Affects every customer immediately. \"Temporarily Closed\" is different from Maintenance Mode — it's a lighter, storefront-only state."
+          },
+          "REGULAR_PRODUCT_VIEWS": {
+            "LABEL": "Product layouts for regular customers",
+            "HELP": "Which layouts regular customers (guests and customers without a membership) can use on the products page.",
+            "TOOLTIP": "Pick one to give everyone a single fixed layout, or two to let them switch between those two. The layout buttons only show when more than one is picked."
+          },
+          "REGULAR_DEFAULT_PRODUCT_VIEW": {
+            "LABEL": "Starting layout for regular customers",
+            "HELP": "The layout a regular customer sees first.",
+            "TOOLTIP": "If it is not one of the layouts picked above, the first picked layout is used."
+          },
+          "ELITE_PRODUCT_VIEWS": {
+            "LABEL": "Product layouts for Elite customers",
+            "HELP": "Which layouts customers with an active membership can switch between.",
+            "TOOLTIP": "Pick all four to give Elite customers full freedom to change the view."
+          },
+          "ELITE_DEFAULT_PRODUCT_VIEW": {
+            "LABEL": "Starting layout for Elite customers",
+            "HELP": "The layout an Elite customer sees first, until they pick another one.",
+            "TOOLTIP": "If it is not one of the layouts picked above, the first picked layout is used."
           }
         },
         "BRANDING": {

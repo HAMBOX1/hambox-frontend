@@ -7,6 +7,7 @@ import { AuthSessionService } from '../auth/auth-session.service';
 
 interface CurrentMembershipFeatureFlagsResponse {
   readonly featureFlags?: readonly string[];
+  readonly subscription?: { readonly status?: string } | null;
 }
 
 /**
@@ -25,6 +26,17 @@ export class MembershipFeatureService {
   private loadingPromise: Promise<void> | null = null;
 
   readonly flags = this.flagsState.asReadonly();
+
+  private readonly memberState = signal(false);
+
+  /**
+   * True for a customer with a membership they bought and that is active (an "Elite" customer). Like hasFeature, it is
+   * safe in a template or computed: the first read starts the load and it re-evaluates once the answer arrives.
+   */
+  isMember(): boolean {
+    void this.ensureLoaded();
+    return this.memberState();
+  }
 
   /** Synchronous, signal-reactive check — safe to call from a template or an effect(). Triggers a
    * background load on first use; returns false until that load resolves (then re-evaluates). */
@@ -47,6 +59,7 @@ export class MembershipFeatureService {
     this.loaded = false;
     this.loadingPromise = null;
     this.flagsState.set([]);
+    this.memberState.set(false);
   }
 
   private async load(): Promise<void> {
@@ -55,8 +68,10 @@ export class MembershipFeatureService {
         this.api.get<CurrentMembershipFeatureFlagsResponse>(ACCOUNT_API.membership),
       );
       this.flagsState.set(dto.featureFlags ?? []);
+      this.memberState.set(dto.subscription?.status?.toLowerCase() === 'active');
     } catch {
       this.flagsState.set([]);
+      this.memberState.set(false);
     } finally {
       this.loaded = true;
       this.loadingPromise = null;

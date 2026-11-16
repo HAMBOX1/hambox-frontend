@@ -200,6 +200,14 @@ export const CURRENCY_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('CURRENCY.PLN'), value: 'PLN' },
 ];
 
+/** How the products page can be laid out; values match the storefront's view modes. */
+export const PRODUCT_VIEW_OPTIONS: SettingsFieldOption[] = [
+  { label: OPT('PRODUCT_VIEW.COMFORTABLE'), value: 'comfortable' },
+  { label: OPT('PRODUCT_VIEW.COMPACT'), value: 'compact' },
+  { label: OPT('PRODUCT_VIEW.DENSE'), value: 'dense' },
+  { label: OPT('PRODUCT_VIEW.LIST'), value: 'list' },
+];
+
 export const STORE_STATUS_OPTIONS: SettingsFieldOption[] = [
   { label: OPT('STORE_STATUS.OPEN'), value: 'Open' },
   { label: OPT('STORE_STATUS.COMING_SOON'), value: 'ComingSoon' },
@@ -264,6 +272,12 @@ export const SETTINGS_FIELD_CONFIGS: Record<string, SettingsFieldConfig[]> = {
     // Storefront → Footer fields instead, and defaultLanguage/defaultCurrency duplicate the
     // (also unwired) localization/currency category fields without either being read anywhere.
     { key: 'storeStatus', control: 'select', options: STORE_STATUS_OPTIONS, ...fieldKeys('GENERAL.STORE_STATUS') },
+    // Which product layouts customers can use on the products page: regular customers get the ones picked here (one or
+    // two keeps the page simple), Elite (membership) customers can switch between theirs.
+    { key: 'regularProductViews', control: 'multiselect', options: PRODUCT_VIEW_OPTIONS, ...fieldKeys('GENERAL.REGULAR_PRODUCT_VIEWS') },
+    { key: 'regularDefaultProductView', control: 'select', options: PRODUCT_VIEW_OPTIONS, ...fieldKeys('GENERAL.REGULAR_DEFAULT_PRODUCT_VIEW') },
+    { key: 'eliteProductViews', control: 'multiselect', options: PRODUCT_VIEW_OPTIONS, ...fieldKeys('GENERAL.ELITE_PRODUCT_VIEWS') },
+    { key: 'eliteDefaultProductView', control: 'select', options: PRODUCT_VIEW_OPTIONS, ...fieldKeys('GENERAL.ELITE_DEFAULT_PRODUCT_VIEW') },
   ],
   // Branding: only the header logo is wired (BrandLogoService). Leave it empty to keep the text wordmark.
   // The other branding fields (favicon, colours, footer/admin logo) still have no consumer, so they stay out.

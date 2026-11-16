@@ -21,6 +21,11 @@ export class StoreViewModeSwitcherComponent {
   readonly filterCount = input(0);
 
   protected readonly mode = this.viewModeService.mode;
+  protected readonly allowed = this.viewModeService.allowedModes;
+
+  constructor() {
+    this.viewModeService.ensureLoaded();
+  }
 
   protected setMode(mode: StorefrontViewMode): void {
     this.viewModeService.setMode(mode);
