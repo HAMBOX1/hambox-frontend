@@ -8,16 +8,18 @@
   gap: 24px;
   align-items: center;
   padding: 20px;
-  border: 1px solid var(--color-card-shell-border);
-  border-radius: var(--sf-radius-lg);
-  background: var(--color-card-shell);
+  // A clear rounded rectangle, like the grid cards: a visible outline and a solid surface that stands out from the
+  // page (the faint shell tint made each row melt into the background and look like a bare list).
+  border: 1px solid color-mix(in srgb, var(--color-text-primary) 16%, transparent);
+  border-radius: var(--sf-radius-xl);
+  background: var(--color-surface, var(--color-card-shell));
   box-shadow: var(--color-shadow-xs);
   transition:
     box-shadow 0.24s ease,
     border-color 0.24s ease;
 
   &:hover {
-    border-color: var(--color-border);
+    border-color: var(--color-accent-border);
     box-shadow: var(--color-card-hover-shadow);
   }
 
@@ -332,7 +334,7 @@
     align-items: center;
     column-gap: 12px;
     row-gap: 6px;
-    padding: 10px;
+    padding: 12px;
   }
 
   .store-list-card__media {
