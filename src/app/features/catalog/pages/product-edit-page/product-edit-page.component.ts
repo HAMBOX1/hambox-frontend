@@ -18,6 +18,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
+import { ProductPromoDialogComponent } from '../../components/product-promo-dialog/product-promo-dialog.component';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -59,6 +60,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
   selector: 'app-product-edit-page',
   standalone: true,
   imports: [
+    ProductPromoDialogComponent,
     RouterLink,
     FormsModule,
     TranslatePipe,
@@ -107,6 +109,16 @@ export class ProductEditPageComponent implements OnInit {
   protected readonly permissions = PERMISSIONS;
   protected readonly statusOptions = STATUS_OPTIONS;
   protected readonly product = this.facade.product;
+  protected readonly promoDialogOpen = signal(false);
+  protected readonly promoResolveIds = async (): Promise<readonly string[]> => {
+    const current = this.product();
+    return current ? [current.id] : [];
+  };
+
+  protected onPromoApplied(message: string): void {
+    this.promoDialogOpen.set(false);
+    this.messageService.add({ severity: 'success', summary: this.translate.instant('ADMIN.CATALOG_PAGE.PROMO.APPLIED'), detail: message, life: 5000 });
+  }
   protected readonly loading = this.facade.loading;
   protected readonly error = this.facade.error;
   protected readonly loadFailed = this.facade.loadFailed;

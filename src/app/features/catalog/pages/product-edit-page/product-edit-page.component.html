@@ -53,6 +53,17 @@
           }
 
           <div class="product-edit-page__hero-buttons">
+            @if (product()) {
+              <button
+                *hamboxHasPermission="permissions.Promotions.Edit"
+                pButton
+                type="button"
+                icon="pi pi-percentage"
+                [label]="'ADMIN.CATALOG_PAGE.PROMO.ADD_PROMO' | translate"
+                severity="secondary"
+                (click)="promoDialogOpen.set(true)"
+              ></button>
+            }
             <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" (click)="onCancel()"></button>
             @if (product()) {
               <button
@@ -210,3 +221,14 @@
     />
   }
 </section>
+
+@if (product(); as promoTarget) {
+  <app-product-promo-dialog
+    [open]="promoDialogOpen()"
+    [productName]="promoTarget.nameEn"
+    [productCount]="1"
+    [resolveProductIds]="promoResolveIds"
+    (closed)="promoDialogOpen.set(false)"
+    (applied)="onPromoApplied($event.message)"
+  />
+}
