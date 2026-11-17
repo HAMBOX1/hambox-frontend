@@ -94,6 +94,12 @@ export class CurrencyService {
     return amountUsd * rate;
   }
 
+  /** Convert an amount typed in the active display currency back into the stored USD base. */
+  convertToBase(amount: number): number {
+    const rate = this.ratesState()[this.currencyState()] ?? 1;
+    return rate > 0 ? amount / rate : amount;
+  }
+
   /** Format a stored USD amount using locale + active currency. */
   format(amountUsd: number | null | undefined, digitsInfo = '1.2-2'): string {
     if (amountUsd === null || amountUsd === undefined || Number.isNaN(amountUsd)) {

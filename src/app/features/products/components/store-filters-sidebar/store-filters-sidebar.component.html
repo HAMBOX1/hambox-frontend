@@ -57,6 +57,33 @@
     </div>
 
     <div class="store-filters__body">
+      @if (platforms().length) {
+        <section class="store-filters__scope" aria-label="Where you are">
+          <label class="store-filters__scope-field">
+            <span class="store-filters__scope-label">{{ 'PRODUCTS.FILTERS.PLATFORM' | translate }}</span>
+            <select class="store-filters__select" [value]="platformId()" (change)="onScopeChange($event)">
+              <option value="all">{{ 'PRODUCTS.FILTERS.ALL_PLATFORMS' | translate }}</option>
+              @for (platform of platforms(); track platform.id) {
+                <option [value]="platform.id" [selected]="platform.id === platformId()">{{ platform.label }}</option>
+              }
+            </select>
+          </label>
+          @if (platformCategories().length) {
+            <label class="store-filters__scope-field">
+              <span class="store-filters__scope-label">{{ 'PRODUCTS.FILTERS.CATEGORY' | translate }}</span>
+              <select class="store-filters__select" [value]="selectedCategoryId()" (change)="onScopeChange($event)">
+                <option [value]="platformId()" [selected]="selectedCategoryId() === platformId()">{{ 'PRODUCTS.FILTERS.ALL_CATEGORIES' | translate }}</option>
+                @for (category of platformCategories(); track category.id) {
+                  <option [value]="category.id" [selected]="category.id === selectedCategoryId()">{{ category.label }}</option>
+                }
+              </select>
+            </label>
+          }
+        </section>
+      }
+
+      <ng-container *ngTemplateOutlet="priceSection" />
+
       @for (group of filterGroups(); track group.id) {
         <section class="store-filters__group">
           <button
@@ -97,6 +124,7 @@
         </section>
       }
 
+      <ng-template #priceSection>
       <section class="store-filters__group">
         <button
           type="button"
@@ -140,7 +168,52 @@
             (input)="onMaxPriceInput($event)"
           />
         </div>
+
+        @if (hasPriceRange() && isExpanded('price')) {
+          <div class="store-filters__slider">
+            <div class="store-filters__slider-track" aria-hidden="true">
+              <span
+                class="store-filters__slider-fill"
+                [style.left.%]="((sliderMin() - boundMin()) / (boundMax() - boundMin())) * 100"
+                [style.right.%]="100 - ((sliderMax() - boundMin()) / (boundMax() - boundMin())) * 100"
+              ></span>
+            </div>
+            <input
+              type="range"
+              class="store-filters__range"
+              [min]="boundMin()"
+              [max]="boundMax()"
+              step="1"
+              [value]="sliderMin()"
+              [attr.aria-label]="'PRODUCTS.FILTERS.MIN_PRICE' | translate"
+              (input)="onMinSlider($event)"
+            />
+            <input
+              type="range"
+              class="store-filters__range"
+              [min]="boundMin()"
+              [max]="boundMax()"
+              step="1"
+              [value]="sliderMax()"
+              [attr.aria-label]="'PRODUCTS.FILTERS.MAX_PRICE' | translate"
+              (input)="onMaxSlider($event)"
+            />
+          </div>
+          <div class="store-filters__slider-legend">
+            <span>{{ boundMin() }} {{ currencyCode() }}</span>
+            <button
+              type="button"
+              class="store-filters__price-reset"
+              [disabled]="minPrice() === '' && maxPrice() === ''"
+              (click)="resetPrice()"
+            >
+              {{ 'PRODUCTS.FILTERS.RESET_PRICE' | translate }}
+            </button>
+            <span>{{ boundMax() }} {{ currencyCode() }}</span>
+          </div>
+        }
       </section>
+      </ng-template>
 
       <section class="store-filters__group">
         <button

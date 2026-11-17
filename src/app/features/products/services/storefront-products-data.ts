@@ -44,6 +44,8 @@ export const STOREFRONT_CATEGORY_PILLS: readonly StoreCategoryPill[] = [
 export const STOREFRONT_SORT_OPTIONS: readonly StoreSortOption[] = [
   { value: 'featured', label: 'Featured' },
   { value: 'newest', label: 'Newest' },
+  { value: 'oldest', label: 'Oldest' },
+  { value: 'popular', label: 'Most popular' },
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
   { value: 'best-selling', label: 'Best Selling' },

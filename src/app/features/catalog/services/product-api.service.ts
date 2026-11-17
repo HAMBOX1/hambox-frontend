@@ -17,6 +17,7 @@ import {
   Product,
   ProductBulkSelection,
   ProductFacetGroup,
+  ProductPriceRange,
   ProductFacetQuery,
   ProductImage,
   ProductImageLibraryPage,
@@ -68,6 +69,14 @@ export class ProductApiService {
       params['attributes'] = attributes;
     }
 
+    if (query.minPrice !== undefined) {
+      params['minPrice'] = query.minPrice;
+    }
+
+    if (query.maxPrice !== undefined) {
+      params['maxPrice'] = query.maxPrice;
+    }
+
     if (query.collectionId) {
       params['collectionId'] = query.collectionId;
     }
@@ -94,6 +103,24 @@ export class ProductApiService {
     }
 
     return this.api.get<PagedResult<Product>>(CATALOG_API.products, { params });
+  }
+
+  /** The lowest and highest selling price among the products in view (search + category + chosen filters). */
+  getPriceRange(query: ProductFacetQuery): Observable<ProductPriceRange> {
+    const params: Record<string, string> = {};
+    const searchTerm = query.searchTerm?.trim();
+    if (searchTerm) {
+      params['searchTerm'] = searchTerm;
+    }
+    if (query.categoryId) {
+      params['categoryId'] = query.categoryId;
+    }
+    const attributes = this.serializeAttributes(query.attributes);
+    if (attributes) {
+      params['attributes'] = attributes;
+    }
+
+    return this.api.get<ProductPriceRange>(CATALOG_API.productPriceRange, { params });
   }
 
   getProductFacets(query: ProductFacetQuery): Observable<readonly ProductFacetGroup[]> {

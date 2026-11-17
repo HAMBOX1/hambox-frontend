@@ -14,6 +14,7 @@ export const CATALOG_API = {
   collectionRestore: (id: string) => `/api/v1/collections/${id}/restore`,
   products: '/api/v1/products',
   productFacets: '/api/v1/products/facets',
+  productPriceRange: '/api/v1/products/price-range',
   product: (id: string) => `/api/v1/products/${id}`,
   productPublish: (id: string) => `/api/v1/products/${id}/publish`,
   productDeactivate: (id: string) => `/api/v1/products/${id}/deactivate`,

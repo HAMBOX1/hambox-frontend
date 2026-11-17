@@ -88,6 +88,8 @@ export class ProductsPageComponent implements OnInit {
   protected readonly categories = this.facade.categories;
   protected readonly sortOptions = this.facade.sortOptions;
   protected readonly dynamicFilterGroups = this.facade.dynamicFilterGroups;
+  protected readonly priceBounds = this.facade.priceBounds;
+  protected readonly categoryNodes = this.facade.categoryNodes;
   protected readonly appliedFilterChips = this.facade.appliedFilterChips;
   protected readonly activeFilterCount = this.facade.activeFilterCount;
   protected readonly loading = this.facade.loading;

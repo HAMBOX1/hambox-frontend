@@ -8,10 +8,11 @@ import {
   Product,
   ProductFacetGroup,
   ProductListQuery,
+  ProductPriceRange,
   ProductSortBy,
 } from '../../catalog/models/product.model';
 import { PagedResult } from '../../catalog/models/category.model';
-import { StoreCategoryPill } from '../models/product';
+import { StoreCategoryNode, StoreCategoryPill } from '../models/product';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import { resolveLocalizedText } from '../../../core/i18n/localized-text.util';
 
@@ -24,6 +25,8 @@ export interface StorefrontProductQuery {
   readonly categoryId?: string;
   readonly sortBy?: ProductSortBy;
   readonly attributes?: Readonly<Record<string, readonly string[]>>;
+  readonly minPrice?: number;
+  readonly maxPrice?: number;
 }
 
 export interface StorefrontFacetQuery {
@@ -49,6 +52,8 @@ export class Products {
       categoryId: query.categoryId,
       sortBy: query.sortBy,
       attributes: query.attributes,
+      minPrice: query.minPrice,
+      maxPrice: query.maxPrice,
     };
 
     return firstValueFrom(this.productApi.getProducts(request));
@@ -56,6 +61,24 @@ export class Products {
 
   getFacets(query: StorefrontFacetQuery): Promise<readonly ProductFacetGroup[]> {
     return firstValueFrom(this.productApi.getProductFacets(query));
+  }
+
+  getPriceRange(query: StorefrontFacetQuery): Promise<ProductPriceRange> {
+    return firstValueFrom(this.productApi.getPriceRange(query));
+  }
+
+  /** Every active category with its parent, so the storefront can show Platform (parent) and Category (child). */
+  getCategoryNodes(): Promise<readonly StoreCategoryNode[]> {
+    const lang = this.translation.language();
+    return firstValueFrom(
+      this.categoryApi.getCategories({ pageNumber: 1, pageSize: CATEGORY_PAGE_SIZE, activeOnly: true }),
+    ).then((result) =>
+      (result.items ?? []).map((category) => ({
+        id: category.id,
+        parentId: category.parentId,
+        label: resolveLocalizedText(category.nameEn, category.nameAr, lang),
+      })),
+    );
   }
 
   getProductById(id: string): Promise<Product> {

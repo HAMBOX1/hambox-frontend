@@ -6,6 +6,9 @@ export interface DynamicFilterGroup {
   readonly id: string;
   readonly label: string;
   readonly options: readonly DynamicFilterOption[];
+  /** False for a filter that allows one value at a time (ticking another replaces the first). */
+  readonly multiSelect?: boolean;
+  readonly defaultExpanded?: boolean;
 }
 
 export interface DynamicFilterOption {

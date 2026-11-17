@@ -49,6 +49,13 @@ export interface StoreCategoryPill {
   imageUrl?: string | null;
 }
 
+/** A category with its parent, for the Platform / Category picker. */
+export interface StoreCategoryNode {
+  id: string;
+  parentId: string | null;
+  label: string;
+}
+
 export interface StoreSortOption {
   value: string;
   label: string;

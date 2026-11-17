@@ -9,6 +9,8 @@ export type ProductDisplayImageSource = 'Product' | 'Category' | 'ParentCategory
 
 export type ProductSortBy =
   | 'Newest'
+  | 'Oldest'
+  | 'Popular'
   | 'PriceAsc'
   | 'PriceDesc'
   | 'NameAsc'
@@ -198,6 +200,9 @@ export interface ProductListQuery {
   readonly categoryId?: string;
   readonly sortBy?: ProductSortBy;
   readonly attributes?: Readonly<Record<string, readonly string[]>>;
+  /** Price range in USD (the stored base currency); the server compares it with each product's cheapest selling price. */
+  readonly minPrice?: number;
+  readonly maxPrice?: number;
   readonly collectionId?: string;
   /** Narrows to exactly this id set — populated only by the Supplier Mapping filter, which resolves
    * matching ids from the Suppliers module first (see `ProductCatalogFacade.setSupplierMappingFilter`). */
@@ -222,11 +227,21 @@ export interface ProductFacetGroup {
   readonly displayName: string;
   readonly displayNameAr?: string | null;
   readonly options: readonly ProductFacetOption[];
+  /** False for a filter that allows one value at a time. */
+  readonly isMultiSelect?: boolean;
+  readonly defaultExpanded?: boolean;
+  readonly isCustom?: boolean;
+}
+
+export interface ProductPriceRange {
+  readonly min: number | null;
+  readonly max: number | null;
 }
 
 export interface ProductFacetOption {
   readonly value: string;
   readonly label: string;
+  readonly labelAr?: string | null;
   readonly count: number;
 }
 

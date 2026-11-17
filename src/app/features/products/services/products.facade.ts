@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { ProductFacetGroup, ProductSortBy } from '../../catalog/models/product.model';
+import { StoreCategoryNode } from '../models/product';
 import { ApiError } from '../../../core/models/api-error.model';
 import { StoreCategoryPill, StoreProduct, StoreSortOption } from '../models/product';
 import { STOREFRONT_SORT_OPTIONS } from '../services/storefront-products-data';
@@ -21,9 +22,11 @@ function mapFacetGroups(groups: readonly ProductFacetGroup[], language: string):
   return groups.map((group) => ({
     id: group.key,
     label: language === 'ar' && group.displayNameAr ? group.displayNameAr : group.displayName,
+    multiSelect: group.isMultiSelect !== false,
+    defaultExpanded: group.defaultExpanded !== false,
     options: group.options.map((option) => ({
       id: option.value,
-      label: option.label,
+      label: language === 'ar' && option.labelAr ? option.labelAr : option.label,
       count: option.count,
     })),
   }));
@@ -93,6 +96,8 @@ export class ProductsFacade {
   private readonly totalCountState = signal(0);
   private readonly clientFiltersState = signal<StorefrontClientFilters>(EMPTY_CLIENT_FILTERS);
   private readonly facetGroupsState = signal<readonly DynamicFilterGroup[]>([]);
+  private readonly categoryNodesState = signal<readonly StoreCategoryNode[]>([]);
+  private readonly priceBoundsState = signal<{ min: number | null; max: number | null }>({ min: null, max: null });
 
   readonly items = this.itemsState.asReadonly();
   readonly categories = this.categoriesState.asReadonly();
@@ -124,6 +129,10 @@ export class ProductsFacade {
   });
 
   readonly dynamicFilterGroups = this.facetGroupsState.asReadonly();
+  /** Every active category with its parent (platform → category) for the filter panel's summary. */
+  readonly categoryNodes = this.categoryNodesState.asReadonly();
+  /** The lowest / highest selling price among the products in view, in USD; null until known. */
+  readonly priceBounds = this.priceBoundsState.asReadonly();
 
   readonly displayItems = computed(() => {
     const filtered = this.applyClientFilters(this.enrichedItems());
@@ -197,7 +206,7 @@ export class ProductsFacade {
     this.categoryIdState.set(categoryId);
     this.sectionState.set(section);
     this.pageNumberState.set(1);
-    await Promise.all([this.loadCategories(), this.fetchProducts(true), this.fetchFacets()]);
+    await Promise.all([this.loadCategories(), this.fetchProducts(true), this.fetchFacets(), this.fetchPriceBounds()]);
   }
 
   setSearchTerm(term: string): void {
@@ -205,6 +214,7 @@ export class ProductsFacade {
     this.pageNumberState.set(1);
     void this.fetchProducts(true);
     void this.fetchFacets();
+    void this.fetchPriceBounds();
   }
 
   setCategory(categoryId: string): void {
@@ -212,6 +222,7 @@ export class ProductsFacade {
     this.pageNumberState.set(1);
     void this.fetchProducts(true);
     void this.fetchFacets();
+    void this.fetchPriceBounds();
   }
 
   setSection(section: string): void {
@@ -220,23 +231,25 @@ export class ProductsFacade {
 
   setSort(sort: StoreSortOption['value']): void {
     this.sortState.set(sort);
-    if (this.isServerSort(sort)) {
-      this.pageNumberState.set(1);
-      void this.fetchProducts(true);
-    }
+    this.pageNumberState.set(1);
+    void this.fetchProducts(true);
   }
 
   setClientFilters(filters: StorefrontClientFilters): void {
-    const attributesChanged = !attributesEqual(
-      this.clientFiltersState().attributes,
-      filters.attributes,
-    );
+    const previous = this.clientFiltersState();
+    const attributesChanged = !attributesEqual(previous.attributes, filters.attributes);
+    const priceChanged = previous.minPrice !== filters.minPrice || previous.maxPrice !== filters.maxPrice;
     this.clientFiltersState.set(filters);
 
-    if (attributesChanged) {
+    // Price and the chosen filters are applied by the server, so paging and counts always match what is shown.
+    if (attributesChanged || priceChanged) {
       this.pageNumberState.set(1);
       void this.fetchProducts(true);
+    }
+
+    if (attributesChanged) {
       void this.fetchFacets();
+      void this.fetchPriceBounds();
     }
   }
 
@@ -305,8 +318,12 @@ export class ProductsFacade {
 
   private async loadCategories(): Promise<void> {
     try {
-      const categories = await this.productsService.getCategoryPills();
+      const [categories, nodes] = await Promise.all([
+        this.productsService.getCategoryPills(),
+        this.productsService.getCategoryNodes(),
+      ]);
       this.categoriesState.set(categories);
+      this.categoryNodesState.set(nodes);
     } catch {
       this.categoriesState.set([{ id: 'all', label: 'All Items' }]);
     }
@@ -329,6 +346,8 @@ export class ProductsFacade {
         categoryId: this.categoryIdState() === 'all' ? undefined : this.categoryIdState(),
         sortBy: this.mapSortToApi(this.sortState()),
         attributes: this.clientFiltersState().attributes,
+        minPrice: this.clientFiltersState().minPrice ?? undefined,
+        maxPrice: this.clientFiltersState().maxPrice ?? undefined,
       });
 
       const baseIndex = append ? this.itemsState().length : 0;
@@ -356,6 +375,19 @@ export class ProductsFacade {
     } finally {
       this.loadingState.set(false);
       this.loadingMoreState.set(false);
+    }
+  }
+
+  private async fetchPriceBounds(): Promise<void> {
+    try {
+      const range = await this.productsService.getPriceRange({
+        searchTerm: this.searchTermState(),
+        categoryId: this.categoryIdState() === 'all' ? undefined : this.categoryIdState(),
+        attributes: this.clientFiltersState().attributes,
+      });
+      this.priceBoundsState.set({ min: range.min, max: range.max });
+    } catch {
+      this.priceBoundsState.set({ min: null, max: null });
     }
   }
 
@@ -387,14 +419,6 @@ export class ProductsFacade {
       }
 
       if (localSearch && !matchesEnhancedSearch(product, configuration, localSearch)) {
-        return false;
-      }
-
-      if (filters.minPrice !== null && product.priceUsd < filters.minPrice) {
-        return false;
-      }
-
-      if (filters.maxPrice !== null && product.priceUsd > filters.maxPrice) {
         return false;
       }
 
@@ -430,10 +454,6 @@ export class ProductsFacade {
     }
   }
 
-  private isServerSort(sort: StoreSortOption['value']): boolean {
-    return sort === 'newest' || sort === 'price-asc' || sort === 'price-desc';
-  }
-
   private matchesSection(product: StoreProduct, section: string): boolean {
     const text = `${product.title} ${product.platformLabel}`.toLowerCase();
 
@@ -467,6 +487,12 @@ export class ProductsFacade {
         return 'PriceDesc';
       case 'newest':
         return 'Newest';
+      case 'oldest':
+        return 'Oldest';
+      case 'popular':
+        return 'Popular';
+      case 'alphabetical':
+        return 'NameAsc';
       default:
         return undefined;
     }
