@@ -6,6 +6,7 @@ import { CATALOG_API } from '../../../core/api/api-endpoints';
 import { ApiClientService } from '../../../core/api/api-client.service';
 import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 import {
+  FilterListVersion,
   Category,
   CategoryFilterConfig,
   CategoryFilterInput,
@@ -31,6 +32,14 @@ export class CategoryApiService {
 
   saveCategoryFilterConfig(categoryId: string, items: readonly CategoryFilterInput[]): Observable<void> {
     return this.api.put<void>(CATALOG_API.categoryFilters(categoryId), { items });
+  }
+
+  getCategoryFilterHistory(categoryId: string): Observable<readonly FilterListVersion[]> {
+    return this.api.get<readonly FilterListVersion[]>(`${CATALOG_API.categoryFilters(categoryId)}/history`);
+  }
+
+  restoreCategoryFilterVersion(categoryId: string, historyId: string): Observable<void> {
+    return this.api.post<void>(`${CATALOG_API.categoryFilters(categoryId)}/history/${historyId}/restore`, {});
   }
 
   resetCategoryFilterConfig(categoryId: string): Observable<void> {

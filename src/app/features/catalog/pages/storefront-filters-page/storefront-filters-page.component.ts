@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
@@ -17,8 +18,11 @@ import {
   CategoryFilterConfig,
   CategoryFilterItem,
   CategoryTreeItem,
+  FilterListVersion,
 } from '../../models/category.model';
 import { CategoryApiService } from '../../services/category-api.service';
+import { FilterPreviewComponent } from '../../components/filter-preview/filter-preview.component';
+import { FilterImportExportComponent } from '../../components/filter-import-export/filter-import-export.component';
 import { FilterLibraryComponent } from '../../components/filter-library/filter-library.component';
 
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
@@ -39,7 +43,7 @@ interface CategoryRow {
 @Component({
   selector: 'app-storefront-filters-page',
   standalone: true,
-  imports: [TranslatePipe, 
+  imports: [DatePipe, TranslatePipe, 
     FormsModule,
     ButtonModule,
     InputTextModule,
@@ -49,6 +53,8 @@ interface CategoryRow {
     HasPermissionPipe,
     AdminPageHeaderComponent,
     FilterLibraryComponent,
+    FilterImportExportComponent,
+    FilterPreviewComponent,
   ],
   providers: [MessageService],
   templateUrl: './storefront-filters-page.component.html',
@@ -72,8 +78,26 @@ export class StorefrontFiltersPageComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly addKey = signal<string | null>(null);
-  protected readonly tab = signal<'lists' | 'library'>('lists');
+  protected readonly tab = signal<'lists' | 'library' | 'sheets' | 'preview'>('lists');
   protected readonly dragIndex = signal<number | null>(null);
+  protected readonly versions = signal<readonly FilterListVersion[]>([]);
+
+  protected async restoreVersion(version: FilterListVersion): Promise<void> {
+    if (!confirm('Bring back this earlier version of the list? The current list is kept as a version too.')) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(this.categoryApi.restoreCategoryFilterVersion(this.selectedId(), version.id));
+      this.messages.add({ severity: 'success', summary: 'Earlier version restored', life: 3000 });
+      await this.loadConfig(this.selectedId());
+    } catch {
+      this.messages.add({ severity: 'error', summary: 'Could not restore that version', life: 4000 });
+    }
+  }
+
+  /** The preview's category choices: everything, then every category. */
+  protected readonly previewScopes = computed(() => [{ id: 'all', label: 'All products' }, ...this.scopeOptions()]);
 
   /** Platforms and categories a library filter can be limited to. */
   protected readonly scopeOptions = computed(() => this.rows().map((row) => ({ id: row.id, label: `${'— '.repeat(row.depth)}${row.name}` })));
@@ -269,6 +293,7 @@ export class StorefrontFiltersPageComponent implements OnInit {
       this.config.set(cfg);
       this.items.set(cfg.items);
       this.dirty.set(false);
+      void firstValueFrom(this.categoryApi.getCategoryFilterHistory(id)).then((list) => this.versions.set(list)).catch(() => this.versions.set([]));
     } catch {
       this.config.set(null);
       this.items.set([]);

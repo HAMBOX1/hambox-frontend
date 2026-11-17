@@ -101,16 +101,27 @@
             ></i>
           </button>
 
+          @if (isExpanded(group.id) && group.options.length >= 8) {
+            <input
+              type="search"
+              class="store-filters__search"
+              [placeholder]="'PRODUCTS.FILTERS.SEARCH_VALUES' | translate"
+              [attr.aria-label]="'PRODUCTS.FILTERS.SEARCH_VALUES' | translate"
+              [value]="groupSearch()[group.id] ?? ''"
+              (input)="onGroupSearch(group.id, $event)"
+            />
+          }
+
           <ul
             [id]="'filter-panel-' + group.id"
             class="store-filters__list"
             [class.store-filters__list--collapsed]="!isExpanded(group.id)"
           >
-            @for (option of group.options; track option.id) {
+            @for (option of visibleOptions(group); track option.id) {
               <li>
                 <label class="store-filters__option">
                   <input
-                    type="checkbox"
+                    [type]="group.multiSelect === false ? 'radio' : 'checkbox'"
                     class="store-filters__checkbox"
                     [checked]="isAttributeSelected(group.id, option.id)"
                     (change)="toggleAttribute(group.id, option.id)"

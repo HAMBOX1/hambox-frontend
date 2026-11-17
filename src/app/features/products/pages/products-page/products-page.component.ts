@@ -31,8 +31,11 @@ import { StoreAppliedFiltersComponent } from '../../components/store-applied-fil
 import { StorefrontNavLinksService } from '../../../home/services/storefront-nav-links.service';
 import { ProductsFacade, StorefrontClientFilters } from '../../services/products.facade';
 import { StorefrontFilterPanelService } from '../../services/storefront-filter-panel.service';
+import { decodeFiltersParam, encodeFiltersParam } from '../../utils/storefront-filter-url.util';
 import { StorefrontViewModeService } from '../../services/storefront-view-mode.service';
 import { resolveNavSection } from '../../../../shared/utils/storefront-nav.utils';
+
+const EMPTY_FILTERS: StorefrontClientFilters = { minPrice: null, maxPrice: null, inStockOnly: false, attributes: {} };
 
 @Component({
   selector: 'app-products-page',
@@ -119,12 +122,15 @@ export class ProductsPageComponent implements OnInit {
       const previousCategory = this.facade.selectedCategoryId();
       const previousSection = this.facade.selectedSection();
 
+      const wasInitialized = this.initialized;
       if (!this.initialized || searchTerm !== previousSearch || categoryId !== previousCategory) {
         this.initialized = true;
         if (searchTerm.trim() && searchTerm !== previousSearch) {
           this.analytics.search(searchTerm.trim());
         }
 
+        // A shared link carries its filters; moving to another platform / category starts without the old ones (they may not exist there).
+        this.facade.presetClientFilters(wasInitialized ? EMPTY_FILTERS : decodeFiltersParam(params.get('f')));
         void this.facade.initialize(searchTerm, categoryId, section);
         return;
       }
@@ -186,14 +192,28 @@ export class ProductsPageComponent implements OnInit {
 
   protected onFiltersChange(filters: StorefrontClientFilters): void {
     this.facade.setClientFilters(filters);
+    // Keep the chosen filters in the address, so the page can be shared or reopened as it is.
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { f: encodeFiltersParam(filters) },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   protected onFiltersReset(): void {
     this.facade.resetClientFilters();
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { f: null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   protected onRemoveFilter(chipId: string): void {
     this.facade.removeAppliedFilter(chipId);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { f: encodeFiltersParam(this.facade.clientFilters()) },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   protected onToggleFiltersCollapse(): void {

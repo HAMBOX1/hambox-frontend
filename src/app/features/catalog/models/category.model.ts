@@ -47,6 +47,15 @@ export interface CategoryFilterConfig {
   readonly groupValues: readonly FilterGroupValues[];
 }
 
+/** An earlier version of a category's filter list (the list as it was before that change). */
+export interface FilterListVersion {
+  readonly id: string;
+  readonly action: string;
+  readonly itemCount: number;
+  readonly changedBy: string | null;
+  readonly changedOnUtc: string;
+}
+
 export interface CategoryFilterInput {
   readonly groupKey: string;
   readonly displayNameEn: string | null;

@@ -9,6 +9,7 @@ import { ProductMarketingPageAvailabilityService } from '../services/product-mar
 import { StorefrontProductEnrichmentService } from '../services/storefront-product-enrichment.service';
 import { mapProductToStoreProduct } from '../utils/storefront-product.mapper';
 import { applyStorefrontEnrichment } from '../utils/storefront-product-enrichment.util';
+import { CurrencyService } from '../../../core/currency/currency.service';
 import { TranslationService } from '../../../core/i18n/translation.service';
 import {
   countActiveAttributeFilters,
@@ -18,7 +19,7 @@ import {
 } from '../utils/storefront-filter.util';
 import { Products } from './products';
 
-function mapFacetGroups(groups: readonly ProductFacetGroup[], language: string): readonly DynamicFilterGroup[] {
+export function mapFacetGroups(groups: readonly ProductFacetGroup[], language: string): readonly DynamicFilterGroup[] {
   return groups.map((group) => ({
     id: group.key,
     label: language === 'ar' && group.displayNameAr ? group.displayNameAr : group.displayName,
@@ -79,6 +80,7 @@ export class ProductsFacade {
   private readonly enrichment = inject(StorefrontProductEnrichmentService);
   private readonly marketingAvailability = inject(ProductMarketingPageAvailabilityService);
   private readonly translation = inject(TranslationService);
+  private readonly currency = inject(CurrencyService);
 
   private readonly itemsState = signal<readonly StoreProduct[]>([]);
   private readonly categoriesState = signal<readonly StoreCategoryPill[]>([
@@ -163,7 +165,7 @@ export class ProductsFacade {
     if (filters.minPrice !== null) {
       chips.push({
         id: 'price-min',
-        label: `Min $${filters.minPrice}`,
+        label: `Min ${this.currency.format(filters.minPrice, '1.0-2')}`,
         type: 'price-min',
       });
     }
@@ -171,7 +173,7 @@ export class ProductsFacade {
     if (filters.maxPrice !== null) {
       chips.push({
         id: 'price-max',
-        label: `Max $${filters.maxPrice}`,
+        label: `Max ${this.currency.format(filters.maxPrice, '1.0-2')}`,
         type: 'price-max',
       });
     }
@@ -251,6 +253,11 @@ export class ProductsFacade {
       void this.fetchFacets();
       void this.fetchPriceBounds();
     }
+  }
+
+  /** Sets the filters (from a shared link) without fetching: the next initialize() loads with them. */
+  presetClientFilters(filters: StorefrontClientFilters): void {
+    this.clientFiltersState.set(filters);
   }
 
   resetClientFilters(): void {

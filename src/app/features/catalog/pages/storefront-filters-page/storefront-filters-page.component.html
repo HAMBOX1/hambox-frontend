@@ -14,9 +14,19 @@
     <button type="button" role="tab" class="store-filters__tab" [class.is-active]="tab() === 'library'" [attr.aria-selected]="tab() === 'library'" (click)="tab.set('library')">
       Filter library
     </button>
+    <button type="button" role="tab" class="store-filters__tab" [class.is-active]="tab() === 'sheets'" [attr.aria-selected]="tab() === 'sheets'" (click)="tab.set('sheets')">
+      Import / export
+    </button>
+    <button type="button" role="tab" class="store-filters__tab" [class.is-active]="tab() === 'preview'" [attr.aria-selected]="tab() === 'preview'" (click)="tab.set('preview')">
+      Preview
+    </button>
   </div>
 
-  @if (tab() === 'library') {
+  @if (tab() === 'preview') {
+    <app-filter-preview [draftItems]="items()" [editedCategoryId]="selectedId()" [scopeOptions]="previewScopes()" />
+  } @else if (tab() === 'sheets') {
+    <app-filter-import-export [categories]="scopeOptions()" />
+  } @else if (tab() === 'library') {
     <app-filter-library [categories]="scopeOptions()" [canEdit]="(permissions.Catalog.Categories.Edit | hamboxHasPermission)" />
   } @else {
   <div class="store-filters__layout">
@@ -153,6 +163,22 @@
           </p-select>
           <button pButton type="button" [label]="'ADMIN.CATALOG_UI.ADD' | translate" icon="pi pi-plus" severity="secondary" [disabled]="!addKey()" (click)="addFilter()"></button>
         </div>
+
+        @if (versions().length) {
+          <details class="store-filters__history">
+            <summary>Earlier versions of this list ({{ versions().length }})</summary>
+            <ul>
+              @for (version of versions(); track version.id) {
+                <li>
+                  <span>{{ version.changedOnUtc | date: 'medium' }} · {{ version.action }} · {{ version.itemCount }} filter(s) · {{ version.changedBy || 'unknown' }}</span>
+                  @if (permissions.Catalog.Categories.Edit | hamboxHasPermission) {
+                    <button type="button" class="store-filters__link" (click)="restoreVersion(version)">Restore</button>
+                  }
+                </li>
+              }
+            </ul>
+          </details>
+        }
 
         @if (permissions.Catalog.Categories.Edit | hamboxHasPermission) {
           <div class="store-filters__footer">

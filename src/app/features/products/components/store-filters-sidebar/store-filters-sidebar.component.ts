@@ -24,6 +24,7 @@ const STATIC_GROUP_IDS = ['price', 'availability'] as const;
   imports: [TranslatePipe, NgTemplateOutlet],
   host: {
     '[class.store-filters-host--collapsed]': 'collapsed()',
+    '[class.store-filters-host--preview-mobile]': "previewDevice() === 'mobile'",
   },
   templateUrl: './store-filters-sidebar.component.html',
   styleUrl: './store-filters-sidebar.component.scss',
@@ -42,6 +43,8 @@ export class StoreFiltersSidebarComponent {
   /** Every active category with its parent, for the Platform / Category summary. */
   readonly categoryNodes = input<readonly StoreCategoryNode[]>([]);
   readonly selectedCategoryId = input('all');
+  /** Admin preview only: forces the phone layout (the panel as a stand-alone card) whatever the screen width. */
+  readonly previewDevice = input<'desktop' | 'mobile' | null>(null);
 
   readonly filtersChange = output<StorefrontClientFilters>();
   readonly resetFilters = output<void>();
@@ -100,6 +103,26 @@ export class StoreFiltersSidebarComponent {
   protected readonly sliderMax = computed(() => this.parsePrice(this.maxPrice()) ?? this.boundMax());
   protected readonly currencyCode = computed(() => this.currency.currency());
   private readonly knownGroups = new Set<string>();
+
+  /** A long list of values gets a search box; this is what is typed in each one. */
+  protected readonly groupSearch = signal<Readonly<Record<string, string>>>({});
+  protected static readonly SEARCH_FROM = 8;
+
+  protected onGroupSearch(groupId: string, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.groupSearch.update((current) => ({ ...current, [groupId]: value }));
+  }
+
+  /** The values of a group that match what was typed (values already chosen always stay visible). */
+  protected visibleOptions(group: DynamicFilterGroup): readonly { id: string; label: string; count: number }[] {
+    const term = (this.groupSearch()[group.id] ?? '').trim().toLowerCase();
+    if (!term) {
+      return group.options;
+    }
+
+    const chosen = this.attributeState()[group.id] ?? [];
+    return group.options.filter((option) => option.label.toLowerCase().includes(term) || chosen.includes(option.id));
+  }
 
   constructor() {
     effect(() => {
