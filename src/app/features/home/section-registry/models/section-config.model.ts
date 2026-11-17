@@ -295,6 +295,15 @@ export interface CommunityNewsletterSectionConfig {
   readonly newsletterPrivacyText: string;
 }
 
+/** A free content block (title, text, optional picture): instructions, an announcement or an ad campaign. */
+export interface InfoBlockSectionConfig {
+  readonly title: string;
+  readonly body: string;
+  readonly imageUrl: string;
+  /** Border / tint colour; empty keeps the store colour. */
+  readonly accentColor: string;
+}
+
 export interface FooterSectionConfig {
   readonly companyName: string;
   readonly copyright: string;
@@ -337,5 +346,6 @@ export type SectionConfig =
   | HardwareShowcaseSectionConfig
   | AiAssistantSectionConfig
   | CommunityNewsletterSectionConfig
+  | InfoBlockSectionConfig
   | FooterSectionConfig
   | FaqSectionConfig;

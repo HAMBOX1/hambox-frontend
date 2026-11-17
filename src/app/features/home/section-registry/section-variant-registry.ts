@@ -6,6 +6,7 @@ import {
   ArenaBriefingsSectionConfig,
   CollectionShowcaseSectionConfig,
   CommunityNewsletterSectionConfig,
+  InfoBlockSectionConfig,
   ConsoleFavoritesSectionConfig,
   FaqSectionConfig,
   FeaturedCollectionsSectionConfig,
@@ -27,6 +28,7 @@ import { AiAssistantVariantDefaultComponent } from './variants/ai-assistant-vari
 import { ArenaBriefingsVariantDefaultComponent } from './variants/arena-briefings-variant-default.component';
 import { CollectionVariantEditorialShowcaseComponent } from './variants/collection-variant-editorial-showcase.component';
 import { CommunityNewsletterVariantDefaultComponent } from './variants/community-newsletter-variant-default.component';
+import { InfoBlockVariantDefaultComponent } from './variants/info-block-variant-default.component';
 import { ConsoleFavoritesVariantDefaultComponent } from './variants/console-favorites-variant-default.component';
 import { FaqVariantDefaultComponent } from './variants/faq-variant-default.component';
 import { FlashDealsVariantDefaultComponent } from './variants/flash-deals-variant-default.component';
@@ -453,6 +455,23 @@ export const SECTION_VARIANT_REGISTRY: readonly SectionVariantDefinition[] = [
         },
       ],
     } satisfies ArenaBriefingsSectionConfig,
+  },
+  {
+    category: 'Content',
+    variantKey: 'info-block',
+    displayName: 'Info / Campaign Block',
+    renderComponent: InfoBlockVariantDefaultComponent,
+    description:
+      'A free block with a title, text and an optional picture. Use it for instructions, an announcement or an ad campaign on the homepage, a product page or a category page.',
+    tags: ['text', 'instructions', 'campaign', 'announcement', 'content', 'ad'],
+    badge: 'new',
+    supportedBreakpoints: ALL_BREAKPOINTS,
+    previewConfig: {
+      title: 'How to redeem your code',
+      body: 'Open the store, choose Redeem a code and enter the code you received.\nYour balance updates within a minute.',
+      imageUrl: '',
+      accentColor: '',
+    } satisfies InfoBlockSectionConfig,
   },
   {
     category: 'Community',

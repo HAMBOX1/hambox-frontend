@@ -3,6 +3,7 @@ import { AiAssistantSettingsFormComponent } from './components/section-settings-
 import { ArenaBriefingsSettingsFormComponent } from './components/section-settings-forms/arena-briefings-settings-form.component';
 import { CollectionShowcaseSettingsFormComponent } from './components/section-settings-forms/collection-showcase-settings-form.component';
 import { ConsoleFavoritesSettingsFormComponent } from './components/section-settings-forms/console-favorites-settings-form.component';
+import { InfoBlockSettingsFormComponent } from './components/section-settings-forms/info-block-settings-form.component';
 import { CommunityNewsletterSettingsFormComponent } from './components/section-settings-forms/community-newsletter-settings-form.component';
 import { FaqSettingsFormComponent } from './components/section-settings-forms/faq-settings-form.component';
 import { FeaturedCollectionsSettingsFormComponent } from './components/section-settings-forms/featured-collections-settings-form.component';
@@ -49,6 +50,7 @@ const SECTION_SETTINGS_FORM_REGISTRY: Readonly<Record<string, SectionSettingsFor
   'Editorial:pulse-feed': PulseFeedSettingsFormComponent,
   'Editorial:arena-briefings': ArenaBriefingsSettingsFormComponent,
   'Community:community-newsletter': CommunityNewsletterSettingsFormComponent,
+  'Content:info-block': InfoBlockSettingsFormComponent,
   'Showcase:console-favorites': ConsoleFavoritesSettingsFormComponent,
   'Showcase:hardware-spotlight': HardwareShowcaseSettingsFormComponent,
   'Assistant:ai-assistant': AiAssistantSettingsFormComponent,
