@@ -1531,7 +1531,7 @@
       "TWO_FACTOR": "المصادقة الثنائية",
       "GATEWAY": "البوابة",
       "IMAGE_LIBRARY": "مكتبة الصور",
-      "STOREFRONT_FILTERS": "فلاتر المتجر",
+      "STOREFRONT_FILTERS": "الفلاتر",
       "DELETED_CODES": "الأكواد المحذوفة",
       "PRODUCTS": "المنتجات"
     },
@@ -6741,7 +6741,7 @@
       "USE_FOR_OTHERS": "استخدام لمنتجات أخرى",
       "UPLOAD": "رفع",
       "COPIES_THIS_PICTURE_ONTO_EACH_PRODUCT_YOU_PI": "ينسخ هذه الصورة إلى كل منتج تختاره (يحصل كل منتج على نسخته الخاصة كصورة إضافية).",
-      "STOREFRONT_FILTERS": "عوامل تصفية المتجر",
+      "STOREFRONT_FILTERS": "الفلاتر",
       "CHOOSE_WHICH_FILTERS_CUSTOMERS_SEE_FOR_EACH": "اختر عوامل التصفية التي يراها العملاء لكل فئة. الفئة التي ليس لها قائمة خاصة تستخدم قائمة فئتها الأب، ثم الافتراضية.",
       "NAME_SHOWN_EN_OPTIONAL": "الاسم المعروض (EN) — اختياري",
       "ALWAYS_SHOWN": "تظهر دائمًا",

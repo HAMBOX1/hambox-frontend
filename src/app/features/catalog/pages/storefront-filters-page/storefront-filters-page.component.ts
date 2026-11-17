@@ -19,6 +19,7 @@ import {
   CategoryTreeItem,
 } from '../../models/category.model';
 import { CategoryApiService } from '../../services/category-api.service';
+import { FilterLibraryComponent } from '../../components/filter-library/filter-library.component';
 
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 /** The all-zero id addresses the store-wide default list on the backend. */
@@ -47,6 +48,7 @@ interface CategoryRow {
     ToastModule,
     HasPermissionPipe,
     AdminPageHeaderComponent,
+    FilterLibraryComponent,
   ],
   providers: [MessageService],
   templateUrl: './storefront-filters-page.component.html',
@@ -70,6 +72,35 @@ export class StorefrontFiltersPageComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly addKey = signal<string | null>(null);
+  protected readonly tab = signal<'lists' | 'library'>('lists');
+  protected readonly dragIndex = signal<number | null>(null);
+
+  /** Platforms and categories a library filter can be limited to. */
+  protected readonly scopeOptions = computed(() => this.rows().map((row) => ({ id: row.id, label: `${'— '.repeat(row.depth)}${row.name}` })));
+
+  protected onDragStart(index: number): void {
+    this.dragIndex.set(index);
+  }
+
+  protected onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  /** Drops the dragged filter in front of the one it was dropped on. */
+  protected onDrop(event: DragEvent, targetIndex: number): void {
+    event.preventDefault();
+    const from = this.dragIndex();
+    this.dragIndex.set(null);
+    if (from === null || from === targetIndex) {
+      return;
+    }
+
+    const list = [...this.items()];
+    const [moved] = list.splice(from, 1);
+    list.splice(targetIndex, 0, moved);
+    this.items.set(list);
+    this.dirty.set(true);
+  }
 
   protected readonly selectedName = computed(() => {
     const id = this.selectedId();

@@ -738,6 +738,67 @@
 </p-dialog>
 
 <p-dialog
+  header="Set filter values"
+  [visible]="bulkFiltersDialogOpen()"
+  (visibleChange)="bulkFiltersDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(30rem, 94vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">
+    Tags every selected product with values of one of your filters (create filters in Catalog → Filters). Prices, stock and everything else stay as they are.
+  </p>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-filter-key">Filter</label>
+    <p-select
+      inputId="bulk-filter-key"
+      [options]="[...bulkFilterList()]"
+      optionLabel="nameEn"
+      optionValue="key"
+      appendTo="body"
+      placeholder="Choose a filter"
+      [ngModel]="bulkFilterKey()"
+      (ngModelChange)="bulkFilterKey.set($event); bulkFilterValues.set([])"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-field">
+    <label class="admin-field__label">Values</label>
+    <p-multiSelect
+      [options]="[...bulkFilterValueChoices()]"
+      optionLabel="labelEn"
+      optionValue="value"
+      display="chip"
+      appendTo="body"
+      placeholder="Choose values"
+      [ngModel]="bulkFilterValues()"
+      (ngModelChange)="bulkFilterValues.set($event ?? [])"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-filter-mode">What to do</label>
+    <p-select
+      inputId="bulk-filter-mode"
+      [options]="[...bulkFilterModes]"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      [ngModel]="bulkFilterMode()"
+      (ngModelChange)="bulkFilterMode.set($event)"
+      [style]="{ width: '100%' }"
+    />
+  </div>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkFiltersDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate" icon="pi pi-check" [loading]="bulkFilterBusy()" [disabled]="!bulkFilterKey() || bulkFilterValues().length === 0" (click)="confirmBulkFilters()"></button>
+  </div>
+</p-dialog>
+
+<p-dialog
   header="Purchase limits"
   [visible]="bulkLimitsDialogOpen()"
   (visibleChange)="bulkLimitsDialogOpen.set($event)"

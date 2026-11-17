@@ -190,3 +190,39 @@
   min-width: 12rem;
   max-width: 100%;
 }
+
+.store-filters__tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.store-filters__tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--admin-border-default);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.is-active {
+    border-color: var(--admin-primary);
+    background: color-mix(in srgb, var(--admin-primary) 16%, transparent);
+    color: var(--admin-primary);
+  }
+}
+
+.store-filters__item[draggable='true'] {
+  cursor: grab;
+}
+
+.store-filters__item.is-dragging {
+  opacity: 0.45;
+}
+
+.store-filters__grip {
+  margin-inline-end: 0.5rem;
+  color: var(--admin-text-muted);
+}

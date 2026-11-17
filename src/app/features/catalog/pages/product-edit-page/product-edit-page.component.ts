@@ -18,6 +18,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
+import { ProductFilterValuesPanelComponent } from '../../components/product-filter-values-panel/product-filter-values-panel.component';
 import { ProductPromoDialogComponent } from '../../components/product-promo-dialog/product-promo-dialog.component';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
@@ -60,6 +61,7 @@ const STATUS_OPTIONS: { label: string; value: ProductStatus }[] = [
   selector: 'app-product-edit-page',
   standalone: true,
   imports: [
+    ProductFilterValuesPanelComponent,
     ProductPromoDialogComponent,
     RouterLink,
     FormsModule,

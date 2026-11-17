@@ -17,7 +17,10 @@ import { DrawerModule } from 'primeng/drawer';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { firstValueFrom } from 'rxjs';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
+import { FilterDefinition, FilterAssignMode, FilterLibraryApiService } from '../../services/filter-library-api.service';
 import { ToastModule } from 'primeng/toast';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { FormsModule } from '@angular/forms';
@@ -111,6 +114,7 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
     InputTextModule,
     RadioButtonModule,
     SelectModule,
+    MultiSelectModule,
     ToastModule,
     HasPermissionDirective,
     ProductCatalogToolbarComponent,
@@ -137,6 +141,7 @@ const SORT_ENUM_TO_FIELD: Partial<Record<ProductSortBy, { field: string; order: 
 })
 export class ProductCatalogPageComponent implements OnInit {
   private readonly facade = inject(ProductCatalogFacade);
+  private readonly filterApi = inject(FilterLibraryApiService);
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
@@ -247,6 +252,20 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly bulkMarginValue = signal<number | null>(null);
   protected readonly bulkOldPriceDialogOpen = signal(false);
   protected readonly bulkLimitsDialogOpen = signal(false);
+  protected readonly bulkFiltersDialogOpen = signal(false);
+  protected readonly bulkFilterList = signal<readonly FilterDefinition[]>([]);
+  protected readonly bulkFilterKey = signal<string | null>(null);
+  protected readonly bulkFilterValues = signal<readonly string[]>([]);
+  protected readonly bulkFilterMode = signal<FilterAssignMode>('Merge');
+  protected readonly bulkFilterBusy = signal(false);
+  protected readonly bulkFilterModes: readonly { label: string; value: FilterAssignMode }[] = [
+    { label: 'Add these values (keep the existing ones)', value: 'Merge' },
+    { label: 'Replace the existing values with these', value: 'Replace' },
+    { label: 'Remove these values', value: 'Remove' },
+  ];
+  protected readonly bulkFilterValueChoices = computed(
+    () => this.bulkFilterList().find((filter) => filter.key === this.bulkFilterKey())?.values ?? [],
+  );
   protected readonly bulkLimitPerOrder = signal<number | null>(null);
   protected readonly bulkLimitPerDay = signal<number | null>(null);
   protected readonly bulkLimitReview = signal(false);
@@ -325,6 +344,17 @@ export class ProductCatalogPageComponent implements OnInit {
         label: t('ADMIN.CATALOG_PAGE.BULK.SET_OLD_PRICE'),
         icon: 'pi pi-tag',
         command: () => this.bulkOldPriceDialogOpen.set(true),
+      });
+      items.push({
+        label: 'Set filter values',
+        icon: 'pi pi-filter',
+        command: () => {
+          this.bulkFilterKey.set(null);
+          this.bulkFilterValues.set([]);
+          this.bulkFilterMode.set('Merge');
+          this.bulkFiltersDialogOpen.set(true);
+          void firstValueFrom(this.filterApi.list()).then((list) => this.bulkFilterList.set(list)).catch(() => this.bulkFilterList.set([]));
+        },
       });
       items.push({
         label: 'Set purchase limits',
@@ -1254,6 +1284,31 @@ export class ProductCatalogPageComponent implements OnInit {
       'Delivery mode updated',
     );
     this.bulkFulfillmentDialogOpen.set(false);
+  }
+
+  /** Tags (or untags) every selected product with values of one filter. Only the filter tags change. */
+  protected async confirmBulkFilters(): Promise<void> {
+    const key = this.bulkFilterKey();
+    if (!key || this.bulkFilterValues().length === 0) {
+      return;
+    }
+
+    this.bulkFilterBusy.set(true);
+    try {
+      const ids = await this.facade.resolveSelectedProductIds();
+      const result = await firstValueFrom(this.filterApi.assign(ids, key, this.bulkFilterValues(), this.bulkFilterMode()));
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Filter values saved',
+        detail: `${result.productsChanged} product(s) changed (${result.added} added, ${result.removed} removed).`,
+        life: 5000,
+      });
+      this.bulkFiltersDialogOpen.set(false);
+    } catch {
+      this.messageService.add({ severity: 'error', summary: 'Could not save the filter values', life: 5000 });
+    } finally {
+      this.bulkFilterBusy.set(false);
+    }
   }
 
   protected async confirmBulkLimits(): Promise<void> {

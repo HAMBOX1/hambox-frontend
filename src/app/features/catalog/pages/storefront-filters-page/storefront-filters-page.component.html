@@ -7,6 +7,18 @@
     [breadcrumbs]="breadcrumbs"
   />
 
+  <div class="store-filters__tabs" role="tablist">
+    <button type="button" role="tab" class="store-filters__tab" [class.is-active]="tab() === 'lists'" [attr.aria-selected]="tab() === 'lists'" (click)="tab.set('lists')">
+      Filter lists &amp; order
+    </button>
+    <button type="button" role="tab" class="store-filters__tab" [class.is-active]="tab() === 'library'" [attr.aria-selected]="tab() === 'library'" (click)="tab.set('library')">
+      Filter library
+    </button>
+  </div>
+
+  @if (tab() === 'library') {
+    <app-filter-library [categories]="scopeOptions()" [canEdit]="(permissions.Catalog.Categories.Edit | hamboxHasPermission)" />
+  } @else {
   <div class="store-filters__layout">
     <nav class="store-filters__tree" [attr.aria-label]="'ADMIN.CATALOG_UI.CATEGORIES' | translate">
       <button
@@ -39,8 +51,18 @@
       } @else {
         <ol class="store-filters__list">
           @for (item of items(); track item.groupKey; let i = $index; let first = $first; let last = $last) {
-            <li class="store-filters__item" [class.is-hidden]="!item.isVisible">
+            <li
+              class="store-filters__item"
+              [class.is-hidden]="!item.isVisible"
+              [class.is-dragging]="dragIndex() === i"
+              draggable="true"
+              (dragstart)="onDragStart(i)"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event, i)"
+              (dragend)="dragIndex.set(null)"
+            >
               <div class="store-filters__item-head">
+                <i class="pi pi-bars store-filters__grip" aria-hidden="true" title="Drag to reorder"></i>
                 <strong>{{ item.defaultName }}</strong>
                 <span class="store-filters__count">{{ item.productCount }} product(s) here</span>
               </div>
@@ -143,4 +165,5 @@
       }
     </div>
   </div>
+  }
 </section>

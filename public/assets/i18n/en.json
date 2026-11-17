@@ -1541,7 +1541,7 @@
       "COMMUNICATION": "Communication",
       "WHATSAPP": "WhatsApp Bot",
       "IMAGE_LIBRARY": "Image Library",
-      "STOREFRONT_FILTERS": "Storefront Filters",
+      "STOREFRONT_FILTERS": "Filters",
       "DELETED_CODES": "Deleted Codes"
     },
     "WHATSAPP": {
@@ -6741,7 +6741,7 @@
       "USE_FOR_OTHERS": "Use for others",
       "UPLOAD": "Upload",
       "COPIES_THIS_PICTURE_ONTO_EACH_PRODUCT_YOU_PI": "Copies this picture onto each product you pick (each gets its own copy, added as an extra image).",
-      "STOREFRONT_FILTERS": "Storefront Filters",
+      "STOREFRONT_FILTERS": "Filters",
       "CHOOSE_WHICH_FILTERS_CUSTOMERS_SEE_FOR_EACH": "Choose which filters customers see for each category. A category without its own list uses its parent's, then the default.",
       "NAME_SHOWN_EN_OPTIONAL": "Name shown (EN) — optional",
       "ALWAYS_SHOWN": "Always shown",
