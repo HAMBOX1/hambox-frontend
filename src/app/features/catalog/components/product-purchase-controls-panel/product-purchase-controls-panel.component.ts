@@ -18,6 +18,7 @@ interface ProductPurchaseControls {
   readonly maxQuantityPerOrder: number | null;
   readonly maxQuantityPerUserPerDay: number | null;
   readonly requiresManualReview: boolean;
+  readonly exemptMembers: boolean;
 }
 
 /**
@@ -75,6 +76,16 @@ interface ProductPurchaseControls {
             <span>Sensitive product — every paid order waits for manual approval</span>
           </label>
 
+          <label class="purchase-controls__check">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="exemptMembers()"
+              (ngModelChange)="exemptMembers.set($event)"
+              [inputId]="'exempt-' + current.id"
+            />
+            <span>Elite members (active membership) are not held to these limits</span>
+          </label>
+
           @if (error()) {
             <p class="purchase-controls__error" role="alert">{{ error() }}</p>
           }
@@ -126,6 +137,7 @@ export class ProductPurchaseControlsPanelComponent {
   protected readonly maxPerOrder = signal<number | null>(null);
   protected readonly maxPerDay = signal<number | null>(null);
   protected readonly requiresReview = signal(false);
+  protected readonly exemptMembers = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -146,6 +158,7 @@ export class ProductPurchaseControlsPanelComponent {
       this.maxPerOrder.set(controls.maxQuantityPerOrder);
       this.maxPerDay.set(controls.maxQuantityPerUserPerDay);
       this.requiresReview.set(controls.requiresManualReview);
+      this.exemptMembers.set(!!controls.exemptMembers);
     } catch {
       this.error.set('Could not load the purchase controls.');
     }
@@ -160,6 +173,7 @@ export class ProductPurchaseControlsPanelComponent {
           maxQuantityPerOrder: this.maxPerOrder() || null,
           maxQuantityPerUserPerDay: this.maxPerDay() || null,
           requiresManualReview: this.requiresReview(),
+          exemptMembers: this.exemptMembers(),
         }),
       );
       this.messageService.add({

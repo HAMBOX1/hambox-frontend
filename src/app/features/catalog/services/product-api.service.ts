@@ -189,6 +189,10 @@ export class ProductApiService {
       badgeTextEn?: string | null;
       badgeTextAr?: string | null;
       badgeColor?: string | null;
+      maxQuantityPerOrder?: number | null;
+      maxQuantityPerUserPerDay?: number | null;
+      requiresManualReview?: boolean;
+      exemptMembers?: boolean;
     },
   ): Observable<BulkProductsResult> {
     return this.api.post<BulkProductsResult>(CATALOG_API.productsBulk, {
@@ -202,6 +206,10 @@ export class ProductApiService {
       badgeTextEn: extra?.badgeTextEn ?? null,
       badgeTextAr: extra?.badgeTextAr ?? null,
       badgeColor: extra?.badgeColor ?? null,
+      maxQuantityPerOrder: extra?.maxQuantityPerOrder ?? null,
+      maxQuantityPerUserPerDay: extra?.maxQuantityPerUserPerDay ?? null,
+      requiresManualReview: extra?.requiresManualReview ?? false,
+      exemptMembers: extra?.exemptMembers ?? false,
     });
   }
 

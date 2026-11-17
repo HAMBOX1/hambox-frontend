@@ -607,6 +607,16 @@ export class ProductCatalogFacade {
     );
   }
 
+  /** Writes the same purchase caps / manual-review / Elite-exemption settings to every selected product. */
+  async bulkSetPurchaseControls(controls: {
+    maxQuantityPerOrder: number | null;
+    maxQuantityPerUserPerDay: number | null;
+    requiresManualReview: boolean;
+    exemptMembers: boolean;
+  }): Promise<BulkProductsResult | null> {
+    return this.runBulkAction(() => this.api.bulkProducts(this.currentBulkSelection(), 'set-purchase-controls', controls));
+  }
+
   async bulkAssignCollection(targetCollectionId: string): Promise<BulkProductsResult | null> {
     return this.runBulkAction(() =>
       this.api.bulkProducts(this.currentBulkSelection(), 'assign-collection', { targetCollectionId }),

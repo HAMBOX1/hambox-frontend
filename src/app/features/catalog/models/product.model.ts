@@ -252,7 +252,8 @@ export type BulkProductAction =
   | 'set-fulfillment'
   | 'set-margin'
   | 'set-badge'
-  | 'set-old-price';
+  | 'set-old-price'
+  | 'set-purchase-controls';
 
 /** Fulfillment modes the bulk "delivery" action offers (backend `FulfillmentMode` names). */
 export type BulkFulfillmentMode = 'ChatDelivery' | 'ManualOnly' | 'SupplierOnly';

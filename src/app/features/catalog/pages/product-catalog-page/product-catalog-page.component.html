@@ -738,6 +738,42 @@
 </p-dialog>
 
 <p-dialog
+  header="Purchase limits"
+  [visible]="bulkLimitsDialogOpen()"
+  (visibleChange)="bulkLimitsDialogOpen.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(28rem, 92vw)' }"
+  styleClass="admin-dialog"
+>
+  <p class="admin-dialog__hint">
+    The same limits are written to every selected product (they replace what each product had). Leave a cap empty for no limit.
+  </p>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-limit-order">Max quantity per order</label>
+    <p-inputNumber inputId="bulk-limit-order" [ngModel]="bulkLimitPerOrder()" (ngModelChange)="bulkLimitPerOrder.set($event)" [min]="1" [useGrouping]="false" placeholder="No limit" [style]="{ width: '100%' }" />
+  </div>
+  <div class="admin-field">
+    <label class="admin-field__label" for="bulk-limit-day">Max quantity per customer / 24 h</label>
+    <p-inputNumber inputId="bulk-limit-day" [ngModel]="bulkLimitPerDay()" (ngModelChange)="bulkLimitPerDay.set($event)" [min]="1" [useGrouping]="false" placeholder="No limit" [style]="{ width: '100%' }" />
+  </div>
+  <label class="admin-field" style="display: flex; align-items: center; gap: 0.6rem">
+    <input type="checkbox" [ngModel]="bulkLimitReview()" (ngModelChange)="bulkLimitReview.set($event)" />
+    <span>Sensitive product: every paid order waits for manual approval</span>
+  </label>
+  <label class="admin-field" style="display: flex; align-items: center; gap: 0.6rem">
+    <input type="checkbox" [ngModel]="bulkLimitExemptMembers()" (ngModelChange)="bulkLimitExemptMembers.set($event)" />
+    <span>Elite members (active membership) are not held to these limits</span>
+  </label>
+  <div class="admin-dialog__actions">
+    <button pButton type="button" [label]="'COMMON.CANCEL' | translate" severity="secondary" (click)="bulkLimitsDialogOpen.set(false)"></button>
+    <button pButton type="button" [label]="'ADMIN.CATALOG_PAGE.BULK.APPLY' | translate" icon="pi pi-check" [loading]="bulkActionLoading()" (click)="confirmBulkLimits()"></button>
+  </div>
+</p-dialog>
+
+<p-dialog
   [header]="'ADMIN.CATALOG_PAGE.BULK.OLD_PRICE_TITLE' | translate"
   [visible]="bulkOldPriceDialogOpen()"
   (visibleChange)="bulkOldPriceDialogOpen.set($event)"

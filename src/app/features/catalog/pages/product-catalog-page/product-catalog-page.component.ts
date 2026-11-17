@@ -246,6 +246,11 @@ export class ProductCatalogPageComponent implements OnInit {
   protected readonly badgeSwatches: readonly string[] = ['#f5b840', '#ff6b6b', '#4da3ff', '#b58cff', '#ffffff'];
   protected readonly bulkMarginValue = signal<number | null>(null);
   protected readonly bulkOldPriceDialogOpen = signal(false);
+  protected readonly bulkLimitsDialogOpen = signal(false);
+  protected readonly bulkLimitPerOrder = signal<number | null>(null);
+  protected readonly bulkLimitPerDay = signal<number | null>(null);
+  protected readonly bulkLimitReview = signal(false);
+  protected readonly bulkLimitExemptMembers = signal(false);
   protected readonly bulkOldPriceValue = signal<number | null>(null);
   protected readonly bulkAssignCollectionDialogOpen = signal(false);
   protected readonly bulkRemoveCollectionDialogOpen = signal(false);
@@ -320,6 +325,17 @@ export class ProductCatalogPageComponent implements OnInit {
         label: t('ADMIN.CATALOG_PAGE.BULK.SET_OLD_PRICE'),
         icon: 'pi pi-tag',
         command: () => this.bulkOldPriceDialogOpen.set(true),
+      });
+      items.push({
+        label: 'Set purchase limits',
+        icon: 'pi pi-shield',
+        command: () => {
+          this.bulkLimitPerOrder.set(null);
+          this.bulkLimitPerDay.set(null);
+          this.bulkLimitReview.set(false);
+          this.bulkLimitExemptMembers.set(false);
+          this.bulkLimitsDialogOpen.set(true);
+        },
       });
       items.push({
         label: t('ADMIN.CATALOG_PAGE.BULK.SET_MARGIN'),
@@ -1238,6 +1254,20 @@ export class ProductCatalogPageComponent implements OnInit {
       'Delivery mode updated',
     );
     this.bulkFulfillmentDialogOpen.set(false);
+  }
+
+  protected async confirmBulkLimits(): Promise<void> {
+    await this.runBulkAction(
+      () =>
+        this.facade.bulkSetPurchaseControls({
+          maxQuantityPerOrder: this.bulkLimitPerOrder() || null,
+          maxQuantityPerUserPerDay: this.bulkLimitPerDay() || null,
+          requiresManualReview: this.bulkLimitReview(),
+          exemptMembers: this.bulkLimitExemptMembers(),
+        }),
+      'Purchase limits saved',
+    );
+    this.bulkLimitsDialogOpen.set(false);
   }
 
   protected async confirmBulkOldPrice(): Promise<void> {
