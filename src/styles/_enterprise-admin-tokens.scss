@@ -62,3 +62,16 @@
   background: var(--ui-bg-base);
   color: var(--ui-text-primary);
 }
+
+// Readability: the secondary / muted greys were too faint on the dark admin surfaces (small hints, table sub-text, icons).
+// Inside the admin they are derived from the main text colour instead, so they stay clearly readable in every theme.
+.admin-layout,
+.ui-auth,
+.p-drawer,
+.p-dialog,
+.p-popover {
+  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 86%, transparent);
+  --color-text-muted: color-mix(in srgb, var(--color-text-primary) 72%, transparent);
+  --admin-text-secondary: var(--color-text-secondary);
+  --admin-text-muted: var(--color-text-muted);
+}
