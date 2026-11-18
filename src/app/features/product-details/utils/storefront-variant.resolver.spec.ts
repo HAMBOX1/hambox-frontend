@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { StorefrontProductConfigurationDto, StorefrontVariantDto } from '../../catalog/models/inventory-api.model';
-import { defaultSelections, resolveVariant } from './storefront-variant.resolver';
+import { defaultSelections, repairSelections, resolveVariant } from './storefront-variant.resolver';
 
 function variant(overrides: Partial<StorefrontVariantDto> = {}): StorefrontVariantDto {
   return {
@@ -72,5 +72,49 @@ describe('storefront-variant.resolver', () => {
     const selections = defaultSelections(config);
 
     expect(selections['group-1']).toBe('opt-supplier');
+  });
+});
+
+describe('picking an option (repairSelections)', () => {
+  const group = (id: string, optionIds: string[], extra: object = {}) => ({
+    id, productId: 'p', parentOptionId: null, key: id, displayName: id, sortOrder: 0, isRequired: true,
+    options: optionIds.map((o) => ({ id: o, label: o, value: o, sortOrder: 0 })), ...extra,
+  });
+  const config = {
+    productId: 'p',
+    basePrice: 10,
+    optionGroups: [group('edition', ['std', 'deluxe']), group('region', ['us', 'eu'])],
+    variants: [
+      variant({ id: 'v1', optionIds: ['std', 'us'] }),
+      variant({ id: 'v2', optionIds: ['deluxe', 'eu'] }),
+    ],
+  } as unknown as StorefrontProductConfigurationDto;
+
+  it('switches the other row to an option that fits instead of emptying it', () => {
+    const next = repairSelections(config, { edition: 'std', region: 'us' }, 'edition', 'deluxe');
+
+    expect(next).toEqual({ edition: 'deluxe', region: 'eu' });
+    expect(resolveVariant(config, next).variant?.id).toBe('v2');
+  });
+
+  it('keeps a choice that still fits', () => {
+    expect(repairSelections(config, { edition: 'std', region: 'us' }, 'region', 'us')).toEqual({ edition: 'std', region: 'us' });
+  });
+
+  it('ignores a hidden child row when matching the variant', () => {
+    const withChild = {
+      productId: 'p',
+      basePrice: 10,
+      optionGroups: [
+        group('platform', ['xbox', 'psn']),
+        group('account', ['full'], { parentOptionId: 'xbox' }),
+      ],
+      variants: [variant({ id: 'x', optionIds: ['xbox', 'full'] }), variant({ id: 'p', optionIds: ['psn'] })],
+    } as unknown as StorefrontProductConfigurationDto;
+
+    const next = repairSelections(withChild, { platform: 'xbox', account: 'full' }, 'platform', 'psn');
+
+    expect(next).toEqual({ platform: 'psn' });
+    expect(resolveVariant(withChild, next).variant?.id).toBe('p');
   });
 });

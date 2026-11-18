@@ -20,7 +20,7 @@ import {
 
   getAvailableOptionsForGroup,
 
-  isOptionCompatible,
+  repairSelections,
 
   resolveVariant,
 
@@ -203,53 +203,7 @@ export class StorefrontVariantFacade {
 
 
 
-    this.selectedByGroupState.update((current) => {
-
-      let next: Record<string, string> = {
-
-        ...current,
-
-        [groupId]: optionId,
-
-      };
-
-
-
-      for (const group of configuration.optionGroups) {
-
-        if (group.id === groupId) {
-
-          continue;
-
-        }
-
-
-
-        const selected = next[group.id];
-
-        if (!selected) {
-
-          continue;
-
-        }
-
-
-
-        if (!isOptionCompatible(configuration, group.id, selected, next)) {
-
-          const { [group.id]: _, ...rest } = next;
-
-          next = rest;
-
-        }
-
-      }
-
-
-
-      return next;
-
-    });
+    this.selectedByGroupState.update((current) => repairSelections(configuration, current, groupId, optionId));
 
   }
 

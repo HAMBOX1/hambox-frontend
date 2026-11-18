@@ -99,7 +99,9 @@ export function resolveVariant(
     return unresolved(configuration);
   }
 
-  const selectedIds = Object.values(selectedByGroup).filter(Boolean);
+  // Only the choices of the rows the shopper can see count: a child row hidden after its parent changed must not keep
+  // blocking the match with a leftover choice.
+  const selectedIds = selectableGroups.map((group) => selectedByGroup[group.id]).filter((id): id is string => Boolean(id));
   const variant =
     configuration.variants.find((entry) => {
       if (entry.optionIds.length !== selectedIds.length) {
@@ -121,6 +123,60 @@ export function resolveVariant(
   }
 
   return toResolved(variant);
+}
+
+/**
+ * The choices after the shopper picked `optionId` in `changedGroupId`: every other row keeps its choice when it still goes
+ * with the new one, otherwise it switches to the first option that does (instead of being emptied, which left the page
+ * with no price / "out of stock" until the shopper clicked again), rows that are no longer shown are cleared, and a newly
+ * shown required row gets its first available option.
+ */
+export function repairSelections(
+  configuration: StorefrontProductConfigurationDto,
+  selectedByGroup: Readonly<Record<string, string>>,
+  changedGroupId: string,
+  optionId: string,
+): Record<string, string> {
+  const next: Record<string, string> = { ...selectedByGroup, [changedGroupId]: optionId };
+
+  for (let round = 0; round < 10; round++) {
+    let changed = false;
+    const visible = visibleOptionGroups(configuration.optionGroups, next);
+    const visibleIds = new Set(visible.map((group) => group.id));
+
+    for (const id of Object.keys(next)) {
+      if (!visibleIds.has(id)) {
+        delete next[id];
+        changed = true;
+      }
+    }
+
+    for (const group of visible) {
+      if (group.id === changedGroupId) {
+        continue;
+      }
+
+      const current = next[group.id];
+      if (current && isOptionCompatible(configuration, group.id, current, next)) {
+        continue;
+      }
+
+      const pick = group.options.find((option) => isOptionCompatible(configuration, group.id, option.id, next));
+      if (pick && (current || group.isRequired)) {
+        next[group.id] = pick.id;
+        changed = true;
+      } else if (current) {
+        delete next[group.id];
+        changed = true;
+      }
+    }
+
+    if (!changed) {
+      break;
+    }
+  }
+
+  return next;
 }
 
 export function defaultSelections(
