@@ -17,6 +17,22 @@ export function applyStorefrontEnrichment(
   product: StoreProduct,
   configuration: StorefrontProductConfigurationDto | null | undefined,
 ): StoreProduct {
+  // A parent product is only a doorway to its variants: it never shows a price, stock state or Add to cart of its own. The
+  // card quotes the lowest variant price and sends the shopper to the options; its variants are left exactly as they are.
+  if (product.isParent) {
+    return {
+      ...product,
+      priceUsd: configuration ? lowestPurchasablePrice(configuration, product.priceUsd) : product.priceUsd,
+      originalPriceUsd: undefined,
+      discountPercent: undefined,
+      stockStatus: 'unknown',
+      outOfStock: false,
+      cta: 'explore',
+      requiresOptionSelection: true,
+      directVariantId: null,
+    };
+  }
+
   const stockStatus = computeProductStockStatus(configuration, !product.outOfStock);
   const inStock = hasPurchasableInventory(configuration, !product.outOfStock);
 

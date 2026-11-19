@@ -190,6 +190,8 @@
         </app-admin-section-card>
       }
 
+      <app-product-parent-card [productId]="productId()" [value]="product()?.isParentProduct ?? false" />
+
       <app-product-usage-instructions-card [productId]="productId()" [html]="product()?.usageInstructionsHtml ?? null" />
 
       <app-product-instructions-panel [productId]="productId()" />

@@ -101,6 +101,8 @@ export interface Product {
   readonly badgeTextAr?: string | null;
   /** The colour (#rrggbb) of the note under the price; null keeps the store's default green. */
   readonly badgeColor?: string | null;
+  /** The admin marked this product as a parent: a doorway to its variants (no price / stock / Add to cart of its own). */
+  readonly isParentProduct?: boolean;
 }
 
 export interface ProductPriceTiers {

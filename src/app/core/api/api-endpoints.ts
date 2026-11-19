@@ -31,6 +31,7 @@ export const CATALOG_API = {
   productPendingMerge: (id: string) => `/api/v1/products/${id}/pending-merge`,
   productFavorite: (id: string) => `/api/v1/products/${id}/favorite`,
   productUsageInstructions: (id: string) => `/api/v1/products/${id}/usage-instructions`,
+  productParent: (id: string) => `/api/v1/products/${id}/parent`,
   productPurchaseControls: (id: string) => `/api/v1/products/${id}/purchase-controls`,
   productStatusCounts: '/api/v1/products/status-counts',
   productImages: (productId: string) => `/api/v1/products/${productId}/images`,

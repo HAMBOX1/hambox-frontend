@@ -196,4 +196,22 @@ describe('applyStorefrontEnrichment old price', () => {
 
     expect(applyStorefrontEnrichment(rawProduct({ priceUsd: 0 }), config).priceUsd).toBe(0);
   });
+
+  it('a parent product quotes the lowest variant price, offers Explore options and never reads as out of stock', () => {
+    const config = configuration(
+      [
+        variant({ id: 'v1', price: 0, isOutOfStock: true }),
+        variant({ id: 'v2', price: 15, isOutOfStock: true }),
+        variant({ id: 'v3', price: 12, isOutOfStock: true }),
+      ],
+      { basePrice: 0, optionGroups: [] },
+    );
+
+    const enriched = applyStorefrontEnrichment(rawProduct({ priceUsd: 0, isParent: true, cta: 'explore' }), config);
+
+    expect(enriched.cta).toBe('explore');
+    expect(enriched.outOfStock).toBe(false);
+    expect(enriched.priceUsd).toBe(12);
+    expect(enriched.directVariantId).toBeNull();
+  });
 });

@@ -727,3 +727,47 @@
   height: 14px;
   object-fit: contain;
 }
+
+// A parent product (a doorway to its variants): a stacked-cards look, a "multiple options" pill, "From <price>" and an
+// Explore options button in the store colour instead of Add to cart.
+.store-card--parent {
+  box-shadow:
+    0 6px 0 -3px color-mix(in srgb, var(--color-primary, #3cdc96) 28%, transparent),
+    0 12px 0 -6px color-mix(in srgb, var(--color-primary, #3cdc96) 14%, transparent);
+}
+
+.store-card__stock-badge--options {
+  background: color-mix(in srgb, var(--color-primary, #3cdc96) 22%, transparent);
+  color: var(--color-primary, #3cdc96);
+}
+
+.store-card__from {
+  align-self: baseline;
+  margin-inline-end: 5px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.store-card__cta--explore {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--store-card-cta-size);
+  padding: 0 14px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--sf-radius-md);
+  background: var(--color-cta-cart-bg);
+  box-shadow: var(--color-cta-cart-shadow);
+  color: var(--color-cta-cart-text, var(--color-on-primary, #07130d));
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+}
+
+.store-card--dense .store-card__cta--explore {
+  display: none;
+}

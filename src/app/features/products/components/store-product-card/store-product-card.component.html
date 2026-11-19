@@ -2,6 +2,7 @@
   class="store-card"
   [class.store-card--highlighted]="product().highlighted"
   [class.store-card--out-of-stock]="product().outOfStock"
+  [class.store-card--parent]="product().isParent"
   [class.store-card--compact]="compact()"
   [class.store-card--dense]="dense()"
 >
@@ -47,6 +48,9 @@
         }}</span>
       }
 
+      @if (product().isParent) {
+        <span class="store-card__stock-badge store-card__stock-badge--options">{{ 'PRODUCT.MULTIPLE_OPTIONS' | translate }}</span>
+      } @else {
       <span
         class="store-card__stock-badge"
         [class.store-card__stock-badge--in]="product().stockStatus === 'in-stock'"
@@ -57,6 +61,7 @@
       >
         {{ stockLabelKey(product()) | translate }}
       </span>
+      }
 
       @if (product().outOfStock) {
         <div class="store-card__stock-overlay">
@@ -114,6 +119,9 @@
           }
         }
         @if (product().priceUsd > 0 || !(product().requiresOptionSelection || product().outOfStock)) {
+          @if (product().isParent) {
+            <span class="store-card__from">{{ 'PRODUCT.FROM_PRICE' | translate }}</span>
+          }
           <span class="store-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
         }
       </div>
@@ -125,7 +133,7 @@
     </div>
 
     <div class="store-card__actions">
-      @if (!product().outOfStock) {
+      @if (!product().outOfStock && !product().isParent) {
         <button
           type="button"
           class="store-card__favorite"
@@ -161,6 +169,11 @@
           >
             <img [src]="cartIconSrc" alt="" aria-hidden="true" />
           </button>
+        }
+        @case ('explore') {
+          <a class="store-card__cta store-card__cta--explore" [routerLink]="['/products', product().id]">
+            {{ 'PRODUCT.EXPLORE_OPTIONS' | translate }}
+          </a>
         }
         @case ('notify-me') {
           <button

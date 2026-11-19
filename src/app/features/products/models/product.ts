@@ -1,4 +1,4 @@
-export type StoreProductCta = 'cart' | 'buy-now' | 'notify-me';
+export type StoreProductCta = 'cart' | 'buy-now' | 'notify-me' | 'explore';
 
 export type StorePlatformTone = 'xbox' | 'psn' | 'pc' | 'nintendo';
 
@@ -25,6 +25,8 @@ export interface StoreProduct {
   /** The discount between the old (struck-through) price and the price shown, in whole percent (e.g. 20 = "-20%"). */
   discountPercent?: number;
   priceUsd: number;
+  /** A parent product: shows "From <lowest variant price>" and an Explore options button instead of Add to cart. */
+  isParent?: boolean;
   priceMuted?: boolean;
   cta: StoreProductCta;
   outOfStock?: boolean;

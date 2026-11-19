@@ -268,6 +268,11 @@ export class ProductApiService {
     return this.api.put<void>(CATALOG_API.productUsageInstructions(productId), { html });
   }
 
+  /** Marks the product as a parent (a doorway to its variants) or back as a normal product. */
+  setParentProduct(productId: string, isParentProduct: boolean): Observable<void> {
+    return this.api.put<void>(CATALOG_API.productParent(productId), { isParentProduct });
+  }
+
   setFavorite(productId: string, isFavorite: boolean): Observable<void> {
     return this.api.put<void>(CATALOG_API.productFavorite(productId), { isFavorite });
   }
