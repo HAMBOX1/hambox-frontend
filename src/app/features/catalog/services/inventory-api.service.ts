@@ -356,6 +356,25 @@ export class InventoryApiService {
   }
 
   /** The real codes as a plain-text file (the CSV export is masked). Pictures cannot be in a text file; their count comes back in `pictureCount`. */
+  /** The pictures uploaded as stock, as a .zip (the text download cannot carry them). */
+  async exportCodesPictures(
+    variantId: string,
+    status?: string,
+  ): Promise<{ readonly blob: Blob; readonly pictureCount: number; readonly missingCount: number }> {
+    const response = await firstValueFrom(
+      this.http.get(this.resolveUrl(INVENTORY_API.variantCodesExportPictures(variantId)), {
+        params: status ? { status } : {},
+        responseType: 'blob',
+        observe: 'response',
+      }),
+    );
+    return {
+      blob: response.body as Blob,
+      pictureCount: Number(response.headers.get('X-Picture-Count') ?? 0),
+      missingCount: Number(response.headers.get('X-Missing-Count') ?? 0),
+    };
+  }
+
   async exportCodesText(
     variantId: string,
     status?: string,

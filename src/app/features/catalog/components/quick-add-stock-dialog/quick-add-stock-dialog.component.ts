@@ -222,6 +222,32 @@ export class QuickAddStockDialogComponent {
     }
   }
 
+  /** The pictures uploaded as stock, back as a .zip (the text download cannot carry them). */
+  protected async downloadPictures(): Promise<void> {
+    const variant = this.selectedVariant();
+    if (!variant || this.downloading()) {
+      return;
+    }
+
+    this.downloading.set(true);
+    this.error.set(null);
+    this.downloadNote.set(null);
+    try {
+      const { blob, pictureCount, missingCount } = await this.inventoryApi.exportCodesPictures(variant.id);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `stock-pictures-${variant.sku}.zip`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      this.downloadNote.set(`Downloaded ${pictureCount} picture${pictureCount === 1 ? '' : 's'}.${missingCount ? ` ${missingCount} could not be included (file missing from storage).` : ''}`);
+    } catch (error) {
+      this.error.set(error instanceof ApiError && error.message ? error.message : 'There are no pictures in stock to download for this variant.');
+    } finally {
+      this.downloading.set(false);
+    }
+  }
+
   protected async onImagesSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files ?? []);

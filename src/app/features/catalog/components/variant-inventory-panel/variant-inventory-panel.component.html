@@ -23,7 +23,21 @@
           <input type="file" accept=".csv,text/csv" (change)="onFileSelected($event, 'csv')" hidden />
           <span><i class="pi pi-file-excel" aria-hidden="true"></i> {{ 'ADMIN.CATALOG_UI.UPLOAD_CSV' | translate }}</span>
         </label>
+        <label class="variant-inventory-panel__file-btn">
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple (change)="onPicturesSelected($event)" hidden />
+          <span><i class="pi pi-image" aria-hidden="true"></i> Upload pictures</span>
+        </label>
+        <button type="button" class="variant-inventory-panel__file-btn" (click)="downloadStock('text')">
+          <span><i class="pi pi-download" aria-hidden="true"></i> Download stock (TXT)</span>
+        </button>
+        <button type="button" class="variant-inventory-panel__file-btn" (click)="downloadStock('pictures')">
+          <span><i class="pi pi-images" aria-hidden="true"></i> Download pictures (ZIP)</span>
+        </button>
       </div>
+      <p class="variant-inventory-panel__hint">Each picture is one item the customer receives as an image. The TXT download holds the text codes; pictures come back as a ZIP.</p>
+      @if (downloadNote(); as note) {
+        <p class="variant-inventory-panel__hint" role="status">{{ note }}</p>
+      }
 
       <label for="bulk-codes">{{ multiLine() ? 'Paste the full code (all lines = one product)' : 'Paste codes (one per line)' }}</label>
       <textarea

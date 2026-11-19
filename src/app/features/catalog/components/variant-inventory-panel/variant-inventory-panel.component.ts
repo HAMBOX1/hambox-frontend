@@ -242,6 +242,86 @@ export class VariantInventoryPanelComponent {
     this.selectedCodeIds.set(checked ? this.codesTable().map((code) => code.id) : []);
   }
 
+  protected readonly downloadNote = signal<string | null>(null);
+
+  /** Adds the chosen pictures as stock: one code per picture, the customer receives the picture itself. */
+  protected async onPicturesSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    const variant = this.selectedVariant();
+    if (!variant || files.length === 0 || this.importing()) {
+      return;
+    }
+
+    this.importing.set(true);
+    try {
+      const created = await this.facade.createBatch({
+        name: `Pictures ${new Date().toISOString()}`,
+        supplierId: this.supplierId(),
+        currency: 'USD',
+        purchaseCost: 0,
+        notes: null,
+      });
+      if (!created) {
+        return;
+      }
+
+      const result = await this.facade.importPictures(files);
+      if (result) {
+        this.duplicatesExpanded.set(false);
+        this.importResult.set(result);
+        this.importResultDialogOpen.set(true);
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('ADMIN.CATALOG_TOASTS.IMPORT_FAILED'),
+          detail: this.facade.error() ?? 'Could not upload the pictures. Use PNG, JPG, WebP or GIF files.',
+        });
+      }
+    } finally {
+      this.importing.set(false);
+    }
+  }
+
+  /** Takes the unsold stock back out: the text codes as a .txt, or the pictures as a .zip. */
+  protected async downloadStock(kind: 'text' | 'pictures'): Promise<void> {
+    this.downloadNote.set(null);
+    if (kind === 'text') {
+      const result = await this.facade.downloadStockText();
+      if (!result) {
+        this.downloadNote.set(this.facade.error() ?? 'Could not download the stock.');
+        return;
+      }
+      this.saveBlob(result.blob, `stock-${result.sku}.txt`);
+      this.downloadNote.set(
+        result.codeCount === 0 && result.pictureCount === 0
+          ? 'There is no unsold stock to download.'
+          : `Downloaded ${result.codeCount} text code(s).${result.pictureCount ? ` ${result.pictureCount} picture(s) are not in a text file: use "Download pictures (ZIP)".` : ''}`,
+      );
+      return;
+    }
+
+    const pictures = await this.facade.downloadStockPictures();
+    if (!pictures) {
+      this.downloadNote.set(this.facade.error() ?? 'There are no pictures in stock to download for this variant.');
+      return;
+    }
+    this.saveBlob(pictures.blob, `stock-pictures-${pictures.sku}.zip`);
+    this.downloadNote.set(
+      `Downloaded ${pictures.pictureCount} picture(s).${pictures.missingCount ? ` ${pictures.missingCount} could not be included (file missing from storage).` : ''}`,
+    );
+  }
+
+  private saveBlob(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   protected async importCodes(): Promise<void> {
     const variant = this.selectedVariant();
     const raw = this.bulkCodes().trim();

@@ -81,6 +81,17 @@
         <i class="pi pi-download" aria-hidden="true"></i>
         <span>{{ 'ADMIN.CATALOG_UI.DOWNLOAD_STOCK_TXT' | translate }}</span>
       </button>
+      <button
+        type="button"
+        class="quick-stock__tool quick-stock__tool--download"
+        [class.quick-stock__tool--disabled]="!variantId() || downloading()"
+        [disabled]="!variantId() || downloading()"
+        title="Download the pictures uploaded as stock, as a ZIP"
+        (click)="downloadPictures()"
+      >
+        <i class="pi pi-images" aria-hidden="true"></i>
+        <span>Download pictures (ZIP)</span>
+      </button>
       </div>
       <p class="quick-stock__hint">{{ 'ADMIN.CATALOG_UI.UPLOAD_PICTURES_HINT' | translate }}</p>
       <textarea

@@ -1725,6 +1725,54 @@ export class ProductEditorFacade {
 
 
 
+  /** Adds the chosen pictures as stock of the selected variant (one code per picture) into the selected batch. */
+  async importPictures(files: readonly File[]): Promise<ImportCodesResultDto | null> {
+    const variant = this.selectedVariant();
+    const batch = this.selectedBatch();
+    const productId = this.productId();
+    if (!variant || !batch || !productId || files.length === 0) {
+      return null;
+    }
+
+    try {
+      const result = await firstValueFrom(this.inventoryApi.importImageCodes(variant.id, batch.id, files));
+      await this.reloadInventory(productId);
+      await this.selectVariant(variant.id);
+      return result;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to upload the pictures.'));
+      return null;
+    }
+  }
+
+  /** The selected variant's unsold stock as a text file (what the quick dialog's "Download stock" gives). */
+  async downloadStockText(): Promise<{ readonly blob: Blob; readonly codeCount: number; readonly pictureCount: number; readonly sku: string } | null> {
+    const variant = this.selectedVariant();
+    if (!variant) {
+      return null;
+    }
+    try {
+      return { ...(await this.inventoryApi.exportCodesText(variant.id)), sku: variant.sku };
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Could not download the stock.'));
+      return null;
+    }
+  }
+
+  /** The selected variant's unsold picture stock as a .zip. */
+  async downloadStockPictures(): Promise<{ readonly blob: Blob; readonly pictureCount: number; readonly missingCount: number; readonly sku: string } | null> {
+    const variant = this.selectedVariant();
+    if (!variant) {
+      return null;
+    }
+    try {
+      return { ...(await this.inventoryApi.exportCodesPictures(variant.id)), sku: variant.sku };
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'There are no pictures in stock to download for this variant.'));
+      return null;
+    }
+  }
+
   async importCodes(codes: readonly string[], batchId?: string, note?: string | null): Promise<ImportCodesResultDto | null> {
 
     const variant = this.selectedVariant();
