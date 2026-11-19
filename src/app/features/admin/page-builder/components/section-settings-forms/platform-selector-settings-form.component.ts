@@ -39,7 +39,8 @@ export class PlatformSelectorSettingsFormComponent {
   readonly disabled = input(false);
   readonly configChange = output<PlatformSelectorSectionConfig>();
 
-  protected readonly localConfig = linkedSignal(() => this.config());
+  // A saved section can lack the tile list entirely: treat that as an empty list so the form (and its Add button) still shows.
+  protected readonly localConfig = linkedSignal<PlatformSelectorSectionConfig>(() => ({ ...this.config(), items: this.config()?.items ?? [] }));
 
   protected updateItem(index: number, patch: Partial<PlatformSelectorItemConfig>): void {
     if (this.disabled()) {
