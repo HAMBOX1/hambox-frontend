@@ -89,3 +89,25 @@
   margin: 0;
   color: var(--color-danger, #ff6b6b);
 }
+
+// The form on the left, the live preview on the right (stacked on a narrow screen).
+.floating-ads__layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 900px) {
+    grid-template-columns: minmax(0, 1fr) 21rem;
+    align-items: start;
+  }
+}
+
+.floating-ads__preview {
+  display: grid;
+  gap: 8px;
+
+  @media (min-width: 900px) {
+    position: sticky;
+    top: 0;
+  }
+}

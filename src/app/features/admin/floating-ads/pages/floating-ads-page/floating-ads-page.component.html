@@ -58,10 +58,58 @@
   [dismissableMask]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: 'min(36rem, 94vw)' }"
+  [style]="{ width: 'min(60rem, 96vw)' }"
   styleClass="admin-dialog"
 >
+  <div class="floating-ads__layout">
   <div class="floating-ads__form">
+    <label class="floating-ads__field">
+      <span>Card design</span>
+      <p-select
+        [options]="[...styleOptions]"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [ngModel]="form().style"
+        (ngModelChange)="patch('style', $event)"
+      />
+    </label>
+    <div class="floating-ads__row">
+      <label class="floating-ads__field">
+        <span>Position on a computer</span>
+        <p-select
+          [options]="[...desktopPositionOptions]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [ngModel]="form().positionDesktop"
+          (ngModelChange)="patch('positionDesktop', $event)"
+        />
+      </label>
+      <label class="floating-ads__field">
+        <span>Position on a phone</span>
+        <p-select
+          [options]="[...mobilePositionOptions]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [ngModel]="form().positionMobile"
+          (ngModelChange)="patch('positionMobile', $event)"
+        />
+      </label>
+    </div>
+    <label class="floating-ads__field">
+      <span>Show on these pages (leave empty for every page)</span>
+      <p-multiselect
+        [options]="[...pageOptions]"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        placeholder="All pages"
+        [ngModel]="form().pages"
+        (ngModelChange)="patch('pages', $event ?? [])"
+      />
+    </label>
     <label class="floating-ads__field">
       <span>Title (English) *</span>
       <input pInputText type="text" maxlength="200" [ngModel]="form().titleEn" (ngModelChange)="patch('titleEn', $event)" />
@@ -78,8 +126,20 @@
       <span>الرسالة (عربي)</span>
       <textarea pTextarea rows="2" dir="rtl" maxlength="1000" [ngModel]="form().messageAr" (ngModelChange)="patch('messageAr', $event)"></textarea>
     </label>
+    @if (form().style === 'Product') {
+      <div class="floating-ads__row">
+        <label class="floating-ads__field">
+          <span>Price (e.g. $19.99)</span>
+          <input pInputText type="text" maxlength="50" [ngModel]="form().priceText" (ngModelChange)="patch('priceText', $event)" />
+        </label>
+        <label class="floating-ads__field">
+          <span>Old price (shown struck through)</span>
+          <input pInputText type="text" maxlength="50" [ngModel]="form().oldPriceText" (ngModelChange)="patch('oldPriceText', $event)" />
+        </label>
+      </div>
+    }
     <div class="floating-ads__field">
-      <span>Picture (optional, shown at the top of the card)</span>
+      <span>Picture (optional; the product image for a Product card)</span>
       <app-media-picker
         [value]="form().imageUrl || null"
         recommendedSize="About 600×340px (landscape), JPG, PNG or WebP"
@@ -143,6 +203,11 @@
     @if (formError(); as error) {
       <p class="floating-ads__error">{{ error }}</p>
     }
+  </div>
+  <div class="floating-ads__preview">
+    <strong class="floating-ads__preview-title">Preview</strong>
+    <app-floating-ad-preview [ad]="previewAd()" />
+  </div>
   </div>
   <div class="admin-dialog__actions">
     <button pButton type="button" label="Cancel" severity="secondary" (click)="dialogOpen.set(false)"></button>

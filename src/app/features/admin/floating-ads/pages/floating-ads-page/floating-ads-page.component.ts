@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -6,18 +6,29 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiError } from '../../../../../core/models/api-error.model';
-import { FloatingAdAdmin, FloatingAdAudience, FloatingAdInput } from '../../../../../core/models/floating-ad.model';
+import {
+  FloatingAdAdmin,
+  FloatingAdAudience,
+  FloatingAdDesktopPosition,
+  FloatingAdInput,
+  FloatingAdMobilePosition,
+  FloatingAdPage,
+  FloatingAdPublic,
+  FloatingAdStyle,
+} from '../../../../../core/models/floating-ad.model';
 import { MediaPickerComponent } from '../../../../../shared/components/admin/media-picker/media-picker.component';
 import { PERMISSIONS } from '../../../../../core/permissions/permission.constants';
 import { AdminPageHeaderComponent } from '../../../../../shared/components/admin';
 import { adminBreadcrumbs } from '../../../../../shared/components/admin/admin-breadcrumb.helpers';
 import { HasPermissionPipe } from '../../../../../shared/pipes/has-permission.pipe';
+import { FloatingAdPreviewComponent } from '../../components/floating-ad-preview/floating-ad-preview.component';
 import { FloatingAdsAdminApiService } from '../../services/floating-ads-admin-api.service';
 
 const AUDIENCE_OPTIONS: readonly { label: string; value: FloatingAdAudience }[] = [
@@ -26,6 +37,29 @@ const AUDIENCE_OPTIONS: readonly { label: string; value: FloatingAdAudience }[] 
   { label: 'Any signed-in customer', value: 'SignedIn' },
   { label: 'Customers without a membership', value: 'WithoutMembership' },
   { label: 'Customers with a membership', value: 'WithMembership' },
+];
+
+const STYLE_OPTIONS: readonly { label: string; value: FloatingAdStyle }[] = [
+  { label: 'Mini card - small, text with a thumbnail', value: 'Mini' },
+  { label: 'Product card - product picture and price', value: 'Product' },
+  { label: 'Promo card - an offer or discount', value: 'Promo' },
+];
+
+const DESKTOP_POSITION_OPTIONS: readonly { label: string; value: FloatingAdDesktopPosition }[] = [
+  { label: 'Bottom left', value: 'BottomLeft' },
+  { label: 'Bottom right (above the assistant button)', value: 'BottomRight' },
+];
+
+const MOBILE_POSITION_OPTIONS: readonly { label: string; value: FloatingAdMobilePosition }[] = [
+  { label: 'Bottom (above the bottom bar)', value: 'Bottom' },
+  { label: 'Top (under the header)', value: 'Top' },
+];
+
+const PAGE_OPTIONS: readonly { label: string; value: FloatingAdPage }[] = [
+  { label: 'Home', value: 'home' },
+  { label: 'Products list', value: 'products' },
+  { label: 'Product page', value: 'product' },
+  { label: 'Category pages', value: 'category' },
 ];
 
 /** A `datetime-local` input wants "yyyy-MM-ddTHH:mm" in local time; the API stores UTC. */
@@ -60,6 +94,12 @@ interface AdForm {
   dismissHours: number;
   imageUrl: string;
   showCountdown: boolean;
+  style: FloatingAdStyle;
+  positionDesktop: FloatingAdDesktopPosition;
+  positionMobile: FloatingAdMobilePosition;
+  pages: FloatingAdPage[];
+  priceText: string;
+  oldPriceText: string;
 }
 
 const EMPTY_FORM: AdForm = {
@@ -79,6 +119,12 @@ const EMPTY_FORM: AdForm = {
   dismissHours: 24,
   imageUrl: '',
   showCountdown: false,
+  style: 'Mini',
+  positionDesktop: 'BottomLeft',
+  positionMobile: 'Bottom',
+  pages: [],
+  priceText: '',
+  oldPriceText: '',
 };
 
 /**
@@ -101,6 +147,8 @@ const EMPTY_FORM: AdForm = {
     HasPermissionPipe,
     AdminPageHeaderComponent,
     MediaPickerComponent,
+    MultiSelectModule,
+    FloatingAdPreviewComponent,
   ],
   providers: [MessageService],
   templateUrl: './floating-ads-page.component.html',
@@ -114,6 +162,10 @@ export class FloatingAdsPageComponent implements OnInit {
   protected readonly permissions = PERMISSIONS;
   protected readonly breadcrumbs = adminBreadcrumbs({ label: 'ADMIN.NAV.FLOATING_ADS' });
   protected readonly audienceOptions = AUDIENCE_OPTIONS;
+  protected readonly styleOptions = STYLE_OPTIONS;
+  protected readonly desktopPositionOptions = DESKTOP_POSITION_OPTIONS;
+  protected readonly mobilePositionOptions = MOBILE_POSITION_OPTIONS;
+  protected readonly pageOptions = PAGE_OPTIONS;
 
   protected readonly ads = signal<readonly FloatingAdAdmin[]>([]);
   protected readonly loading = signal(false);
@@ -121,6 +173,33 @@ export class FloatingAdsPageComponent implements OnInit {
   protected readonly dialogOpen = signal(false);
   protected readonly form = signal<AdForm>({ ...EMPTY_FORM });
   protected readonly formError = signal<string | null>(null);
+
+  /** The form as a visitor's card, for the live preview next to it. */
+  protected readonly previewAd = computed<FloatingAdPublic>(() => {
+    const f = this.form();
+    return {
+      id: f.id ?? 'preview',
+      titleEn: f.titleEn || 'Your offer title',
+      titleAr: f.titleAr || null,
+      messageEn: f.messageEn || null,
+      messageAr: f.messageAr || null,
+      buttonLabelEn: f.buttonLabelEn || null,
+      buttonLabelAr: f.buttonLabelAr || null,
+      linkUrl: f.linkUrl || null,
+      dismissHours: f.dismissHours,
+      imageUrl: f.imageUrl || null,
+      // A running countdown for the preview even before an end date is typed in.
+      countdownEndsOnUtc: f.showCountdown
+        ? (f.endsOn ? new Date(f.endsOn).toISOString() : new Date(Date.now() + 3 * 86_400_000).toISOString())
+        : null,
+      style: f.style,
+      positionDesktop: f.positionDesktop,
+      positionMobile: f.positionMobile,
+      pages: f.pages,
+      priceText: f.priceText || null,
+      oldPriceText: f.oldPriceText || null,
+    };
+  });
 
   ngOnInit(): void {
     void this.load();
@@ -165,6 +244,12 @@ export class FloatingAdsPageComponent implements OnInit {
       dismissHours: ad.dismissHours,
       imageUrl: ad.imageUrl ?? '',
       showCountdown: ad.showCountdown,
+      style: ad.style ?? 'Mini',
+      positionDesktop: ad.positionDesktop ?? 'BottomLeft',
+      positionMobile: ad.positionMobile ?? 'Bottom',
+      pages: [...(ad.pages ?? [])],
+      priceText: ad.priceText ?? '',
+      oldPriceText: ad.oldPriceText ?? '',
     });
     this.formError.set(null);
     this.dialogOpen.set(true);
@@ -202,6 +287,12 @@ export class FloatingAdsPageComponent implements OnInit {
       dismissHours: f.dismissHours ?? 24,
       imageUrl: f.imageUrl.trim() || null,
       showCountdown: f.showCountdown,
+      style: f.style,
+      positionDesktop: f.positionDesktop,
+      positionMobile: f.positionMobile,
+      pages: f.pages,
+      priceText: f.style === 'Product' ? f.priceText.trim() || null : null,
+      oldPriceText: f.style === 'Product' ? f.oldPriceText.trim() || null : null,
     };
 
     this.saving.set(true);
