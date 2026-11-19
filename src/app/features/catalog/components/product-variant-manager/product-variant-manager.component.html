@@ -7,6 +7,8 @@
     [compact]="compact()"
   >
     <div class="variant-manager">
+      <app-variant-review-panel [variants]="variants()" [optionGroups]="optionGroups()" (remove)="requestDelete($event)" />
+
       <app-admin-toolbar>
         <app-admin-search-bar
           adminToolbarSearch
@@ -75,6 +77,17 @@
         </div>
 
         <div adminToolbarActions class="variant-manager__auto-generate">
+          @if (optionGroups().length > 0) {
+            <button
+              *hamboxHasPermission="permissions.Catalog.Inventory.Create"
+              pButton
+              type="button"
+              size="small"
+              icon="pi pi-plus"
+              label="Create variants"
+              (click)="combinationsDialogOpen.set(true)"
+            ></button>
+          }
           @if (autoGenerationMessage(); as message) {
             <span class="variant-manager__auto-generate-status">
               <i class="pi pi-check-circle" aria-hidden="true"></i>
@@ -197,6 +210,9 @@
           icon="pi pi-table"
           [title]="'ADMIN.CATALOG_UI.NO_VARIANTS_YET' | translate"
           [description]="'ADMIN.CATALOG_UI.CREATE_OPTION_GROUPS_TO_GENERATE_VARIANTS' | translate"
+          primaryLabel="Create variants"
+          primaryIcon="pi pi-plus"
+          (primaryAction)="combinationsDialogOpen.set(true)"
         />
       } @else {
         <app-admin-empty-state
@@ -434,6 +450,12 @@
       </div>
     }
   </p-dialog>
+
+  <app-variant-combinations-dialog
+    [visible]="combinationsDialogOpen()"
+    [productId]="productId() ?? ''"
+    (visibleChange)="combinationsDialogOpen.set($event)"
+  />
 
   <app-variant-instructions-dialog
     [visible]="!!instructionsDialogVariant()"

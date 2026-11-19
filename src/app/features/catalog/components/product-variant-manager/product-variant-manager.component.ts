@@ -49,7 +49,9 @@ import { ProductVariantLeafListComponent } from '../product-variant-leaf-list/pr
 import { ProductVariantTreeNodeComponent } from '../product-variant-tree-node/product-variant-tree-node.component';
 import { ProductVariantUsageDialogComponent } from '../product-variant-usage-dialog/product-variant-usage-dialog.component';
 import { VariantFulfillmentPanelComponent } from '../variant-fulfillment-panel/variant-fulfillment-panel.component';
+import { VariantCombinationsDialogComponent } from '../variant-combinations-dialog/variant-combinations-dialog.component';
 import { VariantInstructionsDialogComponent } from '../variant-instructions-dialog/variant-instructions-dialog.component';
+import { VariantReviewPanelComponent } from '../variant-review-panel/variant-review-panel.component';
 import { VariantInventoryPanelComponent } from '../variant-inventory-panel/variant-inventory-panel.component';
 
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -105,6 +107,8 @@ type VariantFilter = 'all' | 'out-of-stock' | 'in-stock' | 'draft';
     VariantInventoryPanelComponent,
     VariantFulfillmentPanelComponent,
     VariantInstructionsDialogComponent,
+    VariantCombinationsDialogComponent,
+    VariantReviewPanelComponent,
   ],
   // No private MessageService: toasts must reach the edit page's <p-toast> (a component-level provider would be a
   // different instance that nothing displays).
@@ -198,6 +202,8 @@ export class ProductVariantManagerComponent {
   protected readonly quickFilter = signal<VariantFilter>('all');
   /** Deactivated / archived variants are hidden from the list by default (they are not sold anyway); this brings them back. */
   protected readonly showHidden = signal(false);
+  /** The "Create variants" dialog: variants are only created for combinations the admin ticks. */
+  protected readonly combinationsDialogOpen = signal(false);
   protected readonly hiddenVariantCount = computed(
     () => this.variants().filter((variant) => this.isHiddenVariant(variant.status)).length,
   );
@@ -362,7 +368,10 @@ export class ProductVariantManagerComponent {
     const quick = this.quickFilter();
     const showHidden = this.showHidden();
 
+    // Only finished combinations are listed here (and can be stocked or sold); half-built and repeated ones are shown in the
+    // "need fixing" panel above instead.
     return this.variants()
+      .filter((variant) => variant.isComplete !== false && !variant.duplicateOfSku)
       .map((variant) => ({
         ...variant,
         optionsLabel: this.formatOptions(variant),

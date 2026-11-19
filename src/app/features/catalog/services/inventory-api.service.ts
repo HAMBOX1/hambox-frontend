@@ -19,6 +19,7 @@ import {
   DigitalInventoryCodeDto,
   DuplicateVariantRequest,
   GenerateProductVariantsResultDto,
+  VariantCombinationsDto,
   DeletedInventoryCodesPageDto,
   ImportCodesRequest,
   ImportCodesResultDto,
@@ -94,10 +95,15 @@ export class InventoryApiService {
     return this.api.post<string>(INVENTORY_API.productVariants(productId), request);
   }
 
-  generateVariants(productId: string): Observable<GenerateProductVariantsResultDto> {
+  getVariantCombinations(productId: string): Observable<VariantCombinationsDto> {
+    return this.api.get<VariantCombinationsDto>(INVENTORY_API.productVariantCombinations(productId));
+  }
+
+  /** Creates the variants for the chosen combinations only (none given = every missing combination). */
+  generateVariants(productId: string, combinations?: readonly (readonly string[])[]): Observable<GenerateProductVariantsResultDto> {
     return this.api.post<GenerateProductVariantsResultDto>(
       INVENTORY_API.generateProductVariants(productId),
-      {},
+      combinations ? { combinations } : {},
     );
   }
 

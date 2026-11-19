@@ -274,7 +274,10 @@ export class QuickAddStockDialogComponent {
   private async loadVariants(productId: string, keepSelected?: string): Promise<void> {
     this.loading.set(true);
     try {
-      const variants = await firstValueFrom(this.inventoryApi.getProductVariants(productId));
+      // Only finished combinations can be stocked: a half-choice (e.g. Region + Type without a Duration) never shows up here.
+      const variants = (await firstValueFrom(this.inventoryApi.getProductVariants(productId))).filter(
+        (variant) => variant.isComplete !== false && !variant.duplicateOfSku,
+      );
       this.variants.set(variants);
       // A product with a single variant needs no choosing — pick it, whatever its delivery mode.
       const keep = keepSelected && variants.some((v) => v.id === keepSelected) ? keepSelected : null;

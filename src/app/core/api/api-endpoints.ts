@@ -108,6 +108,8 @@ export const INVENTORY_API = {
   productVariantPrices: (productId: string) => `/api/v1/inventory/products/${productId}/variant-prices`,
   quickSetChatDelivery: (productId: string) =>
     `/api/v1/inventory/products/${productId}/quick-chat-delivery`,
+  productVariantCombinations: (productId: string) =>
+    `/api/v1/inventory/products/${productId}/variants/combinations`,
   generateProductVariants: (productId: string) =>
     `/api/v1/inventory/products/${productId}/variants/generate`,
   bulkUpdateProductVariants: (productId: string) =>

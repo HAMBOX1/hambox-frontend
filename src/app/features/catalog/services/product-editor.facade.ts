@@ -2018,21 +2018,33 @@ export class ProductEditorFacade {
 
 
 
-  /** Best-effort: regenerates variants from the current option groups, then reloads. Fails silently while option groups are mid-edit (e.g. a group with no values yet) — same pattern as publishProduct()'s legacy variant activation. */
+  /**
+   * Changing option groups or values no longer creates variants by itself: a product only gets the variants the admin
+   * chooses to create (see `createSelectedVariants`), so half-built or unwanted combinations never appear on their own.
+   * This just refreshes what is shown.
+   */
   private async syncVariants(productId: string): Promise<void> {
-    try {
-      const result = await firstValueFrom(this.inventoryApi.generateVariants(productId));
-      this.variantGenerationState.set(result);
-      this.variantSyncErrorState.set(null);
-    } catch (error) {
-      const apiError = parseApiError(error);
-      // 400 = option groups are incomplete (e.g. a new group with no values yet); expected, not a failure.
-      this.variantSyncErrorState.set(
-        apiError.status === 400 ? null : this.toErrorMessage(error, 'Failed to regenerate variants.'),
-      );
+    this.variantSyncErrorState.set(null);
+    await this.reloadInventory(productId);
+  }
+
+  /** Creates variants for exactly the chosen combinations (each an array of option ids), then refreshes the list. */
+  async createSelectedVariants(combinations: readonly (readonly string[])[]): Promise<boolean> {
+    const productId = this.productId();
+    if (!productId || combinations.length === 0) {
+      return false;
     }
 
-    await this.reloadInventory(productId);
+    try {
+      const result = await firstValueFrom(this.inventoryApi.generateVariants(productId, combinations));
+      this.variantGenerationState.set(result);
+      this.variantSyncErrorState.set(null);
+      await this.reloadInventory(productId);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Could not create the variants.'));
+      return false;
+    }
   }
 
   private async reloadInventory(productId: string): Promise<void> {

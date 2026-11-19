@@ -65,6 +65,24 @@ export interface ProductVariantDto {
   /** Note shoppers see on the product page while this exact variant is selected. */
   readonly descriptionHtml?: string | null;
   readonly showDescriptionInline?: boolean;
+  /** One option from every option group that applies to it: only complete variants can be sold or stocked. */
+  readonly isComplete?: boolean;
+  /** The groups a half-complete variant is still missing a choice for. */
+  readonly missingGroups?: readonly string[] | null;
+  /** The SKU of the earlier variant that has exactly the same options (a duplicate), if any. */
+  readonly duplicateOfSku?: string | null;
+}
+
+export interface VariantCombinationDto {
+  readonly optionIds: readonly string[];
+  readonly labels: readonly string[];
+  readonly exists: boolean;
+}
+
+export interface VariantCombinationsDto {
+  readonly items: readonly VariantCombinationDto[];
+  readonly existingCount: number;
+  readonly missingCount: number;
 }
 
 export interface SetVariantDescriptionRequest {
