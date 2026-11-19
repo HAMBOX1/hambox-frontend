@@ -101,6 +101,11 @@ export class CategoryListPageComponent implements OnInit {
     void this.facade.reload();
   }
 
+  /** Opens the import wizard with "Categories" already chosen (it offers the Excel template and the upload). */
+  protected importCategories(): void {
+    void this.router.navigate(['/admin/products/import'], { queryParams: { entity: 'Categories' } });
+  }
+
   protected exportCategories(): void {
     exportCategoriesToCsv(this.flatItems());
   }

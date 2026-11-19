@@ -17,6 +17,14 @@
     <app-admin-icon-button
       adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Categories.Create"
+      icon="pi pi-upload"
+      label="Import categories (Excel)"
+      severity="secondary"
+      (pressed)="importCategories()"
+    />
+    <app-admin-icon-button
+      adminHeaderActions
+      *hamboxHasPermission="permissions.Catalog.Categories.Create"
       icon="pi pi-plus"
       [label]="'ADMIN.CATALOG_UI.CREATE_CATEGORY' | translate"
       severity="primary"

@@ -34,6 +34,7 @@ import {
 import { CatalogImportExportApiService } from '../../services/catalog-import-export-api.service';
 import { CatalogImportExportFacade, extractErrorDetail } from '../../services/catalog-import-export.facade';
 
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 interface CorrectionGroup {
   readonly issueType: string;
@@ -639,6 +640,13 @@ export class CatalogImportWizardPageComponent {
 
   constructor() {
     void this.facade.loadLookups();
+
+    // A link such as /admin/products/import?entity=Categories opens the wizard with that kind of file already chosen.
+    const requested = inject(ActivatedRoute).snapshot.queryParamMap.get('entity');
+    const known = ENTITY_TYPE_OPTIONS.find((option) => option.value === requested);
+    if (known) {
+      this.facade.setEntityType(known.value);
+    }
   }
 
   protected acceptFor(entityType: CatalogImportEntityType): string {
