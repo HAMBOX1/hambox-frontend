@@ -73,6 +73,7 @@ const PRODUCT_TOGGLEABLE_NON_PRICE_COLUMNS: readonly ProductColumnId[] = [
   'stock',
   'sku',
   'margin',
+  'eliteMargin',
   'category',
   'internalCategories',
   'status',
@@ -435,6 +436,37 @@ export class ProductCatalogTableComponent {
     const marginMin = marginFor(costMax);
     const format = (value: number) => `${value.toFixed(0)}%`;
     return marginMin === marginMax ? format(marginMin) : `${format(marginMin)} – ${format(marginMax)}`;
+  }
+
+  /**
+   * The same margin, worked out on the Elite (member) price: `(elite − cost) / elite` over the cost and Elite price ranges the
+   * Cost and Elite price columns show. "—" when either is unset.
+   */
+  protected eliteMarginText(product: Product): string {
+    const tiers = product.priceTiers;
+    const costMin = tiers?.costMin;
+    const costMax = tiers?.costMax;
+    const eliteMin = tiers?.memberMin;
+    const eliteMax = tiers?.memberMax;
+    if (costMin == null || costMax == null || eliteMin == null || eliteMax == null || eliteMin <= 0) {
+      return '—';
+    }
+
+    // Best case: the lowest cost against the highest Elite price; worst case the opposite.
+    const best = ((eliteMax - costMin) / eliteMax) * 100;
+    const worst = ((eliteMin - costMax) / eliteMin) * 100;
+    const format = (value: number) => `${value.toFixed(0)}%`;
+    return Math.round(best) === Math.round(worst) ? format(worst) : `${format(worst)} – ${format(best)}`;
+  }
+
+  /** One variant's margin on its sale price (`sale`) or its Elite price (`elite`): `(price − cost) / price`. */
+  protected variantMarginText(product: Product, variant: ProductVariantDto, basis: 'sale' | 'elite'): string {
+    const price = basis === 'elite' ? variant.memberPrice : (variant.priceOverride ?? product.price);
+    const cost = variant.costPrice;
+    if (price == null || cost == null || price <= 0) {
+      return '—';
+    }
+    return `${(((price - cost) / price) * 100).toFixed(0)}%`;
   }
 
   /** The representative SKU (first variant by sort order) the backend provides — not a true

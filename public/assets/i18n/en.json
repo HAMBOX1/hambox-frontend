@@ -1093,8 +1093,9 @@
         "SKU": "SKU",
         "SALE_PRICE": "Sale Price",
         "COST_PRICE": "Cost",
-        "MEMBER_PRICE": "Member Price",
+        "MEMBER_PRICE": "Elite price",
         "MARGIN": "Margin",
+        "ELITE_MARGIN": "Elite margin",
         "CATEGORY": "Category",
         "INTERNAL_CATEGORIES": "Internal Categories",
         "STATUS": "Status",
@@ -1114,7 +1115,7 @@
         "PRODUCT": "Product",
         "SALE": "Sale",
         "COST": "Cost",
-        "MEMBER": "Member"
+        "MEMBER": "Elite"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "Add Supplier Mapping",

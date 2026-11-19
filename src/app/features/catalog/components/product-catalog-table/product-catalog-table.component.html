@@ -183,6 +183,11 @@
             <th pSortableColumn="margin" class="product-catalog-table__tier-head"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.MARGIN' | translate }} <p-sortIcon field="margin" /></th>
 
                 }
+                @case ('eliteMargin') {
+
+            <th class="product-catalog-table__tier-head"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.ELITE_MARGIN' | translate }} </th>
+
+                }
                 @case ('category') {
 
             <th pSortableColumn="categoryName"> {{ 'ADMIN.CATALOG_PAGE.COLUMNS.CATEGORY' | translate }} <p-sortIcon field="categoryName" /></th>
@@ -403,6 +408,15 @@
             <td class="product-catalog-table__tier-cell">
               <span class="admin-cell-primary product-catalog-table__tier-value product-catalog-table__tier-value--disabled">{{
                 marginText(product)
+              }}</span>
+            </td>
+
+                }
+                @case ('eliteMargin') {
+
+            <td class="product-catalog-table__tier-cell">
+              <span class="admin-cell-primary product-catalog-table__tier-value product-catalog-table__tier-value--disabled">{{
+                eliteMarginText(product)
               }}</span>
             </td>
 
@@ -776,7 +790,16 @@
                       }
                       @case ('margin') {
 
-                  <td></td>
+                  <td class="product-catalog-table__tier-cell">
+                    <span class="admin-cell-primary">{{ variantMarginText(product, variant, 'sale') }}</span>
+                  </td>
+
+                      }
+                      @case ('eliteMargin') {
+
+                  <td class="product-catalog-table__tier-cell">
+                    <span class="admin-cell-primary">{{ variantMarginText(product, variant, 'elite') }}</span>
+                  </td>
 
                       }
                       @case ('category') {

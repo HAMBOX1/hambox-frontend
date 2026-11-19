@@ -1093,8 +1093,9 @@
         "SKU": "رمز المنتج (SKU)",
         "SALE_PRICE": "سعر البيع",
         "COST_PRICE": "التكلفة",
-        "MEMBER_PRICE": "سعر العضو",
+        "MEMBER_PRICE": "سعر Elite",
         "MARGIN": "هامش الربح",
+        "ELITE_MARGIN": "هامش ربح Elite",
         "CATEGORY": "الفئة",
         "INTERNAL_CATEGORIES": "الفئات الداخلية",
         "STATUS": "الحالة",
@@ -1114,7 +1115,7 @@
         "PRODUCT": "المنتج",
         "SALE": "البيع",
         "COST": "التكلفة",
-        "MEMBER": "العضو"
+        "MEMBER": "Elite"
       },
       "SUPPLIER_MAPPING": {
         "ADD": "إضافة ربط مورد",

@@ -10,6 +10,7 @@ export type ProductColumnId =
   | 'costPrice'
   | 'memberPrice'
   | 'margin'
+  | 'eliteMargin'
   | 'category'
   | 'internalCategories'
   | 'status'
@@ -29,6 +30,7 @@ export const PRODUCT_TABLE_COLUMNS: readonly ProductColumnDef[] = [
   { id: 'costPrice', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.COST_PRICE', defaultVisible: false },
   { id: 'memberPrice', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.MEMBER_PRICE', defaultVisible: false },
   { id: 'margin', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.MARGIN', defaultVisible: false },
+  { id: 'eliteMargin', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.ELITE_MARGIN', defaultVisible: false },
   { id: 'category', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.CATEGORY', defaultVisible: true },
   { id: 'internalCategories', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.INTERNAL_CATEGORIES', defaultVisible: true },
   { id: 'status', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.STATUS', defaultVisible: true },
@@ -56,7 +58,7 @@ const BUILTIN_PRESETS: readonly ColumnPreset[] = [
   {
     id: 'prices',
     labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.VIEW_PRICES',
-    columns: ['salePrice', 'costPrice', 'memberPrice', 'margin'],
+    columns: ['salePrice', 'costPrice', 'memberPrice', 'margin', 'eliteMargin'],
     builtin: true,
   },
   { id: 'stock', labelKey: 'ADMIN.CATALOG_PAGE.COLUMNS.VIEW_STOCK', columns: ['stock', 'supplier'], builtin: true },

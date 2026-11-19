@@ -146,7 +146,7 @@ describe('ProductTableColumnsService column views', () => {
     expect(service.presets().map((p) => p.id)).toEqual(['default', 'prices', 'stock']);
 
     service.applyPreset('prices');
-    expect([...service.orderedVisible()].sort()).toEqual(['costPrice', 'margin', 'memberPrice', 'salePrice']);
+    expect([...service.orderedVisible()].sort()).toEqual(['costPrice', 'eliteMargin', 'margin', 'memberPrice', 'salePrice']);
     expect(service.activePresetId()).toBe('prices');
 
     service.applyPreset('stock');
@@ -174,7 +174,7 @@ describe('ProductTableColumnsService column views', () => {
 
     const reloaded = createService();
     const saved = reloaded.presets().find((p) => p.id === id);
-    expect(saved?.columns.length).toBe(5);
+    expect(saved?.columns.length).toBe(6);
 
     reloaded.applyPreset('stock');
     reloaded.applyPreset(id as string);
