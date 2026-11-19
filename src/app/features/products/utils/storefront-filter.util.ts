@@ -85,5 +85,12 @@ export function lowestPurchasablePrice(
     .filter(isPurchasableVariant)
     .map((variant) => variant.price);
 
-  return prices.length ? Math.min(...prices) : basePrice;
+  if (prices.length) {
+    return Math.min(...prices);
+  }
+
+  // Nothing can be bought right now (or every combination is incomplete): still quote the lowest real price of its variants
+  // rather than the parent product's own 0, so a card never shows "$0.00" for a product that has priced variants.
+  const listed = configuration.variants.map((variant) => variant.price).filter((price) => price > 0);
+  return listed.length ? Math.min(...listed) : basePrice;
 }

@@ -174,4 +174,26 @@ describe('applyStorefrontEnrichment old price', () => {
 
     expect(applyStorefrontEnrichment(rawProduct(), config).discountPercent).toBe(1);
   });
+
+  it('quotes the lowest real variant price (never the parent 0) when nothing can be bought right now', () => {
+    const config = configuration(
+      [
+        variant({ id: 'v1', price: 0, isOutOfStock: true }),
+        variant({ id: 'v2', price: 12, isOutOfStock: true }),
+        variant({ id: 'v3', price: 9, isCompleteCombination: false }),
+      ],
+      { basePrice: 0 },
+    );
+
+    const enriched = applyStorefrontEnrichment(rawProduct({ priceUsd: 0 }), config);
+
+    expect(enriched.outOfStock).toBe(true);
+    expect(enriched.priceUsd).toBe(9);
+  });
+
+  it('keeps the base price when no variant has a real price at all', () => {
+    const config = configuration([variant({ price: 0, isOutOfStock: true })], { basePrice: 0 });
+
+    expect(applyStorefrontEnrichment(rawProduct({ priceUsd: 0 }), config).priceUsd).toBe(0);
+  });
 });

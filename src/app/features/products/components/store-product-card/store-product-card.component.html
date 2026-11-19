@@ -113,7 +113,9 @@
             <span class="store-card__off">-{{ product().discountPercent }}%</span>
           }
         }
-        <span class="store-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
+        @if (product().priceUsd > 0 || !(product().requiresOptionSelection || product().outOfStock)) {
+          <span class="store-card__price">{{ product().priceUsd | hamboxCurrency }}</span>
+        }
       </div>
 
       @if (product().badgeText) {
