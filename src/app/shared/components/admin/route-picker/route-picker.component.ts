@@ -9,6 +9,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { TranslationService } from '../../../../core/i18n/translation.service';
 import { Product } from '../../../../features/catalog/models/product.model';
+import { Category } from '../../../../features/catalog/models/category.model';
+import { CategoryApiService } from '../../../../features/catalog/services/category-api.service';
 import { ProductApiService } from '../../../../features/catalog/services/product-api.service';
 import { APP_ROUTE_REGISTRY } from './route-registry';
 
@@ -17,9 +19,11 @@ interface RouteSelectOption {
   readonly value: string;
 }
 
-type RoutePickerMode = 'page' | 'product' | 'custom';
+type RoutePickerMode = 'page' | 'product' | 'category' | 'custom';
 
 const PRODUCT_LINK_PATTERN = /^\/products\/(.+)$/;
+/** A link to the store filtered to one category, e.g. /products?category=<id>. */
+const CATEGORY_LINK_PATTERN = /^\/products\?category=([^&#]+)$/;
 
 const RECENT_ROUTES_KEY = 'hambox.route-picker.recent';
 const MAX_RECENT_ROUTES = 8;
@@ -54,6 +58,11 @@ export class RoutePickerComponent {
   private readonly translate = inject(TranslateService);
   private readonly translationService = inject(TranslationService);
   private readonly productApi = inject(ProductApiService);
+  private readonly categoryApi = inject(CategoryApiService);
+
+  /** Every category (name shown as "Parent / Child"), loaded the first time the Category mode opens. */
+  protected readonly categoryOptions = signal<readonly RouteSelectOption[]>([]);
+  private categoriesLoaded = false;
 
   protected readonly options = computed<RouteSelectOption[]>(() => {
     this.translationService.revision();
@@ -71,13 +80,26 @@ export class RoutePickerComponent {
     if (APP_ROUTE_REGISTRY.some((route) => route.path === current)) {
       return 'page';
     }
+    if (CATEGORY_LINK_PATTERN.test(current)) {
+      return 'category';
+    }
     return PRODUCT_LINK_PATTERN.test(current) ? 'product' : 'custom';
   });
 
   protected readonly forcedMode = signal<RoutePickerMode | null>(null);
   protected readonly activeMode = computed<RoutePickerMode>(() => this.forcedMode() ?? this.mode());
 
+  /** The category id inside the current value, when it is a category link. */
+  protected readonly selectedCategoryId = computed(() => this.value()?.match(CATEGORY_LINK_PATTERN)?.[1] ?? null);
+
   constructor() {
+    // The category list is only fetched once the Category mode is on screen.
+    effect(() => {
+      if (this.activeMode() === 'category') {
+        void this.loadCategories();
+      }
+    });
+
     effect(() => {
       const match = this.value()?.match(PRODUCT_LINK_PATTERN);
       const productId = match?.[1] ?? null;
@@ -106,6 +128,30 @@ export class RoutePickerComponent {
       this.productApi.getProducts({ pageNumber: 1, pageSize: 20, searchTerm: event.query }),
     );
     this.productSuggestions.set([...result.items]);
+  }
+
+  protected selectCategory(categoryId: string | null): void {
+    this.emit(categoryId ? `/products?category=${categoryId}` : null);
+  }
+
+  private async loadCategories(): Promise<void> {
+    if (this.categoriesLoaded) {
+      return;
+    }
+    this.categoriesLoaded = true;
+    try {
+      const result = await firstValueFrom(this.categoryApi.getCategories({ pageNumber: 1, pageSize: 500, activeOnly: true }));
+      const byId = new Map<string, Category>(result.items.map((category) => [category.id, category]));
+      const label = (category: Category): string => {
+        const parent = category.parentId ? byId.get(category.parentId) : undefined;
+        return parent ? `${parent.nameEn} / ${category.nameEn}` : category.nameEn;
+      };
+      this.categoryOptions.set(
+        result.items.map((category) => ({ label: label(category), value: category.id })).sort((a, b) => a.label.localeCompare(b.label)),
+      );
+    } catch {
+      this.categoriesLoaded = false;
+    }
   }
 
   protected selectProduct(product: Product): void {

@@ -8,10 +8,15 @@
       }
 
       <ul #list class="platform-selector__grid" (scroll)="updateArrows()">
-        @for (item of config().items; track item.id) {
+        @for (item of visibleItems(); track item.id) {
           <li>
             @let target = linkTarget(item.linkUrl);
-            @if (target.external) {
+            @if (!item.linkUrl) {
+              <!-- No link chosen yet: the tile is only shown, it does not send the shopper anywhere. -->
+              <span class="platform-selector__item">
+                <ng-container *ngTemplateOutlet="tile; context: { $implicit: item }" />
+              </span>
+            } @else if (target.external) {
               <a class="platform-selector__item" [href]="item.linkUrl" rel="noopener">
                 <ng-container *ngTemplateOutlet="tile; context: { $implicit: item }" />
               </a>

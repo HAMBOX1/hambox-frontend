@@ -4988,6 +4988,7 @@
             "ICON_CLASS": "PrimeIcons class (e.g. pi pi-desktop)",
             "ICON_IMAGE": "Icon picture (optional — shown instead of the icon)",
             "LINK_URL": "Link URL",
+            "SHOW": "Show this tile on the store",
             "ADD_ITEM": "Add item",
             "REMOVE_ITEM": "Remove item"
           },
@@ -6057,6 +6058,8 @@
       "ROUTE_PICKER": {
         "MODE_PAGE": "Choose a page",
         "MODE_PRODUCT": "Product",
+        "MODE_CATEGORY": "Category",
+        "CATEGORY_PLACEHOLDER": "Choose a category...",
         "MODE_CUSTOM": "Custom link",
         "SELECT_PLACEHOLDER": "Search pages…",
         "PRODUCT_PLACEHOLDER": "Search products…",

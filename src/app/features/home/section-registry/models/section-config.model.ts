@@ -67,6 +67,8 @@ export interface PlatformSelectorItemConfig {
   readonly linkUrl: string;
   /** Optional picture shown instead of the icon (a brand logo, a coin…); the icon class is the fallback. */
   readonly imageUrl?: string | null;
+  /** The admin switched this tile off: it stays in the list (so it can be switched back on) but is not shown on the store. */
+  readonly hidden?: boolean;
 }
 
 export interface PlatformSelectorSectionConfig {

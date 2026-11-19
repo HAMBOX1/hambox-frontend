@@ -23,6 +23,16 @@
     <button
       type="button"
       class="route-picker__mode-btn"
+      [class.route-picker__mode-btn--active]="activeMode() === 'category'"
+      [disabled]="disabled()"
+      (click)="setMode('category')"
+    >
+      <i class="pi pi-th-large" aria-hidden="true"></i>
+      {{ 'ADMIN.PICKERS.ROUTE_PICKER.MODE_CATEGORY' | translate }}
+    </button>
+    <button
+      type="button"
+      class="route-picker__mode-btn"
       [class.route-picker__mode-btn--active]="activeMode() === 'custom'"
       [disabled]="disabled()"
       (click)="setMode('custom')"
@@ -62,6 +72,20 @@
       (completeMethod)="searchProducts($event)"
       (onSelect)="selectProduct($event.value)"
       (onClear)="emit(null)"
+    />
+  } @else if (activeMode() === 'category') {
+    <p-select
+      class="w-full"
+      [options]="[...categoryOptions()]"
+      optionLabel="label"
+      optionValue="value"
+      [filter]="true"
+      filterBy="label"
+      [showClear]="true"
+      [placeholder]="'ADMIN.PICKERS.ROUTE_PICKER.CATEGORY_PLACEHOLDER' | translate"
+      [ngModel]="selectedCategoryId()"
+      [disabled]="disabled()"
+      (ngModelChange)="selectCategory($event)"
     />
   } @else {
     <input

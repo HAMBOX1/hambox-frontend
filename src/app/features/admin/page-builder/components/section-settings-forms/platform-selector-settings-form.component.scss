@@ -72,3 +72,10 @@
 .cdk-drag-placeholder {
   opacity: 0.3;
 }
+
+.platform-selector-form__show {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}

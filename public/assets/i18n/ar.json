@@ -5033,6 +5033,7 @@
             "ICON_CLASS": "فئة PrimeIcons (مثال: pi pi-desktop)",
             "ICON_IMAGE": "صورة الأيقونة (اختياري — تظهر بدل الأيقونة)",
             "LINK_URL": "رابط",
+            "SHOW": "إظهار هذا المربع في المتجر",
             "ADD_ITEM": "إضافة عنصر",
             "REMOVE_ITEM": "إزالة العنصر"
           },
@@ -5931,6 +5932,8 @@
       "ROUTE_PICKER": {
         "MODE_PAGE": "اختر صفحة",
         "MODE_PRODUCT": "منتج",
+        "MODE_CATEGORY": "قسم",
+        "CATEGORY_PLACEHOLDER": "اختر قسمًا...",
         "MODE_CUSTOM": "رابط مخصص",
         "SELECT_PLACEHOLDER": "ابحث عن صفحة…",
         "PRODUCT_PLACEHOLDER": "ابحث عن منتج…",

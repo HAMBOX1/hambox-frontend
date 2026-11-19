@@ -60,4 +60,31 @@ describe('PlatformSelectorSectionComponent', () => {
 
     expect(fixture.nativeElement.querySelector('.platform-selector__arrow')).toBeNull();
   });
+
+  it('leaves out tiles the admin switched off', () => {
+    const fixture = create({
+      items: [
+        { id: 'a', label: 'Shown', iconClass: 'pi pi-box', linkUrl: '/products' },
+        { id: 'b', label: 'Hidden', iconClass: 'pi pi-box', linkUrl: '/products', hidden: true },
+      ],
+    });
+
+    const tiles = fixture.nativeElement.querySelectorAll('.platform-selector__item');
+    expect(tiles).toHaveLength(1);
+    expect(tiles[0].textContent).toContain('Shown');
+  });
+
+  it('links a tile to a category and does not link a tile that has no link', () => {
+    const fixture = create({
+      items: [
+        { id: 'a', label: 'Xbox', iconClass: 'pi pi-box', linkUrl: '/products?category=abc-123' },
+        { id: 'b', label: 'No link yet', iconClass: 'pi pi-box', linkUrl: '' },
+      ],
+    });
+
+    const tiles = fixture.nativeElement.querySelectorAll('.platform-selector__item');
+    expect(tiles[0].getAttribute('href')).toBe('/products?category=abc-123');
+    expect(tiles[1].tagName).toBe('SPAN');
+    expect(tiles[1].getAttribute('href')).toBeNull();
+  });
 });

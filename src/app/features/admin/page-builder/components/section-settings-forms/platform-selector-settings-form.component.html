@@ -16,6 +16,11 @@
         <i class="pi pi-bars platform-selector-form__handle" cdkDragHandle aria-hidden="true"></i>
 
         <div class="platform-selector-form__item-fields">
+          <label class="platform-selector-form__field platform-selector-form__field--wide platform-selector-form__show">
+            <input type="checkbox" [checked]="!item.hidden" [disabled]="disabled()" (change)="updateItem(i, { hidden: !$any($event.target).checked })" />
+            <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.SHOW' | translate }}</span>
+          </label>
+
           <label class="platform-selector-form__field">
             <span>{{ 'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.LABEL' | translate }}</span>
             <input

@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   ElementRef,
   OnDestroy,
   input,
@@ -23,6 +24,9 @@ import { PlatformSelectorSectionConfig } from '../../section-registry/models/sec
 })
 export class PlatformSelectorSectionComponent implements AfterViewInit, OnDestroy {
   readonly config = input.required<PlatformSelectorSectionConfig>();
+
+  /** The tiles the admin left switched on. */
+  protected readonly visibleItems = computed(() => this.config().items.filter((item) => !item.hidden));
 
   private readonly list = viewChild<ElementRef<HTMLElement>>('list');
   private resizeObserver?: ResizeObserver;
