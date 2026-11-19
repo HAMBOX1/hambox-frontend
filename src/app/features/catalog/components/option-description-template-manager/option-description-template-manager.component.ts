@@ -14,6 +14,7 @@ import {
   AdminSearchBarComponent,
 } from '../../../../shared/components/admin';
 import { OptionDescriptionTemplateDto } from '../../models/inventory-api.model';
+import { buildBasicEditorModules } from '../../../../core/editor/quill-config';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
 
 /**
@@ -45,6 +46,7 @@ import { ProductEditorFacade } from '../../services/product-editor.facade';
 })
 export class OptionDescriptionTemplateManagerComponent {
   private readonly facade = inject(ProductEditorFacade);
+  protected readonly editorModules = buildBasicEditorModules();
 
   readonly visible = input(false);
   readonly visibleChange = output<boolean>();

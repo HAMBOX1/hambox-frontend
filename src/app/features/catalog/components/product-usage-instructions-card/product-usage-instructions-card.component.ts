@@ -11,7 +11,9 @@ import { ApiError } from '../../../../core/models/api-error.model';
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import { AdminSectionCardComponent } from '../../../../shared/components/admin';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
+import { buildBasicEditorModules } from '../../../../core/editor/quill-config';
 import { ProductApiService } from '../../services/product-api.service';
+import { ProductInstructionsApiService } from '../../services/product-instructions-api.service';
 
 /**
  * The product's own "How to use" text: shown to every visitor on the product page, in the "How to Redeem" section, in
@@ -34,7 +36,7 @@ import { ProductApiService } from '../../services/product-api.service';
       @if (!productId()) {
         <p class="usage-card__hint">{{ 'ADMIN.CATALOG_UI.SAVE_THE_PRODUCT_FIRST_TO_START_WRITING_INST' | translate }}</p>
       } @else {
-        <p-editor [ngModel]="content()" (ngModelChange)="content.set($event ?? '')" [style]="{ height: '220px' }" />
+        <p-editor [ngModel]="content()" (ngModelChange)="content.set($event ?? '')" [modules]="editorModules" [style]="{ height: '220px' }" />
 
         <div class="usage-card__actions">
           <button
@@ -92,6 +94,25 @@ export class ProductUsageInstructionsCardComponent {
   private readonly productApi = inject(ProductApiService);
   private readonly messageService = inject(MessageService);
   private readonly translate = inject(TranslateService);
+  private readonly instructionsApi = inject(ProductInstructionsApiService);
+
+  protected readonly editorModules = buildBasicEditorModules(async (file) => {
+    const productId = this.productId();
+    if (!productId) {
+      return null;
+    }
+    try {
+      return (await firstValueFrom(this.instructionsApi.uploadImage(productId, file))).url;
+    } catch (error) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Could not upload the picture',
+        detail: error instanceof ApiError && error.message ? error.message : 'Use a JPG, PNG or WebP image.',
+        life: 5000,
+      });
+      return null;
+    }
+  });
 
   protected readonly permissions = PERMISSIONS;
 

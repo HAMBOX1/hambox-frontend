@@ -40,6 +40,62 @@ interface QuillToolbarHandlerContext {
   };
 }
 
+/**
+ * Picks an image, uploads it and inserts the returned address at the cursor. Quill's own image button embeds the picture
+ * as a base64 string inside the text (tens of thousands of characters, which the server refuses and never stores), so every
+ * editor that offers pictures goes through here instead.
+ */
+function insertUploadedImage(
+  quill: QuillToolbarHandlerContext['quill'],
+  uploadImage: (file: File) => Promise<string | null>,
+): void {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+    const range = quill.getSelection(true);
+    const index = range?.index ?? quill.getLength();
+    const url = await uploadImage(file);
+    if (!url) {
+      return;
+    }
+    quill.insertEmbed(index, 'image', url, 'user');
+    quill.setSelection(index + 1, 0, 'user');
+  };
+  input.click();
+}
+
+/**
+ * The plain editor used for short customer-facing texts (option / group instructions, usage text, category instructions,
+ * reusable descriptions): headings, bold / italic / underline, lists and links. With `uploadImage` it also offers a picture
+ * button that uploads the file and stores its address; without it there is no picture button at all, so a picture can never
+ * be pasted in as an oversized inline string that would not save.
+ */
+export function buildBasicEditorModules(uploadImage?: (file: File) => Promise<string | null>) {
+  return {
+    toolbar: {
+      container: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        uploadImage ? ['link', 'image'] : ['link'],
+        ['clean'],
+      ],
+      handlers: uploadImage
+        ? {
+            image(this: QuillToolbarHandlerContext) {
+              insertUploadedImage(this.quill, uploadImage);
+            },
+          }
+        : {},
+    },
+  };
+}
+
 /** Builds the shared Quill `modules` config for the product instructions editor (admin panel + preview). */
 export function buildProductInstructionsEditorModules(uploadImage: (file: File) => Promise<string | null>) {
   registerHamboxQuillFormats();
@@ -58,25 +114,7 @@ export function buildProductInstructionsEditorModules(uploadImage: (file: File) 
       ],
       handlers: {
         image(this: QuillToolbarHandlerContext) {
-          const quill = this.quill;
-          const input = document.createElement('input');
-          input.type = 'file';
-          input.accept = 'image/*';
-          input.onchange = async () => {
-            const file = input.files?.[0];
-            if (!file) {
-              return;
-            }
-            const range = quill.getSelection(true);
-            const index = range?.index ?? quill.getLength();
-            const url = await uploadImage(file);
-            if (!url) {
-              return;
-            }
-            quill.insertEmbed(index, 'image', url, 'user');
-            quill.setSelection(index + 1, 0, 'user');
-          };
-          input.click();
+          insertUploadedImage(this.quill, uploadImage);
         },
         video(this: QuillToolbarHandlerContext) {
           const rawUrl = window.prompt('Paste a YouTube link');

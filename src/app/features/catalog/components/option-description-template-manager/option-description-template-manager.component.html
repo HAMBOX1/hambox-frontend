@@ -27,6 +27,7 @@
       <p-editor
         [ngModel]="editDescriptionHtml()"
         (ngModelChange)="editDescriptionHtml.set($event)"
+        [modules]="editorModules"
         [style]="{ height: '160px' }"
       />
     </div>

@@ -558,7 +558,7 @@
     color: var(--sf-accent);
   }
 
-  img {
+  ::ng-deep img {
     max-width: 100%;
     height: auto;
     border-radius: var(--sf-radius-md);
@@ -774,6 +774,15 @@
 
   ::ng-deep a {
     color: var(--color-primary) !important;
+  }
+
+  // Pictures added in the instructions editor: never wider than the dialog.
+  ::ng-deep img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0.5rem 0;
+    border-radius: var(--sf-radius-md);
   }
 }
 

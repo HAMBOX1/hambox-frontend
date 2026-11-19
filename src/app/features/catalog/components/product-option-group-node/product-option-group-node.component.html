@@ -89,8 +89,12 @@
     <p-editor
       [ngModel]="groupInstructionsDraft()"
       (ngModelChange)="groupInstructionsDraft.set($event)"
+      [modules]="editorModules"
       [style]="{ height: '180px' }"
     />
+    @if (editorImageError(); as imageError) {
+      <p class="question-card__save-template-error">{{ imageError }}</p>
+    }
     <label class="instructions-dialog__inline-toggle">
       <p-checkbox [binary]="true" [ngModel]="groupInstructionsInline()" (ngModelChange)="groupInstructionsInline.set($event)" />
       {{ 'ADMIN.CATALOG_UI.IMPORTANT_SHOW_THIS_DIRECTLY_ON_THE_PRODUCT' | translate }}
@@ -184,8 +188,12 @@
     <p-editor
       [ngModel]="instructionsDraft()"
       (ngModelChange)="instructionsDraft.set($event)"
+      [modules]="editorModules"
       [style]="{ height: '180px' }"
     />
+    @if (editorImageError(); as imageError) {
+      <p class="question-card__save-template-error">{{ imageError }}</p>
+    }
     <label class="instructions-dialog__inline-toggle">
       <p-checkbox [binary]="true" [ngModel]="instructionsInline()" (ngModelChange)="instructionsInline.set($event)" />
       {{ 'ADMIN.CATALOG_UI.IMPORTANT_SHOW_THIS_DIRECTLY_ON_THE_PRODUCT' | translate }}

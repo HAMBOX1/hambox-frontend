@@ -61,8 +61,12 @@
     <p-editor
       [ngModel]="groupInstructionsDraft()"
       (ngModelChange)="groupInstructionsDraft.set($event)"
+      [modules]="editorModules"
       [style]="{ height: '180px' }"
     />
+    @if (editorImageError(); as imageError) {
+      <p class="admin-field__hint">{{ imageError }}</p>
+    }
     <div class="admin-dialog__actions">
       <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="savingGroupInstructions()" (click)="closeGroupInstructions()"></button>
       <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" icon="pi pi-check" [loading]="savingGroupInstructions()" (click)="saveGroupInstructions()"></button>
@@ -116,8 +120,12 @@
     <p-editor
       [ngModel]="instructionsDraft()"
       (ngModelChange)="instructionsDraft.set($event)"
+      [modules]="editorModules"
       [style]="{ height: '180px' }"
     />
+    @if (editorImageError(); as imageError) {
+      <p class="admin-field__hint">{{ imageError }}</p>
+    }
     <div class="admin-dialog__actions">
       <button pButton type="button" [label]="'ADMIN.CATALOG_UI.CANCEL' | translate" severity="secondary" [disabled]="savingInstructions()" (click)="closeInstructions()"></button>
       <button pButton type="button" [label]="'ADMIN.CATALOG_UI.SAVE' | translate" icon="pi pi-check" [loading]="savingInstructions()" (click)="saveInstructions()"></button>

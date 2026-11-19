@@ -20,6 +20,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { buildBasicEditorModules } from '../../../../core/editor/quill-config';
 import { AdminErrorAlertComponent, AdminSectionCardComponent } from '../../../../shared/components/admin';
 import { MediaPickerComponent } from '../../../../shared/components/admin/media-picker/media-picker.component';
 import { Category, CategoryOption, CreateCategoryRequest, UpdateCategoryRequest } from '../../models/category.model';
@@ -60,6 +61,7 @@ const FIELD_LABELS = {
 })
 export class CategoryCreateFormComponent {
   private readonly fb = inject(FormBuilder);
+  protected readonly editorModules = buildBasicEditorModules();
   private readonly categoryApi = inject(CategoryApiService);
 
   private readonly imageInput = viewChild<ElementRef<HTMLInputElement>>('categoryImageInput');

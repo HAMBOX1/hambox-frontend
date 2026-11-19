@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { ApiError } from '../../../../core/models/api-error.model';
 import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
@@ -16,7 +18,9 @@ import { AdminActionMenuComponent, AdminConfirmDialogComponent, AdminIconButtonC
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { LongPressDirective } from '../../../../shared/directives/long-press.directive';
 import { OptionDescriptionTemplateDto, ProductOptionDto, ProductOptionGroupDto } from '../../models/inventory-api.model';
+import { buildBasicEditorModules } from '../../../../core/editor/quill-config';
 import { ProductEditorFacade } from '../../services/product-editor.facade';
+import { ProductInstructionsApiService } from '../../services/product-instructions-api.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { slugify } from '../../utils/product-display.utils';
 
@@ -52,6 +56,19 @@ import { slugify } from '../../utils/product-display.utils';
 })
 export class ProductOptionMobileGroupCardComponent {
   private readonly facade = inject(ProductEditorFacade);
+  private readonly instructionsApi = inject(ProductInstructionsApiService);
+
+  /** Pictures in an instructions text are uploaded and stored by address, never embedded inside the text. */
+  protected readonly editorImageError = signal<string | null>(null);
+  protected readonly editorModules = buildBasicEditorModules(async (file) => {
+    this.editorImageError.set(null);
+    try {
+      return (await firstValueFrom(this.instructionsApi.uploadImage(this.group().productId, file))).url;
+    } catch (error) {
+      this.editorImageError.set(error instanceof ApiError && error.message ? error.message : 'Could not upload the picture. Use a JPG, PNG or WebP image.');
+      return null;
+    }
+  });
   private readonly permissionService = inject(PermissionService);
   private suppressToggleClick = false;
 
