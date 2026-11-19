@@ -5,7 +5,8 @@
  */
 
 /** `categories` swaps the section's cards for category cards (the picked categories, or every active one). */
-export type SectionProductSource = 'auto' | 'manual' | 'category' | 'internal' | 'categories';
+/** `all` draws from every active product of the store (newest first, or rotated); `auto` is the page's default featured set. */
+export type SectionProductSource = 'auto' | 'manual' | 'category' | 'internal' | 'categories' | 'all';
 export type SectionProductRotation = 'none' | 'daily' | 'random';
 export type SectionButtonAlign = 'start' | 'center' | 'end';
 /** Small / Medium match the site's usual buttons; Large matches the big hero buttons. */
@@ -139,7 +140,7 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
     buttonTextBelow: text(raw.buttonTextBelow),
     products: products
       ? {
-          source: ['manual', 'category', 'internal', 'categories'].includes(products.source as string)
+          source: ['manual', 'category', 'internal', 'categories', 'all'].includes(products.source as string)
             ? (products.source as SectionProductSource)
             : 'auto',
           productIds: Array.isArray(products.productIds) ? products.productIds.filter((id) => typeof id === 'string') : [],

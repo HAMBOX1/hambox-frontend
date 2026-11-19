@@ -1,6 +1,15 @@
 import { pickRotated } from '../../services/section-product-source.service';
 import { DEFAULT_SECTION_COMMON, readSectionCommon } from './section-common.model';
 
+describe('readSectionCommon: product source "all"', () => {
+  it('accepts the whole-store source and keeps its limit', () => {
+    const common = readSectionCommon({ _common: { products: { source: 'all', limit: 5, rotation: 'random' } } });
+
+    expect(common.products?.source).toBe('all');
+    expect(common.products?.limit).toBe(5);
+  });
+});
+
 describe('readSectionCommon: text, font and button extras', () => {
   it('defaults to the design text, no extra button text and the section-default font', () => {
     expect(readSectionCommon({})).toMatchObject({

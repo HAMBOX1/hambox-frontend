@@ -286,7 +286,8 @@ import {
         <div class="common__row">
           <label for="common-source">Show</label>
           <select id="common-source" [disabled]="disabled()" [ngModel]="products().source" (ngModelChange)="patchProducts({ source: $event })">
-            <option value="auto">Default featured products</option>
+            <option value="auto">Default featured products (e.g. only the ones on sale)</option>
+            <option value="all">All products of the store</option>
             <option value="manual">Products I choose</option>
             <option value="category">A category</option>
             <option value="internal">An internal category</option>
@@ -335,6 +336,10 @@ import {
             (ngModelChange)="patchProducts({ limit: $event })"
           />
         </div>
+
+        @if (products().source === 'auto') {
+          <small>"Default featured" can only show as many products as the page features by default (for example the ones on sale). To show more, choose "All products of the store".</small>
+        }
 
         @if (products().source !== 'manual' && (products().source !== 'categories' || products().categoryIds.length === 0)) {
           <div class="common__row">

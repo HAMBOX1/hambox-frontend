@@ -122,6 +122,12 @@ export class SectionProductSourceService {
           : pickRotated(defaults, config.limit, config.rotation);
       }
 
+      if (config.source === 'all') {
+        // Every active product of the store: not just the few the page features by default (e.g. only what is on sale).
+        const page = await firstValueFrom(this.productApi.getProducts({ pageNumber: 1, pageSize: POOL_SIZE, status: 'Active', sortBy: 'Newest' }));
+        return pickRotated(page.items, config.limit, config.rotation).map((product, index) => mapProductToFlashDeal(product, lang, index));
+      }
+
       if (config.source === 'categories') {
         return await this.resolveCategories(config);
       }
