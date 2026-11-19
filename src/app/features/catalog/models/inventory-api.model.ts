@@ -318,6 +318,11 @@ export interface ImportCodeDuplicateDto {
   readonly productName: string;
   readonly variantName: string;
   readonly batchName: string | null;
+  /** The product the existing code lives in (null when it was deleted). */
+  readonly productId?: string | null;
+  /** When the existing code was added, and by which admin ("Name (email)"). */
+  readonly addedOnUtc?: string | null;
+  readonly addedBy?: string | null;
 }
 
 /** One line the import refused: position is 1-based in the submitted list; the code is masked. */

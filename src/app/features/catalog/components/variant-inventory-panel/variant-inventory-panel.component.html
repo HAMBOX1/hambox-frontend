@@ -530,6 +530,11 @@
                     {{ 'ADMIN.CATALOG_UI.BATCH_2' | translate }} <strong>{{ dup.batchName }}</strong>
                   </span>
                 }
+                @if (dup.addedOnUtc) {
+                  <span class="variant-inventory-panel__import-duplicate-meta">
+                    Added <strong>{{ dup.addedOnUtc | date: 'medium' }}</strong>@if (dup.addedBy) { by <strong>{{ dup.addedBy }}</strong> }
+                  </span>
+                }
               </li>
             }
           </ul>

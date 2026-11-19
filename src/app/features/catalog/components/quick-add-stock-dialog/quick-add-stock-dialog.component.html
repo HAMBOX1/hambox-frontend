@@ -105,7 +105,40 @@
     @if (result(); as r) {
       <p class="admin-dialog__hint" role="status">
         {{ r.importedCount }} added{{ r.duplicateCount ? ' • ' + r.duplicateCount + ' skipped (already exist)' : '' }}{{ r.invalidCount ? ' • ' + r.invalidCount + ' invalid' : '' }}.
+        @if (r.duplicates.length) {
+          <button type="button" class="quick-stock__where" (click)="duplicatesOpen.set(!duplicatesOpen())">
+            <i class="pi pi-search" aria-hidden="true"></i> {{ duplicatesOpen() ? 'Hide details' : 'Where are they?' }}
+          </button>
+        }
       </p>
+      @if (duplicatesOpen() && r.duplicates.length) {
+        <div class="quick-stock__duplicates">
+          <div class="quick-stock__duplicates-head">
+            <span>Codes that already exist: where, when and by whom they were added</span>
+            <button type="button" class="quick-stock__where" (click)="downloadDuplicates(r.duplicates)">
+              <i class="pi pi-download" aria-hidden="true"></i> Download list (CSV)
+            </button>
+          </div>
+          <ul>
+            @for (dup of r.duplicates; track $index) {
+              <li>
+                <code>{{ dup.code }}</code>
+                <span>
+                  @if (dup.productId) {
+                    <a [href]="'/admin/products/' + dup.productId + '/edit'" target="_blank" rel="noopener"><strong>{{ dup.productName }}</strong></a>
+                  } @else {
+                    <strong>{{ dup.productName }}</strong>
+                  }
+                  · {{ dup.variantName }}{{ dup.batchName ? ' · batch ' + dup.batchName : '' }}
+                </span>
+                <span class="quick-stock__duplicates-meta">
+                  Added {{ dup.addedOnUtc ? (dup.addedOnUtc | date: 'medium') : 'at an unknown time' }}{{ dup.addedBy ? ' by ' + dup.addedBy : '' }}
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
     }
     @if (error(); as message) {
       <p class="admin-dialog__error" role="alert">{{ message }}</p>

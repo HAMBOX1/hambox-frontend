@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,7 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiError } from '../../../../core/models/api-error.model';
-import { ImportCodesResultDto, ProductVariantDto } from '../../models/inventory-api.model';
+import { ImportCodeDuplicateDto, ImportCodesResultDto, ProductVariantDto } from '../../models/inventory-api.model';
 import { Product } from '../../models/product.model';
 import { readCodeFile } from '../../utils/read-code-file';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -27,7 +28,7 @@ interface VariantChoice {
 @Component({
   selector: 'app-quick-add-stock-dialog',
   standalone: true,
-  imports: [TranslatePipe, FormsModule, ButtonModule, DialogModule, SelectModule],
+  imports: [TranslatePipe, FormsModule, ButtonModule, DialogModule, SelectModule, DatePipe],
   templateUrl: './quick-add-stock-dialog.component.html',
   styleUrl: './quick-add-stock-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +52,8 @@ export class QuickAddStockDialogComponent {
   protected readonly multiLine = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly result = signal<ImportCodesResultDto | null>(null);
+  /** The "Where are they?" list of codes that were skipped because they already exist. */
+  protected readonly duplicatesOpen = signal(false);
   protected readonly downloading = signal(false);
   protected readonly downloadNote = signal<string | null>(null);
 
@@ -84,6 +87,7 @@ export class QuickAddStockDialogComponent {
       this.multiLine.set(false);
       this.error.set(null);
       this.result.set(null);
+      this.duplicatesOpen.set(false);
       if (product) {
         void this.loadVariants(product.id);
       }
@@ -135,6 +139,25 @@ export class QuickAddStockDialogComponent {
     } finally {
       this.saving.set(false);
     }
+  }
+
+  /** The skipped codes with where / when / who as a CSV, so the list can be kept or shared. */
+  protected downloadDuplicates(duplicates: readonly ImportCodeDuplicateDto[]): void {
+    const cell = (value: string): string => {
+      // A cell that starts with = + - @ would run as a formula in a spreadsheet: neutralise it.
+      const safe = /^[=+\-@]/.test(value) ? `'${value}` : value;
+      return /[",\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
+    };
+    const rows = duplicates.map((dup) =>
+      [dup.code, dup.productName, dup.variantName, dup.batchName ?? '', dup.addedOnUtc ?? '', dup.addedBy ?? ''].map(cell).join(','),
+    );
+    const csv = ['Code,Product,Variant,Batch,AddedOnUtc,AddedBy', ...rows].join('\n');
+    const url = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'codes-already-in-stock.csv';
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   protected openEditor(): void {
