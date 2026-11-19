@@ -102,11 +102,6 @@
 // Tablet: sidebar renders as a drawer here, not inline, so it never affects
 // column count — comfortable gets 3, compact gets 4.
 @media (min-width: 768px) {
-  .storefront-store__grid--dense {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-
   .storefront-store__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
@@ -115,6 +110,13 @@
   .storefront-store__grid--compact {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
+  }
+
+  // Last, so it is not overridden by the plain grid rule above (same specificity: the later one wins). It used to come
+  // first, which made "dense" show 3 columns, fewer than "compact".
+  .storefront-store__grid--dense {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 }
 
@@ -182,9 +184,15 @@
   }
 }
 
+// The smallest cards always show the most per row: 3 (comfortable) < 4 (compact) < 5 / 6 (dense). The two selectors above
+// that pin the column count while the sidebar is open also match the dense grid, so these must be at least as specific
+// or "dense" would fall back to 3 columns, fewer than "compact".
 @media (min-width: 992px) {
-  .storefront-store__content .storefront-store__grid--dense,
-  .storefront-store__content--filters-collapsed .storefront-store__grid--dense {
+  .storefront-store__content:not(.storefront-store__content--filters-collapsed) .storefront-store__grid.storefront-store__grid--dense {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .storefront-store__content--filters-collapsed .storefront-store__grid.storefront-store__grid--dense {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
