@@ -85,14 +85,15 @@
       <p class="quick-stock__hint">{{ 'ADMIN.CATALOG_UI.UPLOAD_PICTURES_HINT' | translate }}</p>
       <textarea
         id="quick-stock-codes"
-        class="admin-field__input"
+        class="admin-field__input quick-stock__codes"
+        [class.quick-stock__codes--single]="multiLine()"
         rows="7"
         style="width:100%;font-family:monospace"
         [placeholder]="multiLine() ? 'Paste one account / multi-line entry' : 'One code per line'"
         [ngModel]="codesText()"
         (ngModelChange)="codesText.set($event)"
       ></textarea>
-      <label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem">
+      <label class="quick-stock__single-toggle" [class.is-on]="multiLine()" style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem">
         <input type="checkbox" [checked]="multiLine()" (change)="multiLine.set($any($event.target).checked)" />
         <span>{{ 'ADMIN.CATALOG_UI.THE_WHOLE_TEXT_IS_ONE_ENTRY_E_G_ACCOUNT_WITH' | translate }}</span>
       </label>
