@@ -1467,6 +1467,24 @@ export class ProductEditorFacade {
 
 
 
+  /** Saves the note shoppers see on the product page for this variant, then refreshes the variant list. */
+  async setVariantDescription(variantId: string, descriptionHtml: string | null, showInline: boolean): Promise<boolean> {
+    const productId = this.productId();
+    if (!productId) {
+      return false;
+    }
+
+    try {
+      await firstValueFrom(this.inventoryApi.setVariantDescription(variantId, { descriptionHtml, showDescriptionInline: showInline }));
+      await this.reloadInventory(productId);
+      await this.selectVariant(variantId);
+      return true;
+    } catch (error) {
+      this.errorState.set(this.toErrorMessage(error, 'Failed to save the variant instructions.'));
+      return false;
+    }
+  }
+
   async setVariantFulfillmentMode(variantId: string, mode: FulfillmentMode): Promise<boolean> {
     const productId = this.productId();
     if (!productId) {

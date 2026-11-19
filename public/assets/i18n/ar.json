@@ -249,6 +249,7 @@
     "SKU_LABEL": "رمز المنتج: {{sku}}",
     "DELIVERY_ESTIMATE": "التسليم المتوقع: فوري بعد الدفع",
     "VARIANTS_CONFIGURING": "جارٍ إعداد خيارات هذا المنتج. يرجى العودة لاحقاً.",
+    "VARIANT_INFORMATION": "عن اختيارك",
     "OPTION_IMPORTANT_INFORMATION": "معلومات هامة",
     "IMPORTANT_INFO_HINT": "{{count}} ملاحظة على الاختيارات اللي اخترتها — اقراها قبل الشراء",
     "HOW_TO_REDEEM": "كيفية الاستخدام",

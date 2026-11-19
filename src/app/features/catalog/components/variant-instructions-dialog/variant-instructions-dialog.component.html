@@ -11,6 +11,42 @@
   styleClass="admin-dialog"
 >
   @if (visible() && variant(); as v) {
-    <app-product-instructions-panel [productId]="productId()" [variantId]="v.id" />
+    <section class="vi__section">
+      <h3 class="vi__title">Shown on the product page</h3>
+      <p class="vi__hint">
+        Customers read this note on the product page while this exact variant is selected, just like the instructions of an
+        option. Save it with the button below: it takes effect immediately.
+      </p>
+      <p-editor
+        [ngModel]="pageNote()"
+        (ngModelChange)="onNoteChange($event)"
+        [modules]="editorModules"
+        [style]="{ height: '180px' }"
+      />
+      <label class="vi__check">
+        <p-checkbox [binary]="true" [ngModel]="pageNoteInline()" (ngModelChange)="pageNoteInline.set($event)" />
+        Important: show it directly under the options (instead of behind "Important information")
+      </label>
+      @if (error(); as message) {
+        <p class="vi__error" role="alert">{{ message }}</p>
+      }
+      <div class="vi__actions">
+        <button pButton type="button" label="Save" icon="pi pi-check" [loading]="saving()" [disabled]="!dirty() || saving()" (click)="savePageNote()"></button>
+        @if (justSaved()) {
+          <span class="vi__saved">Saved. Customers see it now.</span>
+        } @else if (dirty()) {
+          <span class="vi__hint">Not saved yet.</span>
+        }
+      </div>
+    </section>
+
+    <section class="vi__section">
+      <h3 class="vi__title">Guide for customers who bought it</h3>
+      <p class="vi__hint">
+        A private guide (activation steps, links...). Only customers who bought this variant can open it, from My Library.
+        It needs a title, is saved automatically, and must be published with the Publish button to become visible.
+      </p>
+      <app-product-instructions-panel [productId]="productId()" [variantId]="v.id" />
+    </section>
   }
 </p-dialog>

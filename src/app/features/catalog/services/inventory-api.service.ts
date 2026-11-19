@@ -38,6 +38,7 @@ import {
   ReorderIdsRequest,
   RevealInventoryCodeDto,
   SaveOptionGroupAsTemplateRequest,
+  SetVariantDescriptionRequest,
   SetVariantFulfillmentModeRequest,
   StorefrontProductConfigurationDto,
   UpdateOptionDescriptionTemplateRequest,
@@ -133,6 +134,10 @@ export class InventoryApiService {
 
   setVariantFulfillmentMode(variantId: string, request: SetVariantFulfillmentModeRequest): Observable<void> {
     return this.api.put<void>(INVENTORY_API.variantFulfillmentMode(variantId), request);
+  }
+
+  setVariantDescription(variantId: string, request: SetVariantDescriptionRequest): Observable<void> {
+    return this.api.put<void>(INVENTORY_API.variantDescription(variantId), request);
   }
 
   getVariantUsage(variantId: string): Observable<VariantUsageDto> {

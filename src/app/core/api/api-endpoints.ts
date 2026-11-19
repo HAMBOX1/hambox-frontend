@@ -126,6 +126,7 @@ export const INVENTORY_API = {
   variantArchive: (variantId: string) => `/api/v1/inventory/variants/${variantId}/archive`,
   variantUsage: (variantId: string) => `/api/v1/inventory/variants/${variantId}/usage`,
   variantFulfillmentMode: (variantId: string) => `/api/v1/inventory/variants/${variantId}/fulfillment-mode`,
+  variantDescription: (variantId: string) => `/api/v1/inventory/variants/${variantId}/description`,
   variantCleanup: (variantId: string) => `/api/v1/inventory/variants/${variantId}/cleanup`,
   productOptionGroups: (productId: string) =>
     `/api/v1/inventory/products/${productId}/option-groups`,

@@ -255,6 +255,7 @@
     "SKU_LABEL": "SKU: {{sku}}",
     "DELIVERY_ESTIMATE": "Estimated delivery: Instant after payment",
     "VARIANTS_CONFIGURING": "Variants for this product are being configured. Check back soon.",
+    "VARIANT_INFORMATION": "About this selection",
     "OPTION_IMPORTANT_INFORMATION": "Important information",
     "IMPORTANT_INFO_HINT": "{{count}} note(s) for the options you chose — please read before buying",
     "HOW_TO_REDEEM": "How to Redeem",

@@ -557,6 +557,18 @@ export class ProductDetailsPageComponent {
       }
     }
 
+    // The note written for the exact variant the customer has landed on (e.g. "Delivered within 5 minutes").
+    const variant = this.variantFacade.resolved().variant;
+    if (variant?.descriptionHtml) {
+      this.translation.language();
+      sections.push({
+        groupLabel: this.translate.instant('PRODUCT.VARIANT_INFORMATION'),
+        optionLabel: null,
+        descriptionHtml: variant.descriptionHtml,
+        inline: variant.showDescriptionInline ?? false,
+      });
+    }
+
     return sections;
   });
 

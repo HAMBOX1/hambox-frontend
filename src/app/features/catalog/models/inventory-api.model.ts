@@ -62,6 +62,14 @@ export interface ProductVariantDto {
   readonly isOutOfStock: boolean;
   readonly optionIds: readonly string[];
   readonly fulfillmentMode: FulfillmentMode;
+  /** Note shoppers see on the product page while this exact variant is selected. */
+  readonly descriptionHtml?: string | null;
+  readonly showDescriptionInline?: boolean;
+}
+
+export interface SetVariantDescriptionRequest {
+  readonly descriptionHtml: string | null;
+  readonly showDescriptionInline: boolean;
 }
 
 export interface SetVariantFulfillmentModeRequest {
@@ -166,6 +174,8 @@ export interface StorefrontVariantDto {
   readonly isOutOfStock: boolean;
   readonly optionIds: readonly string[];
   readonly isCompleteCombination: boolean;
+  readonly descriptionHtml?: string | null;
+  readonly showDescriptionInline?: boolean;
 }
 
 export interface StorefrontProductConfigurationDto {
