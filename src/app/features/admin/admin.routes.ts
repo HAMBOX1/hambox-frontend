@@ -164,6 +164,11 @@ export const routes: Routes = [
       import('./memberships/admin-memberships.routes').then((m) => m.routes),
   },
   {
+    path: 'customers',
+    loadChildren: () =>
+      import('./customers/admin-customers.routes').then((m) => m.routes),
+  },
+  {
     path: 'referrals',
     loadChildren: () =>
       import('./referrals/admin-referrals.routes').then((m) => m.routes),

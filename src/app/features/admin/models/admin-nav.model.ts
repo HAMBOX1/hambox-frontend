@@ -14,6 +14,7 @@ export type AdminNavId =
   | 'floating-ads'
   | 'memberships'
   | 'referrals'
+  | 'customers'
   | 'reviews'
   | 'themes'
   | 'campaigns'
@@ -125,6 +126,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     route: '/admin/memberships',
     icon: 'pi pi-id-card',
     permission: PERMISSIONS.Memberships.View,
+  },
+  {
+    id: 'customers',
+    labelKey: 'ADMIN.NAV.CUSTOMERS',
+    route: '/admin/customers',
+    icon: 'pi pi-users',
+    permission: PERMISSIONS.Security.ManageUsers,
   },
   {
     id: 'referrals',
@@ -283,7 +291,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     id: 'sales',
     labelKey: 'ADMIN.NAV.GROUP_SALES',
     icon: 'pi pi-receipt',
-    itemIds: ['orders', 'support', 'reviews', 'payment-gateways', 'communication', 'whatsapp', 'operations'],
+    itemIds: ['customers', 'orders', 'support', 'reviews', 'payment-gateways', 'communication', 'whatsapp', 'operations'],
   },
   {
     id: 'security',
