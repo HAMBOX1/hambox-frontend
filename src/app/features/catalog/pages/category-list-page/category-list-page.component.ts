@@ -14,7 +14,7 @@ import {
   UpdateCategoryRequest,
 } from '../../models/category.model';
 import { CategoryListFacade } from '../../services/category-list.facade';
-import { exportCategoriesToCsv } from '../../utils/category-export.util';
+import { exportCategoriesToCsv, exportCategoriesToXlsx } from '../../utils/category-export.util';
 import { HasPermissionDirective } from '../../../../shared/directives/has-permission.directive';
 import { PERMISSIONS } from '../../../../core/permissions/permission.constants';
 import {
@@ -104,6 +104,11 @@ export class CategoryListPageComponent implements OnInit {
   /** Opens the import wizard with "Categories" already chosen (it offers the Excel template and the upload). */
   protected importCategories(): void {
     void this.router.navigate(['/admin/products/import'], { queryParams: { entity: 'Categories' } });
+  }
+
+  /** Excel export: a tab per category that has sub-categories (re-imports through "Import categories"). */
+  protected exportCategoriesExcel(): void {
+    void exportCategoriesToXlsx(this.flatItems());
   }
 
   protected exportCategories(): void {

@@ -16,6 +16,13 @@
     />
     <app-admin-icon-button
       adminHeaderActions
+      icon="pi pi-file-excel"
+      label="Export categories (Excel, a tab per parent)"
+      severity="secondary"
+      (pressed)="exportCategoriesExcel()"
+    />
+    <app-admin-icon-button
+      adminHeaderActions
       *hamboxHasPermission="permissions.Catalog.Categories.Create"
       icon="pi pi-upload"
       label="Import categories (Excel)"
