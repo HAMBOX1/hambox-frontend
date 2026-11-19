@@ -73,4 +73,40 @@ describe('PopularCategoriesVariantDefaultComponent', () => {
 
     expect(titles(fixture).map((t) => t.title)).toEqual(['Store 1', 'Store 2']);
   });
+
+  it("applies the section's own maximum: 4 of the store's categories show only 4", () => {
+    const many = Array.from({ length: 8 }, (_, i) => storeCategory(i + 1));
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        { provide: CategoryApiService, useValue: { getCategories: () => of({ items: [] }) } },
+        { provide: TranslationService, useValue: { language: () => 'en' } },
+      ],
+    });
+    const fixture = TestBed.createComponent(PopularCategoriesVariantDefaultComponent);
+    fixture.componentRef.setInput('context', { ...context, categories: many });
+    fixture.componentRef.setInput('config', { sectionTitle: 'T', maximumCategories: 4, sortOrder: 'manual' });
+    fixture.detectChanges();
+
+    expect(titles(fixture).map((t) => t.title)).toEqual(['Store 1', 'Store 2', 'Store 3', 'Store 4']);
+  });
+
+  it('sorts the automatic list by name before cutting it to the maximum', () => {
+    const list = ['Charlie', 'Alpha', 'Bravo'].map((title, i) => ({ id: `s${i}`, title, subtitle: '', imageUrl: '', route: '/products' }));
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        { provide: CategoryApiService, useValue: { getCategories: () => of({ items: [] }) } },
+        { provide: TranslationService, useValue: { language: () => 'en' } },
+      ],
+    });
+    const fixture = TestBed.createComponent(PopularCategoriesVariantDefaultComponent);
+    fixture.componentRef.setInput('context', { ...context, categories: list });
+    fixture.componentRef.setInput('config', { sectionTitle: 'T', maximumCategories: 2, sortOrder: 'NameAsc' });
+    fixture.detectChanges();
+
+    expect(titles(fixture).map((t) => t.title)).toEqual(['Alpha', 'Bravo']);
+  });
 });

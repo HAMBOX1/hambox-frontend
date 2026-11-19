@@ -1640,7 +1640,7 @@
           "BODY_AR": "Body (Arabic)"
         },
         "MESSAGES": {
-          "SAVED": "Draft saved.",
+          "SAVED": "Draft saved. It is NOT live yet: press Publish to show it on the store.",
           "SAVE_FAILED": "Failed to save draft.",
           "PUBLISHED": "Template published.",
           "PUBLISH_FAILED": "Failed to publish template.",

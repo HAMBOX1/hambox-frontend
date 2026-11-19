@@ -96,8 +96,18 @@ function parseConfigJson(json: string | null | undefined): unknown {
               @if (common().buttonTextAbove; as above) {
                 <p class="section-common-cta__text">{{ above }}</p>
               }
-              @if (common().buttonLabel && common().buttonUrl) {
-                @if (isInternalLink(common().buttonUrl!)) {
+              @if (common().buttonUrl && (common().buttonLabel || common().buttonImageUrl)) {
+                @if (common().buttonImageUrl; as image) {
+                  @if (isInternalLink(common().buttonUrl!)) {
+                    <a class="section-common-cta__image" [routerLink]="common().buttonUrl" [attr.aria-label]="common().buttonLabel">
+                      <img [src]="image" [alt]="common().buttonLabel ?? ''" loading="lazy" />
+                    </a>
+                  } @else {
+                    <a class="section-common-cta__image" [href]="common().buttonUrl" rel="noopener" [attr.aria-label]="common().buttonLabel">
+                      <img [src]="image" [alt]="common().buttonLabel ?? ''" loading="lazy" />
+                    </a>
+                  }
+                } @else if (isInternalLink(common().buttonUrl!)) {
                   <a class="section-common-cta__button" [routerLink]="common().buttonUrl">{{ common().buttonLabel }}</a>
                 } @else {
                   <a class="section-common-cta__button" [href]="common().buttonUrl" rel="noopener">{{ common().buttonLabel }}</a>
@@ -165,6 +175,19 @@ function parseConfigJson(json: string | null | undefined): unknown {
     .section-common-cta[data-align='end'] .section-common-cta__stack {
       align-items: flex-end;
       text-align: end;
+    }
+
+    .section-common-cta__image {
+      display: inline-flex;
+      max-width: min(100%, 360px);
+      border-radius: var(--sf-radius-md, 12px);
+      overflow: hidden;
+    }
+
+    .section-common-cta__image img {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     .section-common-cta__text {
@@ -296,7 +319,7 @@ export class SectionRendererComponent implements OnDestroy {
   /** The button block shows when there is a button, or just the lines of text the admin wrote around it. */
   protected readonly hasCta = computed(() => {
     const common = this.common();
-    return !!(common.buttonLabel && common.buttonUrl) || !!common.buttonTextAbove || !!common.buttonTextBelow;
+    return !!(common.buttonUrl && (common.buttonLabel || common.buttonImageUrl)) || !!common.buttonTextAbove || !!common.buttonTextBelow;
   });
 
   protected readonly effectiveContext = computed<SectionRenderContext>(() => {

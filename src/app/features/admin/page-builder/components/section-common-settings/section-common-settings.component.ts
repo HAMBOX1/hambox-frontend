@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
+import { MediaPickerComponent } from '../../../../../shared/components/admin/media-picker/media-picker.component';
 import { ButtonEditorComponent } from '../../../../../shared/components/admin/button-editor/button-editor.component';
 import { CategoryPickerComponent } from '../../../../../shared/components/admin/category-picker/category-picker.component';
 import { ProductPickerComponent } from '../../../../../shared/components/admin/product-picker/product-picker.component';
@@ -24,7 +25,7 @@ import {
 @Component({
   selector: 'app-section-common-settings',
   standalone: true,
-  imports: [FormsModule, ButtonEditorComponent, CategoryPickerComponent, ProductPickerComponent],
+  imports: [FormsModule, ButtonEditorComponent, CategoryPickerComponent, MediaPickerComponent, ProductPickerComponent],
   template: `
     <div class="common">
       <h4 class="common__title">Appearance</h4>
@@ -108,6 +109,17 @@ import {
         (labelChange)="patch({ buttonLabel: $event || null })"
         (urlChange)="patch({ buttonUrl: $event || null })"
       />
+
+      <div class="common__row">
+        <span class="common__label">Button picture (optional)</span>
+        <app-media-picker
+          [value]="config().buttonImageUrl"
+          [disabled]="disabled()"
+          recommendedSize="A picture of the whole button, e.g. 360x120px, PNG or WebP"
+          (valueChange)="patch({ buttonImageUrl: $event || null })"
+        />
+        <small>When set, the picture is the button (it needs a destination above; the label is its accessible name).</small>
+      </div>
 
       <div class="common__row">
         <label for="common-button-above">Text above the button (optional)</label>
@@ -356,7 +368,8 @@ import {
       gap: 0.35rem;
     }
 
-    .common__row label {
+    .common__row label,
+    .common__label {
       font-weight: 600;
       font-size: 0.85rem;
     }

@@ -69,11 +69,27 @@ export class PopularCategoriesVariantDefaultComponent {
 
     if (this.pickedIds().length > 0) {
       // While the picked ones load, show nothing rather than flashing the default categories.
-      return this.picked() ?? (this.loading() ? [] : this.context().categories);
+      return this.picked() ?? (this.loading() ? [] : this.limited(this.sorted(this.context().categories)));
     }
 
-    return this.context().categories;
+    return this.limited(this.sorted(this.context().categories));
   });
+
+  /** The section's own "Sort order" for the automatic list (a hand-picked list keeps the order it was picked in). */
+  private sorted(list: readonly StorefrontCategory[]): readonly StorefrontCategory[] {
+    const order = this.config().sortOrder;
+    if (order === 'NameAsc' || order === 'NameDesc') {
+      const sign = order === 'NameAsc' ? 1 : -1;
+      return [...list].sort((a, b) => sign * a.title.localeCompare(b.title));
+    }
+    return list;
+  }
+
+  /** The section's own "Maximum categories" for the automatic list: showing 4 of 8 really shows 4. */
+  private limited(list: readonly StorefrontCategory[]): readonly StorefrontCategory[] {
+    const max = Math.floor(Number(this.config().maximumCategories));
+    return Number.isFinite(max) && max > 0 ? list.slice(0, max) : list;
+  }
 
   constructor() {
     effect((onCleanup) => {

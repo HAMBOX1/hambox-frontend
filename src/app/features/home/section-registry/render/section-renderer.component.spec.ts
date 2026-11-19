@@ -86,4 +86,16 @@ describe('SectionRendererComponent: the section button', () => {
     expect(cta.style.getPropertyValue('--cta-fg')).toBe('#000000');
     expect(cta.style.getPropertyValue('--cta-font-size')).toBe('22px');
   });
+
+  it('shows a picture as the button when one is set', async () => {
+    const fixture = render({ buttonLabel: 'Shop', buttonUrl: '/products', buttonImageUrl: '/uploads/shop-button.png' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    const link = el.querySelector('a.section-common-cta__image') as HTMLAnchorElement;
+    expect(link.getAttribute('href')).toBe('/products');
+    expect(link.querySelector('img')?.getAttribute('src')).toBe('/uploads/shop-button.png');
+    expect(el.querySelector('a.section-common-cta__button')).toBeNull();
+  });
 });
