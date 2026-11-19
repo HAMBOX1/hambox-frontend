@@ -1,6 +1,53 @@
 import { pickRotated } from '../../services/section-product-source.service';
 import { DEFAULT_SECTION_COMMON, readSectionCommon } from './section-common.model';
 
+describe('readSectionCommon: text, font and button extras', () => {
+  it('defaults to the design text, no extra button text and the section-default font', () => {
+    expect(readSectionCommon({})).toMatchObject({
+      textFontSize: null,
+      textColor: null,
+      fontFamily: 'default',
+      buttonFontSize: null,
+      buttonColor: null,
+      buttonTextColor: null,
+      buttonTextAbove: null,
+      buttonTextBelow: null,
+    });
+  });
+
+  it('reads and caps the text size, colours, font and the lines of text around the button', () => {
+    const common = readSectionCommon({
+      _common: {
+        textFontSize: 200,
+        textColor: ' #eeeeee ',
+        fontFamily: 'heading',
+        buttonFontSize: 18,
+        buttonColor: '#ff0000',
+        buttonTextColor: '#ffffff',
+        buttonTextAbove: ' Limited time ',
+        buttonTextBelow: '  ',
+        buttonPlacement: 'inside',
+      },
+    });
+
+    expect(common.textFontSize).toBe(64);
+    expect(common.textColor).toBe('#eeeeee');
+    expect(common.fontFamily).toBe('heading');
+    expect(common.buttonFontSize).toBe(18);
+    expect(common.buttonColor).toBe('#ff0000');
+    expect(common.buttonTextAbove).toBe('Limited time');
+    expect(common.buttonTextBelow).toBeNull();
+    expect(common.buttonPlacement).toBe('inside');
+  });
+
+  it('ignores an unknown font or placement', () => {
+    const common = readSectionCommon({ _common: { fontFamily: 'comic', buttonPlacement: 'floating' } });
+
+    expect(common.fontFamily).toBe('default');
+    expect(common.buttonPlacement).toBe('text');
+  });
+});
+
 describe('readSectionCommon', () => {
   it('returns the defaults when a section has no _common options', () => {
     expect(readSectionCommon({})).toEqual(DEFAULT_SECTION_COMMON);

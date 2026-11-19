@@ -60,14 +60,78 @@ import {
         </div>
       </div>
 
+      <div class="common__row">
+        <label for="common-text-size">Text size (px)</label>
+        <input
+          id="common-text-size"
+          type="number"
+          min="0"
+          max="64"
+          step="1"
+          [disabled]="disabled()"
+          [ngModel]="config().textFontSize ?? 0"
+          (ngModelChange)="patch({ textFontSize: $event > 0 ? $event : null })"
+        />
+        <small>The section's descriptions and paragraphs. 0 keeps the default size.</small>
+      </div>
+
+      <div class="common__row">
+        <label for="common-text-color">Text colour</label>
+        <div class="common__color">
+          <input
+            id="common-text-color"
+            type="color"
+            [disabled]="disabled()"
+            [ngModel]="config().textColor ?? '#ffffff'"
+            (ngModelChange)="patch({ textColor: $event })"
+          />
+          <button type="button" class="common__link" [disabled]="disabled() || !config().textColor" (click)="patch({ textColor: null })">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="common__row">
+        <label for="common-font">Font</label>
+        <select id="common-font" [disabled]="disabled()" [ngModel]="config().fontFamily" (ngModelChange)="patch({ fontFamily: $event })">
+          <option value="default">Default (the section's own)</option>
+          <option value="heading">The store's heading font</option>
+          <option value="body">The store's body font</option>
+        </select>
+      </div>
+
       <app-button-editor
-        title="Button under this section"
+        title="Button of this section"
         [label]="config().buttonLabel"
         [url]="config().buttonUrl"
         [disabled]="disabled()"
         (labelChange)="patch({ buttonLabel: $event || null })"
         (urlChange)="patch({ buttonUrl: $event || null })"
       />
+
+      <div class="common__row">
+        <label for="common-button-above">Text above the button (optional)</label>
+        <input
+          id="common-button-above"
+          type="text"
+          maxlength="200"
+          [disabled]="disabled()"
+          [ngModel]="config().buttonTextAbove ?? ''"
+          (ngModelChange)="patch({ buttonTextAbove: $event || null })"
+        />
+      </div>
+
+      <div class="common__row">
+        <label for="common-button-below">Text below the button (optional)</label>
+        <input
+          id="common-button-below"
+          type="text"
+          maxlength="200"
+          [disabled]="disabled()"
+          [ngModel]="config().buttonTextBelow ?? ''"
+          (ngModelChange)="patch({ buttonTextBelow: $event || null })"
+        />
+      </div>
 
       @if (config().buttonLabel && config().buttonUrl) {
         <div class="common__row">
@@ -94,7 +158,8 @@ import {
             (ngModelChange)="patch({ buttonPlacement: $event })"
           >
             <option value="text">Under the section's heading text</option>
-            <option value="bottom">At the bottom of the section</option>
+            <option value="inside">Inside the section, after its content</option>
+            <option value="bottom">After the section (below it)</option>
           </select>
         </div>
 
@@ -110,6 +175,53 @@ import {
             <option value="medium">Medium</option>
             <option value="large">Large (same as the hero buttons)</option>
           </select>
+        </div>
+
+        <div class="common__row">
+          <label for="common-button-font-size">Button text size (px)</label>
+          <input
+            id="common-button-font-size"
+            type="number"
+            min="0"
+            max="48"
+            step="1"
+            [disabled]="disabled()"
+            [ngModel]="config().buttonFontSize ?? 0"
+            (ngModelChange)="patch({ buttonFontSize: $event > 0 ? $event : null })"
+          />
+          <small>0 keeps the size that goes with the chosen button size.</small>
+        </div>
+
+        <div class="common__row">
+          <label for="common-button-color">Button colour</label>
+          <div class="common__color">
+            <input
+              id="common-button-color"
+              type="color"
+              [disabled]="disabled()"
+              [ngModel]="config().buttonColor ?? '#3cdc96'"
+              (ngModelChange)="patch({ buttonColor: $event })"
+            />
+            <button type="button" class="common__link" [disabled]="disabled() || !config().buttonColor" (click)="patch({ buttonColor: null })">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="common__row">
+          <label for="common-button-text-color">Button text colour</label>
+          <div class="common__color">
+            <input
+              id="common-button-text-color"
+              type="color"
+              [disabled]="disabled()"
+              [ngModel]="config().buttonTextColor ?? '#07130d'"
+              (ngModelChange)="patch({ buttonTextColor: $event })"
+            />
+            <button type="button" class="common__link" [disabled]="disabled() || !config().buttonTextColor" (click)="patch({ buttonTextColor: null })">
+              Reset
+            </button>
+          </div>
         </div>
 
         <div class="common__row">
@@ -254,6 +366,7 @@ import {
     }
 
     .common__row input[type='number'],
+    .common__row input[type='text'],
     .common__row select {
       min-height: 2.5rem;
       padding: 0 0.6rem;

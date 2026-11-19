@@ -12,8 +12,13 @@ export type SectionButtonAlign = 'start' | 'center' | 'end';
 export type SectionButtonSize = 'small' | 'medium' | 'large';
 /** `close` tucks the button right under the section's content; `normal` leaves the section's own spacing. */
 export type SectionButtonSpacing = 'close' | 'normal';
-/** `text` puts the button right under the section's heading text (like the hero button); `bottom` after all the content. */
-export type SectionButtonPlacement = 'text' | 'bottom';
+/**
+ * `text` puts the button right under the section's heading text (like the hero button); `inside` puts it at the end of
+ * the section's own content, inside the section; `bottom` after the whole section.
+ */
+export type SectionButtonPlacement = 'text' | 'inside' | 'bottom';
+/** `heading` / `body` use the store's heading or body typeface for the section's text; `default` keeps the design's own. */
+export type SectionFont = 'default' | 'heading' | 'body';
 /** Filled button, an outline, or a soft tinted one. */
 export type SectionButtonStyle = 'filled' | 'outline' | 'soft';
 /** `auto` keeps the shape that goes with the chosen size. */
@@ -50,6 +55,17 @@ export interface SectionCommonConfig {
   readonly buttonPlacement: SectionButtonPlacement;
   readonly buttonStyle: SectionButtonStyle;
   readonly buttonShape: SectionButtonShape;
+  /** The section's text (descriptions, paragraphs): size in px (null = design default), colour (null = theme) and typeface. */
+  readonly textFontSize: number | null;
+  readonly textColor: string | null;
+  readonly fontFamily: SectionFont;
+  /** The button's own text size in px (null = what the chosen size gives), its fill colour and its text colour (null = theme). */
+  readonly buttonFontSize: number | null;
+  readonly buttonColor: string | null;
+  readonly buttonTextColor: string | null;
+  /** A line of text written right above / below the button. */
+  readonly buttonTextAbove: string | null;
+  readonly buttonTextBelow: string | null;
   readonly products: SectionProductsConfig | null;
 }
 
@@ -73,6 +89,14 @@ export const DEFAULT_SECTION_COMMON: SectionCommonConfig = {
   buttonPlacement: 'text',
   buttonStyle: 'filled',
   buttonShape: 'auto',
+  textFontSize: null,
+  textColor: null,
+  fontFamily: 'default',
+  buttonFontSize: null,
+  buttonColor: null,
+  buttonTextColor: null,
+  buttonTextAbove: null,
+  buttonTextBelow: null,
   products: null,
 };
 
@@ -84,6 +108,9 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
   }
 
   const size = Number(raw.titleFontSize);
+  const textSize = Number(raw.textFontSize);
+  const buttonFontSize = Number(raw.buttonFontSize);
+  const text = (value: unknown): string | null => (typeof value === 'string' && value.trim() ? value.trim() : null);
   const products = raw.products && typeof raw.products === 'object' ? raw.products : null;
 
   return {
@@ -94,10 +121,18 @@ export function readSectionCommon(config: unknown): SectionCommonConfig {
     buttonAlign: raw.buttonAlign === 'start' || raw.buttonAlign === 'center' || raw.buttonAlign === 'end' ? raw.buttonAlign : null,
     buttonSize: raw.buttonSize === 'small' || raw.buttonSize === 'large' ? raw.buttonSize : 'medium',
     buttonSpacing: raw.buttonSpacing === 'normal' ? 'normal' : 'close',
-    buttonPlacement: raw.buttonPlacement === 'bottom' ? 'bottom' : 'text',
+    buttonPlacement: raw.buttonPlacement === 'bottom' || raw.buttonPlacement === 'inside' ? raw.buttonPlacement : 'text',
     buttonStyle: raw.buttonStyle === 'outline' || raw.buttonStyle === 'soft' ? raw.buttonStyle : 'filled',
     buttonShape:
       raw.buttonShape === 'pill' || raw.buttonShape === 'rounded' || raw.buttonShape === 'square' ? raw.buttonShape : 'auto',
+    textFontSize: Number.isFinite(textSize) && textSize > 0 ? Math.min(textSize, 64) : null,
+    textColor: text(raw.textColor),
+    fontFamily: raw.fontFamily === 'heading' || raw.fontFamily === 'body' ? raw.fontFamily : 'default',
+    buttonFontSize: Number.isFinite(buttonFontSize) && buttonFontSize > 0 ? Math.min(buttonFontSize, 48) : null,
+    buttonColor: text(raw.buttonColor),
+    buttonTextColor: text(raw.buttonTextColor),
+    buttonTextAbove: text(raw.buttonTextAbove),
+    buttonTextBelow: text(raw.buttonTextBelow),
     products: products
       ? {
           source: ['manual', 'category', 'internal', 'categories'].includes(products.source as string)

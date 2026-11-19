@@ -72,11 +72,13 @@
     }
   </ul>
 
-  <app-admin-icon-button
+  <button
+    pButton
+    type="button"
+    class="platform-selector-form__add"
     icon="pi pi-plus"
-    severity="secondary"
-    [disabled]="disabled()"
     [label]="'ADMIN.PAGE_BUILDER.SETTINGS.FIELDS.PLATFORM_SELECTOR.ADD_ITEM' | translate"
-    (pressed)="addItem()"
-  />
+    [disabled]="disabled()"
+    (click)="addItem()"
+  ></button>
 </div>

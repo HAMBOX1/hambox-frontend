@@ -2,6 +2,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
 import {
@@ -22,6 +23,7 @@ import {
     FormsModule,
     TranslatePipe,
     DragDropModule,
+    ButtonModule,
     InputTextModule,
     AdminIconButtonComponent,
     IconPickerComponent,

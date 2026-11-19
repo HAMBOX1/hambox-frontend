@@ -383,6 +383,23 @@ body .ql-toolbar.ql-snow button {
 
 // Page Builder: per-section heading size / colour (set from a section's "Appearance" settings). `!important` is
 // needed because each section component styles its own headings with higher-specificity scoped selectors.
+// Section body text (descriptions and paragraphs) and typeface, set per section in the page builder.
+.section-text-size :is(p, li) {
+  font-size: var(--section-text-size) !important;
+}
+
+.section-text-color :is(p, li) {
+  color: var(--section-text-color) !important;
+}
+
+[data-section-font='heading'] :is(h1, h2, h3, h4, h5, p, li, a, button, label, small) {
+  font-family: var(--sf-font-heading) !important;
+}
+
+[data-section-font='body'] :is(h1, h2, h3, h4, h5, p, li, a, button, label, small) {
+  font-family: var(--sf-font-body) !important;
+}
+
 .section-title-size :is(h1, h2, h3) {
   font-size: var(--section-title-size) !important;
   line-height: 1.2 !important;

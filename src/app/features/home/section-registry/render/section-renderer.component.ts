@@ -66,14 +66,19 @@ function parseConfigJson(json: string | null | undefined): unknown {
         [class.section-seam]="!isFirst()"
         [class.section-title-size]="common().titleFontSize !== null"
         [class.section-title-color]="common().titleColor !== null"
+        [class.section-text-size]="common().textFontSize !== null"
+        [class.section-text-color]="common().textColor !== null"
+        [attr.data-section-font]="common().fontFamily === 'default' ? null : common().fontFamily"
         [style.--section-title-size]="common().titleFontSize ? common().titleFontSize + 'px' : null"
         [style.--section-title-color]="common().titleColor"
+        [style.--section-text-size]="common().textFontSize ? common().textFontSize + 'px' : null"
+        [style.--section-text-color]="common().textColor"
         hamboxReveal
         [hamboxRevealThreshold]="0.08"
       >
         <ng-container *ngComponentOutlet="v.renderComponent; inputs: { context: effectiveContext(), config: config() }" />
 
-        @if (common().buttonLabel && common().buttonUrl) {
+        @if (hasCta()) {
           <div
             #cta
             class="section-common-cta"
@@ -83,12 +88,25 @@ function parseConfigJson(json: string | null | undefined): unknown {
             [attr.data-spacing]="common().buttonSpacing"
             [attr.data-style]="common().buttonStyle"
             [attr.data-shape]="common().buttonShape"
+            [style.--cta-font-size]="common().buttonFontSize ? common().buttonFontSize + 'px' : null"
+            [style.--cta-bg]="common().buttonColor"
+            [style.--cta-fg]="common().buttonTextColor"
           >
-            @if (isInternalLink(common().buttonUrl!)) {
-              <a class="section-common-cta__button" [routerLink]="common().buttonUrl">{{ common().buttonLabel }}</a>
-            } @else {
-              <a class="section-common-cta__button" [href]="common().buttonUrl" rel="noopener">{{ common().buttonLabel }}</a>
-            }
+            <div class="section-common-cta__stack">
+              @if (common().buttonTextAbove; as above) {
+                <p class="section-common-cta__text">{{ above }}</p>
+              }
+              @if (common().buttonLabel && common().buttonUrl) {
+                @if (isInternalLink(common().buttonUrl!)) {
+                  <a class="section-common-cta__button" [routerLink]="common().buttonUrl">{{ common().buttonLabel }}</a>
+                } @else {
+                  <a class="section-common-cta__button" [href]="common().buttonUrl" rel="noopener">{{ common().buttonLabel }}</a>
+                }
+              }
+              @if (common().buttonTextBelow; as below) {
+                <p class="section-common-cta__text">{{ below }}</p>
+              }
+            </div>
           </div>
         }
       </div>
@@ -129,6 +147,39 @@ function parseConfigJson(json: string | null | undefined): unknown {
       padding-bottom: calc(var(--sf-section-gap, 32px) * 0.5);
     }
 
+    // The button with the optional line of text above and below it, stacked and aligned together.
+    .section-common-cta__stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .section-common-cta[data-align='start'] .section-common-cta__stack {
+      align-items: flex-start;
+      text-align: start;
+    }
+
+    .section-common-cta[data-align='end'] .section-common-cta__stack {
+      align-items: flex-end;
+      text-align: end;
+    }
+
+    .section-common-cta__text {
+      margin: 0;
+      color: var(--section-text-color, var(--color-text-secondary));
+      font-size: var(--section-text-size, 14px);
+      line-height: 1.5;
+    }
+
+    // Inside the section's own content (moved there by the renderer): no extra outer spacing of its own.
+    .section-common-cta[data-placement='inside'] {
+      margin: 24px 0 0;
+      padding: 0;
+    }
+
     .section-common-cta[data-align='start'] {
       justify-content: flex-start;
     }
@@ -144,11 +195,18 @@ function parseConfigJson(json: string | null | undefined): unknown {
       min-height: 46px;
       padding: 0 28px;
       border-radius: var(--sf-radius-pill, 999px);
-      background: linear-gradient(160deg, var(--color-cta-gradient-start), var(--color-cta-gradient-end));
-      color: var(--color-primary-text-on, #fff);
+      --_cta-default-bg: var(--cta-bg, linear-gradient(160deg, var(--color-cta-gradient-start), var(--color-cta-gradient-end)));
+      --_cta-default-fg: var(--cta-fg, var(--color-primary-text-on, #fff));
+      background: var(--_cta-default-bg);
+      color: var(--_cta-default-fg);
       font-weight: 700;
       text-decoration: none;
       box-shadow: var(--color-shadow-md);
+    }
+
+    // The admin's own button colours and text size win over the style / size defaults below.
+    .section-common-cta .section-common-cta__button {
+      font-size: var(--cta-font-size, inherit);
     }
 
     .section-common-cta[data-size='small'] .section-common-cta__button {
@@ -175,16 +233,16 @@ function parseConfigJson(json: string | null | undefined): unknown {
 
     // How the button looks: filled (the default), an outline, or a soft tinted one - and its corner shape.
     .section-common-cta[data-style='outline'] .section-common-cta__button {
-      border: 2px solid var(--color-primary, #3cdc96);
-      background: transparent;
-      color: var(--color-primary, #3cdc96);
+      border: 2px solid var(--cta-bg, var(--color-primary, #3cdc96));
+      --_cta-default-bg: transparent;
+      --_cta-default-fg: var(--cta-fg, var(--cta-bg, var(--color-primary, #3cdc96)));
       box-shadow: none;
     }
 
     .section-common-cta[data-style='soft'] .section-common-cta__button {
-      border: 1px solid color-mix(in srgb, var(--color-primary, #3cdc96) 40%, transparent);
-      background: color-mix(in srgb, var(--color-primary, #3cdc96) 16%, transparent);
-      color: var(--color-primary, #3cdc96);
+      border: 1px solid color-mix(in srgb, var(--cta-bg, var(--color-primary, #3cdc96)) 40%, transparent);
+      --_cta-default-bg: color-mix(in srgb, var(--cta-bg, var(--color-primary, #3cdc96)) 16%, transparent);
+      --_cta-default-fg: var(--cta-fg, var(--cta-bg, var(--color-primary, #3cdc96)));
       box-shadow: none;
     }
 
@@ -235,6 +293,12 @@ export class SectionRendererComponent implements OnDestroy {
 
   protected readonly common = computed(() => readSectionCommon(this.config()));
 
+  /** The button block shows when there is a button, or just the lines of text the admin wrote around it. */
+  protected readonly hasCta = computed(() => {
+    const common = this.common();
+    return !!(common.buttonLabel && common.buttonUrl) || !!common.buttonTextAbove || !!common.buttonTextBelow;
+  });
+
   protected readonly effectiveContext = computed<SectionRenderContext>(() => {
     const override = this.productOverride();
     return override ? { ...this.context(), featuredProducts: override } : this.context();
@@ -258,6 +322,30 @@ export class SectionRendererComponent implements OnDestroy {
 
       if (placement === 'bottom') {
         wrapper.appendChild(cta);
+        return;
+      }
+
+      if (placement === 'inside') {
+        // Inside the section itself: at the end of its content container (or of the section when it has none), so the
+        // button sits within the section's background and padding instead of under it. Re-placed if the variant redraws.
+        const placeInside = () => {
+          const root = wrapper.firstElementChild?.firstElementChild ?? wrapper.firstElementChild;
+          if (!(root instanceof HTMLElement) || root === cta) {
+            return;
+          }
+          const inner = root.querySelector(':scope > [class*="container"], :scope > [class*="inner"], :scope > [class*="content"]');
+          const target = inner instanceof HTMLElement ? inner : root;
+          if (cta.parentElement !== target || target.lastElementChild !== cta) {
+            target.appendChild(cta);
+          }
+        };
+        placeInside();
+        if (typeof MutationObserver !== 'undefined') {
+          const observer = new MutationObserver(() => placeInside());
+          observer.observe(wrapper, { childList: true, subtree: true });
+          this.placementObserver = observer;
+          onCleanup(() => observer.disconnect());
+        }
         return;
       }
 
