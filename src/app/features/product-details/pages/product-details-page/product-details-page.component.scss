@@ -104,8 +104,10 @@
 
 .pdp__product {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 72px;
+  // A smaller, fixed-width gallery so the pictures and their choices sit BESIDE the text, not above it.
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  align-items: start;
+  gap: 40px;
   margin-bottom: 96px;
 }
 
@@ -114,19 +116,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 420px;
-  padding: 48px 40px;
+  // One fixed frame for every picture: changing the picture never changes the size of the block.
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  padding: 20px;
+  overflow: hidden;
   border: 1px solid var(--color-panel-border);
   border-radius: var(--sf-radius-lg);
   background: var(--color-section);
   box-shadow: var(--color-shadow-xs);
 
   img {
-    max-width: 448px;
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     border-radius: var(--sf-radius-md);
     box-shadow: var(--color-shadow-lg);
-    object-fit: cover;
+    object-fit: contain;
   }
 }
 
@@ -147,17 +154,18 @@
 
 .pdp__thumbs {
   display: flex;
-  gap: 16px;
-  margin-top: 24px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .pdp__thumb {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 132px;
-  height: 74px;
-  padding: 10px;
+  width: 72px;
+  height: 56px;
+  padding: 5px;
   border: 1px solid var(--color-border);
   border-radius: var(--sf-radius-sm);
   background: var(--color-surface);
@@ -581,8 +589,8 @@
   }
 
   .pdp__product {
-    grid-template-columns: 1fr;
-    gap: 40px;
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    gap: 24px;
   }
 
   .pdp__steps {
@@ -637,6 +645,17 @@
 @media (max-width: 767px) {
   .pdp__main {
     padding: 32px var(--sf-container-px-mobile) calc(var(--sf-section-gap) + 88px);
+  }
+
+  // Phones: the gallery goes above the text, kept to a sensible size.
+  .pdp__product {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .pdp__gallery {
+    width: min(100%, 320px);
+    margin-inline: auto;
   }
 
   .pdp__actions {
