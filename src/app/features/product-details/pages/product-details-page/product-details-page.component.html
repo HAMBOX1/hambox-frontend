@@ -67,6 +67,8 @@
                     [class.pdp__thumb--active]="selectedImageIndex() === i"
                     [attr.aria-label]="'PRODUCT.GALLERY_IMAGE_ARIA' | translate: { index: i + 1 }"
                     (click)="selectGalleryImage(i)"
+                    (mouseenter)="selectGalleryImage(i)"
+                    (focus)="selectGalleryImage(i)"
                   >
                     <img [src]="image" alt="" />
                   </button>
